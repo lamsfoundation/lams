@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.util;
 
 import io.undertow.UndertowMessages;
@@ -152,6 +170,21 @@ public class URLUtils {
                 default:
                     buffer.append(c);
                     i++;
+                    if(c > 127 && !needToChange) {
+                        //we have non-ascii data in our URL, which sucks
+                        //its hard to know exactly what to do with this, but we assume that because this data
+                        //has not been properly encoded none of the other data is either
+                        try {
+                            char[] carray = s.toCharArray();
+                            byte[] buf = new byte[carray.length];
+                            for(int l = 0;l < buf.length; ++l) {
+                                buf[l] = (byte) carray[l];
+                            }
+                            return new String(buf, enc);
+                        } catch (UnsupportedEncodingException e) {
+                            throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc);
+                        }
+                    }
                     break;
             }
         }

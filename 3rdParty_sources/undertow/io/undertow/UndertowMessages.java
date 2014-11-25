@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow;
@@ -220,7 +220,7 @@ public interface UndertowMessages {
     IllegalStateException fileSystemWatcherNotStarted();
 
     @Message(id = 65, value = "SSL must be specified to connect to a https URL")
-    IllegalArgumentException sslWasNull();
+    IOException sslWasNull();
 
     @Message(id = 66, value = "Incorrect magic number for AJP packet header")
     IOException wrongMagicNumber();
@@ -282,6 +282,88 @@ public interface UndertowMessages {
     @Message(id = 85, value = "Could not generate unique session id")
     RuntimeException couldNotGenerateUniqueSessionId();
 
+    @Message(id = 86, value = "SPDY needs to be provided with a heap buffer pool, for use in compressing and decompressing headers.")
+    IllegalArgumentException mustProvideHeapBuffer();
+
+    @Message(id = 87, value = "Unexpected SPDY frame type %s")
+    IOException unexpectedFrameType(int type);
+
+    @Message(id = 88, value = "SPDY control frames cannot have body content")
+    IOException controlFrameCannotHaveBodyContent();
+
+    @Message(id = 89, value = "SPDY not supported")
+    IOException spdyNotSupported();
+
+    @Message(id = 90, value = "Jetty NPN not available")
+    IOException jettyNPNNotAvailable();
+
     @Message(id = 91, value = "Buffer has already been freed")
     IllegalStateException bufferAlreadyFreed();
+
+    @Message(id = 92, value = "A SPDY header was too large to fit in a response buffer, if you want to support larger headers please increase the buffer size")
+    IllegalStateException headersTooLargeToFitInHeapBuffer();
+
+    @Message(id = 93, value = "A SPDY stream was reset by the remote endpoint")
+    IOException spdyStreamWasReset();
+
+    @Message(id = 94, value = "Blocking await method called from IO thread. Blocking IO must be dispatched to a worker thread or deadlocks will result.")
+    IOException awaitCalledFromIoThread();
+
+    @Message(id = 95, value = "Recursive call to flushSenders()")
+    RuntimeException recursiveCallToFlushingSenders();
+
+    @Message(id = 96, value = "More data was written to the channel than specified in the content-length")
+    IllegalStateException fixedLengthOverflow();
+
+    @Message(id = 97, value = "AJP request already in progress")
+    IllegalStateException ajpRequestAlreadyInProgress();
+
+    @Message(id = 98, value = "HTTP ping data must be 8 bytes in length")
+    IllegalArgumentException httpPingDataMustBeLength8();
+
+    @Message(id = 99, value = "Received a ping of size other than 8")
+    String invalidPingSize();
+
+    @Message(id = 100, value = "stream id must be zero for frame type %s")
+    String streamIdMustBeZeroForFrameType(int frameType);
+
+    @Message(id = 101, value = "stream id must not be zero for frame type %s")
+    String streamIdMustNotBeZeroForFrameType(int frameType);
+
+    @Message(id = 102, value = "RST_STREAM received for idle stream")
+    String rstStreamReceivedForIdleStream();
+
+    @Message(id = 103, value = "Http2 stream was reset")
+    IOException http2StreamWasReset();
+
+    @Message(id = 104, value = "Incorrect HTTP2 preface")
+    IOException incorrectHttp2Preface();
+
+    @Message(id = 105, value = "HTTP2 frame to large")
+    IOException http2FrameTooLarge();
+
+    @Message(id = 106, value = "HTTP2 continuation frame received without a corresponding headers or push promise frame")
+    IOException http2ContinuationFrameNotExpected();
+
+    //@Message(id = 107, value = "Huffman encoded value in HPACK headers did not end with EOS padding")
+    //HpackException huffmanEncodedHpackValueDidNotEndWithEOS();
+
+    //@Message(id = 108, value = "HPACK variable length integer encoded over too many octects, max is %s")
+    //HpackException integerEncodedOverTooManyOctets(int maxIntegerOctets);
+
+    //@Message(id = 109, value = "Zero is not a valid header table index")
+    //HpackException zeroNotValidHeaderTableIndex();
+
+
+    @Message(id = 110, value = "Cannot send 100-Continue, getResponseChannel() has already been called")
+    IOException cannotSendContinueResponse();
+
+    @Message(id = 111, value = "Parser did not make progress")
+    IOException parserDidNotMakeProgress();
+
+    @Message(id = 112, value = "Only client side can call createStream, if you wish to send a PUSH_PROMISE frame use createPushPromiseStream instead")
+    IOException headersStreamCanOnlyBeCreatedByClient();
+
+    @Message(id = 114, value = "Invalid IP access control rule %s. Format is: [ip-match] allow|deny")
+    IllegalArgumentException invalidAclRule(String rule);
 }

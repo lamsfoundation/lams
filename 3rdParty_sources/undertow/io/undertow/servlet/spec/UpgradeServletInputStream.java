@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.servlet.spec;
 
 import io.undertow.servlet.UndertowServletMessages;
@@ -15,7 +33,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
 
-import static org.xnio.Bits.allAreClear;
 import static org.xnio.Bits.anyAreClear;
 import static org.xnio.Bits.anyAreSet;
 
@@ -141,7 +158,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     }
 
     private void readIntoBufferNonBlocking() throws IOException {
-        if (pooled == null && !anyAreSet(state, FLAG_FINISHED)) {
+        if (pooled == null && !anyAreSet(state, FLAG_FINISHED | FLAG_CLOSED)) {
             pooled = bufferPool.allocate();
             if (listener == null) {
                 int res = channel.read(pooled.getResource());
@@ -205,19 +222,13 @@ public class UpgradeServletInputStream extends ServletInputStream {
         if (anyAreSet(state, FLAG_CLOSED)) {
             return;
         }
-        while (allAreClear(state, FLAG_FINISHED)) {
-            readIntoBuffer();
-            if (pooled != null) {
-                pooled.free();
-                pooled = null;
-            }
-        }
+        state |= FLAG_FINISHED | FLAG_CLOSED;
         if (pooled != null) {
             pooled.free();
             pooled = null;
         }
+        channel.suspendReads();
         channel.shutdownReads();
-        state |= FLAG_FINISHED | FLAG_CLOSED;
     }
 
     private class ServletInputStreamChannelListener implements ChannelListener<StreamSourceChannel> {
@@ -236,6 +247,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
                     }
                 }
             } catch (Exception e) {
+                if(pooled != null) {
+                    pooled.free();
+                    pooled = null;
+                }
                 listener.onError(e);
                 IoUtils.safeClose(channel);
             }
@@ -246,6 +261,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
                         channel.shutdownReads();
                         listener.onAllDataRead();
                     } catch (IOException e) {
+                        if(pooled != null) {
+                            pooled.free();
+                            pooled = null;
+                        }
                         listener.onError(e);
                         IoUtils.safeClose(channel);
                     }

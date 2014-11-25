@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.handlers.form;
@@ -25,10 +25,10 @@ import java.nio.ByteBuffer;
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.UndertowOptions;
-import io.undertow.server.Connectors;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.SameThreadExecutor;
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
 import org.xnio.Pooled;
@@ -45,6 +45,7 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
 
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
     private String defaultEncoding = "ISO-8859-1";
+    private boolean forceCreation = false; //if the parser should be created even if the correct headers are missing
 
     public FormEncodedDataDefinition() {
     }
@@ -52,7 +53,7 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
     @Override
     public FormDataParser create(final HttpServerExchange exchange)  {
         String mimeType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
-        if (mimeType != null && mimeType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED)) {
+        if (forceCreation || (mimeType != null && mimeType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED))) {
 
             String charset = defaultEncoding;
             String contentType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
@@ -69,6 +70,15 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
 
     public String getDefaultEncoding() {
         return defaultEncoding;
+    }
+
+    public boolean isForceCreation() {
+        return forceCreation;
+    }
+
+    public FormEncodedDataDefinition setForceCreation(boolean forceCreation) {
+        this.forceCreation = forceCreation;
+        return this;
     }
 
     public FormEncodedDataDefinition setDefaultEncoding(final String defaultEncoding) {
@@ -103,7 +113,7 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
             try {
                 doParse(channel);
                 if (state == 4) {
-                    Connectors.executeRootHandler(handler, exchange);
+                    exchange.dispatch(SameThreadExecutor.INSTANCE, handler);
                 }
             } catch (IOException e) {
                 IoUtils.safeClose(channel);
@@ -119,6 +129,7 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
             try {
                 final ByteBuffer buffer = pooled.getResource();
                 do {
+                    buffer.clear();
                     c = channel.read(buffer);
                     if (c > 0) {
                         buffer.flip();
@@ -130,6 +141,10 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
                                         name = builder.toString();
                                         builder.setLength(0);
                                         state = 2;
+                                    } else if (n == '&') {
+                                        data.add(builder.toString(), "");
+                                        builder.setLength(0);
+                                        state = 0;
                                     } else if (n == '%' || n == '+') {
                                         state = 1;
                                         builder.append((char) n);
@@ -143,6 +158,10 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
                                         name = URLDecoder.decode(builder.toString(), charset);
                                         builder.setLength(0);
                                         state = 2;
+                                    } else if (n == '&') {
+                                        data.add(URLDecoder.decode(builder.toString(), charset), "");
+                                        builder.setLength(0);
+                                        state = 0;
                                     } else {
                                         builder.append((char) n);
                                     }
@@ -180,6 +199,12 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
                         data.add(name, builder.toString());
                     } else if (state == 3) {
                         data.add(name, URLDecoder.decode(builder.toString(), charset));
+                    } else if(builder.length() > 0) {
+                        if(state == 1) {
+                            data.add(URLDecoder.decode(builder.toString(), charset), "");
+                        } else {
+                            data.add(builder.toString(), "");
+                        }
                     }
                     state = 4;
                     exchange.putAttachment(FORM_DATA, data);
@@ -206,7 +231,7 @@ public class FormEncodedDataDefinition implements FormParserFactory.ParserDefini
                     channel.getReadSetter().set(this);
                     channel.resumeReads();
                 } else {
-                    Connectors.executeRootHandler(handler, exchange);
+                    exchange.dispatch(SameThreadExecutor.INSTANCE, handler);
                 }
             }
         }

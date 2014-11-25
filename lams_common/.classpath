@@ -16,15 +16,15 @@
 			<attribute name="javadoc_location" value="http://docs.oracle.com/javaee/7/api/javax/servlet/jsp/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.1.Final.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/remoting-jmx/main/remoting-jmx-2.0.1.CR1.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/main/slf4j-api-1.7.7.jbossorg-1.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.0.Final.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/remoting-jmx/main/remoting-jmx-2.0.0.Final.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/main/slf4j-api-1.7.2.jbossorg-1.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/impl/main/slf4j-jboss-logmanager-1.0.3.GA.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/logging/main/jboss-logging-3.2.0.Final.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/logging/main/jboss-logging-3.1.4.GA.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/javassist/main/javassist-3.18.1-GA.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/xerces/main/xercesImpl-2.9.1-jbossas-2.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/jstl/api/main/jboss-jstl-api_1.2_spec-1.1.2.Beta1.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/mail/api/main/javax.mail-1.5.2.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/jstl/api/main/jboss-jstl-api_1.2_spec-1.1.2.Final.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/mail/api/main/javax.mail-1.5.1.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/transaction/api/main/jboss-transaction-api_1.2_spec-1.0.0.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-4.3.7.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
 		<attributes>
@@ -39,10 +39,10 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-1.7.7.jbossorg-1.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-1.7.2.jbossorg-1.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/codec/main/commons-codec-1.9.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/core/main/undertow-core-1.2.0.Beta5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/servlet/main/undertow-servlet-1.2.0.Beta5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/core/main/undertow-core-1.1.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/servlet/main/undertow-servlet-1.1.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="/lams_build/lib/lams/lams.jar" sourcepath=""/>
 </classpath>

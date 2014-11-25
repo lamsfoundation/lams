@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.handlers;
@@ -23,18 +23,20 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 
 /**
+ * Set a fixed response header.
+ *
  * @author Stuart Douglas
  */
 public class SetHeaderHandler implements HttpHandler {
 
     private final HttpString header;
     private final String value;
-
-    private volatile HttpHandler next = ResponseCodeHandler.HANDLE_404;
+    private final HttpHandler next;
 
     public SetHeaderHandler(final String header, final String value) {
-        this.header = new HttpString(header);
+        this.next = ResponseCodeHandler.HANDLE_404;
         this.value = value;
+        this.header = new HttpString(header);
     }
 
     public SetHeaderHandler(final HttpHandler next, final String header, final String value) {

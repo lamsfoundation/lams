@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.client.http;
 
 import io.undertow.annotationprocessor.HttpResponseParserConfig;
@@ -92,7 +110,7 @@ abstract class HttpResponseParser {
 
     static {
         try {
-            final Class<?> cls = HttpResponseParser.class.getClassLoader().loadClass(HttpResponseParser.class.getName() + "$$generated");
+            final Class<?> cls = Class.forName(HttpResponseParser.class.getName() + "$$generated", false, HttpResponseParser.class.getClassLoader());
             INSTANCE = (HttpResponseParser) cls.newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -332,7 +350,7 @@ abstract class HttpResponseParser {
      * @return
      */
     protected static Map<String, HttpString> httpStrings() {
-        final Map<String, HttpString> results = new HashMap<String, HttpString>();
+        final Map<String, HttpString> results = new HashMap<>();
         final Class[] classs = {Headers.class, Methods.class, Protocols.class};
 
         for (Class<?> c : classs) {

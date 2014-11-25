@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.servlet.websockets;
 
 import io.undertow.UndertowLogger;
@@ -19,7 +37,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Stuart Douglas
@@ -31,6 +52,8 @@ public class WebSocketServlet extends HttpServlet {
     private final List<Handshake> handshakes;
 
     private WebSocketConnectionCallback callback;
+
+    private Set<WebSocketChannel> peerConnections;
 
     public WebSocketServlet() {
         this.handshakes = handshakes();
@@ -45,6 +68,7 @@ public class WebSocketServlet extends HttpServlet {
     @Override
     public void init(final ServletConfig config) throws ServletException {
         super.init(config);
+        peerConnections = Collections.newSetFromMap(new ConcurrentHashMap<WebSocketChannel, Boolean>());
         try {
             final String sessionHandler = config.getInitParameter(SESSION_HANDLER);
             if (sessionHandler != null) {
@@ -69,7 +93,7 @@ public class WebSocketServlet extends HttpServlet {
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 
-        final ServletWebSocketHttpExchange facade = new ServletWebSocketHttpExchange(req, resp);
+        final ServletWebSocketHttpExchange facade = new ServletWebSocketHttpExchange(req, resp, peerConnections);
         Handshake handshaker = null;
         for (Handshake method : handshakes) {
             if (method.matches(facade)) {
@@ -88,6 +112,7 @@ public class WebSocketServlet extends HttpServlet {
             @Override
             public void handleUpgrade(StreamConnection streamConnection, HttpServerExchange exchange) {
                 WebSocketChannel channel = selected.createChannel(facade, streamConnection, facade.getBufferPool());
+                peerConnections.add(channel);
                 callback.onConnect(facade, channel);
             }
         });
@@ -95,7 +120,7 @@ public class WebSocketServlet extends HttpServlet {
     }
 
     protected List<Handshake> handshakes() {
-        List<Handshake> handshakes = new ArrayList<Handshake>();
+        List<Handshake> handshakes = new ArrayList<>();
         handshakes.add(new Hybi13Handshake());
         handshakes.add(new Hybi08Handshake());
         handshakes.add(new Hybi07Handshake());

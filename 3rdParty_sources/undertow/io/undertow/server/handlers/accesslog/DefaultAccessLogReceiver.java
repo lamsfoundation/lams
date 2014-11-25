@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.handlers.accesslog;
 
 import java.io.BufferedWriter;
@@ -55,6 +73,8 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
 
     private Writer writer = null;
 
+    private volatile boolean closed = false;
+
     public DefaultAccessLogReceiver(final Executor logWriteExecutor, final File outputDirectory, final String logBaseName) {
         this(logWriteExecutor, outputDirectory, logBaseName, null);
     }
@@ -64,16 +84,17 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         this.outputDirectory = outputDirectory;
         this.logBaseName = logBaseName;
         this.logNameSuffix = (logNameSuffix != null) ? logNameSuffix : DEFAULT_LOG_SUFFIX;
-        this.pendingMessages = new ConcurrentLinkedDeque<String>();
+        this.pendingMessages = new ConcurrentLinkedDeque<>();
         this.defaultLogFile = new File(outputDirectory, logBaseName + this.logNameSuffix);
         calculateChangeOverPoint();
     }
 
     private void calculateChangeOverPoint() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.HOUR, 23);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.add(Calendar.DATE, 1);
         changeOverPoint = calendar.getTimeInMillis();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         currentDateString = df.format(new Date());
@@ -101,7 +122,7 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         if (forceLogRotation) {
             doRotate();
         }
-        List<String> messages = new ArrayList<String>();
+        List<String> messages = new ArrayList<>();
         String msg = null;
         //only grab at most 1000 messages at a time
         for (int i = 0; i < 1000; ++i) {
@@ -122,6 +143,14 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
             if (!pendingMessages.isEmpty() || forceLogRotation) {
                 if (stateUpdater.compareAndSet(this, 0, 1)) {
                     logWriteExecutor.execute(this);
+                }
+            } else if(closed) {
+                try {
+                    writer.flush();
+                    writer.close();
+                    writer = null;
+                } catch (IOException e) {
+                    UndertowLogger.ROOT_LOGGER.errorWritingAccessLog(e);
                 }
             }
         }
@@ -148,7 +177,7 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
         }
         try {
             if (writer == null) {
-                writer = new BufferedWriter(new FileWriter(defaultLogFile));
+                writer = new BufferedWriter(new FileWriter(defaultLogFile, true));
             }
             for (String message : messages) {
                 writer.write(message);
@@ -197,8 +226,9 @@ public class DefaultAccessLogReceiver implements AccessLogReceiver, Runnable, Cl
 
     @Override
     public void close() throws IOException {
-        writer.flush();
-        writer.close();
-        writer = null;
+        closed = true;
+        if (stateUpdater.compareAndSet(this, 0, 1)) {
+            logWriteExecutor.execute(this);
+        }
     }
 }

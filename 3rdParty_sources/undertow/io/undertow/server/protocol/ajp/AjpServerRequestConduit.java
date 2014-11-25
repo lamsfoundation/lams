@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.protocol.ajp;
 
 import java.io.IOException;
@@ -116,6 +134,15 @@ public class AjpServerRequestConduit extends AbstractStreamSourceConduit<StreamS
     }
 
     @Override
+    public void terminateReads() throws IOException {
+        if(exchange.isPersistent()) {
+            state |= STATE_FINISHED;
+            return;
+        }
+        super.terminateReads();
+    }
+
+    @Override
     public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
         long total = 0;
         for (int i = offset; i < length; ++i) {
@@ -140,6 +167,13 @@ public class AjpServerRequestConduit extends AbstractStreamSourceConduit<StreamS
             return -1;
         } else if (anyAreSet(state, STATE_SEND_REQUIRED)) {
             state = this.state = (state & STATE_MASK) | STATE_READING;
+            if(ajpResponseConduit.isWriteShutdown()) {
+                this.state = STATE_FINISHED;
+                if (finishListener != null) {
+                    finishListener.handleEvent(this);
+                }
+                return -1;
+            }
             if (!ajpResponseConduit.doGetRequestBodyChunk(READ_BODY_CHUNK.duplicate(), this)) {
                 return 0;
             }
@@ -200,9 +234,9 @@ public class AjpServerRequestConduit extends AbstractStreamSourceConduit<StreamS
             chunkRemaining = this.state & STATE_MASK;
         }
 
-        int limit = dst.limit();
+        int limit = dst.remaining();
         try {
-            if (limit > chunkRemaining) {
+            if (dst.remaining() > chunkRemaining) {
                 dst.limit((int) (dst.position() + chunkRemaining));
             }
             int read = next.read(dst);

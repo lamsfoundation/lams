@@ -1,13 +1,38 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.protocol.ajp;
 
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
+import io.undertow.UndertowOptions;
+import io.undertow.conduits.ReadTimeoutStreamSourceConduit;
+import io.undertow.conduits.WriteTimeoutStreamSinkConduit;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.OpenListener;
+import org.xnio.IoUtils;
 import org.xnio.OptionMap;
+import org.xnio.Options;
 import org.xnio.Pool;
+import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static io.undertow.UndertowOptions.DECODE_URL;
@@ -30,20 +55,58 @@ public class AjpOpenListener implements OpenListener {
 
     private final AjpRequestParser parser;
 
+    @Deprecated
     public AjpOpenListener(final Pool<ByteBuffer> pool, final int bufferSize) {
-        this(pool, OptionMap.EMPTY, bufferSize);
+        this(pool, OptionMap.EMPTY);
     }
 
+    @Deprecated
     public AjpOpenListener(final Pool<ByteBuffer> pool, final OptionMap undertowOptions, final int bufferSize) {
+        this(pool, undertowOptions);
+    }
+    public AjpOpenListener(final Pool<ByteBuffer> pool) {
+        this(pool, OptionMap.EMPTY);
+    }
+
+    public AjpOpenListener(final Pool<ByteBuffer> pool, final OptionMap undertowOptions) {
         this.undertowOptions = undertowOptions;
         this.bufferPool = pool;
-        this.bufferSize = bufferSize;
+        Pooled<ByteBuffer> buf = pool.allocate();
+        this.bufferSize = buf.getResource().remaining();
+        buf.free();
         parser = new AjpRequestParser(undertowOptions.get(URL_CHARSET, UTF_8), undertowOptions.get(DECODE_URL, true));
     }
 
+    @Override
     public void handleEvent(final StreamConnection channel) {
         if (UndertowLogger.REQUEST_LOGGER.isTraceEnabled()) {
             UndertowLogger.REQUEST_LOGGER.tracef("Opened connection with %s", channel.getPeerAddress());
+        }
+
+        //set read and write timeouts
+        try {
+            Integer readTimeout = channel.getOption(Options.READ_TIMEOUT);
+            Integer idleTimeout = undertowOptions.get(UndertowOptions.IDLE_TIMEOUT);
+            if ((readTimeout == null || readTimeout <= 0) && idleTimeout != null) {
+                readTimeout = idleTimeout;
+            } else if (readTimeout != null && idleTimeout != null && idleTimeout > 0) {
+                readTimeout = Math.min(readTimeout, idleTimeout);
+            }
+            if (readTimeout != null && readTimeout > 0) {
+                channel.getSourceChannel().setConduit(new ReadTimeoutStreamSourceConduit(channel.getSourceChannel().getConduit(), channel, this));
+            }
+            Integer writeTimeout = channel.getOption(Options.WRITE_TIMEOUT);
+            if ((writeTimeout == null || writeTimeout <= 0) && idleTimeout != null) {
+                writeTimeout = idleTimeout;
+            } else if (writeTimeout != null && idleTimeout != null && idleTimeout > 0) {
+                writeTimeout = Math.min(writeTimeout, idleTimeout);
+            }
+            if (writeTimeout != null && writeTimeout > 0) {
+                channel.getSinkChannel().setConduit(new WriteTimeoutStreamSinkConduit(channel.getSinkChannel().getConduit(), channel, this));
+            }
+        } catch (IOException e) {
+            IoUtils.safeClose(channel);
+            UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
         }
 
         AjpServerConnection connection = new AjpServerConnection(channel, bufferPool, rootHandler, undertowOptions, bufferSize);
@@ -54,18 +117,22 @@ public class AjpOpenListener implements OpenListener {
         readListener.handleEvent(channel.getSourceChannel());
     }
 
+    @Override
     public HttpHandler getRootHandler() {
         return rootHandler;
     }
 
+    @Override
     public void setRootHandler(final HttpHandler rootHandler) {
         this.rootHandler = rootHandler;
     }
 
+    @Override
     public OptionMap getUndertowOptions() {
         return undertowOptions;
     }
 
+    @Override
     public void setUndertowOptions(final OptionMap undertowOptions) {
         if (undertowOptions == null) {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("undertowOptions");

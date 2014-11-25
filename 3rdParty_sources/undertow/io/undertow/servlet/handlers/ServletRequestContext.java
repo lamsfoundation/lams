@@ -1,5 +1,24 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.servlet.handlers;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.AccessController;
 import java.util.List;
@@ -38,7 +57,7 @@ public class ServletRequestContext {
     private static final RuntimePermission GET_CURRENT_REQUEST = new RuntimePermission("io.undertow.servlet.GET_CURRENT_REQUEST");
     private static final RuntimePermission SET_CURRENT_REQUEST = new RuntimePermission("io.undertow.servlet.SET_CURRENT_REQUEST");
 
-    private static final ThreadLocal<ServletRequestContext> CURRENT = new ThreadLocal<ServletRequestContext>();
+    private static final ThreadLocal<ServletRequestContext> CURRENT = new ThreadLocal<>();
 
     public static void setCurrentRequestContext(ServletRequestContext servletRequestContext) {
         if(System.getSecurityManager() != null) {
@@ -90,6 +109,13 @@ public class ServletRequestContext {
     private HttpSessionImpl session;
 
     private ServletContextImpl currentServletContext;
+
+    /**
+     * If this is true the request is running inside the context of ServletInitialHandler
+     */
+    private boolean runningInsideHandler = false;
+    private int errorCode = -1;
+    private String errorMessage;
 
     public ServletRequestContext(final Deployment deployment, final HttpServletRequestImpl originalRequest, final HttpServletResponseImpl originalResponse, final ServletPathMatch originalServletPathMatch) {
         this.deployment = deployment;
@@ -204,11 +230,36 @@ public class ServletRequestContext {
             if(localAddress == null) {
                 return false;
             }
-            if(!localAddress.getAddress().isLoopbackAddress()) {
+            InetAddress address = localAddress.getAddress();
+            if(address == null) {
+                return false;
+            }
+            if(!address.isLoopbackAddress()) {
                 return false;
             }
             return !getExchange().getRequestHeaders().contains(Headers.X_FORWARDED_FOR);
         }
 
+    }
+
+    public void setError(int sc, String msg) {
+        this.errorCode = sc;
+        this.errorMessage = msg;
+    }
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public boolean isRunningInsideHandler() {
+        return runningInsideHandler;
+    }
+
+    public void setRunningInsideHandler(boolean runningInsideHandler) {
+        this.runningInsideHandler = runningInsideHandler;
     }
 }

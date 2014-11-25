@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow;
 
 import io.undertow.attribute.ExchangeAttribute;
@@ -6,9 +24,11 @@ import io.undertow.predicate.PredicateParser;
 import io.undertow.predicate.PredicatesHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.JvmRouteHandler;
+import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.AccessControlListHandler;
 import io.undertow.server.handlers.DateHandler;
 import io.undertow.server.handlers.DisableCacheHandler;
+import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
 import io.undertow.server.handlers.HttpContinueAcceptingHandler;
 import io.undertow.server.handlers.HttpContinueReadHandler;
@@ -21,9 +41,11 @@ import io.undertow.server.handlers.PredicateContextHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.ProxyPeerAddressHandler;
 import io.undertow.server.handlers.RedirectHandler;
+import io.undertow.server.handlers.RequestDumpingHandler;
 import io.undertow.server.handlers.RequestLimit;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.server.handlers.ResponseCodeHandler;
+import io.undertow.server.handlers.ResponseRateLimitingHandler;
 import io.undertow.server.handlers.SetAttributeHandler;
 import io.undertow.server.handlers.SetHeaderHandler;
 import io.undertow.server.handlers.URLDecodingHandler;
@@ -36,6 +58,7 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.WebSocketProtocolHandshakeHandler;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class with convenience methods for dealing with handlers
@@ -69,6 +92,23 @@ public class Handlers {
      */
     public static PathTemplateHandler pathTemplate() {
         return new PathTemplateHandler();
+    }
+
+    /**
+     *
+     * @param rewriteQueryParams If the query params should be rewritten
+     * @return The routing handler
+     */
+    public static RoutingHandler routing(boolean rewriteQueryParams) {
+        return new RoutingHandler(rewriteQueryParams);
+    }
+
+    /**
+     *
+     * @return a new routing handler
+     */
+    public static RoutingHandler routing() {
+        return new RoutingHandler();
     }
 
     /**
@@ -441,6 +481,38 @@ public class Handlers {
      */
     public static HttpHandler disableCache(final HttpHandler next) {
         return new DisableCacheHandler(next);
+    }
+
+    /**
+     * Returns a handler that dumps requests to the log for debugging purposes.
+     *
+     * @param next The next handler
+     * @return The request dumping handler
+     */
+    public static HttpHandler requestDump(final HttpHandler next) {
+        return new RequestDumpingHandler(next);
+    }
+
+    /**
+     * Returns a handler that maps exceptions to additional handlers
+     * @param next The next handler
+     * @return The exception handler
+     */
+    public static ExceptionHandler exceptionHandler(final HttpHandler next) {
+        return new ExceptionHandler(next);
+    }
+
+    /**
+     *
+     * A handler that limits the download speed to a set number of bytes/period
+     *
+     * @param next The next handler
+     * @param bytes The number of bytes per time period
+     * @param time The time period
+     * @param timeUnit The units of the time period
+     */
+    public static ResponseRateLimitingHandler responseRateLimitingHandler(HttpHandler next, int bytes,long time, TimeUnit timeUnit) {
+        return new ResponseRateLimitingHandler(next, bytes, time, timeUnit);
     }
 
     private Handlers() {

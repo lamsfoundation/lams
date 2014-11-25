@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.handlers.form;
@@ -35,7 +35,7 @@ import io.undertow.util.HeaderMap;
  */
 public final class FormData implements Iterable<String> {
 
-    private final Map<String, Deque<FormValue>> values = new LinkedHashMap<String, Deque<FormValue>>();
+    private final Map<String, Deque<FormValue>> values = new LinkedHashMap<>();
 
     private final int maxValues;
     private int valueCount = 0;
@@ -70,7 +70,7 @@ public final class FormData implements Iterable<String> {
     public void add(String name, String value, final HeaderMap headers) {
         Deque<FormValue> values = this.values.get(name);
         if (values == null) {
-            this.values.put(name, values = new ArrayDeque<FormValue>(1));
+            this.values.put(name, values = new ArrayDeque<>(1));
         }
         values.add(new FormValueImpl(value, headers));
         if (++valueCount > maxValues) {
@@ -81,7 +81,7 @@ public final class FormData implements Iterable<String> {
     public void add(String name, File value, String fileName, final HeaderMap headers) {
         Deque<FormValue> values = this.values.get(name);
         if (values == null) {
-            this.values.put(name, values = new ArrayDeque<FormValue>(1));
+            this.values.put(name, values = new ArrayDeque<>(1));
         }
         values.add(new FormValueImpl(value, fileName, headers));
         if (values.size() > maxValues) {
@@ -93,7 +93,7 @@ public final class FormData implements Iterable<String> {
     }
 
     public void put(String name, String value, final HeaderMap headers) {
-        Deque<FormValue> values = new ArrayDeque<FormValue>(1);
+        Deque<FormValue> values = new ArrayDeque<>(1);
         Deque<FormValue> old = this.values.put(name, values);
         if (old != null) {
             valueCount -= old.size();

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.handlers;
@@ -24,6 +24,8 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.HttpUpgradeListener;
 import io.undertow.server.SSLSessionInfo;
 import io.undertow.server.ServerConnection;
+import io.undertow.servlet.api.ExceptionHandler;
+import io.undertow.servlet.api.LoggingExceptionHandler;
 import io.undertow.servlet.api.ServletDispatcher;
 import io.undertow.servlet.api.ThreadSetupAction;
 import io.undertow.servlet.core.ApplicationListeners;
@@ -37,6 +39,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Protocols;
 import io.undertow.util.RedirectBuilder;
+import io.undertow.util.StatusCodes;
 import org.xnio.BufferAllocator;
 import org.xnio.ByteBufferSlicePool;
 import org.xnio.ChannelListener;
@@ -72,6 +75,8 @@ import java.util.concurrent.Executor;
  */
 public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
 
+    private static final String HTTP2_UPGRADE_PREFIX = "h2";
+
     private static final RuntimePermission PERMISSION = new RuntimePermission("io.undertow.servlet.CREATE_INITIAL_HANDLER");
 
     private final HttpHandler next;
@@ -85,6 +90,8 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
 
     private final ServletPathMatches paths;
 
+    private final ExceptionHandler exceptionHandler;
+
     public ServletInitialHandler(final ServletPathMatches paths, final HttpHandler next, final CompositeThreadSetupAction setupAction, final ServletContextImpl servletContext) {
         this.next = next;
         this.setupAction = setupAction;
@@ -96,6 +103,12 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
             //we need to make sure this is not abused
             AccessController.checkPermission(PERMISSION);
         }
+        ExceptionHandler handler = servletContext.getDeployment().getDeploymentInfo().getExceptionHandler();
+        if(handler != null) {
+             this.exceptionHandler = handler;
+        } else {
+            this.exceptionHandler = LoggingExceptionHandler.DEFAULT;
+        }
     }
 
     @Override
@@ -106,7 +119,14 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
             return;
         }
         final ServletPathMatch info = paths.getServletHandlerByPath(path);
-        if (info.getType() == ServletPathMatch.Type.REDIRECT) {
+        //https://issues.jboss.org/browse/WFLY-3439
+        //if the request is an upgrade request then we don't want to redirect
+        //as there is a good chance the web socket client won't understand the redirect
+        //we make an exception for HTTP2 upgrade requests, as this would have already be handled at
+        //the connector level if it was going to be handled.
+        String upgradeString = exchange.getRequestHeaders().getFirst(Headers.UPGRADE);
+        boolean isUpgradeRequest = upgradeString != null && !upgradeString.startsWith(HTTP2_UPGRADE_PREFIX);
+        if (info.getType() == ServletPathMatch.Type.REDIRECT && !isUpgradeRequest) {
             //UNDERTOW-89
             //we redirect on GET requests to the root context to add an / to the end
             exchange.setResponseCode(302);
@@ -235,20 +255,22 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         ThreadSetupAction.Handle handle = setupAction.setup(exchange);
         try {
             SecurityActions.setCurrentRequestContext(servletRequestContext);
+            servletRequestContext.setRunningInsideHandler(true);
             try {
                 listeners.requestInitialized(request);
                 next.handleRequest(exchange);
                 //
+                if(servletRequestContext.getErrorCode() > 0) {
+                    servletRequestContext.getOriginalResponse().doErrorDispatch(servletRequestContext.getErrorCode(), servletRequestContext.getErrorMessage());
+                }
             } catch (Throwable t) {
 
-                if(t instanceof IOException) {
-                    //we log IOExceptions at a lower level
-                    //because they can be easily caused by malicious remote clients in at attempt to DOS the server by filling the logs
-                    UndertowLogger.REQUEST_IO_LOGGER.debugf(t, "Exception handling request to %s", exchange.getRequestURI());
-                } else {
-                    UndertowLogger.REQUEST_LOGGER.exceptionHandlingRequest(t, exchange.getRequestURI());
-                }
-                if (request.isAsyncStarted() || request.getDispatcherType() == DispatcherType.ASYNC) {
+                //by default this will just log the exception
+                boolean handled = exceptionHandler.handleThrowable(exchange, request, response, t);
+
+                if(handled) {
+                    exchange.endExchange();
+                } else if (request.isAsyncStarted() || request.getDispatcherType() == DispatcherType.ASYNC) {
                     exchange.unDispatch();
                     servletRequestContext.getOriginalRequest().getAsyncContextInternal().handleError(t);
                 } else {
@@ -257,10 +279,13 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
                         exchange.setResponseCode(500);
                         exchange.getResponseHeaders().clear();
                         String location = servletContext.getDeployment().getErrorPages().getErrorLocation(t);
+                        if (location == null) {
+                            location = servletContext.getDeployment().getErrorPages().getErrorLocation(500);
+                        }
                         if (location != null) {
                             RequestDispatcherImpl dispatcher = new RequestDispatcherImpl(location, servletContext);
                             try {
-                                dispatcher.error(request, response, servletChain.getManagedServlet().getServletInfo().getName(), t);
+                                dispatcher.error(servletRequestContext, request, response, servletChain.getManagedServlet().getServletInfo().getName(), t);
                             } catch (Exception e) {
                                 UndertowLogger.REQUEST_LOGGER.exceptionGeneratingErrorPage(e, location);
                             }
@@ -268,18 +293,14 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
                             if (servletRequestContext.displayStackTraces()) {
                                 ServletDebugPageHandler.handleRequest(exchange, servletRequestContext, t);
                             } else {
-                                //TODO: we need a debug mode to generate a debug error page
-                                if (response instanceof HttpServletResponse) {
-                                    ((HttpServletResponse) response).sendError(500);
-                                } else {
-                                    servletRequestContext.getOriginalResponse().sendError(500);
-                                }
+                                servletRequestContext.getOriginalResponse().doErrorDispatch(500, StatusCodes.INTERNAL_SERVER_ERROR_STRING);
                             }
                         }
                     }
                 }
 
             } finally {
+                servletRequestContext.setRunningInsideHandler(false);
                 listeners.requestDestroyed(request);
             }
             //if it is not dispatched and is not a mock request
@@ -325,6 +346,11 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         @Override
         public HttpServerExchange sendOutOfBandResponse(HttpServerExchange exchange) {
             throw new IllegalStateException();
+        }
+
+        @Override
+        public void terminateRequestChannel(HttpServerExchange exchange) {
+
         }
 
         @Override
@@ -432,6 +458,10 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         @Override
         protected void setUpgradeListener(HttpUpgradeListener upgradeListener) {
             //ignore
+        }
+
+        @Override
+        protected void maxEntitySizeUpdated(HttpServerExchange exchange) {
         }
     }
 

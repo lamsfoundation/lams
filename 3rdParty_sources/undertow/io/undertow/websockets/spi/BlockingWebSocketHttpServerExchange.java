@@ -1,6 +1,25 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.websockets.spi;
 
 import io.undertow.server.HttpServerExchange;
+import io.undertow.websockets.core.WebSocketChannel;
 import org.xnio.FinishedIoFuture;
 import org.xnio.FutureResult;
 import org.xnio.IoFuture;
@@ -10,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Set;
 
 /**
  * @author Stuart Douglas
@@ -19,8 +39,8 @@ public class BlockingWebSocketHttpServerExchange extends AsyncWebSocketHttpServe
     private final OutputStream out;
     private final InputStream in;
 
-    public BlockingWebSocketHttpServerExchange(final HttpServerExchange exchange) {
-        super(exchange);
+    public BlockingWebSocketHttpServerExchange(final HttpServerExchange exchange, Set<WebSocketChannel> peerConnections) {
+        super(exchange, peerConnections);
         out = exchange.getOutputStream();
         in = exchange.getInputStream();
     }
@@ -31,9 +51,9 @@ public class BlockingWebSocketHttpServerExchange extends AsyncWebSocketHttpServe
             while (data.hasRemaining()) {
                 out.write(data.get());
             }
-            return new FinishedIoFuture<Void>(null);
+            return new FinishedIoFuture<>(null);
         } catch (IOException e) {
-            final FutureResult<Void> ioFuture = new FutureResult<Void>();
+            final FutureResult<Void> ioFuture = new FutureResult<>();
             ioFuture.setException(e);
             return ioFuture.getIoFuture();
         }
@@ -48,9 +68,9 @@ public class BlockingWebSocketHttpServerExchange extends AsyncWebSocketHttpServe
             while ((r = in.read(buf)) != -1) {
                 data.write(buf, 0, r);
             }
-            return new FinishedIoFuture<byte[]>(data.toByteArray());
+            return new FinishedIoFuture<>(data.toByteArray());
         } catch (IOException e) {
-            final FutureResult<byte[]> ioFuture = new FutureResult<byte[]>();
+            final FutureResult<byte[]> ioFuture = new FutureResult<>();
             ioFuture.setException(e);
             return ioFuture.getIoFuture();
         }

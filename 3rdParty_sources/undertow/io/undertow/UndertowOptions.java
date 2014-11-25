@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow;
@@ -51,8 +51,24 @@ public class UndertowOptions {
 
     /**
      * The idle timeout in milliseconds after which the channel will be closed.
+     *
+     * If the underlying channel already has a read or write timeout set the smaller of the two values will be used
+     * for read/write timeouts.
+     *
      */
-    public static final Option<Long> IDLE_TIMEOUT = Option.simple(UndertowOptions.class, "IDLE_TIMEOUT", Long.class);
+    public static final Option<Integer> IDLE_TIMEOUT = Option.simple(UndertowOptions.class, "IDLE_TIMEOUT", Integer.class);
+
+    /**
+     * The maximum allowed time of reading HTTP request in milliseconds.
+     *
+     * <code>-1</code> or missing value disables this functionality.
+     */
+    public static final Option<Integer> REQUEST_PARSE_TIMEOUT = Option.simple(UndertowOptions.class, "REQUEST_PARSE_TIMEOUT", Integer.class);
+
+    /**
+     * The amount of time the connection can be idle with no current requests before it is closed;
+     */
+    public static final Option<Integer> NO_REQUEST_TIMEOUT = Option.simple(UndertowOptions.class, "NO_REQUEST_TIMEOUT", Integer.class);
 
     /**
      * The maximum number of parameters that will be parsed. This is used to protect against hash vulnerabilities.
@@ -151,6 +167,11 @@ public class UndertowOptions {
      * default is false
      */
     public static final Option<Boolean> ALLOW_EQUALS_IN_COOKIE_VALUE = Option.simple(UndertowOptions.class, "ALLOW_EQUALS_IN_COOKIE_VALUE", Boolean.class);
+
+    /**
+     * If we should attempt to use SPDY for HTTPS connections.
+     */
+    public static final Option<Boolean> ENABLE_SPDY = Option.simple(UndertowOptions.class, "ENABLE_SPDY", Boolean.class);
 
     private UndertowOptions() {
 

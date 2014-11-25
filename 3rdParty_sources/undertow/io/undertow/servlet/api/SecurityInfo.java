@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package io.undertow.servlet.api;
 
@@ -51,7 +51,7 @@ public class SecurityInfo<T extends SecurityInfo> implements Cloneable {
     }
 
     private volatile EmptyRoleSemantic emptyRoleSemantic = EmptyRoleSemantic.DENY;
-    private final Set<String> rolesAllowed = new HashSet<String>();
+    private final Set<String> rolesAllowed = new HashSet<>();
     private volatile TransportGuaranteeType transportGuaranteeType = TransportGuaranteeType.NONE;
 
     public EmptyRoleSemantic getEmptyRoleSemantic() {
@@ -86,7 +86,7 @@ public class SecurityInfo<T extends SecurityInfo> implements Cloneable {
         return (T) this;
     }
     public Set<String> getRolesAllowed() {
-        return new HashSet<String>(rolesAllowed);
+        return new HashSet<>(rolesAllowed);
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.spec;
@@ -40,6 +40,7 @@ import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletSecurityInfo;
 import io.undertow.servlet.api.TransportGuaranteeType;
 import io.undertow.servlet.api.WebResourceCollection;
+import io.undertow.servlet.core.ManagedServlet;
 
 import static javax.servlet.annotation.ServletSecurity.TransportGuarantee.CONFIDENTIAL;
 
@@ -49,10 +50,12 @@ import static javax.servlet.annotation.ServletSecurity.TransportGuarantee.CONFID
 public class ServletRegistrationImpl implements ServletRegistration, ServletRegistration.Dynamic {
 
     private final ServletInfo servletInfo;
+    private final ManagedServlet managedServlet;
     private final Deployment deployment;
 
-    public ServletRegistrationImpl(final ServletInfo servletInfo, final Deployment deployment) {
+    public ServletRegistrationImpl(final ServletInfo servletInfo, ManagedServlet managedServlet, final Deployment deployment) {
         this.servletInfo = servletInfo;
+        this.managedServlet = managedServlet;
         this.deployment = deployment;
     }
 
@@ -69,13 +72,13 @@ public class ServletRegistrationImpl implements ServletRegistration, ServletRegi
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
 
         //this is not super efficient, but it does not really matter
-        final Set<String> urlPatterns = new HashSet<String>();
+        final Set<String> urlPatterns = new HashSet<>();
         for (SecurityConstraint sc : deploymentInfo.getSecurityConstraints()) {
             for (WebResourceCollection webResources : sc.getWebResourceCollections()) {
                 urlPatterns.addAll(webResources.getUrlPatterns());
             }
         }
-        final Set<String> ret = new HashSet<String>();
+        final Set<String> ret = new HashSet<>();
         for (String url : servletInfo.getMappings()) {
             if (urlPatterns.contains(url)) {
                 ret.add(url);
@@ -111,6 +114,7 @@ public class ServletRegistrationImpl implements ServletRegistration, ServletRegi
     @Override
     public void setMultipartConfig(final MultipartConfigElement multipartConfig) {
         servletInfo.setMultipartConfig(multipartConfig);
+        managedServlet.setupMultipart(deployment.getServletContext());
     }
 
     @Override
@@ -126,8 +130,8 @@ public class ServletRegistrationImpl implements ServletRegistration, ServletRegi
     @Override
     public Set<String> addMapping(final String... urlPatterns) {
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
-        final Set<String> ret = new HashSet<String>();
-        final Set<String> existing = new HashSet<String>();
+        final Set<String> ret = new HashSet<>();
+        final Set<String> existing = new HashSet<>();
         for (ServletInfo s : deploymentInfo.getServlets().values()) {
             if (!s.getName().equals(servletInfo.getName())) {
                 existing.addAll(s.getMappings());
@@ -187,7 +191,7 @@ public class ServletRegistrationImpl implements ServletRegistration, ServletRegi
 
     @Override
     public Set<String> setInitParameters(final Map<String, String> initParameters) {
-        final Set<String> ret = new HashSet<String>();
+        final Set<String> ret = new HashSet<>();
         for (Map.Entry<String, String> entry : initParameters.entrySet()) {
             if (!setInitParameter(entry.getKey(), entry.getValue())) {
                 ret.add(entry.getKey());

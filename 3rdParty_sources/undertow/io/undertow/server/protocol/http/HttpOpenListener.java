@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,26 +9,28 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.protocol.http;
 
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
+import io.undertow.UndertowOptions;
 import io.undertow.conduits.ReadTimeoutStreamSourceConduit;
 import io.undertow.conduits.WriteTimeoutStreamSinkConduit;
+import io.undertow.server.DelegateOpenListener;
 import io.undertow.server.HttpHandler;
-import io.undertow.server.OpenListener;
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;
 import org.xnio.Options;
 import org.xnio.Pool;
+import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 
 import java.io.IOException;
@@ -40,7 +42,7 @@ import java.nio.ByteBuffer;
  *
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  */
-public final class HttpOpenListener implements ChannelListener<StreamConnection>, OpenListener {
+public final class HttpOpenListener implements ChannelListener<StreamConnection>, DelegateOpenListener {
 
     private final Pool<ByteBuffer> bufferPool;
     private final int bufferSize;
@@ -51,18 +53,35 @@ public final class HttpOpenListener implements ChannelListener<StreamConnection>
 
     private volatile HttpRequestParser parser;
 
+    @Deprecated
     public HttpOpenListener(final Pool<ByteBuffer> pool, final int bufferSize) {
-        this(pool, OptionMap.EMPTY, bufferSize);
+        this(pool, OptionMap.EMPTY);
     }
 
+    @Deprecated
     public HttpOpenListener(final Pool<ByteBuffer> pool, final OptionMap undertowOptions, final int bufferSize) {
+        this(pool, undertowOptions);
+    }
+
+    public HttpOpenListener(final Pool<ByteBuffer> pool) {
+        this(pool, OptionMap.EMPTY);
+    }
+
+    public HttpOpenListener(final Pool<ByteBuffer> pool, final OptionMap undertowOptions) {
         this.undertowOptions = undertowOptions;
         this.bufferPool = pool;
-        this.bufferSize = bufferSize;
+        Pooled<ByteBuffer> buf = pool.allocate();
+        this.bufferSize = buf.getResource().remaining();
+        buf.free();
         parser = HttpRequestParser.instance(undertowOptions);
     }
 
-    public void handleEvent(final StreamConnection channel) {
+    @Override
+    public void handleEvent(StreamConnection channel) {
+        handleEvent(channel, null);
+    }
+    @Override
+    public void handleEvent(final StreamConnection channel, Pooled<ByteBuffer> buffer) {
         if (UndertowLogger.REQUEST_LOGGER.isTraceEnabled()) {
             UndertowLogger.REQUEST_LOGGER.tracef("Opened connection with %s", channel.getPeerAddress());
         }
@@ -70,12 +89,23 @@ public final class HttpOpenListener implements ChannelListener<StreamConnection>
         //set read and write timeouts
         try {
             Integer readTimeout = channel.getOption(Options.READ_TIMEOUT);
+            Integer idleTimeout = undertowOptions.get(UndertowOptions.IDLE_TIMEOUT);
+            if ((readTimeout == null || readTimeout <= 0) && idleTimeout != null) {
+                readTimeout = idleTimeout;
+            } else if (readTimeout != null && idleTimeout != null && idleTimeout > 0) {
+                readTimeout = Math.min(readTimeout, idleTimeout);
+            }
             if (readTimeout != null && readTimeout > 0) {
-                channel.getSourceChannel().setConduit(new ReadTimeoutStreamSourceConduit(channel.getSourceChannel().getConduit(), channel));
+                channel.getSourceChannel().setConduit(new ReadTimeoutStreamSourceConduit(channel.getSourceChannel().getConduit(), channel, this));
             }
             Integer writeTimeout = channel.getOption(Options.WRITE_TIMEOUT);
-            if (writeTimeout != 0 && writeTimeout > 0) {
-                channel.getSinkChannel().setConduit(new WriteTimeoutStreamSinkConduit(channel.getSinkChannel().getConduit(), channel));
+            if ((writeTimeout == null || writeTimeout <= 0) && idleTimeout != null) {
+                writeTimeout = idleTimeout;
+            } else if (writeTimeout != null && idleTimeout != null && idleTimeout > 0) {
+                writeTimeout = Math.min(writeTimeout, idleTimeout);
+            }
+            if (writeTimeout != null && writeTimeout > 0) {
+                channel.getSinkChannel().setConduit(new WriteTimeoutStreamSinkConduit(channel.getSinkChannel().getConduit(), channel, this));
             }
         } catch (IOException e) {
             IoUtils.safeClose(channel);
@@ -85,6 +115,14 @@ public final class HttpOpenListener implements ChannelListener<StreamConnection>
 
         HttpServerConnection connection = new HttpServerConnection(channel, bufferPool, rootHandler, undertowOptions, bufferSize);
         HttpReadListener readListener = new HttpReadListener(connection, parser);
+
+        if(buffer != null) {
+            if(buffer.getResource().hasRemaining()) {
+                connection.setExtraBytes(buffer);
+            } else {
+                buffer.free();
+            }
+        }
 
         connection.setReadListener(readListener);
         readListener.newRequest();

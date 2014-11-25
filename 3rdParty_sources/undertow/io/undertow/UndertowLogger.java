@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow;
@@ -142,6 +142,14 @@ public interface UndertowLogger extends BasicLogger {
     void couldNotRegisterChangeListener(@Cause Exception e);
 
     @LogMessage(level = Logger.Level.ERROR)
+    @Message(id = 5025, value = "Could not initiate SPDY connection and no HTTP fallback defined")
+    void couldNotInitiateSpdyConnection();
+
+    @LogMessage(level = Logger.Level.ERROR)
+    @Message(id = 5026, value = "Jetty ALPN support not found on boot class path, %s client will not be available.")
+    void jettyALPNNotFound(String protocol);
+
+    @LogMessage(level = Logger.Level.ERROR)
     @Message(id = 5027, value = "Timing out request to %s")
     void timingOutRequest(String requestURI);
 
@@ -156,4 +164,24 @@ public interface UndertowLogger extends BasicLogger {
     @LogMessage(level = Logger.Level.ERROR)
     @Message(id = 5031, value = "Proxy request to %s could not connect to backend server %s")
     void proxyFailedToConnectToBackend(String requestURI, URI uri);
+
+    @LogMessage(level = Logger.Level.ERROR)
+    @Message(id = 5032, value = "Listener not making progress on framed channel, closing channel to prevent infinite loop")
+    void listenerNotProgressing();
+
+    @LogMessage(level = Logger.Level.ERROR)
+    @Message(id = 5033, value = "Failed to initiate HTTP2 connection")
+    void couldNotInitiateHttp2Connection();
+
+    @LogMessage(level = Logger.Level.ERROR)
+    @Message(id = 5034, value = "Remote endpoint failed to send initial settings frame in HTTP2 connection")
+    void remoteEndpointFailedToSendInitialSettings();
+
+    @LogMessage(level = Logger.Level.DEBUG)
+    @Message(id = 5035, value = "Closing channel because of parse timeout for remote address %s")
+    void parseRequestTimedOut(java.net.SocketAddress remoteAddress);
+
+    @LogMessage(level = Logger.Level.ERROR)
+    @Message(id = 5036, value = "ALPN negotiation failed for %s and no fallback defined, closing connection")
+    void noALPNFallback(SocketAddress address);
 }

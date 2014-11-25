@@ -1,17 +1,42 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.handlers;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
 import io.undertow.UndertowMessages;
+import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.builder.HandlerBuilder;
 import io.undertow.util.StatusCodes;
 import org.xnio.Bits;
 
@@ -54,15 +79,22 @@ public class IPAddressAccessControlHandler implements HttpHandler {
 
     private volatile HttpHandler next;
     private volatile boolean defaultAllow = false;
-    private final List<PeerMatch> ipv6acl = new CopyOnWriteArrayList<PeerMatch>();
-    private final List<PeerMatch> ipv4acl = new CopyOnWriteArrayList<PeerMatch>();
+    private final int denyResponseCode;
+    private final List<PeerMatch> ipv6acl = new CopyOnWriteArrayList<>();
+    private final List<PeerMatch> ipv4acl = new CopyOnWriteArrayList<>();
 
     public IPAddressAccessControlHandler(final HttpHandler next) {
+      this(next, StatusCodes.FORBIDDEN);
+    }
+
+    public IPAddressAccessControlHandler(final HttpHandler next, final int denyResponseCode) {
         this.next = next;
+        this.denyResponseCode = denyResponseCode;
     }
 
     public IPAddressAccessControlHandler() {
         this.next = ResponseCodeHandler.HANDLE_404;
+        this.denyResponseCode = StatusCodes.FORBIDDEN;
     }
 
     @Override
@@ -71,7 +103,7 @@ public class IPAddressAccessControlHandler implements HttpHandler {
         if (isAllowed(peer.getAddress())) {
             next.handleRequest(exchange);
         } else {
-            exchange.setResponseCode(StatusCodes.FORBIDDEN);
+            exchange.setResponseCode(denyResponseCode);
             exchange.endExchange();
         }
     }
@@ -91,6 +123,10 @@ public class IPAddressAccessControlHandler implements HttpHandler {
             }
         }
         return defaultAllow;
+    }
+
+    public int getDenyResponseCode() {
+        return denyResponseCode;
     }
 
     public boolean isDefaultAllow() {
@@ -374,6 +410,98 @@ public class IPAddressAccessControlHandler implements HttpHandler {
                 }
             }
             return true;
+        }
+    }
+
+
+    public static class Builder implements HandlerBuilder {
+
+        @Override
+        public String name() {
+            return "ip-access-control";
+        }
+
+        @Override
+        public Map<String, Class<?>> parameters() {
+            Map<String, Class<?>> params = new HashMap<>();
+            params.put("acl", String[].class);
+            params.put("failure-status", int.class);
+            params.put("default-allow", boolean.class);
+            return params;
+        }
+
+        @Override
+        public Set<String> requiredParameters() {
+            return Collections.singleton("acl");
+        }
+
+        @Override
+        public String defaultParameter() {
+            return "acl";
+        }
+
+        @Override
+        public HandlerWrapper build(Map<String, Object> config) {
+
+            String[] acl = (String[]) config.get("acl");
+            Boolean defaultAllow = (Boolean) config.get("default-allow");
+            Integer failureStatus = (Integer) config.get("failure-status");
+
+            List<Holder> peerMatches = new ArrayList<>();
+            for(String rule :acl) {
+                String[] parts = rule.split(" ");
+                if(parts.length != 2) {
+                    throw UndertowMessages.MESSAGES.invalidAclRule(rule);
+                }
+                if(parts[1].trim().equals("allow")) {
+                    peerMatches.add(new Holder(parts[0].trim(), false));
+                } else if(parts[1].trim().equals("deny")) {
+                    peerMatches.add(new Holder(parts[0].trim(), true));
+                } else {
+                    throw UndertowMessages.MESSAGES.invalidAclRule(rule);
+                }
+            }
+            return new Wrapper(peerMatches, defaultAllow == null ? false : defaultAllow, failureStatus == null ? StatusCodes.FORBIDDEN : failureStatus);
+        }
+
+    }
+
+    private static class Wrapper implements HandlerWrapper {
+
+        private final List<Holder> peerMatches;
+        private final boolean defaultAllow;
+        private final int failureStatus;
+
+
+        private Wrapper(List<Holder> peerMatches, boolean defaultAllow, int failureStatus) {
+            this.peerMatches = peerMatches;
+            this.defaultAllow = defaultAllow;
+            this.failureStatus = failureStatus;
+        }
+
+
+        @Override
+        public HttpHandler wrap(HttpHandler handler) {
+            IPAddressAccessControlHandler res = new IPAddressAccessControlHandler(handler, failureStatus);
+            for(Holder match: peerMatches) {
+                if(match.deny) {
+                    res.addDeny(match.rule);
+                } else {
+                    res.addAllow(match.rule);
+                }
+            }
+            res.setDefaultAllow(defaultAllow);
+            return res;
+        }
+    }
+
+    private static class Holder {
+        final String rule;
+        final boolean deny;
+
+        private Holder(String rule, boolean deny) {
+            this.rule = rule;
+            this.deny = deny;
         }
     }
 

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.handlers;
@@ -34,6 +34,7 @@ import io.undertow.servlet.core.ManagedServlets;
 import io.undertow.servlet.handlers.security.ServletSecurityRoleHandler;
 
 import javax.servlet.DispatcherType;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -126,9 +127,12 @@ public class ServletPathMatches {
     }
 
     private ServletPathMatch findWelcomeFile(final String path, boolean requiresRedirect) {
+        if(File.separatorChar != '/' && path.contains(File.separator)) {
+            return null;
+        }
         for (String i : welcomePages) {
             try {
-                String mergedPath = path + i;
+                final String mergedPath = path + i;
                 Resource resource = resourceManager.getResource(mergedPath);
                 if (resource != null) {
                     final ServletPathMatch handler = data.getServletHandlerByPath(mergedPath);
@@ -166,11 +170,11 @@ public class ServletPathMatches {
         final ManagedServlets servlets = deployment.getServlets();
         final ManagedFilters filters = deployment.getFilters();
 
-        final Map<String, ServletHandler> extensionServlets = new HashMap<String, ServletHandler>();
-        final Map<String, ServletHandler> pathServlets = new HashMap<String, ServletHandler>();
+        final Map<String, ServletHandler> extensionServlets = new HashMap<>();
+        final Map<String, ServletHandler> pathServlets = new HashMap<>();
 
-        final Set<String> pathMatches = new HashSet<String>();
-        final Set<String> extensionMatches = new HashSet<String>();
+        final Set<String> pathMatches = new HashSet<>();
+        final Set<String> extensionMatches = new HashSet<>();
 
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
 
@@ -240,8 +244,8 @@ public class ServletPathMatches {
             //resolve the target servlet, will return null if this is the default servlet
             MatchData targetServletMatch = resolveServletForPath(path, pathServlets, extensionServlets, defaultServlet);
 
-            final Map<DispatcherType, List<ManagedFilter>> noExtension = new EnumMap<DispatcherType, List<ManagedFilter>>(DispatcherType.class);
-            final Map<String, Map<DispatcherType, List<ManagedFilter>>> extension = new HashMap<String, Map<DispatcherType, List<ManagedFilter>>>();
+            final Map<DispatcherType, List<ManagedFilter>> noExtension = new EnumMap<>(DispatcherType.class);
+            final Map<String, Map<DispatcherType, List<ManagedFilter>>> extension = new HashMap<>();
             //initalize the extension map. This contains all the filers in the noExtension map, plus
             //any filters that match the extension key
             for (String ext : extensionMatches) {
@@ -308,7 +312,13 @@ public class ServletPathMatches {
                 builder.addExactMatch("/", createHandler(deploymentInfo, targetServletMatch.handler, noExtension, targetServletMatch.matchedPath, targetServletMatch.defaultServlet));
             } else {
                 //we need to check for an extension match, so paths like /exact.txt will have the correct filter applied
-                String lastSegment = path.substring(path.lastIndexOf('/'));
+                int lastSegmentIndex = path.lastIndexOf('/');
+                String lastSegment;
+                if(lastSegmentIndex > 0) {
+                    lastSegment = path.substring(lastSegmentIndex);
+                } else {
+                    lastSegment = path;
+                }
                 if (lastSegment.contains(".")) {
                     String ext = lastSegment.substring(lastSegment.lastIndexOf('.') + 1);
                     if (extension.containsKey(ext)) {
@@ -327,7 +337,7 @@ public class ServletPathMatches {
         //now setup name based mappings
         //these are used for name based dispatch
         for (Map.Entry<String, ServletHandler> entry : servlets.getServletHandlers().entrySet()) {
-            final Map<DispatcherType, List<ManagedFilter>> filtersByDispatcher = new EnumMap<DispatcherType, List<ManagedFilter>>(DispatcherType.class);
+            final Map<DispatcherType, List<ManagedFilter>> filtersByDispatcher = new EnumMap<>(DispatcherType.class);
             for (final FilterMappingInfo filterMapping : deploymentInfo.getFilterMappings()) {
                 ManagedFilter filter = filters.getManagedFilter(filterMapping.getFilterName());
                 if (filterMapping.getMappingType() == FilterMappingInfo.MappingType.SERVLET) {
@@ -416,7 +426,7 @@ public class ServletPathMatches {
     private static <K, V> void addToListMap(final Map<K, List<V>> map, final K key, final V value) {
         List<V> list = map.get(key);
         if (list == null) {
-            map.put(key, list = new ArrayList<V>());
+            map.put(key, list = new ArrayList<>());
         }
         list.add(value);
     }

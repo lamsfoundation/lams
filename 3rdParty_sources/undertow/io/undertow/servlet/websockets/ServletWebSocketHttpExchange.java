@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.websockets;
@@ -21,6 +21,7 @@ package io.undertow.servlet.websockets;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.HttpUpgradeListener;
 import io.undertow.util.AttachmentKey;
+import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
 import org.xnio.FinishedIoFuture;
 import org.xnio.FutureResult;
@@ -44,6 +45,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
 * @author Stuart Douglas
@@ -53,10 +56,12 @@ public class ServletWebSocketHttpExchange implements WebSocketHttpExchange {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final HttpServerExchange exchange;
+    private final Set<WebSocketChannel> peerConnections;
 
-    public ServletWebSocketHttpExchange(final HttpServletRequest request, final HttpServletResponse response) {
+    public ServletWebSocketHttpExchange(final HttpServletRequest request, final HttpServletResponse response, Set<WebSocketChannel> peerConnections) {
         this.request = request;
         this.response = response;
+        this.peerConnections = peerConnections;
         this.exchange = SecurityActions.requireCurrentServletRequestContext().getOriginalRequest().getExchange();
     }
 
@@ -78,12 +83,12 @@ public class ServletWebSocketHttpExchange implements WebSocketHttpExchange {
 
     @Override
     public Map<String, List<String>> getRequestHeaders() {
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         final Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String header = headerNames.nextElement();
             final Enumeration<String> theHeaders = request.getHeaders(header);
-            final List<String> vals = new ArrayList<String>();
+            final List<String> vals = new ArrayList<>();
             headers.put(header, vals);
             while (theHeaders.hasMoreElements()) {
                 vals.add(theHeaders.nextElement());
@@ -100,10 +105,10 @@ public class ServletWebSocketHttpExchange implements WebSocketHttpExchange {
 
     @Override
     public Map<String, List<String>> getResponseHeaders() {
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
         final Collection<String> headerNames = response.getHeaderNames();
         for (String header : headerNames) {
-            headers.put(header, new ArrayList<String>(response.getHeaders(header)));
+            headers.put(header, new ArrayList<>(response.getHeaders(header)));
         }
         return Collections.unmodifiableMap(headers);
     }
@@ -138,9 +143,9 @@ public class ServletWebSocketHttpExchange implements WebSocketHttpExchange {
             while (data.hasRemaining()) {
                 outputStream.write(data.get());
             }
-            return new FinishedIoFuture<Void>(null);
+            return new FinishedIoFuture<>(null);
         } catch (IOException e) {
-            final FutureResult<Void> ioFuture = new FutureResult<Void>();
+            final FutureResult<Void> ioFuture = new FutureResult<>();
             ioFuture.setException(e);
             return ioFuture.getIoFuture();
         }
@@ -156,9 +161,9 @@ public class ServletWebSocketHttpExchange implements WebSocketHttpExchange {
             while ((r = in.read(buf)) != -1) {
                 data.write(buf, 0, r);
             }
-            return new FinishedIoFuture<byte[]>(data.toByteArray());
+            return new FinishedIoFuture<>(data.toByteArray());
         } catch (IOException e) {
-            final FutureResult<byte[]> ioFuture = new FutureResult<byte[]>();
+            final FutureResult<byte[]> ioFuture = new FutureResult<>();
             ioFuture.setException(e);
             return ioFuture.getIoFuture();
         }
@@ -202,9 +207,9 @@ public class ServletWebSocketHttpExchange implements WebSocketHttpExchange {
 
     @Override
     public Map<String, List<String>> getRequestParameters() {
-        Map<String, List<String>> params = new HashMap<String, List<String>>();
+        Map<String, List<String>> params = new HashMap<>();
         for(Map.Entry<String, String[]> param : request.getParameterMap().entrySet()) {
-            params.put(param.getKey(), new ArrayList<String>(Arrays.asList(param.getValue())));
+            params.put(param.getKey(), new ArrayList<>(Arrays.asList(param.getValue())));
         }
         return params;
     }
@@ -217,5 +222,10 @@ public class ServletWebSocketHttpExchange implements WebSocketHttpExchange {
     @Override
     public boolean isUserInRole(String role) {
         return request.isUserInRole(role);
+    }
+
+    @Override
+    public Set<WebSocketChannel> getPeerConnections() {
+        return peerConnections;
     }
 }

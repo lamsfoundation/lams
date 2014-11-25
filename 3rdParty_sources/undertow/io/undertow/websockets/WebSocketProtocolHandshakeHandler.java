@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.websockets;
@@ -33,8 +33,10 @@ import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
 import org.xnio.StreamConnection;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link HttpHandler} which will process the {@link HttpServerExchange} and do the actual handshake/upgrade
@@ -51,6 +53,8 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
     private final HttpUpgradeListener upgradeListener;
 
     private final WebSocketConnectionCallback callback;
+
+    private final Set<WebSocketChannel> peerConnections = Collections.newSetFromMap(new ConcurrentHashMap<WebSocketChannel, Boolean>());
 
     /**
      * The handler that is invoked if there are no web socket headers
@@ -75,7 +79,7 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
      */
     public WebSocketProtocolHandshakeHandler(final WebSocketConnectionCallback callback, final HttpHandler next) {
         this.callback = callback;
-        Set<Handshake> handshakes = new HashSet<Handshake>();
+        Set<Handshake> handshakes = new HashSet<>();
         handshakes.add(new Hybi13Handshake());
         handshakes.add(new Hybi08Handshake());
         handshakes.add(new Hybi07Handshake());
@@ -104,7 +108,7 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
      */
     public WebSocketProtocolHandshakeHandler(Collection<Handshake> handshakes, final WebSocketConnectionCallback callback, final HttpHandler next) {
         this.callback = callback;
-        this.handshakes = new HashSet<Handshake>(handshakes);
+        this.handshakes = new HashSet<>(handshakes);
         this.next = next;
         this.upgradeListener = null;
     }
@@ -127,7 +131,7 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
      */
     public WebSocketProtocolHandshakeHandler(final HttpUpgradeListener callback, final HttpHandler next) {
         this.callback = null;
-        Set<Handshake> handshakes = new HashSet<Handshake>();
+        Set<Handshake> handshakes = new HashSet<>();
         handshakes.add(new Hybi13Handshake());
         handshakes.add(new Hybi08Handshake());
         handshakes.add(new Hybi07Handshake());
@@ -157,7 +161,7 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
      */
     public WebSocketProtocolHandshakeHandler(Collection<Handshake> handshakes, final HttpUpgradeListener callback, final HttpHandler next) {
         this.callback = null;
-        this.handshakes = new HashSet<Handshake>(handshakes);
+        this.handshakes = new HashSet<>(handshakes);
         this.next = next;
         this.upgradeListener = callback;
     }
@@ -169,7 +173,7 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
             next.handleRequest(exchange);
             return;
         }
-        final AsyncWebSocketHttpServerExchange facade = new AsyncWebSocketHttpServerExchange(exchange);
+        final AsyncWebSocketHttpServerExchange facade = new AsyncWebSocketHttpServerExchange(exchange, peerConnections);
         Handshake handshaker = null;
         for (Handshake method : handshakes) {
             if (method.matches(facade)) {
@@ -187,6 +191,7 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
                     @Override
                     public void handleUpgrade(StreamConnection streamConnection, HttpServerExchange exchange) {
                         WebSocketChannel channel = selected.createChannel(facade, streamConnection, facade.getBufferPool());
+                        peerConnections.add(channel);
                         callback.onConnect(facade, channel);
                     }
                 });
@@ -195,5 +200,9 @@ public class WebSocketProtocolHandshakeHandler implements HttpHandler {
             }
             handshaker.handshake(facade);
         }
+    }
+
+    public Set<WebSocketChannel> getPeerConnections() {
+        return peerConnections;
     }
 }

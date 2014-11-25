@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.spec;
@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
@@ -37,11 +38,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import io.undertow.UndertowLogger;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.servlet.UndertowServletMessages;
 import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.util.CanonicalPathUtils;
 import io.undertow.util.DateUtils;
+import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.RedirectBuilder;
@@ -68,6 +71,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     private boolean ignoredFlushPerformed = false;
 
+    private boolean treatAsCommitted = false;
 
     private boolean charsetSet = false; //if a content type has been set either implicitly or implicitly
     private String contentType;
@@ -112,26 +116,47 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public void sendError(final int sc, final String msg) throws IOException {
+        if(insideInclude) {
+            //not 100% sure this is the correct action
+            return;
+        }
         if (responseStarted()) {
             throw UndertowServletMessages.MESSAGES.responseAlreadyCommited();
         }
-        resetBuffer();
         writer = null;
         responseState = ResponseState.NONE;
         exchange.setResponseCode(sc);
-        //todo: is this the best way to handle errors?
+        ServletRequestContext src = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+        if(src.isRunningInsideHandler()) {
+            //all we do is set the error on the context, we handle it when the request is returned
+            treatAsCommitted = true;
+            src.setError(sc, msg);
+        } else {
+            //if the src is null there is no outer handler, as we are in an asnc request
+            doErrorDispatch(sc, msg);
+        }
+    }
+
+    public void doErrorDispatch(int sc, String error) throws IOException {
+        resetBuffer();
+        treatAsCommitted = false;
         final String location = servletContext.getDeployment().getErrorPages().getErrorLocation(sc);
         if (location != null) {
             RequestDispatcherImpl requestDispatcher = new RequestDispatcherImpl(location, servletContext);
             final ServletRequestContext servletRequestContext = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
             try {
-                requestDispatcher.error(servletRequestContext.getServletRequest(), servletRequestContext.getServletResponse(), exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY).getCurrentServlet().getManagedServlet().getServletInfo().getName(), msg);
+                requestDispatcher.error(servletRequestContext, servletRequestContext.getServletRequest(), servletRequestContext.getServletResponse(), exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY).getCurrentServlet().getManagedServlet().getServletInfo().getName(), error);
             } catch (ServletException e) {
                 throw new RuntimeException(e);
             }
-        } else if (msg != null) {
+        } else if (error != null) {
             setContentType("text/html");
-            getWriter().write("<html><head><title>Error</title></head><body>" + msg + "</body></html>");
+            setCharacterEncoding("UTF-8");
+            if(servletContext.getDeployment().getDeploymentInfo().isEscapeErrorMessage()) {
+                getWriter().write("<html><head><title>Error</title></head><body>" + escapeHtml(error) + "</body></html>");
+            } else {
+                getWriter().write("<html><head><title>Error</title></head><body>" + error + "</body></html>");
+            }
             getWriter().close();
         }
         responseDone();
@@ -181,27 +206,47 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public void setHeader(final String name, final String value) {
+        if(name == null) {
+            throw UndertowServletMessages.MESSAGES.headerNameWasNull();
+        }
         setHeader(new HttpString(name), value);
     }
 
 
     public void setHeader(final HttpString name, final String value) {
+        if(name == null) {
+            throw UndertowServletMessages.MESSAGES.headerNameWasNull();
+        }
         if (insideInclude || ignoredFlushPerformed) {
             return;
         }
-        exchange.getResponseHeaders().put(name, value);
+        if(name.equals(Headers.CONTENT_TYPE)) {
+            setContentType(value);
+        } else {
+            exchange.getResponseHeaders().put(name, value);
+        }
     }
 
     @Override
     public void addHeader(final String name, final String value) {
+        if(name == null) {
+            throw UndertowServletMessages.MESSAGES.headerNameWasNull();
+        }
         addHeader(new HttpString(name), value);
     }
 
     public void addHeader(final HttpString name, final String value) {
-        if (insideInclude || ignoredFlushPerformed) {
+        if(name == null) {
+            throw UndertowServletMessages.MESSAGES.headerNameWasNull();
+        }
+        if (insideInclude || ignoredFlushPerformed || treatAsCommitted) {
             return;
         }
-        exchange.getResponseHeaders().add(name, value);
+        if(name.equals(Headers.CONTENT_TYPE) && !exchange.getResponseHeaders().contains(Headers.CONTENT_TYPE)) {
+            setContentType(value);
+        } else {
+            exchange.getResponseHeaders().add(name, value);
+        }
     }
 
     @Override
@@ -216,7 +261,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public void setStatus(final int sc) {
-        if (insideInclude) {
+        if (insideInclude || treatAsCommitted) {
             return;
         }
         if (responseStarted()) {
@@ -227,9 +272,6 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public void setStatus(final int sc, final String sm) {
-        if (insideInclude) {
-            return;
-        }
         setStatus(sc);
     }
 
@@ -245,12 +287,16 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public Collection<String> getHeaders(final String name) {
-        return new ArrayList<String>(exchange.getResponseHeaders().get(name));
+        HeaderValues headers = exchange.getResponseHeaders().get(name);
+        if(headers == null) {
+            return Collections.emptySet();
+        }
+        return new ArrayList<>(headers);
     }
 
     @Override
     public Collection<String> getHeaderNames() {
-        final Set<String> headers = new HashSet<String>();
+        final Set<String> headers = new HashSet<>();
         for (final HttpString i : exchange.getResponseHeaders().getHeaderNames()) {
             headers.add(i.toString());
         }
@@ -354,7 +400,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
     }
 
     private boolean responseStarted() {
-        return exchange.isResponseStarted() || ignoredFlushPerformed;
+        return exchange.isResponseStarted() || ignoredFlushPerformed || treatAsCommitted;
     }
 
     @Override
@@ -438,16 +484,25 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
     }
 
     public void closeStreamAndWriter() throws IOException {
+        if(treatAsCommitted) {
+            return;
+        }
         if (writer != null) {
-            if (!servletOutputStream.isClosed()) {
-                writer.flush();
-            }
             writer.close();
         } else {
             if (servletOutputStream == null) {
                 createOutputStream();
             }
             //close also flushes
+            servletOutputStream.close();
+        }
+    }
+
+    public void freeResources() throws IOException {
+        if(writer != null) {
+            writer.close();
+        }
+        if(servletOutputStream != null) {
             servletOutputStream.close();
         }
     }
@@ -476,6 +531,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         responseState = ResponseState.NONE;
         exchange.getResponseHeaders().clear();
         exchange.setResponseCode(200);
+        treatAsCommitted = false;
     }
 
     @Override
@@ -516,7 +572,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
     }
 
     public void responseDone() {
-        if (responseDone) {
+        if (responseDone || treatAsCommitted) {
             return;
         }
         servletContext.updateSessionAccessTime(exchange);
@@ -524,7 +580,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         try {
             closeStreamAndWriter();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
         }
     }
 
@@ -712,5 +768,13 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         NONE,
         STREAM,
         WRITER
+    }
+
+    private static String escapeHtml(String msg) {
+        return msg.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+    }
+
+    public boolean isTreatAsCommitted() {
+        return treatAsCommitted;
     }
 }

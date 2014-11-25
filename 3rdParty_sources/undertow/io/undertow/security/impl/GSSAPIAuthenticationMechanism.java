@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package io.undertow.security.impl;
 
@@ -142,6 +142,16 @@ public class GSSAPIAuthenticationMechanism implements AuthenticationMechanism {
             if (responseChallenge != null) {
                 header = NEGOTIATE_PREFIX + FlexBase64.encodeString(responseChallenge, false);
             }
+        } else {
+            Subject server = null;
+            try {
+                server = subjectFactory.getSubjectForHost(getHostName(exchange));
+            } catch (GeneralSecurityException e) {
+                // Deliberately ignore - no Subject so don't offer GSSAPI is our main concern here.
+            }
+            if (server == null) {
+                return new ChallengeResult(false);
+            }
         }
 
         exchange.getResponseHeaders().add(WWW_AUTHENTICATE, header);
@@ -267,7 +277,7 @@ public class GSSAPIAuthenticationMechanism implements AuthenticationMechanism {
         }
 
         Principal getPrincipal() {
-            if (isEstablished() == false) {
+            if (!isEstablished()) {
                 throw new IllegalStateException("No established GSSContext to use for the Principal.");
             }
 

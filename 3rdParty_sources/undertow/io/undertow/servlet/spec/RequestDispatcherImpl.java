@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.spec;
@@ -133,7 +133,8 @@ public class RequestDispatcherImpl implements RequestDispatcher {
                     String newQueryString = newServletPath.substring(qsPos + 1);
                     newServletPath = newServletPath.substring(0, qsPos);
 
-                    Map<String, Deque<String>> newQueryParameters = QueryParameterUtils.mergeQueryParametersWithNewQueryString(queryParameters, newQueryString);
+                    String encoding = QueryParameterUtils.getQueryParamEncoding(servletRequestContext.getExchange());
+                    Map<String, Deque<String>> newQueryParameters = QueryParameterUtils.mergeQueryParametersWithNewQueryString(queryParameters, newQueryString, encoding);
                     requestImpl.getExchange().setQueryString(newQueryString);
                     requestImpl.setQueryParameters(newQueryParameters);
                 }
@@ -159,6 +160,7 @@ public class RequestDispatcherImpl implements RequestDispatcher {
                         servletContext.getDeployment().getServletDispatcher().dispatchToPath(requestImpl.getExchange(), pathMatch, DispatcherType.FORWARD);
                     }
 
+                    //if we are not in an async or error dispatch then we close the response
                     if (!request.isAsyncStarted()) {
                         if (response instanceof HttpServletResponseImpl) {
                             responseImpl.closeStreamAndWriter();
@@ -249,7 +251,8 @@ public class RequestDispatcherImpl implements RequestDispatcher {
                     String newQueryString = newServletPath.substring(qsPos + 1);
                     newServletPath = newServletPath.substring(0, qsPos);
 
-                    Map<String, Deque<String>> newQueryParameters = QueryParameterUtils.mergeQueryParametersWithNewQueryString(queryParameters, newQueryString);
+                    String encoding = QueryParameterUtils.getQueryParamEncoding(servletRequestContext.getExchange());
+                    Map<String, Deque<String>> newQueryParameters = QueryParameterUtils.mergeQueryParametersWithNewQueryString(queryParameters, newQueryString, encoding);
                     requestImpl.setQueryParameters(newQueryParameters);
                     requestImpl.setAttribute(INCLUDE_QUERY_STRING, newQueryString);
                 } else {
@@ -307,21 +310,19 @@ public class RequestDispatcherImpl implements RequestDispatcher {
         }
     }
 
-    public void error(final ServletRequest request, final ServletResponse response, final String servletName, final String message) throws ServletException, IOException {
-        error(request, response, servletName, null, message);
+    public void error(ServletRequestContext servletRequestContext, final ServletRequest request, final ServletResponse response, final String servletName, final String message) throws ServletException, IOException {
+        error(servletRequestContext, request, response, servletName, null, message);
     }
 
-    public void error(final ServletRequest request, final ServletResponse response, final String servletName) throws ServletException, IOException {
-        error(request, response, servletName, null, null);
+    public void error(ServletRequestContext servletRequestContext, final ServletRequest request, final ServletResponse response, final String servletName) throws ServletException, IOException {
+        error(servletRequestContext, request, response, servletName, null, null);
     }
 
-    public void error(final ServletRequest request, final ServletResponse response, final String servletName, final Throwable exception) throws ServletException, IOException {
-        error(request, response, servletName, exception, exception.getMessage());
+    public void error(ServletRequestContext servletRequestContext, final ServletRequest request, final ServletResponse response, final String servletName, final Throwable exception) throws ServletException, IOException {
+        error(servletRequestContext, request, response, servletName, exception, exception.getMessage());
     }
 
-    private void error(final ServletRequest request, final ServletResponse response, final String servletName, final Throwable exception, final String message) throws ServletException, IOException {
-
-        final ServletRequestContext servletRequestContext = SecurityActions.requireCurrentServletRequestContext();
+    private void error(ServletRequestContext servletRequestContext, final ServletRequest request, final ServletResponse response, final String servletName, final Throwable exception, final String message) throws ServletException, IOException {
         if(request.getDispatcherType() == DispatcherType.ERROR) {
             //we have already dispatched once with an error
             //if we dispatch again we run the risk of a stack overflow
@@ -370,7 +371,7 @@ public class RequestDispatcherImpl implements RequestDispatcher {
         String newRequestUri = servletContext.getContextPath() + newServletPath;
 
         //todo: a more efficent impl
-        Map<String, Deque<String>> newQueryParameters = new HashMap<String, Deque<String>>();
+        Map<String, Deque<String>> newQueryParameters = new HashMap<>();
         for (String part : newQueryString.split("&")) {
             String name = part;
             String value = "";
@@ -381,7 +382,7 @@ public class RequestDispatcherImpl implements RequestDispatcher {
             }
             Deque<String> queue = newQueryParameters.get(name);
             if (queue == null) {
-                newQueryParameters.put(name, queue = new ArrayDeque<String>(1));
+                newQueryParameters.put(name, queue = new ArrayDeque<>(1));
             }
             queue.add(value);
         }
@@ -408,6 +409,10 @@ public class RequestDispatcherImpl implements RequestDispatcher {
                 throw new RuntimeException(e);
             }
         } finally {
+            AsyncContextImpl ac = servletRequestContext.getOriginalRequest().getAsyncContextInternal();
+            if(ac != null) {
+                ac.complete();
+            }
             servletRequestContext.setServletRequest(oldRequest);
             servletRequestContext.setServletResponse(oldResponse);
         }

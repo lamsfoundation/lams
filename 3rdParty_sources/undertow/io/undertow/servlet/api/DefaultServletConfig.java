@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.servlet.api;
 
 import java.util.Arrays;
@@ -26,24 +44,24 @@ public class DefaultServletConfig {
     public DefaultServletConfig(final boolean defaultAllowed, final Set<String> exceptions) {
         this.defaultAllowed = defaultAllowed;
         if(defaultAllowed) {
-            disallowed = Collections.unmodifiableSet(new HashSet<String>(exceptions));
+            disallowed = Collections.unmodifiableSet(new HashSet<>(exceptions));
             allowed = null;
         } else {
-            allowed = Collections.unmodifiableSet(new HashSet<String>(exceptions));
+            allowed = Collections.unmodifiableSet(new HashSet<>(exceptions));
             disallowed = null;
         }
     }
 
     public DefaultServletConfig(final boolean defaultAllowed) {
         this.defaultAllowed = defaultAllowed;
-        this.allowed = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DEFAULT_ALLOWED_EXTENSIONS)));
-        this.disallowed = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DEFAULT_DISALLOWED_EXTENSIONS)));
+        this.allowed = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(DEFAULT_ALLOWED_EXTENSIONS)));
+        this.disallowed = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(DEFAULT_DISALLOWED_EXTENSIONS)));
     }
 
     public DefaultServletConfig() {
         this.defaultAllowed = false;
-        this.allowed = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DEFAULT_ALLOWED_EXTENSIONS)));
-        this.disallowed = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DEFAULT_DISALLOWED_EXTENSIONS)));
+        this.allowed = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(DEFAULT_ALLOWED_EXTENSIONS)));
+        this.disallowed = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(DEFAULT_DISALLOWED_EXTENSIONS)));
     }
 
     public boolean isDefaultAllowed() {

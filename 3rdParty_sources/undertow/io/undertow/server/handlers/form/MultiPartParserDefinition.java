@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,29 +9,18 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.handlers.form;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executor;
-
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.UndertowOptions;
-import io.undertow.server.Connectors;
 import io.undertow.server.ExchangeCompletionListener;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -39,13 +28,25 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import io.undertow.util.MalformedMessageException;
 import io.undertow.util.MultipartParser;
+import io.undertow.util.SameThreadExecutor;
+import org.xnio.ChannelListener;
 import org.xnio.FileAccess;
 import org.xnio.IoUtils;
 import org.xnio.Pooled;
 import org.xnio.channels.StreamSourceChannel;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
+
 /**
- *
  * @author Stuart Douglas
  */
 public class MultiPartParserDefinition implements FormParserFactory.ParserDefinition {
@@ -73,11 +74,11 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         String mimeType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
         if (mimeType != null && mimeType.startsWith(MULTIPART_FORM_DATA)) {
             String boundary = Headers.extractTokenFromHeader(mimeType, "boundary");
-            if(boundary == null) {
+            if (boundary == null) {
                 UndertowLogger.REQUEST_LOGGER.debugf("Could not find boundary in multipart request with ContentType: %s, multipart data will not be available", mimeType);
                 return null;
             }
-            final MultiPartUploadHandler parser =  new MultiPartUploadHandler(exchange, boundary, maxIndividualFileSize, defaultEncoding);
+            final MultiPartUploadHandler parser = new MultiPartUploadHandler(exchange, boundary, maxIndividualFileSize, defaultEncoding);
             exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
                 @Override
                 public void exchangeEvent(final HttpServerExchange exchange, final NextListener nextListener) {
@@ -126,12 +127,12 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         this.maxIndividualFileSize = maxIndividualFileSize;
     }
 
-    private final class MultiPartUploadHandler implements FormDataParser, Runnable, MultipartParser.PartHandler {
+    private final class MultiPartUploadHandler implements FormDataParser, MultipartParser.PartHandler {
 
         private final HttpServerExchange exchange;
         private final FormData data;
         private final String boundary;
-        private final List<File> createdFiles = new ArrayList<File>();
+        private final List<File> createdFiles = new ArrayList<>();
         private final long maxIndividualFileSize;
         private String defaultEncoding;
 
@@ -143,6 +144,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         private HeaderMap headers;
         private HttpHandler handler;
         private long currentFileSize;
+        private final MultipartParser.ParseState parser;
 
 
         private MultiPartUploadHandler(final HttpServerExchange exchange, final String boundary, final long maxIndividualFileSize, final String defaultEncoding) {
@@ -151,6 +153,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
             this.maxIndividualFileSize = maxIndividualFileSize;
             this.defaultEncoding = defaultEncoding;
             this.data = new FormData(exchange.getConnection().getUndertowOptions().get(UndertowOptions.MAX_PARAMETERS, 1000));
+            this.parser = MultipartParser.beginParse(exchange.getConnection().getBufferPool(), this, boundary.getBytes(), exchange.getRequestCharset());
         }
 
 
@@ -163,10 +166,15 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
             this.handler = handler;
             //we need to delegate to a thread pool
             //as we parse with blocking operations
+
+            StreamSourceChannel requestChannel = exchange.getRequestChannel();
+            if (requestChannel == null) {
+                throw new IOException(UndertowMessages.MESSAGES.requestChannelAlreadyProvided());
+            }
             if (executor == null) {
-                exchange.dispatch(this);
+                exchange.dispatch(new NonBlockingParseTask(exchange.getConnection().getWorker(), requestChannel));
             } else {
-                exchange.dispatch(executor, this);
+                exchange.dispatch(executor, new NonBlockingParseTask(executor, requestChannel));
             }
         }
 
@@ -178,43 +186,29 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
             }
 
             final MultipartParser.ParseState parser = MultipartParser.beginParse(exchange.getConnection().getBufferPool(), this, boundary.getBytes(), exchange.getRequestCharset());
-            StreamSourceChannel requestChannel = exchange.getRequestChannel();
-            if (requestChannel == null) {
+            InputStream inputStream = exchange.getInputStream();
+            if (inputStream == null) {
                 throw new IOException(UndertowMessages.MESSAGES.requestChannelAlreadyProvided());
             }
-            final Pooled<ByteBuffer> resource = exchange.getConnection().getBufferPool().allocate();
-            final ByteBuffer buf = resource.getResource();
+            byte[] buf = new byte[1024];
             try {
-                while (!parser.isComplete()) {
-                    buf.clear();
-                    requestChannel.awaitReadable();
-                    int c = requestChannel.read(buf);
-                    buf.flip();
+                while (true) {
+                    int c = inputStream.read(buf);
                     if (c == -1) {
-                        throw UndertowMessages.MESSAGES.connectionTerminatedReadingMultiPartData();
+                        if (parser.isComplete()) {
+                            break;
+                        } else {
+                            throw UndertowMessages.MESSAGES.connectionTerminatedReadingMultiPartData();
+                        }
                     } else if (c != 0) {
-                        parser.parse(buf);
+                        parser.parse(ByteBuffer.wrap(buf, 0, c));
                     }
                 }
                 exchange.putAttachment(FORM_DATA, data);
             } catch (MalformedMessageException e) {
                 throw new IOException(e);
-            } finally {
-                resource.free();
             }
             return exchange.getAttachment(FORM_DATA);
-        }
-
-        @Override
-        public void run() {
-            try {
-                parseBlocking();
-                Connectors.executeRootHandler(handler, exchange);
-            } catch (Throwable e) {
-                UndertowLogger.REQUEST_LOGGER.debug("Exception parsing data", e);
-                exchange.setResponseCode(500);
-                exchange.endExchange();
-            }
         }
 
         @Override
@@ -242,7 +236,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         @Override
         public void data(final ByteBuffer buffer) throws IOException {
             this.currentFileSize += buffer.remaining();
-            if(this.maxIndividualFileSize > 0 && this.currentFileSize > this.maxIndividualFileSize) {
+            if (this.maxIndividualFileSize > 0 && this.currentFileSize > this.maxIndividualFileSize) {
                 throw UndertowMessages.MESSAGES.maxFileSizeExceeded(this.maxIndividualFileSize);
             }
             if (file == null) {
@@ -294,7 +288,7 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         @Override
         public void close() throws IOException {
             //we have to dispatch this, as it may result in file IO
-            final List<File> files = new ArrayList<File>(getCreatedFiles());
+            final List<File> files = new ArrayList<>(getCreatedFiles());
             exchange.getConnection().getWorker().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -314,6 +308,72 @@ public class MultiPartParserDefinition implements FormParserFactory.ParserDefini
         public void setCharacterEncoding(final String encoding) {
             this.defaultEncoding = encoding;
         }
-    }
+
+        private final class NonBlockingParseTask implements Runnable {
+
+            private final Executor executor;
+            private final StreamSourceChannel requestChannel;
+
+            private NonBlockingParseTask(Executor executor, StreamSourceChannel requestChannel) {
+                this.executor = executor;
+                this.requestChannel = requestChannel;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    final FormData existing = exchange.getAttachment(FORM_DATA);
+                    if (existing != null) {
+                        exchange.dispatch(SameThreadExecutor.INSTANCE, handler);
+                        return;
+                    }
+                    Pooled<ByteBuffer> pooled = exchange.getConnection().getBufferPool().allocate();
+                    try {
+                        while (true) {
+                            int c = requestChannel.read(pooled.getResource());
+                            if(c == 0) {
+                                requestChannel.getReadSetter().set(new ChannelListener<StreamSourceChannel>() {
+                                    @Override
+                                    public void handleEvent(StreamSourceChannel channel) {
+                                        channel.suspendReads();
+                                        executor.execute(NonBlockingParseTask.this);
+                                    }
+                                });
+                                requestChannel.resumeReads();
+                                return;
+                            } else if (c == -1) {
+                                if (parser.isComplete()) {
+                                    exchange.putAttachment(FORM_DATA, data);
+                                    exchange.dispatch(SameThreadExecutor.INSTANCE, handler);
+                                } else {
+                                    UndertowLogger.REQUEST_IO_LOGGER.ioException(UndertowMessages.MESSAGES.connectionTerminatedReadingMultiPartData());
+                                    exchange.setResponseCode(500);
+                                    exchange.endExchange();
+                                }
+                                return;
+                            } else {
+                                pooled.getResource().flip();
+                                parser.parse(pooled.getResource());
+                                pooled.getResource().compact();
+                            }
+                        }
+                    } catch (MalformedMessageException e) {
+                        UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                        exchange.setResponseCode(500);
+                        exchange.endExchange();
+                    } finally {
+                        pooled.free();
+                    }
+
+                } catch (Throwable e) {
+                    UndertowLogger.REQUEST_IO_LOGGER.debug("Exception parsing data", e);
+                    exchange.setResponseCode(500);
+                    exchange.endExchange();
+                }
+            }
+        }
+     }
+
+
 
 }

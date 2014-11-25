@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server;
 
 import io.undertow.UndertowLogger;
@@ -62,7 +80,9 @@ public class Connectors {
                 Pooled<ByteBuffer>[] bufs = exchange.getAttachment(HttpServerExchange.BUFFERED_REQUEST_DATA);
                 if (bufs != null) {
                     for (Pooled<ByteBuffer> i : bufs) {
-                        i.free();
+                        if(i != null) {
+                            i.free();
+                        }
                     }
                 }
                 nextListener.proceed();
@@ -126,7 +146,7 @@ public class Connectors {
                 header.append(DateUtils.toOldCookieDateString(expires));
             } else if (cookie.getMaxAge() > 0) {
                 Date expires = new Date();
-                expires.setTime(expires.getTime() + cookie.getMaxAge() * 1000);
+                expires.setTime(expires.getTime() + cookie.getMaxAge() * 1000L);
                 header.append("; Expires=");
                 header.append(DateUtils.toOldCookieDateString(expires));
             }
@@ -197,7 +217,7 @@ public class Connectors {
             if (!exchange.isResponseStarted()) {
                 exchange.setResponseCode(500);
             }
-            UndertowLogger.REQUEST_LOGGER.errorf(t, "Blocking request failed %s", exchange);
+            UndertowLogger.REQUEST_LOGGER.errorf(t, "Undertow request failed %s", exchange);
             exchange.endExchange();
         }
     }

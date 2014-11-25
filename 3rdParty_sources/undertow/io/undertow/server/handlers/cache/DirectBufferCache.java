@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.handlers.cache;
@@ -64,7 +64,7 @@ public class DirectBufferCache {
     public DirectBufferCache(int sliceSize, int slicesPerPage, int maxMemory, final BufferAllocator<ByteBuffer> bufferAllocator, int maxAge) {
         this.sliceSize = sliceSize;
         this.pool = new LimitedBufferSlicePool(bufferAllocator, sliceSize, sliceSize * slicesPerPage, maxMemory / (sliceSize * slicesPerPage));
-        this.cache = new ConcurrentHashMap<Object, CacheEntry>(16);
+        this.cache = new ConcurrentHashMap<>(16);
         this.accessQueue = ConcurrentDirectDeque.newInstance();
         this.maxAge = maxAge;
     }
@@ -140,7 +140,7 @@ public class DirectBufferCache {
      * @return all the keys in this cache
      */
     public Set<Object> getAllKeys() {
-        return new HashSet<Object>(cache.keySet());
+        return new HashSet<>(cache.keySet());
     }
 
     private void bumpAccess(CacheEntry cacheEntry) {

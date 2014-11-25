@@ -1,5 +1,7 @@
 /*
- * Copyright 2012 JBoss, by Red Hat, Inc
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -7,16 +9,17 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.websockets.core.protocol;
 
 import io.undertow.util.Headers;
+import io.undertow.websockets.WebSocketExtension;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSocketVersion;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
@@ -25,6 +28,9 @@ import org.xnio.Pool;
 import org.xnio.StreamConnection;
 
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -39,7 +45,7 @@ public abstract class Handshake {
     private final String magicNumber;
     protected final Set<String> subprotocols;
     private static final byte[] EMPTY = new byte[0];
-    private static final Pattern PATTERN = Pattern.compile(",");
+    private static final Pattern PATTERN = Pattern.compile("\\s*,\\s*");
 
     protected Handshake(WebSocketVersion version, String hashAlgorithm, String magicNumber, final Set<String> subprotocols) {
         this.version = version;
@@ -154,8 +160,33 @@ public abstract class Handshake {
 
         String[] requestedSubprotocolArray = PATTERN.split(requestedSubprotocols);
         String subProtocol = supportedSubprotols(requestedSubprotocolArray);
-        if (subProtocol != null) {
+        if (subProtocol != null && !subProtocol.isEmpty()) {
             exchange.setResponseHeader(Headers.SEC_WEB_SOCKET_PROTOCOL_STRING, subProtocol);
+        }
+
+    }
+
+
+    protected final void selectExtensions(final WebSocketHttpExchange exchange) {
+        List<WebSocketExtension> requestedExtensions = WebSocketExtension.parse(exchange.getRequestHeader(Headers.SEC_WEB_SOCKET_EXTENSIONS_STRING));
+        List<WebSocketExtension> extensions = selectedExtension(requestedExtensions);
+        if (extensions != null && !extensions.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            Iterator<WebSocketExtension> it = extensions.iterator();
+            while (it.hasNext()) {
+                WebSocketExtension next = it.next();
+                sb.append(next.getName());
+                for (WebSocketExtension.Parameter param : next.getParameters()) {
+                    sb.append("; ");
+                    sb.append(param.getName());
+                    sb.append("=");
+                    sb.append(param.getValue());
+                }
+                if (it.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+            exchange.setResponseHeader(Headers.SEC_WEB_SOCKET_EXTENSIONS_STRING, sb.toString());
         }
 
     }
@@ -171,5 +202,9 @@ public abstract class Handshake {
             }
         }
         return null;
+    }
+
+    protected List<WebSocketExtension> selectedExtension(List<WebSocketExtension> extensionList) {
+        return Collections.emptyList();
     }
 }

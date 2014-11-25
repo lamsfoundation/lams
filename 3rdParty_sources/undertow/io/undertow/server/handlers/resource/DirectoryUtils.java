@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.handlers.resource;
 
 import java.io.IOException;
@@ -63,19 +81,25 @@ public class DirectoryUtils {
 
         int state = 0;
         String parent = null;
-        for (int i = path.length() - 1; i >= 0; i--) {
-            if (state == 1) {
-                if (path.charAt(i) == '/') {
-                    state = 2;
+        if(path.length() > 1) {
+            for (int i = path.length() - 1; i >= 0; i--) {
+                if (state == 1) {
+                    if (path.charAt(i) == '/') {
+                        state = 2;
+                    }
+                } else if (path.charAt(i) != '/') {
+                    if (state == 2) {
+                        parent = path.substring(0, i + 1);
+                        break;
+                    }
+                    state = 1;
                 }
-            } else if (path.charAt(i) != '/') {
-                if (state == 2) {
-                    parent = path.substring(0, i + 1);
-                    break;
-                }
-                state = 1;
+            }
+            if(parent == null) {
+                parent = "/";
             }
         }
+
 
         SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
         int i = 0;

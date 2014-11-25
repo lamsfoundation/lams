@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,14 +9,15 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package io.undertow.websockets.core;
 
+import io.undertow.UndertowLogger;
 import org.xnio.Buffers;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
@@ -180,7 +181,7 @@ public final class WebSocketUtils {
                         try {
                             streamSinkFrameChannel.shutdownWrites();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                             IoUtils.safeClose(streamSinkFrameChannel, channel);
                             return;
                         }
@@ -199,7 +200,8 @@ public final class WebSocketUtils {
                                         }, new ChannelExceptionHandler<StreamSinkFrameChannel>() {
                                             @Override
                                             public void handleException(StreamSinkFrameChannel streamSinkFrameChannel, IOException e) {
-                                                e.printStackTrace();
+
+                                                UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                                                 IoUtils.safeClose(streamSinkFrameChannel, channel);
 
                                             }
@@ -214,7 +216,7 @@ public final class WebSocketUtils {
                                 IoUtils.safeClose(streamSinkFrameChannel);
                             }
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                             IoUtils.safeClose(streamSinkFrameChannel, channel);
 
                         }
@@ -222,14 +224,13 @@ public final class WebSocketUtils {
                 }, new ChannelExceptionHandler<StreamSourceFrameChannel>() {
                     @Override
                     public void handleException(StreamSourceFrameChannel streamSourceFrameChannel, IOException e) {
-                        e.printStackTrace();
+                        UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                         IoUtils.safeClose(streamSourceFrameChannel, channel);
                     }
                 }, new ChannelExceptionHandler<StreamSinkFrameChannel>() {
                     @Override
                     public void handleException(StreamSinkFrameChannel streamSinkFrameChannel, IOException e) {
-                        e.printStackTrace();
-
+                        UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                         IoUtils.safeClose(streamSinkFrameChannel, channel);
                     }
                 }, channel.getBufferPool()
@@ -283,7 +284,7 @@ public final class WebSocketUtils {
                     }
                     if (res == 0) {
                         // write first listener
-                        final TransferListener<I, O> listener = new TransferListener<I, O>(allocated, source, sink, sourceListener, sinkListener, writeExceptionHandler, readExceptionHandler, 1);
+                        final TransferListener<I, O> listener = new TransferListener<>(allocated, source, sink, sourceListener, sinkListener, writeExceptionHandler, readExceptionHandler, 1);
                         source.suspendReads();
                         source.getReadSetter().set(listener);
                         sink.getWriteSetter().set(listener);
@@ -299,7 +300,7 @@ public final class WebSocketUtils {
                     }
                 }
             } while (transferred > 0L);
-            final TransferListener<I, O> listener = new TransferListener<I, O>(allocated, source, sink, sourceListener, sinkListener, writeExceptionHandler, readExceptionHandler, 0);
+            final TransferListener<I, O> listener = new TransferListener<>(allocated, source, sink, sourceListener, sinkListener, writeExceptionHandler, readExceptionHandler, 0);
             sink.suspendWrites();
             sink.getWriteSetter().set(listener);
             source.getReadSetter().set(listener);

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.protocol.http;
@@ -182,7 +182,7 @@ public abstract class HttpRequestParser {
 
     public static final HttpRequestParser instance(final OptionMap options) {
         try {
-            final Class<?> cls = HttpRequestParser.class.getClassLoader().loadClass(HttpRequestParser.class.getName() + "$$generated");
+            final Class<?> cls = Class.forName(HttpRequestParser.class.getName() + "$$generated", false, HttpRequestParser.class.getClassLoader());
 
             Constructor<?> ctor = cls.getConstructor(OptionMap.class);
             return (HttpRequestParser) ctor.newInstance(options);
@@ -342,7 +342,7 @@ public abstract class HttpRequestParser {
         boolean urlDecodeRequired = state.urlDecodeRequired;
 
         while (buffer.hasRemaining()) {
-            char next = (char) buffer.get();
+            char next = (char) (buffer.get() & 0xFF);
             if (next == ' ' || next == '\t') {
                 if (stringBuilder.length() != 0) {
                     final String path = stringBuilder.toString();
@@ -373,7 +373,7 @@ public abstract class HttpRequestParser {
                 return;
             } else {
 
-                if (decode && (next == '+' || next == '%')) {
+                if (decode && (next == '+' || next == '%' || next > 127)) {
                     urlDecodeRequired = true;
                 } else if (next == ':' && parseState == START) {
                     parseState = FIRST_COLON;
@@ -468,7 +468,7 @@ public abstract class HttpRequestParser {
         //we encounter an encoded character
 
         while (buffer.hasRemaining()) {
-            char next = (char) buffer.get();
+            char next = (char) (buffer.get() & 0xFF);
             if (next == ' ' || next == '\t') {
                 final String queryString = stringBuilder.toString();
                 exchange.setQueryString(queryString);
@@ -489,7 +489,7 @@ public abstract class HttpRequestParser {
             } else if (next == '\r' || next == '\n') {
                 throw UndertowMessages.MESSAGES.failedToParsePath();
             } else {
-                if (decode && (next == '+' || next == '%')) {
+                if (decode && (next == '+' || next == '%' || next > 127)) {
                     urlDecodeRequired = true;
                 } else if (next == '=' && nextQueryParam == null) {
                     nextQueryParam = decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true);
@@ -548,7 +548,7 @@ public abstract class HttpRequestParser {
         //we encounter an encoded character
 
         while (buffer.hasRemaining()) {
-            char next = (char) buffer.get();
+            char next = (char) (buffer.get() & 0xFF);
             if (next == ' ' || next == '\t' || next == '?') {
                 if (nextQueryParam == null) {
                     if (queryParamPos != stringBuilder.length()) {
@@ -573,7 +573,7 @@ public abstract class HttpRequestParser {
             } else if (next == '\r' || next == '\n') {
                 throw UndertowMessages.MESSAGES.failedToParsePath();
             } else {
-                if (decode && (next == '+' || next == '%')) {
+                if (decode && (next == '+' || next == '%' || next > 127)) {
                     urlDecodeRequired = true;
                 }
                 if (next == '=' && nextQueryParam == null) {
@@ -655,7 +655,7 @@ public abstract class HttpRequestParser {
             } else if (next == ' ' || next == '\t') {
                 parseState = WHITESPACE;
             } else {
-                stringBuilder.append((char) next);
+                stringBuilder.append((char) (next & 0xFF));
             }
         }
 
@@ -670,7 +670,7 @@ public abstract class HttpRequestParser {
                     } else if (next == ' ' || next == '\t') {
                         parseState = WHITESPACE;
                     } else {
-                        stringBuilder.append((char) next);
+                        stringBuilder.append((char) (next & 0xFF));
                     }
                     break;
                 }
@@ -684,7 +684,7 @@ public abstract class HttpRequestParser {
                         if (stringBuilder.length() > 0) {
                             stringBuilder.append(' ');
                         }
-                        stringBuilder.append((char) next);
+                        stringBuilder.append((char) (next & 0xFF));
                         parseState = NORMAL;
                     }
                     break;
@@ -719,6 +719,9 @@ public abstract class HttpRequestParser {
                         state.stringBuilder.setLength(0);
                         if (next == '\r') {
                             parseState = AWAIT_DATA_END;
+                        } else if (next == '\n') {
+                            state.state = ParseState.PARSE_COMPLETE;
+                            return;
                         } else {
                             state.state = ParseState.HEADER;
                             state.parseState = 0;
@@ -816,7 +819,7 @@ public abstract class HttpRequestParser {
      * @return
      */
     protected static Map<String, HttpString> httpStrings() {
-        final Map<String, HttpString> results = new HashMap<String, HttpString>();
+        final Map<String, HttpString> results = new HashMap<>();
         final Class[] classs = {Headers.class, Methods.class, Protocols.class};
 
         for (Class<?> c : classs) {

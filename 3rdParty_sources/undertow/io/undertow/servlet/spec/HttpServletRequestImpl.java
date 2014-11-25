@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.spec;
@@ -75,6 +75,7 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Enumeration;
@@ -138,24 +139,34 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
             if (cookies.isEmpty()) {
                 return null;
             }
-            Cookie[] value = new Cookie[cookies.size()];
+            int count = cookies.size();
+            Cookie[] value = new Cookie[count];
             int i = 0;
             for (Map.Entry<String, io.undertow.server.handlers.Cookie> entry : cookies.entrySet()) {
                 io.undertow.server.handlers.Cookie cookie = entry.getValue();
-                Cookie c = new Cookie(cookie.getName(), cookie.getValue());
-                if (cookie.getDomain() != null) {
-                    c.setDomain(cookie.getDomain());
+                try {
+                    Cookie c = new Cookie(cookie.getName(), cookie.getValue());
+                    if (cookie.getDomain() != null) {
+                        c.setDomain(cookie.getDomain());
+                    }
+                    c.setHttpOnly(cookie.isHttpOnly());
+                    if (cookie.getMaxAge() != null) {
+                        c.setMaxAge(cookie.getMaxAge());
+                    }
+                    if (cookie.getPath() != null) {
+                        c.setPath(cookie.getPath());
+                    }
+                    c.setSecure(cookie.isSecure());
+                    c.setVersion(cookie.getVersion());
+                    value[i++] = c;
+                } catch (IllegalArgumentException e) {
+                    // Ignore bad cookie
                 }
-                c.setHttpOnly(cookie.isHttpOnly());
-                if (cookie.getMaxAge() != null) {
-                    c.setMaxAge(cookie.getMaxAge());
-                }
-                if (cookie.getPath() != null) {
-                    c.setPath(cookie.getPath());
-                }
-                c.setSecure(cookie.isSecure());
-                c.setVersion(cookie.getVersion());
-                value[i++] = c;
+            }
+            if( i < count ) {
+                Cookie[] shrunkCookies = new Cookie[i];
+                System.arraycopy(value, 0, shrunkCookies, 0, i);
+                value = shrunkCookies;
             }
             this.cookies = value;
         }
@@ -193,16 +204,16 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         if (headers == null) {
             return EmptyEnumeration.instance();
         }
-        return new IteratorEnumeration<String>(headers.iterator());
+        return new IteratorEnumeration<>(headers.iterator());
     }
 
     @Override
     public Enumeration<String> getHeaderNames() {
-        final Set<String> headers = new HashSet<String>();
+        final Set<String> headers = new HashSet<>();
         for (final HttpString i : exchange.getRequestHeaders().getHeaderNames()) {
             headers.add(i.toString());
         }
-        return new IteratorEnumeration<String>(headers.iterator());
+        return new IteratorEnumeration<>(headers.iterator());
     }
 
     @Override
@@ -397,10 +408,13 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                 throw UndertowServletMessages.MESSAGES.authenticationFailed();
             }
         } else {
-            // Not authenticated and response already sent.
-            HttpServletResponseImpl responseImpl = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY).getOriginalResponse();
-            responseImpl.closeStreamAndWriter();
-            return false;
+            if(exchange.isResponseStarted()) {
+                //the auth mechanism commited the response, so we return false
+                return false;
+            } else {
+                //as the response was not commited we throw an exception as per the javadoc
+                throw UndertowServletMessages.MESSAGES.authenticationFailed();
+            }
         }
     }
 
@@ -465,7 +479,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         try {
             InstanceFactory<T> factory = servletContext.getDeployment().getDeploymentInfo().getClassIntrospecter().createInstanceFactory(handlerClass);
             final InstanceHandle<T> instance = factory.createInstance();
-            exchange.upgradeChannel(new ServletUpgradeListener<T>(instance, servletContext.getDeployment().getThreadSetupAction(), exchange));
+            exchange.upgradeChannel(new ServletUpgradeListener<>(instance, servletContext.getDeployment().getThreadSetupAction(), exchange));
             return instance.getInstance();
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
@@ -478,7 +492,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         final ServletRequestContext requestContext = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 
         if (parts == null) {
-            final List<Part> parts = new ArrayList<Part>();
+            final List<Part> parts = new ArrayList<>();
             String mimeType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
             if (mimeType != null && mimeType.startsWith(MultiPartParserDefinition.MULTIPART_FORM_DATA)) {
 
@@ -510,7 +524,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         if (attributes == null) {
             return EmptyEnumeration.instance();
         }
-        return new IteratorEnumeration<String>(attributes.keySet().iterator());
+        return new IteratorEnumeration<>(attributes.keySet().iterator());
     }
 
     @Override
@@ -588,6 +602,19 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         servletInputStream.close();
     }
 
+    /**
+     * Frees any resources (namely buffers) that may be associated with this request.
+     *
+     */
+    public void freeResources() throws IOException {
+        if(reader != null) {
+            reader.close();
+        }
+        if(servletInputStream != null) {
+            servletInputStream.close();
+        }
+    }
+
     @Override
     public String getParameter(final String name) {
         if(queryParameters == null) {
@@ -616,7 +643,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         if (queryParameters == null) {
             queryParameters = exchange.getQueryParameters();
         }
-        final Set<String> parameterNames = new HashSet<String>(queryParameters.keySet());
+        final Set<String> parameterNames = new HashSet<>(queryParameters.keySet());
         if (exchange.getRequestMethod().equals(Methods.POST)) {
             final FormData parsedFormData = parseFormData();
             if (parsedFormData != null) {
@@ -632,7 +659,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                 }
             }
         }
-        return new IteratorEnumeration<String>(parameterNames.iterator());
+        return new IteratorEnumeration<>(parameterNames.iterator());
     }
 
     @Override
@@ -640,7 +667,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         if (queryParameters == null) {
             queryParameters = exchange.getQueryParameters();
         }
-        final List<String> ret = new ArrayList<String>();
+        final List<String> ret = new ArrayList<>();
         Deque<String> params = queryParameters.get(name);
         if (params != null) {
             for (String param : params) {
@@ -671,9 +698,9 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
         if (queryParameters == null) {
             queryParameters = exchange.getQueryParameters();
         }
-        final Map<String, ArrayList<String>> arrayMap = new HashMap<String, ArrayList<String>>();
+        final Map<String, ArrayList<String>> arrayMap = new HashMap<>();
         for (Map.Entry<String, Deque<String>> entry : queryParameters.entrySet()) {
-            arrayMap.put(entry.getKey(), new ArrayList<String>(entry.getValue()));
+            arrayMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
         }
         if (exchange.getRequestMethod().equals(Methods.POST)) {
 
@@ -691,7 +718,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                             }
                         }
                     } else {
-                        final ArrayList<String> values = new ArrayList<String>();
+                        final ArrayList<String> values = new ArrayList<>();
                         int i = 0;
                         for (final FormData.FormValue v : val) {
                             if(!v.isFile()) {
@@ -703,7 +730,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                 }
             }
         }
-        final Map<String, String[]> ret = new HashMap<String, String[]>();
+        final Map<String, String[]> ret = new HashMap<>();
         for(Map.Entry<String, ArrayList<String>> entry : arrayMap.entrySet()) {
             ret.put(entry.getKey(), entry.getValue().toArray(new String[entry.getValue().size()]));
         }
@@ -715,12 +742,12 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
             if (readStarted) {
                 return null;
             }
-            readStarted = true;
-            final ManagedServlet originalServlet = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY).getOriginalServletPathMatch().getServletChain().getManagedServlet();
+            final ManagedServlet originalServlet = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY).getCurrentServlet().getManagedServlet();
             final FormDataParser parser = originalServlet.getFormParserFactory().createParser(exchange);
             if (parser == null) {
                 return null;
             }
+            readStarted = true;
             try {
                 return parsedFormData = parser.parseBlocking();
             } catch (IOException e) {
@@ -807,7 +834,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
     @Override
     public void setAttribute(final String name, final Object object) {
         if (attributes == null) {
-            attributes = new HashMap<String, Object>();
+            attributes = new HashMap<>();
         }
         Object existing = attributes.put(name, object);
         if (existing != null) {
@@ -835,7 +862,10 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
     public Enumeration<Locale> getLocales() {
         final List<String> acceptLanguage = exchange.getRequestHeaders().get(Headers.ACCEPT_LANGUAGE);
         List<Locale> ret = LocaleUtils.getLocalesFromHeader(acceptLanguage);
-        return new IteratorEnumeration<Locale>(ret.iterator());
+        if(ret.isEmpty()) {
+            return new IteratorEnumeration<>(Collections.singletonList(Locale.getDefault()).iterator());
+        }
+        return new IteratorEnumeration<>(ret.iterator());
     }
 
     @Override

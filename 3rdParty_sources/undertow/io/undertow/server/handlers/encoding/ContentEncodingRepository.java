@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.handlers.encoding;
 
 import io.undertow.predicate.Predicate;
@@ -20,8 +38,9 @@ import java.util.Map;
 public class ContentEncodingRepository {
 
     public static final String IDENTITY = "identity";
+    public static final EncodingMapping IDENTITY_ENCODING = new EncodingMapping(IDENTITY, ContentEncodingProvider.IDENTITY, 0, Predicates.truePredicate());
 
-    private final Map<String, EncodingMapping> encodingMap = new CopyOnWriteMap<String, EncodingMapping>();
+    private final Map<String, EncodingMapping> encodingMap = new CopyOnWriteMap<>();
 
     /**
      * Gets all allow
@@ -33,10 +52,10 @@ public class ContentEncodingRepository {
         if (res == null || res.isEmpty()) {
             return null;
         }
-        final List<EncodingMapping> resultingMappings = new ArrayList<EncodingMapping>();
+        final List<EncodingMapping> resultingMappings = new ArrayList<>();
         final List<List<QValueParser.QValueResult>> found = QValueParser.parse(res);
         for (List<QValueParser.QValueResult> result : found) {
-            List<EncodingMapping> available = new ArrayList<EncodingMapping>();
+            List<EncodingMapping> available = new ArrayList<>();
             boolean includesIdentity = false;
             boolean isQValue0 = false;
 
@@ -44,9 +63,12 @@ public class ContentEncodingRepository {
                 EncodingMapping encoding;
                 if (value.getValue().equals("*")) {
                     includesIdentity = true;
-                    encoding = new EncodingMapping(IDENTITY, ContentEncodingProvider.IDENTITY, 0, Predicates.truePredicate());
+                    encoding = IDENTITY_ENCODING;
                 } else {
                     encoding = encodingMap.get(value.getValue());
+                    if(encoding == null && IDENTITY.equals(value.getValue())) {
+                        encoding = IDENTITY_ENCODING;
+                    }
                 }
                 if (value.isQValueZero()) {
                     isQValue0 = true;

@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.predicate;
 
 import io.undertow.server.HandlerWrapper;
@@ -17,7 +35,7 @@ import java.util.TreeMap;
 public class PredicatesHandler implements HttpHandler {
 
     private volatile Holder[] handlers = new Holder[0];
-    private final HttpHandler next;
+    private volatile HttpHandler next;
 
     //non-static, so multiple handlers can co-exist
     private final AttachmentKey<Integer> CURRENT_POSITION = AttachmentKey.create(Integer.class);
@@ -67,6 +85,14 @@ public class PredicatesHandler implements HttpHandler {
 
     public PredicatesHandler addPredicatedHandler(final PredicatedHandler handler) {
         return addPredicatedHandler(handler.getPredicate(), handler.getHandler());
+    }
+
+    public void setNext(HttpHandler next) {
+        this.next = next;
+    }
+
+    public HttpHandler getNext() {
+        return next;
     }
 
     private static final class Holder {

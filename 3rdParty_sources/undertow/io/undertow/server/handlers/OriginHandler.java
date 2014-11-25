@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.handlers;
@@ -32,14 +32,14 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
 /**
- * A handler for the HTTP Origin header.
+ * A handler for the HTTP Origin (RFC 6454) header.
  *
  * @author Stuart Douglas
  */
 public class OriginHandler implements HttpHandler {
 
     private volatile HttpHandler originFailedHandler = ResponseCodeHandler.HANDLE_403;
-    private volatile Set<String> allowedOrigins = new HashSet<String>();
+    private volatile Set<String> allowedOrigins = new HashSet<>();
     private volatile boolean requireAllOrigins = true;
     private volatile boolean requireOriginHeader = true;
     private volatile HttpHandler next = ResponseCodeHandler.HANDLE_404;
@@ -86,21 +86,21 @@ public class OriginHandler implements HttpHandler {
     }
 
     public synchronized OriginHandler addAllowedOrigin(final String origin) {
-        final Set<String> allowedOrigins = new HashSet<String>(this.allowedOrigins);
+        final Set<String> allowedOrigins = new HashSet<>(this.allowedOrigins);
         allowedOrigins.add(origin);
         this.allowedOrigins = Collections.unmodifiableSet(allowedOrigins);
         return this;
     }
 
     public synchronized OriginHandler addAllowedOrigins(final Collection<String> origins) {
-        final Set<String> allowedOrigins = new HashSet<String>(this.allowedOrigins);
+        final Set<String> allowedOrigins = new HashSet<>(this.allowedOrigins);
         allowedOrigins.addAll(origins);
         this.allowedOrigins = Collections.unmodifiableSet(allowedOrigins);
         return this;
     }
 
     public synchronized OriginHandler addAllowedOrigins(final String... origins) {
-        final Set<String> allowedOrigins = new HashSet<String>(this.allowedOrigins);
+        final Set<String> allowedOrigins = new HashSet<>(this.allowedOrigins);
         allowedOrigins.addAll(Arrays.asList(origins));
         this.allowedOrigins = Collections.unmodifiableSet(allowedOrigins);
         return this;

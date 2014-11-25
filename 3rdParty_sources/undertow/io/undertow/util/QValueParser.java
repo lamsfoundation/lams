@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.util;
@@ -45,7 +45,7 @@ public class QValueParser {
      * @return The q value results
      */
     public static List<List<QValueResult>> parse(List<String> headers) {
-        final List<QValueResult> found = new ArrayList<QValueResult>();
+        final List<QValueResult> found = new ArrayList<>();
         QValueResult current = null;
         for (final String header : headers) {
             final int l = header.length();
@@ -104,13 +104,13 @@ public class QValueParser {
         }
         Collections.sort(found, Collections.reverseOrder());
         String currentQValue = null;
-        List<List<QValueResult>> values = new ArrayList<List<QValueResult>>();
+        List<List<QValueResult>> values = new ArrayList<>();
         List<QValueResult> currentSet = null;
 
         for(QValueResult val : found) {
             if(!val.qvalue.equals(currentQValue)) {
                 currentQValue = val.qvalue;
-                currentSet = new ArrayList<QValueResult>();
+                currentSet = new ArrayList<>();
                 values.add(currentSet);
             }
             currentSet.add(val);

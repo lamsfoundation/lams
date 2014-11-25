@@ -1,13 +1,35 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.handlers;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import io.undertow.UndertowOptions;
+import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.builder.HandlerBuilder;
 import io.undertow.util.URLUtils;
 
 /**
@@ -40,9 +62,9 @@ public class URLDecodingHandler implements HttpHandler {
             exchange.setRelativePath(URLUtils.decode(exchange.getRelativePath(), charset, decodeSlash, sb));
             exchange.setResolvedPath(URLUtils.decode(exchange.getResolvedPath(), charset, decodeSlash, sb));
             if (!exchange.getQueryString().isEmpty()) {
-                final TreeMap<String, Deque<String>> newParams = new TreeMap<String, Deque<String>>();
+                final TreeMap<String, Deque<String>> newParams = new TreeMap<>();
                 for (Map.Entry<String, Deque<String>> param : exchange.getQueryParameters().entrySet()) {
-                    final Deque<String> newVales = new ArrayDeque<String>(param.getValue().size());
+                    final Deque<String> newVales = new ArrayDeque<>(param.getValue().size());
                     for (String val : param.getValue()) {
                         newVales.add(URLUtils.decode(val, charset, true, sb));
                     }
@@ -54,4 +76,49 @@ public class URLDecodingHandler implements HttpHandler {
         }
         next.handleRequest(exchange);
     }
+
+
+    public static class Builder implements HandlerBuilder {
+
+        @Override
+        public String name() {
+            return "url-decoding";
+        }
+
+        @Override
+        public Map<String, Class<?>> parameters() {
+            return Collections.<String,Class<?>>singletonMap("charset", String.class);
+        }
+
+        @Override
+        public Set<String> requiredParameters() {
+            return Collections.singleton("charset");
+        }
+
+        @Override
+        public String defaultParameter() {
+            return "charset";
+        }
+
+        @Override
+        public HandlerWrapper build(Map<String, Object> config) {
+            return new Wrapper(config.get("charset").toString());
+        }
+
+    }
+
+    private static class Wrapper implements HandlerWrapper {
+
+        private final String charset;
+
+        private Wrapper(String charset) {
+            this.charset = charset;
+        }
+
+        @Override
+        public HttpHandler wrap(HttpHandler handler) {
+            return new URLDecodingHandler(handler, charset);
+        }
+    }
+
 }

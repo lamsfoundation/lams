@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server;
@@ -99,8 +99,8 @@ public final class HttpServerExchange extends AbstractAttachable {
     static final AttachmentKey<Pooled<ByteBuffer>[]> BUFFERED_REQUEST_DATA = AttachmentKey.create(Pooled[].class);
 
     private final ServerConnection connection;
-    private final HeaderMap requestHeaders = new HeaderMap();
-    private final HeaderMap responseHeaders = new HeaderMap();
+    private final HeaderMap requestHeaders;
+    private final HeaderMap responseHeaders;
 
     private int exchangeCompletionListenersCount = 0;
     private ExchangeCompletionListener[] exchangeCompleteListeners;
@@ -216,6 +216,12 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     private Executor dispatchExecutor;
 
+    /**
+     * The number of bytes that have been sent to the remote client. This does not include headers,
+     * only the entity body, and does not take any transfer or content encoding into account.
+     */
+    private long responseBytesSent = 0;
+
 
     private static final int MASK_RESPONSE_CODE = intBitMask(0, 9);
 
@@ -282,12 +288,18 @@ public final class HttpServerExchange extends AbstractAttachable {
     private InetSocketAddress destinationAddress;
 
     public HttpServerExchange(final ServerConnection connection, long maxEntitySize) {
-        this.connection = connection;
-        this.maxEntitySize = maxEntitySize;
+        this(connection, new HeaderMap(), new HeaderMap(), maxEntitySize);
     }
 
     public HttpServerExchange(final ServerConnection connection) {
         this(connection, 0);
+    }
+
+    public HttpServerExchange(final ServerConnection connection, final HeaderMap requestHeaders, final HeaderMap responseHeaders,  long maxEntitySize) {
+        this.connection = connection;
+        this.maxEntitySize = maxEntitySize;
+        this.requestHeaders = requestHeaders;
+        this.responseHeaders = responseHeaders;
     }
 
     /**
@@ -492,6 +504,10 @@ public final class HttpServerExchange extends AbstractAttachable {
         return this;
     }
 
+    /**
+     *
+     * @return The query string, without the leading ?
+     */
     public String getQueryString() {
         return queryString;
     }
@@ -636,12 +652,28 @@ public final class HttpServerExchange extends AbstractAttachable {
         return anyAreSet(state, FLAG_PERSISTENT);
     }
 
+    /**
+     *
+     * @return <code>true</code> If the current thread in the IO thread for the exchange
+     */
     public boolean isInIoThread() {
         return getIoThread() == Thread.currentThread();
     }
 
+    /**
+     *
+     * @return True if this exchange represents an upgrade response
+     */
     public boolean isUpgrade() {
         return getResponseCode() == 101;
+    }
+
+    /**
+     *
+     * @return The number of bytes sent in the entity body
+     */
+    public long getResponseBytesSent() {
+        return responseBytesSent;
     }
 
     public HttpServerExchange setPersistent(final boolean persistent) {
@@ -953,18 +985,18 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public Map<String, Deque<String>> getQueryParameters() {
         if (queryParameters == null) {
-            queryParameters = new TreeMap<String, Deque<String>>();
+            queryParameters = new TreeMap<>();
         }
         return queryParameters;
     }
 
     public HttpServerExchange addQueryParam(final String name, final String param) {
         if (queryParameters == null) {
-            queryParameters = new TreeMap<String, Deque<String>>();
+            queryParameters = new TreeMap<>();
         }
         Deque<String> list = queryParameters.get(name);
         if (list == null) {
-            queryParameters.put(name, list = new ArrayDeque<String>(2));
+            queryParameters.put(name, list = new ArrayDeque<>(2));
         }
         list.add(param);
         return this;
@@ -978,18 +1010,18 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public Map<String, Deque<String>> getPathParameters() {
         if (pathParameters == null) {
-            pathParameters = new TreeMap<String, Deque<String>>();
+            pathParameters = new TreeMap<>();
         }
         return pathParameters;
     }
 
     public HttpServerExchange addPathParam(final String name, final String param) {
         if (pathParameters == null) {
-            pathParameters = new TreeMap<String, Deque<String>>();
+            pathParameters = new TreeMap<>();
         }
         Deque<String> list = pathParameters.get(name);
         if (list == null) {
-            pathParameters.put(name, list = new ArrayDeque<String>(2));
+            pathParameters.put(name, list = new ArrayDeque<>(2));
         }
         list.add(param);
         return this;
@@ -1015,7 +1047,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public HttpServerExchange setResponseCookie(final Cookie cookie) {
         if (responseCookies == null) {
-            responseCookies = new TreeMap<String, Cookie>(); //hashmap is slow to allocate in JDK7
+            responseCookies = new TreeMap<>(); //hashmap is slow to allocate in JDK7
         }
         responseCookies.put(cookie.getName(), cookie);
         return this;
@@ -1026,7 +1058,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      */
     public Map<String, Cookie> getResponseCookies() {
         if (responseCookies == null) {
-            responseCookies = new TreeMap<String, Cookie>();
+            responseCookies = new TreeMap<>();
         }
         return responseCookies;
     }
@@ -1066,7 +1098,7 @@ public final class HttpServerExchange extends AbstractAttachable {
         final ConduitStreamSourceChannel sourceChannel = connection.getSourceChannel();
         if (wrappers != null) {
             this.requestWrappers = null;
-            final WrapperConduitFactory<StreamSourceConduit> factory = new WrapperConduitFactory<StreamSourceConduit>(wrappers, requestWrapperCount, sourceChannel.getConduit(), this);
+            final WrapperConduitFactory<StreamSourceConduit> factory = new WrapperConduitFactory<>(wrappers, requestWrapperCount, sourceChannel.getConduit(), this);
             sourceChannel.setConduit(factory.create());
         }
         return requestChannel = new ReadDispatchChannel(sourceChannel);
@@ -1246,7 +1278,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     public HttpServerExchange addResponseWrapper(final ConduitWrapper<StreamSinkConduit> wrapper) {
         ConduitWrapper<StreamSinkConduit>[] wrappers = responseWrappers;
         if (responseChannel != null) {
-            throw UndertowMessages.MESSAGES.requestChannelAlreadyProvided();
+            throw UndertowMessages.MESSAGES.responseChannelAlreadyProvided();
         }
         if(wrappers == null) {
             this.responseWrappers = wrappers = new ConduitWrapper[2];
@@ -1378,6 +1410,10 @@ public final class HttpServerExchange extends AbstractAttachable {
     public HttpServerExchange endExchange() {
         final int state = this.state;
         if (allAreSet(state, FLAG_REQUEST_TERMINATED | FLAG_RESPONSE_TERMINATED)) {
+            if(blockingHttpExchange != null) {
+                //we still have to close the blocking exchange in this case,
+                IoUtils.safeClose(blockingHttpExchange);
+            }
             return this;
         }
         if(defaultResponseListeners != null) {
@@ -1398,6 +1434,10 @@ public final class HttpServerExchange extends AbstractAttachable {
             }
         }
 
+        if (anyAreClear(state, FLAG_REQUEST_TERMINATED)) {
+            connection.terminateRequestChannel(this);
+        }
+
         if (blockingHttpExchange != null) {
             try {
                 //TODO: can we end up in this situation in a IO thread?
@@ -1410,7 +1450,6 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         //417 means that we are rejecting the request
         //so the client should not actually send any data
-        //TODO: how
         if (anyAreClear(state, FLAG_REQUEST_TERMINATED)) {
 
             //not really sure what the best thing to do here is
@@ -1509,6 +1548,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             }
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+
             IoUtils.safeClose(connection);
         }
     }
@@ -1564,6 +1604,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             throw UndertowMessages.MESSAGES.requestChannelAlreadyProvided();
         }
         this.maxEntitySize = maxEntitySize;
+        connection.maxEntitySizeUpdated(this);
         return this;
     }
 
@@ -1654,8 +1695,11 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void close() throws IOException {
-            IoUtils.safeClose(getInputStream());
-            IoUtils.safeClose(getOutputStream());
+            try {
+                getInputStream().close();
+            } finally {
+                getOutputStream().close();
+            }
         }
     }
 
@@ -1726,12 +1770,86 @@ public final class HttpServerExchange extends AbstractAttachable {
         }
 
         private void invokeListener() {
-            getIoThread().execute(new Runnable() {
-                @Override
-                public void run() {
-                    ChannelListeners.invokeChannelListener(WriteDispatchChannel.this, writeSetter.get());
-                }
-            });
+            if(writeSetter != null) {
+                getIoThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        ChannelListeners.invokeChannelListener(WriteDispatchChannel.this, writeSetter.get());
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void awaitWritable() throws IOException {
+            if(Thread.currentThread() == getIoThread()) {
+                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
+            }
+            super.awaitWritable();
+        }
+
+        @Override
+        public void awaitWritable(long time, TimeUnit timeUnit) throws IOException {
+            if(Thread.currentThread() == getIoThread()) {
+                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
+            }
+            super.awaitWritable(time, timeUnit);
+        }
+
+        @Override
+        public long transferFrom(FileChannel src, long position, long count) throws IOException {
+            long l = super.transferFrom(src, position, count);
+            responseBytesSent += l;
+            return l;
+        }
+
+        @Override
+        public long transferFrom(StreamSourceChannel source, long count, ByteBuffer throughBuffer) throws IOException {
+            long l = super.transferFrom(source, count, throughBuffer);
+            responseBytesSent += l;
+            return l;
+        }
+
+        @Override
+        public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
+            long l = super.write(srcs, offset, length);
+            responseBytesSent += l;
+            return l;
+        }
+
+        @Override
+        public long write(ByteBuffer[] srcs) throws IOException {
+            long l = super.write(srcs);
+            responseBytesSent += l;
+            return l;
+        }
+
+        @Override
+        public int writeFinal(ByteBuffer src) throws IOException {
+            int l = super.writeFinal(src);
+            responseBytesSent += l;
+            return l;
+        }
+
+        @Override
+        public long writeFinal(ByteBuffer[] srcs, int offset, int length) throws IOException {
+            long l = super.writeFinal(srcs, offset, length);
+            responseBytesSent += l;
+            return l;
+        }
+
+        @Override
+        public long writeFinal(ByteBuffer[] srcs) throws IOException {
+            long l = super.writeFinal(srcs);
+            responseBytesSent += l;
+            return l;
+        }
+
+        @Override
+        public int write(ByteBuffer src) throws IOException {
+            int l = super.write(src);
+            responseBytesSent += l;
+            return l;
         }
     }
 
@@ -1787,17 +1905,24 @@ public final class HttpServerExchange extends AbstractAttachable {
         }
 
         private void invokeListener() {
-            getIoThread().execute(new Runnable() {
-                @Override
-                public void run() {
-                    ChannelListeners.invokeChannelListener(ReadDispatchChannel.this, readSetter.get());
-                }
-            });
+            if(readSetter != null) {
+                getIoThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        ChannelListeners.invokeChannelListener(ReadDispatchChannel.this, readSetter.get());
+                    }
+                });
+            }
         }
 
         public void requestDone() {
-            delegate.setReadListener(null);
-            delegate.setCloseListener(null);
+            if(delegate instanceof ConduitStreamSourceChannel) {
+                ((ConduitStreamSourceChannel)delegate).setReadListener(null);
+                ((ConduitStreamSourceChannel)delegate).setCloseListener(null);
+            } else {
+                delegate.getReadSetter().set(null);
+                delegate.getCloseSetter().set(null);
+            }
         }
 
         @Override
@@ -1811,6 +1936,9 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitReadable() throws IOException {
+            if(Thread.currentThread() == getIoThread()) {
+                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
+            }
             Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 super.awaitReadable();
@@ -1865,6 +1993,9 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitReadable(long time, TimeUnit timeUnit) throws IOException {
+            if(Thread.currentThread() == getIoThread()) {
+                throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
+            }
             Pooled<ByteBuffer>[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
             if (buffered == null) {
                 super.awaitReadable(time, timeUnit);

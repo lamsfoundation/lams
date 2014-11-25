@@ -1,6 +1,27 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.channels;
 
-import io.undertow.UndertowMessages;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.concurrent.TimeUnit;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.Option;
@@ -11,10 +32,7 @@ import org.xnio.channels.StreamSinkChannel;
 import org.xnio.channels.StreamSourceChannel;
 import org.xnio.conduits.ConduitStreamSourceChannel;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.concurrent.TimeUnit;
+import io.undertow.UndertowMessages;
 
 /**
  * A stream source channel that can be marked as detached. Once this is marked as detached then
@@ -24,12 +42,12 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class DetachableStreamSourceChannel implements StreamSourceChannel{
 
-    protected final ConduitStreamSourceChannel delegate;
+    protected final StreamSourceChannel delegate;
 
     protected ChannelListener.SimpleSetter<DetachableStreamSourceChannel> readSetter;
     protected ChannelListener.SimpleSetter<DetachableStreamSourceChannel> closeSetter;
 
-    public DetachableStreamSourceChannel(final ConduitStreamSourceChannel delegate) {
+    public DetachableStreamSourceChannel(final StreamSourceChannel delegate) {
         this.delegate = delegate;
     }
 
@@ -103,9 +121,13 @@ public abstract class DetachableStreamSourceChannel implements StreamSourceChann
 
     public ChannelListener.Setter<? extends StreamSourceChannel> getReadSetter() {
         if (readSetter == null) {
-            readSetter = new ChannelListener.SimpleSetter<DetachableStreamSourceChannel>();
+            readSetter = new ChannelListener.SimpleSetter<>();
             if (!isFinished()) {
-                delegate.setReadListener(ChannelListeners.delegatingChannelListener(this, readSetter));
+                if(delegate instanceof ConduitStreamSourceChannel) {
+                    ((ConduitStreamSourceChannel)delegate).setReadListener(ChannelListeners.delegatingChannelListener(this, readSetter));
+                } else {
+                    delegate.getReadSetter().set(ChannelListeners.delegatingChannelListener(this, readSetter));
+                }
             }
         }
         return readSetter;
@@ -152,9 +174,13 @@ public abstract class DetachableStreamSourceChannel implements StreamSourceChann
 
     public ChannelListener.Setter<? extends StreamSourceChannel> getCloseSetter() {
         if (closeSetter == null) {
-            closeSetter = new ChannelListener.SimpleSetter<DetachableStreamSourceChannel>();
+            closeSetter = new ChannelListener.SimpleSetter<>();
             if (!isFinished()) {
-                delegate.setCloseListener(ChannelListeners.delegatingChannelListener(this, closeSetter));
+                if(delegate instanceof ConduitStreamSourceChannel) {
+                    ((ConduitStreamSourceChannel)delegate).setCloseListener(ChannelListeners.delegatingChannelListener(this, closeSetter));
+                } else {
+                    delegate.getCloseSetter().set(ChannelListeners.delegatingChannelListener(this, closeSetter));
+                }
             }
         }
         return closeSetter;

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.spec;
@@ -60,6 +60,7 @@ import io.undertow.servlet.handlers.ServletPathMatch;
 import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.util.AttachmentKey;
 import io.undertow.util.CanonicalPathUtils;
+import io.undertow.util.Headers;
 import io.undertow.util.SameThreadExecutor;
 import org.xnio.IoUtils;
 import org.xnio.XnioExecutor;
@@ -71,7 +72,7 @@ public class AsyncContextImpl implements AsyncContext {
 
     public static final AttachmentKey<Boolean> ASYNC_SUPPORTED = AttachmentKey.create(Boolean.class);
 
-    private final List<BoundAsyncListener> asyncListeners = new CopyOnWriteArrayList<BoundAsyncListener>();
+    private final List<BoundAsyncListener> asyncListeners = new CopyOnWriteArrayList<>();
 
     private final HttpServerExchange exchange;
     private final ServletRequest servletRequest;
@@ -92,7 +93,7 @@ public class AsyncContextImpl implements AsyncContext {
     private boolean initialRequestDone;
     private Thread initiatingThread;
 
-    private final Deque<Runnable> asyncTaskQueue = new ArrayDeque<Runnable>();
+    private final Deque<Runnable> asyncTaskQueue = new ArrayDeque<>();
     private boolean processingAsyncTask = false;
     private boolean complete = false;
 
@@ -227,7 +228,7 @@ public class AsyncContextImpl implements AsyncContext {
         String newRequestUri = context.getContextPath() + newServletPath;
 
         //todo: a more efficient impl
-        Map<String, Deque<String>> newQueryParameters = new HashMap<String, Deque<String>>();
+        Map<String, Deque<String>> newQueryParameters = new HashMap<>();
         for (String part : newQueryString.split("&")) {
             String name = part;
             String value = "";
@@ -238,7 +239,7 @@ public class AsyncContextImpl implements AsyncContext {
             }
             Deque<String> queue = newQueryParameters.get(name);
             if (queue == null) {
-                newQueryParameters.put(name, queue = new ArrayDeque<String>(1));
+                newQueryParameters.put(name, queue = new ArrayDeque<>(1));
             }
             queue.add(value);
         }
@@ -275,8 +276,13 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     public synchronized void completeInternal() {
-
-        if (!initialRequestDone && Thread.currentThread() == initiatingThread) {
+        if(timeoutKey != null) {
+            timeoutKey.remove();
+            timeoutKey = null;
+        }
+        servletRequestContext.getOriginalRequest().asyncRequestDispatched();
+        Thread currentThread = Thread.currentThread();
+        if (!initialRequestDone && currentThread == initiatingThread) {
             //the context was stopped in the same request context it was started, we don't do anything
             if (dispatched) {
                 throw UndertowServletMessages.MESSAGES.asyncRequestAlreadyDispatched();
@@ -285,15 +291,35 @@ public class AsyncContextImpl implements AsyncContext {
             dispatched = true;
             initialRequestDone();
         } else {
-            doDispatch(new Runnable() {
-                @Override
-                public void run() {
-                    //we do not run the ServletRequestListeners here, as the request does not come into the scope
-                    //of a web application, as defined by the javadoc on ServletRequestListener
-                    HttpServletResponseImpl response = servletRequestContext.getOriginalResponse();
-                    response.responseDone();
+            //we do not run the ServletRequestListeners here, as the request does not come into the scope
+            //of a web application, as defined by the javadoc on ServletRequestListener
+            if(currentThread == exchange.getIoThread()) {
+                //the thread safety semantics here are a bit weird.
+                //basically if we are doing async IO we can't do a dispatch here, as then the IO thread can be racing
+                //with the dispatch thread.
+                //at all other times the dispatch is desirable
+                HttpServletResponseImpl response = servletRequestContext.getOriginalResponse();
+                response.responseDone();
+                try {
+                    servletRequestContext.getOriginalRequest().closeAndDrainRequest();
+                } catch (IOException e) {
+                    UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                 }
-            });
+            } else {
+                doDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        HttpServletResponseImpl response = servletRequestContext.getOriginalResponse();
+                        response.responseDone();
+                        try {
+                            servletRequestContext.getOriginalRequest().closeAndDrainRequest();
+                        } catch (IOException e) {
+                            UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -444,28 +470,60 @@ public class AsyncContextImpl implements AsyncContext {
         public void run() {
             synchronized (AsyncContextImpl.this) {
                 if (!dispatched) {
-                    UndertowServletLogger.REQUEST_LOGGER.debug("Async request timed out");
-                    onAsyncTimeout();
-                    if (!dispatched) {
-                        if(!getResponse().isCommitted()) {
-                            //servlet
-                            try {
-                                if (servletResponse instanceof HttpServletResponse) {
-                                    ((HttpServletResponse) servletResponse).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                                } else {
-                                    servletRequestContext.getOriginalResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                                }
-                            } catch (IOException e) {
-                                UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                    addAsyncTask(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            final boolean setupRequired = SecurityActions.currentServletRequestContext() == null;
+                            ThreadSetupAction.Handle handle = null;
+                            if (setupRequired) {
+                                handle = servletRequestContext.getDeployment().getThreadSetupAction().setup(exchange);
                             }
-                        } else {
-                            //not much we can do, just break the connection
-                            IoUtils.safeClose(exchange.getConnection());
+                            UndertowServletLogger.REQUEST_LOGGER.debug("Async request timed out");
+
+                            try {
+                                //now run request listeners
+                                setupRequestContext(setupRequired);
+                                try {
+                                    onAsyncTimeout();
+                                    if (!dispatched) {
+                                        if (!getResponse().isCommitted()) {
+                                            //close the connection on timeout
+                                            exchange.setPersistent(false);
+                                            exchange.getResponseHeaders().put(Headers.CONNECTION, Headers.CLOSE.toString());
+                                            Connectors.executeRootHandler(new HttpHandler() {
+                                                @Override
+                                                public void handleRequest(HttpServerExchange exchange) throws Exception {
+                                                    //servlet
+                                                    try {
+                                                        if (servletResponse instanceof HttpServletResponse) {
+                                                            ((HttpServletResponse) servletResponse).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                                                        } else {
+                                                            servletRequestContext.getOriginalResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                                                        }
+                                                    } catch (IOException e) {
+                                                        UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                                                    }
+                                                }
+                                            }, exchange);
+                                        } else {
+                                            //not much we can do, just break the connection
+                                            IoUtils.safeClose(exchange.getConnection());
+                                        }
+                                        if (!dispatched) {
+                                            complete();
+                                        }
+                                    }
+                                } finally {
+                                    tearDownRequestContext(setupRequired);
+                                }
+                            } finally {
+                                if (setupRequired) {
+                                    handle.tearDown();
+                                }
+                            }
                         }
-                        if (!dispatched) {
-                            complete();
-                        }
-                    }
+                    });
                 }
             }
         }
@@ -551,15 +609,6 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     private void onAsyncTimeout() {
-        final boolean setupRequired = SecurityActions.currentServletRequestContext() == null;
-        ThreadSetupAction.Handle handle = null;
-        if (setupRequired) {
-            handle = servletRequestContext.getDeployment().getThreadSetupAction().setup(exchange);
-        }
-        try {
-            //now run request listeners
-            setupRequestContext(setupRequired);
-            try {
                 for (final BoundAsyncListener listener : asyncListeners) {
                     AsyncEvent event = new AsyncEvent(this, listener.servletRequest, listener.servletResponse);
                     try {
@@ -568,14 +617,6 @@ public class AsyncContextImpl implements AsyncContext {
                         UndertowServletLogger.REQUEST_LOGGER.ioExceptionDispatchingAsyncEvent(e);
                     }
                 }
-            } finally {
-                tearDownRequestContext(setupRequired);
-            }
-        } finally {
-            if (setupRequired) {
-                handle.tearDown();
-            }
-        }
     }
 
     private void onAsyncStart(AsyncContext newAsyncContext) {

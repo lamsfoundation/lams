@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,23 +9,25 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.util;
+
+import io.undertow.UndertowOptions;
+import io.undertow.server.HttpServerExchange;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import io.undertow.UndertowOptions;
-import io.undertow.server.HttpServerExchange;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Utility for parsing and generating dates
@@ -40,21 +42,30 @@ public class DateUtils {
 
     private static final String RFC1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
 
-    private static volatile String cachedDateString;
-    private static volatile long nextUpdateTime = -1;
+    private static final AtomicReference<String> cachedDateString = new AtomicReference<>();
 
     /**
      * Thread local cache of this date format. This is technically a small memory leak, however
      * in practice it is fine, as it will only be used by server threads.
-     *
+     * <p/>
      * This is the most common date format, which is why we cache it.
      */
     private static final ThreadLocal<SimpleDateFormat> RFC1123_PATTERN_FORMAT = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected SimpleDateFormat initialValue() {
-            SimpleDateFormat df =  new SimpleDateFormat(RFC1123_PATTERN, LOCALE_US);
+            SimpleDateFormat df = new SimpleDateFormat(RFC1123_PATTERN, LOCALE_US);
             df.setTimeZone(GMT_ZONE);
             return df;
+        }
+    };
+
+    /**
+     * Invalidates the current date
+     */
+    private static final Runnable INVALIDATE_TASK = new Runnable() {
+        @Override
+        public void run() {
+            cachedDateString.set(null);
         }
     };
 
@@ -71,7 +82,7 @@ public class DateUtils {
     private static final ThreadLocal<SimpleDateFormat> COMMON_LOG_PATTERN_FORMAT = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected SimpleDateFormat initialValue() {
-            SimpleDateFormat df =  new SimpleDateFormat(COMMON_LOG_PATTERN, LOCALE_US);
+            SimpleDateFormat df = new SimpleDateFormat(COMMON_LOG_PATTERN, LOCALE_US);
             return df;
         }
     };
@@ -113,7 +124,7 @@ public class DateUtils {
          */
 
         final int semicolonIndex = date.indexOf(';');
-        final String trimmedDate = semicolonIndex >=0 ? date.substring(0, semicolonIndex) : date;
+        final String trimmedDate = semicolonIndex >= 0 ? date.substring(0, semicolonIndex) : date;
 
         ParsePosition pp = new ParsePosition(0);
         SimpleDateFormat dateFormat = RFC1123_PATTERN_FORMAT.get();
@@ -157,18 +168,7 @@ public class DateUtils {
      * @return
      */
     public static boolean handleIfModifiedSince(final HttpServerExchange exchange, final Date lastModified) {
-        if (lastModified == null) {
-            return true;
-        }
-        String modifiedSince = exchange.getRequestHeaders().getFirst(Headers.IF_MODIFIED_SINCE);
-        if (modifiedSince == null) {
-            return true;
-        }
-        Date modDate = parseDate(modifiedSince);
-        if (modDate == null) {
-            return true;
-        }
-        return lastModified.after(modDate);
+        return handleIfModifiedSince(exchange.getRequestHeaders().getFirst(Headers.IF_MODIFIED_SINCE), lastModified);
     }
 
     /**
@@ -189,7 +189,7 @@ public class DateUtils {
         if (modDate == null) {
             return true;
         }
-        return lastModified.after(modDate);
+        return lastModified.getTime() > (modDate.getTime() + 999); //UNDERTOW-341 +999 as there is no millisecond part in the if-modified-since
     }
 
     /**
@@ -200,18 +200,7 @@ public class DateUtils {
      * @return
      */
     public static boolean handleIfUnmodifiedSince(final HttpServerExchange exchange, final Date lastModified) {
-        if (lastModified == null) {
-            return true;
-        }
-        String modifiedSince = exchange.getRequestHeaders().getFirst(Headers.IF_UNMODIFIED_SINCE);
-        if (modifiedSince == null) {
-            return true;
-        }
-        Date modDate = parseDate(modifiedSince);
-        if (modDate == null) {
-            return true;
-        }
-        return lastModified.before(modDate);
+        return handleIfModifiedSince(exchange.getRequestHeaders().getFirst(Headers.IF_UNMODIFIED_SINCE), lastModified);
     }
 
     /**
@@ -232,20 +221,26 @@ public class DateUtils {
         if (modDate == null) {
             return true;
         }
-        return lastModified.after(modDate);
+        return lastModified.getTime() < (modDate.getTime() + 999); //UNDERTOW-341 +999 as there is no millisecond part in the if-unmodified-since
     }
 
     public static void addDateHeaderIfRequired(HttpServerExchange exchange) {
         HeaderMap responseHeaders = exchange.getResponseHeaders();
-        if(exchange.getConnection().getUndertowOptions().get(UndertowOptions.ALWAYS_SET_DATE, true) && !responseHeaders.contains(Headers.DATE)) {
-            long time = System.nanoTime();
-            if(time < nextUpdateTime) {
-                responseHeaders.put(Headers.DATE, cachedDateString);
+        if (exchange.getConnection().getUndertowOptions().get(UndertowOptions.ALWAYS_SET_DATE, true) && !responseHeaders.contains(Headers.DATE)) {
+            String dateString = cachedDateString.get();
+            if (dateString != null) {
+                responseHeaders.put(Headers.DATE, dateString);
             } else {
+                //set the time and register a timer to invalidate it
+                //note that this is racey, it does not matter if multiple threads do this
+                //the perf cost of synchronizing would be more than the perf cost of multiple threads running it
                 long realTime = System.currentTimeMillis();
-                String dateString = DateUtils.toDateString(new Date(realTime));
-                cachedDateString = dateString;
-                nextUpdateTime = time + 1000000000;
+                long mod = realTime % 1000;
+                long toGo = 1000 - mod;
+                dateString = DateUtils.toDateString(new Date(realTime));
+                if (cachedDateString.compareAndSet(null, dateString)) {
+                    exchange.getConnection().getIoThread().executeAfter(INVALIDATE_TASK, toGo, TimeUnit.MILLISECONDS);
+                }
                 responseHeaders.put(Headers.DATE, dateString);
             }
         }
@@ -254,4 +249,5 @@ public class DateUtils {
     private DateUtils() {
 
     }
+
 }

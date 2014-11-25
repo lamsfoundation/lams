@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.util;
 
 import io.undertow.UndertowMessages;
@@ -173,9 +191,9 @@ public class Cookies {
     public static Map<String, Cookie> parseRequestCookies(int maxCookies, boolean allowEqualInValue, List<String> cookies) {
 
         if (cookies == null) {
-            return new TreeMap<String, Cookie>();
+            return new TreeMap<>();
         }
-        final Map<String, Cookie> parsedCookies = new TreeMap<String, Cookie>();
+        final Map<String, Cookie> parsedCookies = new TreeMap<>();
 
         for (String cookie : cookies) {
             parseCookie(cookie, parsedCookies, maxCookies, allowEqualInValue);
@@ -188,8 +206,8 @@ public class Cookies {
         String name = null;
         int start = 0;
         int cookieCount = parsedCookies.size();
-        final Map<String, String> cookies = new HashMap<String, String>();
-        final Map<String, String> additional = new HashMap<String, String>();
+        final Map<String, String> cookies = new HashMap<>();
+        final Map<String, String> additional = new HashMap<>();
         for (int i = 0; i < cookie.length(); ++i) {
             char c = cookie.charAt(i);
             switch (state) {
@@ -221,7 +239,7 @@ public class Cookies {
                         cookieCount = createCookie(name, cookie.substring(start, i), maxCookies, cookieCount, cookies, additional);
                         state = 0;
                         start = i + 1;
-                    } else if (c == '"') {
+                    } else if (c == '"' && start == i) { //only process the " if it is the first character
                         state = 3;
                         start = i + 1;
                     } else if (!allowEqualInValue && c == '=') {
@@ -274,7 +292,7 @@ public class Cookies {
 
     private static int createCookie(final String name, final String value, int maxCookies, int cookieCount,
             final Map<String, String> cookies, final Map<String, String> additional) {
-        if (name.charAt(0) == '$') {
+        if (!name.isEmpty() && name.charAt(0) == '$') {
             if(additional.containsKey(name)) {
                 return cookieCount;
             }

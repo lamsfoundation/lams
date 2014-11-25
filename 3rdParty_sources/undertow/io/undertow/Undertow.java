@@ -1,17 +1,31 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow;
 
-import java.net.Inet4Address;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
-import io.undertow.server.protocol.ajp.AjpOpenListener;
 import io.undertow.security.api.AuthenticationMode;
 import io.undertow.security.api.GSSAPIServerSubjectFactory;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.protocol.ajp.AjpOpenListener;
+import io.undertow.server.protocol.http.AlpnOpenListener;
 import io.undertow.server.protocol.http.HttpOpenListener;
+import io.undertow.server.protocol.spdy.SpdyOpenListener;
 import org.xnio.BufferAllocator;
 import org.xnio.ByteBufferSlicePool;
 import org.xnio.ChannelListener;
@@ -32,6 +46,11 @@ import org.xnio.ssl.XnioSsl;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import java.net.Inet4Address;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Convenience class used to build an Undertow server.
@@ -47,7 +66,7 @@ public class Undertow {
     private final int ioThreads;
     private final int workerThreads;
     private final boolean directBuffers;
-    private final List<ListenerConfig> listeners = new ArrayList<ListenerConfig>();
+    private final List<ListenerConfig> listeners = new ArrayList<>();
     private final HttpHandler rootHandler;
     private final OptionMap workerOptions;
     private final OptionMap socketOptions;
@@ -79,7 +98,7 @@ public class Undertow {
 
     public synchronized void start() {
         xnio = Xnio.getInstance(Undertow.class.getClassLoader());
-        channels = new ArrayList<AcceptingChannel<? extends StreamConnection>>();
+        channels = new ArrayList<>();
         try {
             worker = xnio.createWorker(OptionMap.builder()
                     .set(Options.WORKER_IO_THREADS, ioThreads)
@@ -102,37 +121,54 @@ public class Undertow {
                     .getMap();
 
 
-
             Pool<ByteBuffer> buffers = new ByteBufferSlicePool(directBuffers ? BufferAllocator.DIRECT_BYTE_BUFFER_ALLOCATOR : BufferAllocator.BYTE_BUFFER_ALLOCATOR, bufferSize, bufferSize * buffersPerRegion);
 
             for (ListenerConfig listener : listeners) {
                 if (listener.type == ListenerType.AJP) {
-                    AjpOpenListener openListener = new AjpOpenListener(buffers, serverOptions, bufferSize);
+                    AjpOpenListener openListener = new AjpOpenListener(buffers, serverOptions);
                     openListener.setRootHandler(rootHandler);
                     ChannelListener<AcceptingChannel<StreamConnection>> acceptListener = ChannelListeners.openListenerAdapter(openListener);
                     AcceptingChannel<? extends StreamConnection> server = worker.createStreamConnectionServer(new InetSocketAddress(Inet4Address.getByName(listener.host), listener.port), acceptListener, socketOptions);
                     server.resumeAccepts();
                     channels.add(server);
-                } else if (listener.type == ListenerType.HTTP) {
-                    HttpOpenListener openListener = new HttpOpenListener(buffers, OptionMap.builder().set(UndertowOptions.BUFFER_PIPELINED_DATA, true).addAll(serverOptions).getMap(), bufferSize);
-                    openListener.setRootHandler(rootHandler);
-                    ChannelListener<AcceptingChannel<StreamConnection>> acceptListener = ChannelListeners.openListenerAdapter(openListener);
-                    AcceptingChannel<? extends StreamConnection> server = worker.createStreamConnectionServer(new InetSocketAddress(Inet4Address.getByName(listener.host), listener.port), acceptListener, socketOptions);
-                    server.resumeAccepts();
-                    channels.add(server);
-                } else if (listener.type == ListenerType.HTTPS){
-                    HttpOpenListener openListener = new HttpOpenListener(buffers, OptionMap.builder().set(UndertowOptions.BUFFER_PIPELINED_DATA, true).addAll(serverOptions).getMap(), bufferSize);
-                    openListener.setRootHandler(rootHandler);
-                    ChannelListener<AcceptingChannel<StreamConnection>> acceptListener = ChannelListeners.openListenerAdapter(openListener);
-                    XnioSsl xnioSsl;
-                    if(listener.sslContext != null) {
-                        xnioSsl = new JsseXnioSsl(xnio, OptionMap.create(Options.USE_DIRECT_BUFFERS, true), listener.sslContext);
-                    } else {
-                        xnioSsl = xnio.getSslProvider(listener.keyManagers, listener.trustManagers, OptionMap.create(Options.USE_DIRECT_BUFFERS, true));
+                } else {
+                    OptionMap undertowOptions = OptionMap.builder().set(UndertowOptions.BUFFER_PIPELINED_DATA, true).addAll(serverOptions).getMap();
+                    if (listener.type == ListenerType.HTTP) {
+                        HttpOpenListener openListener = new HttpOpenListener(buffers, undertowOptions, bufferSize);
+                        openListener.setRootHandler(rootHandler);
+                        ChannelListener<AcceptingChannel<StreamConnection>> acceptListener = ChannelListeners.openListenerAdapter(openListener);
+                        AcceptingChannel<? extends StreamConnection> server = worker.createStreamConnectionServer(new InetSocketAddress(Inet4Address.getByName(listener.host), listener.port), acceptListener, socketOptions);
+                        server.resumeAccepts();
+                        channels.add(server);
+                    } else if (listener.type == ListenerType.HTTPS) {
+                        ChannelListener<StreamConnection> openListener;
+
+                        HttpOpenListener httpOpenListener = new HttpOpenListener(buffers, undertowOptions);
+                        httpOpenListener.setRootHandler(rootHandler);
+
+                        boolean spdy = serverOptions.get(UndertowOptions.ENABLE_SPDY, false);
+                        if(spdy) {
+                            AlpnOpenListener alpn = new AlpnOpenListener(buffers, httpOpenListener);
+                            if(spdy) {
+                                SpdyOpenListener spdyListener = new SpdyOpenListener(buffers, new ByteBufferSlicePool(BufferAllocator.BYTE_BUFFER_ALLOCATOR, 1024, 1024), undertowOptions);
+                                spdyListener.setRootHandler(rootHandler);
+                                alpn.addProtocol(SpdyOpenListener.SPDY_3_1, spdyListener, 5);
+                            }
+                            openListener = alpn;
+                        } else {
+                            openListener = httpOpenListener;
+                        }
+                        ChannelListener<AcceptingChannel<StreamConnection>> acceptListener = ChannelListeners.openListenerAdapter(openListener);
+                        XnioSsl xnioSsl;
+                        if (listener.sslContext != null) {
+                            xnioSsl = new JsseXnioSsl(xnio, OptionMap.create(Options.USE_DIRECT_BUFFERS, true), listener.sslContext);
+                        } else {
+                            xnioSsl = xnio.getSslProvider(listener.keyManagers, listener.trustManagers, OptionMap.create(Options.USE_DIRECT_BUFFERS, true));
+                        }
+                        AcceptingChannel<SslConnection> sslServer = xnioSsl.createSslConnectionServer(worker, new InetSocketAddress(Inet4Address.getByName(listener.host), listener.port), (ChannelListener) acceptListener, socketOptions);
+                        sslServer.resumeAccepts();
+                        channels.add(sslServer);
                     }
-                    AcceptingChannel <SslConnection> sslServer = xnioSsl.createSslConnectionServer(worker, new InetSocketAddress(Inet4Address.getByName(listener.host), listener.port), (ChannelListener) acceptListener, socketOptions);
-                    sslServer.resumeAccepts();
-                    channels.add(sslServer);
                 }
 
             }
@@ -151,7 +187,6 @@ public class Undertow {
         worker = null;
         xnio = null;
     }
-
 
 
     public static enum ListenerType {
@@ -176,6 +211,7 @@ public class Undertow {
             this.trustManagers = trustManagers;
             this.sslContext = null;
         }
+
         private ListenerConfig(final ListenerType type, final int port, final String host, SSLContext sslContext) {
             this.type = type;
             this.port = port;
@@ -254,7 +290,7 @@ public class Undertow {
         private int ioThreads;
         private int workerThreads;
         private boolean directBuffers;
-        private final List<ListenerConfig> listeners = new ArrayList<ListenerConfig>();
+        private final List<ListenerConfig> listeners = new ArrayList<>();
         private HttpHandler handler;
 
         private final OptionMap.Builder workerOptions = OptionMap.builder();
@@ -310,7 +346,6 @@ public class Undertow {
             listeners.add(new ListenerConfig(ListenerType.HTTPS, port, host, sslContext));
             return this;
         }
-
 
         public Builder addAjpListener(int port, String host) {
             listeners.add(new ListenerConfig(ListenerType.AJP, port, host, null, null));

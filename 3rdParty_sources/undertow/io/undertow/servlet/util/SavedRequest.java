@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.servlet.util;
 
 import io.undertow.UndertowLogger;
@@ -108,7 +126,7 @@ public class SavedRequest implements Serializable {
                 if(request.requestUri.equals(exchange.getRequestURI()) && exchange.isRequestComplete()) {
                     UndertowLogger.REQUEST_LOGGER.debugf("restoring request body for request to %s", request.requestUri);
                     exchange.setRequestMethod(request.method);
-                    Connectors.ungetRequestBytes(exchange, new ImmediatePooled<ByteBuffer>(ByteBuffer.wrap(request.data, 0, request.dataLength)));
+                    Connectors.ungetRequestBytes(exchange, new ImmediatePooled<>(ByteBuffer.wrap(request.data, 0, request.dataLength)));
                     underlyingSession.removeAttribute(SESSION_KEY);
                     //clear the existing header map of everything except the connection header
                     //TODO: are there other headers we should preserve?

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package io.undertow.util;
 
@@ -43,18 +43,19 @@ public class HeaderTokenParser<E extends HeaderToken> {
         char[] headerChars = header.toCharArray();
 
         // The LinkedHashMap is used so that the parameter order can also be retained.
-        Map<E, String> response = new LinkedHashMap<E, String>();
+        Map<E, String> response = new LinkedHashMap<>();
 
         SearchingFor searchingFor = SearchingFor.START_OF_NAME;
         int nameStart = 0;
         E currentToken = null;
         int valueStart = 0;
+        boolean containsEscapes = false;
 
         for (int i = 0; i < headerChars.length; i++) {
             switch (searchingFor) {
                 case START_OF_NAME:
                     // Eliminate any white space before the name of the parameter.
-                    if (headerChars[i] != COMMA && Character.isWhitespace(headerChars[i]) == false) {
+                    if (headerChars[i] != COMMA && !Character.isWhitespace(headerChars[i])) {
                         nameStart = i;
                         searchingFor = SearchingFor.EQUALS_SIGN;
                     }
@@ -70,7 +71,7 @@ public class HeaderTokenParser<E extends HeaderToken> {
                     }
                     break;
                 case START_OF_VALUE:
-                    if (Character.isWhitespace(headerChars[i]) == false) {
+                    if (!Character.isWhitespace(headerChars[i])) {
                         if (headerChars[i] == QUOTE && currentToken.isAllowQuoted()) {
                             valueStart = i + 1;
                             searchingFor = SearchingFor.LAST_QUOTE;
@@ -81,11 +82,28 @@ public class HeaderTokenParser<E extends HeaderToken> {
                     }
                     break;
                 case LAST_QUOTE:
-                    if (headerChars[i] == QUOTE) {
+                    boolean backslash = headerChars[i - 1] != '\\';
+                    if (headerChars[i] == QUOTE && backslash) {
                         String value = String.valueOf(headerChars, valueStart, i - valueStart);
+                        if(containsEscapes) {
+                            StringBuilder sb = new StringBuilder();
+                            boolean lastEscape = false;
+                            for(int j = 0; j < value.length(); ++j) {
+                                char c = value.charAt(j);
+                                if(c == '\\' && !lastEscape) {
+                                    lastEscape = true;
+                                } else {
+                                    lastEscape = false;
+                                    sb.append(c);
+                                }
+                            }
+                            value = sb.toString();
+                        }
                         response.put(currentToken, value);
 
                         searchingFor = SearchingFor.START_OF_NAME;
+                    } else if(backslash) {
+                        containsEscapes = true;
                     }
                     break;
                 case END_OF_VALUE:

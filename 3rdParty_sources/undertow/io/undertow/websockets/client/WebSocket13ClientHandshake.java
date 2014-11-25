@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.websockets.client;
 
 import io.undertow.util.FlexBase64;
@@ -10,7 +28,7 @@ import io.undertow.websockets.core.WebSocketVersion;
 import io.undertow.websockets.core.protocol.version13.WebSocket13Channel;
 import org.xnio.Pool;
 import org.xnio.StreamConnection;
-import org.xnio.http.HandshakeChecker;
+import org.xnio.http.ExtendedHandshakeChecker;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,6 +38,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -45,12 +64,12 @@ public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
 
     @Override
     public WebSocketChannel createChannel(final StreamConnection channel, final String wsUri, final Pool<ByteBuffer> bufferPool) {
-        return new WebSocket13Channel(channel, bufferPool, wsUri, negotiation != null ? negotiation.getSelectedSubProtocol() : "", true, false);
+        return new WebSocket13Channel(channel, bufferPool, wsUri, negotiation != null ? negotiation.getSelectedSubProtocol() : "", true, false, new HashSet<WebSocketChannel>());
     }
 
 
     public Map<String, String> createHeaders() {
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put(Headers.UPGRADE_STRING, "websocket");
         headers.put(Headers.CONNECTION_STRING, "upgrade");
         String key = createSecKey();
@@ -75,7 +94,7 @@ public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
                 Iterator<WebSocketExtension> it = extensions.iterator();
                 while (it.hasNext()) {
                     WebSocketExtension next = it.next();
-                    sb.append(next);
+                    sb.append(next.getName());
                     for (WebSocketExtension.Parameter param : next.getParameters()) {
                         sb.append("; ");
                         sb.append(param.getName());
@@ -107,41 +126,56 @@ public class WebSocket13ClientHandshake extends WebSocketClientHandshake {
     }
 
     @Override
-    public HandshakeChecker handshakeChecker(final URI uri, final Map<String, String> requestHeaders) {
-        final String sentKey = requestHeaders.get(Headers.SEC_WEB_SOCKET_KEY_STRING);
-        return new HandshakeChecker() {
+    public ExtendedHandshakeChecker handshakeChecker(final URI uri, final Map<String, List<String>> requestHeaders) {
+        final String sentKey = requestHeaders.containsKey(Headers.SEC_WEB_SOCKET_KEY_STRING) ? requestHeaders.get(Headers.SEC_WEB_SOCKET_KEY_STRING).get(0) : null;
+        return new ExtendedHandshakeChecker() {
+
             @Override
-            public void checkHandshake(Map<String, String> headers) throws IOException {
-                if(negotiation != null) {
-                    negotiation.afterRequest(headers);
-                }
-                String upgrade = headers.get(Headers.UPGRADE_STRING.toLowerCase(Locale.ENGLISH));
-                if (upgrade == null || !upgrade.trim().equalsIgnoreCase("websocket")) {
-                    throw WebSocketMessages.MESSAGES.noWebSocketUpgradeHeader();
-                }
-                String connHeader = headers.get(Headers.CONNECTION_STRING.toLowerCase(Locale.ENGLISH));
-                if (connHeader == null || !connHeader.trim().equalsIgnoreCase("upgrade")) {
-                    throw WebSocketMessages.MESSAGES.noWebSocketConnectionHeader();
-                }
-                String acceptKey = headers.get(Headers.SEC_WEB_SOCKET_ACCEPT_STRING.toLowerCase(Locale.ENGLISH));
-                final String dKey = solve(sentKey);
-                if (!dKey.equals(acceptKey)) {
-                    throw WebSocketMessages.MESSAGES.webSocketAcceptKeyMismatch(dKey, acceptKey);
-                }
-                if (negotiation != null) {
-                    String subProto = headers.get(Headers.SEC_WEB_SOCKET_PROTOCOL_STRING.toLowerCase(Locale.ENGLISH));
-                    if (subProto != null && !subProto.isEmpty() && !negotiation.getSupportedSubProtocols().contains(subProto)) {
-                        throw WebSocketMessages.MESSAGES.unsupportedProtocol(subProto, negotiation.getSupportedSubProtocols());
+            public void checkHandshakeExtended(Map<String, List<String>> headers) throws IOException {
+                try {
+                    if (negotiation != null) {
+                        negotiation.afterRequest(headers);
                     }
-                    List<WebSocketExtension> extensions = Collections.emptyList();
-                    String extHeader = headers.get(Headers.SEC_WEB_SOCKET_EXTENSIONS_STRING.toLowerCase(Locale.ENGLISH));
-                    if (extHeader != null) {
-                        extensions = WebSocketExtension.parse(extHeader);
+                    String upgrade = getFirst(Headers.UPGRADE_STRING, headers);
+                    if (upgrade == null || !upgrade.trim().equalsIgnoreCase("websocket")) {
+                        throw WebSocketMessages.MESSAGES.noWebSocketUpgradeHeader();
                     }
-                    negotiation.handshakeComplete(subProto, extensions);
+                    String connHeader = getFirst(Headers.CONNECTION_STRING, headers);
+                    if (connHeader == null || !connHeader.trim().equalsIgnoreCase("upgrade")) {
+                        throw WebSocketMessages.MESSAGES.noWebSocketConnectionHeader();
+                    }
+                    String acceptKey = getFirst(Headers.SEC_WEB_SOCKET_ACCEPT_STRING, headers);
+                    final String dKey = solve(sentKey);
+                    if (!dKey.equals(acceptKey)) {
+                        throw WebSocketMessages.MESSAGES.webSocketAcceptKeyMismatch(dKey, acceptKey);
+                    }
+                    if (negotiation != null) {
+                        String subProto = getFirst(Headers.SEC_WEB_SOCKET_PROTOCOL_STRING, headers);
+                        if (subProto != null && !subProto.isEmpty() && !negotiation.getSupportedSubProtocols().contains(subProto)) {
+                            throw WebSocketMessages.MESSAGES.unsupportedProtocol(subProto, negotiation.getSupportedSubProtocols());
+                        }
+                        List<WebSocketExtension> extensions = Collections.emptyList();
+                        String extHeader = getFirst(Headers.SEC_WEB_SOCKET_EXTENSIONS_STRING, headers);
+                        if (extHeader != null) {
+                            extensions = WebSocketExtension.parse(extHeader);
+                        }
+                        negotiation.handshakeComplete(subProto, extensions);
+                    }
+                } catch (IOException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new IOException(e);
                 }
             }
         };
+    }
+
+    private String getFirst(String key, Map<String, List<String>> map) {
+        List<String> list = map.get(key.toLowerCase(Locale.ENGLISH));
+        if(list == null || list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
     }
 
     protected final String solve(final String nonceBase64) {

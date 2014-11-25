@@ -1,7 +1,26 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.attribute;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -25,10 +44,17 @@ public class ExchangeAttributeParser {
     ExchangeAttributeParser(final ClassLoader classLoader, List<ExchangeAttributeWrapper> wrappers) {
         this.wrappers = wrappers;
         ServiceLoader<ExchangeAttributeBuilder> loader = ServiceLoader.load(ExchangeAttributeBuilder.class, classLoader);
-        final List<ExchangeAttributeBuilder> builders = new ArrayList<ExchangeAttributeBuilder>();
+        final List<ExchangeAttributeBuilder> builders = new ArrayList<>();
         for (ExchangeAttributeBuilder instance : loader) {
             builders.add(instance);
         }
+        //sort with highest priority first
+        Collections.sort(builders, new Comparator<ExchangeAttributeBuilder>() {
+            @Override
+            public int compare(ExchangeAttributeBuilder o1, ExchangeAttributeBuilder o2) {
+                return Integer.compare(o2.priority(), o1.priority());
+            }
+        });
         this.builders = Collections.unmodifiableList(builders);
 
     }
@@ -46,7 +72,7 @@ public class ExchangeAttributeParser {
      * @return
      */
     public ExchangeAttribute parse(final String valueString) {
-        final List<ExchangeAttribute> attributes = new ArrayList<ExchangeAttribute>();
+        final List<ExchangeAttribute> attributes = new ArrayList<>();
         int pos = 0;
         int state = 0; //0 = literal, 1 = %, 2 = %{, 3 = $, 4 = ${
         for (int i = 0; i < valueString.length(); ++i) {

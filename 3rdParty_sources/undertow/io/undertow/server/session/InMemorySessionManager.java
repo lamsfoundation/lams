@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.session;
@@ -23,9 +23,8 @@ import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.ConcurrentDirectDeque;
 
-import org.xnio.XnioExecutor;
-import org.xnio.XnioWorker;
-
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+
+import org.xnio.XnioExecutor;
+import org.xnio.XnioWorker;
 
 /**
  * The default in memory session manager. This basically just stores sessions in an in memory hash map.
@@ -61,7 +63,7 @@ public class InMemorySessionManager implements SessionManager {
 
     public InMemorySessionManager(String deploymentName, int maxSessions) {
         this.deploymentName = deploymentName;
-        this.sessions = new ConcurrentHashMap<String, InMemorySession>();
+        this.sessions = new ConcurrentHashMap<>();
         this.maxSize = maxSessions;
         ConcurrentDirectDeque<String> evictionQueue = null;
         if (maxSessions > 0) {
@@ -184,7 +186,7 @@ public class InMemorySessionManager implements SessionManager {
 
     @Override
     public Set<String> getAllSessions() {
-        return new HashSet<String>(sessions.keySet());
+        return new HashSet<>(sessions.keySet());
     }
 
     @Override
@@ -201,7 +203,7 @@ public class InMemorySessionManager implements SessionManager {
 
     @Override
     public String toString() {
-        return this.deploymentName.toString();
+        return this.deploymentName;
     }
 
     /**
@@ -211,16 +213,33 @@ public class InMemorySessionManager implements SessionManager {
 
         private final InMemorySessionManager sessionManager;
 
-        private static volatile AtomicReferenceFieldUpdater<SessionImpl, Object> evictionTokenUpdater = AtomicReferenceFieldUpdater.newUpdater(SessionImpl.class, Object.class, "evictionToken");
+        static volatile AtomicReferenceFieldUpdater<SessionImpl, Object> evictionTokenUpdater;
+        static {
+            //this is needed in case there is unprivileged code on the stack
+            //it needs to delegate to the createTokenUpdater() method otherwise the creation will fail
+            //as the inner class cannot access the member
+            evictionTokenUpdater = AccessController.doPrivileged(new PrivilegedAction<AtomicReferenceFieldUpdater<SessionImpl, Object>>() {
+                @Override
+                public AtomicReferenceFieldUpdater<SessionImpl, Object> run() {
+                    return createTokenUpdater();
+                }
+            });
+        }
+
+        private static AtomicReferenceFieldUpdater<SessionImpl, Object> createTokenUpdater() {
+            return AtomicReferenceFieldUpdater.newUpdater(SessionImpl.class, Object.class, "evictionToken");
+        }
+
 
         private String sessionId;
         private volatile Object evictionToken;
         private final SessionConfig sessionCookieConfig;
+        private volatile long expireTime = -1;
 
         final XnioExecutor executor;
         final XnioWorker worker;
 
-        XnioExecutor.Key cancelKey;
+        XnioExecutor.Key timerCancelKey;
 
         Runnable cancelTask = new Runnable() {
             @Override
@@ -228,7 +247,12 @@ public class InMemorySessionManager implements SessionManager {
                 worker.execute(new Runnable() {
                     @Override
                     public void run() {
-                        invalidate(null, SessionListener.SessionDestroyedReason.TIMEOUT);
+                        long currentTime = System.currentTimeMillis();
+                        if(currentTime >= expireTime) {
+                            invalidate(null, SessionListener.SessionDestroyedReason.TIMEOUT);
+                        } else {
+                            timerCancelKey = executor.executeAfter(cancelTask, expireTime - currentTime, TimeUnit.MILLISECONDS);
+                        }
                     }
                 });
             }
@@ -244,13 +268,23 @@ public class InMemorySessionManager implements SessionManager {
         }
 
         synchronized void bumpTimeout() {
-            if (cancelKey != null) {
-                if (!cancelKey.remove()) {
-                    return;
+            final int maxInactiveInterval = getMaxInactiveInterval();
+            if (maxInactiveInterval > 0) {
+                long newExpireTime = System.currentTimeMillis() + (maxInactiveInterval * 1000);
+                if(timerCancelKey != null && (newExpireTime < expireTime)) {
+                    // We have to re-schedule as the new maxInactiveInterval is lower than the old one
+                    if (!timerCancelKey.remove()) {
+                        return;
+                    }
+                    timerCancelKey = null;
                 }
-            }
-            if (getMaxInactiveInterval() > 0) {
-                cancelKey = executor.executeAfter(cancelTask, getMaxInactiveInterval(), TimeUnit.SECONDS);
+                expireTime = newExpireTime;
+                if(timerCancelKey == null) {
+                    //+1 second, to make sure that the time has actually expired
+                    //we don't re-schedule every time, as it is expensive
+                    //instead when it expires we check if the timeout has been bumped, and if so we re-schedule
+                    timerCancelKey = executor.executeAfter(cancelTask, (maxInactiveInterval * 1000) + 1, TimeUnit.MILLISECONDS);
+                }
             }
             if (evictionToken != null) {
                 Object token = evictionToken;
@@ -366,8 +400,8 @@ public class InMemorySessionManager implements SessionManager {
         }
 
         synchronized void invalidate(final HttpServerExchange exchange, SessionListener.SessionDestroyedReason reason) {
-            if (cancelKey != null) {
-                cancelKey.remove();
+            if (timerCancelKey != null) {
+                timerCancelKey.remove();
             }
             InMemorySession sess = sessionManager.sessions.get(sessionId);
             if (sess == null) {
@@ -402,8 +436,8 @@ public class InMemorySessionManager implements SessionManager {
         }
 
         private synchronized void destroy() {
-            if (cancelKey != null) {
-                cancelKey.remove();
+            if (timerCancelKey != null) {
+                timerCancelKey.remove();
             }
             cancelTask = null;
         }
@@ -423,7 +457,7 @@ public class InMemorySessionManager implements SessionManager {
             this.maxInactiveInterval = maxInactiveInterval;
         }
 
-        final ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+        final ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<>();
         volatile long lastAccessed;
         final long creationTime;
         volatile int maxInactiveInterval;

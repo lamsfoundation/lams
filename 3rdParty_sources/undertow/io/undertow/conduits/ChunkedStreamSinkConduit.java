@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.conduits;
@@ -100,8 +100,6 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
     private static final int FLAG_FIRST_DATA_WRITTEN = 1 << 4; //set on first flush or write call
     private static final int FLAG_FINISHED = 1 << 5;
 
-    int written = 0;
-
     /**
      * Construct a new instance.
      *
@@ -140,7 +138,6 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
         int oldLimit = src.limit();
         if (chunkleft == 0 && !chunkingSepBuffer.hasRemaining()) {
             chunkingBuffer.clear();
-            written += src.remaining();
             putIntAsHexString(chunkingBuffer, src.remaining());
             chunkingBuffer.put(CRLF);
             chunkingBuffer.flip();
@@ -197,6 +194,13 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
 
     }
 
+    @Override
+    public void truncateWrites() throws IOException {
+        if(lastChunkBuffer != null) {
+            lastChunkBuffer.free();
+        }
+        super.truncateWrites();
+    }
 
     @Override
     public long write(final ByteBuffer[] srcs, final int offset, final int length) throws IOException {
@@ -339,7 +343,7 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
         ByteBuffer data = ByteBuffer.allocate(lastChunkBuffer.remaining());
         data.put(lastChunkBuffer);
         data.flip();
-        this.lastChunkBuffer = new ImmediatePooled<ByteBuffer>(data);
+        this.lastChunkBuffer = new ImmediatePooled<>(data);
 
         lastChunkBufferPooled.free();
     }

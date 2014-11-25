@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,17 +9,17 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.conduits;
 
-import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
+import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.protocol.http.HttpAttachments;
 import io.undertow.server.protocol.http.HttpServerConnection;
@@ -95,7 +95,7 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
         this.bufferWrapper = bufferWrapper;
         this.finishListener = finishListener;
         this.remainingAllowed = Long.MIN_VALUE;
-        this.chunkReader = new ChunkReader<ChunkedStreamSourceConduit>(attachable, HttpAttachments.REQUEST_TRAILERS, finishListener, this);
+        this.chunkReader = new ChunkReader<>(attachable, HttpAttachments.REQUEST_TRAILERS, finishListener, this);
         this.exchange = exchange;
     }
 
@@ -118,15 +118,10 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
         remainingAllowed -= written;
         if (remainingAllowed < 0) {
             //max entity size is exceeded
-            //we need to forcibly close the read side
-            try {
-                next.terminateReads();
-            } catch (IOException e) {
-                UndertowLogger.REQUEST_LOGGER.debug("Exception terminating reads due to exceeding max size", e);
-            }
+            Connectors.terminateRequest(exchange);
             closed = true;
-            finishListener.handleEvent(this);
             exchange.setPersistent(false);
+            finishListener.handleEvent(this);
             throw UndertowMessages.MESSAGES.requestEntityWasTooLarge(exchange.getMaxEntitySize());
         }
     }

@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server;
 
 import java.net.InetSocketAddress;
@@ -21,7 +39,7 @@ import io.undertow.util.CopyOnWriteMap;
  */
 public class ListenerRegistry {
 
-    private final ConcurrentMap<String, Listener> listeners = new CopyOnWriteMap<String, Listener>();
+    private final ConcurrentMap<String, Listener> listeners = new CopyOnWriteMap<>();
 
     public Listener getListener(final String name) {
         return listeners.get(name);
@@ -47,12 +65,12 @@ public class ListenerRegistry {
         /**
          * Map that can be used to store additional listener metadata
          */
-        private final Map<String, Object> contextInformation = new CopyOnWriteMap<String, Object>();
+        private final Map<String, Object> contextInformation = new CopyOnWriteMap<>();
 
         /**
          * Information about any HTTP upgrade handlers that are registered on this handler.
          */
-        private final Set<HttpUpgradeMetadata> httpUpgradeMetadata = new CopyOnWriteArraySet<HttpUpgradeMetadata>();
+        private final Set<HttpUpgradeMetadata> httpUpgradeMetadata = new CopyOnWriteArraySet<>();
 
         public Listener(final String protocol, final String name, final String serverName, final InetSocketAddress bindAddress) {
             this.protocol = protocol;
@@ -122,7 +140,7 @@ public class ListenerRegistry {
 
         private final String protocol;
         private final String subProtocol;
-        private final Map<String, Object> contextInformation = new CopyOnWriteMap<String, Object>();
+        private final Map<String, Object> contextInformation = new CopyOnWriteMap<>();
 
 
         public HttpUpgradeMetadata(final String protocol, final String subProtocol) {

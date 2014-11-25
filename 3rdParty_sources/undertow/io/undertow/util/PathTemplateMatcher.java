@@ -1,11 +1,31 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.util;
 
 import io.undertow.UndertowMessages;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -22,7 +42,7 @@ public class PathTemplateMatcher<T> {
     /**
      * Map of path template stem to the path templates that share the same base.
      */
-    private Map<String, Set<PathTemplateHolder>> pathTemplateMap = new CopyOnWriteMap<String, Set<PathTemplateHolder>>();
+    private Map<String, Set<PathTemplateHolder>> pathTemplateMap = new CopyOnWriteMap<>();
 
     /**
      * lengths of all registered paths
@@ -30,7 +50,7 @@ public class PathTemplateMatcher<T> {
     private volatile int[] lengths = {};
 
     public PathMatchResult<T> match(final String path) {
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         int length = path.length();
         final int[] lengths = this.lengths;
         for (int i = 0; i < lengths.length; ++i) {
@@ -63,7 +83,7 @@ public class PathTemplateMatcher<T> {
     private PathMatchResult<T> handleStemMatch(Set<PathTemplateHolder> entry, final String path, final Map<String, String> params) {
         for (PathTemplateHolder val : entry) {
             if (val.template.matches(path, params)) {
-                return new PathMatchResult<T>(params, val.template.getTemplateString(), val.value);
+                return new PathMatchResult<>(params, val.template.getTemplateString(), val.value);
             } else {
                 params.clear();
             }
@@ -76,9 +96,9 @@ public class PathTemplateMatcher<T> {
         Set<PathTemplateHolder> values = pathTemplateMap.get(trimBase(template));
         Set<PathTemplateHolder> newValues;
         if (values == null) {
-            newValues = new TreeSet<PathTemplateHolder>();
+            newValues = new TreeSet<>();
         } else {
-            newValues = new TreeSet<PathTemplateHolder>(values);
+            newValues = new TreeSet<>(values);
         }
         PathTemplateHolder holder = new PathTemplateHolder(value, template);
         if (newValues.contains(holder)) {
@@ -105,7 +125,7 @@ public class PathTemplateMatcher<T> {
     }
 
     private void buildLengths() {
-        final Set<Integer> lengths = new TreeSet<Integer>(new Comparator<Integer>() {
+        final Set<Integer> lengths = new TreeSet<>(new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
                 return -o1.compareTo(o2);
@@ -128,6 +148,29 @@ public class PathTemplateMatcher<T> {
         return add(template, value);
     }
 
+    public synchronized PathTemplateMatcher<T> addAll(PathTemplateMatcher<T> pathTemplateMatcher) {
+        for (Entry<String, Set<PathTemplateHolder>> entry : pathTemplateMatcher.getPathTemplateMap().entrySet()) {
+            for (PathTemplateHolder pathTemplateHolder : entry.getValue()) {
+                add(pathTemplateHolder.template, pathTemplateHolder.value);
+            }
+        }
+        return this;
+    }
+
+    Map<String, Set<PathTemplateHolder>> getPathTemplateMap() {
+        return pathTemplateMap;
+    }
+
+    public Set<PathTemplate> getPathTemplates() {
+        Set<PathTemplate> templates = new HashSet<>();
+        for (Set<PathTemplateHolder> holders : pathTemplateMap.values()) {
+            for (PathTemplateHolder holder: holders) {
+                templates.add(holder.template);
+            }
+        }
+        return templates;
+    }
+
     public synchronized PathTemplateMatcher<T> remove(final String pathTemplate) {
         final PathTemplate template = PathTemplate.create(pathTemplate);
         return remove(template);
@@ -137,9 +180,9 @@ public class PathTemplateMatcher<T> {
         Set<PathTemplateHolder> values = pathTemplateMap.get(trimBase(template));
         Set<PathTemplateHolder> newValues;
         if (values == null) {
-            newValues = new TreeSet<PathTemplateHolder>();
+            return this;
         } else {
-            newValues = new TreeSet<PathTemplateHolder>(values);
+            newValues = new TreeSet<>(values);
         }
         Iterator<PathTemplateHolder> it = newValues.iterator();
         while (it.hasNext()) {
@@ -158,23 +201,27 @@ public class PathTemplateMatcher<T> {
         return this;
     }
 
-    public static class PathMatchResult<T> {
-        private final Map<String, String> parameters;
-        private final String matchedTemplate;
+
+    public synchronized T get(String template) {
+        PathTemplate pathTemplate = PathTemplate.create(template);
+        Set<PathTemplateHolder> values = pathTemplateMap.get(trimBase(pathTemplate));
+        if(values == null) {
+            return null;
+        }
+        for (PathTemplateHolder next : values) {
+            if (next.template.getTemplateString().equals(template)) {
+                return next.value;
+            }
+        }
+        return null;
+    }
+
+    public static class PathMatchResult<T> extends PathTemplateMatch {
         private final T value;
 
         public PathMatchResult(Map<String, String> parameters, String matchedTemplate, T value) {
-            this.parameters = parameters;
-            this.matchedTemplate = matchedTemplate;
+            super(matchedTemplate, parameters);
             this.value = value;
-        }
-
-        public Map<String, String> getParameters() {
-            return parameters;
-        }
-
-        public String getMatchedTemplate() {
-            return matchedTemplate;
         }
 
         public T getValue() {

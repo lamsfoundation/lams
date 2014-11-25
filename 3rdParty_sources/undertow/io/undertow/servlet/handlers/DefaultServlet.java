@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.handlers;
@@ -27,6 +27,7 @@ import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.servlet.api.DefaultServletConfig;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.spec.ServletContextImpl;
+import io.undertow.util.CanonicalPathUtils;
 import io.undertow.util.DateUtils;
 import io.undertow.util.ETag;
 import io.undertow.util.ETagUtils;
@@ -40,6 +41,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -73,8 +75,7 @@ public class DefaultServlet extends HttpServlet {
     public static final String DISALLOWED_EXTENSIONS = "disallowed-extensions";
     public static final String RESOLVE_AGAINST_CONTEXT_ROOT = "resolve-against-context-root";
 
-    private static final Set<String> DEFAULT_ALLOWED_EXTENSIONS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("js", "css", "png", "jpg", "gif", "html", "htm", "txt", "pdf", "jpeg", "xml")));
-    private static final Set<String> DEFAULT_DISALLOWED_EXTENSIONS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("class", "jar", "war")));
+    private static final Set<String> DEFAULT_ALLOWED_EXTENSIONS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("js", "css", "png", "jpg", "gif", "html", "htm", "txt", "pdf", "jpeg", "xml")));
 
 
     private Deployment deployment;
@@ -83,7 +84,7 @@ public class DefaultServlet extends HttpServlet {
 
     private boolean defaultAllowed = true;
     private Set<String> allowed = DEFAULT_ALLOWED_EXTENSIONS;
-    private Set<String> disallowed = DEFAULT_DISALLOWED_EXTENSIONS;
+    private Set<String> disallowed = Collections.emptySet();
     private boolean resolveAgainstContextRoot;
 
     @Override
@@ -94,11 +95,11 @@ public class DefaultServlet extends HttpServlet {
         DefaultServletConfig defaultServletConfig = deployment.getDeploymentInfo().getDefaultServletConfig();
         if (defaultServletConfig != null) {
             defaultAllowed = defaultServletConfig.isDefaultAllowed();
-            allowed = new HashSet<String>();
+            allowed = new HashSet<>();
             if (defaultServletConfig.getAllowed() != null) {
                 allowed.addAll(defaultServletConfig.getAllowed());
             }
-            disallowed = new HashSet<String>();
+            disallowed = new HashSet<>();
             if (defaultServletConfig.getDisallowed() != null) {
                 disallowed.addAll(defaultServletConfig.getDisallowed());
             }
@@ -108,11 +109,11 @@ public class DefaultServlet extends HttpServlet {
         }
         if (config.getInitParameter(ALLOWED_EXTENSIONS) != null) {
             String extensions = config.getInitParameter(ALLOWED_EXTENSIONS);
-            allowed = new HashSet<String>(Arrays.asList(extensions.split(",")));
+            allowed = new HashSet<>(Arrays.asList(extensions.split(",")));
         }
         if (config.getInitParameter(DISALLOWED_EXTENSIONS) != null) {
             String extensions = config.getInitParameter(DISALLOWED_EXTENSIONS);
-            disallowed = new HashSet<String>(Arrays.asList(extensions.split(",")));
+            disallowed = new HashSet<>(Arrays.asList(extensions.split(",")));
         }
         if (config.getInitParameter(RESOLVE_AGAINST_CONTEXT_ROOT) != null) {
             resolveAgainstContextRoot = Boolean.parseBoolean(config.getInitParameter(RESOLVE_AGAINST_CONTEXT_ROOT));
@@ -126,12 +127,22 @@ public class DefaultServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        final String path = getPath(req);
-        if (!isAllowed(path)) {
+        String path = getPath(req);
+        if (!isAllowed(path, req.getDispatcherType())) {
             resp.sendError(404);
             return;
         }
-        final Resource resource = resourceManager.getResource(path);
+        if(File.separatorChar != '/') {
+            //if the separator char is not / we want to replace it with a / and canonicalise
+            path = CanonicalPathUtils.canonicalize(path.replace(File.separatorChar, '/'));
+        }
+        final Resource resource;
+        //we want to disallow windows characters in the path
+        if(File.separatorChar == '/' || !path.contains(File.separator)) {
+            resource = resourceManager.getResource(path);
+        } else {
+            resource = null;
+        }
         if (resource == null) {
             if (req.getDispatcherType() == DispatcherType.INCLUDE) {
                 //servlet 9.3
@@ -244,11 +255,13 @@ public class DefaultServlet extends HttpServlet {
         }
         //todo: handle range requests
         //we are going to proceed. Set the appropriate headers
-        final String contentType = deployment.getServletContext().getMimeType(resource.getName());
-        if (contentType != null) {
-            resp.setHeader(Headers.CONTENT_TYPE_STRING, contentType);
-        } else {
-            resp.setHeader(Headers.CONTENT_TYPE_STRING, "application/octet-stream");
+        if(resp.getContentType() == null) {
+            final String contentType = deployment.getServletContext().getMimeType(resource.getName());
+            if (contentType != null) {
+                resp.setContentType(contentType);
+            } else {
+                resp.setContentType("application/octet-stream");
+            }
         }
         if (lastModified != null) {
             resp.setHeader(Headers.LAST_MODIFIED_STRING, resource.getLastModifiedString());
@@ -297,7 +310,6 @@ public class DefaultServlet extends HttpServlet {
         if (request.getDispatcherType() == DispatcherType.INCLUDE && request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI) != null) {
             pathInfo = (String) request.getAttribute(RequestDispatcher.INCLUDE_PATH_INFO);
             servletPath = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
-
         } else {
             pathInfo = request.getPathInfo();
             servletPath = request.getServletPath();
@@ -306,7 +318,9 @@ public class DefaultServlet extends HttpServlet {
         if (result == null) {
             result = servletPath;
         } else if(resolveAgainstContextRoot) {
-            result = servletPath + pathInfo;
+            result = servletPath + CanonicalPathUtils.canonicalize(pathInfo);
+        } else {
+            result = CanonicalPathUtils.canonicalize(result);
         }
         if ((result == null) || (result.equals(""))) {
             result = "/";
@@ -315,13 +329,16 @@ public class DefaultServlet extends HttpServlet {
 
     }
 
-    private boolean isAllowed(String path) {
+    private boolean isAllowed(String path, DispatcherType dispatcherType) {
         if (!path.isEmpty()) {
-            if (path.startsWith("/META-INF") ||
-                    path.startsWith("META-INF") ||
-                    path.startsWith("/WEB-INF") ||
-                    path.startsWith("WEB-INF")) {
-                return false;
+            if(dispatcherType == DispatcherType.REQUEST) {
+                //WFLY-3543 allow the dispatcher to access stuff in web-inf and meta inf
+                if (path.startsWith("/META-INF") ||
+                        path.startsWith("META-INF") ||
+                        path.startsWith("/WEB-INF") ||
+                        path.startsWith("WEB-INF")) {
+                    return false;
+                }
             }
         }
         int pos = path.lastIndexOf('/');

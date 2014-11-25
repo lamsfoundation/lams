@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.protocol.ajp;
 
 import io.undertow.UndertowLogger;
@@ -8,12 +26,12 @@ import io.undertow.conduits.ReadDataStreamSourceConduit;
 import io.undertow.server.AbstractServerConnection;
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.protocol.ParseTimeoutUpdater;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.xnio.ChannelListener;
-import org.xnio.IoUtils;
 import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
@@ -48,15 +66,24 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
     private final AjpRequestParser parser;
     private WriteReadyHandler.ChannelListenerHandler<ConduitStreamSinkChannel> writeReadyHandler;
 
+    private ParseTimeoutUpdater parseTimeoutUpdater;
 
     AjpReadListener(final AjpServerConnection connection, final String scheme, AjpRequestParser parser) {
         this.connection = connection;
         this.scheme = scheme;
         this.parser = parser;
         this.maxRequestSize = connection.getUndertowOptions().get(UndertowOptions.MAX_HEADER_SIZE, UndertowOptions.DEFAULT_MAX_HEADER_SIZE);
-        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, 0);
-        this.writeReadyHandler = new WriteReadyHandler.ChannelListenerHandler<ConduitStreamSinkChannel>(connection.getChannel().getSinkChannel());
+        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, UndertowOptions.DEFAULT_MAX_ENTITY_SIZE);
+        this.writeReadyHandler = new WriteReadyHandler.ChannelListenerHandler<>(connection.getChannel().getSinkChannel());
         this.recordRequestStartTime = connection.getUndertowOptions().get(UndertowOptions.RECORD_REQUEST_START_TIME, false);
+        int requestParseTimeout = connection.getUndertowOptions().get(UndertowOptions.REQUEST_PARSE_TIMEOUT, -1);
+        int requestIdleTimeout = connection.getUndertowOptions().get(UndertowOptions.NO_REQUEST_TIMEOUT, -1);
+        if(requestIdleTimeout < 0 && requestParseTimeout < 0) {
+            this.parseTimeoutUpdater = null;
+        } else {
+            this.parseTimeoutUpdater = new ParseTimeoutUpdater(connection, requestParseTimeout, requestIdleTimeout);
+            connection.addCloseListener(parseTimeoutUpdater);
+        }
     }
 
     public void startRequest() {
@@ -64,11 +91,14 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
         state = new AjpRequestParseState();
         httpServerExchange = new HttpServerExchange(connection, maxEntitySize);
         read = 0;
+        if(parseTimeoutUpdater != null) {
+            parseTimeoutUpdater.connectionIdle();
+        }
     }
 
     public void handleEvent(final StreamSourceChannel channel) {
         if(connection.getOriginalSinkConduit().isWriteShutdown() || connection.getOriginalSourceConduit().isReadShutdown()) {
-            IoUtils.safeClose(connection);
+            safeClose(connection);
             channel.suspendReads();
             return;
         }
@@ -77,7 +107,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
         final Pooled<ByteBuffer> pooled = existing == null ? connection.getBufferPool().allocate() : existing;
         final ByteBuffer buffer = pooled.getResource();
         boolean free = true;
-
+        boolean bytesRead = false;
         try {
             int res;
             do {
@@ -94,6 +124,10 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                     res = buffer.remaining();
                 }
                 if (res == 0) {
+
+                    if(bytesRead && parseTimeoutUpdater != null) {
+                        parseTimeoutUpdater.failedParse();
+                    }
                     if (!channel.isReadResumed()) {
                         channel.getReadSetter().set(this);
                         channel.resumeReads();
@@ -105,15 +139,16 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                         channel.shutdownReads();
                         final StreamSinkChannel responseChannel = connection.getChannel().getSinkChannel();
                         responseChannel.shutdownWrites();
-                        IoUtils.safeClose(connection);
+                        safeClose(connection);
                     } catch (IOException e) {
                         UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                         // fuck it, it's all ruined
-                        IoUtils.safeClose(connection);
+                        safeClose(connection);
                         return;
                     }
                     return;
                 }
+                bytesRead = true;
                 //TODO: we need to handle parse errors
                 if (existing != null) {
                     existing = null;
@@ -123,19 +158,22 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                 }
                 int begin = buffer.remaining();
                 parser.parse(buffer, state, httpServerExchange);
-                read += (begin - buffer.remaining());
+
+                read += begin - buffer.remaining();
                 if (buffer.hasRemaining()) {
                     free = false;
                     connection.setExtraBytes(pooled);
                 }
                 if (read > maxRequestSize) {
                     UndertowLogger.REQUEST_LOGGER.requestHeaderWasTooLarge(connection.getPeerAddress(), maxRequestSize);
-                    IoUtils.safeClose(connection);
+                    safeClose(connection);
                     return;
                 }
             } while (!state.isComplete());
 
-
+            if(parseTimeoutUpdater != null) {
+                parseTimeoutUpdater.requestStarted();
+            }
             if (state.prefix != AjpRequestParser.FORWARD_REQUEST) {
                 if (state.prefix == AjpRequestParser.CPING) {
                     UndertowLogger.REQUEST_LOGGER.debug("Received CPING, sending CPONG");
@@ -147,7 +185,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                     channel.resumeReads();
                 } else {
                     UndertowLogger.REQUEST_LOGGER.ignoringAjpRequestWithPrefixCode(state.prefix);
-                    IoUtils.safeClose(connection);
+                    safeClose(connection);
                 }
                 return;
             }
@@ -189,12 +227,12 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             } catch (Throwable t) {
                 //TODO: we should attempt to return a 500 status code in this situation
                 UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(t);
-                IoUtils.safeClose(channel);
-                IoUtils.safeClose(connection);
+                safeClose(channel);
+                safeClose(connection);
             }
         } catch (Exception e) {
             UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(e);
-            IoUtils.safeClose(connection.getChannel());
+            safeClose(connection.getChannel());
         } finally {
             if (free) pooled.free();
         }
@@ -222,7 +260,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                                     }
                                 } catch (IOException e) {
                                     UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-                                    IoUtils.safeClose(connection);
+                                    safeClose(connection);
                                 }
                             } while (buffer.hasRemaining());
                             channel.suspendWrites();
@@ -236,7 +274,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             AjpReadListener.this.handleEvent(underlyingChannel.getSourceChannel());
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-            IoUtils.safeClose(connection);
+            safeClose(connection);
         }
     }
 
@@ -247,7 +285,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             channel.getReadSetter().set(this);
             channel.wakeupReads();
         } else if(!exchange.isPersistent()) {
-            IoUtils.safeClose(exchange.getConnection());
+            safeClose(exchange.getConnection());
         }
     }
 

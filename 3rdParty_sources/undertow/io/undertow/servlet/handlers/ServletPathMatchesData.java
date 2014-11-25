@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.handlers;
@@ -40,9 +40,9 @@ class ServletPathMatchesData {
     public ServletPathMatchesData(final Map<String, ServletChain> exactPathMatches, final Map<String, PathMatch> prefixMatches, final Map<String, ServletChain> nameMatches) {
         this.prefixMatches = prefixMatches;
         this.nameMatches = nameMatches;
-        Map<String, ServletPathMatch> newExactPathMatches = new HashMap<String, ServletPathMatch>();
+        Map<String, ServletPathMatch> newExactPathMatches = new HashMap<>();
         for (Map.Entry<String, ServletChain> entry : exactPathMatches.entrySet()) {
-            newExactPathMatches.put(entry.getKey(), new ServletPathMatch(entry.getValue(), entry.getKey(), false));
+            newExactPathMatches.put(entry.getKey(), new ServletPathMatch(entry.getValue(), entry.getKey(), entry.getValue().isDefaultServletMapping()));
         }
         this.exactPathMatches = newExactPathMatches;
 
@@ -74,10 +74,8 @@ class ServletPathMatchesData {
                 if (match != null) {
                     return handleMatch(path, match, extensionPos);
                 }
-            } else if (c == '.') {
-                if (extensionPos == -1) {
+            } else if (c == '.' && extensionPos == -1) {
                     extensionPos = i;
-                }
             }
         }
         //this should never happen
@@ -88,20 +86,17 @@ class ServletPathMatchesData {
     private ServletPathMatch handleMatch(final String path, final PathMatch match, final int extensionPos) {
         if (match.extensionMatches.isEmpty()) {
             return new ServletPathMatch(match.defaultHandler, path, match.requireWelcomeFileMatch);
-        } else {
-            if (extensionPos == -1) {
-                return new ServletPathMatch(match.defaultHandler, path, match.requireWelcomeFileMatch);
-            } else {
-                final String ext;
-                ext = path.substring(extensionPos + 1, path.length());
-                ServletChain handler = match.extensionMatches.get(ext);
-                if (handler != null) {
-                    return new ServletPathMatch(handler, path, handler.getManagedServlet().getServletInfo().isRequireWelcomeFileMapping());
-                } else {
-                    return new ServletPathMatch(match.defaultHandler, path, match.requireWelcomeFileMatch);
-                }
-            }
         }
+        if (extensionPos == -1) {
+            return new ServletPathMatch(match.defaultHandler, path, match.requireWelcomeFileMatch);
+        }
+        final String ext;
+        ext = path.substring(extensionPos + 1, path.length());
+        ServletChain handler = match.extensionMatches.get(ext);
+        if (handler != null) {
+            return new ServletPathMatch(handler, path, handler.getManagedServlet().getServletInfo().isRequireWelcomeFileMapping());
+        }
+        return new ServletPathMatch(match.defaultHandler, path, match.requireWelcomeFileMatch);
     }
 
     public static Builder builder() {
@@ -110,11 +105,11 @@ class ServletPathMatchesData {
 
     public static final class Builder {
 
-        private final Map<String, ServletChain> exactPathMatches = new HashMap<String, ServletChain>();
+        private final Map<String, ServletChain> exactPathMatches = new HashMap<>();
 
-        private final Map<String, PathMatch> prefixMatches = new HashMap<String, PathMatch>();
+        private final Map<String, PathMatch> prefixMatches = new HashMap<>();
 
-        private final Map<String, ServletChain> nameMatches = new HashMap<String, ServletChain>();
+        private final Map<String, ServletChain> nameMatches = new HashMap<>();
 
         public void addExactMatch(final String exactMatch, final ServletChain match) {
             exactPathMatches.put(exactMatch, match);
@@ -150,7 +145,7 @@ class ServletPathMatchesData {
 
     private static class PathMatch {
 
-        private final Map<String, ServletChain> extensionMatches = new HashMap<String, ServletChain>();
+        private final Map<String, ServletChain> extensionMatches = new HashMap<>();
         private volatile ServletChain defaultHandler;
         private volatile boolean requireWelcomeFileMatch;
 

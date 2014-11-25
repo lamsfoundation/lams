@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.server.protocol.http;
@@ -23,13 +23,17 @@ import io.undertow.UndertowOptions;
 import io.undertow.conduits.ReadDataStreamSourceConduit;
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.protocol.ParseTimeoutUpdater;
+import io.undertow.util.ClosingChannelExceptionHandler;
 import io.undertow.util.StringWriteChannelListener;
 import org.xnio.ChannelListener;
+import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
 import org.xnio.channels.StreamSourceChannel;
+import org.xnio.conduits.ConduitStreamSinkChannel;
 import org.xnio.conduits.ConduitStreamSourceChannel;
 
 import java.io.IOException;
@@ -64,18 +68,31 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
 
     private static final AtomicIntegerFieldUpdater<HttpReadListener> requestStateUpdater = AtomicIntegerFieldUpdater.newUpdater(HttpReadListener.class, "requestState");
 
+    private ParseTimeoutUpdater parseTimeoutUpdater;
+
     HttpReadListener(final HttpServerConnection connection, final HttpRequestParser parser) {
         this.connection = connection;
         this.parser = parser;
         this.maxRequestSize = connection.getUndertowOptions().get(UndertowOptions.MAX_HEADER_SIZE, UndertowOptions.DEFAULT_MAX_HEADER_SIZE);
-        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, 0);
+        this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, UndertowOptions.DEFAULT_MAX_ENTITY_SIZE);
         this.recordRequestStartTime = connection.getUndertowOptions().get(UndertowOptions.RECORD_REQUEST_START_TIME, false);
+        int requestParseTimeout = connection.getUndertowOptions().get(UndertowOptions.REQUEST_PARSE_TIMEOUT, -1);
+        int requestIdleTimeout = connection.getUndertowOptions().get(UndertowOptions.NO_REQUEST_TIMEOUT, -1);
+        if(requestIdleTimeout < 0 && requestParseTimeout < 0) {
+            this.parseTimeoutUpdater = null;
+        } else {
+            this.parseTimeoutUpdater = new ParseTimeoutUpdater(connection, requestParseTimeout, requestIdleTimeout);
+            connection.addCloseListener(parseTimeoutUpdater);
+        }
     }
 
     public void newRequest() {
         state.reset();
         read = 0;
         httpServerExchange = new HttpServerExchange(connection, maxEntitySize);
+        if(parseTimeoutUpdater != null) {
+            parseTimeoutUpdater.connectionIdle();
+        }
     }
 
     public void handleEvent(final ConduitStreamSourceChannel channel) {
@@ -99,13 +116,13 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
             return;
         }
 
-
         final Pooled<ByteBuffer> pooled = existing == null ? connection.getBufferPool().allocate() : existing;
         final ByteBuffer buffer = pooled.getResource();
         boolean free = true;
 
         try {
             int res;
+            boolean bytesRead = false;
             do {
                 if (existing == null) {
                     buffer.clear();
@@ -121,8 +138,13 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
                 }
 
                 if (res <= 0) {
+                    if(bytesRead && parseTimeoutUpdater != null) {
+                        parseTimeoutUpdater.failedParse();
+                    }
                     handleFailedRead(channel, res);
                     return;
+                } else {
+                    bytesRead = true;
                 }
                 if (existing != null) {
                     existing = null;
@@ -143,6 +165,9 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
                     return;
                 }
             } while (!state.isComplete());
+            if(parseTimeoutUpdater != null) {
+                parseTimeoutUpdater.requestStarted();
+            }
 
             final HttpServerExchange httpServerExchange = this.httpServerExchange;
             httpServerExchange.setRequestScheme(connection.getSslSession() != null ? "https" : "http");
@@ -268,7 +293,22 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
             if (connection.getExtraBytes() != null) {
                 connection.getChannel().getSourceChannel().setConduit(new ReadDataStreamSourceConduit(connection.getChannel().getSourceChannel().getConduit(), connection));
             }
-            connection.getUpgradeListener().handleUpgrade(connection.getChannel(), exchange);
+            try {
+                if (!connection.getChannel().getSinkChannel().flush()) {
+                    connection.getChannel().getSinkChannel().setWriteListener(ChannelListeners.flushingChannelListener(new ChannelListener<ConduitStreamSinkChannel>() {
+                        @Override
+                        public void handleEvent(ConduitStreamSinkChannel conduitStreamSinkChannel) {
+                            connection.getUpgradeListener().handleUpgrade(connection.getChannel(), exchange);
+                        }
+                    }, new ClosingChannelExceptionHandler<ConduitStreamSinkChannel>(connection)));
+                    connection.getChannel().getSinkChannel().resumeWrites();
+                    return;
+                }
+                connection.getUpgradeListener().handleUpgrade(connection.getChannel(), exchange);
+            } catch (IOException e) {
+                UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                IoUtils.safeClose(connection);
+            }
         }
     }
 

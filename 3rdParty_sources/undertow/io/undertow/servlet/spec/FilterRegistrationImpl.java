@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.spec;
@@ -41,42 +41,23 @@ public class FilterRegistrationImpl implements FilterRegistration, FilterRegistr
 
     private final FilterInfo filterInfo;
     private final Deployment deployment;
+    private final ServletContextImpl servletContext;
 
-    public FilterRegistrationImpl(final FilterInfo filterInfo, final Deployment deployment) {
+    public FilterRegistrationImpl(final FilterInfo filterInfo, final Deployment deployment, ServletContextImpl servletContext) {
         this.filterInfo = filterInfo;
         this.deployment = deployment;
+        this.servletContext = servletContext;
     }
 
     @Override
     public void addMappingForServletNames(final EnumSet<DispatcherType> dispatcherTypes, final boolean isMatchAfter, final String... servletNames) {
-        DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
-
-        for(final String servlet : servletNames){
-            if(isMatchAfter) {
-                if(dispatcherTypes == null || dispatcherTypes.isEmpty()) {
-                    deploymentInfo.addFilterServletNameMapping(filterInfo.getName(), servlet, DispatcherType.REQUEST);
-                } else {
-                    for(final DispatcherType dispatcher : dispatcherTypes) {
-                        deploymentInfo.addFilterServletNameMapping(filterInfo.getName(), servlet, dispatcher);
-                    }
-                }
-            } else {
-                if(dispatcherTypes == null || dispatcherTypes.isEmpty()) {
-                    deploymentInfo.insertFilterServletNameMapping(0, filterInfo.getName(), servlet, DispatcherType.REQUEST);
-                } else {
-                    for(final DispatcherType dispatcher : dispatcherTypes) {
-                        deploymentInfo.insertFilterServletNameMapping(0, filterInfo.getName(), servlet, dispatcher);
-                    }
-                }
-            }
-        }
-        deployment.getServletPaths().invalidate();
+        servletContext.addMappingForServletNames(filterInfo, dispatcherTypes, isMatchAfter, servletNames);
     }
 
     @Override
     public Collection<String> getServletNameMappings() {
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
-        final List<String> ret = new ArrayList<String>();
+        final List<String> ret = new ArrayList<>();
         for(final FilterMappingInfo mapping : deploymentInfo.getFilterMappings()) {
             if(mapping.getMappingType() == FilterMappingInfo.MappingType.SERVLET) {
                 if(mapping.getFilterName().equals(filterInfo.getName())) {
@@ -89,33 +70,13 @@ public class FilterRegistrationImpl implements FilterRegistration, FilterRegistr
 
     @Override
     public void addMappingForUrlPatterns(final EnumSet<DispatcherType> dispatcherTypes, final boolean isMatchAfter, final String... urlPatterns) {
-        DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
-        for(final String url : urlPatterns){
-            if(isMatchAfter) {
-                if(dispatcherTypes == null || dispatcherTypes.isEmpty()) {
-                    deploymentInfo.addFilterUrlMapping(filterInfo.getName(), url, DispatcherType.REQUEST);
-                } else {
-                    for(final DispatcherType dispatcher : dispatcherTypes) {
-                        deploymentInfo.addFilterUrlMapping(filterInfo.getName(), url, dispatcher);
-                    }
-                }
-            } else {
-                if(dispatcherTypes == null || dispatcherTypes.isEmpty()) {
-                    deploymentInfo.insertFilterUrlMapping(0, filterInfo.getName(), url, DispatcherType.REQUEST);
-                } else {
-                    for(final DispatcherType dispatcher : dispatcherTypes) {
-                        deploymentInfo.insertFilterUrlMapping(0, filterInfo.getName(), url, dispatcher);
-                    }
-                }
-            }
-        }
-        deployment.getServletPaths().invalidate();
+        servletContext.addMappingForUrlPatterns(filterInfo, dispatcherTypes, isMatchAfter, urlPatterns);
     }
 
     @Override
     public Collection<String> getUrlPatternMappings() {
         DeploymentInfo deploymentInfo = deployment.getDeploymentInfo();
-        final List<String> ret = new ArrayList<String>();
+        final List<String> ret = new ArrayList<>();
         for(final FilterMappingInfo mapping : deploymentInfo.getFilterMappings()) {
             if(mapping.getMappingType() == FilterMappingInfo.MappingType.URL) {
                 if(mapping.getFilterName().equals(filterInfo.getName())) {
@@ -152,7 +113,7 @@ public class FilterRegistrationImpl implements FilterRegistration, FilterRegistr
 
     @Override
     public Set<String> setInitParameters(final Map<String, String> initParameters) {
-        final Set<String> ret = new HashSet<String>();
+        final Set<String> ret = new HashSet<>();
         for(Map.Entry<String, String> entry : initParameters.entrySet()) {
             if(!setInitParameter(entry.getKey(), entry.getValue())) {
                 ret.add(entry.getKey());

@@ -1,7 +1,26 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.server.protocol.http;
 
 import io.undertow.UndertowMessages;
 import io.undertow.io.IoCallback;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.xnio.ChannelExceptionHandler;
@@ -33,7 +52,7 @@ public class HttpContinue {
      * @return <code>true</code> if the server needs to send a continue response
      */
     public static boolean requiresContinueResponse(final HttpServerExchange exchange) {
-        if (!exchange.isHttp11()) {
+        if (!exchange.isHttp11() || exchange.isResponseStarted()) {
             return false;
         }
         if (exchange.getConnection() instanceof HttpServerConnection) {
@@ -62,7 +81,8 @@ public class HttpContinue {
      */
     public static void sendContinueResponse(final HttpServerExchange exchange, final IoCallback callback) {
         if (!exchange.isResponseChannelAvailable()) {
-            throw UndertowMessages.MESSAGES.responseChannelAlreadyProvided();
+            callback.onException(exchange, null, UndertowMessages.MESSAGES.cannotSendContinueResponse());
+            return;
         }
         internalSendContinueResponse(exchange, callback);
     }
@@ -73,9 +93,9 @@ public class HttpContinue {
      * @param exchange The exchange
      * @return The response sender
      */
-    public static ContinueResponseSender createResponseSender(final HttpServerExchange exchange) {
+    public static ContinueResponseSender createResponseSender(final HttpServerExchange exchange) throws IOException {
         if (!exchange.isResponseChannelAvailable()) {
-            throw UndertowMessages.MESSAGES.responseChannelAlreadyProvided();
+            throw UndertowMessages.MESSAGES.cannotSendContinueResponse();
         }
 
         HttpServerExchange newExchange = exchange.getConnection().sendOutOfBandResponse(exchange);
@@ -113,7 +133,7 @@ public class HttpContinue {
      */
     public static void sendContinueResponseBlocking(final HttpServerExchange exchange) throws IOException {
         if (!exchange.isResponseChannelAvailable()) {
-            throw UndertowMessages.MESSAGES.responseChannelAlreadyProvided();
+            throw UndertowMessages.MESSAGES.cannotSendContinueResponse();
         }
         HttpServerExchange newExchange = exchange.getConnection().sendOutOfBandResponse(exchange);
         newExchange.setResponseCode(100);
@@ -143,23 +163,31 @@ public class HttpContinue {
         try {
             responseChannel.shutdownWrites();
             if (!responseChannel.flush()) {
-                exchange.dispatch();
                 responseChannel.getWriteSetter().set(ChannelListeners.flushingChannelListener(
                         new ChannelListener<StreamSinkChannel>() {
                             @Override
                             public void handleEvent(StreamSinkChannel channel) {
-                                callback.onComplete(exchange, null);
                                 channel.suspendWrites();
+                                exchange.dispatch(new HttpHandler() {
+                                    @Override
+                                    public void handleRequest(HttpServerExchange exchange) throws Exception {
+                                        callback.onComplete(exchange, null);
+                                    }
+                                });
                             }
                         }, new ChannelExceptionHandler<Channel>() {
                             @Override
-                            public void handleException(Channel channel, IOException e) {
-                                callback.onException(exchange, null, e);
-                            }
-                        }
-                ));
-                responseChannel.resumeWrites();
-            } else {
+                            public void handleException(Channel channel, final IOException e) {
+                                exchange.dispatch(new HttpHandler() {
+                                    @Override
+                                    public void handleRequest(HttpServerExchange exchange) throws Exception {
+                                        callback.onException(exchange, null, e);
+                                    }
+                                });
+                            }}));
+                            responseChannel.resumeWrites();
+                            exchange.dispatch();
+                        }else {
                 callback.onComplete(exchange, null);
             }
         } catch (IOException e) {

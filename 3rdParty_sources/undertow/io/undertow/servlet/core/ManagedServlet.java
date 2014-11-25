@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,16 +9,17 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.core;
 
 import java.io.File;
+import java.util.List;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
@@ -35,6 +36,7 @@ import io.undertow.servlet.UndertowServletMessages;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.InstanceFactory;
 import io.undertow.servlet.api.InstanceHandle;
+import io.undertow.servlet.api.LifecycleInterceptor;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.spec.ServletConfigImpl;
 import io.undertow.servlet.spec.ServletContextImpl;
@@ -53,8 +55,8 @@ public class ManagedServlet implements Lifecycle {
     private final InstanceStrategy instanceStrategy;
     private volatile boolean permanentlyUnavailable = false;
 
-    private final long maxRequestSize;
-    private final FormParserFactory formParserFactory;
+    private long maxRequestSize;
+    private FormParserFactory formParserFactory;
 
     public ManagedServlet(final ServletInfo servletInfo, final ServletContextImpl servletContext) {
         this.servletInfo = servletInfo;
@@ -64,6 +66,10 @@ public class ManagedServlet implements Lifecycle {
         } else {
             instanceStrategy = new DefaultInstanceStrategy(servletInfo.getInstanceFactory(), servletInfo, servletContext);
         }
+        setupMultipart(servletContext);
+    }
+
+    public void setupMultipart(ServletContextImpl servletContext) {
         FormEncodedDataDefinition formDataParser = new FormEncodedDataDefinition()
                 .setDefaultEncoding(servletContext.getDeployment().getDeploymentInfo().getDefaultEncoding());
         if (servletInfo.getMultipartConfig() != null) {
@@ -74,7 +80,7 @@ public class ManagedServlet implements Lifecycle {
             } else {
                 maxRequestSize = -1;
             }
-            final  File tempDir;
+            final File tempDir;
             if(config.getLocation() == null || config.getLocation().isEmpty()) {
                 tempDir = servletContext.getDeployment().getDeploymentInfo().getTempDir();
             } else {
@@ -211,7 +217,8 @@ public class ManagedServlet implements Lifecycle {
                 throw UndertowServletMessages.MESSAGES.couldNotInstantiateComponent(servletInfo.getName(), e);
             }
             instance = handle.getInstance();
-            instance.init(new ServletConfigImpl(servletInfo, servletContext));
+            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(), servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext)).proceed();
+
             //if a servlet implements FileChangeCallback it will be notified of file change events
             final ResourceManager resourceManager = servletContext.getDeployment().getDeploymentInfo().getResourceManager();
             if(instance instanceof ResourceChangeListener && resourceManager.isResourceChangeListenerSupported()) {
@@ -225,8 +232,17 @@ public class ManagedServlet implements Lifecycle {
                 if(changeListener != null) {
                     resourceManager.removeResourceChangeListener(changeListener);
                 }
-                instance.destroy();
+                invokeDestroy();
                 handle.release();
+            }
+        }
+
+        private void invokeDestroy() {
+            List<LifecycleInterceptor> interceptors = servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors();
+            try {
+                new LifecyleInterceptorInvocation(interceptors, servletInfo, instance).proceed();
+            } catch (ServletException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -282,8 +298,8 @@ public class ManagedServlet implements Lifecycle {
                 throw UndertowServletMessages.MESSAGES.couldNotInstantiateComponent(servletInfo.getName(), e);
             }
             instance = instanceHandle.getInstance();
+            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(), servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext)).proceed();
 
-            instance.init(new ServletConfigImpl(servletInfo, servletContext));
             return new InstanceHandle<Servlet>() {
                 @Override
                 public Servlet getInstance() {

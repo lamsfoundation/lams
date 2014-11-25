@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012 Red Hat, Inc., and individual contributors
+ * Copyright 2014 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,11 +9,11 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package io.undertow.servlet.spec;
@@ -132,11 +132,11 @@ public class HttpSessionImpl implements HttpSession {
     @Override
     public Enumeration<String> getAttributeNames() {
         Set<String> attributeNames = getFilteredAttributeNames();
-        return new IteratorEnumeration<String>(attributeNames.iterator());
+        return new IteratorEnumeration<>(attributeNames.iterator());
     }
 
     private Set<String> getFilteredAttributeNames() {
-        Set<String> attributeNames = new HashSet<String>(session.getAttributeNames());
+        Set<String> attributeNames = new HashSet<>(session.getAttributeNames());
         Iterator<String> it = attributeNames.iterator();
         while (it.hasNext()) {
             if(it.next().startsWith(IO_UNDERTOW)) {

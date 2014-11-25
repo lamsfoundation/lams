@@ -1,3 +1,21 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2014 Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.undertow.servlet.handlers.security;
 
 import java.util.ArrayList;
@@ -53,11 +71,13 @@ public class SecurityPathMatches {
         PathSecurityInformation match = exactPathRoleInformation.get(path);
         if (match != null) {
             handleMatch(method, match, currentMatch);
+            return new SecurityPathMatch(currentMatch.type, mergeConstraints(currentMatch));
         }
 
         match = prefixPathRoleInformation.get(path);
         if (match != null) {
             handleMatch(method, match, currentMatch);
+            return new SecurityPathMatch(currentMatch.type, mergeConstraints(currentMatch));
         }
 
         int qsPos = -1;
@@ -70,6 +90,7 @@ public class SecurityPathMatches {
                 match = exactPathRoleInformation.get(part);
                 if (match != null) {
                     handleMatch(method, match, currentMatch);
+                    return new SecurityPathMatch(currentMatch.type, mergeConstraints(currentMatch));
                 }
                 qsPos = i;
                 extension = false;
@@ -79,6 +100,7 @@ public class SecurityPathMatches {
                 match = prefixPathRoleInformation.get(part);
                 if (match != null) {
                     handleMatch(method, match, currentMatch);
+                    return new SecurityPathMatch(currentMatch.type, mergeConstraints(currentMatch));
                 }
             } else if (c == '.') {
                 if (!extension) {
@@ -92,24 +114,22 @@ public class SecurityPathMatches {
                     match = extensionRoleInformation.get(ext);
                     if (match != null) {
                         handleMatch(method, match, currentMatch);
+                        return new SecurityPathMatch(currentMatch.type, mergeConstraints(currentMatch));
                     }
                 }
             }
         }
-
-
         return new SecurityPathMatch(currentMatch.type, mergeConstraints(currentMatch));
     }
 
     /**
      * merge all constraints, as per 13.8.1 Combining Constraints
-     * @param constraintSet
      */
     private SingleConstraintMatch mergeConstraints(final RuntimeMatch currentMatch) {
         if(currentMatch.uncovered && denyUncoveredHttpMethods) {
             return new SingleConstraintMatch(SecurityInfo.EmptyRoleSemantic.DENY, Collections.<String>emptySet());
         }
-        final Set<String> allowedRoles = new HashSet<String>();
+        final Set<String> allowedRoles = new HashSet<>();
         for(SingleConstraintMatch match : currentMatch.constraints) {
             if(match.getRequiredRoles().isEmpty()) {
                 return new SingleConstraintMatch(match.getEmptyRoleSemantic(), Collections.<String>emptySet());
@@ -159,9 +179,9 @@ public class SecurityPathMatches {
     public static class Builder {
         private final DeploymentInfo deploymentInfo;
         private final PathSecurityInformation defaultPathSecurityInformation = new PathSecurityInformation();
-        private final Map<String, PathSecurityInformation> exactPathRoleInformation = new HashMap<String, PathSecurityInformation>();
-        private final Map<String, PathSecurityInformation> prefixPathRoleInformation = new HashMap<String, PathSecurityInformation>();
-        private final Map<String, PathSecurityInformation> extensionRoleInformation = new HashMap<String, PathSecurityInformation>();
+        private final Map<String, PathSecurityInformation> exactPathRoleInformation = new HashMap<>();
+        private final Map<String, PathSecurityInformation> prefixPathRoleInformation = new HashMap<>();
+        private final Map<String, PathSecurityInformation> extensionRoleInformation = new HashMap<>();
 
         private Builder(final DeploymentInfo deploymentInfo) {
             this.deploymentInfo = deploymentInfo;
@@ -203,7 +223,7 @@ public class SecurityPathMatches {
         }
 
         private Set<String> expandRolesAllowed(final Set<String> rolesAllowed) {
-            final Set<String> roles = new HashSet<String>(rolesAllowed);
+            final Set<String> roles = new HashSet<>(rolesAllowed);
             if (roles.contains("*")) {
                 roles.remove("*");
                 roles.addAll(deploymentInfo.getSecurityRoles());
@@ -220,7 +240,7 @@ public class SecurityPathMatches {
                 for (String method : webResources.getHttpMethods()) {
                     List<SecurityInformation> securityInformations = info.perMethodRequiredRoles.get(method);
                     if (securityInformations == null) {
-                        info.perMethodRequiredRoles.put(method, securityInformations = new ArrayList<SecurityInformation>());
+                        info.perMethodRequiredRoles.put(method, securityInformations = new ArrayList<>());
                     }
                     securityInformations.add(securityConstraint);
                 }
@@ -236,9 +256,9 @@ public class SecurityPathMatches {
 
 
     private static class PathSecurityInformation {
-        final List<SecurityInformation> defaultRequiredRoles = new ArrayList<SecurityInformation>();
-        final Map<String, List<SecurityInformation>> perMethodRequiredRoles = new HashMap<String, List<SecurityInformation>>();
-        final List<ExcludedMethodRoles> excludedMethodRoles = new ArrayList<ExcludedMethodRoles>();
+        final List<SecurityInformation> defaultRequiredRoles = new ArrayList<>();
+        final Map<String, List<SecurityInformation>> perMethodRequiredRoles = new HashMap<>();
+        final List<ExcludedMethodRoles> excludedMethodRoles = new ArrayList<>();
     }
 
     private static final class ExcludedMethodRoles {
@@ -258,14 +278,14 @@ public class SecurityPathMatches {
 
         private SecurityInformation(final Set<String> roles, final TransportGuaranteeType transportGuaranteeType, final SecurityInfo.EmptyRoleSemantic emptyRoleSemantic) {
             this.emptyRoleSemantic = emptyRoleSemantic;
-            this.roles = new HashSet<String>(roles);
+            this.roles = new HashSet<>(roles);
             this.transportGuaranteeType = transportGuaranteeType;
         }
     }
 
     private static final class RuntimeMatch {
         TransportGuaranteeType type = TransportGuaranteeType.NONE;
-        final List<SingleConstraintMatch> constraints = new ArrayList<SingleConstraintMatch>();
+        final List<SingleConstraintMatch> constraints = new ArrayList<>();
         boolean uncovered = true;
     }
 }
