@@ -125,6 +125,14 @@
             length="1"
             not-null="true"
         />
+        
+		<property
+            name="timeToLiveLoginRequest"
+            type="int"
+            update="true"
+            insert="true"
+            column="time_to_live_login_request"
+        />
 
         <many-to-one
             name="organisation"
