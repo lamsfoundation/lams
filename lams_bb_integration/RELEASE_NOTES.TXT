@@ -60,3 +60,7 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 1.2.5 Release Fixes
 ===================
 * LDEV-3285: include lessonid in integration hash 
+
+1.2.6 Release Fixes
+===================
+* LDEV-3382: Add datetime parameter check to LoginRequest

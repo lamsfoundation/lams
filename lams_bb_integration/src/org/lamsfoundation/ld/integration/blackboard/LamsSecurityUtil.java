@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.ld.integration.blackboard;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -35,6 +36,8 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,7 +47,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
+import blackboard.persist.PersistenceException;
 import blackboard.platform.context.Context;
+import blackboard.portal.data.ExtraInfo;
+import blackboard.portal.data.PortalExtraInfo;
+import blackboard.portal.servlet.PortalUtil;
 
 /**
  * This class creates URLs, servlet calls and webservice calls for communication with LAMS
@@ -54,6 +61,24 @@ import blackboard.platform.context.Context;
 public class LamsSecurityUtil {
 
     private static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
+    
+    /**
+     * How often it should refresh LAMS server time. Measured in hours.
+     */
+    private static long INTERVAL;
+    
+    static {
+	//set default value
+	INTERVAL = 24;
+	
+	Properties props = new Properties();
+	try {
+	    props.load(LamsSecurityUtil.class.getResourceAsStream("/main.properties"));
+	    INTERVAL = Long.parseLong(props.getProperty("lams.server.time.refresh.interval"));
+	} catch (IOException e) {
+	    logger.error("Error loading propertis from main.properties file due to " + e.getMessage());
+	}
+    }
 
     /**
      * Generates login requests to LAMS for author, monitor and learner
@@ -65,9 +90,11 @@ public class LamsSecurityUtil {
      * @param lsid
      *            lesson id. It is expected to be present in case of "monitor" and "learnerStrictAuth"
      * @return a url pointing to the LAMS lesson, monitor, author session
+     * @throws IOException 
+     * @throws PersistenceException 
      * @throws Exception
      */
-    public static String generateRequestURL(Context ctx, String method, String lsid) {
+    public static String generateRequestURL(Context ctx, String method, String lsid) throws PersistenceException, IOException {
 	
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
@@ -78,17 +105,28 @@ public class LamsSecurityUtil {
 	    throw new RuntimeException("Configuration Exception " + serverAddr + ", " + serverId);
 	}
 
-	String timestamp = new Long(System.currentTimeMillis()).toString();
+	String timestamp = getServerTime();
 	String username = ctx.getUser().getUserName();
 	String firstName = ctx.getUser().getGivenName();
 	String lastName  = ctx.getUser().getFamilyName();
 	String email = ctx.getUser().getEmailAddress();
-	String hash = generateAuthenticationHash(timestamp, username, method, lsid, serverId);
 	String courseId = ctx.getCourse().getCourseId();
-
 	String locale = ctx.getUser().getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
+
+	String secretkey = LamsPluginUtil.getSecretKey();
+
+	// in case of learnerStrictAuth we should also include lsid value when creating hash: [ts + uid + method + lsid
+	// + serverID + serverKey]
+	// regular case: [ts + uid + method + serverID + serverKey]
+	String plaintext = "learnerStrictAuth".equals(method) ? timestamp.toLowerCase().trim()
+		+ username.toLowerCase().trim() + method.toLowerCase().trim() + lsid.toLowerCase().trim()
+		+ serverId.toLowerCase().trim() + secretkey.toLowerCase().trim() : timestamp.toLowerCase().trim()
+		+ username.toLowerCase().trim() + method.toLowerCase().trim() + serverId.toLowerCase().trim()
+		+ secretkey.toLowerCase().trim();
+	// generate authentication hash code to validate parameters
+	String hash = sha1(plaintext);
 
 	String url;
 	try {
@@ -210,22 +248,7 @@ public class LamsSecurityUtil {
 		serviceURL += "&folderID=" + folderId;
 	    }
 
-	    URL url = new URL(serviceURL);
-	    URLConnection conn = url.openConnection();
-	    if (!(conn instanceof HttpURLConnection)) {
-		throw new RuntimeException("Unable to open connection to: " + serviceURL);
-	    }
-
-	    HttpURLConnection httpConn = (HttpURLConnection) conn;
-
-	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		throw new RuntimeException(
-			"Problem with getting LAMS learning designs. LAMS server responded with HTTP response code: "
-				+ httpConn.getResponseCode() + ", HTTP response message: "
-				+ httpConn.getResponseMessage());
-	    }
-
-	    InputStream is = conn.getInputStream();
+	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
 
 	    // Read/convert response to a String 
 	    StringWriter writer = new StringWriter();
@@ -286,8 +309,6 @@ public class LamsSecurityUtil {
 	    String timestamp = new Long(System.currentTimeMillis()).toString();
 	    String hash = generateAuthenticationHash(timestamp, username, serverId);
 
-	    // (serverId, datetime, hashValue, username, ldId, courseId, title, desc, country, lang)
-
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
@@ -296,23 +317,9 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(title, "utf8").trim() + "&desc=" + URLEncoder.encode(desc, "utf8").trim();
 
 	    logger.info("LAMS START LESSON Req: " + serviceURL);
-	    // System.out.println("START LESSON: " + serviceURL);
-
-	    URL url = new URL(serviceURL);
-	    URLConnection conn = url.openConnection();
-	    if (!(conn instanceof HttpURLConnection)) {
-		throw new RuntimeException("Unable to open connection to: " + serviceURL);
-	    }
-
-	    HttpURLConnection httpConn = (HttpURLConnection) conn;
-
-	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		throw new RuntimeException("HTTP Response Code: " + httpConn.getResponseCode()
-			+ ", HTTP Response Message: " + httpConn.getResponseMessage());
-	    }
 
 	    // InputStream is = url.openConnection().getInputStream();
-	    InputStream is = conn.getInputStream();
+	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
 
 	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -348,6 +355,114 @@ public class LamsSecurityUtil {
 	}
 
     }
+    
+    /**
+     * Make a call to LAMS server.
+     * 
+     * @param serviceURL
+     * @return resulted InputStream
+     * @throws IOException
+     */
+    private static InputStream callLamsServer(String serviceURL) throws IOException {
+	URL url = new URL(serviceURL);
+	URLConnection conn = url.openConnection();
+	if (!(conn instanceof HttpURLConnection)) {
+	    throw new RuntimeException("Unable to open connection to: " + serviceURL);
+	}
+
+	HttpURLConnection httpConn = (HttpURLConnection) conn;
+
+	if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+	    throw new RuntimeException("LAMS server responded with HTTP response code: " + httpConn.getResponseCode()
+		    + ", HTTP response message: " + httpConn.getResponseMessage());
+	}
+
+	// InputStream is = url.openConnection().getInputStream();
+	InputStream is = conn.getInputStream();
+
+	return is;
+    }
+    
+    public static String getServerTime() throws IOException, PersistenceException {
+	long now = (new Date()).getTime();
+	
+	// get LamsServerTime from the storage
+	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsServerTimeStorage");
+	ExtraInfo ei = pei.getExtraInfo();
+	
+	String lamsServerTimeDeltaStr = ei.getValue("LAMSServerTimeDelta");
+	long lamsServerTimeDelta = (lamsServerTimeDeltaStr == null) ? -1 : Long.parseLong(lamsServerTimeDeltaStr);
+	
+	//check if it's time to update
+	String lastUpdateTimeStr = ei.getValue("lastUpdateTime");
+	long lastUpdateTime = (lastUpdateTimeStr == null) ? -1 : Long.parseLong(lastUpdateTimeStr);
+	long lamsServerTime;
+
+	if ((lamsServerTimeDeltaStr == null) || (lastUpdateTime + INTERVAL * 60 * 60 * 1000 < now)) {
+	    
+	    // refresh time from LAMS server
+	    String serverAddr = getServerAddress();
+	    String serviceURL = serverAddr + "/services/getServerTime";
+	    logger.info("LAMS Get Server Time request: " + serviceURL);
+	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+
+	    StringWriter writer = new StringWriter();
+	    IOUtils.copy(is, writer, "UTF-8");
+	    
+	    try {
+		lamsServerTime = Long.parseLong(writer.toString().trim());
+	    } catch (NumberFormatException e) {
+		throw new RuntimeException("LAMS server returned wrong time format on call to /service/getServerTime",
+			e);
+	    }
+	    lamsServerTimeDelta = now - lamsServerTime;
+
+	    // Store LAMSServerTime and lastUpdateTime to the storage
+	    ei.setValue("LAMSServerTimeDelta", "" + lamsServerTimeDelta);
+	    ei.setValue("lastUpdateTime", "" + now);
+	    PortalUtil.savePortalExtraInfo(pei);
+	} else {
+	    
+	    //no need to refresh - use stored value
+	    lamsServerTime = now - lamsServerTimeDelta;
+	}
+	
+	return "" + lamsServerTime;
+    }
+    
+    /**
+     * Gets the app.version property value from
+     * the ./main.properties file of the base folder
+     *
+     * @return app.version string
+     * @throws IOException
+     */
+    public static String getAppVersion() throws IOException{
+
+        String versionString = null;
+
+        //to load application's properties, we use this class
+        Properties mainProperties = new Properties();
+
+        FileInputStream file;
+
+        //the base folder is ./, the root of the main.properties file  
+        String path = "./main.properties";
+
+        //load the file handle for main.properties
+        file = new FileInputStream(path);
+
+        //load all the properties from this file
+        mainProperties.load(file);
+
+        //we have loaded the properties, so close the file handle
+        file.close();
+
+        //retrieve the property we are intrested, the app.version
+        versionString = mainProperties.getProperty("app.version");
+
+        return versionString;
+    }
 
     /**
      * @return gets server address from the lams.properties file
@@ -377,75 +492,6 @@ public class LamsSecurityUtil {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_REQ_SRC);
     }
 
-//    /**
-//     * 
-//     * @param node
-//     *            the node from which to do the recursive conversion
-//     * @return the string converted to tigra format
-//     */
-//    public static String convertToTigraFormat(Node node) {
-//
-//	StringBuilder sb = new StringBuilder();
-//
-//	if (node.getNodeName().equals(Constants.ELEM_FOLDER)) {
-//
-//	    StringBuilder attribute = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_NAME)
-//		    .getNodeValue().replace("'", "\\'"));
-//
-//	    sb.append("{type:'Text', label:'" + attribute + "',id:0");
-//
-//	    NodeList children = node.getChildNodes();
-//	    if (children.getLength() == 0) {
-//		sb.append(",expanded:0,children:[{type:'HTML',html:'<i>-empty-</i>', id:0}]}");
-//		return sb.toString();
-//	    } else {
-//		sb.append(",children:[");
-//		
-//		
-//		sb.append(convertToTigraFormat(children.item(0)));
-//		for (int i = 1; i < children.getLength(); i++) {
-//		    sb.append(',').append(convertToTigraFormat(children.item(i)));
-//		}
-//		
-//		sb.append("]}");
-//	    }
-//	    
-//	} else if (node.getNodeName().equals(Constants.ELEM_LEARNING_DESIGN)) {
-//	    
-//	    
-////		  $ld_name = preg_replace("/'/", "$1\'", $xml_node['@']['name']);
-////		  $output .= "{type:'Text',label:'" . $ld_name . "',id:'" . $xml_node['@']['resourceId'] . "'}";
-//
-//	    StringBuilder attrName = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_NAME)
-//		    .getNodeValue().replace("'", "\\'"));
-//	    StringBuilder attrResId = new StringBuilder(node.getAttributes().getNamedItem(Constants.ATTR_RESOURCE_ID)
-//		    .getNodeValue().replace("'", "\\'"));
-//
-//	    sb.append("{type:'Text',label:'");
-//	    sb.append(attrName);
-//	    sb.append("',id:'");
-//	    sb.append(attrResId);
-//	    sb.append("'}");
-//	}
-//	return sb.toString();
-//    }
-
-    // generate authentication hash code to validate parameters
-    public static String generateAuthenticationHash(String datetime, String login, String method, String lsid, String serverId) {
-	String secretkey = LamsPluginUtil.getSecretKey();
-
-	//in case of learnerStrictAuth we should also include lsid value when creating hash: [ts + uid + method + lsid + serverID + serverKey]
-	//regular case: [ts + uid + method + serverID + serverKey]	
-	String plaintext = "learnerStrictAuth".equals(method) ? datetime.toLowerCase().trim()
-		+ login.toLowerCase().trim() + method.toLowerCase().trim() + lsid.toLowerCase().trim()
-		+ serverId.toLowerCase().trim() + secretkey.toLowerCase().trim() : datetime.toLowerCase().trim()
-		+ login.toLowerCase().trim() + method.toLowerCase().trim() + serverId.toLowerCase().trim()
-		+ secretkey.toLowerCase().trim();
-
-	String hash = sha1(plaintext);
-	return hash;
-    }
-
     // generate authentication hash code to validate parameters
     public static String generateAuthenticationHash(String datetime, String login, String serverId) {
 	String secretkey = getServerKey();
@@ -456,16 +502,6 @@ public class LamsSecurityUtil {
 	String hash = sha1(plaintext);
 
 	return hash;
-    }
-
-    // generate authentication hash code to validate parameters
-    public static String generateAuthenticationHash(String datetime, String serverId) throws NoSuchAlgorithmException {
-	String secretkey = LamsPluginUtil.getSecretKey();
-
-	String plaintext = datetime.toLowerCase().trim() + serverId.toLowerCase().trim()
-		+ secretkey.toLowerCase().trim();
-
-	return sha1(plaintext);
     }
 
     /**
