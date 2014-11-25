@@ -1350,12 +1350,7 @@ public class MonitoringAction extends LamsDispatchAction {
     /** Open Time Chart display */
     public ActionForward viewTimeChart(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-
 	try {
-
 	    long lessonID = WebUtil.readLongParam(request, "lessonID");
 
 	    // check monitor privledges
@@ -1366,7 +1361,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    request.setAttribute("lessonID", lessonID);
 	    request.setAttribute("learnerID", WebUtil.readLongParam(request, "learnerID", true));
-
 	} catch (Exception e) {
 	    request.setAttribute("errorName", "MonitoringAction");
 	    request.setAttribute("errorMessage", e.getMessage());
@@ -1381,8 +1375,6 @@ public class MonitoringAction extends LamsDispatchAction {
      * Creates a list of users out of string with comma-delimited user IDs.
      */
     private List<User> parseUserList(HttpServletRequest request, String paramName, Collection<User> users) {
-	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
-		.getServletContext());
 	String userIdList = request.getParameter(paramName);
 	String[] userIdArray = userIdList.split(",");
 	List<User> result = new ArrayList<User>(userIdArray.length);
