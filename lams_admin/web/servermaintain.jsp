@@ -1,5 +1,8 @@
 <%@ include file="/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+
 <h4>
 	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
 	<a href="serverlist.do"><fmt:message key="sysadmin.maintain.external.servers" /></a>
@@ -9,7 +12,7 @@
 
 <html:errors/>
 <br />
-<html:form action="serversave.do" method="post">
+<html:form action="serversave.do" styleId="ext-server-form" method="post">
 <html:hidden property="sid" />
 <table>
 	<tr>
@@ -36,15 +39,19 @@
 		<td><fmt:message key="sysadmin.disabled" />:</td>
 		<td><html:checkbox property="disabled" /></td>
 	</tr>
-	<logic:notEqual name="ServerOrgMapForm" property="orgId" value="-1">
 	<tr>
-		<td><fmt:message key="sysadmin.organisation" />:</td>
-		<td>
-			<html:select property="orgId" >
-				<html:options collection="orgs" property="organisationId" labelProperty="name"/> 
-			</html:select> &nbsp; 
-		</td>
-	</tr>
+		<td><fmt:message key="sysadmin.login.request.ttl" />:</td>
+		<td><html:text property="timeToLiveLoginRequest" size="10"/></td>
+	</tr>	
+	<logic:notEqual name="ServerOrgMapForm" property="orgId" value="-1">
+		<tr>
+			<td><fmt:message key="sysadmin.organisation" />:</td>
+			<td>
+				<html:select property="orgId" >
+					<html:options collection="orgs" property="organisationId" labelProperty="name"/> 
+				</html:select> &nbsp; 
+			</td>
+		</tr>
 	</logic:notEqual>
 	<tr>
 		<td><fmt:message key="sysadmin.userinfoUrl" />:</td>
@@ -70,10 +77,40 @@
 </div>
 </html:form>
 <script type="text/javascript" language="javascript">
-<!--
 	function changeStatus(obj){
 		document.forms[0].orgId.disabled = obj.checked;
 		document.forms[0].orgName.disabled = !obj.checked;
 	}
-//->
+	
+	$(document).ready(function(){
+
+		// validate signup form on keyup and submit
+		$("#ext-server-form").validate({
+			rules: {
+				serverid: "required", 
+				serverkey: "required",
+				servername: "required",
+				prefix: "required",
+				userinfoUrl: "required",
+				timeoutUrl: "required",
+				timeToLiveLoginRequest: {
+					required: true,
+					min: 1
+				}
+			},
+			messages: {
+				serverid: "<c:set var="namev"><fmt:message key='sysadmin.serverid' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+				serverkey: "<c:set var="namev"><fmt:message key='sysadmin.serverkey' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+				servername: "<c:set var="namev"><fmt:message key='sysadmin.servername' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+				prefix: "<c:set var="namev"><fmt:message key='sysadmin.prefix' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+				userinfoUrl: "<c:set var="namev"><fmt:message key='sysadmin.userinfoUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+				timeoutUrl: "<c:set var="namev"><fmt:message key='sysadmin.timeoutUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+				timeoutUrl: "<c:set var="namev"><fmt:message key='sysadmin.timeoutUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+				timeToLiveLoginRequest: {
+					required: "<c:set var="namev"><fmt:message key='sysadmin.login.request.ttl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
+					min: "<fmt:message key="error.login.request.ttl.negative" />"
+				}
+			}
+		});
+	});
 </script>
