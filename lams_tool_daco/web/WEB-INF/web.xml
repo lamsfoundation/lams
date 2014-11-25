@@ -30,12 +30,7 @@
 			org.springframework.web.context.ContextLoaderListener
 		</listener-class>
 	</listener>
-	<listener>
-		<listener-class>
-			org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
-		</listener-class>
-	</listener>
-
+	
 	<filter>
 		<filter-name>hibernateFilter</filter-name>
 		<filter-class>

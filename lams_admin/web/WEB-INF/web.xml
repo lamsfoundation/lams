@@ -96,11 +96,6 @@
 			org.springframework.web.context.ContextLoaderListener
 		</listener-class>
 	</listener>
-	<listener>
-		<listener-class>
-			org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
-		</listener-class>
-	</listener>
 
 	<servlet>
 		<servlet-name>action</servlet-name>

@@ -89,12 +89,6 @@
 		</listener-class>
 	</listener>
 
-	<listener>
-		<listener-class>
-			org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
-		</listener-class>
-	</listener>
-
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
