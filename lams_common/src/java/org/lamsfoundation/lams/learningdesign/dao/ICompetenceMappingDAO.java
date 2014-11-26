@@ -12,5 +12,5 @@ public interface ICompetenceMappingDAO
 	public CompetenceMapping getCompetenceMapping(ToolActivity toolActivity, Competence competence);
 	public void delete(CompetenceMapping competenceMapping);
 	public void deleteAll(Set<CompetenceMapping> competenceMappings);
-
+	public void insert(CompetenceMapping competenceMapping);
 }
