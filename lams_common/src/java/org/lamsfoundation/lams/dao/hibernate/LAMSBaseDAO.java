@@ -76,8 +76,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 	 * org.lamsfoundation.lams.dao.IBaseDAO#insertOrUpdate(java.lang.Object)
 	 */
 	public void insertOrUpdate(Object object) {
-		throw new PessimisticLockException("TEST", new SQLException("SQLExceptionReason"), "");
-//		getSession().saveOrUpdate(object);
+		getSession().saveOrUpdate(object);
 	}
 
 	/*
