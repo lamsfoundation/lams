@@ -48,7 +48,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
@@ -67,16 +67,16 @@ import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceMappingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ICompetenceDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ICompetenceMappingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -94,8 +94,8 @@ import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO;
-import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
+import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -131,29 +131,29 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     protected Logger log = Logger.getLogger(AuthoringService.class);
 
     /** Required DAO's */
-    protected LearningDesignDAO learningDesignDAO;
+    protected ILearningDesignDAO learningDesignDAO;
 
-    protected LearningLibraryDAO learningLibraryDAO;
+    protected ILearningLibraryDAO learningLibraryDAO;
 
-    protected ActivityDAO activityDAO;
+    protected IActivityDAO activityDAO;
 
-    protected BaseDAO baseDAO;
+    protected IBaseDAO baseDAO;
 
-    protected TransitionDAO transitionDAO;
+    protected ITransitionDAO transitionDAO;
 
-    protected ToolDAO toolDAO;
+    protected IToolDAO toolDAO;
 
-    protected LicenseDAO licenseDAO;
+    protected ILicenseDAO licenseDAO;
 
-    protected GroupingDAO groupingDAO;
+    protected IGroupingDAO groupingDAO;
 
-    protected GroupDAO groupDAO;
+    protected IGroupDAO groupDAO;
 
-    protected CompetenceDAO competenceDAO;
+    protected ICompetenceDAO competenceDAO;
 
-    protected CompetenceMappingDAO competenceMappingDAO;
+    protected ICompetenceMappingDAO competenceMappingDAO;
 
-    protected SystemToolDAO systemToolDAO;
+    protected ISystemToolDAO systemToolDAO;
 
     protected PedagogicalPlannerDAO pedagogicalPlannerDAO;
 
@@ -200,11 +200,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param groupDAO
      *            The groupDAO to set.
      */
-    public void setGroupDAO(GroupDAO groupDAO) {
+    public void setGroupDAO(IGroupDAO groupDAO) {
 	this.groupDAO = groupDAO;
     }
 
-    public void setGroupingDAO(GroupingDAO groupingDAO) {
+    public void setGroupingDAO(IGroupingDAO groupingDAO) {
 	this.groupingDAO = groupingDAO;
     }
 
@@ -216,7 +216,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * 
      * @return
      */
-    public CompetenceDAO getCompetenceDAO() {
+    public ICompetenceDAO getCompetenceDAO() {
 	return competenceDAO;
     }
 
@@ -224,7 +224,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * 
      * @param competenceDAO
      */
-    public void setCompetenceDAO(CompetenceDAO competenceDAO) {
+    public void setCompetenceDAO(ICompetenceDAO competenceDAO) {
 	this.competenceDAO = competenceDAO;
     }
 
@@ -232,7 +232,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * 
      * @return
      */
-    public CompetenceMappingDAO getCompetenceMappingDAO() {
+    public ICompetenceMappingDAO getCompetenceMappingDAO() {
 	return competenceMappingDAO;
     }
 
@@ -240,7 +240,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * 
      * @param competenceMappingDAO
      */
-    public void setCompetenceMappingDAO(CompetenceMappingDAO competenceMappingDAO) {
+    public void setCompetenceMappingDAO(ICompetenceMappingDAO competenceMappingDAO) {
 	this.competenceMappingDAO = competenceMappingDAO;
     }
 
@@ -248,7 +248,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param transitionDAO
      *            The transitionDAO to set
      */
-    public void setTransitionDAO(TransitionDAO transitionDAO) {
+    public void setTransitionDAO(ITransitionDAO transitionDAO) {
 	this.transitionDAO = transitionDAO;
     }
 
@@ -256,7 +256,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param learningDesignDAO
      *            The learningDesignDAO to set.
      */
-    public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+    public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 	this.learningDesignDAO = learningDesignDAO;
     }
 
@@ -264,7 +264,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param learningLibraryDAO
      *            The learningLibraryDAO to set.
      */
-    public void setLearningLibraryDAO(LearningLibraryDAO learningLibraryDAO) {
+    public void setLearningLibraryDAO(ILearningLibraryDAO learningLibraryDAO) {
 	this.learningLibraryDAO = learningLibraryDAO;
     }
 
@@ -272,7 +272,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param baseDAO
      *            The baseDAO to set.
      */
-    public void setBaseDAO(BaseDAO baseDAO) {
+    public void setBaseDAO(IBaseDAO baseDAO) {
 	this.baseDAO = baseDAO;
     }
 
@@ -280,7 +280,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param activityDAO
      *            The activityDAO to set.
      */
-    public void setActivityDAO(ActivityDAO activityDAO) {
+    public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
 
@@ -288,7 +288,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param toolDAO
      *            The toolDAO to set
      */
-    public void setToolDAO(ToolDAO toolDAO) {
+    public void setToolDAO(IToolDAO toolDAO) {
 	this.toolDAO = toolDAO;
     }
 
@@ -296,7 +296,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param toolDAO
      *            The toolDAO to set
      */
-    public void setSystemToolDAO(SystemToolDAO systemToolDAO) {
+    public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
 	this.systemToolDAO = systemToolDAO;
     }
 
@@ -304,7 +304,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param licenseDAO
      *            The licenseDAO to set
      */
-    public void setLicenseDAO(LicenseDAO licenseDAO) {
+    public void setLicenseDAO(ILicenseDAO licenseDAO) {
 	this.licenseDAO = licenseDAO;
     }
 

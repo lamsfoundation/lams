@@ -44,10 +44,10 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
@@ -81,11 +81,11 @@ public class LearningDesignService implements ILearningDesignService {
     protected Logger log = Logger.getLogger(LearningDesignService.class);
     protected MessageService messageService;
 
-    protected LearningDesignDAO learningDesignDAO;
-    protected ActivityDAO activityDAO;
-    protected GroupingDAO groupingDAO;
+    protected ILearningDesignDAO learningDesignDAO;
+    protected IActivityDAO activityDAO;
+    protected IGroupingDAO groupingDAO;
 
-    protected LearningLibraryDAO learningLibraryDAO;
+    protected ILearningLibraryDAO learningLibraryDAO;
     protected ILoadedMessageSourceService toolActMessageService;
 
     /*
@@ -124,19 +124,19 @@ public class LearningDesignService implements ILearningDesignService {
 	this.toolActMessageService = toolActMessageService;
     }
 
-    public void setLearningLibraryDAO(LearningLibraryDAO learningLibraryDAO) {
+    public void setLearningLibraryDAO(ILearningLibraryDAO learningLibraryDAO) {
 	this.learningLibraryDAO = learningLibraryDAO;
     }
 
-    public void setActivityDAO(ActivityDAO activityDAO) {
+    public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
 
-    public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+    public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 	this.learningDesignDAO = learningDesignDAO;
     }
 
-    public void setGroupingDAO(GroupingDAO groupingDAO) {
+    public void setGroupingDAO(IGroupingDAO groupingDAO) {
 	this.groupingDAO = groupingDAO;
     }
 

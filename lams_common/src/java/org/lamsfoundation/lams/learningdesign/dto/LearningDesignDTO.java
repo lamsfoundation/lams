@@ -37,8 +37,8 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -89,7 +89,7 @@ public class LearningDesignDTO extends BaseDTO {
     public LearningDesignDTO() {
     }
 
-    public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO, GroupingDAO groupingDAO,
+    public LearningDesignDTO(LearningDesign learningDesign, IActivityDAO activityDAO, IGroupingDAO groupingDAO,
 	    String languageCode) {
 	this.learningDesignID = learningDesign.getLearningDesignId();
 	this.learningDesignUIID = learningDesign.getLearningDesignUIID();
@@ -375,7 +375,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @param setupUserList
      * @return ArrayList the array of groupingDTOs
      */
-    public ArrayList populateGroupings(LearningDesign design, GroupingDAO groupingDAO) {
+    public ArrayList populateGroupings(LearningDesign design, IGroupingDAO groupingDAO) {
 	ArrayList<GroupingDTO> groupingList = new ArrayList<GroupingDTO>();
 	List dbGroupings = groupingDAO.getGroupingsByLearningDesign(design.getLearningDesignId());
 	if (dbGroupings != null) {
