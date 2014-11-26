@@ -45,5 +45,8 @@
 	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
 		<!-- <property name="sessionFactory"><ref bean="coreSessionFactory"/></property> -->
 	</bean>
+	
+	<!-- PostProcessor to convert Hibernate specific (checked) exceptions to Runtime DataAccessExceptions -->
+	<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 
 </beans>
