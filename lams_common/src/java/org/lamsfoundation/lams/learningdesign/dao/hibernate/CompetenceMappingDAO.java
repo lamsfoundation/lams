@@ -3,13 +3,15 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 import java.util.Set;
 
 import org.hibernate.Query;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.ICompetenceMappingDAO;
+import org.springframework.stereotype.Repository;
 
-public class CompetenceMappingDAO extends BaseDAO implements ICompetenceMappingDAO
+@Repository
+public class CompetenceMappingDAO extends LAMSBaseDAO implements ICompetenceMappingDAO
 {
 
 	private static final String LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE= "from lams_competence_mapping in class " + CompetenceMapping.class.getName() 
@@ -17,7 +19,7 @@ public class CompetenceMappingDAO extends BaseDAO implements ICompetenceMappingD
 	
 	public void saveOrUpdate(CompetenceMapping competenceMapping)
 	{
-		this.getHibernateTemplate().saveOrUpdate(competenceMapping);
+		this.getSession().saveOrUpdate(competenceMapping);
 	}
 	
 	public CompetenceMapping getCompetenceMapping(ToolActivity toolActivity, Competence competence)
@@ -25,7 +27,7 @@ public class CompetenceMappingDAO extends BaseDAO implements ICompetenceMappingD
 			if ( toolActivity != null && competence != null ) {
 			Long activityId = toolActivity.getActivityId();
 			Long competenceId = competence.getCompetenceId();
-			Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE);
+			Query query = getSession().createQuery(LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE);
 			query.setLong(0,competenceId);
 			query.setLong(1,activityId.longValue());
 			return (CompetenceMapping) query.uniqueResult();
@@ -35,11 +37,18 @@ public class CompetenceMappingDAO extends BaseDAO implements ICompetenceMappingD
 	
 	public void delete(CompetenceMapping competenceMapping)
 	{
-		this.getHibernateTemplate().delete(competenceMapping);
+		this.getSession().delete(competenceMapping);
 	}
 	
 	public void deleteAll(Set<CompetenceMapping> competenceMappings)
 	{
-		this.getHibernateTemplate().deleteAll(competenceMappings);
+		this.doDeleteAll(competenceMappings);
 	}
+
+	@Override
+	public void insert(CompetenceMapping competenceMapping) {
+		super.insert(competenceMapping);
+	}
+	
+	
 }

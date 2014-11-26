@@ -21,17 +21,20 @@
  * ****************************************************************
  */
 /* $$Id$$ */
+
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
+import org.springframework.stereotype.Repository;
 
-public class BranchActivityEntryDAO extends BaseDAO implements IBranchActivityEntryDAO {
+@Repository
+public class BranchActivityEntryDAO extends LAMSBaseDAO implements IBranchActivityEntryDAO {
 
     private final static String ENTRIES_FOR_LEARNING_DESIGN = "select entry from "
 	    + BranchActivityEntry.class.getName() + " entry, " + Activity.class.getName() + " branchingActivity "
@@ -47,12 +50,12 @@ public class BranchActivityEntryDAO extends BaseDAO implements IBranchActivityEn
      */
     @SuppressWarnings("unchecked")
     public List<BranchActivityEntry> getEntriesByLearningDesign(Long learningDesignId) {
-	return (List<BranchActivityEntry>) this.getHibernateTemplate().find(BranchActivityEntryDAO.ENTRIES_FOR_LEARNING_DESIGN, learningDesignId);
+	return (List<BranchActivityEntry>) this.doFind(BranchActivityEntryDAO.ENTRIES_FOR_LEARNING_DESIGN, learningDesignId);
     }
 
     @SuppressWarnings("unchecked")
     public BranchCondition getConditionByID(Long conditionID) {
-	List<BranchCondition> result = (List<BranchCondition>) this.getHibernateTemplate().find(BranchActivityEntryDAO.CONDITION_BY_ID,
+	List<BranchCondition> result = (List<BranchCondition>) this.doFind(BranchActivityEntryDAO.CONDITION_BY_ID,
 		conditionID);
 	if (result == null || result.isEmpty()) {
 	    return null;

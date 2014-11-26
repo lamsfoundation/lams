@@ -23,14 +23,16 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class LicenseDAO extends BaseDAO implements ILicenseDAO{
+@Repository
+public class LicenseDAO extends LAMSBaseDAO implements ILicenseDAO{
 	
 	public License getLicenseByID(Long licenseID){
 		return(License)super.find(License.class,licenseID);

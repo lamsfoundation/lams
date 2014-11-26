@@ -23,25 +23,21 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.springframework.orm.hibernate4.HibernateCallback;
 import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class GroupDAO extends BaseDAO implements IGroupDAO {
+@Repository
+public class GroupDAO extends LAMSBaseDAO implements IGroupDAO {
 
 	private final static String NUM_GROUPS = "select count(*) from "
 		+ Group.class.getName() + " g join g.users u"
@@ -55,11 +51,11 @@ public class GroupDAO extends BaseDAO implements IGroupDAO {
 	}
 	
 	public void saveGroup(Group group) {
-        getHibernateTemplate().save(group);
+        getSession().save(group);
 	}
 	
 	public void deleteGroup(Group group) {
-        getHibernateTemplate().delete(group);
+		getSession().delete(group);
 	}
 
 	/** 

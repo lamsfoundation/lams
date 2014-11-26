@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -37,11 +37,13 @@ import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class GroupingDAO extends BaseDAO implements IGroupingDAO {
+@Repository 
+public class GroupingDAO extends LAMSBaseDAO implements IGroupingDAO {
 
 	private final static String GROUPINGS_FOR_LEARNING_DESIGN_VIA_CREATE = "select grouping from " + Grouping.class.getName()
 			+ " grouping, " + GroupingActivity.class.getName() + " grouping_activity "
@@ -64,9 +66,8 @@ public class GroupingDAO extends BaseDAO implements IGroupingDAO {
 	 * related to branches and which are not attached to a GroupingActivity.
 	 */
 	public List<Grouping> getGroupingsByLearningDesign(Long learningDesignId) {
-		List groupingsA = this.getHibernateTemplate()
-				.find(GroupingDAO.GROUPINGS_FOR_LEARNING_DESIGN_VIA_CREATE, learningDesignId);
-		List groupingsB = this.getHibernateTemplate().find(GroupingDAO.GROUPINGS_FOR_LEARNING_DESIGN_VIA_GROUPING,
+		List groupingsA = this.doFind(GroupingDAO.GROUPINGS_FOR_LEARNING_DESIGN_VIA_CREATE, learningDesignId);
+		List groupingsB = this.doFind(GroupingDAO.GROUPINGS_FOR_LEARNING_DESIGN_VIA_GROUPING,
 				learningDesignId);
 		HashMap<Long, Grouping> realGroupings = new HashMap<Long, Grouping>();
 		Iterator iter = groupingsA.iterator();

@@ -31,7 +31,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -41,13 +41,15 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate4.HibernateCallback;
 import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of ILessonDAO
  * 
  * @author chris
  */
-public class LessonDAO extends BaseDAO implements ILessonDAO {
+@Repository
+public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     private final static String FIND_LESSON_BY_CREATOR = "from " + Lesson.class.getName()
 	    + " lesson where lesson.user.userId=? and lesson.lessonStateId <= 6 and "
 	    + " lesson.learningDesign.copyTypeID=" + LearningDesign.COPY_TYPE_LESSON;
@@ -76,7 +78,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @return the lesson
      */
     public Lesson getLesson(Long lessonId) {
-	Lesson lesson = (Lesson) getHibernateTemplate().get(Lesson.class, lessonId);
+	Lesson lesson = (Lesson) getSession().get(Lesson.class, lessonId);
 	return lesson;
     }
 
@@ -93,7 +95,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 
     /** Get all the lessons in the database. This includes the disabled lessons. */
     public List getAllLessons() {
-	return getHibernateTemplate().loadAll(Lesson.class);
+	return loadAll(Lesson.class);
     }
 
     /**
@@ -202,7 +204,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @param lesson
      */
     public void saveLesson(Lesson lesson) {
-	getHibernateTemplate().save(lesson);
+    	getSession().save(lesson);
     }
 
     /**
@@ -211,7 +213,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @param lesson
      */
     public void deleteLesson(Lesson lesson) {
-	getHibernateTemplate().delete(lesson);
+    	getSession().delete(lesson);
     }
 
     /**
@@ -220,7 +222,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#updateLesson(org.lamsfoundation.lams.lesson.Lesson)
      */
     public void updateLesson(Lesson lesson) {
-	getHibernateTemplate().update(lesson);
+    	getSession().update(lesson);
     }
 
     /**
@@ -232,7 +234,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @return List The list of Lessons for the given user
      */
     public List getLessonsCreatedByUser(Integer userID) {
-	List lessons = this.getHibernateTemplate().find(LessonDAO.FIND_LESSON_BY_CREATOR, userID);
+	List lessons = this.doFind(LessonDAO.FIND_LESSON_BY_CREATOR, userID);
 	return lessons;
     }
 
@@ -268,7 +270,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @return the list of Lessons
      */
     public List getPreviewLessonsBeforeDate(final Date startDate) {
-	List lessons = this.getHibernateTemplate().find(LessonDAO.FIND_PREVIEW_BEFORE_START_DATE, startDate);
+	List lessons = this.doFind(LessonDAO.FIND_PREVIEW_BEFORE_START_DATE, startDate);
 	return lessons;
     }
 
@@ -337,7 +339,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     }
     
     public List getLessonsByGroup(final Integer orgId) {
-	return this.getHibernateTemplate().find(LessonDAO.LESSONS_BY_GROUP, orgId);
+	return this.doFind(LessonDAO.LESSONS_BY_GROUP, orgId);
     }
 
     /**
@@ -345,7 +347,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      */
     public List getLessonsByOriginalLearningDesign(final Long ldId, final Integer orgId) {
 	Object[] args = { ldId.longValue(), orgId.intValue() };
-	List lessons = this.getHibernateTemplate().find(LessonDAO.LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
+	List lessons = this.doFind(LessonDAO.LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
 	return lessons;
     }
 
@@ -354,7 +356,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      */
     @SuppressWarnings("unchecked")
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return (List<User>) this.getHibernateTemplate().findByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId",
+	return (List<User>) this.doFindByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId",
 		sessionId);
     }
     

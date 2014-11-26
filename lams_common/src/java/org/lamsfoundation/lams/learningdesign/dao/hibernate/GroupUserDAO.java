@@ -27,16 +27,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Andrey Balan
  */
-public class GroupUserDAO extends BaseDAO implements IGroupUserDAO {
+@Repository
+public class GroupUserDAO extends LAMSBaseDAO implements IGroupUserDAO {
 
     private static final String GET_USERS_BY_LESSON_AND_TIME = "SELECT DISTINCT gu.user FROM "
 	    + GroupUser.class.getName()
@@ -64,12 +66,12 @@ public class GroupUserDAO extends BaseDAO implements IGroupUserDAO {
      */
     @SuppressWarnings("unchecked")
     public List<User> getUsersWithLessonEndingSoonerThan(Lesson lesson, Date timeToScheduledLessonEnd) {
-	return (List<User>) getHibernateTemplate().find(GET_USERS_BY_LESSON_AND_TIME,
+	return (List<User>) doFind(GET_USERS_BY_LESSON_AND_TIME,
 		new Object[] { lesson.getLessonClass().getGroupingId(), timeToScheduledLessonEnd });
     }
 
     public void saveGroupUser(GroupUser groupUser) {
-	getHibernateTemplate().save(groupUser);
+	getSession().save(groupUser);
     }
 
 }

@@ -24,20 +24,22 @@
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of ILessonDAO
  * @author chris
  */
-public class LessonClassDAO extends BaseDAO implements ILessonClassDAO
+@Repository
+public class LessonClassDAO extends LAMSBaseDAO implements ILessonClassDAO
 {
     
     public LessonClass getLessonClass(Long lessonClassId)
     {
-        return (LessonClass)getHibernateTemplate().get(LessonClass.class, lessonClassId);
+        return (LessonClass)getSession().get(LessonClass.class, lessonClassId);
     }
     
     /**
@@ -46,7 +48,7 @@ public class LessonClassDAO extends BaseDAO implements ILessonClassDAO
      */
     public void saveLessonClass(LessonClass lessonClass)
     {
-        getHibernateTemplate().save(lessonClass);
+    	getSession().save(lessonClass);
     }
     
     /**
@@ -55,7 +57,7 @@ public class LessonClassDAO extends BaseDAO implements ILessonClassDAO
      */
     public void deleteLessonClass(LessonClass lessonClass)
     {
-        getHibernateTemplate().delete(lessonClass);
+    	getSession().delete(lessonClass);
     }
 
     /**
@@ -63,7 +65,7 @@ public class LessonClassDAO extends BaseDAO implements ILessonClassDAO
      */
     public void updateLessonClass(LessonClass lessonClass)
     {
-        getHibernateTemplate().update(lessonClass);
+    	getSession().update(lessonClass);
         
     }
     

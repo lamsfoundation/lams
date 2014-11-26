@@ -23,20 +23,17 @@
 
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.learningdesign.dao.ICompetenceDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Competence;
-import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.lamsfoundation.lams.learningdesign.dao.ICompetenceDAO;
+import org.springframework.stereotype.Repository;
 
-public class CompetenceDAO extends BaseDAO implements ICompetenceDAO
+@Repository
+public class CompetenceDAO extends LAMSBaseDAO implements ICompetenceDAO
 {
 	private static final String LOAD_COMPETENCE_BY_LDID_AND_TITLE= "from lams_competence in class " + Competence.class.getName() 
 		+ " where title=? AND learning_design_id=?";
@@ -48,7 +45,7 @@ public class CompetenceDAO extends BaseDAO implements ICompetenceDAO
  
     public void saveOrUpdate(Competence competence)
     {
-    	this.getHibernateTemplate().saveOrUpdate(competence);
+    	this.getSession().saveOrUpdate(competence);
     }
     
     
@@ -70,11 +67,11 @@ public class CompetenceDAO extends BaseDAO implements ICompetenceDAO
     
     public void delete(Competence competence)
     {
-    	this.getHibernateTemplate().delete(competence);
+    	this.getSession().delete(competence);
     }
     
     public void deleteAll(Set<Competence> competences)
 	{
-		this.getHibernateTemplate().deleteAll(competences);
+		this.doDeleteAll(competences);
 	}
 }

@@ -25,16 +25,18 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.DataTransition;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Marcin Cieslak
  */
-public class DataFlowDAO extends BaseDAO implements IDataFlowDAO {
+@Repository
+public class DataFlowDAO extends LAMSBaseDAO implements IDataFlowDAO {
 
     private static final String FIND_DATA_FLOW_OBJECTS_BY_TOOL_CONTENT_ID = "SELECT obj FROM "
 	    + DataFlowObject.class.getName()
@@ -53,7 +55,7 @@ public class DataFlowDAO extends BaseDAO implements IDataFlowDAO {
 
     @SuppressWarnings("unchecked")
     public List<DataFlowObject> getDataFlowObjectsByToolContentId(Long toolContentId) {
-	List<DataFlowObject> result = (List<DataFlowObject>) this.getHibernateTemplate().find(
+	List<DataFlowObject> result = (List<DataFlowObject>) this.doFind(
 		DataFlowDAO.FIND_DATA_FLOW_OBJECTS_BY_TOOL_CONTENT_ID, toolContentId);
 	if (result == null || result.isEmpty()) {
 	    return null;
@@ -63,7 +65,7 @@ public class DataFlowDAO extends BaseDAO implements IDataFlowDAO {
 
     @SuppressWarnings("unchecked")
     public DataFlowObject getAssignedDataFlowObject(Long toolContentId, Integer assigmentId) {
-	List<DataFlowObject> result = (List<DataFlowObject>) this.getHibernateTemplate().findByNamedParam(
+	List<DataFlowObject> result = (List<DataFlowObject>) this.doFindByNamedParam(
 		DataFlowDAO.FIND_ASSIGNED_DATA_FLOW_OBJECTS, new String[] { "toolContentId", "toolAssigmentId" },
 		new Object[] { toolContentId, assigmentId });
 	// There must be exactly one result

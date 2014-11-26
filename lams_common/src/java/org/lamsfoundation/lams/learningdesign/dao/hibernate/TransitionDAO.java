@@ -26,16 +26,18 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class TransitionDAO extends BaseDAO implements ITransitionDAO {
+@Repository
+public class TransitionDAO extends LAMSBaseDAO implements ITransitionDAO {
 
 	private static final String TABLENAME ="lams_learning_transition";
 	private static final String FIND_BY_TO_ACTIVITY = "from " + TABLENAME +" in class " + Transition.class.getName()+ " where to_activity_id =?";
@@ -51,7 +53,7 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByTransitionID(java.lang.Long)
 	 */
 	public Transition getTransitionByTransitionID(Long transitionID) {
-		return (Transition)this.getHibernateTemplate().get(Transition.class,transitionID);
+		return (Transition)this.getSession().get(Transition.class,transitionID);
 	}
 
 	/**

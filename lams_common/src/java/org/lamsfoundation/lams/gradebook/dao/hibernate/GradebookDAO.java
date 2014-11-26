@@ -26,12 +26,14 @@ package org.lamsfoundation.lams.gradebook.dao.hibernate;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
+import org.springframework.stereotype.Repository;
 
-public class GradebookDAO extends BaseDAO implements IGradebookDAO {
+@Repository
+public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 
     private static final String GET_GRADEBOOK_USER_ACTIVITY = "from GradebookUserActivity gact where "
 	    + "gact.learner.userId=:userID and gact.activity.activityId=:activityID";

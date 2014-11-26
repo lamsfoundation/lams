@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
@@ -46,11 +46,13 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas 
  */
-public class ActivityDAO extends BaseDAO implements IActivityDAO {
+@Repository
+public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 
 	private static final String TABLENAME = "lams_learning_activity";
 
@@ -134,7 +136,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivityByParentActivityId(java.lang.Long)
 	 */
 	public List getActivitiesByParentActivityId(Long parentActivityId) {
-		List list = this.getHibernateTemplate().find(ActivityDAO.FIND_BY_PARENT, parentActivityId);
+		List list = this.doFind(ActivityDAO.FIND_BY_PARENT, parentActivityId);
 		return list;
 	}
 
@@ -149,7 +151,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivitiesByLearningDesignId(java.lang.Long)
 	 */
 	public List getActivitiesByLearningDesignId(Long learningDesignId) {
-		return this.getHibernateTemplate().find(ActivityDAO.FIND_BY_LEARNING_DESIGN_ID, learningDesignId);
+		return this.doFind(ActivityDAO.FIND_BY_LEARNING_DESIGN_ID, learningDesignId);
 	}
 
 	/**
@@ -158,32 +160,32 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 * @return List of GroupingActivity objects
 	 */
 	public List getGroupingActivitiesByLearningDesignId(Long learningDesignId) {
-		return this.getHibernateTemplate().find(ActivityDAO.FIND_GROUPINGACTIVITY_TYPE_BY_LEARNING_DESIGN_ID, learningDesignId);
+		return this.doFind(ActivityDAO.FIND_GROUPINGACTIVITY_TYPE_BY_LEARNING_DESIGN_ID, learningDesignId);
 	}
 
 	/* 
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#insertActivity(org.lamsfoundation.lams.learningdesign.Activity)
 	 */
 	public void insertActivity(Activity activity) {
-		this.getHibernateTemplate().save(activity);
+		this.getSession().save(activity);
 	}
 
 	public void insertOptActivity(OptionsActivity activity) {
-		this.getHibernateTemplate().save(activity);
+		this.getSession().save(activity);
 	}
 
 	/* 
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#updateActivity(org.lamsfoundation.lams.learningdesign.Activity)
 	 */
 	public void updateActivity(Activity activity) {
-		this.getHibernateTemplate().update(activity);
+		this.getSession().update(activity);
 	}
 
 	/* 
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#deleteActivity(org.lamsfoundation.lams.learningdesign.Activity)
 	 */
 	public void deleteActivity(Activity activity) {
-		this.getHibernateTemplate().delete(activity);
+		this.getSession().delete(activity);
 	}
 
 	/**
@@ -204,13 +206,13 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivitiesByLibraryID(java.lang.Long)
 	 */
 	public List getActivitiesByLibraryID(Long libraryID) {
-		List list = this.getHibernateTemplate().find(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
+		List list = this.doFind(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
 		return list;
 	}
 
 	/** @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getTemplateActivityByLibraryID(java.lang.Long) */
 	public Activity getTemplateActivityByLibraryID(Long libraryID) {
-		List list = this.getHibernateTemplate().find(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
+		List list = this.doFind(ActivityDAO.FIND_BY_LIBRARY_ID, libraryID);
 		return list != null && list.size() != 0 ? (Activity) list.get(0) : null;
 	}
 }

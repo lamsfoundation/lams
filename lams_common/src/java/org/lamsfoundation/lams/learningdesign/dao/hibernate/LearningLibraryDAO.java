@@ -25,15 +25,17 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class LearningLibraryDAO extends BaseDAO implements ILearningLibraryDAO {
+@Repository
+public class LearningLibraryDAO extends LAMSBaseDAO implements ILearningLibraryDAO {
 
     private static final String FIND_VALID_LIB = "from " + LearningLibrary.class.getName()
 	    + " l where l.validLibrary=true";
@@ -47,7 +49,7 @@ public class LearningLibraryDAO extends BaseDAO implements ILearningLibraryDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<LearningLibrary> getAllLearningLibraries() {
-	return getSessionFactory().getCurrentSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).list();
+	return getSession().createQuery(LearningLibraryDAO.FIND_VALID_LIB).list();
     }
 
     @Override
@@ -56,13 +58,13 @@ public class LearningLibraryDAO extends BaseDAO implements ILearningLibraryDAO {
 	if (valid) {
 	    return getAllLearningLibraries();
 	} else {
-	    return (List<LearningLibrary>) getHibernateTemplate().find(LearningLibraryDAO.FIND_ALL_LIB);
+	    return (List<LearningLibrary>) doFind(LearningLibraryDAO.FIND_ALL_LIB);
 	}
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<LearningLibraryGroup> getLearningLibraryGroups() {
-	return getHibernateTemplate().loadAll(LearningLibraryGroup.class);
+	return loadAll(LearningLibraryGroup.class);
     }
 }
