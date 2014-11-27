@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.integration.security;
 
+import java.util.Date;
+
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.util.HashUtil;
 
@@ -47,6 +49,7 @@ public class Authenticator {
      */
     public static void authenticate(ExtServerOrgMap map, String datetime, String username, String method,
 	    String hashValue) throws AuthenticationException {
+	
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");
 	}
@@ -60,19 +63,21 @@ public class Authenticator {
     }
 
     /**
-     * Checks hash. Differs from the method above (the one without lsid parameter) in a way that hash is expected to also
-     * contain lsidx: [ts + uid + method + lsid + serverID + serverKey]
+     * Checks hash for LoginRequest calls. Differs from the method above in a way that datetime is expected to contain
+     * real value and it must be quite recent one.
      * 
      * @param map
      * @param datetime
      * @param username
      * @param method
      * @param lsid
+     *            this parameter provided only if coming from learnerStrictAuth
      * @param hashValue
      * @throws AuthenticationException
      */
-    public static void authenticate(ExtServerOrgMap map, String datetime, String username, String method, String lsid,
-	    String hashValue) throws AuthenticationException {
+    public static void authenticateLoginRequest(ExtServerOrgMap map, String datetime, String username, String method,
+	    String lsid, String hashValue) throws AuthenticationException {
+
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");
 	}
@@ -80,9 +85,31 @@ public class Authenticator {
 	    throw new AuthenticationException("The third party server is disabled");
 	}
 
-	String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
-		+ lsid.toLowerCase().trim() + map.getServerid().toLowerCase().trim()
-		+ map.getServerkey().toLowerCase().trim();
+	// check if datetime parameter is not too old
+	long datetimeParam;
+	try {
+	    datetimeParam = Long.parseLong(datetime);
+	} catch (NumberFormatException e) {
+	    throw new AuthenticationException("The third party server provided wrong format of datetime, datetime = "
+		    + datetime, e);
+	}
+
+	int timeToLiveLoginRequest = map.getTimeToLiveLoginRequest();
+	//sum up request time and maximum allowed request's time to live
+	Date requestTimePlusTimeToLive = new Date(datetimeParam + timeToLiveLoginRequest * 60 * 1000);
+	Date now = new Date();
+	if (requestTimePlusTimeToLive.before(now)) {
+	    throw new AuthenticationException("Login Request can't be older than " + timeToLiveLoginRequest
+		    + "minutes. Request time is: " + new Date(datetimeParam));
+	}
+
+	//learnerStrictAuth hash [ts + uid + method + lsid + serverID + serverKey]
+	//otherwise [ts + uid + method + serverID + serverKey]
+	String plaintext = (lsid == null) ? datetime.toLowerCase().trim() + username.toLowerCase().trim()
+		+ method.toLowerCase().trim() + map.getServerid().toLowerCase().trim()
+		+ map.getServerkey().toLowerCase().trim() : datetime.toLowerCase().trim()
+		+ username.toLowerCase().trim() + method.toLowerCase().trim() + lsid.toLowerCase().trim()
+		+ map.getServerid().toLowerCase().trim() + map.getServerkey().toLowerCase().trim();
 	checkHash(plaintext, hashValue);
     }
 

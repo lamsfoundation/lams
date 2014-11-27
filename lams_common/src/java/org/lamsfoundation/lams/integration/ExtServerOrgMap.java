@@ -41,6 +41,9 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     /** persistent field */
     private Boolean disabled;
+    
+    /** persistent field */
+    private int timeToLiveLoginRequest;
 
     /** persistent field */
     private Organisation organisation;
@@ -51,42 +54,9 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     /** persistent field */
     private Set extUserUseridMaps;
 
-    /** full constructor */
-    public ExtServerOrgMap(String serverid, String serverkey, String servername, String serverdesc, String prefix,
-	    String userinfoUrl, String serverUrl, String timeoutUrl, Boolean disabled, Organisation organisation, Set extCourseClassMaps,
-	    Set extUserUseridMaps) {
-	this.serverid = serverid;
-	this.serverkey = serverkey;
-	this.servername = servername;
-	this.serverdesc = serverdesc;
-	this.prefix = prefix;
-	this.userinfoUrl = userinfoUrl;
-	this.serverUrl = serverUrl;
-	this.timeoutUrl = timeoutUrl;
-	this.disabled = disabled;
-	this.organisation = organisation;
-	this.extCourseClassMaps = extCourseClassMaps;
-	this.extUserUseridMaps = extUserUseridMaps;
-    }
-
     /** default constructor */
     public ExtServerOrgMap() {
-    }
-
-    /** minimal constructor */
-    public ExtServerOrgMap(String serverid, String serverkey, String servername, String prefix, String userinfoUrl,
-	    String timeoutUrl, Boolean disabled, Organisation organisation, Set extCourseClassMaps,
-	    Set extUserUseridMaps) {
-	this.serverid = serverid;
-	this.serverkey = serverkey;
-	this.servername = servername;
-	this.prefix = prefix;
-	this.userinfoUrl = userinfoUrl;
-	this.timeoutUrl = timeoutUrl;
-	this.disabled = disabled;
-	this.organisation = organisation;
-	this.extCourseClassMaps = extCourseClassMaps;
-	this.extUserUseridMaps = extUserUseridMaps;
+	timeToLiveLoginRequest = 80;
     }
 
     public Integer getSid() {
@@ -175,6 +145,19 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     public void setDisabled(Boolean disabled) {
 	this.disabled = disabled;
+    }
+    
+    /**
+     * Measured in minutes.
+     * 
+     * @return
+     */
+    public int getTimeToLiveLoginRequest() {
+	return this.timeToLiveLoginRequest;
+    }
+
+    public void setTimeToLiveLoginRequest(int timeToLiveLoginRequest) {
+	this.timeToLiveLoginRequest = timeToLiveLoginRequest;
     }
 
     public Organisation getOrganisation() {
