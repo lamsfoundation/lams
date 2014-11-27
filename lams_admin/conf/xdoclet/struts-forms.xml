@@ -82,6 +82,7 @@
 	<form-property name="timeoutUrl" type="java.lang.String" initial="http://dummy.url/not.implemented"/>
 	<form-property name="lessonFinishUrl" type="java.lang.String"/>
 	<form-property name="disabled" type="java.lang.Boolean" initial="false"/>
+	<form-property name="timeToLiveLoginRequest" type="java.lang.Integer" initial="80"/>
 	<form-property name="orgId" type="java.lang.Integer" initial="-1"/>
 	<form-property name="newOrg" type="java.lang.Boolean" initial="false"/>
 	<form-property name="orgName" type="java.lang.String" />
