@@ -23,9 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
+import org.springframework.stereotype.Repository;
 
 
 /**
@@ -33,7 +34,8 @@ import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
  * @author Jacky Fang 8/02/2005
  * 
  */
-public class ToolContentDAO extends BaseDAO implements IToolContentDAO
+@Repository
+public class ToolContentDAO extends LAMSBaseDAO implements IToolContentDAO
 {
 
     /**
@@ -49,7 +51,7 @@ public class ToolContentDAO extends BaseDAO implements IToolContentDAO
      */
     public void saveToolContent(ToolContent toolContent)
     {
-        getHibernateTemplate().save(toolContent);
+        getSession().save(toolContent);
     }
 
 }

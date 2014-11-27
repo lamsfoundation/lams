@@ -25,19 +25,18 @@ package org.lamsfoundation.lams.config.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
  * @author Mitchell Seaton
  * 
  */
-public class ConfigurationDAO extends BaseDAO implements IConfigurationDAO {
+@Repository
+public class ConfigurationDAO extends LAMSBaseDAO implements IConfigurationDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from configuration in class "
 	    + ConfigurationItem.class.getName() + " where configuration.key=:key";
 
@@ -55,12 +54,7 @@ public class ConfigurationDAO extends BaseDAO implements IConfigurationDAO {
      */
     @Override
     public ConfigurationItem getConfigItemByKey(final String configKey) {
-	return (ConfigurationItem) getHibernateTemplate().execute(new HibernateCallback() {
-	    @Override
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(ConfigurationDAO.LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
-			.uniqueResult();
-	    }
-	});
+		return (ConfigurationItem) getSession().createQuery(ConfigurationDAO.LOAD_CONFIG_ITEM_BY_KEY)
+				.setString("key", configKey).uniqueResult();
     }
 }

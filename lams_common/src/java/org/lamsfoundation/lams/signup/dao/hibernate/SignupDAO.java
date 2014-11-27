@@ -2,18 +2,20 @@ package org.lamsfoundation.lams.signup.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.signup.dao.ISignupDAO;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.stereotype.Repository;
 
-public class SignupDAO extends BaseDAO implements ISignupDAO {
+@Repository
+public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
 
     @Override
     public SignupOrganisation getSignupOrganisation(String context) {
-	List list = getHibernateTemplate().find(
+	List list = doFind(
 		"from SignupOrganisation s where s.disabled=" + Boolean.FALSE + " and s.context=?", context);
 	if (list != null && list.size() > 0) {
 	    return (SignupOrganisation) list.get(0);
@@ -30,7 +32,7 @@ public class SignupDAO extends BaseDAO implements ISignupDAO {
     public List getOrganisationCandidates() {
 	String query = "from Organisation o where o.organisationState.organisationStateId=" + OrganisationState.ACTIVE;
 	query += " and o.organisationType.organisationTypeId!=" + OrganisationType.ROOT_TYPE;
-	return getHibernateTemplate().find(query);
+	return doFind(query);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class SignupDAO extends BaseDAO implements ISignupDAO {
 	Object[] values = new Object[2];
 	values[0] = soid;
 	values[1] = context;
-	List list = getHibernateTemplate().find(query, values);
+	List list = doFind(query, values);
 	if (list != null && list.size() > 0)
 	    return true;
 	else
@@ -61,7 +63,7 @@ public class SignupDAO extends BaseDAO implements ISignupDAO {
 	Object[] values = new Object[2];
 	values[0] = context;
 	values[1] = courseKey;
-	List list = getHibernateTemplate().find(query, values);
+	List list = doFind(query, values);
 	if (list != null && list.size() > 0)
 	    return true;
 	else

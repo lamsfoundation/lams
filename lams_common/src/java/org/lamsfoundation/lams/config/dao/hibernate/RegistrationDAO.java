@@ -27,25 +27,27 @@ import java.util.List;
 
 import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.IRegistrationDAO;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
-public class RegistrationDAO extends BaseDAO implements IRegistrationDAO {
+@Repository
+public class RegistrationDAO extends LAMSBaseDAO implements IRegistrationDAO {
 
     private static final String LOAD_REG = "from registration in class " + Registration.class.getName();
 
     public void saveOrUpdate(Registration reg) {
-	getHibernateTemplate().saveOrUpdate(reg);
+    	saveOrUpdate(reg);
     }
 
-    @SuppressWarnings("unchecked")
-    public Registration get() {
-	List list = getHibernateTemplate().find(LOAD_REG);
+	@SuppressWarnings("unchecked")
+	public Registration get() {
+		List list = doFind(LOAD_REG);
 
-	if (list != null && list.size() > 0) {
-	    return (Registration) list.get(0);
-	} else {
-	    return null;
+		if (list != null && list.size() > 0) {
+			return (Registration) list.get(0);
+		} else {
+			return null;
+		}
 	}
-    }
 
 }

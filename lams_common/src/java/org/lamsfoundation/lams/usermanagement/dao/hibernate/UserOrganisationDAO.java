@@ -25,19 +25,17 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author jliew
  * 
  */
-public class UserOrganisationDAO extends BaseDAO implements IUserOrganisationDAO {
+@Repository
+public class UserOrganisationDAO extends LAMSBaseDAO implements IUserOrganisationDAO {
 
     /*
      * Uses named query to retrieve list of userOrganisations to delete. Used by
@@ -51,19 +49,10 @@ public class UserOrganisationDAO extends BaseDAO implements IUserOrganisationDAO
      * userOrganisationsNotById(java.lang.Integer, java.lang.Integer)
      */
     public List userOrganisationsNotById(final Integer userId, final Integer orgId) {
-
-	List userOrganisations;
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	userOrganisations = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("userOrganisationsNotById");
+		Query query = getSession().getNamedQuery("userOrganisationsNotById");
 		query.setInteger("userId", userId.intValue());
 		query.setInteger("orgId", orgId.intValue());
 		List result = query.list();
 		return result;
-	    }
-	});
-
-	return userOrganisations;
     }
 }

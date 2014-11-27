@@ -30,7 +30,7 @@ import java.util.TimeZone;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.timezone.Timezone;
-import org.lamsfoundation.lams.timezone.dao.hibernate.TimezoneDAO;
+import org.lamsfoundation.lams.timezone.dao.ITimezoneDAO;
 
 /**
  * Class implements <code>ITimezoneService</code>.
@@ -43,7 +43,7 @@ public class TimezoneService implements ITimezoneService{
     protected Logger log = Logger.getLogger(TimezoneService.class);
 
     /** Required DAO's */
-    protected TimezoneDAO timezoneDAO;    
+    protected ITimezoneDAO timezoneDAO;    
     
     public List<Timezone> getDefaultTimezones() {
 	return timezoneDAO.getDefaultTimezones();
@@ -86,7 +86,7 @@ public class TimezoneService implements ITimezoneService{
     /**
      * @return Returns the timezoneDAO.
      */
-    public TimezoneDAO getTimezoneDAO() {
+    public ITimezoneDAO getTimezoneDAO() {
 	return timezoneDAO;
     }
     /**
@@ -94,7 +94,7 @@ public class TimezoneService implements ITimezoneService{
      * @param timezoneDAO
      *            The timezoneDAO to set.
      */
-    public void setTimezoneDAO(TimezoneDAO timezoneDAO) {
+    public void setTimezoneDAO(ITimezoneDAO timezoneDAO) {
 	this.timezoneDAO = timezoneDAO;
     }
 

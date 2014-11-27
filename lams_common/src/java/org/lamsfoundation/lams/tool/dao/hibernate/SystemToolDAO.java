@@ -24,33 +24,24 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.dao.hibernate;  
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class SystemToolDAO extends BaseDAO implements ISystemToolDAO {
+@Repository
+public class SystemToolDAO extends LAMSBaseDAO implements ISystemToolDAO {
 
 	private static final String LOAD_TOOL_BY_ACT_TYPE = "from tool in class SystemTool where tool.activityTypeId=:activityTypeId";
 	
     public SystemTool getSystemToolByID(final Long systemToolID)
     {
-        return (SystemTool)getHibernateTemplate().get(SystemTool.class,systemToolID);
+        return (SystemTool)getSession().get(SystemTool.class,systemToolID);
     }
    
     public SystemTool getSystemToolByActivityTypeId(final Integer activityTypeId)
     {
-        return (SystemTool) getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 return session.createQuery(LOAD_TOOL_BY_ACT_TYPE)
-                               .setInteger("activityTypeId",activityTypeId)
-                               .uniqueResult();
-             }
-         });
+		return (SystemTool) getSession().createQuery(LOAD_TOOL_BY_ACT_TYPE).setInteger("activityTypeId", activityTypeId).uniqueResult();
     }
 
 }

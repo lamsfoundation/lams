@@ -27,20 +27,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.events.ResendMessagesJob;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.dao.ILogEventDAO;
-import org.lamsfoundation.lams.logevent.dao.hibernate.LogEventDAO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 
 /**
  * Class implements <code>ILogEventService</code>.
@@ -110,7 +100,7 @@ public class LogEventService implements ILogEventService{
      * @param logEventDAO
      *            The logEventDAO to set.
      */
-    public void setLogEventDAO(LogEventDAO logEventDAO) {
+    public void setLogEventDAO(ILogEventDAO logEventDAO) {
 	this.logEventDAO = logEventDAO;
     }
     

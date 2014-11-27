@@ -25,9 +25,10 @@ package org.lamsfoundation.lams.timezone.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dao.ITimezoneDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>ITimezoneDAO</code>.
@@ -35,7 +36,8 @@ import org.lamsfoundation.lams.timezone.dao.ITimezoneDAO;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.timezone.dao.ITimezoneDAO
  */
-public class TimezoneDAO extends BaseDAO implements ITimezoneDAO {
+@Repository
+public class TimezoneDAO extends LAMSBaseDAO implements ITimezoneDAO {
     
     private final static String FIND_DEFAULT_TIMEZONES = "from " + Timezone.class.getName()
 	    + " timezone where timezone.serverTimezone=false";
@@ -44,7 +46,7 @@ public class TimezoneDAO extends BaseDAO implements ITimezoneDAO {
     + " timezone where timezone.serverTimezone=true";
     
     public List<Timezone> getDefaultTimezones() {
-	List timezones = this.getHibernateTemplate().find(FIND_DEFAULT_TIMEZONES);
+	List timezones = this.doFind(FIND_DEFAULT_TIMEZONES);
 	return timezones;
     }
 
@@ -57,7 +59,7 @@ public class TimezoneDAO extends BaseDAO implements ITimezoneDAO {
     }
     
     public Timezone getServerTimezone() {
-	List list = getHibernateTemplate().find(FIND_SERVER_TIMEZONE);
+	List list = doFind(FIND_SERVER_TIMEZONE);
 	if (list.size() > 0) {
 	    return (Timezone) list.get(0);
 	} else {

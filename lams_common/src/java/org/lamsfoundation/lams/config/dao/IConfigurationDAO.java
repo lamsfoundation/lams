@@ -26,13 +26,14 @@ package org.lamsfoundation.lams.config.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.config.ConfigurationItem;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 
 /**
  * 
  * @author Mitchell Seaton
  * 
  */
-public interface IConfigurationDAO {
+public interface IConfigurationDAO extends IBaseDAO {
 
     public List<ConfigurationItem> getAllItems();
 

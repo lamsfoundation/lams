@@ -27,18 +27,20 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.springframework.orm.hibernate4.HibernateCallback;
 import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
  
 /**
  * @author jliew
  *
  */
-public class OrganisationDAO extends BaseDAO implements IOrganisationDAO {
+@Repository
+public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	
 	private static final String GET_ALL_ACTIVE_COURSE_IDS = "select o.organisationId from Organisation o"
 		+ " where o.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE

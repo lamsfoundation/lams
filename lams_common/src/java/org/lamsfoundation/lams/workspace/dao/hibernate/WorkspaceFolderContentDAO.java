@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.workspace.dao.hibernate;
 import java.util.Iterator;
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class WorkspaceFolderContentDAO extends BaseDAO implements IWorkspaceFolderContentDAO {
+@Repository
+public class WorkspaceFolderContentDAO extends LAMSBaseDAO implements IWorkspaceFolderContentDAO {
 	
 	private static final String TABLENAME ="lams_workspace_folder_content";
 	

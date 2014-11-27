@@ -23,21 +23,19 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
 /**
  * Hibernate implementation of IRoleDAO
  * @author chris
  */
-public class RoleDAO extends BaseDAO implements IRoleDAO
+@Repository
+public class RoleDAO extends LAMSBaseDAO implements IRoleDAO
 {
 	 private final static String LOAD_USER_BY_ORG_AND_ROLE =
 		 	"select u "
@@ -59,54 +57,26 @@ public class RoleDAO extends BaseDAO implements IRoleDAO
 	 
     public User getUserByOrganisationAndRole(final Integer userId, final Integer roleId, final Organisation organisation)
     {
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-
-        return (User)hibernateTemplate.execute(
-             new HibernateCallback() 
-             {
-                 public Object doInHibernate(Session session) throws HibernateException 
-                 {
-                	 return session.createQuery(LOAD_USER_BY_ORG_AND_ROLE)
-       			   		.setInteger("userId",userId)
-       			   		.setEntity("org", organisation)
-       			   		.setInteger("roleId",roleId)
-       			   		.uniqueResult();
-                 }
-             }
-       ); 
+		return (User) getSession().createQuery(LOAD_USER_BY_ORG_AND_ROLE).setInteger("userId", userId)
+				.setEntity("org", organisation).setInteger("roleId", roleId).uniqueResult();
     }
     
     public Integer getCountRoleForSystem(final Integer roleId)
     {
-    	 HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
-    	 return (Integer) hibernateTemplate.execute(new HibernateCallback() {
-             public Object doInHibernate(Session session)
-                     throws HibernateException {
-     	    	Query query = session.createQuery(COUNT_ROLE);
-     	    	query.setInteger("roleId", roleId.intValue());
-     	    	Object value = query.uniqueResult();
-     	    	return new Integer (((Number)value).intValue()); 
-             }
-         });
-    	
+		Query query = getSession().createQuery(COUNT_ROLE);
+		query.setInteger("roleId", roleId.intValue());
+		Object value = query.uniqueResult();
+		return new Integer(((Number) value).intValue());
     }
     
-    public Integer getCountRoleForOrg(final Integer roleId, final Integer orgId)
-    {
-    	 HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-
-    	 return (Integer) hibernateTemplate.execute(new HibernateCallback() {
-             public Object doInHibernate(Session session)
-                     throws HibernateException {
-     	    	Query query = session.createQuery(COUNT_ROLE_FOR_ORG);
-     	    	query.setInteger("roleId", roleId.intValue());
-     	    	query.setInteger("orgId", orgId.intValue());
-     	    	Object value = query.uniqueResult();
-     	    	return new Integer (((Number)value).intValue()); 
-             }
-         });
-    }
+	public Integer getCountRoleForOrg(final Integer roleId, final Integer orgId) {
+		Query query = getSession().createQuery(COUNT_ROLE_FOR_ORG);
+		query.setInteger("roleId", roleId.intValue());
+		query.setInteger("orgId", orgId.intValue());
+		Object value = query.uniqueResult();
+		return new Integer(((Number) value).intValue());
+	}
     
 
 }

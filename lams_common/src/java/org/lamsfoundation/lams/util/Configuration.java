@@ -36,8 +36,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.config.Registration;
-import org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO;
-import org.lamsfoundation.lams.config.dao.hibernate.RegistrationDAO;
+import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
+import org.lamsfoundation.lams.config.dao.IRegistrationDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -63,8 +63,8 @@ public class Configuration implements InitializingBean {
 
     private static Map<String, ConfigurationItem> items = null;
 
-    protected static ConfigurationDAO configurationDAO;
-    protected static RegistrationDAO registrationDAO;
+    protected static IConfigurationDAO configurationDAO;
+    protected static IRegistrationDAO registrationDAO;
     protected static MessageService messageService;
     protected static Scheduler scheduler;
 
@@ -279,7 +279,7 @@ public class Configuration implements InitializingBean {
 	return Configuration.messageService;
     }
 
-    public RegistrationDAO getRegistrationDAO() {
+    public IRegistrationDAO getRegistrationDAO() {
 	return Configuration.registrationDAO;
     }
 
@@ -290,14 +290,14 @@ public class Configuration implements InitializingBean {
 	Configuration.setSystemProperty(ConfigurationKeys.TRUSTSTORE_PASSWORD,
 		Configuration.get(ConfigurationKeys.TRUSTSTORE_PASSWORD));
 	updatePublicFolderName();
-	Configuration.configurationDAO.insertOrUpdateAll(Configuration.items.values());
+	 configurationDAO.insertOrUpdateAll(Configuration.items.values());
     }
 
     /**
      * @param configurationDAO
      *            The configurationDAO to set.
      */
-    public void setConfigurationDAO(ConfigurationDAO configurationDAO) {
+    public void setConfigurationDAO(IConfigurationDAO configurationDAO) {
 	Configuration.configurationDAO = configurationDAO;
     }
 
@@ -305,7 +305,7 @@ public class Configuration implements InitializingBean {
 	Configuration.messageService = messageService;
     }
 
-    public void setRegistrationDAO(RegistrationDAO registrationDAO) {
+    public void setRegistrationDAO(IRegistrationDAO registrationDAO) {
 	Configuration.registrationDAO = registrationDAO;
     }
 
@@ -322,7 +322,7 @@ public class Configuration implements InitializingBean {
     private void updatePublicFolderName() {
 	// LDEV-2430 update public folder name according to default server locale
 	WorkspaceFolder publicFolder = null;
-	List<WorkspaceFolder> list = Configuration.configurationDAO.findByProperty(WorkspaceFolder.class,
+	List<WorkspaceFolder> list = configurationDAO.findByProperty(WorkspaceFolder.class,
 		"workspaceFolderType", WorkspaceFolder.PUBLIC_SEQUENCES);
 
 	if ((list != null) && (list.size() > 0)) {
@@ -331,7 +331,7 @@ public class Configuration implements InitializingBean {
 	    Locale locale = new Locale(langCountry[0], langCountry[1]);
 	    publicFolder.setName(Configuration.messageService.getMessageSource().getMessage("public.folder.name", null,
 		    locale));
-	    Configuration.configurationDAO.update(publicFolder);
+	    configurationDAO.update(publicFolder);
 	}
     }
 }

@@ -28,12 +28,14 @@ package org.lamsfoundation.lams.presence.dao.hibernate;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.presence.dao.IPresenceChatDAO;
 import org.lamsfoundation.lams.presence.model.PresenceChatMessage;
 import org.lamsfoundation.lams.presence.model.PresenceChatUser;
+import org.springframework.stereotype.Repository;
 
-public class PresenceChatDAO extends BaseDAO implements IPresenceChatDAO {
+@Repository
+public class PresenceChatDAO extends LAMSBaseDAO implements IPresenceChatDAO {
 
     private static final String MESSAGE_BY_MESSAGE_ID = "from " + PresenceChatMessage.class.getName() + " msg"
 	    + " where msg.uid=?";
@@ -62,14 +64,14 @@ public class PresenceChatDAO extends BaseDAO implements IPresenceChatDAO {
 
     @Override
     public void saveOrUpdate(Object object) {
-	this.getHibernateTemplate().saveOrUpdate(object);
-	this.getHibernateTemplate().flush();
+	this.saveOrUpdate(object);
+	this.getSession().flush();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public PresenceChatMessage getMessageById(Long id) {
-	List<PresenceChatMessage> list = (List<PresenceChatMessage>) (getHibernateTemplate().find(PresenceChatDAO.MESSAGE_BY_CONVERSATION,
+	List<PresenceChatMessage> list = (List<PresenceChatMessage>) (doFind(PresenceChatDAO.MESSAGE_BY_CONVERSATION,
 		new Object[] { id }));
 
 	if (!list.isEmpty()) {
@@ -82,21 +84,21 @@ public class PresenceChatDAO extends BaseDAO implements IPresenceChatDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<PresenceChatMessage> getMessagesByConversation(Long lessonId, String from, String to) {
-	return (List<PresenceChatMessage>) (getHibernateTemplate().findByNamedParam(PresenceChatDAO.MESSAGE_BY_CONVERSATION, new String[] { "from",
+	return (List<PresenceChatMessage>) (doFindByNamedParam(PresenceChatDAO.MESSAGE_BY_CONVERSATION, new String[] { "from",
 		"to", "lessonId" }, new Object[] { from, to, lessonId }));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<PresenceChatMessage> getMessagesByLessonId(Long lessonId) {
-	return (List<PresenceChatMessage>) (getHibernateTemplate().find(PresenceChatDAO.MESSAGE_BY_LESSON_ID, new Object[] { lessonId }));
+	return (List<PresenceChatMessage>) (doFind(PresenceChatDAO.MESSAGE_BY_LESSON_ID, new Object[] { lessonId }));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<PresenceChatMessage> getNewMessages(Long lessonId, String from, String to, Long lastMessageUid,
 	    Date lastCheck) {
-	return (List<PresenceChatMessage>) (getHibernateTemplate().findByNamedParam(PresenceChatDAO.MESSAGE_NEW, new String[] { "lessonId", "from",
+	return (List<PresenceChatMessage>) (doFindByNamedParam(PresenceChatDAO.MESSAGE_NEW, new String[] { "lessonId", "from",
 		"to", "lastMessageUid", "lastCheck" }, new Object[] { lessonId, from, to == null ? "NULL" : to,
 		lastMessageUid == null ? 0 : lastMessageUid, lastCheck == null ? new Date(0) : lastCheck }));
     }
@@ -104,7 +106,7 @@ public class PresenceChatDAO extends BaseDAO implements IPresenceChatDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<PresenceChatUser> getUsersByLessonIdAndLastPresence(Long lessonId, Date oldestLastPresence) {
-	return (List<PresenceChatUser>) this.getHibernateTemplate().find(PresenceChatDAO.USER_BY_LESSON_ID_AND_TIME,
+	return (List<PresenceChatUser>) this.doFind(PresenceChatDAO.USER_BY_LESSON_ID_AND_TIME,
 		new Object[] { lessonId, oldestLastPresence });
 
     }
