@@ -584,4 +584,7 @@ public class LAMSBaseDAO implements IBaseDAO {
     	getSession().delete(getObject(clazz, id));
     }
     
+    public void releaseFromCache(Object o) {
+		getSessionFactory().getCurrentSession().evict(o);
+    }
 }
