@@ -26,32 +26,34 @@ package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatDAO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Chat objects - Hibernate specific code.
  */
-public class ChatDAO extends BaseDAO implements IChatDAO {
+@Repository
+public class ChatDAO extends LAMSBaseDAO implements IChatDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Chat chat where chat.toolContentId=?";
 
-    public Chat getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(ChatDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
-	if (list != null && list.size() > 0) {
-	    return (Chat) list.get(0);
-	} else {
-	    return null;
+	public Chat getByContentId(Long toolContentId) {
+		List list = doFind(ChatDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+		if (list != null && list.size() > 0) {
+			return (Chat) list.get(0);
+		} else {
+			return null;
+		}
 	}
-    }
 
-    public void saveOrUpdate(Chat chat) {
-	this.getHibernateTemplate().saveOrUpdate(chat);
-	this.getHibernateTemplate().flush();
-    }
+	public void saveOrUpdate(Chat chat) {
+		getSession().saveOrUpdate(chat);
+		getSession().flush();
+	}
 
-    public void releaseFromCache(Object o) {
-	getSessionFactory().getCurrentSession().evict(o);
-    }
+	public void releaseFromCache(Object o) {
+		getSessionFactory().getCurrentSession().evict(o);
+	}
 }

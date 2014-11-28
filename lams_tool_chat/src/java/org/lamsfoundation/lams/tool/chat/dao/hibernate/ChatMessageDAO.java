@@ -30,16 +30,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatMessageDAO;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
+import org.springframework.stereotype.Repository;
 
-public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
+@Repository
+public class ChatMessageDAO extends LAMSBaseDAO implements IChatMessageDAO {
 
+	protected final Log logger = LogFactory.getLog(getClass());
+	
     // public static final String SQL_QUERY_FIND_USER_MESSAGE_HISTORY = "from "
     // + ChatMessage.class.getName() + " as f where "
     // + "f.chatSession=? and (f.type='groupchat' or "
@@ -64,69 +70,65 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
     public static final String SQL_QUERY_FIND_MESSAGES_SENT_BY_USER = "FROM " + ChatMessage.class.getName()
 	    + " AS f WHERE f.fromUser.uid=?";
 
-    public void saveOrUpdate(ChatMessage chatMessage) {
-	this.getHibernateTemplate().saveOrUpdate(chatMessage);
-	this.getHibernateTemplate().flush();
-    }
-
-    public List getForUser(ChatUser chatUser) {
-	return this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_USER_MESSAGE_HISTORY,
-		new Object[] { chatUser.getChatSession().getUid(), chatUser.getUid(), chatUser.getUid() });
-    }
-
-    public ChatMessage getByUID(Long uid) {
-	// TODO Auto-generated method stub
-	List list = this.getHibernateTemplate()
-		.find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_UID, new Object[] { uid });
-
-	if (list != null && list.size() > 0) {
-	    return (ChatMessage) list.get(0);
-	} else {
-	    return null;
+	public void saveOrUpdate(ChatMessage chatMessage) {
+		getSession().saveOrUpdate(chatMessage);
+		getSession().flush();
 	}
 
-    }
-
-    public List getLatest(ChatSession chatSession, int max) {
-	try {
-	    Query query = getSessionFactory().getCurrentSession().createQuery(
-		    ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE_ASC);
-	    query.setLong(0, chatSession.getUid());
-	    query.setMaxResults(max);
-	    return query.list();
-	} catch (HibernateException he) {
-	    logger.error("getLatest: hibernate exception");
-	    return null;
+	public List getForUser(ChatUser chatUser) {
+		return doFind(ChatMessageDAO.SQL_QUERY_FIND_USER_MESSAGE_HISTORY, new Object[] {
+				chatUser.getChatSession().getUid(), chatUser.getUid(), chatUser.getUid() });
 	}
-    }
 
-    public Map<Long, Integer> getCountBySession(Long chatUID) {
-	List list = this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_COUNT_BY_SESSION,
-		new Object[] { chatUID });
+	public ChatMessage getByUID(Long uid) {
+		// TODO Auto-generated method stub
+		List list = doFind(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_UID, new Object[] { uid });
 
-	Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
-	for (Iterator iter = list.iterator(); iter.hasNext();) {
-	    Object[] row = (Object[]) iter.next();
-	    resultMap.put((Long) row[0], ((Number) row[1]).intValue());
+		if (list != null && list.size() > 0) {
+			return (ChatMessage) list.get(0);
+		} else {
+			return null;
+		}
+
 	}
-	return resultMap;
-    }
 
-    public Map<Long, Integer> getCountByFromUser(Long sessionUID) {
-	List list = this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_COUNT_BY_FROM_USER,
-		new Object[] { sessionUID });
-
-	Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
-	for (Iterator iter = list.iterator(); iter.hasNext();) {
-	    Object[] row = (Object[]) iter.next();
-	    resultMap.put((Long) row[0], ((Number) row[1]).intValue());
+	public List getLatest(ChatSession chatSession, int max) {
+		try {
+			Query query = getSessionFactory().getCurrentSession().createQuery(
+					ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE_ASC);
+			query.setLong(0, chatSession.getUid());
+			query.setMaxResults(max);
+			return query.list();
+		} catch (HibernateException he) {
+			logger.error("getLatest: hibernate exception");
+			return null;
+		}
 	}
-	return resultMap;
-    }
 
-    @SuppressWarnings("unchecked")
-    public List<ChatMessage> getSentByUser(Long userUid) {
-	return (List<ChatMessage>) this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGES_SENT_BY_USER,
-		new Object[] { userUid });
-    }
+	public Map<Long, Integer> getCountBySession(Long chatUID) {
+		List list = doFind(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_COUNT_BY_SESSION, new Object[] { chatUID });
+
+		Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
+		for (Iterator iter = list.iterator(); iter.hasNext();) {
+			Object[] row = (Object[]) iter.next();
+			resultMap.put((Long) row[0], ((Number) row[1]).intValue());
+		}
+		return resultMap;
+	}
+
+	public Map<Long, Integer> getCountByFromUser(Long sessionUID) {
+		List list = doFind(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_COUNT_BY_FROM_USER, new Object[] { sessionUID });
+
+		Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
+		for (Iterator iter = list.iterator(); iter.hasNext();) {
+			Object[] row = (Object[]) iter.next();
+			resultMap.put((Long) row[0], ((Number) row[1]).intValue());
+		}
+		return resultMap;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ChatMessage> getSentByUser(Long userUid) {
+		return (List<ChatMessage>) doFind(ChatMessageDAO.SQL_QUERY_FIND_MESSAGES_SENT_BY_USER, new Object[] { userUid });
+	}
 }

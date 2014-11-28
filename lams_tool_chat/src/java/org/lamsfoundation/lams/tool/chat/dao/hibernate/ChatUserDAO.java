@@ -27,14 +27,16 @@ package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the ChatUser objects - Hibernate specific code.
  */
-public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
+@Repository
+public class ChatUserDAO extends LAMSBaseDAO implements IChatUserDAO {
 
     public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + ChatUser.class.getName() + " as f"
 	    + " where user_id=? and f.chatSession.sessionId=?";
@@ -51,7 +53,7 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 	    + " where f.chatSession.sessionId=? and f.lastPresence > ?";
 
     public ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
+	List list = doFind(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 		new Object[] { userId, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -62,7 +64,7 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 
     public ChatUser getByLoginNameAndSessionId(String loginName, Long toolSessionId) {
 
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
+	List list = doFind(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 		new Object[] { loginName, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -72,34 +74,28 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 
     }
 
-    public void saveOrUpdate(ChatUser chatUser) {
-	this.getHibernateTemplate().saveOrUpdate(chatUser);
-	this.getHibernateTemplate().flush();
-    }
+	public void saveOrUpdate(ChatUser chatUser) {
+		getSession().saveOrUpdate(chatUser);
+		getSession().flush();
+	}
 
-    public ChatUser getByUID(Long uid) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
+	public ChatUser getByUID(Long uid) {
+		List list = doFind(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
+		if (list == null || list.isEmpty())
+			return null;
+		return (ChatUser) list.get(0);
+	}
 
-	if (list == null || list.isEmpty())
-	    return null;
+	public ChatUser getByNicknameAndSessionID(String nickname, Long sessionID) {
+		List list = doFind(SQL_QUERY_FIND_BY_NICKNAME_AND_SESSION, new Object[] { nickname, sessionID });
+		if (list == null || list.isEmpty())
+			return null;
+		return (ChatUser) list.get(0);
+	}
 
-	return (ChatUser) list.get(0);
-    }
-
-    public ChatUser getByNicknameAndSessionID(String nickname, Long sessionID) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_NICKNAME_AND_SESSION,
-		new Object[] { nickname, sessionID });
-
-	if (list == null || list.isEmpty())
-	    return null;
-
-	return (ChatUser) list.get(0);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<ChatUser> getBySessionIdAndLastPresence(Long toolSessionID, Date oldestLastPresence) {
-	return (List<ChatUser>) this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID_AND_TIME,
-		new Object[] { toolSessionID, oldestLastPresence });
-
-    }
+	@SuppressWarnings("unchecked")
+	public List<ChatUser> getBySessionIdAndLastPresence(Long toolSessionID, Date oldestLastPresence) {
+		return (List<ChatUser>) doFind(SQL_QUERY_FIND_BY_SESSION_ID_AND_TIME, new Object[] { toolSessionID,
+				oldestLastPresence });
+	}
 }
