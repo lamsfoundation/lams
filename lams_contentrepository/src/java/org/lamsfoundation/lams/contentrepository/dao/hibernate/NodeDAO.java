@@ -30,7 +30,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrNode;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
 import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
 
 
@@ -39,12 +40,13 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
  * 
  * @author Fiona Malikoff
  */
-public class NodeDAO extends BaseDAO implements INodeDAO  {
+@Repository
+public class NodeDAO extends LAMSBaseDAO implements INodeDAO  {
 
 	protected Logger log = Logger.getLogger(NodeDAO.class);	
 
 	public void saveOrUpdate(Object object) {
-		this.getHibernateTemplate().saveOrUpdate(object);		
+		this.saveOrUpdate(object);		
 	}
 	
 	/** Get all child nodes for a node/version.
@@ -62,7 +64,7 @@ public class NodeDAO extends BaseDAO implements INodeDAO  {
 			log.debug("Getting all child nodes for "+parentNodeVersion);
 		
 		String queryString = "from CrNode as n where n.parentNodeVersion = ?";
-		List nodes = getHibernateTemplate().find(queryString,parentNodeVersion);
+		List nodes = doFind(queryString,parentNodeVersion);
 		
 		if(nodes.size() == 0){
 			log.debug("No nodes found");
@@ -92,7 +94,7 @@ public class NodeDAO extends BaseDAO implements INodeDAO  {
 			log.debug("Getting child node from "+parentNodeVersion+" path "+relPath);
 		
 		String queryString = "from CrNode as n where n.parentNodeVersion = ? and n.path = ? ";
-		List nodes = getHibernateTemplate().find(queryString,new Object[] {parentNodeVersion, relPath});
+		List nodes = doFind(queryString,new Object[] {parentNodeVersion, relPath});
 		
 		if(nodes.size() == 0){
 			log.debug("No nodes found");

@@ -34,7 +34,8 @@ import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
@@ -43,7 +44,8 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
  * @author Fiona Malikoff
  * 
  */
-public class CredentialDAO extends BaseDAO implements ICredentialDAO {
+@Repository
+public class CredentialDAO extends LAMSBaseDAO implements ICredentialDAO {
     private Logger log = Logger.getLogger(CredentialDAO.class);
 
     private static final String GET_CREDENTIAL = "FROM " + CrCredential.class.getName() + " AS cr WHERE cr.name = ?";
@@ -112,7 +114,7 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
 	    log.debug("Getting credential for name " + name);
 	}
 
-	List<CrCredential> credentials = (List<CrCredential>) getHibernateTemplate().find(CredentialDAO.GET_CREDENTIAL,
+	List<CrCredential> credentials = (List<CrCredential>) doFind(CredentialDAO.GET_CREDENTIAL,
 		name);
 	return credentials.size() == 0 ? null : credentials.get(0);
     }

@@ -33,8 +33,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.springframework.orm.hibernate4.HibernateObjectRetrievalFailureException;
+import org.springframework.stereotype.Repository;
 
 
 
@@ -43,7 +44,8 @@ import org.springframework.orm.hibernate4.HibernateObjectRetrievalFailureExcepti
  * 
  * @author Fiona Malikoff
  */
-public class WorkspaceDAO extends BaseDAO implements IWorkspaceDAO  {
+@Repository
+public class WorkspaceDAO extends LAMSBaseDAO implements IWorkspaceDAO  {
 
 	protected Logger log = Logger.getLogger(WorkspaceDAO.class);	
 
@@ -58,7 +60,7 @@ public class WorkspaceDAO extends BaseDAO implements IWorkspaceDAO  {
 		log.debug("Getting workspace for name "+workspaceName);
 		
 		String queryString = "from CrWorkspace as w where w.name = ?";
-		List workspaces = getHibernateTemplate().find(queryString,workspaceName);
+		List workspaces = doFind(queryString,workspaceName);
 		
 		if(workspaces.size() == 0){
 			log.debug("No workspaces found");
