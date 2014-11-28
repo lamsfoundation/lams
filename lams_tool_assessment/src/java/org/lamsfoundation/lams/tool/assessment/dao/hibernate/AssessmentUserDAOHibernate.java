@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.springframework.stereotype.Repository;
 
-public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements AssessmentUserDAO {
+@Repository
+public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements AssessmentUserDAO {
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
 	    + " as u where u.userId =? and u.assessment.contentId=?";
@@ -37,23 +40,23 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
     private static final String FIND_BY_SESSION_ID = "from " + AssessmentUser.class.getName()
 	    + " as u where u.session.sessionId=?";
 
-    public AssessmentUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
-	if (list == null || list.size() == 0)
-	    return null;
-	return (AssessmentUser) list.get(0);
-    }
+	public AssessmentUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
+		List list = doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+		if (list == null || list.size() == 0)
+			return null;
+		return (AssessmentUser) list.get(0);
+	}
 
-    public AssessmentUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
-	if (list == null || list.size() == 0)
-	    return null;
-	return (AssessmentUser) list.get(0);
-    }
+	public AssessmentUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+		List list = doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+		if (list == null || list.size() == 0)
+			return null;
+		return (AssessmentUser) list.get(0);
+	}
 
-    @SuppressWarnings("unchecked")
-    public List<AssessmentUser> getBySessionID(Long sessionId) {
-	return (List<AssessmentUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
-    }
+	@SuppressWarnings("unchecked")
+	public List<AssessmentUser> getBySessionID(Long sessionId) {
+		return (List<AssessmentUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
+	}
 
 }

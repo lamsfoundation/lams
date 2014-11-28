@@ -553,4 +553,35 @@ public class LAMSBaseDAO implements IBaseDAO {
 		
 		return queryObject.list();
 	}
+	
+	
+	   /**
+     * @see com.edgenius.paradise.dao.DAO#saveObject(java.lang.Object)
+     */
+    public void saveObject(Object o) {
+    	getSession().saveOrUpdate(o);
+    }
+
+    /**
+     * @see com.edgenius.paradise.dao.DAO#getObject(java.lang.Class, java.io.Serializable)
+     */
+	public Object getObject(Class clazz, Serializable id) {
+		Object o = getSession().get(clazz, id);
+		return o;
+	}
+
+    /**
+     * @see com.edgenius.paradise.dao.DAO#getObjects(java.lang.Class)
+     */
+	public List getObjects(Class clazz) {
+		return loadAll(clazz);
+	}
+
+    /**
+     * @see com.edgenius.paradise.dao.DAO#removeObject(java.lang.Class, java.io.Serializable)
+     */
+    public void removeObject(Class clazz, Serializable id) {
+    	getSession().delete(getObject(clazz, id));
+    }
+    
 }

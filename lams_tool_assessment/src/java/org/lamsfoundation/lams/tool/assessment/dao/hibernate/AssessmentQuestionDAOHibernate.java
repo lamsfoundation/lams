@@ -25,25 +25,27 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.springframework.stereotype.Repository;
 
-public class AssessmentQuestionDAOHibernate extends BaseDAOHibernate implements AssessmentQuestionDAO {
+@Repository
+public class AssessmentQuestionDAOHibernate extends LAMSBaseDAO implements AssessmentQuestionDAO {
 
     private static final String FIND_AUTHORING_QUESTIONS = "from " + AssessmentQuestion.class.getName()
 	    + " where assessment_uid = ? order by create_date asc";
 
-    public List getAuthoringQuestions(Long assessmentUid) {
+	public List getAuthoringQuestions(Long assessmentUid) {
+		return doFind(FIND_AUTHORING_QUESTIONS, assessmentUid);
+	}
 
-	return this.getHibernateTemplate().find(FIND_AUTHORING_QUESTIONS, assessmentUid);
-    }
-
-    public AssessmentQuestion getByUid(Long assessmentQuestionUid) {
-	return (AssessmentQuestion) this.getObject(AssessmentQuestion.class, assessmentQuestionUid);
-    }
+	public AssessmentQuestion getByUid(Long assessmentQuestionUid) {
+		return (AssessmentQuestion) this.getObject(AssessmentQuestion.class, assessmentQuestionUid);
+	}
     
-    public void evict(Object o) {
-	getHibernateTemplate().evict(o);
-    }
+	public void evict(Object o) {
+		getSession().evict(o);
+	}
 
 }

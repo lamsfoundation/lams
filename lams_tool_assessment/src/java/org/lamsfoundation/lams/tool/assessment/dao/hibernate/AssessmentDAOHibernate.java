@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentDAO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
@@ -34,24 +36,25 @@ import org.lamsfoundation.lams.tool.assessment.model.Assessment;
  * 
  * @version $Revision$
  */
-public class AssessmentDAOHibernate extends BaseDAOHibernate implements AssessmentDAO {
+@Repository
+public class AssessmentDAOHibernate extends LAMSBaseDAO implements AssessmentDAO {
     private static final String GET_RESOURCE_BY_CONTENTID = "from " + Assessment.class.getName()
 	    + " as r where r.contentId=?";
 
-    public Assessment getByContentId(Long contentId) {
-	List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID, contentId);
-	if (list.size() > 0)
-	    return (Assessment) list.get(0);
-	else
-	    return null;
-    }
+	public Assessment getByContentId(Long contentId) {
+		List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+		if (list.size() > 0)
+			return (Assessment) list.get(0);
+		else
+			return null;
+	}
 
-    public Assessment getByUid(Long assessmentUid) {
-	return (Assessment) getObject(Assessment.class, assessmentUid);
-    }
+	public Assessment getByUid(Long assessmentUid) {
+		return (Assessment) getObject(Assessment.class, assessmentUid);
+	}
 
     public void delete(Assessment assessment) {
-	this.getHibernateTemplate().delete(assessment);
+		getSession().delete(assessment);
     }
 
 }

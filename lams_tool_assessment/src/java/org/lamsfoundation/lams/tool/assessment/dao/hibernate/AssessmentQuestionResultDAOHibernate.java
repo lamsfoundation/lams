@@ -25,15 +25,15 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate implements AssessmentQuestionResultDAO {
+@Repository
+public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements AssessmentQuestionResultDAO {
 
 	private static final String FIND_BY_UID = "FROM " + AssessmentQuestionResult.class.getName()
 			+ " AS r WHERE r.uid = ?";
@@ -61,7 +61,7 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 
 	@Override
 	public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
-		List list = getHibernateTemplate().find(FIND_WRONG_ANSWERS_NUMBER,
+		List list = doFind(FIND_WRONG_ANSWERS_NUMBER,
 				new Object[] { assessmentUid, userId, questionUid });
 		if (list == null || list.size() == 0) {
 			return 0;
@@ -73,13 +73,13 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
-		return (List<Object[]>) getHibernateTemplate().find(FIND_BY_ASSESSMENT_QUESTION_AND_USER,
+		return (List<Object[]>) doFind(FIND_BY_ASSESSMENT_QUESTION_AND_USER,
 				new Object[] { assessmentUid, userId, questionUid });
 	}
 
 	@Override
 	public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
-		List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { questionResultUid });
+		List list = doFind(FIND_BY_UID, new Object[] { questionResultUid });
 		if (list == null || list.size() == 0)
 			return null;
 		return (AssessmentQuestionResult) list.get(0);
@@ -87,19 +87,13 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 
 	@Override
 	public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
-		
-		return getHibernateTemplate().execute(new HibernateCallback<Float>() {
-			@Override
-			public Float doInHibernate(Session session) throws HibernateException {
-				Query q = session.createQuery(GET_ANSWER_MARK);
-				q.setParameter(0, assessmentUid);
-				q.setParameter(1, userId);
-				q.setParameter(2, questionSequenceId);
-				q.setMaxResults(1);
-				Object result = q.uniqueResult();
-				return result != null ? ((Number) result).floatValue() : null;
-			}
-		});
-		
+		Query q = getSession().createQuery(GET_ANSWER_MARK);
+		q.setParameter(0, assessmentUid);
+		q.setParameter(1, userId);
+		q.setParameter(2, questionSequenceId);
+		q.setMaxResults(1);
+		Object result = q.uniqueResult();
+		return result != null ? ((Number) result).floatValue() : null;
+
 	}
 }

@@ -25,34 +25,37 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
+import org.springframework.stereotype.Repository;
 
-public class AssessmentSessionDAOHibernate extends BaseDAOHibernate implements AssessmentSessionDAO {
+@Repository
+public class AssessmentSessionDAOHibernate extends LAMSBaseDAO implements AssessmentSessionDAO {
 
     private static final String FIND_BY_SESSION_ID = "from " + AssessmentSession.class.getName()
 	    + " as p where p.sessionId=?";
     private static final String FIND_BY_CONTENT_ID = "from " + AssessmentSession.class.getName()
 	    + " as p where p.assessment.contentId=? order by p.sessionName asc";
 
-    public AssessmentSession getSessionBySessionId(Long sessionId) {
-	List list = getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
-	if (list == null || list.size() == 0)
-	    return null;
-	return (AssessmentSession) list.get(0);
-    }
+	public AssessmentSession getSessionBySessionId(Long sessionId) {
+		List list = doFind(FIND_BY_SESSION_ID, sessionId);
+		if (list == null || list.size() == 0)
+			return null;
+		return (AssessmentSession) list.get(0);
+	}
 
-    @SuppressWarnings("unchecked")
-    public List<AssessmentSession> getByContentId(Long toolContentId) {
-	return (List<AssessmentSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
-    }
+	@SuppressWarnings("unchecked")
+	public List<AssessmentSession> getByContentId(Long toolContentId) {
+		return (List<AssessmentSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	}
 
-    public void delete(AssessmentSession session) {
-	this.getHibernateTemplate().delete(session);
-    }
+	public void delete(AssessmentSession session) {
+		getSession().delete(session);
+	}
 
-    public void deleteBySessionId(Long toolSessionId) {
-	this.removeObject(AssessmentSession.class, toolSessionId);
-    }
+	public void deleteBySessionId(Long toolSessionId) {
+		this.removeObject(AssessmentSession.class, toolSessionId);
+	}
 
 }
