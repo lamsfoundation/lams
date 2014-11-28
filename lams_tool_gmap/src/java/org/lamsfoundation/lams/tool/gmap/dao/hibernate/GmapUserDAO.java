@@ -25,15 +25,17 @@
 package org.lamsfoundation.lams.tool.gmap.dao.hibernate;
 
 import java.util.List;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapUserDAO;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the GmapUser objects - Hibernate specific code.
  */
-public class GmapUserDAO extends BaseDAO implements IGmapUserDAO {
+@Repository
+public class GmapUserDAO extends LAMSBaseDAO implements IGmapUserDAO {
 
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ GmapUser.class.getName() + " as f"
@@ -47,7 +49,7 @@ public class GmapUserDAO extends BaseDAO implements IGmapUserDAO {
 			+ GmapUser.class.getName() + " where uid=?";
 
 	public GmapUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 				new Object[] { userId, toolSessionId });
 
@@ -60,7 +62,7 @@ public class GmapUserDAO extends BaseDAO implements IGmapUserDAO {
 	public GmapUser getByLoginNameAndSessionId(String loginName,
 			Long toolSessionId) {
 
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 				new Object[] { loginName, toolSessionId });
 
@@ -72,12 +74,12 @@ public class GmapUserDAO extends BaseDAO implements IGmapUserDAO {
 	}
 
 	public void saveOrUpdate(GmapUser gmapUser) {
-		this.getHibernateTemplate().saveOrUpdate(gmapUser);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(gmapUser);
+		getSession().flush();
 	}
 
 	public GmapUser getByUID(Long uid) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
+		List list = doFind(SQL_QUERY_FIND_BY_UID,
 				new Object[] { uid });
 
 		if (list == null || list.isEmpty())

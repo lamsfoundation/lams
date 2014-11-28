@@ -25,22 +25,22 @@
 package org.lamsfoundation.lams.tool.gmap.dao.hibernate;
 
 import java.util.List;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 
-import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Gmap objects - Hibernate specific code.
  */
-public class GmapDAO extends BaseDAO implements IGmapDAO {
+@Repository
+public class GmapDAO extends LAMSBaseDAO implements IGmapDAO {
 
 	private static final String FIND_FORUM_BY_CONTENTID = "from Gmap gmap where gmap.toolContentId=?";
 
 	public Gmap getByContentId(Long toolContentId) {
-		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,
+		List list = doFind(FIND_FORUM_BY_CONTENTID,
 				toolContentId);
 		if (list != null && list.size() > 0)
 			return (Gmap) list.get(0);
@@ -49,7 +49,7 @@ public class GmapDAO extends BaseDAO implements IGmapDAO {
 	}
 
 	public void saveOrUpdate(Gmap gmap) {
-		this.getHibernateTemplate().saveOrUpdate(gmap);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(gmap);
+		getSession().flush();
 	}
 }

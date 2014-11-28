@@ -25,26 +25,28 @@
 package org.lamsfoundation.lams.tool.gmap.dao.hibernate;
 
 import java.util.List;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapSessionDAO;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the GmapSession objects - Hibernate specific code.
  */
-public class GmapSessionDAO extends BaseDAO implements IGmapSessionDAO {
+@Repository
+public class GmapSessionDAO extends LAMSBaseDAO implements IGmapSessionDAO {
 
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ GmapSession.class.getName() + " where session_id=?";
 
 	public void saveOrUpdate(GmapSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(session);
+		getSession().flush();
 	}
 
 	public GmapSession getBySessionId(Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 		if (list == null || list.isEmpty())
 			return null;
@@ -54,8 +56,8 @@ public class GmapSessionDAO extends BaseDAO implements IGmapSessionDAO {
 	public void deleteBySessionID(Long toolSessionID) {
 		GmapSession session = getBySessionId(toolSessionID);
 		if(session != null){
-			this.getHibernateTemplate().delete(session);
-			this.getHibernateTemplate().flush();
+			getSession().delete(session);
+			getSession().flush();
 		}
 	}
 }
