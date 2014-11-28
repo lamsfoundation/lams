@@ -27,9 +27,11 @@ import java.util.List;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureParamDAO;
 import org.eucm.lams.tool.eadventure.model.EadventureParam;
-import org.eucm.lams.tool.eadventure.model.EadventureVars;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
  
-public class EadventureParamDAOHibernate extends BaseDAOHibernate implements EadventureParamDAO {
+@Repository
+public class EadventureParamDAOHibernate extends LAMSBaseDAO implements EadventureParamDAO {
 
     
     private static final String FIND_BY_PARAM_NAME= "from " + EadventureParam.class.getName()
@@ -41,7 +43,7 @@ public class EadventureParamDAOHibernate extends BaseDAOHibernate implements Ead
 
     
     public List<EadventureParam> getEadventureParamByEadContentId(Long contentId){
-	List list = getHibernateTemplate().find(FIND_BY_EAD,contentId);
+	List list = doFind(FIND_BY_EAD,contentId);
 	if(list == null || list.size() ==0)
 		return null;
 	
@@ -50,13 +52,13 @@ public class EadventureParamDAOHibernate extends BaseDAOHibernate implements Ead
 
     
     public void delete(EadventureParam param){
-	this.getHibernateTemplate().delete(param);
+    	getSession().delete(param);
     }
 
 	public String getEadventureParamTypeByNameAndEadContentID(String name,
 			Long contentId) {
 		
-		List list = getHibernateTemplate().find(FIND_BY_PARAM_NAME,new Object[]{contentId,name});
+		List list = doFind(FIND_BY_PARAM_NAME,new Object[]{contentId,name});
 		if(list == null || list.size() ==0)
 			return null;
 		

@@ -27,23 +27,25 @@ import java.util.List;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureUserDAO;
 import org.eucm.lams.tool.eadventure.model.EadventureUser;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
-
-public class EadventureUserDAOHibernate extends BaseDAOHibernate implements EadventureUserDAO{
+@Repository
+public class EadventureUserDAOHibernate extends LAMSBaseDAO implements EadventureUserDAO{
 	
 	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + EadventureUser.class.getName() + " as u where u.userId =? and u.eadventure.contentId=?";
 	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + EadventureUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
 	private static final String FIND_BY_SESSION_ID = "from " + EadventureUser.class.getName() + " as u where u.session.sessionId=?";
 
 	public EadventureUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
+		List list = this.doFind(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
 		if(list == null || list.size() == 0)
 			return null;
 		return (EadventureUser) list.get(0);
 	}
 
 	public EadventureUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
+		List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
 		if(list == null || list.size() == 0)
 			return null;
 		return (EadventureUser) list.get(0);
@@ -51,7 +53,7 @@ public class EadventureUserDAOHibernate extends BaseDAOHibernate implements Eadv
 
 	@SuppressWarnings("unchecked")
 	public List<EadventureUser> getBySessionID(Long sessionId) {
-		return (List<EadventureUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<EadventureUser>) this.doFind(FIND_BY_SESSION_ID,sessionId);
 	}
 
 

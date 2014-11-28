@@ -24,8 +24,11 @@
 package org.eucm.lams.tool.eadventure.dao.hibernate; 
 
 import org.eucm.lams.tool.eadventure.dao.EadventureExpressionDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
  
-public class EadventureExpressionDAOHibernate extends BaseDAOHibernate implements EadventureExpressionDAO {
+@Repository
+public class EadventureExpressionDAOHibernate extends LAMSBaseDAO implements EadventureExpressionDAO {
 
 }
  

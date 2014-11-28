@@ -27,26 +27,28 @@ import java.util.List;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureSessionDAO;
 import org.eucm.lams.tool.eadventure.model.EadventureSession;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
-
-public class EadventureSessionDAOHibernate extends BaseDAOHibernate implements EadventureSessionDAO{
+@Repository
+public class EadventureSessionDAOHibernate extends LAMSBaseDAO implements EadventureSessionDAO{
 	
 	private static final String FIND_BY_SESSION_ID = "from " + EadventureSession.class.getName() + " as p where p.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + EadventureSession.class.getName() + " as p where p.eadventure.contentId=?";
 	
 	public EadventureSession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		List list = doFind(FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.size() == 0)
 			return null;
 		return (EadventureSession) list.get(0);
 	}
 	@SuppressWarnings("unchecked")
 	public List<EadventureSession> getByContentId(Long toolContentId) {
-		return (List<EadventureSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<EadventureSession>) doFind(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(EadventureSession session) {
-		this.getHibernateTemplate().delete(session);
+		getSession().delete(session);
 	}
 	public void deleteBySessionId(Long toolSessionId) {
 		this.removeObject(EadventureSession.class,toolSessionId);

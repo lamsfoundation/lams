@@ -23,19 +23,19 @@
 /* $$Id$$ */
 package org.eucm.lams.tool.eadventure.dao.hibernate;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureItemVisitDAO;
-import org.eucm.lams.tool.eadventure.dto.Summary;
 import org.eucm.lams.tool.eadventure.model.Eadventure;
 import org.eucm.lams.tool.eadventure.model.EadventureItemVisitLog;
 import org.eucm.lams.tool.eadventure.model.EadventureSession;
-import org.eucm.lams.tool.eadventure.model.EadventureUser;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
-public class EadventureItemVisitDAOHibernate extends BaseDAOHibernate implements EadventureItemVisitDAO{
+@Repository
+public class EadventureItemVisitDAOHibernate extends LAMSBaseDAO implements EadventureItemVisitDAO{
 	
 	private static final String FIND_BY_ITEM_AND_USER = "from " + EadventureItemVisitLog.class.getName()
 			+ " as r where r.user.userId = ? and r.eadventure.uid = ?";
@@ -66,14 +66,14 @@ public class EadventureItemVisitDAOHibernate extends BaseDAOHibernate implements
 	
 	*/
 	public EadventureItemVisitLog getEadventureItemLog(Long itemUid,Long userId){
-		List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});
+		List list = doFind(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});
 		if(list == null || list.size() ==0)
 			return null;
 		return (EadventureItemVisitLog) list.get(0);
 	}
 
 	public int getUserViewLogCount(Long toolSessionId ,Long userUid) {
-		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{toolSessionId, userUid});
+		List list = doFind(FIND_VIEW_COUNT_BY_USER,new Object[]{toolSessionId, userUid});
 		if(list == null || list.size() ==0)
 			return 0;
 		return ((Number) list.get(0)).intValue();
@@ -84,7 +84,7 @@ public class EadventureItemVisitDAOHibernate extends BaseDAOHibernate implements
 	public Map<Long,Integer> getSummary(Long contentId) {
 
 		// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-		List<Object[]> result =  (List<Object[]>) getHibernateTemplate().find(FIND_SUMMARY,contentId);
+		List<Object[]> result =  (List<Object[]>) doFind(FIND_SUMMARY,contentId);
 		Map<Long,Integer>  summaryList = new HashMap<Long,Integer> (result.size());
 		for(Object[] list : result){
 			if ( list[1] != null ) {
@@ -97,7 +97,7 @@ public class EadventureItemVisitDAOHibernate extends BaseDAOHibernate implements
 
 	public List<EadventureItemVisitLog> getEadventureItemLogBySession(Long sessionId, Long itemUid) {
 		
-		return (List<EadventureItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
+		return (List<EadventureItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
 	}
 
 }

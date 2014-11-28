@@ -27,6 +27,8 @@ import java.util.List;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureDAO;
 import org.eucm.lams.tool.eadventure.model.Eadventure;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
@@ -34,11 +36,12 @@ import org.eucm.lams.tool.eadventure.model.Eadventure;
  * 
  * @version $Revision$
  */
-public class EadventureDAOHibernate extends BaseDAOHibernate implements EadventureDAO{
+@Repository
+public class EadventureDAOHibernate extends LAMSBaseDAO implements EadventureDAO{
 	private static final String GET_RESOURCE_BY_CONTENTID = "from "+Eadventure.class.getName()+" as r where r.contentId=?";
 	
 	public Eadventure getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		List list = doFind(GET_RESOURCE_BY_CONTENTID,contentId);
 		if(list.size() > 0)
 			return (Eadventure) list.get(0);
 		else
@@ -50,7 +53,7 @@ public class EadventureDAOHibernate extends BaseDAOHibernate implements Eadventu
 	}
 
 	public void delete(Eadventure eadventure) {
-		this.getHibernateTemplate().delete(eadventure);
+		getSession().delete(eadventure);
 	}
 
 }

@@ -26,10 +26,12 @@ package org.eucm.lams.tool.eadventure.dao.hibernate;
 import java.util.List;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureVarsDAO;
-import org.eucm.lams.tool.eadventure.model.EadventureItemVisitLog;
 import org.eucm.lams.tool.eadventure.model.EadventureVars;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.springframework.stereotype.Repository;
  
-public class EadventureVarsDAOHibernate extends BaseDAOHibernate implements EadventureVarsDAO {
+@Repository
+public class EadventureVarsDAOHibernate extends LAMSBaseDAO implements EadventureVarsDAO {
 
     
     
@@ -37,7 +39,7 @@ public class EadventureVarsDAOHibernate extends BaseDAOHibernate implements Eadv
 	+ " as r where r.visitLog.uid = ? and r.name =?";
     
     public EadventureVars getEadventureVars(Long itemVisitLogID,String name){
-	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_NAME,new Object[]{itemVisitLogID,name});
+	List list = doFind(FIND_BY_ITEM_AND_NAME,new Object[]{itemVisitLogID,name});
 	if(list == null || list.size() ==0)
 		return null;
 	
