@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+ 	<display-name>LAMS</display-name>
+
+	<description>Learning Activity Management System</description>
+
+	<servlet>
+	    <servlet-name>LaunchLearnerUrl</servlet-name>
+	    <servlet-class>org.lamsfoundation.lams.launchlearnerurl.LaunchLearnerUrlServlet</servlet-class>
+	    <init-param>
+	      <param-name>debug</param-name>
+	      <param-value>999</param-value>
+	    </init-param>
+	    <init-param>
+	      <param-name>detail</param-name>
+	      <param-value>2</param-value>
+	    </init-param>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>LaunchLearnerUrl</servlet-name>
+	    <url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+   <session-config>
+      <session-timeout>120</session-timeout>
+   </session-config>
+
+  	<!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Free access Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    </security-constraint> 
+
+</web-app>
