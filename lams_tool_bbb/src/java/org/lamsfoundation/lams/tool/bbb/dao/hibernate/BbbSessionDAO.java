@@ -24,12 +24,14 @@
 
 package org.lamsfoundation.lams.tool.bbb.dao.hibernate;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.bbb.dao.IBbbSessionDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the BbbSession objects - Hibernate specific code.
  */
-public class BbbSessionDAO extends BaseDAO implements IBbbSessionDAO {
+@Repository
+public class BbbSessionDAO extends LAMSBaseDAO implements IBbbSessionDAO {
 
 }
