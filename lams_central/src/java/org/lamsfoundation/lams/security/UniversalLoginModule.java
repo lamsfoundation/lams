@@ -216,10 +216,6 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 							isValid = authenticator.authenticate(username,
 									inputPassword);
 						}
-					} else if (AuthenticationMethodType.WEB_AUTH.equals(type)) {
-						WebAuthAuthenticator authenticator = new WebAuthAuthenticator();
-						isValid = authenticator.authenticate(username,
-								inputPassword);
 					} else {
 						log.error("===> Unexpected authentication type: "
 								+ type);
