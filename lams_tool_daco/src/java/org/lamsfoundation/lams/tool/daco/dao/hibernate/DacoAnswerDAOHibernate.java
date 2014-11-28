@@ -2,15 +2,22 @@ package org.lamsfoundation.lams.tool.daco.dao.hibernate;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummarySingleAnswerDTO;
 import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.springframework.stereotype.Repository;
 
-public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnswerDAO {
+@Repository
+public class DacoAnswerDAOHibernate extends LAMSBaseDAO implements DacoAnswerDAO {
 
+	protected final Log log = LogFactory.getLog(getClass());
+	
     private static final String FIND_USER_NUMBER_SUMMARY = "SELECT a.question.uid, "
 	    + "SUM(a.answer),AVG(a.answer) FROM " + DacoAnswer.class.getName()
 	    + " AS a WHERE a.question.type=:numberQuestionType AND a.user.uid=:userUid AND a.answer IS NOT NULL "
@@ -45,7 +52,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
     @SuppressWarnings("unchecked")
     public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid, List<QuestionSummaryDTO> summaries) {
 
-	List<Object[]> result = (List<Object[]>) getHibernateTemplate().findByNamedParam(
+	List<Object[]> result = (List<Object[]>) doFindByNamedParam(
 		DacoAnswerDAOHibernate.FIND_USER_NUMBER_SUMMARY, new String[] { "userUid", "numberQuestionType" },
 		new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER });
 
@@ -53,7 +60,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	    addNumberSummary(summaries, objectRow, true);
 	}
 
-	result = (List<Object[]>) getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_GROUP_NUMBER_SUMMARY,
+	result = (List<Object[]>) doFindByNamedParam(DacoAnswerDAOHibernate.FIND_GROUP_NUMBER_SUMMARY,
 		new String[] { "userUid", "numberQuestionType" },
 		new Object[] { userUid, DacoConstants.QUESTION_TYPE_NUMBER });
 
@@ -61,7 +68,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	    addNumberSummary(summaries, objectRow, false);
 	}
 
-	result = (List<Object[]>) getHibernateTemplate().findByNamedParam(
+	result = (List<Object[]>) doFindByNamedParam(
 		DacoAnswerDAOHibernate.FIND_USER_ANSWER_ENUMERATION_QUERY,
 		new String[] { "userUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
 			"checkboxQuestionType" },
@@ -72,7 +79,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	    addAnswerEnumerationSummary(summaries, objectRow, true);
 	}
 
-	result = (List<Object[]>) getHibernateTemplate().findByNamedParam(
+	result = (List<Object[]>) doFindByNamedParam(
 		DacoAnswerDAOHibernate.FIND_GROUP_ANSWER_ENUMERATION_QUERY,
 		new String[] { "userUid", "numberQuestionType", "radioQuestionType", "dropdownQuestionType",
 			"checkboxQuestionType" },
@@ -93,7 +100,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	QuestionSummarySingleAnswerDTO singleAnswer = new QuestionSummarySingleAnswerDTO();
 	singleAnswer.setAnswer(row[DacoConstants.QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_ANSWER]);
 	singleAnswer.setCount(row[DacoConstants.QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_COUNT]);
-	Long answerCount = (Long) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_ANSWER_COUNT, currentUid)
+	Long answerCount = (Long) doFind(DacoAnswerDAOHibernate.FIND_ANSWER_COUNT, currentUid)
 		.get(0);
 	singleAnswer.setAverage(Math.round(Float.parseFloat(singleAnswer.getCount()) / answerCount * 100) + "%");
 
@@ -156,7 +163,7 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
     }
 
     public Integer getUserRecordCount(Long userId, Long sessionId) {
-	return ((Number) getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_USER_RECORD_COUNT,
+	return ((Number) doFindByNamedParam(DacoAnswerDAOHibernate.FIND_USER_RECORD_COUNT,
 		new String[] { "userId", "sessionId" }, new Object[] { userId, sessionId }).get(0)).intValue();
     }
 }

@@ -25,17 +25,20 @@ package org.lamsfoundation.lams.tool.daco.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.daco.dao.DacoSessionDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
+import org.springframework.stereotype.Repository;
 
-public class DacoSessionDAOHibernate extends BaseDAOHibernate implements DacoSessionDAO {
+@Repository
+public class DacoSessionDAOHibernate extends LAMSBaseDAO implements DacoSessionDAO {
 
 	private static final String FIND_BY_SESSION_ID = "from " + DacoSession.class.getName() + " as p where p.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + DacoSession.class.getName()
 			+ " as p where p.daco.contentId=? ORDER BY p.sessionId";
 
 	public DacoSession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(DacoSessionDAOHibernate.FIND_BY_SESSION_ID, sessionId);
+		List list = doFind(DacoSessionDAOHibernate.FIND_BY_SESSION_ID, sessionId);
 		if (list == null || list.size() == 0) {
 			return null;
 		}
@@ -44,7 +47,7 @@ public class DacoSessionDAOHibernate extends BaseDAOHibernate implements DacoSes
 
 	@SuppressWarnings("unchecked")
 	public List<DacoSession> getByContentId(Long toolContentId) {
-		return (List<DacoSession>) getHibernateTemplate().find(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
+		return (List<DacoSession>) doFind(DacoSessionDAOHibernate.FIND_BY_CONTENT_ID, toolContentId);
 	}
 
 	public void deleteBySessionId(Long toolSessionId) {

@@ -23,10 +23,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.daco.dao.hibernate;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.daco.dao.DacoQuestionDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
+import org.springframework.stereotype.Repository;
 
-public class DacoQuestionDAOHibernate extends BaseDAOHibernate implements DacoQuestionDAO {
+@Repository
+public class DacoQuestionDAOHibernate extends LAMSBaseDAO implements DacoQuestionDAO {
 
 	public DacoQuestion getByUid(Long dacoQuestionUid) {
 		return (DacoQuestion) this.getObject(DacoQuestion.class, dacoQuestionUid);

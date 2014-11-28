@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.daco.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.daco.dao.DacoUserDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.springframework.stereotype.Repository;
 
-public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDAO {
+@Repository
+public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 
 	private static final String FIND_BY_USER_ID_AND_CONTENT_ID = "from " + DacoUser.class.getName()
 			+ " as u where u.userId =? and u.daco.contentId=?";
@@ -38,7 +41,7 @@ public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDA
 	private static final String FIND_BY_CONTENT_ID = "from " + DacoUser.class.getName() + " as u where u.daco.contentId=?";
 
 	public DacoUser getUserByUserIdAndSessionId(Long userID, Long sessionId) {
-		List list = this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_SESSION_ID,
+		List list = doFind(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_SESSION_ID,
 				new Object[] { userID, sessionId });
 		if (list == null || list.size() == 0) {
 			return null;
@@ -47,7 +50,7 @@ public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDA
 	}
 
 	public DacoUser getUserByUserIdAndContentId(Long userId, Long contentId) {
-		List list = this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_CONTENT_ID,
+		List list = doFind(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_CONTENT_ID,
 				new Object[] { userId, contentId });
 		if (list == null || list.size() == 0) {
 			return null;
@@ -57,6 +60,6 @@ public class DacoUserDAOHibernate extends BaseDAOHibernate implements DacoUserDA
 
 	@SuppressWarnings("unchecked")
 	public List<DacoUser> getBySessionId(Long sessionId) {
-		return (List<DacoUser>) this.getHibernateTemplate().find(DacoUserDAOHibernate.FIND_BY_SESSION_ID, sessionId);
+		return (List<DacoUser>) doFind(DacoUserDAOHibernate.FIND_BY_SESSION_ID, sessionId);
 	}
 }
