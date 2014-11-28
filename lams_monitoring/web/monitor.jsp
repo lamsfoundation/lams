@@ -3,7 +3,10 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-function" prefix="fn" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="url">${pageContext.request.requestURL}</c:set>
+<c:set var="uri" value="${pageContext.request.requestURI}" />
 
 <!DOCTYPE HTML>
 <lams:html>
@@ -174,7 +177,7 @@
 					</td>
 					<td>
 						<input id="learnerURLField" class="lessonManageField"
-						       value="<lams:LAMSURL/>launchlearner.do?lessonID=${lesson.lessonID}"
+						       value="${fn:substring(url, 0, fn:length(url) - fn:length(uri))}/${lesson.encodedLessonID}"
 						       readonly="readonly" />
 						<a class="button lessonManageField" href="#"
 						   onClick="javascript:selectLearnerURL()"><fmt:message key="button.select"/></a>
