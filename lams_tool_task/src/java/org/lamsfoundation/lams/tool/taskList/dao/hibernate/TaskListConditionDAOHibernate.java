@@ -23,7 +23,9 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.taskList.dao.hibernate;  
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO;
+import org.springframework.stereotype.Repository;
  
 /**
  * Hibernate implementation of <code>TaskListConditionDAO</code>.
@@ -31,7 +33,8 @@ import org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO
  */
-public class TaskListConditionDAOHibernate extends BaseDAOHibernate implements TaskListConditionDAO{
+@Repository
+public class TaskListConditionDAOHibernate extends LAMSBaseDAO implements TaskListConditionDAO{
 
 }
  

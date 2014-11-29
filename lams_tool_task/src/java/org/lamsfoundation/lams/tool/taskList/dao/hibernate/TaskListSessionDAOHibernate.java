@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>TaskListSessionDAO</code>.
@@ -34,7 +36,8 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO
  */
-public class TaskListSessionDAOHibernate extends BaseDAOHibernate implements TaskListSessionDAO{
+@Repository
+public class TaskListSessionDAOHibernate extends LAMSBaseDAO implements TaskListSessionDAO{
 	
 	private static final String FIND_BY_SESSION_ID = "from " + TaskListSession.class.getName() + " as p where p.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + TaskListSession.class.getName() + " as p where p.taskList.contentId=?";
@@ -43,7 +46,7 @@ public class TaskListSessionDAOHibernate extends BaseDAOHibernate implements Tas
      * {@inheritDoc}
      */
 	public TaskListSession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		List list = doFind(FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.size() == 0)
 			return null;
 		return (TaskListSession) list.get(0);
@@ -54,14 +57,14 @@ public class TaskListSessionDAOHibernate extends BaseDAOHibernate implements Tas
      */
 	@SuppressWarnings("unchecked")
 	public List<TaskListSession> getByContentId(Long toolContentId) {
-		return (List<TaskListSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<TaskListSession>) doFind(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
     /**
      * {@inheritDoc}
      */
 	public void delete(TaskListSession session) {
-		this.getHibernateTemplate().delete(session);
+		getSession().delete(session);
 	}
 	
     /**

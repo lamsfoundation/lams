@@ -23,7 +23,9 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.taskList.dao.hibernate;  
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemAttachmentDAO;
+import org.springframework.stereotype.Repository;
  
 /**
  * Hibernate implementation of <code>TaskListItemAttachmentDAO</code>.
@@ -31,7 +33,8 @@ import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemAttachmentDAO;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListItemAttachmentDAO
  */
-public class TaskListItemAttachmentDAOHibernate extends BaseDAOHibernate implements TaskListItemAttachmentDAO{
+@Repository
+public class TaskListItemAttachmentDAOHibernate extends LAMSBaseDAO implements TaskListItemAttachmentDAO{
 
 }
  

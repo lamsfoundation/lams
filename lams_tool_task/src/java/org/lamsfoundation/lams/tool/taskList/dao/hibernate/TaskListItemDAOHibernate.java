@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>TaskListItemDAO</code>.
@@ -34,7 +36,8 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO
  */
-public class TaskListItemDAOHibernate extends BaseDAOHibernate implements TaskListItemDAO{
+@Repository
+public class TaskListItemDAOHibernate extends LAMSBaseDAO implements TaskListItemDAO{
 	
 	private static final String FIND_AUTHORING_ITEMS = "from " + TaskListItem.class.getName() + " where taskList_uid = ? order by sequence_Id asc";
 	
@@ -42,7 +45,7 @@ public class TaskListItemDAOHibernate extends BaseDAOHibernate implements TaskLi
 	 * {@inheritDoc}
 	 */
 	public List getAuthoringItems(Long taskListUid) {
-		return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS,taskListUid); 
+		return this.doFind(FIND_AUTHORING_ITEMS,taskListUid); 
 	}
 
 	/**

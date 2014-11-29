@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>TaskListItemVisitDAO</code>.
@@ -34,7 +36,8 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO
  */
-public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements TaskListItemVisitDAO{
+@Repository
+public class TaskListItemVisitDAOHibernate extends LAMSBaseDAO implements TaskListItemVisitDAO{
 	
 	private static final String FIND_BY_ITEM_AND_USER = "from " + TaskListItemVisitLog.class.getName()
 			+ " as r where r.user.userId = ? and r.taskListItem.uid=?";
@@ -58,7 +61,7 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
      * {@inheritDoc}
      */
 	public TaskListItemVisitLog getTaskListItemLog(Long itemUid,Long userId){
-		List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});
+		List list = doFind(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});
 		if(list == null || list.size() ==0)
 			return null;
 		return (TaskListItemVisitLog) list.get(0);
@@ -68,7 +71,7 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
      * {@inheritDoc}
      */
 	public int getTasksCompletedCountByUser(Long toolSessionId ,Long userUid) {
-		List list = getHibernateTemplate().find(FIND_TASKS_COMPLETED_COUNT_BY_USER, new Object[]{toolSessionId, userUid});
+		List list = doFind(FIND_TASKS_COMPLETED_COUNT_BY_USER, new Object[]{toolSessionId, userUid});
 		if(list == null || list.size() ==0)
 			return 0;
 		return ((Number) list.get(0)).intValue();
@@ -77,7 +80,7 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
 //	public Map<Long,Integer> getSummary(Long contentId) {
 //
 //		// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-//		List<Object[]> result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
+//		List<Object[]> result =  doFind(FIND_SUMMARY,contentId);
 //		Map<Long,Integer>  summaryList = new HashMap<Long,Integer> (result.size());
 //		for(Object[] list : result){
 //			if ( list[1] != null ) {
@@ -94,7 +97,7 @@ public class TaskListItemVisitDAOHibernate extends BaseDAOHibernate implements T
 	@SuppressWarnings("unchecked")
 	public List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId, Long itemUid) {
 		
-		return (List<TaskListItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
+		return (List<TaskListItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
 	}
 
 }

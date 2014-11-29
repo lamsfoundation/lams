@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>TaskListDAO</code>.
@@ -35,14 +37,15 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskList;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListDAO
  */
-public class TaskListDAOHibernate extends BaseDAOHibernate implements TaskListDAO{
+@Repository
+public class TaskListDAOHibernate extends LAMSBaseDAO implements TaskListDAO{
 	private static final String GET_RESOURCE_BY_CONTENTID = "from "+TaskList.class.getName()+" as r where r.contentId=?";
 	
     /**
      * {@inheritDoc}
      */
 	public TaskList getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		List list = doFind(GET_RESOURCE_BY_CONTENTID,contentId);
 		if(list.size() > 0)
 			return (TaskList) list.get(0);
 		else
@@ -60,7 +63,7 @@ public class TaskListDAOHibernate extends BaseDAOHibernate implements TaskListDA
      * {@inheritDoc}
      */
 	public void delete(TaskList taskList) {
-		this.getHibernateTemplate().delete(taskList);
+		getSession().delete(taskList);
 	}
 
 }
