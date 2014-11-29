@@ -25,17 +25,20 @@ package org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
+import org.springframework.stereotype.Repository;
 
-public class CommonCartridgeItemDAOHibernate extends BaseDAOHibernate implements CommonCartridgeItemDAO {
+@Repository
+public class CommonCartridgeItemDAOHibernate extends LAMSBaseDAO implements CommonCartridgeItemDAO {
 
     private static final String FIND_AUTHORING_ITEMS = "from " + CommonCartridgeItem.class.getName()
 	    + " where commonCartridge_uid = ? order by create_date asc";
 
     public List getAuthoringItems(Long commonCartridgeUid) {
 
-	return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS, commonCartridgeUid);
+	return this.doFind(FIND_AUTHORING_ITEMS, commonCartridgeUid);
     }
 
     public CommonCartridgeItem getByUid(Long commonCartridgeItemUid) {

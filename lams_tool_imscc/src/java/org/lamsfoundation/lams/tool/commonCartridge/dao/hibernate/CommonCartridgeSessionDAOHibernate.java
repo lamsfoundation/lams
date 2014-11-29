@@ -25,34 +25,37 @@ package org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeSessionDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
+import org.springframework.stereotype.Repository;
 
-public class CommonCartridgeSessionDAOHibernate extends BaseDAOHibernate implements CommonCartridgeSessionDAO {
+@Repository
+public class CommonCartridgeSessionDAOHibernate extends LAMSBaseDAO implements CommonCartridgeSessionDAO {
 
     private static final String FIND_BY_SESSION_ID = "from " + CommonCartridgeSession.class.getName()
 	    + " as p where p.sessionId=?";
     private static final String FIND_BY_CONTENT_ID = "from " + CommonCartridgeSession.class.getName()
 	    + " as p where p.commonCartridge.contentId=?";
 
-    public CommonCartridgeSession getSessionBySessionId(Long sessionId) {
-	List list = getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
-	if (list == null || list.size() == 0)
-	    return null;
-	return (CommonCartridgeSession) list.get(0);
-    }
+	public CommonCartridgeSession getSessionBySessionId(Long sessionId) {
+		List list = doFind(FIND_BY_SESSION_ID, sessionId);
+		if (list == null || list.size() == 0)
+			return null;
+		return (CommonCartridgeSession) list.get(0);
+	}
 
-    @SuppressWarnings("unchecked")
-    public List<CommonCartridgeSession> getByContentId(Long toolContentId) {
-	return (List<CommonCartridgeSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
-    }
+	@SuppressWarnings("unchecked")
+	public List<CommonCartridgeSession> getByContentId(Long toolContentId) {
+		return (List<CommonCartridgeSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	}
 
-    public void delete(CommonCartridgeSession session) {
-	this.getHibernateTemplate().delete(session);
-    }
+	public void delete(CommonCartridgeSession session) {
+		getSession().delete(session);
+	}
 
-    public void deleteBySessionId(Long toolSessionId) {
-	this.removeObject(CommonCartridgeSession.class, toolSessionId);
-    }
+	public void deleteBySessionId(Long toolSessionId) {
+		this.removeObject(CommonCartridgeSession.class, toolSessionId);
+	}
 
 }

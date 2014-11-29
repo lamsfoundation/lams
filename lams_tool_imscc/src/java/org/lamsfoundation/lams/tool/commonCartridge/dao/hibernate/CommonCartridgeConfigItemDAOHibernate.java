@@ -23,28 +23,23 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeConfigItemDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class CommonCartridgeConfigItemDAOHibernate extends BaseDAO implements CommonCartridgeConfigItemDAO {
+@Repository
+public class CommonCartridgeConfigItemDAOHibernate extends LAMSBaseDAO implements CommonCartridgeConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from CommonCartridgeConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
     public CommonCartridgeConfigItem getConfigItemByKey(final String configKey) {
-	return (CommonCartridgeConfigItem) getHibernateTemplate().execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
-	    }
-	});
+		return (CommonCartridgeConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY)
+				.setString("key", configKey).uniqueResult();
+	}
 
-    }
-
-    public void saveOrUpdate(CommonCartridgeConfigItem configItem) {
-	this.getHibernateTemplate().saveOrUpdate(configItem);
-	this.getHibernateTemplate().flush();
-    }
+	public void saveOrUpdate(CommonCartridgeConfigItem configItem) {
+		getSession().saveOrUpdate(configItem);
+		getSession().flush();
+	}
 }

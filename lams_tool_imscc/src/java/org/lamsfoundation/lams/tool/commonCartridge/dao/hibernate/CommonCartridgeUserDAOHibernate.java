@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeUserDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
+import org.springframework.stereotype.Repository;
 
-public class CommonCartridgeUserDAOHibernate extends BaseDAOHibernate implements CommonCartridgeUserDAO {
+@Repository
+public class CommonCartridgeUserDAOHibernate extends LAMSBaseDAO implements CommonCartridgeUserDAO {
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + CommonCartridgeUser.class.getName()
 	    + " as u where u.userId =? and u.commonCartridge.contentId=?";
@@ -38,14 +41,14 @@ public class CommonCartridgeUserDAOHibernate extends BaseDAOHibernate implements
 	    + " as u where u.session.sessionId=?";
 
     public CommonCartridgeUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (CommonCartridgeUser) list.get(0);
     }
 
     public CommonCartridgeUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (CommonCartridgeUser) list.get(0);
@@ -53,7 +56,7 @@ public class CommonCartridgeUserDAOHibernate extends BaseDAOHibernate implements
 
     @SuppressWarnings("unchecked")
     public List<CommonCartridgeUser> getBySessionID(Long sessionId) {
-	return (List<CommonCartridgeUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<CommonCartridgeUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
 
 }

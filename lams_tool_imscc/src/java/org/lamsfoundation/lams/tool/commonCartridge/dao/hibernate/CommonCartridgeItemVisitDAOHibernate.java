@@ -27,12 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemVisitDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemVisitLog;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
+import org.springframework.stereotype.Repository;
 
-public class CommonCartridgeItemVisitDAOHibernate extends BaseDAOHibernate implements CommonCartridgeItemVisitDAO {
+@Repository
+public class CommonCartridgeItemVisitDAOHibernate extends LAMSBaseDAO implements CommonCartridgeItemVisitDAO {
 
     private static final String FIND_BY_ITEM_AND_USER = "from " + CommonCartridgeItemVisitLog.class.getName()
 	    + " as r where r.user.userId = ? and r.commonCartridgeItem.uid=?";
@@ -50,14 +53,14 @@ public class CommonCartridgeItemVisitDAOHibernate extends BaseDAOHibernate imple
 	    + " group by v.sessionId, v.commonCartridgeItem.uid ";
 
     public CommonCartridgeItemVisitLog getCommonCartridgeItemLog(Long itemUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
+	List list = doFind(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (CommonCartridgeItemVisitLog) list.get(0);
     }
 
     public int getUserViewLogCount(Long toolSessionId, Long userUid) {
-	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userUid });
+	List list = doFind(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userUid });
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();
@@ -67,7 +70,7 @@ public class CommonCartridgeItemVisitDAOHibernate extends BaseDAOHibernate imple
     public Map<Long, Integer> getSummary(Long contentId) {
 
 	// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-	List<Object[]> result = (List<Object[]>) getHibernateTemplate().find(FIND_SUMMARY, contentId);
+	List<Object[]> result = (List<Object[]>) doFind(FIND_SUMMARY, contentId);
 	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
 	for (Object[] list : result) {
 	    if (list[1] != null) {
@@ -81,7 +84,7 @@ public class CommonCartridgeItemVisitDAOHibernate extends BaseDAOHibernate imple
     @SuppressWarnings("unchecked")
     public List<CommonCartridgeItemVisitLog> getCommonCartridgeItemLogBySession(Long sessionId, Long itemUid) {
 
-	return (List<CommonCartridgeItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
+	return (List<CommonCartridgeItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
 }

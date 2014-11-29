@@ -25,31 +25,34 @@ package org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
  * @author Andrey Balan
  */
-public class CommonCartridgeDAOHibernate extends BaseDAOHibernate implements CommonCartridgeDAO {
-    private static final String GET_RESOURCE_BY_CONTENTID = "from " + CommonCartridge.class.getName()
-	    + " as r where r.contentId=?";
+@Repository
+public class CommonCartridgeDAOHibernate extends LAMSBaseDAO implements CommonCartridgeDAO {
+	private static final String GET_RESOURCE_BY_CONTENTID = "from " + CommonCartridge.class.getName()
+			+ " as r where r.contentId=?";
 
-    public CommonCartridge getByContentId(Long contentId) {
-	List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID, contentId);
-	if (list.size() > 0)
-	    return (CommonCartridge) list.get(0);
-	else
-	    return null;
-    }
+	public CommonCartridge getByContentId(Long contentId) {
+		List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+		if (list.size() > 0)
+			return (CommonCartridge) list.get(0);
+		else
+			return null;
+	}
 
-    public CommonCartridge getByUid(Long commonCartridgeUid) {
-	return (CommonCartridge) getObject(CommonCartridge.class, commonCartridgeUid);
-    }
+	public CommonCartridge getByUid(Long commonCartridgeUid) {
+		return (CommonCartridge) getObject(CommonCartridge.class, commonCartridgeUid);
+	}
 
-    public void delete(CommonCartridge commonCartridge) {
-	this.getHibernateTemplate().delete(commonCartridge);
-    }
+	public void delete(CommonCartridge commonCartridge) {
+		getSession().delete(commonCartridge);
+	}
 
 }
