@@ -25,28 +25,30 @@ package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
+import org.springframework.stereotype.Repository;
 
-
-public class ResourceSessionDAOHibernate extends BaseDAOHibernate implements ResourceSessionDAO{
+@Repository
+public class ResourceSessionDAOHibernate extends LAMSBaseDAO implements ResourceSessionDAO{
 	
 	private static final String FIND_BY_SESSION_ID = "from " + ResourceSession.class.getName() + " as p where p.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + ResourceSession.class.getName() + " as p where p.resource.contentId=?";
 	
 	public ResourceSession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		List list = doFind(FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.size() == 0)
 			return null;
 		return (ResourceSession) list.get(0);
 	}
 	@SuppressWarnings("unchecked")
 	public List<ResourceSession> getByContentId(Long toolContentId) {
-		return (List<ResourceSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<ResourceSession>) doFind(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(ResourceSession session) {
-		this.getHibernateTemplate().delete(session);
+		getSession().delete(session);
 	}
 	public void deleteBySessionId(Long toolSessionId) {
 		this.removeObject(ResourceSession.class,toolSessionId);

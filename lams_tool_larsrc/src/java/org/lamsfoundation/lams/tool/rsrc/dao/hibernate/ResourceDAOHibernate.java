@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceDAO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
@@ -34,11 +36,12 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
  * 
  * @version $Revision$
  */
-public class ResourceDAOHibernate extends BaseDAOHibernate implements ResourceDAO{
+@Repository
+public class ResourceDAOHibernate extends LAMSBaseDAO implements ResourceDAO{
 	private static final String GET_RESOURCE_BY_CONTENTID = "from "+Resource.class.getName()+" as r where r.contentId=?";
 	
 	public Resource getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		List list = doFind(GET_RESOURCE_BY_CONTENTID,contentId);
 		if(list.size() > 0)
 			return (Resource) list.get(0);
 		else
@@ -50,7 +53,7 @@ public class ResourceDAOHibernate extends BaseDAOHibernate implements ResourceDA
 	}
 
 	public void delete(Resource resource) {
-		this.getHibernateTemplate().delete(resource);
+		getSession().delete(resource);
 	}
 
 }

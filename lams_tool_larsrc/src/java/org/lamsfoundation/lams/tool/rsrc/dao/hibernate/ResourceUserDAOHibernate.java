@@ -25,25 +25,27 @@ package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
+import org.springframework.stereotype.Repository;
 
-
-public class ResourceUserDAOHibernate extends BaseDAOHibernate implements ResourceUserDAO{
+@Repository
+public class ResourceUserDAOHibernate extends LAMSBaseDAO implements ResourceUserDAO{
 	
 	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.resource.contentId=?";
 	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
 	private static final String FIND_BY_SESSION_ID = "from " + ResourceUser.class.getName() + " as u where u.session.sessionId=?";
 
 	public ResourceUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
+		List list = this.doFind(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
 		if(list == null || list.size() == 0)
 			return null;
 		return (ResourceUser) list.get(0);
 	}
 
 	public ResourceUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
+		List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
 		if(list == null || list.size() == 0)
 			return null;
 		return (ResourceUser) list.get(0);
@@ -51,7 +53,7 @@ public class ResourceUserDAOHibernate extends BaseDAOHibernate implements Resour
 
 	@SuppressWarnings("unchecked")
 	public List<ResourceUser> getBySessionID(Long sessionId) {
-		return (List<ResourceUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<ResourceUser>) this.doFind(FIND_BY_SESSION_ID,sessionId);
 	}
 
 
