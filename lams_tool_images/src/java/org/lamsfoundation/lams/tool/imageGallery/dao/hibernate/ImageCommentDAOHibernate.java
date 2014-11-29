@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageCommentDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>ImageCommentDAO</code>.
@@ -34,16 +36,17 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.imageGallery.dao.ImageCommentDAO
  */
-public class ImageCommentDAOHibernate extends BaseDAOHibernate implements ImageCommentDAO {
+@Repository
+public class ImageCommentDAOHibernate extends LAMSBaseDAO implements ImageCommentDAO {
 
     private static final String FIND_BY_UID = "from " + ImageComment.class.getName()
 	    + " as r where r.uid = ?";
 
-    public ImageComment getCommentByUid(Long commentUid) {
-	List list = getHibernateTemplate().find(FIND_BY_UID, commentUid);
-	if (list == null || list.size() == 0)
-	    return null;
-	return (ImageComment) list.get(0);
-    }
+	public ImageComment getCommentByUid(Long commentUid) {
+		List list = doFind(FIND_BY_UID, commentUid);
+		if (list == null || list.size() == 0)
+			return null;
+		return (ImageComment) list.get(0);
+	}
 
 }

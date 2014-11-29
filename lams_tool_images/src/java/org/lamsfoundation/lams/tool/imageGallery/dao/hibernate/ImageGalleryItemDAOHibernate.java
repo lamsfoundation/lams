@@ -25,16 +25,19 @@ package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
+import org.springframework.stereotype.Repository;
 
-public class ImageGalleryItemDAOHibernate extends BaseDAOHibernate implements ImageGalleryItemDAO {
+@Repository
+public class ImageGalleryItemDAOHibernate extends LAMSBaseDAO implements ImageGalleryItemDAO {
 
     private static final String FIND_AUTHORING_ITEMS = "from " + ImageGalleryItem.class.getName()
 	    + " where imageGallery_uid = ? order by create_date asc";
 
     public List getAuthoringItems(Long imageGalleryUid) {
-	return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS, imageGalleryUid);
+	return this.doFind(FIND_AUTHORING_ITEMS, imageGalleryUid);
     }
 
     @Override

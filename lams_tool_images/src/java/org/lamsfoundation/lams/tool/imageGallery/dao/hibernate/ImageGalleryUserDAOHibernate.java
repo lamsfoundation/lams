@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryUserDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
+import org.springframework.stereotype.Repository;
 
-public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements ImageGalleryUserDAO {
+@Repository
+public class ImageGalleryUserDAOHibernate extends LAMSBaseDAO implements ImageGalleryUserDAO {
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ImageGalleryUser.class.getName()
 	    + " as u where u.userId =? and u.imageGallery.contentId=?";
@@ -38,14 +41,14 @@ public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements Im
 	    + " as u where u.session.sessionId=?";
 
     public ImageGalleryUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ImageGalleryUser) list.get(0);
     }
 
     public ImageGalleryUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ImageGalleryUser) list.get(0);
@@ -53,7 +56,7 @@ public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements Im
 
     @SuppressWarnings("unchecked")
     public List<ImageGalleryUser> getBySessionID(Long sessionId) {
-	return (List<ImageGalleryUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<ImageGalleryUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
 
 }

@@ -25,28 +25,30 @@ package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGallerySessionDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
+import org.springframework.stereotype.Repository;
 
-
-public class ImageGallerySessionDAOHibernate extends BaseDAOHibernate implements ImageGallerySessionDAO{
+@Repository
+public class ImageGallerySessionDAOHibernate extends LAMSBaseDAO implements ImageGallerySessionDAO{
 	
 	private static final String FIND_BY_SESSION_ID = "from " + ImageGallerySession.class.getName() + " as p where p.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + ImageGallerySession.class.getName() + " as p where p.imageGallery.contentId=?";
 	
 	public ImageGallerySession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		List list = doFind(FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.size() == 0)
 			return null;
 		return (ImageGallerySession) list.get(0);
 	}
 	@SuppressWarnings("unchecked")
 	public List<ImageGallerySession> getByContentId(Long toolContentId) {
-		return (List<ImageGallerySession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<ImageGallerySession>) doFind(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(ImageGallerySession session) {
-		this.getHibernateTemplate().delete(session);
+		getSession().delete(session);
 	}
 	public void deleteBySessionId(Long toolSessionId) {
 		this.removeObject(ImageGallerySession.class,toolSessionId);

@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageRatingDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>ImageCommentDAO</code>.
@@ -34,7 +36,8 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.imageGallery.dao.ImageCommentDAO
  */
-public class ImageRatingDAOHibernate extends BaseDAOHibernate implements ImageRatingDAO {
+@Repository
+public class ImageRatingDAOHibernate extends LAMSBaseDAO implements ImageRatingDAO {
 
     private static final String FIND_BY_IMAGE_AND_USER = "from " + ImageRating.class.getName()
 	    + " as r where r.createBy.userId = ? and r.imageGalleryItem.uid=?";
@@ -43,7 +46,7 @@ public class ImageRatingDAOHibernate extends BaseDAOHibernate implements ImageRa
 	    + " as r where r.imageGalleryItem.uid=?";
 
     public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_IMAGE_AND_USER, new Object[] { userId, imageUid });
+	List list = doFind(FIND_BY_IMAGE_AND_USER, new Object[] { userId, imageUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ImageRating) list.get(0);
@@ -51,7 +54,7 @@ public class ImageRatingDAOHibernate extends BaseDAOHibernate implements ImageRa
 
     @SuppressWarnings("unchecked")
     public List<ImageRating> getImageRatingsByImageUid(Long imageUid) {
-	return (List<ImageRating>) getHibernateTemplate().find(FIND_BY_IMAGE_UID, imageUid);
+	return (List<ImageRating>) doFind(FIND_BY_IMAGE_UID, imageUid);
     }
 
 }

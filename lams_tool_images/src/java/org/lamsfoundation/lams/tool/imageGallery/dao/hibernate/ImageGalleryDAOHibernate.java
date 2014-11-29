@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
@@ -34,11 +36,12 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
  * 
  * @version $Revision$
  */
-public class ImageGalleryDAOHibernate extends BaseDAOHibernate implements ImageGalleryDAO{
+@Repository
+public class ImageGalleryDAOHibernate extends LAMSBaseDAO implements ImageGalleryDAO{
 	private static final String GET_RESOURCE_BY_CONTENTID = "from "+ImageGallery.class.getName()+" as r where r.contentId=?";
 	
 	public ImageGallery getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		List list = doFind(GET_RESOURCE_BY_CONTENTID,contentId);
 		if(list.size() > 0)
 			return (ImageGallery) list.get(0);
 		else
@@ -50,7 +53,7 @@ public class ImageGalleryDAOHibernate extends BaseDAOHibernate implements ImageG
 	}
 
 	public void delete(ImageGallery imageGallery) {
-		this.getHibernateTemplate().delete(imageGallery);
+		getSession().delete(imageGallery);
 	}
 
 }

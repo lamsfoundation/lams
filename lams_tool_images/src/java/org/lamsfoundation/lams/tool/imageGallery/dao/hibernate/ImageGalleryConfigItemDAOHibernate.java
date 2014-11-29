@@ -23,28 +23,22 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryConfigItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class ImageGalleryConfigItemDAOHibernate extends BaseDAO implements ImageGalleryConfigItemDAO {
+@Repository
+public class ImageGalleryConfigItemDAOHibernate extends LAMSBaseDAO implements ImageGalleryConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from ImageGalleryConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
-    public ImageGalleryConfigItem getConfigItemByKey(final String configKey) {
-	return (ImageGalleryConfigItem) getHibernateTemplate().execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
-	    }
-	});
+	public ImageGalleryConfigItem getConfigItemByKey(final String configKey) {
+		return (ImageGalleryConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
+	}
 
-    }
-
-    public void saveOrUpdate(ImageGalleryConfigItem mdlForumConfigItem) {
-	this.getHibernateTemplate().saveOrUpdate(mdlForumConfigItem);
-	this.getHibernateTemplate().flush();
-    }
+	public void saveOrUpdate(ImageGalleryConfigItem mdlForumConfigItem) {
+		getSession().saveOrUpdate(mdlForumConfigItem);
+		getSession().flush();
+	}
 }

@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageVoteDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>ImageVoteDAO</code>.
@@ -34,7 +36,8 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.imageGallery.dao.ImageVoteDAO
  */
-public class ImageVoteDAOHibernate extends BaseDAOHibernate implements ImageVoteDAO {
+@Repository
+public class ImageVoteDAOHibernate extends LAMSBaseDAO implements ImageVoteDAO {
 
     private static final String FIND_BY_IMAGE_AND_USER = "from " + ImageVote.class.getName()
 	    + " as r where r.createBy.userId = ? and r.imageGalleryItem.uid=?";
@@ -46,7 +49,7 @@ public class ImageVoteDAOHibernate extends BaseDAOHibernate implements ImageVote
 	    + " as r where r.voted=true and r.imageGalleryItem.uid = ? and r.createBy.session.sessionId=?";
 
     public ImageVote getImageVoteByImageAndUser(Long imageUid, Long userId) {
-	List list = getHibernateTemplate().find(ImageVoteDAOHibernate.FIND_BY_IMAGE_AND_USER,
+	List list = doFind(ImageVoteDAOHibernate.FIND_BY_IMAGE_AND_USER,
 		new Object[] { userId, imageUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -55,7 +58,7 @@ public class ImageVoteDAOHibernate extends BaseDAOHibernate implements ImageVote
     }
 
     public int getNumImageVotesByImageUid(Long imageUid, Long sessionId) {
-	List list = getHibernateTemplate().find(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_IMAGE, new Object[] {imageUid, sessionId});
+	List list = doFind(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_IMAGE, new Object[] {imageUid, sessionId});
 	if ((list == null) || (list.size() == 0)) {
 	    return 0;
 	}
@@ -63,7 +66,7 @@ public class ImageVoteDAOHibernate extends BaseDAOHibernate implements ImageVote
     }
 
     public int getNumImageVotesByUserId(Long userId) {
-	List list = getHibernateTemplate().find(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_USER, userId);
+	List list = doFind(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_USER, userId);
 	if ((list == null) || (list.size() == 0)) {
 	    return 0;
 	}
