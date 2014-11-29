@@ -26,27 +26,29 @@ package org.lamsfoundation.lams.tool.leaderselection.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.leaderselection.dao.ILeaderselectionSessionDAO;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the LeaderselectionSession objects - Hibernate specific code.
  */
-public class LeaderselectionSessionDAO extends BaseDAO implements ILeaderselectionSessionDAO {
+@Repository
+public class LeaderselectionSessionDAO extends LAMSBaseDAO implements ILeaderselectionSessionDAO {
 
     public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + LeaderselectionSession.class.getName()
 	    + " where session_id=?";
 
     @Override
     public void saveOrUpdate(LeaderselectionSession session) {
-	this.getHibernateTemplate().saveOrUpdate(session);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(session);
+	getSession().flush();
     }
 
     @Override
     public LeaderselectionSession getBySessionId(Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+	List list = doFind(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty())
 	    return null;
 	return (LeaderselectionSession) list.get(0);
@@ -56,8 +58,8 @@ public class LeaderselectionSessionDAO extends BaseDAO implements ILeaderselecti
     public void deleteBySessionID(Long toolSessionID) {
 	LeaderselectionSession session = getBySessionId(toolSessionID);
 	if (session != null) {
-	    this.getHibernateTemplate().delete(session);
-	    this.getHibernateTemplate().flush();
+	    getSession().delete(session);
+	    getSession().flush();
 	}
     }
 }

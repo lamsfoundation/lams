@@ -26,20 +26,22 @@ package org.lamsfoundation.lams.tool.leaderselection.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.leaderselection.dao.ILeaderselectionDAO;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Leaderselection objects - Hibernate specific code.
  */
-public class LeaderselectionDAO extends BaseDAO implements ILeaderselectionDAO {
+@Repository
+public class LeaderselectionDAO extends LAMSBaseDAO implements ILeaderselectionDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Leaderselection leaderselection where leaderselection.toolContentId=?";
 
     @Override
     public Leaderselection getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(LeaderselectionDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFind(LeaderselectionDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Leaderselection) list.get(0);
 	} else {
@@ -49,8 +51,8 @@ public class LeaderselectionDAO extends BaseDAO implements ILeaderselectionDAO {
 
     @Override
     public void saveOrUpdate(Leaderselection leaderselection) {
-	this.getHibernateTemplate().saveOrUpdate(leaderselection);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(leaderselection);
+	getSession().flush();
     }
 
     @Override

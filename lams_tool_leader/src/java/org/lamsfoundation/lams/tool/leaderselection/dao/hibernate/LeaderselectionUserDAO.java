@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.leaderselection.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.leaderselection.dao.ILeaderselectionUserDAO;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the LeaderselectionUser objects - Hibernate specific code.
  */
-public class LeaderselectionUserDAO extends BaseDAO implements ILeaderselectionUserDAO {
+@Repository
+public class LeaderselectionUserDAO extends LAMSBaseDAO implements ILeaderselectionUserDAO {
 
     public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + LeaderselectionUser.class.getName()
 	    + " as f" + " where user_id=? and f.leaderselectionSession.sessionId=?";
@@ -48,7 +50,7 @@ public class LeaderselectionUserDAO extends BaseDAO implements ILeaderselectionU
 
     @Override
     public LeaderselectionUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
+	List list = doFind(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 		new Object[] { userId, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -59,13 +61,13 @@ public class LeaderselectionUserDAO extends BaseDAO implements ILeaderselectionU
 
     @Override
     public void saveOrUpdate(LeaderselectionUser leaderselectionUser) {
-	this.getHibernateTemplate().saveOrUpdate(leaderselectionUser);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(leaderselectionUser);
+	getSession().flush();
     }
 
     @Override
     public LeaderselectionUser getByUID(Long uid) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
+	List list = doFind(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
 
 	if (list == null || list.isEmpty())
 	    return null;
@@ -76,6 +78,6 @@ public class LeaderselectionUserDAO extends BaseDAO implements ILeaderselectionU
     @SuppressWarnings("unchecked")
     @Override
     public List<LeaderselectionUser> getBySessionId(Long sessionId) {
-	return (List<LeaderselectionUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<LeaderselectionUser>) doFind(FIND_BY_SESSION_ID, sessionId);
     }
 }
