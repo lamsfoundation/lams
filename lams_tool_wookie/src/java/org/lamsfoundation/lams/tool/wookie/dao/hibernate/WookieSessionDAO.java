@@ -26,26 +26,28 @@ package org.lamsfoundation.lams.tool.wookie.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieSessionDAO;
 import org.lamsfoundation.lams.tool.wookie.model.WookieSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the WookieSession objects - Hibernate specific code.
  */
-public class WookieSessionDAO extends BaseDAO implements IWookieSessionDAO {
+@Repository
+public class WookieSessionDAO extends LAMSBaseDAO implements IWookieSessionDAO {
 
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ WookieSession.class.getName() + " where session_id=?";
 
 	public void saveOrUpdate(WookieSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(session);
+		getSession().flush();
 	}
 
 	@SuppressWarnings("unchecked")
 	public WookieSession getBySessionId(Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = this.doFind(
 				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 		if (list == null || list.isEmpty())
 			return null;
@@ -55,8 +57,8 @@ public class WookieSessionDAO extends BaseDAO implements IWookieSessionDAO {
 	public void deleteBySessionID(Long toolSessionID) {
 		WookieSession session = getBySessionId(toolSessionID);
 		if(session != null){
-			this.getHibernateTemplate().delete(session);
-			this.getHibernateTemplate().flush();
+			getSession().delete(session);
+			getSession().flush();
 		}
 	}
 }

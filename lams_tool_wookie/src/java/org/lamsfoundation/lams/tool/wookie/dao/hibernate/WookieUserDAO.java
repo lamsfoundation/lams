@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.wookie.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieUserDAO;
 import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the WookieUser objects - Hibernate specific code.
  */
-public class WookieUserDAO extends BaseDAO implements IWookieUserDAO {
+@Repository
+public class WookieUserDAO extends LAMSBaseDAO implements IWookieUserDAO {
 
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ WookieUser.class.getName() + " as f"
@@ -48,7 +50,7 @@ public class WookieUserDAO extends BaseDAO implements IWookieUserDAO {
 
 	@SuppressWarnings("unchecked")
 	public WookieUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 				new Object[] { userId, toolSessionId });
 
@@ -62,7 +64,7 @@ public class WookieUserDAO extends BaseDAO implements IWookieUserDAO {
 	public WookieUser getByLoginNameAndSessionId(String loginName,
 			Long toolSessionId) {
 
-		List list = this.getHibernateTemplate().find(
+		List list = this.doFind(
 				SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 				new Object[] { loginName, toolSessionId });
 
@@ -74,13 +76,13 @@ public class WookieUserDAO extends BaseDAO implements IWookieUserDAO {
 	}
 
 	public void saveOrUpdate(WookieUser wookieUser) {
-		this.getHibernateTemplate().saveOrUpdate(wookieUser);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(wookieUser);
+		getSession().flush();
 	}
 
 	@SuppressWarnings("unchecked")
 	public WookieUser getByUID(Long uid) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
+		List list = this.doFind(SQL_QUERY_FIND_BY_UID,
 				new Object[] { uid });
 
 		if (list == null || list.isEmpty())

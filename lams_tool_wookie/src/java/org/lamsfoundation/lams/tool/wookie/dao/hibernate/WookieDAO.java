@@ -26,20 +26,22 @@ package org.lamsfoundation.lams.tool.wookie.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieDAO;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Wookie objects - Hibernate specific code.
  */
-public class WookieDAO extends BaseDAO implements IWookieDAO {
+@Repository
+public class WookieDAO extends LAMSBaseDAO implements IWookieDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Wookie wookie where wookie.toolContentId=?";
 
     @SuppressWarnings("unchecked")
     public Wookie getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(WookieDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFind(WookieDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Wookie) list.get(0);
 	} else {
@@ -48,8 +50,8 @@ public class WookieDAO extends BaseDAO implements IWookieDAO {
     }
 
     public void saveOrUpdate(Wookie wookie) {
-	this.getHibernateTemplate().saveOrUpdate(wookie);
-	this.getHibernateTemplate().flush();
+    	getSession().saveOrUpdate(wookie);
+    	getSession().flush();
     }
 
     public void releaseFromCache(Object o) {
