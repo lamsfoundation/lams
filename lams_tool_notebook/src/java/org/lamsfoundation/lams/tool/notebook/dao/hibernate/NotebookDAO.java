@@ -26,19 +26,21 @@ package org.lamsfoundation.lams.tool.notebook.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookDAO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Notebook objects - Hibernate specific code.
  */
-public class NotebookDAO extends BaseDAO implements INotebookDAO {
+@Repository
+public class NotebookDAO extends LAMSBaseDAO implements INotebookDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Notebook notebook where notebook.toolContentId=?";
 
     public Notebook getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(NotebookDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFind(NotebookDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Notebook) list.get(0);
 	} else {
@@ -47,8 +49,8 @@ public class NotebookDAO extends BaseDAO implements INotebookDAO {
     }
 
     public void saveOrUpdate(Notebook notebook) {
-	this.getHibernateTemplate().saveOrUpdate(notebook);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(notebook);
+	getSession().flush();
     }
 
     public void releaseFromCache(Object o) {

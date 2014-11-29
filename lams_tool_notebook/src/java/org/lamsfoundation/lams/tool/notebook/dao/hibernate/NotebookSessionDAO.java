@@ -26,26 +26,28 @@ package org.lamsfoundation.lams.tool.notebook.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookSessionDAO;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the NotebookSession objects - Hibernate specific code.
  */
-public class NotebookSessionDAO extends BaseDAO implements INotebookSessionDAO {
+@Repository
+public class NotebookSessionDAO extends LAMSBaseDAO implements INotebookSessionDAO {
 
     public static final String FIND_BY_SESSION_ID = "from " + NotebookSession.class.getName() + " where session_id=?";
 
     @Override
     public void saveOrUpdate(NotebookSession session) {
-	this.getHibernateTemplate().saveOrUpdate(session);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(session);
+	getSession().flush();
     }
 
     @Override
     public NotebookSession getBySessionId(Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_SESSION_ID, toolSessionId);
+	List list = doFind(FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty())
 	    return null;
 	return (NotebookSession) list.get(0);
@@ -55,8 +57,8 @@ public class NotebookSessionDAO extends BaseDAO implements INotebookSessionDAO {
     public void deleteBySessionID(Long toolSessionID) {
 	NotebookSession session = getBySessionId(toolSessionID);
 	if (session != null) {
-	    this.getHibernateTemplate().delete(session);
-	    this.getHibernateTemplate().flush();
+	    getSession().delete(session);
+	    getSession().flush();
 	}
     }
 }

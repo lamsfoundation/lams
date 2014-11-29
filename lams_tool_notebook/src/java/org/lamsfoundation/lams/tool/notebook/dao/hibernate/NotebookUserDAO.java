@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.notebook.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookUserDAO;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the NotebookUser objects - Hibernate specific code.
  */
-public class NotebookUserDAO extends BaseDAO implements INotebookUserDAO {
+@Repository
+public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ NotebookUser.class.getName() + " as f"
@@ -47,7 +49,7 @@ public class NotebookUserDAO extends BaseDAO implements INotebookUserDAO {
 			+ NotebookUser.class.getName() + " where uid=?";
 
 	public NotebookUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 				new Object[] { userId, toolSessionId });
 
@@ -60,7 +62,7 @@ public class NotebookUserDAO extends BaseDAO implements INotebookUserDAO {
 	public NotebookUser getByLoginNameAndSessionId(String loginName,
 			Long toolSessionId) {
 
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 				new Object[] { loginName, toolSessionId });
 
@@ -72,12 +74,12 @@ public class NotebookUserDAO extends BaseDAO implements INotebookUserDAO {
 	}
 
 	public void saveOrUpdate(NotebookUser notebookUser) {
-		this.getHibernateTemplate().saveOrUpdate(notebookUser);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(notebookUser);
+		getSession().flush();
 	}
 
 	public NotebookUser getByUID(Long uid) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
+		List list = doFind(SQL_QUERY_FIND_BY_UID,
 				new Object[] { uid });
 
 		if (list == null || list.isEmpty())
