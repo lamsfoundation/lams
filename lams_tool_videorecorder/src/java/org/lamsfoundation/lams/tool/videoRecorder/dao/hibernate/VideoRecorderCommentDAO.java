@@ -25,16 +25,17 @@
 package org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate;
 
 import java.util.List;
-import java.util.Set;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderCommentDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the VideoRecorderRecording objects - Hibernate specific code.
  */
-public class VideoRecorderCommentDAO extends BaseDAO implements IVideoRecorderCommentDAO {
+@Repository
+public class VideoRecorderCommentDAO extends LAMSBaseDAO implements IVideoRecorderCommentDAO {
 
 	private static final String SQL_QUERY_FIND_BY_COMMENT_ID = "from "
 		+ VideoRecorderComment.class.getName() + " as c"
@@ -53,7 +54,7 @@ public class VideoRecorderCommentDAO extends BaseDAO implements IVideoRecorderCo
 	+ " where c.createBy.userId=? and c.videoRecorderSession.sessionId=?";
 	
 	public VideoRecorderComment getCommentById(Long recordingId) {
-		List list = this.getHibernateTemplate().find(
+		List list = this.doFind(
 				SQL_QUERY_FIND_BY_COMMENT_ID ,
 				recordingId);
 	
@@ -64,24 +65,24 @@ public class VideoRecorderCommentDAO extends BaseDAO implements IVideoRecorderCo
 	}
 	
 	public List<VideoRecorderComment> getCommentsByUserId(Long userId){
-		return (List<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_USER_ID, userId));
+		return (List<VideoRecorderComment>)(this.doFind(SQL_QUERY_BY_USER_ID, userId));
 	}
 
 	public List<VideoRecorderComment> getCommentsByToolSessionId(Long toolSessionId){
-		return (List<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_SESSION_ID, toolSessionId));
+		return (List<VideoRecorderComment>)(this.doFind(SQL_QUERY_BY_TOOL_SESSION_ID, toolSessionId));
 	}
 	
 	public List<VideoRecorderComment> getCommentsByRecordingId(Long recordingId) {
-		return (List<VideoRecorderComment>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_RECORDING_ID, recordingId));
+		return (List<VideoRecorderComment>)(this.doFind(SQL_QUERY_BY_TOOL_RECORDING_ID, recordingId));
 	}
 	
     public void saveOrUpdate(VideoRecorderComment videoRecorderComment) {
-		this.getHibernateTemplate().saveOrUpdate(videoRecorderComment);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(videoRecorderComment);
+		getSession().flush();
     }
     
 	public Long getNbComments(Long userID, Long sessionId) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_NB_COMMENTS_BY_USER, new Object[]{userID,sessionId});
+		List list = this.doFind(SQL_QUERY_NB_COMMENTS_BY_USER, new Object[]{userID,sessionId});
 		if(list != null && list.size() > 0)
 			return ((Number)list.get(0)).longValue();
 		else

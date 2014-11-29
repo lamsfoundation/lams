@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderUserDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the VideoRecorderUser objects - Hibernate specific code.
  */
-public class VideoRecorderUserDAO extends BaseDAO implements IVideoRecorderUserDAO {
+@Repository
+public class VideoRecorderUserDAO extends LAMSBaseDAO implements IVideoRecorderUserDAO {
 
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ VideoRecorderUser.class.getName() + " as f"
@@ -47,7 +49,7 @@ public class VideoRecorderUserDAO extends BaseDAO implements IVideoRecorderUserD
 			+ VideoRecorderUser.class.getName() + " where uid=?";
 
 	public VideoRecorderUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = this.doFind(
 				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 				new Object[] { userId, toolSessionId });
 
@@ -60,7 +62,7 @@ public class VideoRecorderUserDAO extends BaseDAO implements IVideoRecorderUserD
 	public VideoRecorderUser getByLoginNameAndSessionId(String loginName,
 			Long toolSessionId) {
 
-		List list = this.getHibernateTemplate().find(
+		List list = this.doFind(
 				SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 				new Object[] { loginName, toolSessionId });
 
@@ -72,12 +74,12 @@ public class VideoRecorderUserDAO extends BaseDAO implements IVideoRecorderUserD
 	}
 
 	public void saveOrUpdate(VideoRecorderUser videoRecorderUser) {
-		this.getHibernateTemplate().saveOrUpdate(videoRecorderUser);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(videoRecorderUser);
+		getSession().flush();
 	}
 
 	public VideoRecorderUser getByUID(Long uid) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
+		List list = this.doFind(SQL_QUERY_FIND_BY_UID,
 				new Object[] { uid });
 
 		if (list == null || list.isEmpty())

@@ -26,19 +26,21 @@ package org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the VideoRecorder objects - Hibernate specific code.
  */
-public class VideoRecorderDAO extends BaseDAO implements IVideoRecorderDAO {
+@Repository
+public class VideoRecorderDAO extends LAMSBaseDAO implements IVideoRecorderDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from VideoRecorder videoRecorder where videoRecorder.toolContentId=?";
 
     public VideoRecorder getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(VideoRecorderDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFind(VideoRecorderDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (VideoRecorder) list.get(0);
 	} else {
@@ -47,8 +49,8 @@ public class VideoRecorderDAO extends BaseDAO implements IVideoRecorderDAO {
     }
 
     public void saveOrUpdate(VideoRecorder videoRecorder) {
-	this.getHibernateTemplate().saveOrUpdate(videoRecorder);
-	this.getHibernateTemplate().flush();
+    	getSession().saveOrUpdate(videoRecorder);
+    	getSession().flush();
     }
 
     public void releaseFromCache(Object o) {

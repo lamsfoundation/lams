@@ -26,25 +26,27 @@ package org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderSessionDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the VideoRecorderSession objects - Hibernate specific code.
  */
-public class VideoRecorderSessionDAO extends BaseDAO implements IVideoRecorderSessionDAO {
+@Repository
+public class VideoRecorderSessionDAO extends LAMSBaseDAO implements IVideoRecorderSessionDAO {
 
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ VideoRecorderSession.class.getName() + " where session_id=?";
 
 	public void saveOrUpdate(VideoRecorderSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(session);
+		getSession().flush();
 	}
 
 	public VideoRecorderSession getBySessionId(Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = this.doFind(
 				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 		if (list == null || list.isEmpty())
 			return null;
@@ -54,8 +56,8 @@ public class VideoRecorderSessionDAO extends BaseDAO implements IVideoRecorderSe
 	public void deleteBySessionID(Long toolSessionID) {
 		VideoRecorderSession session = getBySessionId(toolSessionID);
 		if(session != null){
-			this.getHibernateTemplate().delete(session);
-			this.getHibernateTemplate().flush();
+			getSession().delete(session);
+			getSession().flush();
 		}
 	}
 }
