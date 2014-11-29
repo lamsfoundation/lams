@@ -27,14 +27,16 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class SubmitFilesSessionDAO extends BaseDAO implements
+@Repository
+public class SubmitFilesSessionDAO extends LAMSBaseDAO implements
 		ISubmitFilesSessionDAO {
 
     private static final String FIND_LEARNER_BY_CONTENT_ID = 
@@ -54,7 +56,7 @@ public class SubmitFilesSessionDAO extends BaseDAO implements
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#createSession(org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession)
 	 */
 	public void createSession(SubmitFilesSession submitSession) {
-		 this.getHibernateTemplate().save(submitSession);
+		 getSession().save(submitSession);
 	}
     
     public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID){

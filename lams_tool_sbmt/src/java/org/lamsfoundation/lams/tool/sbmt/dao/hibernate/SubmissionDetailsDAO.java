@@ -27,15 +27,17 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class SubmissionDetailsDAO extends BaseDAO implements
+@Repository
+public class SubmissionDetailsDAO extends LAMSBaseDAO implements
 		ISubmissionDetailsDAO {
 	
 	private static final String FIND_BY_SESSION = "from " + SubmissionDetails.class.getName() + " as d where d.submitFileSession.sessionID=? ";
@@ -47,8 +49,7 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#getSubmissionDetailsByID(java.lang.Long)
 	 */
 	public SubmissionDetails getSubmissionDetailsByID(Long submissionID) {
-		return (SubmissionDetails) this.getHibernateTemplate().
-								   get(SubmissionDetails.class, submissionID);
+		return (SubmissionDetails) getSession().get(SubmissionDetails.class, submissionID);
 	}
 	
 
@@ -57,7 +58,7 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#saveOrUpdate(org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession)
 	 */
 	public void saveOrUpdate(SubmitFilesSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
+		getSession().saveOrUpdate(session);
 		
 	}
 	/* (non-Javadoc)
@@ -75,7 +76,7 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	@SuppressWarnings("unchecked")
 	public List<SubmissionDetails> getBySessionAndLearner(Long sessionID, Integer userID){
 		
-		return (List<SubmissionDetails>) this.getHibernateTemplate().find(FIND_BY_SESSION_LEARNER, new Object[]{sessionID,userID});
+		return (List<SubmissionDetails>) doFind(FIND_BY_SESSION_LEARNER, new Object[]{sessionID,userID});
 		
 	}
 }

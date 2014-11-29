@@ -25,14 +25,15 @@
 
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
+import org.springframework.stereotype.Repository;
 
-public class SubmitUserDAO extends BaseDAO implements ISubmitUserDAO {
+@Repository
+public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + SubmitUser.class.getName() +
 	 		" where user_id=? and session_id=?";
 	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + SubmitUser.class.getName() +
@@ -42,7 +43,7 @@ public class SubmitUserDAO extends BaseDAO implements ISubmitUserDAO {
 	
 	
 	public SubmitUser getLearner(Long sessionID, Integer userID) {
-		List list = getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionID});
+		List list = doFind(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionID});
 		if(list.size() > 0)
 			return (SubmitUser) list.get(0);
 		else
@@ -50,7 +51,7 @@ public class SubmitUserDAO extends BaseDAO implements ISubmitUserDAO {
 	}
 
 	public SubmitUser getContentUser(Long contentId, Integer userID) {
-		List list = getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userID,contentId});
+		List list = doFind(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userID,contentId});
 		if(list.size() > 0)
 			return (SubmitUser) list.get(0);
 		else
@@ -59,7 +60,7 @@ public class SubmitUserDAO extends BaseDAO implements ISubmitUserDAO {
 	
 	@SuppressWarnings("unchecked")
 	public List<SubmitUser> getUsersBySession(Long sessionID){
-		return (List<SubmitUser>) getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionID);
+		return (List<SubmitUser>) doFind(FIND_BY_SESSION_ID,sessionID);
 	}
 	
 	

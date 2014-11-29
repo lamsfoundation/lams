@@ -27,15 +27,16 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Manpreet Minhas
  */
-public class SubmitFilesReportDAO extends BaseDAO implements
+@Repository
+public class SubmitFilesReportDAO extends LAMSBaseDAO implements
 		ISubmitFilesReportDAO {
 	
 	private static final String FIND_BY_SUBMISSION = "from " + SubmitFilesReport.class.getName() + 
@@ -55,7 +56,7 @@ public class SubmitFilesReportDAO extends BaseDAO implements
 	 */
 	public SubmitFilesReport getReportBySubmissionID(Long submissionID){
 		
-		List list = this.getHibernateTemplate().find(FIND_BY_SUBMISSION,submissionID);
+		List list = doFind(FIND_BY_SUBMISSION,submissionID);
 		if(list!=null)
 			return (SubmitFilesReport)list.get(0);
 		else
@@ -66,6 +67,6 @@ public class SubmitFilesReportDAO extends BaseDAO implements
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO#updateReport(org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport)
 	 */
 	public void updateReport(SubmitFilesReport report) {
-		getHibernateTemplate().update(report);
+		getSession().update(report);
 	}
 }
