@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapSessionDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the MindmapSession objects - Hibernate specific code.
  */
-public class MindmapSessionDAO extends BaseDAO implements IMindmapSessionDAO {
+@Repository
+public class MindmapSessionDAO extends LAMSBaseDAO implements IMindmapSessionDAO {
 
     public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + MindmapSession.class.getName()
 	    + " where session_id = ?";
@@ -42,12 +44,12 @@ public class MindmapSessionDAO extends BaseDAO implements IMindmapSessionDAO {
 	    + " ms where ms.mindmap.uid = ?";
 
     public void saveOrUpdate(MindmapSession session) {
-	this.getHibernateTemplate().saveOrUpdate(session);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(session);
+	getSession().flush();
     }
 
     public MindmapSession getBySessionId(Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+	List list = doFind(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty())
 	    return null;
 	return (MindmapSession) list.get(0);
@@ -56,8 +58,8 @@ public class MindmapSessionDAO extends BaseDAO implements IMindmapSessionDAO {
     public void deleteBySessionID(Long toolSessionID) {
 	MindmapSession session = getBySessionId(toolSessionID);
 	if (session != null) {
-	    this.getHibernateTemplate().delete(session);
-	    this.getHibernateTemplate().flush();
+		getSession().delete(session);
+		getSession().flush();
 	}
     }
 

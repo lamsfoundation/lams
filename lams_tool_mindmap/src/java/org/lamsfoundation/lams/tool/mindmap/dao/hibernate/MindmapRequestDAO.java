@@ -29,17 +29,18 @@ import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapRequestDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
 /**
  * MindmapRequestDAO
  * 
  * @author Ruslan Kazakov
  */
-public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
+@Repository
+public class MindmapRequestDAO extends LAMSBaseDAO implements IMindmapRequestDAO {
 	private static final String SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID = " from " + MindmapRequest.class.getName()
 			+ " mr where mr.globalId > ? and "
 			+ " mr.mindmap.uid = ? and mr.user.uid <> ? and mr.user.mindmapSession.sessionId = ? order by mr.globalId ";
@@ -55,16 +56,16 @@ public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
 			+ " mr where mr.user.userId = ? ";
 
 	public void saveOrUpdate(MindmapRequest mindmapRequest) {
-		this.getHibernateTemplate().saveOrUpdate(mindmapRequest);
+		getSession().saveOrUpdate(mindmapRequest);
 	}
 
 	public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
-		return this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID,
+		return this.doFind(SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID,
 				new Object[] { globalId, mindmapId, userId, sessionId });
 	}
 
 	public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID,
+		List list = this.doFind(SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID,
 				new Object[] { uniqueId, userId, mindmapId, globalId });
 		if (list != null && list.size() > 0)
 			return (MindmapRequest) list.get(list.size() - 1);
@@ -73,22 +74,16 @@ public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
 	}
 
 	public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId) {
-		return getHibernateTemplate().execute(new HibernateCallback<Long>() {
-			@Override
-			public Long doInHibernate(Session session) throws HibernateException {
-				Query q = session.createQuery(SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP);
-				q.setParameter(0, mindmapId);
-				q.setParameter(1, sessionId);
-				q.setMaxResults(1);
-				Object result = q.uniqueResult();
-				return result != null ? ((Number) result).longValue() : null;
-			}
-		});
-		
+		Query q = getSession().createQuery(SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP);
+		q.setParameter(0, mindmapId);
+		q.setParameter(1, sessionId);
+		q.setMaxResults(1);
+		Object result = q.uniqueResult();
+		return result != null ? ((Number) result).longValue() : null;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<MindmapRequest> getRequestsByUserId(Long userId) {
-		return (List<MindmapRequest>) this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_BY_USER_ID, userId);
+		return (List<MindmapRequest>) this.doFind(SQL_QUERY_FIND_REQUESTS_BY_USER_ID, userId);
 	}
 }

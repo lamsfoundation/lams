@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Mindmap objects - Hibernate specific code.
  */
-public class MindmapDAO extends BaseDAO implements IMindmapDAO {
+@Repository
+public class MindmapDAO extends LAMSBaseDAO implements IMindmapDAO {
 
     private static final String FIND_MINDMAP_BY_CONTENTID = "from Mindmap mindmap where mindmap.toolContentId = ?";
     
@@ -41,7 +43,7 @@ public class MindmapDAO extends BaseDAO implements IMindmapDAO {
 	"from Mindmap mindmap where mindmap.uid = ?";
     
     public Mindmap getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(MindmapDAO.FIND_MINDMAP_BY_CONTENTID, toolContentId);
+	List list = doFind(MindmapDAO.FIND_MINDMAP_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Mindmap) list.get(0);
 	} else {
@@ -50,7 +52,7 @@ public class MindmapDAO extends BaseDAO implements IMindmapDAO {
     }
     
     public Mindmap getMindmapByUid(Long Uid) {
-	List list = getHibernateTemplate().find(MindmapDAO.FIND_MINDMAP_BY_UID, Uid);
+	List list = doFind(MindmapDAO.FIND_MINDMAP_BY_UID, Uid);
 	if (list != null && list.size() > 0) {
 	    return (Mindmap) list.get(0);
 	} else {
@@ -59,8 +61,8 @@ public class MindmapDAO extends BaseDAO implements IMindmapDAO {
     }
     
     public void saveOrUpdate(Mindmap mindmap) {
-	this.getHibernateTemplate().saveOrUpdate(mindmap);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(mindmap);
+	getSession().flush();
     }
 
     public void releaseFromCache(Object o) {

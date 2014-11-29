@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapUserDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the MindmapUser objects - Hibernate specific code.
  */
-public class MindmapUserDAO extends BaseDAO implements IMindmapUserDAO {
+@Repository
+public class MindmapUserDAO extends LAMSBaseDAO implements IMindmapUserDAO {
 
     public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + MindmapUser.class.getName() + " as f"
 	    + " where user_id=? and f.mindmapSession.sessionId=?";
@@ -44,7 +46,7 @@ public class MindmapUserDAO extends BaseDAO implements IMindmapUserDAO {
     private static final String SQL_QUERY_FIND_BY_UID = "from " + MindmapUser.class.getName() + " where uid=?";
 
     public MindmapUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
+	List list = doFind(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 		new Object[] { userId, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -55,7 +57,7 @@ public class MindmapUserDAO extends BaseDAO implements IMindmapUserDAO {
 
     public MindmapUser getByLoginNameAndSessionId(String loginName, Long toolSessionId) {
 
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
+	List list = doFind(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 		new Object[] { loginName, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -66,12 +68,12 @@ public class MindmapUserDAO extends BaseDAO implements IMindmapUserDAO {
     }
 
     public void saveOrUpdate(MindmapUser mindmapUser) {
-	this.getHibernateTemplate().saveOrUpdate(mindmapUser);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(mindmapUser);
+	getSession().flush();
     }
 
     public MindmapUser getByUID(Long uid) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
+	List list = doFind(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
 
 	if (list == null || list.isEmpty())
 	    return null;
