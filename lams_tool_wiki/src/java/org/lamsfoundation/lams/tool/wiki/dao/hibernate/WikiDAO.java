@@ -29,22 +29,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiDAO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
-import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Wiki objects - Hibernate specific code.
  */
-public class WikiDAO extends BaseDAO implements IWikiDAO {
+@Repository
+public class WikiDAO extends LAMSBaseDAO implements IWikiDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Wiki wiki where wiki.toolContentId=?";
 
   public Wiki getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFind(FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    Wiki wiki = (Wiki) list.get(0);
 	    removeDuplicatePages(wiki);
@@ -58,7 +58,7 @@ public class WikiDAO extends BaseDAO implements IWikiDAO {
     public void saveOrUpdate(Wiki wiki) {
 	// Removing duplicate pages 
 	removeDuplicatePages(wiki);
-	this.getHibernateTemplate().saveOrUpdate(wiki);
+	getSession().saveOrUpdate(wiki);
 	//this.getHibernateTemplate().flush();
     }
 

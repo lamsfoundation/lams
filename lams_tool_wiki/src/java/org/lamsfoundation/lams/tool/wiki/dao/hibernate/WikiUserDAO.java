@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.wiki.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiUserDAO;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the WikiUser objects - Hibernate specific code.
  */
-public class WikiUserDAO extends BaseDAO implements IWikiUserDAO {
+@Repository
+public class WikiUserDAO extends LAMSBaseDAO implements IWikiUserDAO {
 
     public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + WikiUser.class.getName() + " as f"
 	    + " where user_id=? and f.wikiSession.sessionId=?";
@@ -44,7 +46,7 @@ public class WikiUserDAO extends BaseDAO implements IWikiUserDAO {
     private static final String SQL_QUERY_FIND_BY_UID = "from " + WikiUser.class.getName() + " where uid=?";
 
     public WikiUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
+	List list = this.doFind(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 		new Object[] { userId, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -55,7 +57,7 @@ public class WikiUserDAO extends BaseDAO implements IWikiUserDAO {
 
     public WikiUser getByLoginNameAndSessionId(String loginName, Long toolSessionId) {
 
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
+	List list = this.doFind(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 		new Object[] { loginName, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -66,12 +68,12 @@ public class WikiUserDAO extends BaseDAO implements IWikiUserDAO {
     }
 
     public void saveOrUpdate(WikiUser wikiUser) {
-	this.getHibernateTemplate().saveOrUpdate(wikiUser);
-	this.getHibernateTemplate().flush();
+    	getSession().saveOrUpdate(wikiUser);
+    	getSession().flush();
     }
 
     public WikiUser getByUID(Long uid) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
+	List list = this.doFind(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
 
 	if (list == null || list.isEmpty())
 	    return null;

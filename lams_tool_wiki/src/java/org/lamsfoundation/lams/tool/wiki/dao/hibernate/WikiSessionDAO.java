@@ -26,25 +26,27 @@ package org.lamsfoundation.lams.tool.wiki.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiSessionDAO;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the WikiSession objects - Hibernate specific code.
  */
-public class WikiSessionDAO extends BaseDAO implements IWikiSessionDAO {
+@Repository
+public class WikiSessionDAO extends LAMSBaseDAO implements IWikiSessionDAO {
 
     public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + WikiSession.class.getName()
 	    + " where session_id=?";
 
     public void saveOrUpdate(WikiSession session) {
-	this.getHibernateTemplate().saveOrUpdate(session);
-	this.getHibernateTemplate().flush();
+    	getSession().saveOrUpdate(session);
+    	getSession().flush();
     }
 
     public WikiSession getBySessionId(Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+	List list = this.doFind(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 	if (list == null || list.isEmpty())
 	    return null;
 	return (WikiSession) list.get(0);
@@ -53,8 +55,8 @@ public class WikiSessionDAO extends BaseDAO implements IWikiSessionDAO {
     public void deleteBySessionID(Long toolSessionID) {
 	WikiSession session = getBySessionId(toolSessionID);
 	if (session != null) {
-	    this.getHibernateTemplate().delete(session);
-	    this.getHibernateTemplate().flush();
+		getSession().delete(session);
+		getSession().flush();
 	}
     }
 }
