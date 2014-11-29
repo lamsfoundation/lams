@@ -26,25 +26,27 @@ package org.lamsfoundation.lams.tool.scribe.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeSessionDAO;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the ScribeSession objects - Hibernate specific code.
  */
-public class ScribeSessionDAO extends BaseDAO implements IScribeSessionDAO {
+@Repository
+public class ScribeSessionDAO extends LAMSBaseDAO implements IScribeSessionDAO {
 
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ ScribeSession.class.getName() + " where session_id=?";
 
 	public void saveOrUpdate(ScribeSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(session);
+		getSession().flush();
 	}
 
 	public ScribeSession getBySessionId(Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 		if (list == null || list.isEmpty())
 			return null;
@@ -54,8 +56,8 @@ public class ScribeSessionDAO extends BaseDAO implements IScribeSessionDAO {
 	public void deleteBySessionID(Long toolSessionID) {
 		ScribeSession session = getBySessionId(toolSessionID);
 		if(session != null){
-			this.getHibernateTemplate().delete(session);
-			this.getHibernateTemplate().flush();
+			getSession().delete(session);
+			getSession().flush();
 		}
 	}
 }

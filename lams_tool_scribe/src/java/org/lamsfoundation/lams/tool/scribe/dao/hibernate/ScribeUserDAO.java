@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.scribe.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeUserDAO;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the ScribeUser objects - Hibernate specific code.
  */
-public class ScribeUserDAO extends BaseDAO implements IScribeUserDAO {
+@Repository
+public class ScribeUserDAO extends LAMSBaseDAO implements IScribeUserDAO {
 
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ ScribeUser.class.getName() + " as f"
@@ -47,7 +49,7 @@ public class ScribeUserDAO extends BaseDAO implements IScribeUserDAO {
 			+ ScribeUser.class.getName() + " where uid=?";
 
 	public ScribeUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 				new Object[] { userId, toolSessionId });
 
@@ -60,7 +62,7 @@ public class ScribeUserDAO extends BaseDAO implements IScribeUserDAO {
 	public ScribeUser getByLoginNameAndSessionId(String loginName,
 			Long toolSessionId) {
 
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 				new Object[] { loginName, toolSessionId });
 
@@ -72,12 +74,12 @@ public class ScribeUserDAO extends BaseDAO implements IScribeUserDAO {
 	}
 
 	public void saveOrUpdate(ScribeUser scribeUser) {
-		this.getHibernateTemplate().saveOrUpdate(scribeUser);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(scribeUser);
+		getSession().flush();
 	}
 
 	public ScribeUser getByUID(Long uid) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
+		List list = doFind(SQL_QUERY_FIND_BY_UID,
 				new Object[] { uid });
 
 		if (list == null || list.isEmpty())

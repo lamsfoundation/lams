@@ -26,19 +26,21 @@ package org.lamsfoundation.lams.tool.scribe.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeDAO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Scribe objects - Hibernate specific code.
  */
-public class ScribeDAO extends BaseDAO implements IScribeDAO {
+@Repository
+public class ScribeDAO extends LAMSBaseDAO implements IScribeDAO {
 
 	private static final String FIND_FORUM_BY_CONTENTID = "from Scribe scribe where scribe.toolContentId=?";
 
 	public Scribe getByContentId(Long toolContentId) {
-		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,
+		List list = doFind(FIND_FORUM_BY_CONTENTID,
 				toolContentId);
 		if (list != null && list.size() > 0)
 			return (Scribe) list.get(0);
@@ -47,7 +49,7 @@ public class ScribeDAO extends BaseDAO implements IScribeDAO {
 	}
 
 	public void saveOrUpdate(Scribe scribe) {
-		this.getHibernateTemplate().saveOrUpdate(scribe);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(scribe);
+		getSession().flush();
 	}
 }
