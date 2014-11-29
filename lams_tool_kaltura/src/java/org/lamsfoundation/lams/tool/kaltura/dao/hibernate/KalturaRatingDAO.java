@@ -27,10 +27,11 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaRatingDAO;
 import org.lamsfoundation.lams.tool.kaltura.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaRating;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>IKalturaRatingDAO</code>.
@@ -38,7 +39,8 @@ import org.lamsfoundation.lams.tool.kaltura.model.KalturaRating;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.kaltura.dao.IKalturaRatingDAO
  */
-public class KalturaRatingDAO extends BaseDAO implements IKalturaRatingDAO {
+@Repository
+public class KalturaRatingDAO extends LAMSBaseDAO implements IKalturaRatingDAO {
 
     private static final String FIND_BY_ITEM_AND_USER = "from " + KalturaRating.class.getName()
 	    + " as r where r.createBy.userId = ? and r.kalturaItem.uid=?";
@@ -51,7 +53,7 @@ public class KalturaRatingDAO extends BaseDAO implements IKalturaRatingDAO {
 
     @Override
     public KalturaRating getKalturaRatingByItemAndUser(Long itemUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
+	List list = doFind(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (KalturaRating) list.get(0);
@@ -60,13 +62,13 @@ public class KalturaRatingDAO extends BaseDAO implements IKalturaRatingDAO {
     @SuppressWarnings("unchecked")
     @Override
     public List<KalturaRating> getKalturaRatingsByItemUid(Long itemUid) {
-	return (List<KalturaRating>) getHibernateTemplate().find(FIND_BY_ITEM_UID, itemUid);
+	return (List<KalturaRating>) doFind(FIND_BY_ITEM_UID, itemUid);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public AverageRatingDTO getAverageRatingDtoByItem(Long itemUid, Long sessionId) {
-	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { itemUid, sessionId });
+	List<Object[]> list = (List<Object[]>) doFind(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { itemUid, sessionId });
 	Object[] results = list.get(0);
 
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];

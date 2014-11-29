@@ -26,35 +26,37 @@ package org.lamsfoundation.lams.tool.kaltura.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaSessionDAO;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the KalturaSession objects - Hibernate specific code.
  */
-public class KalturaSessionDAO extends BaseDAO implements IKalturaSessionDAO {
+@Repository
+public class KalturaSessionDAO extends LAMSBaseDAO implements IKalturaSessionDAO {
 
     public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + KalturaSession.class.getName()
 	    + " where session_id=?";
 
-    public void saveOrUpdate(KalturaSession session) {
-	this.getHibernateTemplate().saveOrUpdate(session);
-	this.getHibernateTemplate().flush();
-    }
-
-    public KalturaSession getBySessionId(Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
-	if (list == null || list.isEmpty())
-	    return null;
-	return (KalturaSession) list.get(0);
-    }
-
-    public void deleteBySessionID(Long toolSessionID) {
-	KalturaSession session = getBySessionId(toolSessionID);
-	if (session != null) {
-	    this.getHibernateTemplate().delete(session);
-	    this.getHibernateTemplate().flush();
+	public void saveOrUpdate(KalturaSession session) {
+		getSession().saveOrUpdate(session);
+		getSession().flush();
 	}
-    }
+
+	public KalturaSession getBySessionId(Long toolSessionId) {
+		List list = this.doFind(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+		if (list == null || list.isEmpty())
+			return null;
+		return (KalturaSession) list.get(0);
+	}
+
+	public void deleteBySessionID(Long toolSessionID) {
+		KalturaSession session = getBySessionId(toolSessionID);
+		if (session != null) {
+			getSession().delete(session);
+			getSession().flush();
+		}
+	}
 }

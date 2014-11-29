@@ -25,9 +25,10 @@ package org.lamsfoundation.lams.tool.kaltura.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaCommentDAO;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaComment;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>IKalturaCommentDAO</code>.
@@ -35,12 +36,13 @@ import org.lamsfoundation.lams.tool.kaltura.model.KalturaComment;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.kaltura.dao.IKalturaCommentDAO
  */
-public class KalturaCommentDAO extends BaseDAO implements IKalturaCommentDAO {
+@Repository
+public class KalturaCommentDAO extends LAMSBaseDAO implements IKalturaCommentDAO {
 
     private static final String FIND_BY_UID = "from " + KalturaComment.class.getName() + " as r where r.uid = ?";
 
     public KalturaComment getCommentByUid(Long commentUid) {
-	List list = getHibernateTemplate().find(FIND_BY_UID, commentUid);
+	List list = doFind(FIND_BY_UID, commentUid);
 	if (list == null || list.size() == 0)
 	    return null;
 	return (KalturaComment) list.get(0);

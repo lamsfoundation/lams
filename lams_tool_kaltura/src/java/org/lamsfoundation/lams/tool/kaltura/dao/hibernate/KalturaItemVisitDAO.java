@@ -25,9 +25,10 @@ package org.lamsfoundation.lams.tool.kaltura.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaItemVisitDAO;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItemVisitLog;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>IKalturaItemVisitDAO</code>.
@@ -35,7 +36,8 @@ import org.lamsfoundation.lams.tool.kaltura.model.KalturaItemVisitLog;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.kaltura.dao.IKalturaItemVisitDAO
  */
-public class KalturaItemVisitDAO extends BaseDAO implements IKalturaItemVisitDAO {
+@Repository
+public class KalturaItemVisitDAO extends LAMSBaseDAO implements IKalturaItemVisitDAO {
 
     private static final String FIND_BY_ITEM_AND_USER = "from " + KalturaItemVisitLog.class.getName()
 	    + " as r where r.user.userId = ? and r.kalturaItem.uid=?";
@@ -47,14 +49,14 @@ public class KalturaItemVisitDAO extends BaseDAO implements IKalturaItemVisitDAO
 	    + KalturaItemVisitLog.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
     
     public KalturaItemVisitLog getKalturaItemLog(Long itemUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
+	List list = doFind(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (KalturaItemVisitLog) list.get(0);
     }
 
     public int getUserViewLogCount(Long toolSessionId, Long userId) {
-	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userId });
+	List list = doFind(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userId });
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();
@@ -63,7 +65,7 @@ public class KalturaItemVisitDAO extends BaseDAO implements IKalturaItemVisitDAO
     @SuppressWarnings("unchecked")
     public List<KalturaItemVisitLog> getKalturaItemLogBySession(Long sessionId, Long itemUid) {
 
-	return (List<KalturaItemVisitLog>) getHibernateTemplate().find(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
+	return (List<KalturaItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
 }

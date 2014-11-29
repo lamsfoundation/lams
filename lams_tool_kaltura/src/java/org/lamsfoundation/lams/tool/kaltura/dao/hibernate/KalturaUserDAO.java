@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.kaltura.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaUserDAO;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the KalturaUser objects - Hibernate specific code.
  */
-public class KalturaUserDAO extends BaseDAO implements IKalturaUserDAO {
+@Repository
+public class KalturaUserDAO extends LAMSBaseDAO implements IKalturaUserDAO {
 
     public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + KalturaUser.class.getName() + " as f"
 	    + " where user_id=? and f.session.sessionId=?";
@@ -48,7 +50,7 @@ public class KalturaUserDAO extends BaseDAO implements IKalturaUserDAO {
 
     @Override
     public KalturaUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
+	List list = this.doFind(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 		new Object[] { userId, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -60,7 +62,7 @@ public class KalturaUserDAO extends BaseDAO implements IKalturaUserDAO {
     @Override
     public KalturaUser getByLoginNameAndSessionId(String loginName, Long toolSessionId) {
 
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
+	List list = this.doFind(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 		new Object[] { loginName, toolSessionId });
 
 	if (list == null || list.isEmpty())
@@ -72,21 +74,21 @@ public class KalturaUserDAO extends BaseDAO implements IKalturaUserDAO {
     
     @Override
     public KalturaUser getByUserIdAndContentId(Long userId, Long contentId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (KalturaUser) list.get(0);
     }
 
-    @Override
-    public void saveOrUpdate(KalturaUser kalturaUser) {
-	this.getHibernateTemplate().saveOrUpdate(kalturaUser);
-	this.getHibernateTemplate().flush();
-    }
+	@Override
+	public void saveOrUpdate(KalturaUser kalturaUser) {
+		getSession().saveOrUpdate(kalturaUser);
+		getSession().flush();
+	}
 
     @Override
     public KalturaUser getByUid(Long uid) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
+	List list = this.doFind(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
 
 	if (list == null || list.isEmpty())
 	    return null;

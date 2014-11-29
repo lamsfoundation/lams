@@ -26,19 +26,21 @@ package org.lamsfoundation.lams.tool.kaltura.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaDAO;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Kaltura objects - Hibernate specific code.
  */
-public class KalturaDAO extends BaseDAO implements IKalturaDAO {
+@Repository
+public class KalturaDAO extends LAMSBaseDAO implements IKalturaDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Kaltura kaltura where kaltura.toolContentId=?";
 
     public Kaltura getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(KalturaDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFind(KalturaDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Kaltura) list.get(0);
 	} else {
@@ -46,10 +48,10 @@ public class KalturaDAO extends BaseDAO implements IKalturaDAO {
 	}
     }
 
-    public void saveOrUpdate(Kaltura kaltura) {
-	this.getHibernateTemplate().saveOrUpdate(kaltura);
-	this.getHibernateTemplate().flush();
-    }
+	public void saveOrUpdate(Kaltura kaltura) {
+		getSession().saveOrUpdate(kaltura);
+		getSession().flush();
+	}
 
     public void releaseFromCache(Object o) {
 	getSessionFactory().getCurrentSession().evict(o);
