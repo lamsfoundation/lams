@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieUserDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
+import org.springframework.stereotype.Repository;
 
-public class ScratchieUserDAOHibernate extends BaseDAOHibernate implements ScratchieUserDAO {
+@Repository
+public class ScratchieUserDAOHibernate extends LAMSBaseDAO implements ScratchieUserDAO {
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ScratchieUser.class.getName()
 	    + " as u where u.userId =? and u.scratchie.contentId=?";
@@ -38,14 +41,14 @@ public class ScratchieUserDAOHibernate extends BaseDAOHibernate implements Scrat
 	    + " as u where u.session.sessionId=?";
 
     public ScratchieUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ScratchieUser) list.get(0);
     }
 
     public ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ScratchieUser) list.get(0);
@@ -53,7 +56,7 @@ public class ScratchieUserDAOHibernate extends BaseDAOHibernate implements Scrat
 
     @SuppressWarnings("unchecked")
     public List<ScratchieUser> getBySessionID(Long sessionId) {
-	return (List<ScratchieUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<ScratchieUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
 
 }

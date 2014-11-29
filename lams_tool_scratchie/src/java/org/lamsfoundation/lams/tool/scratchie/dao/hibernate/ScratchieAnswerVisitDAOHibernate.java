@@ -25,15 +25,15 @@ package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implements ScratchieAnswerVisitDAO {
+@Repository
+public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements ScratchieAnswerVisitDAO {
 
 	private static final String FIND_BY_SESSION_AND_ANSWER = "from " + ScratchieAnswerVisitLog.class.getName()
 			+ " as r where r.sessionId = ? and r.scratchieAnswer.uid=?";
@@ -53,7 +53,7 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 
 	@Override
 	public ScratchieAnswerVisitLog getLog(Long answerUid, Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, answerUid });
+		List list = doFind(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, answerUid });
 		if (list == null || list.size() == 0)
 			return null;
 		return (ScratchieAnswerVisitLog) list.get(0);
@@ -61,7 +61,7 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 
 	@Override
 	public int getLogCountTotal(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_SESSION, new Object[] { sessionId });
+		List list = doFind(FIND_VIEW_COUNT_BY_SESSION, new Object[] { sessionId });
 		if (list == null || list.size() == 0)
 			return 0;
 		return ((Number) list.get(0)).intValue();
@@ -70,28 +70,23 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<ScratchieAnswerVisitLog> getLogsBySessionAndItem(Long sessionId, Long itemUid) {
-		return (List<ScratchieAnswerVisitLog>) getHibernateTemplate().find(FIND_BY_SESSION_AND_ITEM,
+		return (List<ScratchieAnswerVisitLog>) doFind(FIND_BY_SESSION_AND_ITEM,
 				new Object[] { sessionId, itemUid });
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<ScratchieAnswerVisitLog> getLogsBySession(Long sessionId) {
-		return (List<ScratchieAnswerVisitLog>) getHibernateTemplate().find(FIND_BY_SESSION, new Object[] { sessionId });
+		return (List<ScratchieAnswerVisitLog>) doFind(FIND_BY_SESSION, new Object[] { sessionId });
 	}
 
 	@Override
 	public ScratchieAnswer getFirstScratchedAnswerBySessionAndItem(Long sessionId, Long itemUid) {
-		return getHibernateTemplate().execute(new HibernateCallback<ScratchieAnswer>() {
-			@Override
-			public ScratchieAnswer doInHibernate(Session session) throws HibernateException {
-				Query q = session.createQuery(FIND_FIRST_SCRATCHED_ANSWER_BY_SESSION_AND_ITEM);
-				q.setParameter(0, sessionId);
-				q.setParameter(1, itemUid);
-				q.setMaxResults(1);
-				return (ScratchieAnswer) q.uniqueResult();
-			}
-		});
+		Query q = getSession().createQuery(FIND_FIRST_SCRATCHED_ANSWER_BY_SESSION_AND_ITEM);
+		q.setParameter(0, sessionId);
+		q.setParameter(1, itemUid);
+		q.setMaxResults(1);
+		return (ScratchieAnswer) q.uniqueResult();
 	}
 
 }

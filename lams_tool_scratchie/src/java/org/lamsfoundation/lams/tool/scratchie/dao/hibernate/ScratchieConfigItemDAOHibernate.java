@@ -23,30 +23,25 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieConfigItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class ScratchieConfigItemDAOHibernate extends BaseDAO implements ScratchieConfigItemDAO {
+@Repository
+public class ScratchieConfigItemDAOHibernate extends LAMSBaseDAO implements ScratchieConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from ScratchieConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
     @Override
     public ScratchieConfigItem getConfigItemByKey(final String configKey) {
-	return (ScratchieConfigItem) getHibernateTemplate().execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
-	    }
-	});
+		return (ScratchieConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
 
     }
 
     @Override
     public void saveOrUpdate(ScratchieConfigItem mdlForumConfigItem) {
-	this.getHibernateTemplate().saveOrUpdate(mdlForumConfigItem);
-	this.getHibernateTemplate().flush();
+    	getSession().saveOrUpdate(mdlForumConfigItem);
+    	getSession().flush();
     }
 }

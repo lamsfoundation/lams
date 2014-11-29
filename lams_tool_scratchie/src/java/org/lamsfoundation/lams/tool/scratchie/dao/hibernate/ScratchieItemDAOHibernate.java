@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
+import org.springframework.stereotype.Repository;
 
-public class ScratchieItemDAOHibernate extends BaseDAOHibernate implements ScratchieItemDAO {
+@Repository
+public class ScratchieItemDAOHibernate extends LAMSBaseDAO implements ScratchieItemDAO {
 
     private static final String FIND_AUTHORING_ITEMS = "from " + ScratchieItem.class.getName()
 	    + " where scratchie_uid = ? order by create_date asc";
@@ -36,7 +39,7 @@ public class ScratchieItemDAOHibernate extends BaseDAOHibernate implements Scrat
     @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieItem> getAuthoringItems(Long scratchieUid) {
-	return (List<ScratchieItem>) this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS, scratchieUid);
+	return (List<ScratchieItem>) doFind(FIND_AUTHORING_ITEMS, scratchieUid);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class ScratchieItemDAOHibernate extends BaseDAOHibernate implements Scrat
 
     @Override
     public void releaseItemFromCache(ScratchieItem item) {
-	getHibernateTemplate().evict(item);
+    	getSession().evict(item);
     }
 
 }

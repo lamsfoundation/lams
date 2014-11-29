@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.springframework.stereotype.Repository;
 
-public class ScratchieSessionDAOHibernate extends BaseDAOHibernate implements ScratchieSessionDAO {
+@Repository
+public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements ScratchieSessionDAO {
 
     private static final String FIND_BY_SESSION_ID = "from " + ScratchieSession.class.getName()
 	    + " as p where p.sessionId=?";
@@ -36,7 +39,7 @@ public class ScratchieSessionDAOHibernate extends BaseDAOHibernate implements Sc
 	    + " as p where p.scratchie.contentId=? order by p.sessionName asc";
 
     public ScratchieSession getSessionBySessionId(Long sessionId) {
-	List list = getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	List list = doFind(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ScratchieSession) list.get(0);
@@ -44,11 +47,11 @@ public class ScratchieSessionDAOHibernate extends BaseDAOHibernate implements Sc
 
     @SuppressWarnings("unchecked")
     public List<ScratchieSession> getByContentId(Long toolContentId) {
-	return (List<ScratchieSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
+	return (List<ScratchieSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     public void delete(ScratchieSession session) {
-	this.getHibernateTemplate().delete(session);
+	getSession().delete(session);
     }
 
     public void deleteBySessionId(Long toolSessionId) {

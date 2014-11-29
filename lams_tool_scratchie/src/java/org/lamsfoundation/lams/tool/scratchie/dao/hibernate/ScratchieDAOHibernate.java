@@ -25,15 +25,18 @@ package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.springframework.stereotype.Repository;
 
-public class ScratchieDAOHibernate extends BaseDAOHibernate implements ScratchieDAO {
+@Repository
+public class ScratchieDAOHibernate extends LAMSBaseDAO implements ScratchieDAO {
     private static final String GET_RESOURCE_BY_CONTENTID = "from " + Scratchie.class.getName()
 	    + " as r where r.contentId=?";
 
     public Scratchie getByContentId(Long contentId) {
-	List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID, contentId);
+	List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0)
 	    return (Scratchie) list.get(0);
 	else
@@ -45,7 +48,7 @@ public class ScratchieDAOHibernate extends BaseDAOHibernate implements Scratchie
     }
 
     public void delete(Scratchie scratchie) {
-	this.getHibernateTemplate().delete(scratchie);
+	getSession().delete(scratchie);
     }
 
 }
