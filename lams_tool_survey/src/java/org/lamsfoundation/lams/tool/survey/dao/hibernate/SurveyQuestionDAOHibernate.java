@@ -22,15 +22,17 @@
  */
 package org.lamsfoundation.lams.tool.survey.dao.hibernate;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyQuestionDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
+import org.springframework.stereotype.Repository;
 
-public class SurveyQuestionDAOHibernate  extends BaseDAOHibernate implements SurveyQuestionDAO {
+@Repository
+public class SurveyQuestionDAOHibernate extends LAMSBaseDAO implements SurveyQuestionDAO {
+
 	public SurveyQuestion getByUid(Long questionUid) {
 		
 		return (SurveyQuestion) this.getObject(SurveyQuestion.class, questionUid);
 	}
-
-
 
 }

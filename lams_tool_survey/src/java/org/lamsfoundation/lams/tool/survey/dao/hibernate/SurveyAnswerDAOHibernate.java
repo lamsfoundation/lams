@@ -24,14 +24,14 @@ package org.lamsfoundation.lams.tool.survey.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyAnswerDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements SurveyAnswerDAO {
+@Repository
+public class SurveyAnswerDAOHibernate extends LAMSBaseDAO implements SurveyAnswerDAO {
     private static final String GET_LEARNER_ANSWER = "FROM " + SurveyAnswer.class.getName()
 	    + " AS a WHERE a.surveyQuestion.uid=? AND a.user.uid=?";
     private static final String GET_SESSION_ANSWER = "FROM " + SurveyAnswer.class.getName() + " AS a "
@@ -50,7 +50,7 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 
     @Override
     public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
-	List list = getHibernateTemplate().find(GET_LEARNER_ANSWER, new Object[] { questionUid, userUid });
+	List list = doFind(GET_LEARNER_ANSWER, new Object[] { questionUid, userUid });
 	if (list.size() > 0)
 	    return (SurveyAnswer) list.get(0);
 	else
@@ -59,46 +59,41 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 
     @SuppressWarnings("unchecked")
     public List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid) {
-	return (List<SurveyAnswer>) getHibernateTemplate().find(GET_SESSION_ANSWER,
+	return (List<SurveyAnswer>) doFind(GET_SESSION_ANSWER,
 		new Object[] { sessionId, questionUid });
     }
 
     @SuppressWarnings("unchecked")
     public List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId) {
-	return (List<SurveyAnswer>) getHibernateTemplate().find(GET_BY_TOOL_CONTENT_ID_AND_USER_ID,
+	return (List<SurveyAnswer>) doFind(GET_BY_TOOL_CONTENT_ID_AND_USER_ID,
 		new Object[] { toolContentId, userId });
     }
 
-    @Override
-    public List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid, final int page,
-	    final int size, final int sorting) {
-	String sortingOrder = "";
-	switch (sorting) {
-	case SurveyConstants.SORT_BY_DEAFAULT:
-	    sortingOrder = "r.updateDate";
-	    break;
-	case SurveyConstants.SORT_BY_ANSWER_ASC:
-	    sortingOrder = "r.answerText ASC";
-	    break;
-	case SurveyConstants.SORT_BY_ANSWER_DESC:
-	    sortingOrder = "r.answerText DESC";
-	    break;
-	}
-	final String sqlQuery = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder;
+	@Override
+	public List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid, final int page,
+			final int size, final int sorting) {
+		String sortingOrder = "";
+		switch (sorting) {
+		case SurveyConstants.SORT_BY_DEAFAULT:
+			sortingOrder = "r.updateDate";
+			break;
+		case SurveyConstants.SORT_BY_ANSWER_ASC:
+			sortingOrder = "r.answerText ASC";
+			break;
+		case SurveyConstants.SORT_BY_ANSWER_DESC:
+			sortingOrder = "r.answerText DESC";
+			break;
+		}
+		final String sqlQuery = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder;
 
-	return (List<String>) getHibernateTemplate().execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(sqlQuery).setLong("sessionId", sessionId.longValue())
-			.setLong("questionUid", questionUid.longValue()).setFirstResult(page * size)
-			.setMaxResults(size).list();
-	    }
-	});
-    }
+		return (List<String>) getSession().createQuery(sqlQuery).setLong("sessionId", sessionId.longValue())
+				.setLong("questionUid", questionUid.longValue()).setFirstResult(page * size).setMaxResults(size).list();
+	}
 
     @Override
     public int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId) {
 
-	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
+	List list = doFind(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
 		new Object[] { sessionId, questionId });
 	if (list == null || list.size() == 0) {
 	    return 0;

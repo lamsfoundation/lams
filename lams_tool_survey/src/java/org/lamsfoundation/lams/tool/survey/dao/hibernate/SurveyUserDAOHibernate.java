@@ -25,10 +25,13 @@ package org.lamsfoundation.lams.tool.survey.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
+import org.springframework.stereotype.Repository;
 
-public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUserDAO {
+@Repository
+public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO {
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "FROM " + SurveyUser.class.getName()
 	    + " AS u WHERE u.userId =? AND u.survey.contentId=?";
@@ -41,14 +44,14 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	    + " AS u WHERE u.session.sessionId=? AND (u.sessionFinished is true OR u.responseFinalized is true)";
 
     public SurveyUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (SurveyUser) list.get(0);
     }
 
     public SurveyUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (SurveyUser) list.get(0);
@@ -56,11 +59,11 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 
     @SuppressWarnings("unchecked")
     public List<SurveyUser> getBySessionID(Long sessionId) {
-	return (List<SurveyUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return (List<SurveyUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
 
     public int getCountFinishedUsers(Long sessionId) {
-	List list = getHibernateTemplate().find(GET_COUNT_FINISHED_USERS_FOR_SESSION, new Object[] { sessionId });
+	List list = doFind(GET_COUNT_FINISHED_USERS_FOR_SESSION, new Object[] { sessionId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
