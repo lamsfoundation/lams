@@ -26,22 +26,22 @@ package org.lamsfoundation.lams.tool.pixlr.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrDAO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
-import org.springframework.orm.hibernate4.HibernateTemplate;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the Pixlr objects - Hibernate specific code.
  */
-public class PixlrDAO extends BaseDAO implements IPixlrDAO {
+@Repository
+public class PixlrDAO extends LAMSBaseDAO implements IPixlrDAO {
 
     private static final String FIND_FORUM_BY_CONTENTID = "from Pixlr pixlr where pixlr.toolContentId=?";
 
     @SuppressWarnings("unchecked")
     public Pixlr getByContentId(Long toolContentId) {
-	List list = getHibernateTemplate().find(PixlrDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	List list = doFind(PixlrDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
 	if (list != null && list.size() > 0) {
 	    return (Pixlr) list.get(0);
 	} else {
@@ -50,8 +50,8 @@ public class PixlrDAO extends BaseDAO implements IPixlrDAO {
     }
 
     public void saveOrUpdate(Pixlr pixlr) {
-	this.getHibernateTemplate().saveOrUpdate(pixlr);
-	this.getHibernateTemplate().flush();
+	getSession().saveOrUpdate(pixlr);
+	getSession().flush();
     }
 
     public void releaseFromCache(Object o) {

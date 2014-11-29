@@ -26,26 +26,28 @@ package org.lamsfoundation.lams.tool.pixlr.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrSessionDAO;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the PixlrSession objects - Hibernate specific code.
  */
-public class PixlrSessionDAO extends BaseDAO implements IPixlrSessionDAO {
+@Repository
+public class PixlrSessionDAO extends LAMSBaseDAO implements IPixlrSessionDAO {
 
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ PixlrSession.class.getName() + " where session_id=?";
 
 	public void saveOrUpdate(PixlrSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(session);
+		getSession().flush();
 	}
 
 	@SuppressWarnings("unchecked")
 	public PixlrSession getBySessionId(Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
 		if (list == null || list.isEmpty())
 			return null;
@@ -55,8 +57,8 @@ public class PixlrSessionDAO extends BaseDAO implements IPixlrSessionDAO {
 	public void deleteBySessionID(Long toolSessionID) {
 		PixlrSession session = getBySessionId(toolSessionID);
 		if(session != null){
-			this.getHibernateTemplate().delete(session);
-			this.getHibernateTemplate().flush();
+			getSession().delete(session);
+			getSession().flush();
 		}
 	}
 }

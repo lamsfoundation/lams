@@ -26,14 +26,16 @@ package org.lamsfoundation.lams.tool.pixlr.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrUserDAO;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO for accessing the PixlrUser objects - Hibernate specific code.
  */
-public class PixlrUserDAO extends BaseDAO implements IPixlrUserDAO {
+@Repository
+public class PixlrUserDAO extends LAMSBaseDAO implements IPixlrUserDAO {
 
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ PixlrUser.class.getName() + " as f"
@@ -48,7 +50,7 @@ public class PixlrUserDAO extends BaseDAO implements IPixlrUserDAO {
 
 	@SuppressWarnings("unchecked")
 	public PixlrUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
 				new Object[] { userId, toolSessionId });
 
@@ -62,7 +64,7 @@ public class PixlrUserDAO extends BaseDAO implements IPixlrUserDAO {
 	public PixlrUser getByLoginNameAndSessionId(String loginName,
 			Long toolSessionId) {
 
-		List list = this.getHibernateTemplate().find(
+		List list = doFind(
 				SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
 				new Object[] { loginName, toolSessionId });
 
@@ -74,13 +76,13 @@ public class PixlrUserDAO extends BaseDAO implements IPixlrUserDAO {
 	}
 
 	public void saveOrUpdate(PixlrUser pixlrUser) {
-		this.getHibernateTemplate().saveOrUpdate(pixlrUser);
-		this.getHibernateTemplate().flush();
+		getSession().saveOrUpdate(pixlrUser);
+		getSession().flush();
 	}
 
 	@SuppressWarnings("unchecked")
 	public PixlrUser getByUID(Long uid) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
+		List list = doFind(SQL_QUERY_FIND_BY_UID,
 				new Object[] { uid });
 
 		if (list == null || list.isEmpty())
