@@ -25,28 +25,30 @@ package org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetSessionDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
+import org.springframework.stereotype.Repository;
 
-
-public class SpreadsheetSessionDAOHibernate extends BaseDAOHibernate implements SpreadsheetSessionDAO{
+@Repository
+public class SpreadsheetSessionDAOHibernate extends LAMSBaseDAO implements SpreadsheetSessionDAO{
 	
 	private static final String FIND_BY_SESSION_ID = "from " + SpreadsheetSession.class.getName() + " as p where p.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + SpreadsheetSession.class.getName() + " as p where p.spreadsheet.contentId=?";
 	
 	public SpreadsheetSession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		List list = doFind(FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.size() == 0)
 			return null;
 		return (SpreadsheetSession) list.get(0);
 	}
 	@SuppressWarnings("unchecked")
 	public List<SpreadsheetSession> getByContentId(Long toolContentId) {
-		return (List<SpreadsheetSession>) getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return (List<SpreadsheetSession>) doFind(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(SpreadsheetSession session) {
-		this.getHibernateTemplate().delete(session);
+		getSession().delete(session);
 	}
 	public void deleteBySessionId(Long toolSessionId) {
 		this.removeObject(SpreadsheetSession.class,toolSessionId);

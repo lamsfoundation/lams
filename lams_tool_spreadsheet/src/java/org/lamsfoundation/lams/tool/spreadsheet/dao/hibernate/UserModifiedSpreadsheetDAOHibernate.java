@@ -23,13 +23,11 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.UserModifiedSpreadsheetDAO;
+import org.springframework.stereotype.Repository;
 		
-public class UserModifiedSpreadsheetDAOHibernate extends BaseDAOHibernate implements UserModifiedSpreadsheetDAO{
+@Repository
+public class UserModifiedSpreadsheetDAOHibernate extends LAMSBaseDAO implements UserModifiedSpreadsheetDAO{
 	
 }

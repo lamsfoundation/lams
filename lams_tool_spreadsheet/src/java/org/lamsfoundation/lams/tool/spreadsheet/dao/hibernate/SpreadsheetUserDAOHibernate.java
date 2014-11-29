@@ -25,25 +25,27 @@ package org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetUserDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
+import org.springframework.stereotype.Repository;
 
-
-public class SpreadsheetUserDAOHibernate extends BaseDAOHibernate implements SpreadsheetUserDAO{
+@Repository
+public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements SpreadsheetUserDAO{
 	
 	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + SpreadsheetUser.class.getName() + " as u where u.userId =? and u.spreadsheet.contentId=?";
 	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + SpreadsheetUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
 	private static final String FIND_BY_SESSION_ID = "from " + SpreadsheetUser.class.getName() + " as u where u.session.sessionId=?";
 
 	public SpreadsheetUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
+		List list = this.doFind(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
 		if(list == null || list.size() == 0)
 			return null;
 		return (SpreadsheetUser) list.get(0);
 	}
 
 	public SpreadsheetUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
+		List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
 		if(list == null || list.size() == 0)
 			return null;
 		return (SpreadsheetUser) list.get(0);
@@ -51,7 +53,7 @@ public class SpreadsheetUserDAOHibernate extends BaseDAOHibernate implements Spr
 
 	@SuppressWarnings("unchecked")
 	public List<SpreadsheetUser> getBySessionID(Long sessionId) {
-		return (List<SpreadsheetUser>) this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		return (List<SpreadsheetUser>) this.doFind(FIND_BY_SESSION_ID,sessionId);
 	}
 
 

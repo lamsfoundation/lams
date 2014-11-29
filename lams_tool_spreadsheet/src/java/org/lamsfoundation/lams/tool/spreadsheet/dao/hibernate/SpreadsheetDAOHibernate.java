@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
@@ -34,11 +36,12 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
  * 
  * @version $Revision$
  */
-public class SpreadsheetDAOHibernate extends BaseDAOHibernate implements SpreadsheetDAO{
+@Repository
+public class SpreadsheetDAOHibernate extends LAMSBaseDAO implements SpreadsheetDAO{
 	private static final String GET_RESOURCE_BY_CONTENTID = "from "+Spreadsheet.class.getName()+" as r where r.contentId=?";
 	
 	public Spreadsheet getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		List list = doFind(GET_RESOURCE_BY_CONTENTID,contentId);
 		if(list.size() > 0)
 			return (Spreadsheet) list.get(0);
 		else
@@ -50,7 +53,7 @@ public class SpreadsheetDAOHibernate extends BaseDAOHibernate implements Spreads
 	}
 
 	public void delete(Spreadsheet spreadsheet) {
-		this.getHibernateTemplate().delete(spreadsheet);
+		getSession().delete(spreadsheet);
 	}
 
 }

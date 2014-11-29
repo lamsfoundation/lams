@@ -23,10 +23,12 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate;  
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetMarkDAO;
-import org.lamsfoundation.lams.tool.spreadsheet.dao.UserModifiedSpreadsheetDAO;
+import org.springframework.stereotype.Repository;
  
-public class SpreadsheetMarkDAOHibernate extends BaseDAOHibernate implements SpreadsheetMarkDAO{
+@Repository
+public class SpreadsheetMarkDAOHibernate extends LAMSBaseDAO implements SpreadsheetMarkDAO{
 	
 }
  
