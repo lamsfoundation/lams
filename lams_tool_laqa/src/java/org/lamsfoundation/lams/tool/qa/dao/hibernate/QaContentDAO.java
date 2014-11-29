@@ -27,23 +27,22 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ozgur Demirtas
  * 
  */
-
-public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
+@Repository
+public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 
     public QaContent getQaByContentId(long qaId) {
 	String query = "from QaContent as qa where qa.qaContentId = ?";
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaId).list();
 
 	if (list != null && list.size() > 0) {
@@ -55,26 +54,26 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 
     public void updateQa(QaContent qa) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().update(qa);
+	getSession().update(qa);
     }
 
     public void saveQa(QaContent qa) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().save(qa);
+	getSession().save(qa);
     }
 
     public void saveOrUpdateQa(QaContent qa) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().saveOrUpdate(qa);
+	getSession().saveOrUpdate(qa);
     }
 
     public void createQa(QaContent qa) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().save(qa);
+	getSession().save(qa);
     }
 
     public void removeAllQaSession(QaContent qaContent) {
-	this.getHibernateTemplate().deleteAll(qaContent.getQaSessions());
+    	deleteAll(qaContent.getQaSessions());
     }
 
     public void removeQa(Long qaContentId) {
@@ -82,13 +81,13 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent" + " where qa.qaContentId = ?";
 	    Object obj = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaContentId.longValue()).uniqueResult();
 	    getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	    getHibernateTemplate().delete(obj);
+	    getSession().delete(obj);
 	}
     }
 
     public void deleteQa(QaContent qaContent) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(qaContent);
+	getSession().delete(qaContent);
     }
 
     public void removeQaById(Long qaId) {
@@ -97,19 +96,19 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
     }
 
     public void flush() {
-	this.getHibernateTemplate().flush();
+    	getSession().flush();
     }
 
     public void deleteCondition(QaCondition condition) {
 	if (condition != null && condition.getConditionId() != null) {
 	    getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	    this.getHibernateTemplate().delete(condition);
+	    getSession().delete(condition);
 	}
     }
     
     public void removeQaContentFromCache(QaContent qaContent) {
 	if (qaContent != null) {
-	    getHibernateTemplate().evict(qaContent);
+		getSession().evict(qaContent);
 	}
 
     }
@@ -118,7 +117,7 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	if (qaContent != null) {
 
 	    for (QaQueContent question : (Set<QaQueContent>) qaContent.getQaQueContents()) {
-		getHibernateTemplate().evict(question);
+	    	getSession().evict(question);
 	    }
 	}
 
@@ -126,6 +125,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 
     @Override
     public void delete(Object object) {
-	getHibernateTemplate().delete(object);
+    	getSession().delete(object);
     }
 }

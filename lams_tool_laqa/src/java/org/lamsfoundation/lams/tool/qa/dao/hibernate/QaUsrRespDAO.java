@@ -25,18 +25,18 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
-import org.apache.poi.ss.formula.functions.Rate;
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ozgur Demirtas
  */
-public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
+@Repository
+public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
     private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.queUsrId=:queUsrId and qaUsrResp.qaQuestion.uid=:questionId";
 
@@ -61,12 +61,12 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    + " as r where r.qaQueUser.qaSession.qaSessionId=? and r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?";
 
     public void createUserResponse(QaUsrResp qaUsrResp) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().save(qaUsrResp);
+    	getSession().setFlushMode(FlushMode.AUTO);
+    	getSession().save(qaUsrResp);
     }
 
     public QaUsrResp getResponseById(Long responseId) {
-	return (QaUsrResp) this.getHibernateTemplate().get(QaUsrResp.class, responseId);
+	return (QaUsrResp) getSession().get(QaUsrResp.class, responseId);
     }
 
     /**
@@ -74,12 +74,12 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
      */
     public void updateUserResponse(QaUsrResp resp) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().update(resp);
+	getSession().update(resp);
     }
 
     public void removeUserResponse(QaUsrResp resp) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(resp);
+	getSession().delete(resp);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 
     public int getCountResponsesByQaContent(final Long qaContentId) {
 
-	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
+	List list = doFind(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -160,7 +160,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 
     public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId) {
 
-	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
+	List list = doFind(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
 		new Object[] { qaSessionId, questionId, excludeUserId });
 	if (list == null || list.size() == 0) {
 	    return 0;

@@ -27,18 +27,20 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill;
 import org.lamsfoundation.lams.tool.qa.QaWizardQuestion;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
  * @author edited by lfoxton
  * 
  */
-public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
+@Repository
+public class QaWizardDAO extends LAMSBaseDAO implements IQaWizardDAO {
 
     private static final String QUERY_FIND_ALL_CATEGORIES = "from " + QaWizardCategory.class.getName();
     private static final String QUERY_GET_CATEGORY = "from " + QaWizardCategory.class.getName() + " c where c.uid=?";
@@ -48,7 +50,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     public void saveOrUpdateCategories(SortedSet<QaWizardCategory> categories) {
 	if (categories != null) {
 	    for (QaWizardCategory category : categories) {
-		getHibernateTemplate().saveOrUpdate(category);
+	    	getSession().saveOrUpdate(category);
 	    }
 	}
     }
@@ -56,7 +58,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     @SuppressWarnings("unchecked")
     public SortedSet<QaWizardCategory> getWizardCategories() {
 	SortedSet<QaWizardCategory> ret = new TreeSet<QaWizardCategory>();
-	List<QaWizardCategory> list = (List<QaWizardCategory>) getHibernateTemplate().find(QUERY_FIND_ALL_CATEGORIES);
+	List<QaWizardCategory> list = (List<QaWizardCategory>) doFind(QUERY_FIND_ALL_CATEGORIES);
 	for (QaWizardCategory category : list) {
 	    ret.add(category);
 	}
@@ -67,7 +69,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
 	QaWizardCategory cat = getWizardCategoryByUID(uid);
 	if (cat != null)
 	{
-	    getHibernateTemplate().delete(cat);
+	    getSession().delete(cat);
 	}
     }
 
@@ -75,7 +77,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
 	QaWizardCognitiveSkill skill = getWizardSkillByUID(uid);
 	if (skill != null)
 	{
-	    getHibernateTemplate().delete(skill);
+		getSession().delete(skill);
 	}
     }
     
@@ -83,13 +85,13 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
 	QaWizardQuestion question = getWizardQuestionByUID(uid);
 	if (question != null)
 	{
-	    getHibernateTemplate().delete(question);
+		getSession().delete(question);
 	}
     }
 
     @SuppressWarnings("unchecked")
     public QaWizardCategory getWizardCategoryByUID(Long uid) {
-	List result = getHibernateTemplate().find(QUERY_GET_CATEGORY, uid);
+	List result = doFind(QUERY_GET_CATEGORY, uid);
 	if (result.size() > 0)
 	{
 	    return (QaWizardCategory)result.get(0);
@@ -102,7 +104,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
 
     @SuppressWarnings("unchecked")
     public QaWizardCognitiveSkill getWizardSkillByUID(Long uid){
-	List result = getHibernateTemplate().find(QUERY_GET_SKILL, uid);
+	List result = doFind(QUERY_GET_SKILL, uid);
 	if (result.size() > 0)
 	{
 	    return (QaWizardCognitiveSkill)result.get(0);
@@ -116,7 +118,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     @SuppressWarnings("unchecked")
     public QaWizardQuestion getWizardQuestionByUID(Long uid){
 	
-	List result = getHibernateTemplate().find(QUERY_GET_QUESTION, uid);
+	List result = doFind(QUERY_GET_QUESTION, uid);
 	if (result.size() > 0)
 	{
 	    return (QaWizardQuestion)result.get(0);
@@ -129,7 +131,7 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     
     public void deleteAllWizardCategories()
     {
-	this.getHibernateTemplate().deleteAll(getWizardCategories());
+    	deleteAll(getWizardCategories());
     }
 
 }

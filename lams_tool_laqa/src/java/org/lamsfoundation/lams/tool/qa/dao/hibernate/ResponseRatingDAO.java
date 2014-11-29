@@ -30,10 +30,11 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>ImageCommentDAO</code>.
@@ -41,7 +42,8 @@ import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO
  */
-public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
+@Repository
+public class ResponseRatingDAO  extends LAMSBaseDAO implements IResponseRatingDAO {
 
     private static final String FIND_BY_RESPONSE_AND_USER = "from " + ResponseRating.class.getName()
 	    + " as r where r.user.queUsrId = ? and r.response.responseId=?";
@@ -62,7 +64,7 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
 	    + " as r where r.user.uid = ?";
 
     public ResponseRating getRatingByResponseAndUser(Long responseId, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_RESPONSE_AND_USER, new Object[] { userId, responseId });
+	List list = doFind(FIND_BY_RESPONSE_AND_USER, new Object[] { userId, responseId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ResponseRating) list.get(0);
@@ -70,12 +72,12 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
 
     @SuppressWarnings("unchecked")
     public List<ResponseRating> getRatingsByResponse(Long responseId) {
-	return (List<ResponseRating>) getHibernateTemplate().find(FIND_BY_RESPONSE_ID, responseId);
+	return (List<ResponseRating>) doFind(FIND_BY_RESPONSE_ID, responseId);
     }
 
     @SuppressWarnings("unchecked")
     public AverageRatingDTO getAverageRatingDTOByResponse(Long responseId) {
-	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_RESPONSE, new Object[] { responseId });
+	List<Object[]> list = (List<Object[]>) doFind(FIND_AVERAGE_RATING_BY_RESPONSE, new Object[] { responseId });
 	Object[] results = list.get(0);
 	
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];
@@ -88,7 +90,7 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
     }
     
     public Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId) {
-	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_QUESTION_AND_SESSION, new Object[] { questionUid, qaSessionId });
+	List<Object[]> list = (List<Object[]>) doFind(FIND_AVERAGE_RATING_BY_QUESTION_AND_SESSION, new Object[] { questionUid, qaSessionId });
 	
 	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = new HashMap<Long, AverageRatingDTO>();
 	for (Object[] results : list) {
@@ -114,7 +116,7 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
     }
     
     public Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId) {
-	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_USER_AND_CONTENT, new Object[] {userUid, contentId});
+	List<Object[]> list = (List<Object[]>) doFind(FIND_AVERAGE_RATING_BY_USER_AND_CONTENT, new Object[] {userUid, contentId});
 	
 	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = new HashMap<Long, AverageRatingDTO>();
 	for (Object[] results : list) {
@@ -143,13 +145,13 @@ public class ResponseRatingDAO  extends BaseDAO implements IResponseRatingDAO {
 	super.insertOrUpdate(o);
     }
     
-    public void removeResponseRating(ResponseRating rating) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(rating);
-    }
+	public void removeResponseRating(ResponseRating rating) {
+		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
+		getSession().delete(rating);
+	}
 
-    @SuppressWarnings("unchecked")
-    public List<ResponseRating> getRatingsByUser(Long userUid) {
-	return (List<ResponseRating>) getHibernateTemplate().find(FIND_BY_USER_UID, userUid);
-    }
+	@SuppressWarnings("unchecked")
+	public List<ResponseRating> getRatingsByUser(Long userUid) {
+		return (List<ResponseRating>) doFind(FIND_BY_USER_UID, userUid);
+	}
 }

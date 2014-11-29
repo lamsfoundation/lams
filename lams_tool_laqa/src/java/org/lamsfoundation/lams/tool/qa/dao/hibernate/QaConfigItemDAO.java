@@ -23,30 +23,25 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.stereotype.Repository;
 
-public class QaConfigItemDAO extends BaseDAO implements IQaConfigItemDAO {
+@Repository
+public class QaConfigItemDAO extends LAMSBaseDAO implements IQaConfigItemDAO {
 
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from QaConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
     public QaConfigItem getConfigItemByKey(final String configKey) {
-	return (QaConfigItem) getHibernateTemplate().execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
-	    }
-	});
+		return (QaConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+				.uniqueResult();
+	}
 
-    }
-
-    public void saveOrUpdate(QaConfigItem qaConfigItem) {
-	this.getHibernateTemplate().saveOrUpdate(qaConfigItem);
-	this.getHibernateTemplate().flush();
-    }
+	public void saveOrUpdate(QaConfigItem qaConfigItem) {
+		getSession().saveOrUpdate(qaConfigItem);
+		getSession().flush();
+	}
 
 }

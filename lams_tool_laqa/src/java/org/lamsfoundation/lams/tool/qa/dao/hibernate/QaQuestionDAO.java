@@ -27,15 +27,17 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ozgur Demirtas
  * 
  */
-public class QaQuestionDAO extends HibernateDaoSupport implements IQaQuestionDAO {
+@Repository
+public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     private static final String LOAD_QUESTION_BY_CONTENT_UID = "from qaQuestion in class QaQueContent where qaQuestion.qaContent.uid=:uid";
     private static final String LOAD_QUESTION_BY_DISPLAY_ORDER = "from qaQuestion in class QaQueContent where qaQuestion.displayOrder=:displayOrder and qaQuestion.qaContent.uid=:uid";
     private static final String LOAD_QUESTION_BY_QUESTION_UID = "from qaQuestion in class QaQueContent where qaQuestion.uid=:uid";
@@ -79,23 +81,23 @@ public class QaQuestionDAO extends HibernateDaoSupport implements IQaQuestionDAO
 
     public void createQueContent(QaQueContent queContent) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().save(queContent);
+	getSession().save(queContent);
     }
 
     public void saveOrUpdateQaQueContent(QaQueContent qaQuestion) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().saveOrUpdate(qaQuestion);
+	getSession().saveOrUpdate(qaQuestion);
     }
 
     public void removeQueContent(long qaQueContentId) {
-	QaQueContent qaQuestion = (QaQueContent) this.getHibernateTemplate().load(QaQueContent.class,
+	QaQueContent qaQuestion = (QaQueContent) getSession().load(QaQueContent.class,
 		new Long(qaQueContentId));
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(qaQuestion);
+	getSession().delete(qaQuestion);
     }
 
     public void removeQaQueContent(QaQueContent qaQuestion) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(qaQuestion);
+	getSession().delete(qaQuestion);
     }
 }
