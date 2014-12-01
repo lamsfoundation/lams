@@ -25,9 +25,10 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ozgur Demirtas
@@ -42,7 +43,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  *         session, but if McQueUser.queUsrId is supplied, then this is just the user, not the session and the session
  *         must also be checked.
  */
-public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
+@Repository
+public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
 	    + " and attempt.mcQueContentId=:mcQueContentId"
@@ -61,12 +63,12 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
     
     @Override
     public McUsrAttempt getUserAttemptByUid(Long uid) {
-	return (McUsrAttempt) this.getHibernateTemplate().get(McUsrAttempt.class, uid);
+	return (McUsrAttempt) this.getSession().get(McUsrAttempt.class, uid);
     }
     
     @Override
     public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
-	this.getHibernateTemplate().saveOrUpdate(mcUsrAttempt);
+	this.getSession().saveOrUpdate(mcUsrAttempt);
     }
 
     @Override
@@ -102,7 +104,7 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
     @Override
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().update(mcUsrAttempt);
+	this.getSession().update(mcUsrAttempt);
     }
 
     @Override
@@ -113,18 +115,18 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 		.setLong("queUsrUid", queUserUid.longValue()).list();
 
 	for (McUsrAttempt userAttempt : userAttempts) {
-	    this.getHibernateTemplate().delete(userAttempt);
+	    this.getSession().delete(userAttempt);
 	}
     }
     
     @Override
     public void removeAttempt(McUsrAttempt userAttempt) {
-	this.getHibernateTemplate().delete(userAttempt);
+	this.getSession().delete(userAttempt);
     }
     
     @Override
     public int getAttemptsCountPerOption(Long optionUid) {
-	List list = getHibernateTemplate().find(FIND_ATTEMPTS_COUNT_BY_OPTION, new Object[] { optionUid });
+	List list = doFind(FIND_ATTEMPTS_COUNT_BY_OPTION, new Object[] { optionUid });
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();

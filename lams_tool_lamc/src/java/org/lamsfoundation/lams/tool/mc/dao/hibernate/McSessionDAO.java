@@ -25,12 +25,10 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author ozgurd
@@ -38,8 +36,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  *         Hibernate implementation for database access to Mc sessions for the mc tool.
  *         </p>
  */
-
-public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
+@Repository
+public class McSessionDAO extends LAMSBaseDAO implements IMcSessionDAO {
 
     private static final String LOAD_MCSESSION_BY_USER = "select ms from McSession ms left join fetch "
 	    + "ms.mcQueUsers user where user.queUsrId=:userId";
@@ -58,26 +56,22 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     }
 
     public void saveMcSession(McSession mcSession) {
-	this.getHibernateTemplate().save(mcSession);
+	this.getSession().save(mcSession);
     }
 
     public void updateMcSession(McSession mcSession) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().update(mcSession);
+	this.getSession().update(mcSession);
     }
 
     public void removeMcSession(McSession mcSession) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(mcSession);
+	this.getSession().delete(mcSession);
     }
 
-    public McSession getMcSessionByUser(final Long userId) {
-	return (McSession) getHibernateTemplate().execute(new HibernateCallback() {
-
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_MCSESSION_BY_USER).setLong("userId", userId.longValue()).uniqueResult();
-	    }
-	});
-    }
+	public McSession getMcSessionByUser(final Long userId) {
+		return (McSession) getSession().createQuery(LOAD_MCSESSION_BY_USER).setLong("userId", userId.longValue())
+				.uniqueResult();
+	}
 
 }

@@ -22,24 +22,23 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation for database access to McOptionsContent for the mc tool.
  * 
  * @author Ozgur Demirtas
  */
-public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptionsContentDAO {
+@Repository
+public class McOptionsContentDAO extends LAMSBaseDAO implements IMcOptionsContentDAO {
     private static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 
     private static final String FIND_OPTIONS_BY_QUESTION_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.displayOrder";
@@ -71,10 +70,10 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
     }
 
     public void updateMcOptionsContent(McOptsContent mcOptsContent) {
-	this.getHibernateTemplate().update(mcOptsContent);
+	this.getSession().update(mcOptsContent);
     }
 
     public void flush() {
-	this.getHibernateTemplate().flush();
+	this.getSession().flush();
     }
 }

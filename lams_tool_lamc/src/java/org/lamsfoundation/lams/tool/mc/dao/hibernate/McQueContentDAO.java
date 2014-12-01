@@ -22,21 +22,21 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation for database access to McQueContent for the mc tool.
  * 
  * @author Ozgur Demirtas
  */
-public class McQueContentDAO extends HibernateDaoSupport implements IMcQueContentDAO {
+@Repository
+public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
 
     private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId order by mcQueContent.displayOrder";
 
@@ -50,7 +50,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 
     @Override
     public McQueContent findMcQuestionContentByUid(Long uid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	if (uid != null) {
 	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_QUESTION_CONTENT_BY_UID).setLong("uid", uid.longValue()).list();
 
@@ -64,7 +63,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 
     @Override
     public List getQuestionsByContentUid(final long contentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("mcContentId", contentUid)
 		.list();
 
@@ -73,7 +71,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 
     @Override
     public List refreshQuestionContent(final Long mcContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSessionFactory().getCurrentSession().createQuery(REFRESH_QUESTION_CONTENT).setLong("mcContentId", mcContentId.longValue())
 		.list();
 
@@ -82,7 +79,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 
     @Override
     public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
 		.setLong("displayOrder", displayOrder.longValue()).setLong("mcContentUid", mcContentUid.longValue())
 		.list();
@@ -96,18 +92,17 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 
     @Override
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) {
-	this.getHibernateTemplate().saveOrUpdate(mcQueContent);
+	this.getSession().saveOrUpdate(mcQueContent);
     }
 
     @Override
     public void updateMcQueContent(McQueContent mcQueContent) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().saveOrUpdate(mcQueContent);
+	this.getSession().saveOrUpdate(mcQueContent);
     }
 
     @Override
     public List getAllQuestionEntriesSorted(final long mcContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSessionFactory().getCurrentSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER)
 		.setLong("mcContentId", mcContentId).list();
 
@@ -118,13 +113,13 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
     public void removeMcQueContent(McQueContent mcQueContent) {
 	if ((mcQueContent != null) && (mcQueContent.getUid() != null)) {
 	    getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	    this.getHibernateTemplate().delete(mcQueContent);
+	    this.getSession().delete(mcQueContent);
 
 	}
     }
     
     @Override
     public void releaseQuestionFromCache(McQueContent question) {
-	getHibernateTemplate().evict(question);
+    	getSession().evict(question);
     }
 }

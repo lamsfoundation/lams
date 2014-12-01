@@ -25,9 +25,10 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ozgur Demirtas
@@ -35,7 +36,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  *         Hibernate implementation for database access to Mc users (learners) for the mc tool.
  *         </p>
  */
-public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
+@Repository
+public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
     private static final String CALC_MARK_STATS_FOR_SESSION = "select max(mu.lastAttemptTotalMark), min(mu.lastAttemptTotalMark), avg(mu.lastAttemptTotalMark)"
 	    + " from McQueUsr mu where mu.mcSessionId = :mcSessionUid";
@@ -43,7 +45,7 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionUid";
 
     public McQueUsr getMcUserByUID(Long uid) {
-	return (McQueUsr) this.getHibernateTemplate().get(McQueUsr.class, uid);
+	return (McQueUsr) this.getSession().get(McQueUsr.class, uid);
     }
 
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
@@ -59,16 +61,16 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     }
 
     public void saveMcUser(McQueUsr mcUser) {
-	this.getHibernateTemplate().save(mcUser);
+	this.getSession().save(mcUser);
     }
 
     public void updateMcUser(McQueUsr mcUser) {
-	this.getHibernateTemplate().update(mcUser);
+	this.getSession().update(mcUser);
     }
 
     public void removeMcUser(McQueUsr mcUser) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(mcUser);
+	this.getSession().delete(mcUser);
     }
 
     /** Get the max, min and average mark (in that order) for a session */
