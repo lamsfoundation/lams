@@ -23,14 +23,18 @@
 
 /* $$Id$$ */
 
-package org.lamsfoundation.lams.tool.forum.persistence;
+package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.IMessageSeqDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
+import org.springframework.stereotype.Repository;
 
-public class MessageSeqDao extends HibernateDaoSupport {
+@Repository
+public class MessageSeqDao extends LAMSBaseDAO implements IMessageSeqDAO {
     private static final String SQL_QUERY_FIND_TOPIC_THREAD = "from " + MessageSeq.class.getName()
 	    + " where root_message_uid = ?";
     private static final String SQL_QUERY_FIND_TOPIC_ID = "from " + MessageSeq.class.getName()
@@ -42,46 +46,63 @@ public class MessageSeqDao extends HibernateDaoSupport {
     private static final String SQL_QUERY_NUM_POSTS_BY_ROOT_MESSAGE_AND_DATE = "SELECT count(*) FROM "
 	    + MessageSeq.class.getName() + " seq WHERE seq.rootMessage.uid = ? AND seq.message.updated > ?";
 
-    public List getTopicThread(Long rootTopicId) {
-	return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPIC_THREAD, rootTopicId);
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageSeqDAO#getTopicThread(java.lang.Long)
+	 */
+    @Override
+	public List getTopicThread(Long rootTopicId) {
+	return doFind(SQL_QUERY_FIND_TOPIC_THREAD, rootTopicId);
     }
 
-    public MessageSeq getByTopicId(Long messageId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPIC_ID, messageId);
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageSeqDAO#getByTopicId(java.lang.Long)
+	 */
+    @Override
+	public MessageSeq getByTopicId(Long messageId) {
+	List list = doFind(SQL_QUERY_FIND_TOPIC_ID, messageId);
 	if (list == null || list.isEmpty())
 	    return null;
 	return (MessageSeq) list.get(0);
     }
 
-    public void save(MessageSeq msgSeq) {
-	this.getHibernateTemplate().save(msgSeq);
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageSeqDAO#save(org.lamsfoundation.lams.tool.forum.persistence.MessageSeq)
+	 */
+    @Override
+	public void save(MessageSeq msgSeq) {
+	getSession().save(msgSeq);
     }
 
-    public void deleteByTopicId(Long topicUid) {
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageSeqDAO#deleteByTopicId(java.lang.Long)
+	 */
+    @Override
+	public void deleteByTopicId(Long topicUid) {
 	MessageSeq seq = getByTopicId(topicUid);
 	if (seq != null)
-	    this.getHibernateTemplate().delete(seq);
+	    getSession().delete(seq);
     }
 
-    public int getNumOfPostsByTopic(Long userID, Long topicID) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_NUM_POSTS_BY_TOPIC, new Object[] { userID, topicID });
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageSeqDAO#getNumOfPostsByTopic(java.lang.Long, java.lang.Long)
+	 */
+    @Override
+	public int getNumOfPostsByTopic(Long userID, Long topicID) {
+	List list = doFind(SQL_QUERY_NUM_POSTS_BY_TOPIC, new Object[] { userID, topicID });
 	if (list != null && list.size() > 0)
 	    return ((Number) list.get(0)).intValue();
 	else
 	    return 0;
     }
 
-    /**
-     * Get number of messages newer than specified date.
-     * 
-     * @param rootMessageId
-     * @param userId
-     * @return
-     */
-    public int getNumOfPostsNewerThan(Long rootMessageId, Date date) {
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageSeqDAO#getNumOfPostsNewerThan(java.lang.Long, java.util.Date)
+	 */
+    @Override
+	public int getNumOfPostsNewerThan(Long rootMessageId, Date date) {
 
 	// user views forum not the first time
-	List messages = this.getHibernateTemplate().find(SQL_QUERY_NUM_POSTS_BY_ROOT_MESSAGE_AND_DATE,
+	List messages = doFind(SQL_QUERY_NUM_POSTS_BY_ROOT_MESSAGE_AND_DATE,
 		new Object[] { rootMessageId, date });
 
 	if (messages != null && messages.size() > 0) {

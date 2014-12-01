@@ -23,13 +23,17 @@
 
 /* $$Id$$ */	
 
-package org.lamsfoundation.lams.tool.forum.persistence;
+package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
+import org.lamsfoundation.lams.tool.forum.persistence.IForumUserDAO;
+import org.springframework.stereotype.Repository;
 
-public class ForumUserDao extends HibernateDaoSupport{
+@Repository
+public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 
 	private static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + ForumUser.class.getName() + " as f" 
 									+ " where user_id=? and f.session.sessionId=?";
@@ -42,15 +46,27 @@ public class ForumUserDao extends HibernateDaoSupport{
 									" where f.session.sessionId=?";
 
 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumUserDAO#getBySessionId(java.lang.Long)
+	 */
+	@Override
 	public List getBySessionId(Long sessionID) {
-		return this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, sessionID);
+		return this.doFind(SQL_QUERY_FIND_BY_SESSION_ID, sessionID);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumUserDAO#save(org.lamsfoundation.lams.tool.forum.persistence.ForumUser)
+	 */
+	@Override
 	public void save(ForumUser forumUser){
-		this.getHibernateTemplate().save(forumUser);
+		this.getSession().save(forumUser);
 	}
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumUserDAO#getByUserIdAndSessionId(java.lang.Long, java.lang.Long)
+	 */
+	@Override
 	public ForumUser getByUserIdAndSessionId(Long userId, Long sessionId) {
-		List list =  this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID
+		List list =  this.doFind(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID
 				, new Object[]{userId,sessionId});
 		
 		if(list == null || list.isEmpty())
@@ -59,21 +75,33 @@ public class ForumUserDao extends HibernateDaoSupport{
 		return (ForumUser) list.get(0);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumUserDAO#getByUserId(java.lang.Long)
+	 */
+	@Override
 	public ForumUser getByUserId(Long userId) {
-		List list =  this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID, userId);
+		List list =  this.doFind(SQL_QUERY_FIND_BY_USER_ID, userId);
 		
 		if(list == null || list.isEmpty())
 			return null;
 		
 		return (ForumUser) list.get(0);
 	}
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumUserDAO#getByUid(java.lang.Long)
+	 */
+	@Override
 	public ForumUser getByUid(Long userUid) {
 		
-		return (ForumUser) this.getHibernateTemplate().get(ForumUser.class,userUid);
+		return (ForumUser) this.getSession().get(ForumUser.class,userUid);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumUserDAO#delete(org.lamsfoundation.lams.tool.forum.persistence.ForumUser)
+	 */
+	@Override
 	public void delete(ForumUser user) {
-		this.getHibernateTemplate().delete(user);
+		this.getSession().delete(user);
 	}
 
 

@@ -21,14 +21,17 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.tool.forum.persistence;
+package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.tool.forum.persistence.IMessageRatingDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageRating;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO interface for <code>MessageRating</code>..
@@ -36,7 +39,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.forum.persistence.MessageRating
  */
-public class MessageRatingDAO  extends HibernateDaoSupport {
+@Repository
+public class MessageRatingDAO  extends LAMSBaseDAO implements IMessageRatingDAO {
 
     private static final String FIND_BY_MESSAGE_AND_USER = "from " + MessageRating.class.getName()
 	    + " as r where r.user.userId = ? and r.message.uid=?";
@@ -50,41 +54,33 @@ public class MessageRatingDAO  extends HibernateDaoSupport {
     private static final String FIND_COUNT_RATING_BY_USER_AND_FORUM = "SELECT COUNT(*) from " + MessageRating.class.getName()
 	    + " as r where r.user.uid = ? and r.message.forum.uid=?"; 
     
-    /**
-     * Return responseRating by the given imageUid and userId.
-     * 
-     * @param messageId
-     * @param userId
-     * @return
-     */
-    public MessageRating getRatingByMessageAndUser(Long messageId, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_MESSAGE_AND_USER, new Object[] { userId, messageId });
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageRatingDAO#getRatingByMessageAndUser(java.lang.Long, java.lang.Long)
+	 */
+    @Override
+	public MessageRating getRatingByMessageAndUser(Long messageId, Long userId) {
+	List list = doFind(FIND_BY_MESSAGE_AND_USER, new Object[] { userId, messageId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (MessageRating) list.get(0);
     }
 
-    /**
-     * Return list of responseRating by the the given imageUid.
-     * 
-     * @param messageId
-     * @param userId
-     * @return
-     */
-    @SuppressWarnings("unchecked")
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageRatingDAO#getRatingsByMessage(java.lang.Long)
+	 */
+    @Override
+	@SuppressWarnings("unchecked")
     public List<MessageRating> getRatingsByMessage(Long messageId) {
-	return (List<MessageRating>) getHibernateTemplate().find(FIND_BY_MESSAGE_ID, messageId);
+	return (List<MessageRating>) doFind(FIND_BY_MESSAGE_ID, messageId);
     }
 
-    /**
-     * Returns rating statistics by particular message
-     * 
-     * @param messageId
-     * @return
-     */
-    @SuppressWarnings("unchecked")
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageRatingDAO#getAverageRatingDTOByMessage(java.lang.Long)
+	 */
+    @Override
+	@SuppressWarnings("unchecked")
     public AverageRatingDTO getAverageRatingDTOByMessage(Long messageId) {
-	List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { messageId });
+	List<Object[]> list = (List<Object[]>) doFind(FIND_AVERAGE_RATING_BY_MESSAGE, new Object[] { messageId });
 	Object[] results = list.get(0);
 	
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];
@@ -96,15 +92,12 @@ public class MessageRatingDAO  extends HibernateDaoSupport {
 	return new AverageRatingDTO(averageRating, numberOfVotes);
     }
     
-    /**
-     * Return total number of posts done by current user in this forum activity
-     * 
-     * @param userUid
-     * @param forumUid
-     * @return
-     */
-    public int getNumOfRatingsByUserAndForum(Long userUid, Long forumUid) {
-	List list = this.getHibernateTemplate().find(FIND_COUNT_RATING_BY_USER_AND_FORUM,
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageRatingDAO#getNumOfRatingsByUserAndForum(java.lang.Long, java.lang.Long)
+	 */
+    @Override
+	public int getNumOfRatingsByUserAndForum(Long userUid, Long forumUid) {
+	List list = this.doFind(FIND_COUNT_RATING_BY_USER_AND_FORUM,
 		new Object[] { userUid, forumUid });
 	if (list != null && list.size() > 0)
 	    return ((Number) list.get(0)).intValue();
@@ -112,14 +105,12 @@ public class MessageRatingDAO  extends HibernateDaoSupport {
 	    return 0;
     }
 
-    /**
-     * Generic method to save an object - handles both update and insert.
-     * 
-     * @param o
-     *            the object to save
-     */
-    public void saveObject(Object o) {
-	super.getHibernateTemplate().saveOrUpdate(o);
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageRatingDAO#saveObject(java.lang.Object)
+	 */
+    @Override
+	public void saveObject(Object o) {
+	super.getSession().saveOrUpdate(o);
     }
 
 }

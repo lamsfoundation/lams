@@ -80,25 +80,25 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
-import org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao;
+import org.lamsfoundation.lams.tool.forum.persistence.IAttachmentDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.IForumDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.IForumToolSessionDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.IForumUserDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.IMessageDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.IMessageRatingDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.IMessageSeqDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.ITimestampDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageRating;
-import org.lamsfoundation.lams.tool.forum.persistence.MessageRatingDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
-import org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
-import org.lamsfoundation.lams.tool.forum.persistence.TimestampDao;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
@@ -124,21 +124,21 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private static final Logger log = Logger.getLogger(ForumService.class);
 
     // DAO variables
-    private ForumDao forumDao;
+    private IForumDAO forumDao;
 
-    private AttachmentDao attachmentDao;
+    private IAttachmentDAO attachmentDao;
 
-    private MessageDao messageDao;
+    private IMessageDAO messageDao;
 
-    private TimestampDao timestampDao;
+    private ITimestampDAO timestampDao;
 
-    private MessageSeqDao messageSeqDao;
+    private IMessageSeqDAO messageSeqDao;
     
-    private MessageRatingDAO messageRatingDao;
+    private IMessageRatingDAO messageRatingDao;
 
-    private ForumUserDao forumUserDao;
+    private IForumUserDAO forumUserDao;
 
-    private ForumToolSessionDao forumToolSessionDao;
+    private IForumToolSessionDAO forumToolSessionDao;
 
     // system level handler and service
     private ILamsToolService toolService;
@@ -1268,67 +1268,67 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.toolService = toolService;
     }
 
-    public AttachmentDao getAttachmentDao() {
+    public IAttachmentDAO getAttachmentDao() {
 	return attachmentDao;
     }
 
-    public void setAttachmentDao(AttachmentDao attachmentDao) {
+    public void setAttachmentDao(IAttachmentDAO attachmentDao) {
 	this.attachmentDao = attachmentDao;
     }
 
-    public ForumDao getForumDao() {
+    public IForumDAO getForumDao() {
 	return forumDao;
     }
 
-    public void setForumDao(ForumDao forumDao) {
+    public void setForumDao(IForumDAO forumDao) {
 	this.forumDao = forumDao;
     }
 
-    public TimestampDao getTimestampDao() {
+    public ITimestampDAO getTimestampDao() {
 	return timestampDao;
     }
 
-    public void setTimestampDao(TimestampDao timestampDao) {
+    public void setTimestampDao(ITimestampDAO timestampDao) {
 	this.timestampDao = timestampDao;
     }
 
-    public MessageDao getMessageDao() {
+    public IMessageDAO getMessageDao() {
 	return messageDao;
     }
 
-    public void setMessageDao(MessageDao messageDao) {
+    public void setMessageDao(IMessageDAO messageDao) {
 	this.messageDao = messageDao;
     }
 
-    public MessageSeqDao getMessageSeqDao() {
+    public IMessageSeqDAO getMessageSeqDao() {
 	return messageSeqDao;
     }
 
-    public void setMessageSeqDao(MessageSeqDao messageSeqDao) {
+    public void setMessageSeqDao(IMessageSeqDAO messageSeqDao) {
 	this.messageSeqDao = messageSeqDao;
     }
     
-    public MessageRatingDAO getMessageRatingDao() {
+    public IMessageRatingDAO getMessageRatingDao() {
 	return messageRatingDao;
     }
 
-    public void setMessageRatingDao(MessageRatingDAO messageRatingDao) {
+    public void setMessageRatingDao(IMessageRatingDAO messageRatingDao) {
 	this.messageRatingDao = messageRatingDao;
     }
 
-    public ForumToolSessionDao getForumToolSessionDao() {
+    public IForumToolSessionDAO getForumToolSessionDao() {
 	return forumToolSessionDao;
     }
 
-    public void setForumToolSessionDao(ForumToolSessionDao forumToolSessionDao) {
+    public void setForumToolSessionDao(IForumToolSessionDAO forumToolSessionDao) {
 	this.forumToolSessionDao = forumToolSessionDao;
     }
 
-    public ForumUserDao getForumUserDao() {
+    public IForumUserDAO getForumUserDao() {
 	return forumUserDao;
     }
 
-    public void setForumUserDao(ForumUserDao forumUserDao) {
+    public void setForumUserDao(IForumUserDAO forumUserDao) {
 	this.forumUserDao = forumUserDao;
     }
 

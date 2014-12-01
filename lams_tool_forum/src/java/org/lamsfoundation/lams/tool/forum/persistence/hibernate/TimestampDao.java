@@ -22,45 +22,47 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.forum.persistence;
+package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
-import java.util.Date;
 import java.util.List;
 
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.ITimestampDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
+import org.springframework.stereotype.Repository;
 
 /**
  * TimestampDao
  * @author ruslan
  */
-public class TimestampDao extends HibernateDaoSupport {
+@Repository
+public class TimestampDao extends LAMSBaseDAO implements ITimestampDAO {
     
     private static final String GET_TIMESTAMP_BY_MESSAGE_AND_USER = " FROM " + Timestamp.class.getName()
 	    + " ts WHERE ts.message.uid = ? AND ts.forumUser.uid = ? ";
     
-    public void delete(Timestamp timestamp) {
-	this.getHibernateTemplate().delete(timestamp);
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.ITimestampDAO#delete(org.lamsfoundation.lams.tool.forum.persistence.Timestamp)
+	 */
+    @Override
+	public void delete(Timestamp timestamp) {
+	this.getSession().delete(timestamp);
     }
     
-    /**
-     * Save timestamp.
-     * 
-     * @param timestamp
-     * @return 
-     */
-    public void saveOrUpdate(Timestamp timestamp) {
-	this.getHibernateTemplate().saveOrUpdate(timestamp);
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.ITimestampDAO#saveOrUpdate(org.lamsfoundation.lams.tool.forum.persistence.Timestamp)
+	 */
+    @Override
+	public void saveOrUpdate(Timestamp timestamp) {
+	this.getSession().saveOrUpdate(timestamp);
     }
     
-    /**
-     * Get timestamp.
-     * 
-     * @param messageId
-     * @param forumUserId
-     * @return 
-     */
-    public Timestamp getTimestamp(Long messageId, Long forumUserId) {
-	List timestampList = this.getHibernateTemplate().find(GET_TIMESTAMP_BY_MESSAGE_AND_USER, new Object[]{messageId, forumUserId});
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.ITimestampDAO#getTimestamp(java.lang.Long, java.lang.Long)
+	 */
+    @Override
+	public Timestamp getTimestamp(Long messageId, Long forumUserId) {
+	List timestampList = this.doFind(GET_TIMESTAMP_BY_MESSAGE_AND_USER, new Object[]{messageId, forumUserId});
 	if (timestampList != null && timestampList.size() > 0)
 	    return (Timestamp) (timestampList.get(0));
 	else

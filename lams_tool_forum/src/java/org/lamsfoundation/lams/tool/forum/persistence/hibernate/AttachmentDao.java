@@ -22,34 +22,43 @@
  */
 
 /* $$Id$$ */	
-package org.lamsfoundation.lams.tool.forum.persistence;
+package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
+import org.lamsfoundation.lams.tool.forum.persistence.IAttachmentDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * User: conradb
  * Date: 7/06/2005
  * Time: 12:23:49
  */
-public class AttachmentDao extends HibernateDaoSupport {
+@Repository
+public class AttachmentDao extends LAMSBaseDAO implements IAttachmentDAO {
 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IAttachmentDAO#saveOrUpdate(org.lamsfoundation.lams.tool.forum.persistence.Attachment)
+	 */
+	@Override
 	public void saveOrUpdate(Attachment attachment) {
-		this.getHibernateTemplate().saveOrUpdate(attachment);
+		this.getSession().saveOrUpdate(attachment);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IAttachmentDAO#delete(org.lamsfoundation.lams.tool.forum.persistence.Attachment)
+	 */
+	@Override
 	public void delete(Attachment attachment) {
-		this.getHibernateTemplate().delete(attachment);
+		this.getSession().delete(attachment);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IAttachmentDAO#getById(java.lang.Long)
+	 */
+	@Override
 	public Attachment getById(final Long attachmentId) {
-		Attachment entity = (Attachment) this.getHibernateTemplate().execute(new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException {
-                return session.get(Attachment.class,attachmentId);
-            }
-        });
+		Attachment entity = (Attachment) getSession().get(Attachment.class,attachmentId);
         return entity;
 	}
 }
