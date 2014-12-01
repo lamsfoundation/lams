@@ -29,17 +29,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation for database access to VoteUsrAttemptDAO for the voting tool.
  * 
  * @author Ozgur Demirtas repaired by lfoxton
  */
-public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAttemptDAO {
+@Repository
+public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO {
 
     private static final String LOAD_ATTEMPT_FOR_USER = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId";
 
@@ -81,7 +82,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public void saveVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
-	this.getHibernateTemplate().save(voteUsrAttempt);
+	this.getSession().save(voteUsrAttempt);
     }
 
     @Override
@@ -137,7 +138,6 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     @Override
     public void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid) {
 	String strGetUser = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue())
 		.setLong("sessionUid", sessionUid).list();
 
@@ -146,8 +146,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    while (listIterator.hasNext()) {
 		VoteUsrAttempt attempt = listIterator.next();
 		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-		templ.delete(attempt);
-		templ.flush();
+		getSession().delete(attempt);
+		getSession().flush();
 	    }
 	}
     }
@@ -268,12 +268,12 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     @Override
     public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().update(voteUsrAttempt);
+	this.getSession().update(voteUsrAttempt);
     }
 
     @Override
     public void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(voteUsrAttempt);
+	this.getSession().delete(voteUsrAttempt);
     }
 }

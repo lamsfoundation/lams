@@ -25,15 +25,12 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author ozgurd
@@ -41,8 +38,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  *         Hibernate implementation for database access to Vote sessions for the voting tool.
  *         </p>
  */
-
-public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionDAO {
+@Repository
+public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     private static final String FIND_VOTE_SESSION_CONTENT = "from " + VoteSession.class.getName()
 	    + " as votes where vote_session_id=?";
@@ -55,7 +52,7 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     private static final String COUNT_SESSION_COMPLETE = "from voteSession in class VoteSession where voteSession.sessionStatus='COMPLETE'";
 
     public VoteSession getVoteSessionByUID(Long sessionUid) {
-	return (VoteSession) this.getHibernateTemplate().get(VoteSession.class, sessionUid);
+	return (VoteSession) this.getSession().get(VoteSession.class, sessionUid);
     }
 
     public VoteSession getSessionBySessionId(Long voteSessionId) {
@@ -80,22 +77,21 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     }
 
     public void saveVoteSession(VoteSession voteSession) {
-	this.getHibernateTemplate().save(voteSession);
+	this.getSession().save(voteSession);
     }
 
     public void updateVoteSession(VoteSession voteSession) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().update(voteSession);
+	this.getSession().update(voteSession);
     }
 
     public void removeVoteSessionByUID(Long uid) {
-	VoteSession votes = (VoteSession) getHibernateTemplate().get(VoteSession.class, uid);
-	this.getHibernateTemplate().delete(votes);
+	VoteSession votes = (VoteSession) getSession().get(VoteSession.class, uid);
+	this.getSession().delete(votes);
     }
 
     public void removeVoteSessionById(Long voteSessionId) {
 
-	HibernateTemplate templ = this.getHibernateTemplate();
 	if (voteSessionId != null) {
 	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_VOTE_SESSION_CONTENT).setLong(0, voteSessionId.longValue())
 		    .list();
@@ -103,8 +99,8 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 	    if (list != null && list.size() > 0) {
 		VoteSession vote = (VoteSession) list.get(0);
 		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-		templ.delete(vote);
-		templ.flush();
+		getSession().delete(vote);
+		getSession().flush();
 	    }
 	}
 
@@ -112,34 +108,29 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 
     public void removeVoteSession(VoteSession voteSession) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(voteSession);
+	this.getSession().delete(voteSession);
     }
 
-    public VoteSession getVoteSessionByUser(final Long userId) {
-	return (VoteSession) getHibernateTemplate().execute(new HibernateCallback() {
-
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_VOTESESSION_BY_USER).setLong("userId", userId.longValue())
-			.uniqueResult();
-	    }
-	});
-    }
+	public VoteSession getVoteSessionByUser(final Long userId) {
+		return (VoteSession) getSession().createQuery(LOAD_VOTESESSION_BY_USER).setLong("userId", userId.longValue())
+				.uniqueResult();
+	}
 
     public void removeVoteUsers(VoteSession voteSession) {
-	this.getHibernateTemplate().deleteAll(voteSession.getVoteQueUsers());
+    	deleteAll(voteSession.getVoteQueUsers());
     }
 
     public void addVoteUsers(Long voteSessionId, VoteQueUsr user) {
 	VoteSession session = getSessionBySessionId(voteSessionId);
 	user.setVoteSession(session);
 	session.getVoteQueUsers().add(user);
-	this.getHibernateTemplate().saveOrUpdate(user);
-	this.getHibernateTemplate().saveOrUpdate(session);
+	this.getSession().saveOrUpdate(user);
+	this.getSession().saveOrUpdate(session);
 
     }
 
     @SuppressWarnings("unchecked")
     public List<Long> getSessionsFromContent(VoteContent voteContent) {
-	return (List<Long>) (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT, "voteContent", voteContent));
+	return (List<Long>) (doFindByNamedParam(GET_SESSIONS_FROM_CONTENT, new String[]{"voteContent"}, new Object[]{voteContent}));
     }
 }

@@ -26,11 +26,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -39,7 +39,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
+@Repository
+public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 
     private static final String LOAD_USER_FOR_SESSION = "from voteQueUsr in class VoteQueUsr where  voteQueUsr.voteSessionId= :voteSessionId";
 
@@ -99,11 +100,11 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
     }
 
     public void saveVoteUser(VoteQueUsr voteUser) {
-	this.getHibernateTemplate().save(voteUser);
+	this.getSession().save(voteUser);
     }
 
     public void updateVoteUser(VoteQueUsr voteUser) {
-	this.getHibernateTemplate().update(voteUser);
+	this.getSession().update(voteUser);
     }
 
     public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) {
@@ -114,12 +115,12 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 
     public void removeVoteUser(VoteQueUsr voteUser) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(voteUser);
+	this.getSession().delete(voteUser);
     }
 
     public int getTotalNumberOfUsers() {
 	String query = "from obj in class VoteQueUsr";
-	return this.getHibernateTemplate().find(query).size();
+	return this.doFind(query).size();
     }
 
 }

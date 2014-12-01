@@ -24,9 +24,10 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation for database access to VoteQueContent for the vote
@@ -34,7 +35,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueContentDAO {
+@Repository
+public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO {
 
     private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
 
@@ -46,7 +48,7 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 
     @Override
     public VoteQueContent getQuestionByUid(Long uid) {
-	return (VoteQueContent) this.getHibernateTemplate().get(VoteQueContent.class, uid);
+	return (VoteQueContent) this.getSession().get(VoteQueContent.class, uid);
     }
     
     @Override
@@ -84,12 +86,12 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 
     @Override
     public void saveOrUpdateQuestion(VoteQueContent voteQueContent) {
-	this.getHibernateTemplate().saveOrUpdate(voteQueContent);
+	this.getSession().saveOrUpdate(voteQueContent);
     }
 
     @Override
     public void removeQuestion(VoteQueContent voteQueContent) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(voteQueContent);
+	this.getSession().delete(voteQueContent);
     }
 }
