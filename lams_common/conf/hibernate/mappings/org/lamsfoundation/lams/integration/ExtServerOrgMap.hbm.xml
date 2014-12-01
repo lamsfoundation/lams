@@ -126,6 +126,16 @@
             not-null="true"
         />
         
+        <property
+            name="timeToLiveLoginRequestEnabled"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="time_to_live_login_request_enabled"
+            length="1"
+            not-null="true"            
+        />
+        
 		<property
             name="timeToLiveLoginRequest"
             type="int"
