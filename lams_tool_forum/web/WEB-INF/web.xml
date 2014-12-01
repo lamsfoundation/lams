@@ -56,16 +56,6 @@
 			<param-value>UTF-8</param-value>
 		</init-param>
 	</filter>
-	<filter>
-		<filter-name>AccessPermissionFilter</filter-name>
-		<filter-class>
-			org.lamsfoundation.lams.web.filter.AccessPermissionFilter
-		</filter-class>
-		<init-param>
-			<param-name>toolSignature</param-name>
-			<param-value>lafrum11</param-value>
-		</init-param>
-	</filter>
 
 	<filter-mapping>
 		<filter-name>UrlRewriteFilter</filter-name>
@@ -84,10 +74,6 @@
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>AccessPermissionFilter</filter-name>
-		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
 
 	<listener>
