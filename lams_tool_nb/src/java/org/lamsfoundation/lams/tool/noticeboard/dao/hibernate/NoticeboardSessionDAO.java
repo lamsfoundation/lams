@@ -27,14 +27,11 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author mtruong
@@ -42,8 +39,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  *         Hibernate implementation for database access to Noticeboard sessions for the noticeboard tool.
  *         </p>
  */
-
-public class NoticeboardSessionDAO extends HibernateDaoSupport implements INoticeboardSessionDAO {
+@Repository
+public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSessionDAO {
 	
     private static final String FIND_NB_SESSION = "from " + NoticeboardSession.class.getName()
 	    + " as nb where nb.nbSessionId=?";
@@ -56,7 +53,7 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
     @Override
     public NoticeboardSession findNbSessionById(Long nbSessionId) {
 	    String query = "from NoticeboardSession nbS where nbS.nbSessionId=?";
-	List<NoticeboardSession> session = (List<NoticeboardSession>) getHibernateTemplate().find(query, nbSessionId);
+	List<NoticeboardSession> session = (List<NoticeboardSession>) doFind(query, nbSessionId);
 		
 	if ((session != null) && (session.size() == 0)) {
 			return null;
@@ -68,14 +65,14 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#saveNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
     @Override
     public void saveNbSession(NoticeboardSession nbSession) {
-    	this.getHibernateTemplate().save(nbSession);
+    	this.getSession().save(nbSession);
     }
     
 	
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#updateNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
     @Override
     public void updateNbSession(NoticeboardSession nbSession) {
-    	this.getHibernateTemplate().update(nbSession);
+    	this.getSession().update(nbSession);
     }
 
  
@@ -84,7 +81,6 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
     @Override
     public void removeNbSession(Long nbSessionId) {
        
-    	HibernateTemplate templ = this.getHibernateTemplate();
 		if ( nbSessionId != null) {
 			//String query = "from org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent as nb where nb.nbContentId=?";
 			List<NoticeboardSession> list = getSessionFactory().getCurrentSession().createQuery(FIND_NB_SESSION)
@@ -94,8 +90,8 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
 	    if ((list != null) && (list.size() > 0)) {
 				NoticeboardSession nb = (NoticeboardSession) list.get(0);
 				getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(nb);
-				templ.flush();
+				getSession().delete(nb);
+				getSession().flush();
 			}
 		}
       
@@ -105,28 +101,21 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
     @Override
     public void removeNbSession(NoticeboardSession nbSession) {
     	removeNbSession(nbSession.getNbSessionId());
-        //this.getHibernateTemplate().delete(nbSession);
     }
 
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#getNbSessionByUser(java.lang.Long) */
     @Override
-    public NoticeboardSession getNbSessionByUser(final Long userId) {
-	return (NoticeboardSession) getHibernateTemplate().execute(new HibernateCallback() {
-
-	    @Override
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(NoticeboardSessionDAO.LOAD_NBSESSION_BY_USER)
-			.setLong("userId", userId.longValue()).uniqueResult();
-                    }
-                });
+	public NoticeboardSession getNbSessionByUser(final Long userId) {
+		return (NoticeboardSession) getSession().createQuery(NoticeboardSessionDAO.LOAD_NBSESSION_BY_USER)
+				.setLong("userId", userId.longValue()).uniqueResult();
 	}
 	
 	 
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbUsers(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
     @Override
     public void removeNbUsers(NoticeboardSession nbSession) {
-    	this.getHibernateTemplate().deleteAll(nbSession.getNbUsers());
+    	deleteAll(nbSession.getNbUsers());
     }
 	
     /**
@@ -138,7 +127,7 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
 	    NoticeboardSession session = findNbSessionById(nbSessionId);
 	    user.setNbSession(session);
 	    session.getNbUsers().add(user);
-	    this.getHibernateTemplate().saveOrUpdate(user);
-	    this.getHibernateTemplate().merge(session);	    
+	    this.getSession().saveOrUpdate(user);
+	    this.getSession().merge(session);	    
 	}
 }

@@ -27,18 +27,18 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
-import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author mtruong
  * <p>Hibernate implementation for database access to Noticeboard users (learners) for the noticeboard tool.</p>
  */
-public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticeboardUserDAO {
+@Repository
+public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserDAO {
     
 	private static final String FIND_NB_USER = "from " + NoticeboardUser.class.getName() + " as nb where nb.userId=?";
 	
@@ -54,7 +54,7 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
 	    Object[] values = new Object[2];
 	    values[0] = userId;
 	    values[1] = sessionId;
-	    List users = getHibernateTemplate().find(query,values);
+	    List users = doFind(query,values);
 		if(users!=null && users.size() == 0)
 		{			
 			return null;
@@ -85,13 +85,13 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
 	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#saveNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
 	public void saveNbUser(NoticeboardUser nbUser)
     {
-    	this.getHibernateTemplate().save(nbUser);
+    	this.getSession().save(nbUser);
     }
 	
 	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#updateNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
     public void updateNbUser(NoticeboardUser nbUser)
     {
-    	this.getHibernateTemplate().update(nbUser);
+    	this.getSession().update(nbUser);
     }
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(java.lang.Long) */
@@ -106,8 +106,8 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
 			if(list != null && list.size() > 0){
 				NoticeboardUser nb = (NoticeboardUser) list.get(0);
 				getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-				this.getHibernateTemplate().delete(nb);
-				this.getHibernateTemplate().flush();
+				this.getSession().delete(nb);
+				this.getSession().flush();
 			}
 		}
       
@@ -116,20 +116,19 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
     public void removeNbUser(NoticeboardUser nbUser)
     {
-       // this.getHibernateTemplate().delete(nbUser);
     	removeNbUser(nbUser.getUserId());
     }
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNumberOfUsers((org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
     public int getNumberOfUsers(NoticeboardSession nbSession)
     {
-        return (getHibernateTemplate().findByNamedParam(COUNT_USERS_IN_SESSION,
-	            "nbSession",
-				nbSession)).size();
+        return (doFindByNamedParam(COUNT_USERS_IN_SESSION,
+        		new String[] {"nbSession"},
+        		new Object[] {nbSession})).size();
     }
     
     public List getNbUsersBySession(Long sessionId) {
     	String query = "from NoticeboardUser user where user.nbSession.nbSessionId=?";
-	    return getHibernateTemplate().find(query,sessionId);
+	    return doFind(query,sessionId);
     }
 }
