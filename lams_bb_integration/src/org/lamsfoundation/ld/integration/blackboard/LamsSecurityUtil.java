@@ -61,24 +61,6 @@ import blackboard.portal.servlet.PortalUtil;
 public class LamsSecurityUtil {
 
     private static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
-    
-    /**
-     * How often it should refresh LAMS server time. Measured in hours.
-     */
-    private static long INTERVAL;
-    
-    static {
-	//set default value
-	INTERVAL = 24;
-	
-	Properties props = new Properties();
-	try {
-	    props.load(LamsSecurityUtil.class.getResourceAsStream("/main.properties"));
-	    INTERVAL = Long.parseLong(props.getProperty("lams.server.time.refresh.interval"));
-	} catch (IOException e) {
-	    logger.error("Error loading propertis from main.properties file due to " + e.getMessage());
-	}
-    }
 
     /**
      * Generates login requests to LAMS for author, monitor and learner
@@ -398,7 +380,8 @@ public class LamsSecurityUtil {
 	long lastUpdateTime = (lastUpdateTimeStr == null) ? -1 : Long.parseLong(lastUpdateTimeStr);
 	long lamsServerTime;
 
-	if ((lamsServerTimeDeltaStr == null) || (lastUpdateTime + INTERVAL * 60 * 60 * 1000 < now)) {
+	long lamsServerTimeRefreshInterval = getLamsServerTimeRefreshInterval() * 60 * 60 * 1000;
+	if ((lamsServerTimeDeltaStr == null) || (lastUpdateTime + lamsServerTimeRefreshInterval < now)) {
 	    
 	    // refresh time from LAMS server
 	    String serverAddr = getServerAddress();
@@ -490,6 +473,25 @@ public class LamsSecurityUtil {
      */
     public static String getReqSrc() {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_REQ_SRC);
+    }
+    
+    /**
+     * 
+     * @return the LAMS server time refresh interval from lams.properties
+     */
+    public static long getLamsServerTimeRefreshInterval() {
+	//set default value
+	long lamsServerTimeRefreshInterval = 24;
+	
+	try {
+	    String lamsServerTimeRefreshIntervalStr = LamsPluginUtil.getProperties().getProperty(
+		    LamsPluginUtil.PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL);
+	    lamsServerTimeRefreshInterval = Long.parseLong(lamsServerTimeRefreshIntervalStr);
+	} catch (NumberFormatException e) {
+	    logger.warn("Wrong format of PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL from lams.properties");
+	}
+	
+	return lamsServerTimeRefreshInterval;
     }
 
     // generate authentication hash code to validate parameters
