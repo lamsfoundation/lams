@@ -53,7 +53,6 @@
 		</javac>
 		<jar jarfile="${build.lib}/${product}-${version}.jar">
 			<fileset dir="${build.classes}" />
-			<fileset dir="${basedir}/conf" includes="main.properties"/>
 		</jar>
 	</target>
 	

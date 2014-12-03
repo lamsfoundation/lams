@@ -22,7 +22,6 @@
  */
 package org.lamsfoundation.ld.integration.blackboard;
 
-
 import java.util.Properties;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,31 +31,28 @@ import java.io.IOException;
 import blackboard.platform.plugin.PlugInException;
 import blackboard.platform.plugin.PlugInUtil;
 
-
-
 /**
  * 
- * This class basically manages the lams.properties file on the BB server
- * This file contains the LAMS server URL, server ID and secret key
- * These values allow the communication between the two servers
+ * This class basically manages the lams.properties file on the BB server This file contains the LAMS server URL, server
+ * ID and secret key These values allow the communication between the two servers
  * 
  * @author <a href="mailto:lfoxton@melcoe.mq.edu.au">Luke Foxton</a>
  */
 public class LamsPluginUtil {
-    
+
     public static final String VENDOR_ID = "lams";
     public static final String PLUGIN_HANDLE = "lamscontent";
     public static final String CONTENT_HANDLE = "resource/x-lams-lamscontent";
     public static final String FILE_PROPERTIES = "lams.properties";
-    
+
     public static final String PROP_LAMS_SECRET_KEY = "LAMS_SERVER_SKEY";
     public static final String PROP_LAMS_SERVER_ID = "LAMS_SERVER_ID";
     public static final String PROP_LAMS_URL = "LAMS_SERVER_URL";
     public static final String PROP_REQ_SRC = "BB_REQ_SRC";
-    
+    public static final String PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL = "LAMS_SERVER_TIME_REFRESH_INTERVAL";
+
     private static Properties lamsProperties = null;
-    
-    
+
     /**
      * Returns the properties file that contains the server name, key and connection URL
      * 
@@ -66,36 +62,38 @@ public class LamsPluginUtil {
      * @throws IOException
      */
     public static Properties getProperties() {
-        if(lamsProperties != null)
-            return lamsProperties;
-        
-        //load LAMS Configuration File
-        try{
-	        File configFile = new File(PlugInUtil.getConfigDirectory(VENDOR_ID, PLUGIN_HANDLE).getPath() + File.separator + FILE_PROPERTIES);
-	        Properties p = new Properties();
-	        
-	        if(configFile.exists())
-	            p.load(new FileInputStream(configFile));
-	        else{
-	            p.setProperty(PROP_LAMS_URL, "");
-	            p.setProperty(PROP_LAMS_SECRET_KEY, "");
-	            p.setProperty(PROP_LAMS_SERVER_ID, "");
-	            p.setProperty(PROP_REQ_SRC, "");
-	        }
-	        
-	        lamsProperties = p;
-	        return p;
-        } catch(PlugInException e){
-            throw new RuntimeException(e);
-        } catch(FileNotFoundException e){           
-            throw new RuntimeException(e);
-        } catch(IOException e){
-            throw new RuntimeException(e);
-        }
+	if (lamsProperties != null)
+	    return lamsProperties;
+
+	// load LAMS Configuration File
+	try {
+	    File configFile = new File(PlugInUtil.getConfigDirectory(VENDOR_ID, PLUGIN_HANDLE).getPath()
+		    + File.separator + FILE_PROPERTIES);
+	    Properties p = new Properties();
+
+	    if (configFile.exists())
+		p.load(new FileInputStream(configFile));
+	    else {
+		p.setProperty(PROP_LAMS_URL, "");
+		p.setProperty(PROP_LAMS_SECRET_KEY, "");
+		p.setProperty(PROP_LAMS_SERVER_ID, "");
+		p.setProperty(PROP_REQ_SRC, "");
+		p.setProperty(PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL, "24");
+	    }
+
+	    lamsProperties = p;
+	    return p;
+	} catch (PlugInException e) {
+	    throw new RuntimeException(e);
+	} catch (FileNotFoundException e) {
+	    throw new RuntimeException(e);
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
     }
-    
+
     /**
-     * Save a Properties file as the LAMS properties file 
+     * Save a Properties file as the LAMS properties file
      * 
      * @param p
      * @throws PlugInException
@@ -103,54 +101,60 @@ public class LamsPluginUtil {
      * @throws IOException
      */
     public static void setProperties(Properties p) {
-        try{
-	        lamsProperties = p;
-	        
-	        FileOutputStream configFile = 
-	            new FileOutputStream(PlugInUtil.getConfigDirectory(VENDOR_ID, PLUGIN_HANDLE).getPath() + 
-	                                    File.separator + FILE_PROPERTIES);
-	        p.store(configFile, "LAMS configuration");
-	        configFile.close();
-	    } catch(PlugInException e){
-	        throw new RuntimeException(e);
-	    } catch(FileNotFoundException e){
-	        throw new RuntimeException(e);
-	    } catch(IOException e){
-	        throw new RuntimeException(e);
-	    }
+	try {
+	    lamsProperties = p;
+
+	    FileOutputStream configFile = new FileOutputStream(PlugInUtil.getConfigDirectory(VENDOR_ID, PLUGIN_HANDLE)
+		    .getPath() + File.separator + FILE_PROPERTIES);
+	    p.store(configFile, "LAMS configuration");
+	    configFile.close();
+	} catch (PlugInException e) {
+	    throw new RuntimeException(e);
+	} catch (FileNotFoundException e) {
+	    throw new RuntimeException(e);
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
     }
-    
+
     /**
      * 
      * @return the secret key from lams.properties
      */
-    public static String getSecretKey(){
-        return getProperties().getProperty(PROP_LAMS_SECRET_KEY);
+    public static String getSecretKey() {
+	return getProperties().getProperty(PROP_LAMS_SECRET_KEY);
     }
-    
+
     /**
      * 
      * @return the secret url from lams.properties
      */
-    public static String getServerUrl(){
-        return getProperties().getProperty(PROP_LAMS_URL);
+    public static String getServerUrl() {
+	return getProperties().getProperty(PROP_LAMS_URL);
     }
-    
+
     /**
      * 
      * @return the server id from lams.properties
      */
-    public static String getServerId(){
-        return getProperties().getProperty(PROP_LAMS_SERVER_ID);
+    public static String getServerId() {
+	return getProperties().getProperty(PROP_LAMS_SERVER_ID);
     }
-    
+
     /**
      * 
      * @return the request source from lams.properties
      */
-    public static String getReqSrc(){
-        return getProperties().getProperty(PROP_REQ_SRC);
+    public static String getReqSrc() {
+	return getProperties().getProperty(PROP_REQ_SRC);
     }
     
+    /**
+     * 
+     * @return the LAMS server time refresh interval from lams.properties
+     */
+    public static String getLamsServerTimeRefreshInterval() {
+	return getProperties().getProperty(PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL);
+    }
 
 }

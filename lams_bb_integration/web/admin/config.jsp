@@ -32,6 +32,7 @@
     String lamsServerId = p.getProperty("LAMS_SERVER_ID", "");
     String SecretKey = p.getProperty("LAMS_SERVER_SKEY", "");
     String ReqSrc = p.getProperty("BB_REQ_SRC");
+    String lamsServerTimeRefreshInterval = p.getProperty("LAMS_SERVER_TIME_REFRESH_INTERVAL");
 
     //Add port to the url if the port is in the blackboard url
     int bbport = request.getServerPort();
@@ -67,7 +68,10 @@
                 <bbNG:dataElement label="BLACKBOARD REQUEST SRC" isRequired="true" labelFor="bb_req_src">
                     <input type="text" name="bb_req_src" size="70" value="<%=ReqSrc%>">
                 </bbNG:dataElement>
-		<p>For further information on how to configure these settings, see <a target="_blank" href="http://wiki.lamsfoundation.org/display/lamsdocs/Blackboard+9">this tutorial</a>.</p>
+                <bbNG:dataElement label="LAMS SERVER TIME REFRESH INTERVAL (HOURS)" isRequired="true" labelFor="lams_server_time_refresh_interval">
+                    <input type="text" name="lams_server_time_refresh_interval" size="20" value="<%=lamsServerTimeRefreshInterval%>">
+                </bbNG:dataElement>                
+				<p>For further information on how to configure these settings, see <a target="_blank" href="http://wiki.lamsfoundation.org/display/lamsdocs/Blackboard+9">this tutorial</a>.</p>
             </bbNG:step>  
             <bbNG:stepSubmit title="Submit" />
         </bbNG:dataCollection>    
