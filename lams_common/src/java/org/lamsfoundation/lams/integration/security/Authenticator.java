@@ -101,7 +101,7 @@ public class Authenticator {
 	    Date now = new Date();
 	    if (requestTimePlusTimeToLive.before(now)) {
 		throw new AuthenticationException("Login Request can't be older than " + timeToLiveLoginRequest
-			+ "minutes. Request time is: " + new Date(datetimeParam));
+			+ " minutes. Please, refresh your previous page and try again.");
 	    }
 	}
 

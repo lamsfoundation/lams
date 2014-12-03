@@ -175,7 +175,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
 	} catch (AuthenticationException e) {
 	    LoginRequestServlet.log.error("Authentication error: ", e);
-	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - authentication error");
+	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - authentication error. " + e.getMessage());
 	} catch (UserInfoFetchException e) {
 	    LoginRequestServlet.log.error("User fetch info error: ", e);
 	    response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
