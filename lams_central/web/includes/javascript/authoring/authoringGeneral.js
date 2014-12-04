@@ -1487,7 +1487,7 @@ GeneralLib = {
 					var activityData = this,
 						activity = null;
 					
-					// find max uiid so newly created elements have, unique ones
+					// find max uiid so newly created elements have unique ones
 					if (activityData.activityUIID && layout.ld.maxUIID < activityData.activityUIID) {
 						layout.ld.maxUIID = activityData.activityUIID;
 					}
@@ -1916,6 +1916,10 @@ GeneralLib = {
 						if (fromActivity && toActivity) {
 							ActivityLib.addTransition(fromActivity, toActivity, true,
 									transition.transitionID, transition.transitionUIID);
+							// find max uiid so newly created elements have unique ones
+							if (transition.transitionUIID && layout.ld.maxUIID < transition.transitionUIID) {
+								layout.ld.maxUIID = transition.transitionUIID;
+							}
 							return false;
 						}
 					});
