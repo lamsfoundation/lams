@@ -76,7 +76,7 @@ public class SsoHandler implements ServletExtension {
 			// prevent session fixation attack - change session ID with any login attempt
 			request.changeSessionId();
 
-			// get session here in case it was invalidated in login.jsp 
+			// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs 
 			HttpSession session = request.getSession();
 
 			// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
@@ -85,25 +85,29 @@ public class SsoHandler implements ServletExtension {
 			    SsoHandler.handleRedirectBack(context, redirectURL);
 			}
 
-			// store session so UniversalLoginModule can access it
-			SessionManager.startSession(request);
-			// do the logging in UniversalLoginModule
-			handler.handleRequest(exchange);
-			SessionManager.endSession();
-
-			String login = request.getRemoteUser();
-			// was the user authenticated?
-			if (login != null) {
-			    // is there already correct DTO in the session?
-			    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
-			    if ((userDTO == null) || !userDTO.getLogin().equals(login)) {
-				User user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
-				// user can be null for authentication methods other than LAMS DB
-				if (user != null) {
-				    session.setAttribute(AttributeNames.USER, user.getUserDTO());
-				}
+			/* Fetch UserDTO before completing request so putting it later in session is done ASAP
+			 * Response is sent in another thread and if UserDTO is not present in session when browser completes redirect,
+			 * it results in error. Winning this race is the easiest option.
+			 */
+			UserDTO userDTO = null;
+			String login = request.getParameter("j_username");
+			if (!StringUtils.isBlank(login)) {
+			    User user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
+			    if (user != null) {
+				userDTO = user.getUserDTO();
 			    }
 			}
+
+			// store session so UniversalLoginModule can access it
+			SessionManager.startSession(request);
+			// do the logging in UniversalLoginModule or cache
+			handler.handleRequest(exchange);
+
+			if (login.equals(request.getRemoteUser())) {
+			    session.setAttribute(AttributeNames.USER, userDTO);
+			}
+
+			SessionManager.endSession();
 		    }
 		});
 	    }
