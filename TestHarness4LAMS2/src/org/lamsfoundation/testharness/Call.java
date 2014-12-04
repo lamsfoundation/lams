@@ -194,6 +194,7 @@ public class Call {
 	try {
 	    WebResponse resp = null;
 	    WebRequest req = null;
+
 	    if (form != null) {
 		SubmitButton[] submitButtons = filterCancelButton(form.getSubmitButtons());
 		Call.log.debug(submitButtons.length + " non-cancel submit buttons in the form");
@@ -221,10 +222,10 @@ public class Call {
 		resp = wc.getResponse(req);
 		end = System.currentTimeMillis();
 	    }
-	    
+
 	    httpStatusCode = resp.getResponseCode();
 	    if (httpStatusCode >= 400) {
-		log.debug("Got " + httpStatusCode + " HTTP code. Retrying call: " + callee);
+		Call.log.debug("Got " + httpStatusCode + " HTTP code. Retrying call: " + callee);
 		resp = wc.getResponse(req);
 		end = System.currentTimeMillis();
 		httpStatusCode = resp.getResponseCode();
@@ -233,18 +234,31 @@ public class Call {
 		    throw new TestHarnessException(test.testName + " got HTTP code " + httpStatusCode);
 		}
 	    }
-	    
+
 	    message = resp.getResponseMessage();
+	    // set session cookie manually as the built-in mechanism can't really handle paths and domains
 	    for (String headerFieldName : resp.getHeaderFieldNames()) {
 		if (headerFieldName.equalsIgnoreCase("SET-COOKIE")) {
+		    String cookieValue = null;
+		    String path = null;
 		    for (String headerFieldValue : resp.getHeaderFields(headerFieldName)) {
 			String[] headerFieldSplit = headerFieldValue.split("=|;");
-			String cookieName = headerFieldSplit[0];
-			if ("JSESSIONID".equalsIgnoreCase(cookieName) && (wc.getCookieValue(cookieName) == null)) {
-			    String cookieValue = headerFieldSplit[1];
-			    Call.log.debug("Manually setting cookie: " + cookieName + "=" + cookieValue);
-			    wc.putCookie(cookieName, cookieValue);
+			for (int paramIndex = 0; paramIndex < headerFieldSplit.length; paramIndex++) {
+			    String param = headerFieldSplit[paramIndex].trim();
+			    if ("JSESSIONID".equalsIgnoreCase(param)) {
+				cookieValue = headerFieldSplit[paramIndex + 1];
+				paramIndex++;
+			    } else if ("path".equalsIgnoreCase(param)) {
+				path = headerFieldSplit[paramIndex + 1];
+				paramIndex++;
+			    }
 			}
+		    }
+		    if (cookieValue != null) {
+			Call.log.debug("Manually setting JSESSIONID = " + cookieValue);
+			// "single use cookie" is misleading; it's just a cookie with a path and domain
+			wc.getCookieJar().putSingleUseCookie("JSESSIONID", cookieValue,
+				test.getTestSuite().getCookieDomain(), path);
 		    }
 		}
 	    }

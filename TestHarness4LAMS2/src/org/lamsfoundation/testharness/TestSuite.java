@@ -41,6 +41,8 @@ public class TestSuite implements Runnable {
     private int suiteIndex;
     private String targetServer;
     private String contextRoot;
+    private String cookieDomain;
+    
     private AdminTest adminTest;
     private AuthorTest authorTest;
     private MonitorTest monitorTest;
@@ -53,6 +55,11 @@ public class TestSuite implements Runnable {
 	this.suiteIndex = suiteIndex;
 	this.targetServer = targetServer == null ? "localhost" : targetServer;
 	this.contextRoot = (contextRoot == null) || contextRoot.equals("/") ? "" : contextRoot;
+
+	int beginIndex = this.targetServer.lastIndexOf("/") + 1;
+	int endIndex = this.targetServer.lastIndexOf(":");
+	this.cookieDomain = endIndex < 0 ? this.targetServer.substring(beginIndex) : this.targetServer.substring(
+		beginIndex, endIndex);
 	
 	this.adminTest = adminTest;
 	adminTest.setTestSuite(this);
@@ -82,6 +89,10 @@ public class TestSuite implements Runnable {
 	return contextRoot;
     }
 
+    public String getCookieDomain() {
+        return cookieDomain;
+    }
+    
     /**
      * @return Returns the learnerTest.
      */
