@@ -154,7 +154,6 @@
 		<ant antfile="../${lams_common}/build.xml"            target="_build-jar"     inheritAll="false" />
 		<ant antfile="../${lams_contentrepository}/build.xml" target="_build-jar"     inheritAll="false" />
 		<ant antfile="../${lams_central}/build.xml"           target="_build-product" inheritAll="false" />
-		<ant antfile="../${lams_launchlearnerurl}/build.xml"  target="_build-war"     inheritAll="false" />
 		<ant antfile="../${lams_learning}/build.xml"          target="_build-product" inheritAll="false" />
 		<ant antfile="../${lams_monitoring}/build.xml"        target="_build-product" inheritAll="false" />
 		<ant antfile="../${lams_admin}/build.xml"             target="_build-product" inheritAll="false" />
@@ -271,9 +270,6 @@
 		<copy todir="${jboss.deploy}">
 			<fileset dir="${assembly}/${lams.ear}" />
 		</copy>
-		
-		<echo>Deploying ROOT.war responsible for launching learner url</echo>
-		<ant antfile="../${lams_launchlearnerurl}/build.xml" target="deploy-war" inheritAll="false" />
 	</target>
 	
 	

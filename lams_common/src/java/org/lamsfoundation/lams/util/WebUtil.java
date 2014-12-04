@@ -42,6 +42,8 @@ public class WebUtil {
      * <code>(?:<BR>|<br>|<BR />|<br />)</code> . Right now CKeditor creates only the first option.
      */
     private static final String SPACE_TAG_REGEX = "(?:<BR>)|(?:&nbsp;)|(?:</div><div>)";
+    
+    private static final String URL_SHORTENING_CYPHER = "jbdnuteywk";
 
     /**
      */
@@ -655,5 +657,56 @@ public class WebUtil {
 	String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
 	// "https://" is 8 characters, so next "/" should be context
 	return serverURL.substring(0, serverURL.indexOf('/', 9));
+    }
+    
+    /**
+     * Converse lessonId into alphabetic sequence for using it in URL shortening
+     * 
+     * @param lessonId
+     * @return
+     */
+    public static String encodeLessonId(Long lessonId) {
+	
+	String encodedLessonId = lessonId.toString();
+	encodedLessonId = encodedLessonId.replace('0', URL_SHORTENING_CYPHER.charAt(0));
+	encodedLessonId = encodedLessonId.replace('1', URL_SHORTENING_CYPHER.charAt(1));
+	encodedLessonId = encodedLessonId.replace('2', URL_SHORTENING_CYPHER.charAt(2));
+	encodedLessonId = encodedLessonId.replace('3', URL_SHORTENING_CYPHER.charAt(3));
+	encodedLessonId = encodedLessonId.replace('4', URL_SHORTENING_CYPHER.charAt(4));
+	encodedLessonId = encodedLessonId.replace('5', URL_SHORTENING_CYPHER.charAt(5));
+	encodedLessonId = encodedLessonId.replace('6', URL_SHORTENING_CYPHER.charAt(6));
+	encodedLessonId = encodedLessonId.replace('7', URL_SHORTENING_CYPHER.charAt(7));
+	encodedLessonId = encodedLessonId.replace('8', URL_SHORTENING_CYPHER.charAt(8));
+	encodedLessonId = encodedLessonId.replace('9', URL_SHORTENING_CYPHER.charAt(9));
+	
+	return encodedLessonId;
+    }
+    
+    /**
+     * Decodes alphabetic sequence (that is lessonId encoded for URL shortening purposes)
+     * 
+     * @param encodedlessonId
+     * @return
+     */
+    public static String decodeLessonId(String encodedLessonId) throws IllegalArgumentException{
+	
+	// it should contain only the characters from URL_SHORTENING_CYPHER
+	if (!encodedLessonId.matches("[" + URL_SHORTENING_CYPHER + "]*")) {
+	    throw new IllegalArgumentException("LessonId: " + encodedLessonId + " has wrong format.");
+	}
+	
+	String decodedLessonId = encodedLessonId;
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(0), '0');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(1), '1');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(2), '2');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(3), '3');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(4), '4');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(5), '5');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(6), '6');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(7), '7');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(8), '8');
+	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(9), '9');
+	
+	return decodedLessonId;
     }
 }

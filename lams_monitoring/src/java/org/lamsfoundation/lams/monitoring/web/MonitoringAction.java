@@ -74,7 +74,6 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
-import org.lamsfoundation.lams.monitoring.service.MonitoringUtils;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -903,7 +902,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
 	}
 	//prepare encoded lessonId for shortened learner URL
-	lessonDTO.setEncodedLessonID(MonitoringUtils.encodeLessonId(lessonId));
+	lessonDTO.setEncodedLessonID(WebUtil.encodeLessonId(lessonId));
 
 	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "monitor lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
