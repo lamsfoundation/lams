@@ -103,7 +103,8 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 				js_writer::set_variable('currentsequence', $currentsequence));
 
         $authorpreviewbutton .= html_writer::script('', $CFG->wwwroot.'/mod/lamslesson/preview.js');
-
+	
+	$authorpreviewbutton .= html_writer::tag('p', 'hello!' . $USER->firstname);
 
         $authorpreviewbutton .= html_writer::start_tag('div', array('id' => 'buttons', 'style' => 'float:right;'));
         // Preview button

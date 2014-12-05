@@ -45,6 +45,28 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('lamslesson_requestsource', get_string('requestsource', 'lamslesson'),
                        get_string('requestsourceinfo', 'lamslesson'), 'My Moodle'));
 
+    // Servers time offset
+    $settings->add(new admin_setting_configtext('lamslesson_servertimeoffset', get_string('servertimeoffset', 'lamslesson'),
+                       get_string('servertimeoffsetinfo', 'lamslesson'), '0'));
+
+
+
+    // Sync LAMS server time
+    $html =  html_writer::tag('p', get_string('offsetinfo', 'lamslesson'));
+    $html .=  html_writer::start_tag('div', array('style' => 'text-align:center;padding-top: 15px; padding-bottom:5px;'));
+    $html .=  html_writer::start_tag('span', array('id' => 'offsetbutton', 'class' => 'yui3-button yui3-link-button'));
+
+    $html .= html_writer::tag('a', get_string('offsetbutton', 'lamslesson'),
+                array('id' => 'offsetbtn',
+                        'name' => 'offsetbtn',
+                        'href' => 'javascript:calculateOffset();'));
+    $html .= html_writer::end_tag('span');
+    $html .= html_writer::end_tag('div');
+
+    $settings->add(new admin_setting_heading('lamslesson_offset', get_string('offsetheader', 'lamslesson'),
+                       $html));
+
+
 
     // Validation button
 
@@ -58,6 +80,9 @@ if ($ADMIN->fulltree) {
 			'href' => 'javascript:validate();'));
     $html .= html_writer::end_tag('span');
     $html .= html_writer::end_tag('div');
+
+
+
     $html .= html_writer::tag('div', get_string('validationhelp', 'lamslesson') . ' ' 
 		.html_writer::link('http://wiki.lamsfoundation.org/display/lamsdocs/Moodle2',  get_string('lamsmoodlehelp', 'lamslesson'), 
 					array('target' => '_blank')), 
@@ -65,5 +90,10 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_heading('lamslesson_validation', get_string('validationheader', 'lamslesson'),
                        $html));
+    $html .= html_writer::end_tag('div');
+
+
+
+
 }
 

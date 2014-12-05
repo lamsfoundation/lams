@@ -79,6 +79,18 @@ $string['validationbutton'] = "Validate settings";
 $string['validationheader'] = 'Settings validation';
 $string['validationinfo'] = 'Before you save your settings, please press the button to validate them with the LAMS server. If the validation is correct, save these settings. If not, please check that the settings you have entered match with the values in the LAMS server';
 $string['validationhelp'] = 'Need help? check out the';
+
+$string['offsetbutton'] = "Calculate offset";
+$string['offsetinfo'] = "If you are enforcing the login request time to live limit, it's important that you set up the time difference (in minutes) between the LAMS and your Moodle server. Click on the Calculate offset to see if there's a time difference between your LAMS and Moodle server. Take the offset time displayed and add it to \"Offset time difference\" setting.";
+
+$string['servertimeoffset'] = "Offset time difference (minutes)";
+
+$string['servertimeoffsetinfo'] = "This is the time difference (or time offset) between the LAMS and Moodle server.";
+
+$string['offsetheader'] = "Time offset";
+
+
+
 $string['lamsmoodlehelp'] = 'LAMS-Moodle integration tutorial';
 
 $string['validationsuccessful'] = 'Validation successful! You can now save your settings and start using LAMS within Moodle.';
