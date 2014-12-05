@@ -101,8 +101,8 @@ public class Authenticator {
 	    Date requestTimeMinusTimeToLive = new Date(datetimeParam - timeToLiveLoginRequest * 60 * 1000);
 	    Date now = new Date();
 	    if (requestTimePlusTimeToLive.before(now) || requestTimeMinusTimeToLive.after(now)) {
-		throw new AuthenticationException("Login Request can't be older than " + timeToLiveLoginRequest
-			+ " minutes. Please, refresh your previous page and try again.");
+		throw new AuthenticationException("Request is not in the time range of " + timeToLiveLoginRequest
+			+ " minutes. Please, contact sysadmin.");
 	    }
 	}
 
