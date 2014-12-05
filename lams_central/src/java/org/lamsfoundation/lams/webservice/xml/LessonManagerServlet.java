@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.webservice.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -102,7 +103,6 @@ public class LessonManagerServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-	ServletOutputStream outputStream = response.getOutputStream();
 	response.setContentType("text/xml");
 	response.setCharacterEncoding("UTF-8");
 
@@ -142,6 +142,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	Long ldId = null;
 	Long lsId = null;
+	ServletOutputStream outputStream = null;
 	try {
 	    // TODO check input parameters are valid.
 
@@ -233,9 +234,10 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_VERIFY_EXT_SERVER)) {
 		verify(serverId, datetime, hashValue);
 		response.setContentType("text/html");
-		outputStream.write(1);
-		outputStream.flush();
-		outputStream.close();
+		PrintWriter out = response.getWriter();
+		out.write("1");
+		out.flush();
+		out.close();
 		return;
 
 	    } else {
@@ -247,6 +249,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    document.appendChild(element);
 
 	    // write out the xml document.
+	    outputStream = response.getOutputStream();
 	    DOMImplementationLS domImplementation = (DOMImplementationLS) document.getImplementation();
 	    LSSerializer lsSerializer = domImplementation.createLSSerializer();
 	    LSOutput lsOutput = domImplementation.createLSOutput();
@@ -272,10 +275,15 @@ public class LessonManagerServlet extends HttpServlet {
 	} catch (Exception e) {
 	    LessonManagerServlet.log.error("Problem loading learning manager servlet request", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	    
+	} finally {
+	    if (outputStream != null) {
+		outputStream.flush();
+		outputStream.close();
+
+	    }
 	}
 
-	outputStream.flush();
-	outputStream.close();
     }
 
     /**
