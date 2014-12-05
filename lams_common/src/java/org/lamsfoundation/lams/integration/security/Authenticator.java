@@ -98,8 +98,9 @@ public class Authenticator {
 	    int timeToLiveLoginRequest = map.getTimeToLiveLoginRequest();
 	    // sum up request time and maximum allowed request's time to live
 	    Date requestTimePlusTimeToLive = new Date(datetimeParam + timeToLiveLoginRequest * 60 * 1000);
+	    Date requestTimeMinusTimeToLive = new Date(datetimeParam - timeToLiveLoginRequest * 60 * 1000);
 	    Date now = new Date();
-	    if (requestTimePlusTimeToLive.before(now)) {
+	    if (requestTimePlusTimeToLive.before(now) || requestTimeMinusTimeToLive.after(now)) {
 		throw new AuthenticationException("Login Request can't be older than " + timeToLiveLoginRequest
 			+ " minutes. Please, refresh your previous page and try again.");
 	    }
