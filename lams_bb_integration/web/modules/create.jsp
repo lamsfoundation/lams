@@ -27,6 +27,7 @@
 
 <bbNG:cssFile href="../includes/css/treeview.css" />
 <bbNG:cssFile href="../includes/css/folders.css" />
+
 <%
     // Authorise current user for Course Control Panel (automatic redirect)
     try{
@@ -35,17 +36,11 @@
     } catch(PlugInException e) {
         throw new RuntimeException(e);
     }
-
-    // Get the Login Request URL for authoring LAMS Lessons
-    String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author", null);
     
-    // Get the list of Learning Designs
-    //String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
     String lamsServerUrl = LamsSecurityUtil.getServerAddress();
     
 	// get all user accessible folders and LD descriptions as JSON
 	String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, ctx.getCourse().getCourseId(), null);
-
 %>
 
 <bbNG:jsBlock>
@@ -225,8 +220,7 @@
         
             // Open the LAMS Seuence Author Window
             function openAuthor() {
-                var authorUrl = '<%=authorUrl%>';
-                authorUrl += "&isPostMessageToParent=true";
+                var authorUrl = 'openAuthor.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>';
                 
                 if(authorWin && authorWin.open && !authorWin.closed){
                     try {

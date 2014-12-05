@@ -42,12 +42,6 @@
     } catch(PlugInException e) {
         throw new RuntimeException(e);
     }
-    
-    // Get the LAMS access URLs
-    String lsid = request.getParameter("lsid");
-    String learnerUrl = LamsSecurityUtil.generateRequestURL(ctx, "learnerStrictAuth", lsid);
-    String monitorUrl = LamsSecurityUtil.generateRequestURL(ctx, "monitor", lsid);
-    String liveEditUrl = LamsSecurityUtil.generateRequestURL(ctx, "author", null);
 	
     // Get Course ID and Session User ID
     BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
@@ -183,9 +177,6 @@
         <!--
             var learnerWin = null;
             var monitorWin = null;
-            var liveEditUrl= null;
-            var learnerUrl = null;
-            var monitorUrl = null;
                 
             // Go back one page if the user clicks the Cancel Button
             function back() {
@@ -194,7 +185,7 @@
                 
             // Open the Lesson as a Learner
             function openLearner() {
-                learnerUrl = '<%=learnerUrl%>'; 
+            	var learnerUrl = 'openLearner.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
                 if(learnerWin && learnerWin.open && !learnerWin.closed){
                     try {
                         learnerWin.focus();
@@ -215,7 +206,7 @@
             
             // Open the Lesson Monitor                
             function openMonitor() {
-                monitorUrl = '<%=monitorUrl%>'; 
+            	var monitorUrl = 'openMonitor.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
                 if(monitorWin && monitorWin.open && !monitorWin.closed){
                     try {
                         monitorWin.focus();
