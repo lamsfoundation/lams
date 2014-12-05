@@ -73,8 +73,6 @@ public class SsoHandler implements ServletExtension {
 		    public void handleRequest(HttpServerExchange exchange) throws Exception {
 			ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 			HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
-			// prevent session fixation attack - change session ID with any login attempt
-			request.changeSessionId();
 
 			// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs 
 			HttpSession session = request.getSession();
