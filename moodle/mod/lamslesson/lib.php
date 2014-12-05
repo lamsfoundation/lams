@@ -67,6 +67,7 @@ define('LAMSLESSON_PARAM_CUSTOM_CSV', 'customCSV');
 define('LAMSLESSON_LD_SERVICE', '/services/xml/LearningDesignRepository');
 define('LAMSLESSON_LD_SERVICE_SVG', '/services/LearningDesignSVG');
 define('LAMSLESSON_LESSON_MANAGER', '/services/xml/LessonManager');
+define('LAMSLESSON_LAMS_SERVERTIME', 'services/getServerTime');
 define('LAMSLESSON_POPUP_OPTIONS', 'location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable');
 define('LAMSLESSON_OUTPUT_METHOD', 'toolOutputsUser');
 
@@ -281,7 +282,7 @@ function lamslesson_get_design_image($username,$courseid,$coursename,$coursecrea
     $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
 
     // generate hash
-    $datetime = date('F d,Y g:i a');
+    $datetime = lamslesson_get_datetime();
     $datetime_encoded = urlencode($datetime);
     $rawstring = trim($datetime).trim($username).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
     $hashvalue = sha1(strtolower($rawstring));
@@ -313,7 +314,8 @@ function lamslesson_get_sequences_rest($username,$firstname,$lastname,$email,$co
     $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
 
     // generate hash
-    $datetime = date('F d,Y g:i a');
+    //$datetime = date('F d,Y g:i a');
+    $datetime = lamslesson_get_datetime();
     $rawstring = trim($datetime).trim($username).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
     $hashvalue = sha1(strtolower($rawstring));
 
@@ -325,8 +327,8 @@ function lamslesson_get_sequences_rest($username,$firstname,$lastname,$email,$co
 		  'datetime' 	=> 	$datetime,
 		  'hashValue' 	=>	$hashvalue,
 		  'username'    =>	$username,
-		  'firstName'	=> 	$firstName,
-		  'lastName'	=> 	$lastName,
+		  'firstName'	=> 	$firstname,
+		  'lastName'	=> 	$lastname,
 		  'email'	=>	$email,
 		  'courseId'	=>	$courseId,
 		  'courseName'	=> 	$coursename,
@@ -542,7 +544,8 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$c
     return NULL;
   }
     
-  $datetime =    date("F d,Y g:i a");
+  //$datetime =    date("F d,Y g:i a");
+  $datetime = lamslesson_get_datetime();
   if(!isset($username)){
     $username = $USER->username;
   }
@@ -584,7 +587,8 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$member
 
   }
     
-  $datetime =    date('F d,Y g:i a');
+  //$datetime =    date('F d,Y g:i a');
+  $datetime = lamslesson_get_datetime();
   if(!isset($username)){
     $username = $USER->username;
   }
@@ -621,7 +625,8 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$member
 function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
   global $CFG, $DB;
 
-  $datetime = date('F d,Y g:i a');
+  //$datetime = date('F d,Y g:i a');
+  $datetime = lamslesson_get_datetime();
   $plaintext = trim($datetime)
     .trim($username)
     .trim($CFG->lamslesson_serverid)
@@ -703,7 +708,9 @@ function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $co
     // append month/year to course name
     $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
     
-    $datetime = date('F d,Y g:i a');
+    // change datetime to enforce time to live for login request
+    // See LDEV-3382
+    $datetime = lamslesson_get_datetime();
 
     // check if we are to use lessonstrictauth
     if ($method == LAMSLESSON_PARAM_LEARNER_STRICT_METHOD) {
@@ -787,7 +794,8 @@ function lamslesson_get_student_progress($username,$ldid,$courseid) {
     return NULL;
   }
     
-  $datetime =    date("F d,Y g:i a");
+  //$datetime =    date("F d,Y g:i a");
+  $datetime = lamslesson_get_datetime();
   $plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
   $hashvalue = sha1(strtolower($plaintext));
 
@@ -964,7 +972,7 @@ function lamslesson_update_grades($lamslesson, $userid, $usermark) {
  */
 function lamslesson_verify($url, $id, $key){
 
-    $datetime =    date("F d,Y g:i a");
+    $datetime = lamslesson_get_datetime();
     $plaintext = $datetime.$id.$key;
     // create hash
     $hashvalue = sha1(strtolower($plaintext));
@@ -1009,4 +1017,46 @@ function lamslesson_http_call_post($url,$request) {
             return false;
         }
 }
+
+/**
+ * Returns a Number of milliseconds since January 1, 1970, 00:00:00 GMT 
+ * (known as "the epoch") till the time when the call is made
+ *
+ * @return timestamp in milliseconds
+*/
+function lamslesson_get_datetime() {
+        global $CFG;
+
+    	// change datetime to enforce time to live for login request
+    	// See LDEV-3382
+
+	$offset = $CFG->lamslesson_servertimeoffset * 60 * 1000;
+
+	$datetime = round(microtime(true) * 1000) + $offset;
+
+	return $datetime;
+}
+
+/**
+ * Gets LAMS server time
+ *
+ * @return timestamp in milliseconds (from LAMS server)
+*/
+function lamslesson_get_lamsserver_time() {
+        // change datetime to enforce time to live for login request
+        // See LDEV-3382
+	global $CFG;
+	$url = "$CFG->lamslesson_serverurl" . LAMSLESSON_LAMS_SERVERTIME;
+ 	$load = array('method'      =>      LAMSLESSON_PARAM_VERIFY_METHOD);
+
+	$result = lamslesson_http_call_post($url, $load);
+
+	$localtime = round(microtime(true) * 1000);
+
+	$offset = $result - $localtime;
+	
+        return "LAMS time: " . date('m-d-Y H:i:s.u', $result/1000) . " \rMoodle time:" . date('m-d-Y H:i:s.u', $localtime/1000) . " \rOffset: " . $offset/1000/60 . " minutes";
+}
+
+
 

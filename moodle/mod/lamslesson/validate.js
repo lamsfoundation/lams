@@ -60,6 +60,37 @@
                 return pairs.join("&");
         }        
 
+	function calculateOffset(){
+		timer = setTimeout('timeCount()', 5000);
+		var url = '../mod/lamslesson/offset.php';
+		var contentType = "application/x-www-form-urlencoded; charset=UTF-8";
+		 var query = createQuery();
+            if (window.XMLHttpRequest) { // Non-IE browsers
+                req = new XMLHttpRequest();
+                req.onreadystatechange = getResult;
+                try {
+                    req.open("POST", url, true);
+                                req.setRequestHeader("Content-Type", contentType);
+                                req.send(query);
+                } catch (e) {
+                                clearTimeout(timer);
+                    alert(e);
+                }
+            } else if (window.ActiveXObject) { // IE
+                req = new ActiveXObject("Microsoft.XMLHTTP");
+                if (req) {
+                    req.onreadystatechange = getResult;
+                    req.open("POST", url, true);
+                                req.setRequestHeader("Content-Type", contentType);
+                    req.send(query);
+                }else{
+                                clearTimeout(timer);
+                        }
+            }
+
+
+	}
+
         function verify(){
                 timer = setTimeout('timeCount()', 5000);
                 var url = '../mod/lamslesson/verify.php';
