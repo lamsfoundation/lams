@@ -34,6 +34,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="signup" path=".signup"
  * @struts:action-forward name="index" path="/"
  * @struts:action-forward name="success" path=".successfulSignup"
+ * @struts:action-forward name="error" path=".error"
+ * @struts:action-forward name="message" path=".message"
  */
 public class SignupAction extends Action {
 
@@ -49,16 +51,22 @@ public class SignupAction extends Action {
 	    signupService = (ISignupService) wac.getBean("signupService");
 	}
 
-	String context = WebUtil.readStrParam(request, "context", true);
-	if (StringUtils.isNotBlank(context)) {
-	    SignupOrganisation signupOrganisation = signupService.getSignupOrganisation(context);
-	    request.setAttribute("signupOrganisation", signupOrganisation);
-	}
-
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);
-
 	if (signupForm.get("submitted") == null || !((Boolean) signupForm.get("submitted"))) {
+
+	    String context = WebUtil.readStrParam(request, "context", true);
+	    SignupOrganisation signupOrganisation = null;
+	    if (StringUtils.isNotBlank(context)) {
+		signupOrganisation = signupService.getSignupOrganisation(context);
+		request.setAttribute("signupOrganisation", signupOrganisation);
+	    }
+
+	    if (signupOrganisation == null) {
+		request.setAttribute("messageKey", "No such signup page exists");
+		return mapping.findForward("message");
+	    }
+	    
 	    // no context and unsubmitted form means it's the initial request
 	    return mapping.findForward("signup");
 	} else if (StringUtils.equals(method, "register")) {
