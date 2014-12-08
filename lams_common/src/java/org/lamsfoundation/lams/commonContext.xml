@@ -373,7 +373,7 @@
 	
 	<!--User management related beans -->
 	
-	<bean id="baseDAO" class="org.lamsfoundation.lams.dao.hibernate.BaseDAO">
+	<bean id="baseDAO" class="org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	<!--  Theme beans -->

@@ -25,14 +25,10 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.HibernateTemplate;
 import org.springframework.stereotype.Repository;
  
 /**
@@ -82,39 +78,15 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 		+ " order by o1.name";
 	
 	public List getActiveCourseIdsByUser(final Integer userId, final boolean isSysadmin) {
-		
-		HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
-        return (List)hibernateTemplate.execute(
-             new HibernateCallback() 
-             {
-                 public Object doInHibernate(Session session) throws HibernateException 
-                 {
-                	 return (isSysadmin 
-                			 ? session.createQuery(GET_ALL_ACTIVE_COURSE_IDS).list() 
-                			 : session.createQuery(GET_ACTIVE_COURSE_IDS_BY_USER).setInteger("userId",userId).list()
-                	 );
-                 }
-             }
-       );
+		return (List) (isSysadmin ? getSession().createQuery(GET_ALL_ACTIVE_COURSE_IDS).list() : getSession()
+				.createQuery(GET_ACTIVE_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
 	}
 	
 	public List getArchivedCourseIdsByUser(final Integer userId, final boolean isSysadmin) {
-		
-		HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
-        return (List)hibernateTemplate.execute(
-             new HibernateCallback() 
-             {
-                 public Object doInHibernate(Session session) throws HibernateException 
-                 {
-                	 return (isSysadmin 
-                			 ? session.createQuery(GET_ALL_ARCHIVED_COURSE_IDS).list() 
-                			 : session.createQuery(GET_ARCHIVED_COURSE_IDS_BY_USER).setInteger("userId",userId).list()
-                	 );
-                 }
-             }
-       );
+		return (List) (isSysadmin ? getSession().createQuery(GET_ALL_ARCHIVED_COURSE_IDS).list() : getSession()
+				.createQuery(GET_ARCHIVED_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
 	}
 
 }

@@ -29,12 +29,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerNodeRole;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * 
@@ -42,7 +43,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  * 
  * @version $Revision$
  */
-public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implements PedagogicalPlannerDAO {
+@Repository
+public class PedagogicalPlannerDAOHibernate extends LAMSBaseDAO implements PedagogicalPlannerDAO {
     private static final String FIND_ROOT_NODE = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
 	    + " AS n WHERE n.parent=NULL";
     private static final String FIND_PARENT_TITLE = "SELECT n.parent.uid, n.title FROM "
@@ -66,12 +68,12 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
      */
 
     public PedagogicalPlannerSequenceNode getByUid(Long uid) {
-	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().get(PedagogicalPlannerSequenceNode.class, uid);
+	return (PedagogicalPlannerSequenceNode) getSession().get(PedagogicalPlannerSequenceNode.class, uid);
     }
 
     @SuppressWarnings("unchecked")
     public PedagogicalPlannerSequenceNode getRootNode() {
-	List<PedagogicalPlannerSequenceNode> subnodeList = (List<PedagogicalPlannerSequenceNode>) getHibernateTemplate().find(
+	List<PedagogicalPlannerSequenceNode> subnodeList = (List<PedagogicalPlannerSequenceNode>) doFind(
 		PedagogicalPlannerDAOHibernate.FIND_ROOT_NODE);
 	PedagogicalPlannerSequenceNode rootNode = new PedagogicalPlannerSequenceNode();
 	rootNode.setLocked(true);
@@ -87,7 +89,7 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	List<Object[]> result;
 	Object[] row;
 	while (currentUid != null) {
-	    result = (List<Object[]>) getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_PARENT_TITLE, currentUid);
+	    result = (List<Object[]>) doFind(PedagogicalPlannerDAOHibernate.FIND_PARENT_TITLE, currentUid);
 	    if (result.size() > 0) {
 		row = result.get(0);
 		if (!currentUid.equals(nodeUid)) {
@@ -104,17 +106,17 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     }
 
     public void removeNode(PedagogicalPlannerSequenceNode node) {
-	getHibernateTemplate().delete(node);
-	getHibernateTemplate().flush();
+    	getSession().delete(node);
+    	getSession().flush();
     }
 
     public void saveOrUpdateNode(PedagogicalPlannerSequenceNode node) {
-	getHibernateTemplate().saveOrUpdate(node);
-	getHibernateTemplate().flush();
+    	getSession().saveOrUpdate(node);
+    	getSession().flush();
     }
 
     public Integer getNextOrderId(Long parentUid) {
-	Integer maxOrderId = (Integer) getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_MAX_ORDER_ID,
+	Integer maxOrderId = (Integer) doFind(PedagogicalPlannerDAOHibernate.FIND_MAX_ORDER_ID,
 		parentUid).get(0);
 	if (maxOrderId == null) {
 	    maxOrderId = 0;
@@ -127,12 +129,12 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
 	String query = (orderDelta < 0) ? PedagogicalPlannerDAOHibernate.FIND_NEIGHBOUR_NODE_DESC
 		: PedagogicalPlannerDAOHibernate.FIND_NEIGHBOUR_NODE_ASC;
-	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().find(query,
+	return (PedagogicalPlannerSequenceNode) doFind(query,
 		new Object[] { parentUid, parentUid, order }).get(0);
     }
     
     private List getPlannerNodeRoles(Integer userId, Long nodeUid, Integer roleId) {
-	return getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.GET_PLANNER_NODE_ROLE, 
+	return doFind(PedagogicalPlannerDAOHibernate.GET_PLANNER_NODE_ROLE, 
 		new Object[] { userId, nodeUid, roleId });
     }
     
@@ -154,7 +156,7 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     }
     
     public List getNodeUsers(Long nodeUid, Integer roleId) {
-	return getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.GET_PLANNER_NODE_ROLE_USERS, 
+	return doFind(PedagogicalPlannerDAOHibernate.GET_PLANNER_NODE_ROLE_USERS, 
 		new Object[] { nodeUid, roleId });
     }
     
@@ -173,18 +175,18 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     
     public void saveNodeRole(Integer userId, Long nodeUid, Integer roleId) {
 	PedagogicalPlannerSequenceNode node = getByUid(nodeUid);
-	User user = (User) getHibernateTemplate().get(User.class, userId);
-	Role role = (Role) getHibernateTemplate().get(Role.class, roleId);
+	User user = (User) getSession().get(User.class, userId);
+	Role role = (Role) getSession().get(Role.class, roleId);
 	PedagogicalPlannerNodeRole nodeRole = new PedagogicalPlannerNodeRole(node, user, role);
-	getHibernateTemplate().saveOrUpdate(nodeRole);
-	getHibernateTemplate().flush();
+	getSession().saveOrUpdate(nodeRole);
+	getSession().flush();
     }
     
     public void removeNodeRole(Integer userId, Long nodeUid, Integer roleId) {
 	List l = getPlannerNodeRoles(userId, nodeUid, roleId);
 	for (Object o : l) {
-	    getHibernateTemplate().delete(o);
+		getSession().delete(o);
 	}
-	getHibernateTemplate().flush();
+	getSession().flush();
     }
 }

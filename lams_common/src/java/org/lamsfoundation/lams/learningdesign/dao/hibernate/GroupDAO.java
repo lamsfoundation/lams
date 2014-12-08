@@ -29,8 +29,6 @@ import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -65,15 +63,9 @@ public class GroupDAO extends LAMSBaseDAO implements IGroupDAO {
 	 * @param userID
 	 */
 	public Integer getCountGroupsForUser(final Integer userID) {
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-        return (Integer) hibernateTemplate.execute(new HibernateCallback() {
-            public Object doInHibernate(Session session)
-                    throws HibernateException {
-    	    	Query query = session.createQuery(NUM_GROUPS);
-    	    	query.setInteger("userID", userID);
-    	    	Object value = query.uniqueResult();
-    	    	return new Integer (((Number)value).intValue()); 
-            }
-        });
+		Query query = getSession().createQuery(NUM_GROUPS);
+		query.setInteger("userID", userID);
+		Object value = query.uniqueResult();
+		return new Integer(((Number) value).intValue());
 	}
 }

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
@@ -33,13 +34,14 @@ import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of ILessonDAO
  * @author chris, Jacky Fang
  */
-public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionDAO
+@Repository
+public class ToolSessionDAO extends LAMSBaseDAO implements IToolSessionDAO
 {
 
     protected static final String LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER = 
@@ -61,7 +63,7 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
      */
 	public ToolSession getToolSession(Long toolSessionId)
     {
-        ToolSession session = (ToolSession) getHibernateTemplate().get(ToolSession.class, toolSessionId);
+        ToolSession session = (ToolSession) getSession().get(ToolSession.class, toolSessionId);
         return session;
     }
 
@@ -107,14 +109,14 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
 		
     public void saveToolSession(ToolSession toolSession)
     {
-        getHibernateTemplate().save(toolSession);
+    	getSession().save(toolSession);
     }
     /**
      * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#removeToolSession(org.lamsfoundation.lams.tool.ToolSession)
      */
     public void removeToolSession(ToolSession toolSession)
     {
-        getHibernateTemplate().delete(toolSession);
+    	getSession().delete(toolSession);
     }
 
     /**
@@ -133,7 +135,7 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
      */
     public void updateToolSession(ToolSession toolSession)
     {
-        getHibernateTemplate().update(toolSession);
+    	getSession().update(toolSession);
     }
 
 

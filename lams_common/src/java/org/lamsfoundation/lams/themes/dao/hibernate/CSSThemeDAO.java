@@ -25,23 +25,24 @@ package org.lamsfoundation.lams.themes.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 /**
- * This class interacts with Spring's HibernateTemplate to save/delete and
- * retrieve Theme and other related objects.
+ * This class retrieve CSSTheme and other related objects.
  * 
  * @author Fiona Malikoff
  */
-public class CSSThemeDAO extends HibernateDaoSupport implements ICSSThemeDAO {
+@Repository
+public class CSSThemeDAO extends LAMSBaseDAO implements ICSSThemeDAO {
 
     /**
      * @see org.lamsfoundation.lams.themes.dao.ICSSThemeDAO#getAllThemes()
      */
     public List getAllThemes() {
-	return getHibernateTemplate().find("from Theme c");
+	return doFind("from Theme c");
     }
 
     /**
@@ -49,7 +50,7 @@ public class CSSThemeDAO extends HibernateDaoSupport implements ICSSThemeDAO {
      */
     public Theme getThemeById(Long themeId) {
 	String queryString = "from Theme c where c.themeId=?";
-	List list = getHibernateTemplate().find(queryString, themeId);
+	List list = doFind(queryString, themeId);
 	if (list != null && list.size() > 0)
 	    return (Theme) list.get(0);
 	else
@@ -61,42 +62,42 @@ public class CSSThemeDAO extends HibernateDaoSupport implements ICSSThemeDAO {
      */
     public List getThemeByName(String name) {
 	String queryString = "from Theme c where c.name=?";
-	return getHibernateTemplate().find(queryString, name);
+	return doFind(queryString, name);
     }
 
     /**
      * @see org.lamsfoundation.lams.themes.dao.ICSSThemeDAO#saveOrUpdateTheme(org.lamsfoundation.lams.usermanagement.User)
      */
     public void saveOrUpdateTheme(Theme theme) {
-	getHibernateTemplate().saveOrUpdate(theme);
+    	getSession().saveOrUpdate(theme);
     }
 
     /**
      * @see org.lamsfoundation.lams.themes.dao.ICSSThemeDAO#deleteTheme(org.lamsfoundation.lams.usermanagement.User)
      */
     public void deleteTheme(Theme theme) {
-	getHibernateTemplate().delete(theme);
+    	getSession().delete(theme);
     }
 
     /**
      * @see org.lamsfoundation.lams.themes.dao.ICSSThemeDAO#deleteUserById(java.lang.Integer)
      */
     public void deleteThemeById(Long themeId) {
-	getHibernateTemplate().delete(getThemeById(themeId));
+    	getSession().delete(getThemeById(themeId));
     }
 
     /**
      * @see org.lamsfoundation.lams.themes.dao.ICSSThemeDAO#getAllCSSThemes()
      */
     public List getAllCSSThemes() {
-	return getHibernateTemplate().find("from Theme c where c.type=1");
+	return doFind("from Theme c where c.type=1");
     }
 
     /**
      * @see org.lamsfoundation.lams.themes.dao.ICSSThemeDAO#getAllFlashThemes()
      */
     public List getAllFlashThemes() {
-	return getHibernateTemplate().find("from Theme c where c.type=2");
+	return doFind("from Theme c where c.type=2");
     }
 
 }

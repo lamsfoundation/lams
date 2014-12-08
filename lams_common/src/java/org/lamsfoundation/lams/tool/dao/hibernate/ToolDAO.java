@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 
 /**
@@ -39,7 +39,8 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
  * @author Ozgur Demirtas 24/06/2005
  * 
  */
-public class ToolDAO extends HibernateDaoSupport implements IToolDAO
+@Repository
+public class ToolDAO extends LAMSBaseDAO implements IToolDAO
 {
 	private static final String FIND_ALL = "from obj in class " + Tool.class.getName();
 	private static final String LOAD_TOOL_BY_SIG = "from tool in class Tool where tool.toolSignature=:toolSignature";
@@ -50,37 +51,23 @@ public class ToolDAO extends HibernateDaoSupport implements IToolDAO
      */
     public Tool getToolByID(Long toolID)
     {
-        return (Tool)getHibernateTemplate().get(Tool.class,toolID);
+        return (Tool)getSession().get(Tool.class,toolID);
     }
    
     public List getAllTools(){    	
-    	return this.getHibernateTemplate().find(FIND_ALL);
+    	return this.doFind(FIND_ALL);
     }
     
-    public Tool getToolBySignature(final String toolSignature)
-    {
-        return (Tool) getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 return session.createQuery(LOAD_TOOL_BY_SIG)
-                               .setString("toolSignature",toolSignature)
-                               .uniqueResult();
-             }
-         });
-    }
+	public Tool getToolBySignature(final String toolSignature) {
+		return (Tool) getSession().createQuery(LOAD_TOOL_BY_SIG).setString("toolSignature", toolSignature)
+				.uniqueResult();
+	}
 
     public long getToolDefaultContentIdBySignature(final String toolSignature)
     {
-    	Tool tool= (Tool) getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 return session.createQuery(LOAD_TOOL_BY_SIG)
+    	Tool tool= (Tool) getSession().createQuery(LOAD_TOOL_BY_SIG)
                                .setString("toolSignature",toolSignature)
                                .uniqueResult();
-             }
-         });
         
         if (tool != null)
         	return tool.getDefaultToolContentId();
@@ -90,7 +77,7 @@ public class ToolDAO extends HibernateDaoSupport implements IToolDAO
     
     public void saveOrUpdateTool(Tool tool)
     {
-    	this.getHibernateTemplate().saveOrUpdate(tool);
+    	this.getSession().saveOrUpdate(tool);
     }
 
 

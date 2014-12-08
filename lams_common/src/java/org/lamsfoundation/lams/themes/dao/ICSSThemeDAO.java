@@ -28,8 +28,7 @@ import java.util.List;
 import org.lamsfoundation.lams.themes.Theme;
 
 /**
- * This class interacts with Spring's HibernateTemplate to save/delete and
- * retrieve CSSTheme and other related objects.
+ * This class retrieve CSSTheme and other related objects.
  * 
  * @author Fiona Malikoff
  */

@@ -25,34 +25,25 @@ package org.lamsfoundation.lams.tool.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.ToolImportSupport;
 import org.lamsfoundation.lams.tool.dao.IToolImportSupportDAO;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
-public class ToolImportSupportDAO extends HibernateDaoSupport implements IToolImportSupportDAO
+@Repository
+public class ToolImportSupportDAO extends LAMSBaseDAO implements IToolImportSupportDAO
 {
 	private static final String LOAD_BY_OLD_SIG = "from tis in class ToolImportSupport where tis.supportsToolSignature=:supportsToolSignature";
 	private static final String FIND_ALL = "from obj in class " + ToolImportSupport.class.getName();
 	
 	/** Get all the ToolImportSupport objects which record support for the given old tool signature */
-    public List getToolSignatureWhichSupports(final String oldToolSignature) {
-        return (List) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                return session.createQuery(LOAD_BY_OLD_SIG)
-                              .setString("supportsToolSignature",oldToolSignature)
-                              .list();
-            }
-        });
+	public List getToolSignatureWhichSupports(final String oldToolSignature) {
+		return (List) getSession().createQuery(LOAD_BY_OLD_SIG).setString("supportsToolSignature", oldToolSignature).list();
 
-    }
+	}
 
     public List getAllToolImportSupport(){    	
-    	return this.getHibernateTemplate().find(FIND_ALL);
+    	return doFind(FIND_ALL);
     }
 
 }

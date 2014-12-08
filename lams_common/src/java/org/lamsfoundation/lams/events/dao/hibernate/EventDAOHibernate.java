@@ -3,11 +3,13 @@ package org.lamsfoundation.lams.events.dao.hibernate;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.events.Event;
 import org.lamsfoundation.lams.events.dao.EventDAO;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
-class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
+@Repository
+class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
 
     protected static final String GET_EVENT_QUERY = "FROM " + Event.class.getName()
 	    + " AS e WHERE e.scope=? AND e.name=? AND e.eventSessionId=? AND e.failTime IS NULL";
@@ -18,7 +20,7 @@ class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
     
     @SuppressWarnings("unchecked")
     public Event getEvent(String scope, String name, Long sessionId) throws InvalidParameterException {
-	List<Event> events = (List<Event>) getHibernateTemplate().find(EventDAOHibernate.GET_EVENT_QUERY,
+	List<Event> events = (List<Event>) doFind(EventDAOHibernate.GET_EVENT_QUERY,
 		new Object[] { scope, name, sessionId });
 	if (events.size() > 1) {
 	    throw new InvalidParameterException("Two events with the same parameters exist in the database.");
@@ -31,14 +33,14 @@ class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
 
     @SuppressWarnings("unchecked")
     public List<Event> getEventsToResend() {
-	return (List<Event>) getHibernateTemplate().find(EventDAOHibernate.GET_EVENTS_TO_RESEND_QUERY);
+	return (List<Event>) doFind(EventDAOHibernate.GET_EVENTS_TO_RESEND_QUERY);
     }
 
     public void deleteEvent(Event event) {
-	getHibernateTemplate().delete(event);
+	getSession().delete(event);
     }
 
     public void saveEvent(Event event) {
-	getHibernateTemplate().saveOrUpdate(event);
+	getSession().saveOrUpdate(event);
     }
 }

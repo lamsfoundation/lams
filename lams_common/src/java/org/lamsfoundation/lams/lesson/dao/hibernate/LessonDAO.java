@@ -27,9 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.FetchMode;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -39,8 +37,6 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.springframework.orm.hibernate4.HibernateCallback;
-import org.springframework.orm.hibernate4.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -82,16 +78,11 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	return lesson;
     }
 
-    public Lesson getLessonWithJoinFetchedProgress(final Long lessonId) {
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	public Lesson getLessonWithJoinFetchedProgress(final Long lessonId) {
 
-	return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createCriteria(Lesson.class).add(Restrictions.like("lessonId", lessonId)).setFetchMode(
-			"learnerProgresses", FetchMode.JOIN).uniqueResult();
-	    }
-	});
-    }
+		return (Lesson) getSession().createCriteria(Lesson.class).add(Restrictions.like("lessonId", lessonId))
+				.setFetchMode("learnerProgresses", FetchMode.JOIN).uniqueResult();
+	}
 
     /** Get all the lessons in the database. This includes the disabled lessons. */
     public List getAllLessons() {
@@ -105,20 +96,13 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *                a User that identifies the learner.
      * @return a List with all active lessons in it.
      */
-    public List getActiveLessonsForLearner(final User learner) {
-	List lessons = null;
+	public List getActiveLessonsForLearner(final User learner) {
 
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("activeLessonsAllOrganisations");
+		Query query = getSession().getNamedQuery("activeLessonsAllOrganisations");
 		query.setInteger("userId", learner.getUserId().intValue());
 		List result = query.list();
 		return result;
-	    }
-	});
-	return lessons;
-    }
+	}
 
     /**
      * Gets all lessons that are active for a learner, in a given organisation
@@ -129,57 +113,35 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *                the desired organisation.
      * @return a List with all active lessons in it.
      */
-    public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId) {
-	List lessons = null;
+	public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId) {
 
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("activeLessons");
+		Query query = getSession().getNamedQuery("activeLessons");
 		query.setInteger("userId", learnerId);
 		query.setInteger("organisationId", organisationId);
 		List result = query.list();
 		return result;
-	    }
-	});
-	return (List<Lesson>)lessons;
-    }
+	}
 
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
      */
     public List getActiveLearnerByLesson(final long lessonId) {
-	List learners = null;
 
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	learners = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("activeLearners");
+		Query query = getSession().getNamedQuery("activeLearners");
 		query.setLong("lessonId", lessonId);
 		List result = query.list();
 		return result;
-	    }
-	});
-	return learners;
     }
 
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLessonAndGroup(long, long)
      */
     public List getActiveLearnerByLessonAndGroup(final long lessonId, final long groupId) {
-	List learners = null;
-
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	learners = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("activeLearnersByGroup");
+		Query query = getSession().getNamedQuery("activeLearnersByGroup");
 		query.setLong("lessonId", lessonId);
 		query.setLong("groupId", groupId);
 		List result = query.list();
 		return result;
-	    }
-	});
-	return learners;
     }
 
     /**
@@ -187,15 +149,10 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *      query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
      */
     public Integer getCountActiveLearnerByLesson(final long lessonId) {
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.createQuery(LessonDAO.COUNT_ACTIVE_LEARNERS);
+		Query query = getSession().createQuery(LessonDAO.COUNT_ACTIVE_LEARNERS);
 		query.setLong("lessonId", lessonId);
 		Object value = query.uniqueResult();
 		return new Integer(((Number) value).intValue());
-	    }
-	});
     }
 
     /**
@@ -247,19 +204,11 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @return a List with all appropriate lessons in it.
      */
     public List getLessonsForMonitoring(final int userID, final int organisationID) {
-	List lessons = null;
-
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("lessonsForMonitoring");
+		Query query = getSession().getNamedQuery("lessonsForMonitoring");
 		query.setInteger("userId", userID);
 		query.setInteger("organisationId", organisationID);
 		List result = query.list();
 		return result;
-	    }
-	});
-	return lessons;
     }
 
     /**
@@ -278,14 +227,9 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * Get the lesson that applies to this activity. Not all activities have an attached lesson.
      */
     public Lesson getLessonForActivity(final long activityId) {
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.createQuery(LessonDAO.FIND_LESSON_FOR_ACTIVITY);
+		Query query = getSession().createQuery(LessonDAO.FIND_LESSON_FOR_ACTIVITY);
 		query.setLong("activityId", activityId);
-		return query.uniqueResult();
-	    }
-	});
+		return (Lesson) query.uniqueResult();
     }
 
     /**
@@ -293,12 +237,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *      boolean)
      */
     public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final Integer userRole) {
-	List dtos = null;
 
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	dtos = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		
 		String queryName;
 		if (Role.ROLE_MONITOR.equals(userRole)) {
 		    queryName = "staffLessonsByOrgAndUserWithCompletedFlag";
@@ -309,14 +248,11 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 		    queryName = "allLessonsByOrgAndUserWithCompletedFlag";
 		}
 		
-		Query query = session.getNamedQuery(queryName);
+		Query query = getSession().getNamedQuery(queryName);
 		query.setInteger("userId", userId.intValue());
 		query.setInteger("orgId", orgId.intValue());
 		List result = query.list();
 		return result;
-	    }
-	});
-	return dtos;
     }
     
     /**
@@ -324,18 +260,11 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *      boolean)
      */
     public List getLessonsByGroupAndUser(final Integer userId, final Integer orgId) {
-	List dtos = null;
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	dtos = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("lessonsByOrgAndUserWithChildOrgs");
+		Query query = getSession().getNamedQuery("lessonsByOrgAndUserWithChildOrgs");
 		query.setInteger("userId", userId.intValue());
 		query.setInteger("orgId", orgId.intValue());
 		List result = query.list();
 		return result;
-	    }
-	});
-	return dtos;
     }
     
     public List getLessonsByGroup(final Integer orgId) {
@@ -364,13 +293,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonDetailsFromSessionID(java.lang.Long)
      */
     public Lesson getLessonFromSessionID(final Long toolSessionID) {
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.createQuery(LessonDAO.LESSON_BY_SESSION_ID);
+		Query query = getSession().createQuery(LessonDAO.LESSON_BY_SESSION_ID);
 		query.setLong("toolSessionID", toolSessionID);
-		return query.uniqueResult();
-	    }
-	});
+		return (Lesson) query.uniqueResult();
     }
 }

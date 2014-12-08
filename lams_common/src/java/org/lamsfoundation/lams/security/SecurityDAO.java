@@ -27,14 +27,16 @@ import java.io.Serializable;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
-public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
+@Repository
+public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     /**
      * Checks if the user is a staff member in the given lesson.
@@ -70,12 +72,12 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
     @Override
     @SuppressWarnings("rawtypes")
     public Object find(Class clazz, Serializable id) {
-	return getHibernateTemplate().get(clazz, id);
+	return getSession().get(clazz, id);
     }
 
     @Override
     public boolean hasOrgRole(Integer orgId, Integer userId, String... roles) {
-	Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
+	Query query = getSession()
 		.createQuery(SecurityDAO.CHECK_ORG_ROLE);
 	query.setParameter("orgId", orgId);
 	query.setParameter("userId", userId);
@@ -97,7 +99,7 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
 
     @Override
     public boolean isLessonLearner(Long lessonId, Integer userId) {
-	SQLQuery query = getHibernateTemplate().getSessionFactory().getCurrentSession()
+	SQLQuery query = getSession()
 		.createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
 	query.setLong(0, lessonId);
 	query.setInteger(1, userId);
@@ -106,7 +108,7 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
 
     @Override
     public boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted) {
-	boolean result = !getHibernateTemplate().find(SecurityDAO.CHECK_LESSON_MONITOR,
+	boolean result = !doFind(SecurityDAO.CHECK_LESSON_MONITOR,
 		new Object[] { lessonId, userId }).isEmpty();
 	Lesson lesson = null;
 	if (!result && ownerAccepted) {
@@ -118,6 +120,6 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
 
     @Override
     public boolean isSysadmin(Integer userId) {
-	return !getHibernateTemplate().find(SecurityDAO.CHECK_SYSADMIN, new Object[] { userId }).isEmpty();
+	return !doFind(SecurityDAO.CHECK_SYSADMIN, new Object[] { userId }).isEmpty();
     }
 }
