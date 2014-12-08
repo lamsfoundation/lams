@@ -52,7 +52,6 @@ public class GetServerTimeServlet extends HttpServlet {
 	    PrintWriter out = response.getWriter();
 
 	    out.println(currentTime);
-	    logger.warn("AAAB " + currentTime);
 
 	    out.flush();
 	    out.close();

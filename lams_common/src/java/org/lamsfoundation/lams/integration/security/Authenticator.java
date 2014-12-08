@@ -84,23 +84,26 @@ public class Authenticator {
 	if (map.getDisabled()) {
 	    throw new AuthenticationException("The third party server is disabled");
 	}
+	
+	// check if there is datetime check and if so if it isn't too old
+	if (map.getTimeToLiveLoginRequestEnabled()) {
+	    long datetimeParam;
+	    try {
+		datetimeParam = Long.parseLong(datetime);
+	    } catch (NumberFormatException e) {
+		throw new AuthenticationException(
+			"The third party server provided wrong format of datetime, datetime = " + datetime, e);
+	    }
 
-	// check if datetime parameter is not too old
-	long datetimeParam;
-	try {
-	    datetimeParam = Long.parseLong(datetime);
-	} catch (NumberFormatException e) {
-	    throw new AuthenticationException("The third party server provided wrong format of datetime, datetime = "
-		    + datetime, e);
-	}
-
-	int timeToLiveLoginRequest = map.getTimeToLiveLoginRequest();
-	//sum up request time and maximum allowed request's time to live
-	Date requestTimePlusTimeToLive = new Date(datetimeParam + timeToLiveLoginRequest * 60 * 1000);
-	Date now = new Date();
-	if (requestTimePlusTimeToLive.before(now)) {
-	    throw new AuthenticationException("Login Request can't be older than " + timeToLiveLoginRequest
-		    + "minutes. Request time is: " + new Date(datetimeParam));
+	    int timeToLiveLoginRequest = map.getTimeToLiveLoginRequest();
+	    // sum up request time and maximum allowed request's time to live
+	    Date requestTimePlusTimeToLive = new Date(datetimeParam + timeToLiveLoginRequest * 60 * 1000);
+	    Date requestTimeMinusTimeToLive = new Date(datetimeParam - timeToLiveLoginRequest * 60 * 1000);
+	    Date now = new Date();
+	    if (requestTimePlusTimeToLive.before(now) || requestTimeMinusTimeToLive.after(now)) {
+		throw new AuthenticationException("Request is not in the time range of " + timeToLiveLoginRequest
+			+ " minutes. Please, contact sysadmin.");
+	    }
 	}
 
 	//learnerStrictAuth hash [ts + uid + method + lsid + serverID + serverKey]

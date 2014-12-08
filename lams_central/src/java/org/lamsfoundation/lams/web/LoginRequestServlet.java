@@ -163,7 +163,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    response.sendRedirect("login.jsp?redirectURL=" + redirectURL);
 	} catch (AuthenticationException e) {
 	    LoginRequestServlet.log.error("Authentication error: ", e);
-	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - authentication error");
+	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - authentication error. " + e.getMessage());
 	} catch (UserInfoFetchException e) {
 	    LoginRequestServlet.log.error("User fetch info error: ", e);
 	    response.sendError(HttpServletResponse.SC_BAD_GATEWAY,

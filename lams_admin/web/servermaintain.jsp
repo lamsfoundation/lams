@@ -1,4 +1,9 @@
 <%@ include file="/taglibs.jsp"%>
+<style media="screen,projection" type="text/css">
+	table td {
+  		padding-bottom: 7px;
+	}
+</style>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
@@ -13,7 +18,9 @@
 <html:errors/>
 <br />
 <html:form action="serversave.do" styleId="ext-server-form" method="post">
-<html:hidden property="sid" />
+	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<html:hidden property="sid" />
+	
 <table>
 	<tr>
 		<td><fmt:message key="sysadmin.serverid" />:</td>
@@ -35,14 +42,26 @@
 		<td><fmt:message key="sysadmin.prefix" />:</td>
 		<td><html:text property="prefix" size="10"/> *</td>
 	</tr>
+	
 	<tr>
 		<td><fmt:message key="sysadmin.disabled" />:</td>
 		<td><html:checkbox property="disabled" /></td>
 	</tr>
+	
 	<tr>
+		<td><fmt:message key="sysadmin.login.request.ttl.enable" />:</td>
+		<td>
+			<html:checkbox property="timeToLiveLoginRequestEnabled" styleId="ttl-login-request-enabled"/>
+			<!-- to overcome nasty DynaActionForm bug (http://www.coderanch.com/t/46408/Struts/DynaValidatorActionForm-checkboxes) -->
+			<input type="hidden" name="timeToLiveLoginRequestEnabled" value="false">
+		</td>
+	</tr>
+	
+	<tr id="ttl-login-request-wrap" <c:if test="${!formBean.map.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
 		<td><fmt:message key="sysadmin.login.request.ttl" />:</td>
-		<td><html:text property="timeToLiveLoginRequest" size="10"/></td>
-	</tr>	
+		<td><html:text property="timeToLiveLoginRequest" size="10" styleId="ttl-login-request"/></td>
+	</tr>
+	
 	<logic:notEqual name="ServerOrgMapForm" property="orgId" value="-1">
 		<tr>
 			<td><fmt:message key="sysadmin.organisation" />:</td>
@@ -72,8 +91,8 @@
 </table>
 <div align="center">
 	<html:submit property="submitbutton" styleClass="button"><fmt:message key="admin.save" /></html:submit>
-	<html:reset styleClass="button"><fmt:message key="admin.reset" /></html:reset>
-	<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
+	<html:reset styleClass="button cancel"><fmt:message key="admin.reset" /></html:reset>
+	<html:cancel styleClass="button cancel"><fmt:message key="admin.cancel" /></html:cancel>
 </div>
 </html:form>
 <script type="text/javascript" language="javascript">
@@ -83,9 +102,15 @@
 	}
 	
 	$(document).ready(function(){
+		$("#ttl-login-request-enabled").click(function(){
+			$('#ttl-login-request-wrap').toggle('slow');
+			if ($("#ttl-login-request-enabled").is(':checked')) {
+				$('#ttl-login-request').prop("value", 80);
+			}
+		});
 
 		// validate signup form on keyup and submit
-		$("#ext-server-form").validate({
+		var validator = $("#ext-server-form").validate({
 			rules: {
 				serverid: "required", 
 				serverkey: "required",

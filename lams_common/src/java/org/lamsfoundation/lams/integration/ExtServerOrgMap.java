@@ -42,6 +42,8 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     /** persistent field */
     private Boolean disabled;
     
+    private Boolean timeToLiveLoginRequestEnabled;
+    
     /** persistent field */
     private int timeToLiveLoginRequest;
 
@@ -145,6 +147,14 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     public void setDisabled(Boolean disabled) {
 	this.disabled = disabled;
+    }
+    
+    public Boolean getTimeToLiveLoginRequestEnabled() {
+	return this.timeToLiveLoginRequestEnabled;
+    }
+
+    public void setTimeToLiveLoginRequestEnabled(Boolean timeToLiveLoginRequestEnabled) {
+	this.timeToLiveLoginRequestEnabled = timeToLiveLoginRequestEnabled;
     }
     
     /**
