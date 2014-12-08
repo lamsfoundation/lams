@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-function" prefix="fn" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <!DOCTYPE HTML>
@@ -166,6 +167,11 @@
 				</td>
 				<td id="learnersStartedPossibleCell"></td>
 			</tr>
+			
+			<c:set var="serverURL"><%=Configuration.get(ConfigurationKeys.SERVER_URL)%></c:set>
+			<c:if test="${fn:substring(serverURL, fn:length(serverURL)-1, fn:length(serverURL)) != '/'}">
+				<c:set var="serverURL">${serverURL}/</c:set>
+			</c:if>
 			<c:set var="showLearnerURL"><%=Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
 			<c:if test="${showLearnerURL}">
 				<tr>
@@ -174,7 +180,7 @@
 					</td>
 					<td>
 						<input id="learnerURLField" class="lessonManageField"
-						       value="<lams:LAMSURL/>launchlearner.do?lessonID=${lesson.lessonID}"
+						       value="${serverURL}r/${lesson.encodedLessonID}"
 						       readonly="readonly" />
 						<a class="button lessonManageField" href="#"
 						   onClick="javascript:selectLearnerURL()"><fmt:message key="button.select"/></a>
@@ -182,6 +188,7 @@
 					</td>
 				</tr>
 			</c:if>
+			
 			<tr>
 				<td class="fieldLabel">
 					<fmt:message key="lesson.class"/>

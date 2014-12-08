@@ -901,6 +901,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
 	}
+	//prepare encoded lessonId for shortened learner URL
+	lessonDTO.setEncodedLessonID(WebUtil.encodeLessonId(lessonId));
 
 	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "monitor lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");

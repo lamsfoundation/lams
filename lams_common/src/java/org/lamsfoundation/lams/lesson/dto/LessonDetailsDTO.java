@@ -62,6 +62,7 @@ public class LessonDetailsDTO {
     private Boolean learnerImAvailable;
     private Boolean liveEditEnabled;
     private Boolean isPreview;
+    private String encodedLessonID;
 
     /**
      * Create the DTO based on the lesson. Sets up all the fields except
@@ -391,5 +392,13 @@ public class LessonDetailsDTO {
 
     public void setLiveEditEnabled(Boolean liveEditEnabled) {
         this.liveEditEnabled = liveEditEnabled;
+    }
+    
+    public String getEncodedLessonID() {
+	return encodedLessonID;
+    }
+
+    public void setEncodedLessonID(String encodedLessonID) {
+	this.encodedLessonID = encodedLessonID;
     }
 }

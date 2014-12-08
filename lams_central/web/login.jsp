@@ -34,9 +34,9 @@ j_security_login_page
 	<lams:css style="core" />
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<script type="text/javascript" src="includes/javascript/browser_detect.js"></script>
-	<script type="text/javascript" src="includes/javascript/sha1.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/browser_detect.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/sha1.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		function submitForm() {
 			var password = $('#j_password').val();
