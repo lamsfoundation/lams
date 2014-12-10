@@ -90,13 +90,6 @@ public class ConfigurationKeys {
      */
     public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
-    /**
-     * Turn on the cache debugging listener. Logs whenever an item is
-     * added/removed/evicted to/from the cache. Not on in production. Must be
-     * set to a boolean value
-     */
-    public static String USE_CACHE_DEBUG_LISTENER = "UseCacheDebugListener";
-
     /** Value for controlling style colour on Canvas Activities */
     public static String AUTHORING_ACTS_COLOUR = "AuthoringActivitiesColour";
 
