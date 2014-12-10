@@ -391,26 +391,25 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	qaLearningForm.setMode(mode);
     }
     
-    private QaQueUsr getCurrentUser(String toolSessionId) {
 
-	// get back login user DTO 
+    private QaQueUsr getCurrentUser(String toolSessionId) {
+	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userId = new Long(toolUser.getUserID().longValue());	
-	
-	QaQueUsr qaUser = qaService.getUserByIdAndSession(userId, new Long(toolSessionId));
+	Integer userId = toolUser.getUserID();
+
+	QaQueUsr qaUser = qaService.getUserByIdAndSession(userId.longValue(), new Long(toolSessionId));
 	if (qaUser == null) {
-	    qaUser = qaService.createUser(new Long(toolSessionId));
+	    qaUser = qaService.createUser(new Long(toolSessionId), userId);
 	}
 
 	return qaUser;
     }
 
     private QaQueUsr getSpecifiedUser(String toolSessionId, Integer userId) {
-	QaQueUsr qaUser = qaService.getUserByIdAndSession(new Long(userId.intValue()), new Long(toolSessionId));
+	QaQueUsr qaUser = qaService.getUserByIdAndSession(userId.longValue(), new Long(toolSessionId));
 	if (qaUser == null) {
-	    logger.error("Unable to find specified user for Q&A activity. Screens are likely to fail. SessionId="
-		    + new Long(toolSessionId) + " UserId=" + userId);
+	    qaUser = qaService.createUser(new Long(toolSessionId), userId);
 	}
 	return qaUser;
     }
