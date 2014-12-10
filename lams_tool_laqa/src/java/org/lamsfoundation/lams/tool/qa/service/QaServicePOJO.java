@@ -263,18 +263,16 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qaQuestionDAO.createQueContent(question);
     }
 
-    public QaQueUsr createUser(Long toolSessionID) {
-	HttpSession ss = SessionManager.getSession();
-	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userId = toolUser.getUserID().longValue();
-	String userName = toolUser.getLogin();
-	String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
+    public QaQueUsr createUser(Long toolSessionID, Integer userId) {
+	User user = (User) userManagementService.findById(User.class, userId);
+	String userName = user.getLogin();
+	String fullName = user.getFirstName() + " " + user.getLastName();
 	QaSession qaSession = getSessionById(toolSessionID.longValue());
 
-	QaQueUsr user = new QaQueUsr(userId, userName, fullName, qaSession, new TreeSet());
-	qaQueUsrDAO.createUsr(user);
+	QaQueUsr qaUser = new QaQueUsr(userId.longValue(), userName, fullName, qaSession, new TreeSet());
+	qaQueUsrDAO.createUsr(qaUser);
 
-	return user;
+	return qaUser;
     }
 
     @Override

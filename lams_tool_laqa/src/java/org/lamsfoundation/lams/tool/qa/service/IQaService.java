@@ -155,7 +155,7 @@ public interface IQaService {
 
     void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    QaQueUsr createUser(Long toolSessionID);
+    QaQueUsr createUser(Long toolSessionID, Integer userId);
 
     void updateSession(QaSession qaSession);
 
