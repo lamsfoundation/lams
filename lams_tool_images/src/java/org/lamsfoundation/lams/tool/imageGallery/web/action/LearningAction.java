@@ -482,7 +482,12 @@ public class LearningAction extends Action {
 	ImageGalleryUser createdBy = image.getCreateBy();
 	if (createdBy != null) {
 	    image.getCreateBy().getLoginName();
-	}
+	}	
+	
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	boolean isTeacher = mode != null && mode.isTeacher();
+	boolean isAuthor = !isTeacher && !image.isCreateByAuthor() && (createdBy != null)
+		&& (createdBy.getUserId().equals(imageGalleryUser.getUserId()));
 
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
@@ -498,7 +503,7 @@ public class LearningAction extends Action {
 	    sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	}
 
-	if (imageGallery.isAllowRank()) {
+	if (!isTeacher && imageGallery.isAllowRank()) {
 	    ImageRating imageRating = service.getImageRatingByImageAndUser(imageUid, imageGalleryUser.getUserId());
 	    int rating = imageRating == null ? 0 : imageRating.getRating();
 
@@ -508,7 +513,7 @@ public class LearningAction extends Action {
 	    sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_RATING, rating);
 	}
 
-	if (imageGallery.isAllowVote()) {
+	if (!isTeacher && imageGallery.isAllowVote()) {
 	    boolean isVotedForThisImage = false;
 	    ImageVote imageVote = service.getImageVoteByImageAndUser(image.getUid(), imageGalleryUser.getUserId());
 	    if (imageVote != null && imageVote.isVoted()) {
@@ -518,11 +523,7 @@ public class LearningAction extends Action {
 	}
 
 	// set visibility of "Delete image" button
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	boolean isAuthor = !mode.isTeacher() && !image.isCreateByAuthor() && (createdBy != null)
-		&& (createdBy.getUserId().equals(imageGalleryUser.getUserId()));
 	sessionMap.put(ImageGalleryConstants.PARAM_IS_AUTHOR, isAuthor);
-
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
