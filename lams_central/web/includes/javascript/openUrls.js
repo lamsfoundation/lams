@@ -1,9 +1,9 @@
 	<!--
 		// resolution checking
 		var belowMinRes;
-		if(screen.width <= 800 && screen.height <= 600){
+		if (screen.width <= 800 && screen.height <= 600) {
 			belowMinRes = true;
-		}else{
+		} else {
 			belowMinRes = false;
 		}
 		
@@ -21,7 +21,7 @@
 		var gradebookLrnWin = null;
 		var gradebookMonLessonWin = null;
 		
-		function closeAllChildren(){
+		function closeAllChildren() {
 			if (authorWin && !authorWin.closed) authorWin.closeWindow();
 			if (learnWin && !learnWin.closed) learnWin.close();
 			if (monitorLessonWin && !monitorLessonWin.closed) monitorLessonWin.closeWindow();
@@ -36,243 +36,186 @@
 			if (gradebookMonLessonWin && !gradebookMonLessonWin.closed) gradebookMonLessonWin.close();
 		}
 		
-		function openProfile()
-		{
-			if(isMac)
-			{
+		function openProfile() {
+			if(isMac) {
 				pWin = window.open('profile.do?method=view','pWindow','width=796,height=570,resizable,scrollbars');
-			}
-			else
-			{
-				if(pWin && !pWin.closed)
-				{
+			} else {
+				if (pWin && !pWin.closed) {
 					pWin.location='profile.do?method=view';
 					pWin.focus();
-				}
-				else
-				{
+				} else {
 					pWin = window.open('profile.do?method=view','pWindow','width=796,height=570,resizable,scrollbars');
 					pWin.focus();
 				}
 			}
 		}
 		
-		function openAuthor(){
-			if(isMac)
-				{
+		function openAuthor() {
+			if (isMac) {
 					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+			} else {
+				if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('home.do?method=author') > -1) {
+					//authorWin.location = 'home.do?method=author';
+					authorWin.focus();
+				} else {
+					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+					authorWin.focus();
 				}
-			else
-				{
-					if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('home.do?method=author') > -1)
-					{
-						//authorWin.location = 'home.do?method=author';
-						authorWin.focus();
-					}
-					else
-					{
-						authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-						authorWin.focus();
-					}
-				}
+			}
 		}
 		
-		function openPedagogicalPlanner(){
-			if(isMac)
-				{
+		function openPedagogicalPlanner() {
+			if(isMac) {
 					authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
+			} else {
+				if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('pedagogicalPlanner.do') > -1) {
+					authorWin.focus();
+				} else {
+					authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
+					authorWin.focus();
 				}
-			else
-				{
-					if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('pedagogicalPlanner.do') > -1)
-					{
-						authorWin.focus();
-					}
-					else
-					{
-						authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
-						authorWin.focus();
-					}
-				}
+			}
 		}
 
-		function openAuthorForEditOnFly( learningDesignID )
-		{
-			if(isMac)
-			{
+		function openAuthorForEditOnFly( learningDesignID ) {
+			if (isMac) {
 				monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-			}
-			else
-			{
-				if(monitorLessonWin && !monitorLessonWin.closed)
-				{
+			} else {
+				if(monitorLessonWin && !monitorLessonWin.closed) {
 					monitorLessonWin.location = '../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID;
-				}
-				else
-				{
+				} else {
 					monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow', 'width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 					monitorLessonWin.focus();
 				}
 			}
 		}
 		
-		function openAuthorForEditOnFlyIntegrated( learningDesignID )
-		{
+		function openAuthorForEditOnFlyIntegrated( learningDesignID ) {
 			window.location = '../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID;
 		}
 		
-		function returnToMonitorLessonIntegrated( lessonID )
-		{
+		function returnToMonitorLessonIntegrated( lessonID ) {
 			window.location = 'home.do?method=monitorLesson&lessonID='+lessonID;
 		}
 
-		function openMonitorLesson( lessonID )
-		{
-			if(isMac)
-			{
-				if(belowMinRes)
-				{
+		function openMonitorLesson( lessonID ) {
+			if (isMac) {
+				if(belowMinRes) {
+					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,scrollbars');
+				} else {
 					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,scrollbars');
 				}
-				else
-				{
-					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,scrollbars');
-				}
-			}
-			else
-			{
-				if(monitorLessonWin && !monitorLessonWin.closed)
-				{
+			} else {
+				if (monitorLessonWin && !monitorLessonWin.closed) {
 					monitorLessonWin.location = 'home.do?method=monitorLesson&lessonID='+lessonID;
 					monitorLessonWin.focus();
-				}else{
+				} else {
 					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,resizable,scrollbars');
 				}
 			}
 		}
 		
-		function openAddLesson( courseID, classID )
-		{
-			if(isMac)
-			{
-				if(belowMinRes)
-				{
+		function openAddLesson ( courseID, classID ) {
+			if (isMac) {
+				if (belowMinRes) {
 					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=623,height=480,scrollbars');
-				}
-				else
-				{
+				} else {
 					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=610,height=480,scrollbars');
 				}
-			}
-			else
-			{
-				if(addLessonWin && !addLessonWin.closed)
-				{
+			} else {
+				if (addLessonWin && !addLessonWin.closed) {
 					addLessonWin.location = 'home.do?method=addLesson&courseID='+courseID+'&classID='+classID;
 					addLessonWin.focus();
-				}
-				else
-				{
+				} else {
 					addLessonWin = window.open('home.do?method=addLesson&courseID='+courseID+'&classID='+classID,'alWindow','width=610,height=480,scrollbars');
 				}
 			}
 		}
 
-		function openLearner( lessonId )
-		{
-			if(isMac)
-			{
-				learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+		function openLearner( lessonId ) {
+			if (isMac) {
+				learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+			} else {
+				if (learnWin && !learnWin.closed ) {
+					learnWin.location = 'home.do?method=learner&lessonID='+lessonId;		
+					learnWin.focus();
+				} else {
+					learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+				}
 			}
-			else
-			{
-				if(learnWin && !learnWin.closed )
-				{
+		}
+		
+		/**
+		 * Method designed to open learner window from shortened LAMS learner
+		 * URLS like /lams/r/*. Works exactly the same as openLearner() method except it
+		 * opens slightly modified path "../home.do".
+		 */
+		function openLearnerShortenedUrl( lessonId ) {
+			if (isMac) {
+				learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+			} else {
+				if (learnWin && !learnWin.closed ) {
 					learnWin.location = '../home.do?method=learner&lessonID='+lessonId;		
 					learnWin.focus();
-				}
-				else
-				{
+				} else {
 					learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
 				}
 			}
 		}
 		
-		
-		function openExportPortfolio( lessonId )
-		{
-			if(isMac)
-			{
+		function openExportPortfolio( lessonId ) {
+			if (isMac) {
 				epWin = window.open('learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId,'epWindow','width=796,height=570,resizable,status=yes');
-			}
-			else
-			{
-				if(epWin && !epWin.closed )
-				{
+			} else {
+				if (epWin && !epWin.closed ) {
 					epWin.location = 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId;		
 					ep.focus();
-				}
-				else
-				{
+				} else {
 					epWin = window.open('learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId,'epWindow','width=796,height=570,resizable,status=yes');
 				}
 			}
 		}
 		
-		function openSysadmin()
-		{
+		function openSysadmin() {
 			var height = sys_admin_height;
 			var width = sys_admin_width;
 			var left = 0;
 			var top = 0;
 			
-			if(self.screen){
+			if (self.screen) {
 				top = self.screen.height/2-height/2;
 				left = self.screen.width/2-width/2;
 			}
 			
-			if(isMac)
-			{
+			if (isMac) {
 				sysadminWin = window.open('admin/sysadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
-			}
-			else
-			{
-				if(sysadminWin && !sysadminWin.closed )
-				{
+			} else {
+				if (sysadminWin && !sysadminWin.closed ) {
 					sysadminWin.location = 'admin/sysadminstart.do';
 					sysadminWin.focus();
-				}
-				else
-				{
+				} else {
 					sysadminWin = window.open('admin/sysadminstart.do','saWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					sysadminWin.focus();
 				}
 			}
 		}
 		
-		function openOrgManagement(orgId)
-		{
+		function openOrgManagement(orgId) {
 			var height = 570;
 			var width = 796;
 			var left = 0;
 			var top = 0;
-			if(self.screen){
+			if (self.screen) {
 				top = self.screen.height/2-height/2;
 				left = self.screen.width/2-width/2;
 			}
-			if(isMac)
-			{
+			if (isMac) {
 				omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
-			}
-			else
-			{
-				if(omWin && !omWin.closed )
-				{
+			} else {
+				if (omWin && !omWin.closed ) {
 					omWin.location = 'admin/orgmanage.do?org='+orgId;
 					omWin.focus();
-				}
-				else
-				{
+				} else {
 					omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left='+left+',top='+top+',width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					omWin.focus();
 				}
@@ -284,16 +227,16 @@
 			var width = 750;
 			var left = 0;
 			var top = 0;
-			if(self.screen){
+			if (self.screen) {
 				top = self.screen.height/2-height/2;
 				left = self.screen.width/2-width/2;
 			}
-			if(isMac){
+			if (isMac) {
 				copyrightWin = window.open('copyright.jsp','copyright','resizable,left='+left+',top='+top+',width=750,height=388,scrollbars');
-			}else{
-				if(copyrightWin && !copyrightWin.closed ){
+			} else {
+				if (copyrightWin && !copyrightWin.closed ) {
 					copyrightWin.focus();
-				}else{
+				} else {
 					copyrightWin = window.open('copyright.jsp','copyright','resizable,left='+left+',top='+top+',width=750,height=388,scrollbars');
 					copyrightWin.focus();
 				}
@@ -303,12 +246,12 @@
 		function openCustom(url) {
 			var left = 0;
 			var top = 0;
-			if(isMac){
+			if (isMac) {
 				customWin = window.open(url,'custom','resizable,left='+left+',top='+top+',scrollbars');
-			}else{
-				if(customWin && !customWin.closed ){
+			} else {
+				if (customWin && !customWin.closed ) {
 					customWin.focus();
-				}else{
+				} else {
 					customWin = window.open(url,'custom','resizable,left='+left+',top='+top+',scrollbars');
 					customWin.focus();
 				}
@@ -316,27 +259,27 @@
 		}
 	
 		function openGradebookCourseMonitorPopup(winname, url, width, height, left, top) {
-			if(gradebookMonWin && !gradebookMonWin.closed ){
+			if (gradebookMonWin && !gradebookMonWin.closed ) {
 				gradebookMonWin.focus();
-			}else{
+			} else {
 				gradebookMonWin = window.open(url, "gradebookMonWin",'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
 				gradebookMonWin.focus();
 			}
 		}
 		
 		function openGradebookLearnerPopup(winname, url, width, height, left, top) {
-			if(gradebookLrnWin && !gradebookLrnWin.closed ){
+			if (gradebookLrnWin && !gradebookLrnWin.closed ) {
 				gradebookLrnWin.focus();
-			}else{
+			} else {
 				gradebookLrnWin = window.open(url, "gradebookLrnWin",'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
 				gradebookLrnWin.focus();
 			}
 		}
 		
 		function openGradebookLessonMonitorPopup(winname, url, width, height, left, top) {
-			if(gradebookMonLessonWin && !gradebookMonLessonWin.closed ){
+			if (gradebookMonLessonWin && !gradebookMonLessonWin.closed ) {
 				gradebookMonLessonWin.focus();
-			}else{
+			} else {
 				gradebookMonLessonWin = window.open(url, "gradebookMonLessonWin",'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
 				gradebookMonLessonWin.focus();
 			}
