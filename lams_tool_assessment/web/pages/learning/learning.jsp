@@ -37,72 +37,123 @@
 	<c:set var="isEditingDisabled" value="${finishedLock || !hasEditRight}"/>
 	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
+	<style media="screen,projection" type="text/css">
+		#timelimit-start-dialog {
+			display:none; cursor: default; padding: 10px;
+		}
+		#timelimit-start-dialog h1{
+			padding-bottom: 10px;
+		}
+		#countdown {
+			width: 150px; position: absolute; font-size: 110%; font-style: italic; color:#47bc23;
+		}
+		#countdown-label {
+			font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
+		}
+		#timelimit-expired {
+			font-size: 145%; padding: 15px;
+		}
+		
+		.jGrowl {
+		  	font-size: 22px;
+		  	font-family: arial, helvetica, sans-serif;
+		  	margin-left: 120px;
+		}
+		.jGrowl-notification {
+			opacity: .6;
+			border-radius: 10px;
+			width: 230px;
+			padding: 10px 20px;
+  			margin: 10px 20px;
+			background: black url(${lams}/images/css/check48.png) no-repeat 10px 10px;
+		}
+		.jGrowl-message {
+			padding-left: 60px;
+			padding-top: 5px;
+		}
+	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript">
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	
-		<c:if test="${not finishedLock && assessment.timeLimit > 0}">	
+	<script type="text/javascript">
+		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
+		var isWaitingForConfirmation = ${not finishedLock && assessment.timeLimit > 0 && empty param.secondsLeft};
+	
+		<c:if test="${not finishedLock && assessment.timeLimit > 0}">
 			$(document).ready(function(){
 				if (${empty param.secondsLeft}) {
-					$.blockUI({ message: $('#question'), css: { width: '325px', height: '85px'}, overlayCSS: { opacity: '.98'} }); 
-			        $('#ok').click(function() {
+					//show confirmation dialog
+					$.blockUI({ 
+						message: $('#timelimit-start-dialog'), 
+						css: { width: '325px', height: '120px'}, 
+						overlayCSS: { opacity: '.98'} 
+					});
+					
+					//once OK button pressed start countdown
+			        $('#timelimit-start-ok').click(function() {
 			        	$.unblockUI();
 			        	displayCountdown();
-			        });					
+			        	isWaitingForConfirmation = false;
+			        });
+					
 				} else {
 					displayCountdown();
 				}
 			});
 			
 			function displayCountdown(){
-				var countdown = '<div id="countdown" style="width: 150px; position: absolute; font-size: 110%; font-style: italic; color:#47bc23;"></div>' 
-					$.blockUI({ 
-						message: countdown, 
-						showOverlay: false,
-						focusInput: false,
-						css: { 
-							top: '40px',
-							left: '',
-							right: '0%',
-				            opacity: '.8', 
-				            width: '230px',
-				            cursor: 'default',
-				            border: 'none'
-			        	}   
-					});
-					$('#countdown').countdown({
-						until: '+${secondsLeft}S',  
-						format: 'hMS',
-						compact: true,
-						onTick: checkFor30Seconds,
-						onExpiry: liftoffTime,
-						description: "<div style='font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;' ><fmt:message key='label.learning.countdown.time.left' /></div>"
-					});
-			}	
-			function checkFor30Seconds(periods) {
-				if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-					$('#countdown').css('color', '#FF3333');
-				}
-			}					
-			function liftoffTime(){
-		        $.blockUI({ message: '<h1 style="font-size: 145%;"><img src="<html:rewrite page='/includes/images/indicator.gif'/>" border="0" > <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
-		        
-		        setTimeout(function() { 
-		            $.unblockUI({ 
-		                onUnblock: submitAll 
-		            }); 
-		        }, 4000); 
-			}	
+				var countdown = '<div id="countdown"></div>' 
+				$.blockUI({
+					message: countdown, 
+					showOverlay: false,
+					focusInput: false,
+					css: { 
+						top: '40px',
+						left: '',
+						right: '0%',
+				        opacity: '.8', 
+				        width: '230px',
+				        cursor: 'default',
+				        border: 'none'
+			        }   
+				});
+				
+				$('#countdown').countdown({
+					until: '+${secondsLeft}S',  
+					format: 'hMS',
+					compact: true,
+					onTick: function(periods) {
+						//check for 30 seconds
+						if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
+							$('#countdown').css('color', '#FF3333');
+						}					
+					},
+					onExpiry: function(periods) {
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><img src="<html:rewrite page='/includes/images/indicator.gif'/>" border="0" > <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+				        
+				        setTimeout(function() { 
+				        	submitAll(true);
+				        }, 4000); 
+					},
+					description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
+				});
+			}
 		</c:if>
 		
 		//autosave feature
 		<c:if test="${!isEditingDisabled && (mode != 'teacher')}">
+			
 			var autosaveInterval = "30000"; // 30 seconds interval
 			window.setInterval(
 				function(){
+					if (isWaitingForConfirmation) return;
+					
 					//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
 					$("span[id^=cke_question]").each(function() {
 						var questionNumber = "" + this.id.substring("cke_question".length);
@@ -122,7 +173,10 @@
 					$('#answers').ajaxSubmit({
 						url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 		                success: function() {
-		                	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
+		                	$.jGrowl(
+		                		"<fmt:message key="label.learning.draft.autosaved" />",
+		                		{ life: 2000, closeTemplate: '' }
+		                	);
 		                }
 					});
 	        	}, autosaveInterval
@@ -165,18 +219,25 @@
         	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber + "&secondsLeft=" + secondsLeft);
         	myForm.submit();
 		}
-		function submitAll(){
-			if (!validateAnswers()) {
-				return;
-			}
+		function submitAll(isTimelimitExpired){
 			
 			var secondsLeft = 0;
-			if (${not finishedLock && assessment.timeLimit > 0}) {
-				var times = $("#countdown").countdown('getTimes'); 
-				secondsLeft = times[4]*3600 + times[5]*60 + times[6];
+			
+			//only if time limit is not expired
+			if (!isTimelimitExpired) {
+
+				if (!validateAnswers()) {
+					return;
+				}
+				
+				if (${not finishedLock && assessment.timeLimit > 0}) {
+					var times = $("#countdown").countdown('getTimes'); 
+					secondsLeft = times[4]*3600 + times[5]*60 + times[6];
+				}
 			}
+
         	var myForm = $("#answers");
-        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&secondsLeft=" + secondsLeft);
+        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&secondsLeft=" + secondsLeft + "&isTimelimitExpired=" + isTimelimitExpired);
         	myForm.submit();
 		}	
 		function resubmit(){
@@ -415,12 +476,13 @@
 			<fmt:message key="warn.answers.word.requirements.limit" />
 		</div>
 		
-		<div id="question" style="display:none; cursor: default"> 
-	        <h1 style="padding: 30 10 50">
+		<div id="timelimit-start-dialog"> 
+	        <h1>
 	        	<fmt:message key='label.learning.blockui.are.you.ready' />
 	        </h1>
-    	    <input type="button" id="ok" value="OK" />
-    	    <br>  
+	        <html:button property="ok" styleId="timelimit-start-ok" styleClass="button">
+				OK
+			</html:button>
 		</div>
 		
 		<%@ include file="/common/messages.jsp"%>
@@ -464,7 +526,7 @@
 			<div class="space-bottom-top align-right">
 				<c:choose>
 					<c:when	test="${not finishedLock && hasEditRight}">					
-						<html:button property="submitAll" onclick="return submitAll();" styleClass="button">
+						<html:button property="submitAll" onclick="return submitAll(false);" styleClass="button">
 							<fmt:message key="label.learning.submit.all" />
 						</html:button>	
 					</c:when>
