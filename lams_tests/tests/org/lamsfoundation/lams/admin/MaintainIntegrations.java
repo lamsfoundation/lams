@@ -44,12 +44,14 @@ public class MaintainIntegrations {
 	private static String serverName = "Testing integration";
 	private static String serverDescription  = "Tests the integration via JUnit";
 	private static String userInfoURL = "http://someurl.com/";
+	private static String timeToLiveLimit = "5";
 	private static String externalServerURL = "http://someurl.com/external/";
 	private static String timeoutURL = "http://someurl.com/";
 	private static String lessonFinishCallbackURL = "http://someurl.com/callback/url";
 	private static String country = "AU";
 	private static String language = "en";
-
+	
+	
 	// user testing data
 	private String username = "bart" + randomInt;
 	private String firstName = "Bart";
@@ -92,6 +94,17 @@ public class MaintainIntegrations {
 		driver.findElement(By.name("serverUrl")).sendKeys(externalServerURL);
 		driver.findElement(By.name("timeoutUrl")).sendKeys(timeoutURL);
 		driver.findElement(By.name("lessonFinishUrl")).sendKeys(lessonFinishCallbackURL);
+		
+		// Check if TTL is enable, if so disable it (see LDEV-3382)
+		Boolean isTTLEnabled = (driver.findElement(By.name("timeToLiveLoginRequestEnabled")).isSelected());
+		
+		if (isTTLEnabled) {
+			// disabled it for now
+			driver.findElement(By.name("timeToLiveLoginRequestEnabled")).click();
+			
+		}
+		
+		
 		// Submit form
 		driver.findElement(By.name("submitbutton")).click();
 
@@ -647,10 +660,219 @@ public class MaintainIntegrations {
 	}
 	
 	
+	/**
+	 * Get LAMS server time and check if the format (long) is correct
+	 * 
+	 * 
+	 * @see http://wiki.lamsfoundation.org/x/_Qg
+	 */
+	@Test (description = "Get LAMS server time and check if the format (long) is correct", dependsOnMethods={"getLearnerMarks"})
+	public void getLamsServertime() { 
+
+	Long LamsTime = getLAMSServerTime();
+	
+	System.out.println("LAMS Time: " + LamsTime);
+	
+	Assert.assertTrue(LamsTime instanceof Long);
+	}
 	
 	
+	/**
+	 * Turns on TTL limit for login request validation
+	 * 
+	 * @see http://wiki.lamsfoundation.org/x/_Qg
+	 */
+	@Test (description = "Turns on TTL limit for login request validation", dependsOnMethods={"getLamsServertime"})
+	public void turnOnTtl() { 
+		
+		// First let's logout
+		LamsUtil.logout(driver);
+		
+		// Login
+		AdminUtil.loginAsSysadmin(driver);
+
+		// Get to Sysadmin menu
+		driver.get(LamsConstants.ADMIN_MENU_URL);
+
+		// Click on Maintain integrated servers link
+		driver.findElement(By.linkText("Maintain integrated servers")).click();
+		
+		// Click on the integration
+		driver.findElement(By.id("edit_"+serverId)).click();
+
+		// Check if TTL is enable, if so disable it (see LDEV-3382)
+		Boolean isTTLEnabled = (driver.findElement(By.name("timeToLiveLoginRequestEnabled")).isSelected());
+		
+		System.out.println("isTTLEnabled: " + isTTLEnabled );
+		
+		Assert.assertFalse(isTTLEnabled, "TTL should have been disabled but it shows as enabled");
+		
+		if (!isTTLEnabled) {
+			// enable it 
+			driver.findElement(By.name("timeToLiveLoginRequestEnabled")).click();
+			// set up TTL limit
+			driver.findElement(By.name("timeToLiveLoginRequest")).clear();
+			driver.findElement(By.name("timeToLiveLoginRequest")).sendKeys(timeToLiveLimit);
+			
+		}
+		
+		// Submit form
+		driver.findElement(By.name("submitbutton")).click();
+		
+		
+	}
+	
+	/**
+	 * Tests with a time different of -6 minutes
+	 * This test should get a 401 not authorized response
+	 * 
+	 * @see http://wiki.lamsfoundation.org/x/_Qg
+	 */
+	@Test (description = "Tests with a time different of -6 minutes (it should fail)", dependsOnMethods={"turnOnTtl"})
+	public void testWithMinus6MinutesLoginRequest() { 
+		
+		// First let's logout
+		LamsUtil.logout(driver);
+		
+		Long LamsTime = getLAMSServerTime();
+		
+		System.out.println("LamsTime: " + LamsTime);
+		
+		Long sixMinutes = (long) (6 * 60 * 1000);
+		
+		System.out.println("sixMinutes: " + sixMinutes);
+
+		Long datetime = (LamsTime - sixMinutes);
+
+		System.out.println("datetime: " + datetime);
+		
+		// test data
+		String learnerUsername = "shiho";
+		String method = "learnerStrictAuth";
+
+		// Create the authentication hash
+		String hash = createHashWithMethod(datetime.toString(), learnerUsername, method, lessonId);
+		String queryString = "?uid=" + learnerUsername 
+				+ "&ts=" + datetime.toString()
+				+ "&sid=" + serverId
+				+ "&method=" + method
+				+ "&hash=" + hash
+				+ "&lsid=" + lessonId
+				+ "&couseid=" + courseId;
+
+		// Get the learner page
+		driver.get(LamsConstants.INTEGRATION_LOGINREQUEST_URL + queryString);
+
+		System.out.println("Jump into learner URL: " + LamsConstants.INTEGRATION_LOGINREQUEST_URL + queryString);
+
+		String page = driver.getPageSource();
+		
+		Assert.assertTrue(page.contains("Request is not in the time range of 5 minutes"), 
+				"The page should have returned a 401 error as the datetime passed was -6 and the limit is 5 mins");
+		
+		
+	}
 	
 	
+	/**
+	 * Tests with a time different of 0 minutes
+	 * This test should pass
+	 * 
+	 * @see http://wiki.lamsfoundation.org/x/_Qg
+	 */
+	@Test (description = "Tests with a time different of 0 minutes", dependsOnMethods={"testWithMinus6MinutesLoginRequest"})
+	public void testWith0MinutesLoginRequest() { 
+		
+		// First let's logout
+		LamsUtil.logout(driver);
+		
+		Long LamsTime = getLAMSServerTime();
+		
+		System.out.println("LamsTime: " + LamsTime);
+
+		Long datetime = (LamsTime);
+
+		System.out.println("datetime: " + datetime);
+		
+		// test data
+		String learnerUsername = "shiho";
+		String method = "learnerStrictAuth";
+
+		// Create the authentication hash
+		String hash = createHashWithMethod(datetime.toString(), learnerUsername, method, lessonId);
+		String queryString = "?uid=" + learnerUsername 
+				+ "&ts=" + datetime.toString()
+				+ "&sid=" + serverId
+				+ "&method=" + method
+				+ "&hash=" + hash
+				+ "&lsid=" + lessonId
+				+ "&couseid=" + courseId;
+
+		// Get the learner page
+		driver.get(LamsConstants.INTEGRATION_LOGINREQUEST_URL + queryString);
+
+		System.out.println("Jump into learner URL: " + LamsConstants.INTEGRATION_LOGINREQUEST_URL + queryString);
+
+		String pageTitle = driver.getTitle();
+		
+		Assert.assertTrue(pageTitle.contains("LAMS Learner"), 
+				"This test should have seen the LAMS learning page. However, it was not the case");
+		
+		
+	}
+	
+	
+	/**
+	 * Tests with a time different of +6 minutes
+	 * This test should failed
+	 * 
+	 * @see http://wiki.lamsfoundation.org/x/_Qg
+	 */
+	@Test (description = "Tests with a time different of +6 minutes", dependsOnMethods={"testWith0MinutesLoginRequest"})
+	public void testWithPlus6MinutesLoginRequest() { 
+		
+		// First let's logout
+		LamsUtil.logout(driver);
+		
+		Long LamsTime = getLAMSServerTime();
+		
+		System.out.println("LamsTime: " + LamsTime);
+		
+		Long sixMinutes = (long) (6 * 60 * 1000);
+		
+		System.out.println("sixMinutes: " + sixMinutes);
+
+		Long datetime = (LamsTime + sixMinutes);
+
+		System.out.println("datetime: " + datetime);
+		
+		// test data
+		String learnerUsername = "shiho";
+		String method = "learnerStrictAuth";
+
+		// Create the authentication hash
+		String hash = createHashWithMethod(datetime.toString(), learnerUsername, method, lessonId);
+		String queryString = "?uid=" + learnerUsername 
+				+ "&ts=" + datetime.toString()
+				+ "&sid=" + serverId
+				+ "&method=" + method
+				+ "&hash=" + hash
+				+ "&lsid=" + lessonId
+				+ "&couseid=" + courseId;
+
+		// Get the learner page
+		driver.get(LamsConstants.INTEGRATION_LOGINREQUEST_URL + queryString);
+
+		System.out.println("Jump into learner URL: " + LamsConstants.INTEGRATION_LOGINREQUEST_URL + queryString);
+
+		String page = driver.getPageSource();
+		
+		Assert.assertTrue(page.contains("Request is not in the time range of 5 minutes"), 
+				"The page should have returned a 401 error as the datetime passed was -6 and the limit is 5 mins");
+		
+		
+		
+	}
 	
 	
 	/**
@@ -663,6 +885,24 @@ public class MaintainIntegrations {
 	    DocumentBuilder builder = factory.newDocumentBuilder();
 	    InputSource is = new InputSource(new StringReader(xml));
 	    return builder.parse(is);
+	}
+	
+	
+	/**
+	 * Gets the LAMS server time 
+	 * 
+	 * @return long with LAMS server time
+	 */
+	private long getLAMSServerTime() {
+		
+		driver.get(LamsConstants.INTEGRATION_LAMS_SERVER_TIME_URL);
+		System.out.println("Server getime URL: " + LamsConstants.INTEGRATION_LAMS_SERVER_TIME_URL);
+		// String lamsServertime = driver.getPageSource();
+		String lamsServertime = driver.findElement(By.tagName("body")).getText();
+		System.out.println("LAMS server time: " + lamsServertime);
+		
+		return Long.valueOf(lamsServertime).longValue();
+		
 	}
 	
 	

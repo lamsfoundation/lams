@@ -51,6 +51,7 @@ public class LamsConstants {
 	public static final String INTEGRATION_LESSON_MANAGER_URL = TEST_SERVER_URL + "services/xml/LessonManager";
 	public static final String INTEGRATION_LOGINREQUEST_URL = TEST_SERVER_URL + "LoginRequest";
 	public static final String INTEGRATION_LEARNING_DESIGN_SVG = TEST_SERVER_URL + "services/LearningDesignSVG";
+	public static final String INTEGRATION_LAMS_SERVER_TIME_URL = TEST_SERVER_URL + "services/getServerTime";
 		
 	// Authoring URLs
 	public static final String AUTHOR_FLASHLESS_URL = TEST_SERVER_URL + "authoring/author.do?method=openAuthoring";
