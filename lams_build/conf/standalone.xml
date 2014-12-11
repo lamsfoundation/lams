@@ -447,7 +447,7 @@
                     <filter-ref name="x-powered-by-header"/>
                 </host>
             </server>
-            <servlet-container name="default">
+            <servlet-container name="default" default-encoding="UTF-8">
                 <jsp-config/>
                 <websockets/>
             </servlet-container>

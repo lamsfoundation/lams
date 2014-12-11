@@ -32,6 +32,7 @@ import javax.servlet.jsp.jstl.core.Config;
 
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 /**
@@ -57,11 +58,11 @@ public class SessionListener implements HttpSessionListener {
 	//set server default locale for STURTS and JSTL. This value should be overwrite 
 	//LocaleFilter class. But this part code can cope with login.jsp Locale.
 	if (session != null) {
-	    Locale preferredLocale = new Locale(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
-	    if (preferredLocale != null) {
-		session.setAttribute(LocaleFilter.PREFERRED_LOCALE_KEY, preferredLocale);
-		Config.set(session, Config.FMT_LOCALE, preferredLocale);
-	    }
+	    String defaults[] = LanguageUtil.getDefaultLangCountry();
+	    Locale preferredLocale = new Locale(defaults[0] == null ? "" : defaults[0], defaults[1] == null ? ""
+		    : defaults[1]);
+	    session.setAttribute(LocaleFilter.PREFERRED_LOCALE_KEY, preferredLocale);
+	    Config.set(session, Config.FMT_LOCALE, preferredLocale);
 	}
     }
 
