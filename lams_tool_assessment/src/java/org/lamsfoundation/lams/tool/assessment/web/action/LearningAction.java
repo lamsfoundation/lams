@@ -432,14 +432,18 @@ public class LearningAction extends Action {
 	//get user answers from request and store them into sessionMap
 	storeUserAnswersIntoSessionMap(request);
 	
-	//check all required questions got answered
-	int pageNumberWithUnasweredQuestions = validateAnswers(sessionMap);
-	//if some were not then forward to nextPage()
-	if (pageNumberWithUnasweredQuestions != 0) {
-	    request.setAttribute(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumberWithUnasweredQuestions);
-	    request.setAttribute(AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, true);
+	boolean isTimelimitExpired = WebUtil.readBooleanParam(request, "isTimelimitExpired", false);
+ 	if (!isTimelimitExpired) {
 	    
-	    return nextPage(mapping, form, request, response);
+	    // check all required questions got answered
+	    int pageNumberWithUnasweredQuestions = validateAnswers(sessionMap);
+	    // if some were not then forward to nextPage()
+	    if (pageNumberWithUnasweredQuestions != 0) {
+		request.setAttribute(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumberWithUnasweredQuestions);
+		request.setAttribute(AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, true);
+
+		return nextPage(mapping, form, request, response);
+	    }
 	}
 	
 	//store results from sessionMap into DB
