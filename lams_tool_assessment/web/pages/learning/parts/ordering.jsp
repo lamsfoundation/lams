@@ -14,6 +14,19 @@
 	<table class="question-table">
 		<c:forEach var="option" items="${question.options}" varStatus="ordStatus">
 			<tr>
+
+				<c:if test="${finishedLock}">
+					<td class="complete-item-gif">
+						<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.sequenceId == ordStatus.index)}">
+							<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
+						</c:if>
+						<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.sequenceId != ordStatus.index)}">
+							<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">	
+						</c:if>
+							
+					</td>		
+				</c:if>													
+			
 				<td class="reg-padding">
 					<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${option.sequenceId}" />
 					<c:out value="${option.optionString}" escapeXml="false" />
@@ -26,16 +39,14 @@
 								border="0" title="<fmt:message key="label.authoring.basic.up"/>"
 								onclick="upOption(${question.uid},${ordStatus.index})">
 							<c:if test="${ordStatus.last}">
-								<img
-									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+								<img src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
 									border="0" title="<fmt:message key="label.authoring.basic.down"/>">
 							</c:if>
 						</c:if>
 			
 						<c:if test="${not ordStatus.last and !finishedLock}">
 							<c:if test="${ordStatus.first}">
-								<img
-									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+								<img src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
 									border="0" title="<fmt:message key="label.authoring.basic.up"/>">
 							</c:if>
 			

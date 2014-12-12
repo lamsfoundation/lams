@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
+import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -899,23 +900,18 @@ public class LearningAction extends Action {
 				if (option.getUid().equals(optionAnswer.getOptionUid())) {
 				    
 				    option.setAnswerBoolean(optionAnswer.getAnswerBoolean());
-				    if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-					option.setSequenceId(optionAnswer.getAnswerInt());
-				    } else {
-					option.setAnswerInt(optionAnswer.getAnswerInt());
-				    }
-				    
+				    option.setAnswerInt(optionAnswer.getAnswerInt());
 				    break;
 				}
-			    }			    
-			}
+			    }
+			}			
 			break;
 		    }
 		}
 		
 		//sort ordering type of question
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-		    TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+		    TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(new AnswerIntComparator());
 		    orderedSet.addAll(question.getOptions());
 		    question.setOptions(orderedSet);
 		}
