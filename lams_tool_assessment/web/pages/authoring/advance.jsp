@@ -80,8 +80,8 @@
 </p>
 
 <p>
-	<html:checkbox property="assessment.numbered" styleClass="noBorder" styleId="shuffled"/>
-	<label for="shuffled">
+	<html:checkbox property="assessment.numbered" styleClass="noBorder" styleId="questions-numbering"/>
+	<label for="questions-numbering">
 		<fmt:message key="label.authoring.advance.numbered.questions" />
 	</label>
 </p>
