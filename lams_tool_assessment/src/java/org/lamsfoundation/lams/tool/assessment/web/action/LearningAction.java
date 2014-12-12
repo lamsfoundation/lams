@@ -904,16 +904,17 @@ public class LearningAction extends Action {
 				    break;
 				}
 			    }
-			}			
+			}
+			
+			//sort ordering type of question in order to show how learner has sorted them
+			if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+			    TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(new AnswerIntComparator());
+			    orderedSet.addAll(question.getOptions());
+			    question.setOptions(orderedSet);
+			}
+			
 			break;
 		    }
-		}
-		
-		//sort ordering type of question
-		if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-		    TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(new AnswerIntComparator());
-		    orderedSet.addAll(question.getOptions());
-		    question.setOptions(orderedSet);
 		}
 	    }
 	}
