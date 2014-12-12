@@ -17,7 +17,6 @@
 
 				<c:if test="${finishedLock}">
 					<td class="complete-item-gif">
-					${option.answerInt}!${option.sequenceId}!${ordStatus.index }
 						<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.sequenceId == ordStatus.index)}">
 							<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
 						</c:if>
