@@ -119,9 +119,9 @@
 	
 	<!-- Tab names -->
 	<ul>
-		<li><a href="#tabLesson"><fmt:message key="tab.lesson"/></a></li>
-		<li><a href="#tabSequence"><fmt:message key="tab.sequence"/></a></li>
-		<li><a href="#tabLearners"><fmt:message key="tab.learners"/></a></li>
+		<li><a id="tabLessonLink" href="#tabLesson"><fmt:message key="tab.lesson"/></a></li>
+		<li><a id="tabSequenceLink" href="#tabSequence"><fmt:message key="tab.sequence"/></a></li>
+		<li><a id="tabLearnersLink" href="#tabLearners"><fmt:message key="tab.learners"/></a></li>
 	</ul>
 	
 	<!-- Tab contents -->
@@ -144,7 +144,7 @@
 				<td class="fieldLabel">
 					<fmt:message key="lesson.name"/>
 				</td>
-				<td>
+				<td id="tabLessonLessonName">
 					<c:out value="${lesson.lessonName}" />
 				</td>
 			</tr>
@@ -152,7 +152,7 @@
 				<td class="fieldLabel">
 					<fmt:message key="lesson.description"/>
 				</td>
-				<td>
+				<td id="tabLessonLessonDescription">
 					<c:out value="${lesson.lessonDescription}" escapeXml="false"/>
 				</td>
 			</tr>
@@ -207,18 +207,18 @@
 					<fmt:message key="lesson.class"/>
 				</td>
 				<td>
-					<a class="button lessonManageField" href="#"
+					<a id="viewLearnersButton" class="button lessonManageField" href="#"
 					   onClick="javascript:showLessonLearnersDialog()"
 					   title='<fmt:message key="button.view.learners.tooltip"/>'>
 					   <fmt:message key="button.view.learners"/>
 					</a>
-					<a class="button lessonManageField" href="#"
+					<a id="editClassButton" class="button lessonManageField" href="#"
 					   onClick="javascript:showClassDialog()"
 					   title='<fmt:message key="button.edit.class.tooltip"/>'>
 					   <fmt:message key="button.edit.class"/>
 					</a>
-					<c:if test="${notificationsAvailable}">
-						<a class="button lessonManageField" href="#"
+					<c:if test="${notificationsAvailable && lesson.enabledLessonNotifications}">
+						<a id="notificationButton" class="button lessonManageField" href="#"
 						   onClick="javascript:window.parent.showNotificationsDialog(null,${lesson.lessonID})">
 						   <fmt:message key="email.notifications"/>
 						</a>
@@ -337,18 +337,18 @@
 	
 	<div id="tabSequence">
 		<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
-			<a target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
+			<a id="helpButton" target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
 			   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
 			   <fmt:message key="button.help"/></a>
-			<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
+			<a id="refreshButton" class="button" title="<fmt:message key='button.refresh.tooltip'/>"
 			   href="#" onClick="javascript:refreshMonitor('sequence')">
 			   <fmt:message key="button.refresh"/></a>
-			<a class="button" title="<fmt:message key='button.export.tooltip'/>"
+			<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
 			   href="#"
 			   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
 			   <fmt:message key="button.export"/></a>
 			<c:if test="${lesson.liveEditEnabled}">
-				<a class="button" title="<fmt:message key='button.live.edit.tooltip'/>"
+				<a id="liveEditButton" class="button" title="<fmt:message key='button.live.edit.tooltip'/>"
 			       href="#"
 			  	   onClick="javascript:openLiveEdit()">
 				 <fmt:message key='button.live.edit'/></a>
