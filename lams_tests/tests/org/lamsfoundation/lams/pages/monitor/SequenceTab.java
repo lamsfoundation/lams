@@ -22,61 +22,54 @@
 
 package org.lamsfoundation.lams.pages.monitor;
 
+import java.util.concurrent.TimeUnit;
+
 import org.lamsfoundation.lams.pages.AbstractPage;
-import org.lamsfoundation.lams.pages.IndexPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class MonitorPage extends AbstractPage {
+public class SequenceTab extends AbstractPage {
+
 	
-	/** 
-	 * Tabs & buttons 
-	 * These are the menu buttons and tabs on this interface
+	/**
+	 * Sequence tab attributes 
 	 */
-
 	
-	@FindBy(id = "tabLessonLink")
-	private WebElement tabLessonLink;
-
-	@FindBy(id = "tabSequenceLink")
-	private WebElement tabSequenceLink;
+	@FindBy(id = "refreshButton")
+	private WebElement refreshButton;
 	
-	@FindBy(id = "closeButton")
-	private WebElement closeButton;
+	@FindBy(id = "exportPortfolioButton")
+	private WebElement exportPortfolioButton;
 
-	public MonitorPage(WebDriver driver) {
+	@FindBy(id = "liveEditButton")
+	private WebElement liveEditButton;
+	
+	@FindBy(id = "closeBranchingButton")
+	private WebElement closeBranchingButton;
+
+	@FindBy(id = "helpButton")
+	private WebElement helpButton;
+	
+	
+	public SequenceTab(WebDriver driver) {
 		super(driver);
-		
+
 	}
 	
-	public MonitorPage name() {
+	public boolean isLiveEditPresent() {
+
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+		Boolean isLiveEditPresent = driver.findElements(By.id("liveEditButton")).size() > 0 ? true: false;
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		
-		return PageFactory.initElements(driver, MonitorPage.class);	
+		return isLiveEditPresent;
 		
+
+
 	}
 
-	public LessonTab openLessonTab() {
 
-		tabLessonLink.click();
-		
-		return PageFactory.initElements(driver, LessonTab.class);
-	}
-
-	public SequenceTab openSequenceTab() {
-
-		tabSequenceLink.click();
-		
-		return PageFactory.initElements(driver, SequenceTab.class);
-	}
-	
-	public IndexPage closeDialog() {
-		
-		closeButton.click();
-		driver.switchTo().defaultContent();
-		return PageFactory.initElements(driver, IndexPage.class);
-		
-	}
-	
 }

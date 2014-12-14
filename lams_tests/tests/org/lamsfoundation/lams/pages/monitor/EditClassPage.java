@@ -23,60 +23,33 @@
 package org.lamsfoundation.lams.pages.monitor;
 
 import org.lamsfoundation.lams.pages.AbstractPage;
-import org.lamsfoundation.lams.pages.IndexPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
-public class MonitorPage extends AbstractPage {
+public class EditClassPage extends AbstractPage {
 	
-	/** 
-	 * Tabs & buttons 
-	 * These are the menu buttons and tabs on this interface
+	/**
+	 * Edit class page properties
 	 */
-
 	
-	@FindBy(id = "tabLessonLink")
-	private WebElement tabLessonLink;
+	@FindBy(id = "classMonitorSelectAll")
+	private WebElement classMonitorSelectAll;
 
-	@FindBy(id = "tabSequenceLink")
-	private WebElement tabSequenceLink;
+
+	@FindBy(id = "classLearnerSelectAll")
+	private WebElement classLearnerSelectAll;
 	
-	@FindBy(id = "closeButton")
-	private WebElement closeButton;
-
-	public MonitorPage(WebDriver driver) {
+	public EditClassPage(WebDriver driver) {
 		super(driver);
-		
+	}
+
+	public Boolean areAllMonitorsSelected() {
+		return classMonitorSelectAll.isSelected();
 	}
 	
-	public MonitorPage name() {
-		
-		return PageFactory.initElements(driver, MonitorPage.class);	
-		
+	public Boolean areAlllearnersSelected() {
+		return classLearnerSelectAll.isSelected();
 	}
 
-	public LessonTab openLessonTab() {
-
-		tabLessonLink.click();
-		
-		return PageFactory.initElements(driver, LessonTab.class);
-	}
-
-	public SequenceTab openSequenceTab() {
-
-		tabSequenceLink.click();
-		
-		return PageFactory.initElements(driver, SequenceTab.class);
-	}
-	
-	public IndexPage closeDialog() {
-		
-		closeButton.click();
-		driver.switchTo().defaultContent();
-		return PageFactory.initElements(driver, IndexPage.class);
-		
-	}
-	
 }
