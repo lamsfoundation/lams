@@ -161,7 +161,9 @@ public class IndexPage extends AbstractPage {
 		WebElement lessonMonitor = lessonTable.findElement(By.id(lessonId));
 		
 		lessonMonitor.findElement((By.className("mycourses-monitor-img"))).click();
-		
+		WebDriverWait wait = new WebDriverWait(driver, 3);
+		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.id("dialogFrame")));
+
 		return PageFactory.initElements(driver, MonitorPage.class);
 	}
 	

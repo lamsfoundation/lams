@@ -27,24 +27,53 @@ import java.util.concurrent.TimeUnit;
 
 import org.lamsfoundation.lams.pages.IndexPage;
 import org.lamsfoundation.lams.pages.LoginPage;
+import org.lamsfoundation.lams.pages.monitor.MonitorPage;
 import org.lamsfoundation.lams.pages.monitor.addlesson.AddLessonPage;
 import org.lamsfoundation.lams.pages.monitor.addlesson.LessonTab;
 import org.lamsfoundation.lams.util.LamsUtil;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+
+/**
+ * 
+ * Add lesson tests
+ *  - Open Add lesson wizard
+ *  - Check landing tab
+ *  - Create a first lesson (checks default settings)
+ *  - Create lesson with 
+ *     + all monitors
+ *     + only one learner
+ *     + lesson intro
+ *     + start in monitor
+ *     + start always from the first activity
+ *     + without live edit
+ *     + without lesson notifications
+ *     + without export portfolio
+ *     + with presence (who's online)
+ *     + with IM
+ *     + multiple lesson (x number of learners in each)
+ *     + scheduled lesson
+ * 
+ * @author Ernie Ghiglione (ernieg@lamsfoundation.org)
+ *
+ */
 public class AddLessonTests {
 
 	private static final String RANDOM_INT = LamsUtil.randInt(0, 9999);
 
 	private LoginPage onLogin;
 	private IndexPage index;
+	private MonitorPage monitor;
 	private AddLessonPage addLesson;
 	
 	WebDriver driver;
@@ -58,6 +87,7 @@ public class AddLessonTests {
 		onLogin = PageFactory.initElements(driver, LoginPage.class);
 		index = PageFactory.initElements(driver, IndexPage.class);
 		addLesson = PageFactory.initElements(driver, AddLessonPage.class);
+		monitor = PageFactory.initElements(driver, MonitorPage.class);
 		onLogin.navigateToLamsLogin().loginAs("test3", "test3");
 		
 	}
@@ -87,6 +117,9 @@ public class AddLessonTests {
 	}
 	
 
+	/**
+	 * Checks that the opening tab is the lesson tab
+	 */
 	@Test(dependsOnMethods="openAddLesson")
 	public void checksLandingtTab() {
 		
@@ -97,6 +130,9 @@ public class AddLessonTests {
 		
 	}
 	
+	/**
+	 * Show learning design images
+	 */
 	@Test(dependsOnMethods="checksLandingtTab")
 	public void getUserDesigns() {
 		
@@ -153,7 +189,6 @@ public class AddLessonTests {
 		
 		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
 		
-		
 	}
 	
 	/**
@@ -180,6 +215,9 @@ public class AddLessonTests {
 		
 	}
 	
+	/**
+	 * Checks default setting: All learners should be included in the lesson
+	 */
 	@Test(dependsOnMethods="checkOnlyOneMonitorSelected")
 	public void checkOnlyAllLearnersSelected() {
 		
@@ -189,13 +227,16 @@ public class AddLessonTests {
 		Assert.assertTrue(emptyUnselectedLearners, 
 				"There shouldn't be any unselected learners");
 		
-		// addLesson.closeDialog();
 	}	
 	
+
+	/**
+	 * Creates a lesson with all monitors selected
+	 */
 	@Test(dependsOnMethods="checkOnlyAllLearnersSelected")
 	public void createLessonWithAllMonitors() {
 		
-		String lessonName = "All in " + RANDOM_INT;
+		String lessonName = "All monitors included " + RANDOM_INT;
 		
 		int selectedMonitorsAtStart = addLesson
 		.openClasstab()
@@ -239,6 +280,9 @@ public class AddLessonTests {
 	
 
 
+	/**
+	 * Creates a lesson with only one learner
+	 */
 	@Test(dependsOnMethods="createLessonWithAllMonitors")
 	public void createLessonWithOnlyOneLearner() {
 
@@ -316,6 +360,9 @@ public class AddLessonTests {
 		
 	}
 	
+	/**
+	 * Creates a lesson with an intro page
+	 */
 	@Test(dependsOnMethods="checksDefaultAdvancedSettings")
 	public void createLessonWithIntro() {
 		String introHTMLTxt = "<strong>Hi!</strong> <i>This is a new lesson</i><p>Try to have a go at it</p>";
@@ -349,6 +396,9 @@ public class AddLessonTests {
 		
 	}
 	
+	/**
+	 * Creates a lesson set to start in monitor
+	 */
 	@Test(dependsOnMethods="createLessonWithIntro")
 	public void createLessonStartInMonitor() {
 		addLesson = openDialog(index);
@@ -373,6 +423,9 @@ public class AddLessonTests {
 
 	}
 
+	/**
+	 * Creates a lesson that will always starts from the first activity
+	 */
 	@Test(dependsOnMethods="createLessonStartInMonitor")
 	public void createLessonStartAlwaysFirstActivity() {
 		
@@ -397,6 +450,9 @@ public class AddLessonTests {
 
 	}
 
+	/**
+	 * Creates a lesson without live edit feature
+	 */
 	@Test(dependsOnMethods="createLessonStartInMonitor")
 	public void createLessonWithOutLiveEdit() {
 		
@@ -423,6 +479,9 @@ public class AddLessonTests {
 		
 	}
 
+	/**
+	 * Creates a lesson without lesson notifications
+	 */
 	@Test(dependsOnMethods="createLessonWithOutLiveEdit")
 	public void createLessonStartWithOutLessonNotifications() {
 		addLesson = openDialog(index);
@@ -448,6 +507,9 @@ public class AddLessonTests {
 		
 	}
 	
+	/**
+	 * Creates a lesson without lesson notifications
+	 */
 	@Test(dependsOnMethods="createLessonStartWithOutLessonNotifications")
 	public void createLessonEnableExportPortfolio() {
 		addLesson = openDialog(index);
@@ -472,6 +534,9 @@ public class AddLessonTests {
 		
 	}
 
+	/**
+	 * Creates a lesson with presence enabled
+	 */
 	@Test(dependsOnMethods="createLessonEnableExportPortfolio")
 	public void createLessonEnableWhosOnline() {
 		addLesson = openDialog(index);
@@ -496,6 +561,9 @@ public class AddLessonTests {
 		
 	}
 
+	/**
+	 * Creates a lesson with IM enabled
+	 */
 	@Test(dependsOnMethods="createLessonEnableWhosOnline")
 	public void createLessonEnableIM() {
 		addLesson = openDialog(index);
@@ -520,6 +588,9 @@ public class AddLessonTests {
 		Assert.assertTrue(wasLessonCreated, "Lesson " + lessonName + " was not found!");
 	}
 	
+	/**
+	 * Creates multiple lessons putting X number of learners in each
+	 */
 	@Test(dependsOnMethods="createLessonEnableIM")
 	public void createLessonSplitInMultiple() {
 		addLesson = openDialog(index);
@@ -551,6 +622,9 @@ public class AddLessonTests {
 	
 	}
 	
+	/**
+	 * Creates an scheduled lesson
+	 */
 	@Test(dependsOnMethods="createLessonSplitInMultiple")
 	public void createLessonScheduleStart() {
 		addLesson = openDialog(index);
@@ -576,11 +650,309 @@ public class AddLessonTests {
 	}
 	
 	
+	/*	
+		Now let's check the monitor view for all the lessons we've created
+	*/
+	
+	
+	
+	
+	/**
+	 * Check first lesson
+	 */
+	@Test(dependsOnMethods="createLessonScheduleStart")
+	public void checkLessonWithFirstDesign() {
+		
+		String lessonName  = "First lesson " + RANDOM_INT;
+		
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+	    // driver.findElement(By.linkText(lessonName)).click();
+
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		boolean allLearnersSelected = monitor
+				.openLessonTab()
+				.openEditClass()
+				.areAlllearnersSelected();
+		
+		Assert.assertTrue(allLearnersSelected, 
+				"All learners should have been selected");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	
+	/**
+	 * Check All monitors included lesson
+	 */
+	@Test(dependsOnMethods="checkLessonWithFirstDesign")
+	public void checkLessonAllMonitors() {
+		
+		String lessonName = "All monitors included " + RANDOM_INT;
+		
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+	    // driver.findElement(By.linkText(lessonName)).click();
+
+		monitor = openMonitor(index, lessonName);
+
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		// Start assertions
+		// Assert lesson name
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		
+		boolean allMonitorsSelected = monitor
+				.openLessonTab()
+				.openEditClass()
+				.areAllMonitorsSelected();
+		
+		// Assert all monitors selected
+		Assert.assertTrue(allMonitorsSelected, 
+				"All monitors should have been selected");
+		
+		boolean allLearnersSelected = monitor
+				.openLessonTab()
+				.openEditClass()
+				.areAlllearnersSelected();
+		
+		Assert.assertTrue(allLearnersSelected, 
+				"All learners should have been selected");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	
+	
+	/**
+	 * Check only one learner lesson
+	 */
+	@Test(dependsOnMethods="checkLessonAllMonitors")
+	public void checkLessonOnlyOneLearner() {
+		
+		String lessonName  = "Only one learner " + RANDOM_INT;
+		
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+	    // driver.findElement(By.linkText(lessonName)).click();
+
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		boolean allLearnersSelected = monitor
+				.openLessonTab()
+				.openEditClass()
+				.areAlllearnersSelected();
+		
+		Assert.assertFalse(allLearnersSelected, 
+				"Only one learner should have been selected");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	
+	/**
+	 * Check lesson with intro
+	 */
+	@Test(dependsOnMethods="checkLessonOnlyOneLearner")
+	public void checkLessonWithIntro() {
+		
+		String lessonName  = "Lesson with Intro " + RANDOM_INT;
+		
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+	    // driver.findElement(By.linkText(lessonName)).click();
+		
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		String lessonDescription = monitor.openLessonTab().getLessonDescription();
+		
+		Assert.assertTrue(lessonDescription.contains("Hi!"), 
+				"Lesson doesn't contain description");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	/**
+	 * Check only one learner lesson
+	 */
+	@Test(dependsOnMethods="checkLessonWithIntro")
+	public void checkLessonStartInMonitor() {
+		
+		String lessonName = "Lesson start in monitor " + RANDOM_INT;
+
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+		
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		boolean isLessonScheduled = monitor.openLessonTab().isLessonScheduled();
+		
+		Assert.assertTrue(isLessonScheduled, 
+				"Lesson isn't scheduled");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	/**
+	 * Check lesson without live edit
+	 */
+	@Test(dependsOnMethods="checkLessonStartInMonitor")
+	public void checkLessonWithOutLiveEdit() {
+		
+		String lessonName = "Without live edit " + RANDOM_INT;
+
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+		
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		boolean isLiveEditPresent = monitor.openSequenceTab().isLiveEditPresent();
+		
+		Assert.assertFalse(isLiveEditPresent, 
+				"Lesson's live edit is present, when it shouldn't");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	
+	/**
+	 * Check lesson without notifications
+	 */
+	@Test(dependsOnMethods="checkLessonWithOutLiveEdit")
+	public void checkLessonWithOutNotifications() {
+		
+		String lessonName = "Without notifications " + RANDOM_INT;
+
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+		
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		boolean isNotificationsPresent = monitor.openLessonTab().isNotificationsPresent();
+		
+		Assert.assertFalse(isNotificationsPresent, 
+				"Lesson's live edit is present, when it shouldn't");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	
+	/**
+	 * Check lesson with who's online (presence)
+	 */
+	@Test(dependsOnMethods="checkLessonWithOutNotifications")
+	public void checkLessonEnableWhosOnline() {
+		
+		String lessonName = "Enable presence " + RANDOM_INT;
+
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+		
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		boolean isPresenceEnabled = monitor.openLessonTab().isPresenceEnabled();
+		
+		Assert.assertTrue(isPresenceEnabled, 
+				"Lesson's presence is disabled");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	
+	/**
+	 * Check lesson with enabled IM
+	 */
+	@Test(dependsOnMethods="checkLessonEnableWhosOnline")
+	public void checkLessonEnableIM() {
+		
+		String lessonName = "Enable IM " + RANDOM_INT;
+
+		WebDriverWait wait = new WebDriverWait(driver, 15);
+	    wait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(lessonName)));
+		
+		monitor = openMonitor(index, lessonName);
+		monitor.openLessonTab();
+		
+		String lessonTitleInMonitor = monitor.openLessonTab().getLessonTitle();
+		
+		Assert.assertEquals(lessonName, lessonTitleInMonitor, 
+				"Expected the name to be the same but it isn't");
+		
+		boolean isImEnabled = monitor.openLessonTab().isImEnabled();
+		
+		Assert.assertTrue(isImEnabled, 
+				"Lesson's IM is disabled");
+		
+		monitor.closeDialog();
+		
+	}
+	
+	
 	private AddLessonPage openDialog(IndexPage index) {
 		addLesson = index.addLesson();
 		//driver.switchTo().frame("dialogFrame");
 		
 		return addLesson;
+	}
+	
+	private MonitorPage openMonitor(IndexPage index, String lessonName) {
+		
+		monitor = index.openMonitorLessonByLessonName(lessonName);
+		
+		return monitor;
 	}
 	
 	private void selectRandomDesign(AddLessonPage addLesson, String lessonName) {
@@ -608,5 +980,4 @@ public class AddLessonTests {
 		
 	}
 
-	
 }
