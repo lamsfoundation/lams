@@ -63,6 +63,7 @@ public class LessonDetailsDTO {
     private Boolean liveEditEnabled;
     private Boolean isPreview;
     private String encodedLessonID;
+    private Boolean enabledLessonNotifications;
 
     /**
      * Create the DTO based on the lesson. Sets up all the fields except
@@ -124,6 +125,7 @@ public class LessonDetailsDTO {
 	this.locked_for_edit = lesson.getLockedForEdit();
 	
 	this.isPreview = lesson.isPreviewLesson();
+	this.enabledLessonNotifications = lesson.getEnableLessonNotifications();
     }
 
     public Date getScheduleEndDate() {
@@ -300,6 +302,15 @@ public class LessonDetailsDTO {
 
     public Boolean getIsPreview() {
         return isPreview;
+    }
+
+    public Boolean getEnabledLessonNotifications() {
+	return enabledLessonNotifications;
+
+    }
+
+    public void setEnabledLessonNotifications(Boolean enabledLessonNotifications) {
+	this.enabledLessonNotifications = enabledLessonNotifications;
     }
 
     public void setIsPreview(Boolean isPreview) {
