@@ -52,15 +52,18 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.analysis.snowball.SnowballAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -75,7 +78,6 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -107,7 +109,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
-import org.lamsfoundation.lams.util.CentralToolContentHandler;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -142,6 +143,19 @@ import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvide
  * @struts:action-forward name="editAuthors" path="/pedagogical_planner/editAuthors.jsp"
  */
 public class PedagogicalPlannerAction extends LamsDispatchAction {
+    private static Logger log = Logger.getLogger(PedagogicalPlannerAction.class);
+
+    // Services used in the class, injected by Spring
+    private static IUserManagementService userManagementService;
+    private static IExportToolContentService exportService;
+    private static IAuthoringService authoringService;
+    private static IMonitoringService monitoringService;
+    private static MessageService messageService;
+    private static PedagogicalPlannerDAO pedagogicalPlannerDAO;
+    private static ActivityDAO activityDAO;
+
+    private static final RAMDirectory luceneDir = new RAMDirectory();
+    private static final Analyzer luceneAnalyzer = new StandardAnalyzer();
 
     private static final String FILE_EXTENSION_ZIP = ".zip";
     private static final String FILE_EXTENSION_LAS = ".las";
@@ -159,28 +173,13 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String ACTIVITY_METADATA_COLLAPSED = "Collapsed";
     private static final String ACTIVITY_METADATA_EDITING_ADVICE = "EditingAdvice";
 
-    // Services used in the class, injected by Spring
-    private static IUserManagementService userManagementService;
-    private static IExportToolContentService exportService;
-    private static IAuthoringService authoringService;
-    private static IMonitoringService monitoringService;
-    private static MessageService messageService;
-    private static PedagogicalPlannerDAO pedagogicalPlannerDAO;
-    private static ActivityDAO activityDAO;
-    private static ToolContentHandler contentHandler;
-
-    private static final String PEDAGOGICAL_PLANNER_DAO_BEAN_NAME = "pedagogicalPlannerDAO";
-    private static final String ACTIVITY_DAO_BEAN_NAME = "activityDAO";
-
     // Keys of error messages used in this class. They are meant to be displayed for user.
     private static final String ERROR_KEY_TOOL_ERRORS = "error.planner.tools.";
     private static final String ERROR_KEY_NODE_TITLE_BLANK = "error.planner.node.title.blank";
-    private static final String ERROR_KEY_REPOSITORY = "error.planner.repository";
     private static final String ERROR_KEY_FILE_BAD_EXTENSION = "error.planner.file.bad.extension";
     private static final String ERROR_KEY_FILE_EMPTY = "error.planner.file.empty";
     private static final String ERROR_KEY_FILE_OPEN = "error.planner.file.open";
     private static final String ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED = "error.planner.learning.design.retrieve";
-    private static final String ERROR_KEY_EDITOR = "error.planner.editor";
     private static final String ERROR_KEY_EXPORT = "error.planner.export";
     private static final String ERROR_KEY_IMPORT = "error.planner.import";
     private static final String ERROR_KEY_FILTER_PARSE = "error.planner.filter.parse";
@@ -199,8 +198,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    + CentralConstants.PLANNER_MAX_BRANCHES + " in Pedagogical Planner.";
     private static final String ERROR_TOO_MANY_PARALLEL_ACTIVITIES = "Number of parallel activities is limited to "
 	    + CentralConstants.PLANNER_MAX_PARALLEL_ACTIVITIES + " in Pedagogical Planner.";
-
-    private static Logger log = Logger.getLogger(PedagogicalPlannerAction.class);
 
     // Paths used in templateBase.jsp
     private static final String IMAGE_PATH_GATE = "images/stop.gif";
@@ -226,9 +223,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String FIELD_NAME_FULL_DESCRIPTION = "fullDescription";
     private static final String FIELD_NAME_ANCESTOR_UID = "ancestorUid";
 
-    private static final Map<String, String> filterLanguageMap = new TreeMap<String, String>();
-    private static final Map<String, String[]> filterStopWordsMap = new TreeMap<String, String[]>();
-
     // Tutorial video page string for recognising which page the video was started from
     private static final String PAGE_STRING_START_PLANNER = "StPed";
 
@@ -241,26 +235,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public static final String COPY_MODE_EDIT_CURRENT = "editCurrent";
     public static final String COPY_MODE_MOVE_CURRRENT = "moveCurrent";
     public static final String COPY_MODE_MAKE_COPY = "makeCopy";
-
-    static {
-	PedagogicalPlannerAction.filterLanguageMap.put("en", "English");
-	PedagogicalPlannerAction.filterLanguageMap.put("nl", "Dutch");
-	PedagogicalPlannerAction.filterLanguageMap.put("da", "Danish");
-	PedagogicalPlannerAction.filterLanguageMap.put("nl", "Finnish");
-	PedagogicalPlannerAction.filterLanguageMap.put("fr", "French");
-	PedagogicalPlannerAction.filterLanguageMap.put("de", "German");
-	PedagogicalPlannerAction.filterLanguageMap.put("hu", "Hungarian");
-	PedagogicalPlannerAction.filterLanguageMap.put("it", "Italian");
-	PedagogicalPlannerAction.filterLanguageMap.put("no", "Norwegian");
-	PedagogicalPlannerAction.filterLanguageMap.put("pt", "Portuguese");
-	PedagogicalPlannerAction.filterLanguageMap.put("ru", "Russian");
-	PedagogicalPlannerAction.filterLanguageMap.put("es", "Spanish");
-	PedagogicalPlannerAction.filterLanguageMap.put("sv", "Swedish");
-	PedagogicalPlannerAction.filterLanguageMap.put("tr", "Turkish");
-
-	PedagogicalPlannerAction.filterStopWordsMap.put("English", StopAnalyzer.ENGLISH_STOP_WORDS);
-	// ^[\s\|]+(\S+).*$
-    }
 
     @Override
     /**
@@ -1514,26 +1488,27 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    Set<Document> docs = extractSubnodeDocuments(node);
 	    if (!docs.isEmpty()) {
-		Analyzer analyzer = getAnalyzer();
 		// Searching is performed in title, brief description and full description of the node.
 		MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[] {
 			PedagogicalPlannerAction.FIELD_NAME_TITLE,
 			PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION,
-			PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION }, analyzer);
+			PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION },
+			PedagogicalPlannerAction.luceneAnalyzer);
 
 		Query query = queryParser.parse(filterText);
 
-		// Index is store in the operational memory (not on a hard drive)
-		RAMDirectory dir = new RAMDirectory();
-		IndexWriter indexWriter = new IndexWriter(dir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+		// build index based on nodes
+		IndexWriterConfig config = new IndexWriterConfig(PedagogicalPlannerAction.luceneAnalyzer.getVersion(),
+			PedagogicalPlannerAction.luceneAnalyzer);
+		config.setOpenMode(OpenMode.CREATE);
+		IndexWriter indexWriter = new IndexWriter(PedagogicalPlannerAction.luceneDir, config);
 		for (Document doc : docs) {
 		    indexWriter.addDocument(doc);
 		}
-		indexWriter.optimize();
 		indexWriter.close();
 
-		IndexSearcher searcher = new IndexSearcher(dir);
-
+		// execute search
+		IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(PedagogicalPlannerAction.luceneDir));
 		TopDocs topDocs = searcher.search(query, null, docs.size());
 
 		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
@@ -1559,26 +1534,26 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if ((node != null) && (node.getSubnodes() != null)) {
 	    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
 		Document doc = new Document();
-		Field titleField = new Field(PedagogicalPlannerAction.FIELD_NAME_TITLE, subnode.getTitle(),
-			Field.Store.NO, Field.Index.ANALYZED);
+		Field titleField = new TextField(PedagogicalPlannerAction.FIELD_NAME_TITLE, subnode.getTitle(),
+			Field.Store.NO);
 		titleField.setBoost(10);
 		doc.add(titleField);
 
 		String briefDesc = WebUtil.removeHTMLtags(subnode.getBriefDescription());
 		if (briefDesc != null) {
-		    Field briefDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION, briefDesc,
-			    Field.Store.NO, Field.Index.ANALYZED);
+		    Field briefDescField = new TextField(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION,
+			    briefDesc, Field.Store.NO);
 		    doc.add(briefDescField);
 		}
 		String fullDesc = WebUtil.removeHTMLtags(subnode.getFullDescription());
 		if (fullDesc != null) {
-		    Field fullDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, fullDesc,
-			    Field.Store.NO, Field.Index.ANALYZED);
+		    Field fullDescField = new TextField(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, fullDesc,
+			    Field.Store.NO);
 		    doc.add(fullDescField);
 		}
 
-		Field uidField = new Field(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, subnode.getUid()
-			.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
+		Field uidField = new StringField(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, subnode.getUid()
+			.toString(), Field.Store.YES);
 		doc.add(uidField);
 		docs.add(doc);
 
@@ -1587,21 +1562,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	}
 	return docs;
-    }
-
-    private Analyzer getAnalyzer() {
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	String languageCode = user == null ? null : user.getLocaleLanguage();
-	String language = PedagogicalPlannerAction.filterLanguageMap.get(languageCode);
-	if (language == null) {
-	    return new SimpleAnalyzer();
-	}
-	String[] stopWords = PedagogicalPlannerAction.filterStopWordsMap.get(language);
-	if (stopWords == null) {
-	    return new SnowballAnalyzer(language);
-	}
-	return new SnowballAnalyzer(language, stopWords);
     }
 
     /*----------------------- GROUPING METHODS -------------------------*/
@@ -1867,7 +1827,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	    return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
 	}
-	
+
 	FileUtils.copyFile(new File(zipFilePath), response.getOutputStream());
 	return null;
     }
@@ -1885,8 +1845,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    Role.SYSADMIN, false, true);
 
 	    // list existing users (inherited role from parent nodes)
-	    Set<User> allInheritedUsers = getPedagogicalPlannerDAO().getInheritedNodeUsers(nodeUid,
-		    Role.ROLE_SYSADMIN);
+	    Set<User> allInheritedUsers = getPedagogicalPlannerDAO().getInheritedNodeUsers(nodeUid, Role.ROLE_SYSADMIN);
 	    ArrayList<User> filteredInheritedUsers = new ArrayList<User>();
 	    for (Object o : allInheritedUsers) {
 		User u = (User) o;
@@ -2061,7 +2020,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
 	    PedagogicalPlannerAction.pedagogicalPlannerDAO = (PedagogicalPlannerDAO) wac
-		    .getBean(PedagogicalPlannerAction.PEDAGOGICAL_PLANNER_DAO_BEAN_NAME);
+		    .getBean("pedagogicalPlannerDAO");
 	}
 	return PedagogicalPlannerAction.pedagogicalPlannerDAO;
     }
@@ -2070,19 +2029,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if (PedagogicalPlannerAction.activityDAO == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    PedagogicalPlannerAction.activityDAO = (ActivityDAO) wac
-		    .getBean(PedagogicalPlannerAction.ACTIVITY_DAO_BEAN_NAME);
+	    PedagogicalPlannerAction.activityDAO = (ActivityDAO) wac.getBean("activityDAO");
 	}
 	return PedagogicalPlannerAction.activityDAO;
-    }
-
-    private ToolContentHandler getContentHandler() {
-	if (PedagogicalPlannerAction.contentHandler == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    PedagogicalPlannerAction.contentHandler = (CentralToolContentHandler) wac
-		    .getBean(CentralConstants.CENTRAL_TOOL_CONTENT_HANDLER_BEAN_NAME);
-	}
-	return PedagogicalPlannerAction.contentHandler;
     }
 }

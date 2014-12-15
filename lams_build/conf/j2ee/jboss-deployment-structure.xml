@@ -42,7 +42,7 @@
       <module name="org.jdom" slot="0.7" export="true" />
       <module name="org.verisign.joid" export="true" />
       <module name="com.google.gson" export="true" />
-      <module name="org.apache.lucene" slot="2.4" export="true" />
+      <module name="org.apache.lucene" slot="4.10" export="true" />
       <module name="org.quartz" export="true" />
       <module name="uk.ac.reload" export="true" />
       <module name="org.springframework" export="true" meta-inf="export" />

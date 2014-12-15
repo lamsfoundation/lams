@@ -25,8 +25,6 @@
         <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>
         <archive path="/lams_build/lib/flagstone/transform.jar"/>
         <archive path="/lams_build/lib/flagstone/translate.jar"/>
-        <archive javadoc="http://www.lhelper.org/dev/lucene-2.4.0/docs/api/core/" path="/lams_build/lib/lucene/lucene-core-2.4.0.jar" source="/3rdParty_sources/lucene"/>
-        <archive javadoc="http://www.lhelper.org/dev/lucene-2.4.0/docs/api/contrib-snowball/" path="/lams_build/lib/lucene/lucene-snowball-2.4.0.jar" source="/3rdParty_sources/lucene"/>
         <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.0.jar" source="/3rdParty_sources/commons-httpclient"/>
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.31-bin.jar" source="/3rdParty_sources/mysql-connector"/>
@@ -43,5 +41,8 @@
         <archive path="/lams_build/lib/xstream/xstream-1.5.0-SNAPSHOT.jar" source="/3rdParty_sources/xstream"/>
         <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/joda/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
         <archive path="/lams_build/lib/quartz/quartz-2.2.1.jar" source="/3rdParty_sources/quartz"/>
+        <archive path="/lams_build/lib/lucene/lucene-core-4.10.2.jar" source="/3rdParty_sources/lucene"/>
+        <archive path="/lams_build/lib/lucene/lucene-analyzers-common-4.10.2.jar" source="/3rdParty_sources/lucene"/>
+        <archive path="/lams_build/lib/lucene/lucene-queryparser-4.10.2.jar" source="/3rdParty_sources/lucene"/>
     </library>
 </eclipse-userlibraries>
