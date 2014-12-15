@@ -106,7 +106,7 @@
 
 	<c:forEach var="entry"items="${requestScope.listGeneralCheckedOptionsContent}">
 		<div>
-			<c:out value="${entry}" escapeXml="true" />
+			<c:out value="${entry}" escapeXml="false" />
 		</div>
 	</c:forEach>
 	
