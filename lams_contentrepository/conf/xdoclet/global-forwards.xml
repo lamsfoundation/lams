@@ -1,3 +1,0 @@
-  <global-forwards >
-	     <forward name="logout" path="/loggedout.html" />
-   </global-forwards>
