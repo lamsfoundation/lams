@@ -60,16 +60,16 @@ ALTER TABLE lams_qtz_fired_triggers DROP COLUMN is_stateful;
 
 -- add new 'sched_name' COLUMN to all tables
 
-ALTER TABLE lams_qtz_blob_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_calendars ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_cron_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_fired_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_job_details ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_locks ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_paused_trigger_grps ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_scheduler_state ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_simple_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
-ALTER TABLE lams_qtz_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LamsQuartzScheduler' FIRST;
+ALTER TABLE lams_qtz_blob_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_calendars ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_cron_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_fired_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_job_details ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_locks ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_paused_trigger_grps ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_scheduler_state ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_simple_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
+ALTER TABLE lams_qtz_triggers ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
 
 -- drop all primary and foreign key constraints, so that we can define new ones
 

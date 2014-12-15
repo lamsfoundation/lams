@@ -227,7 +227,7 @@
 
 	 <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="applicationContextSchedulerContextKey" value="context.central"/>
-        <property name="schedulerName" value="LamsQuartzScheduler"/>
+        <property name="schedulerName" value="LAMS"/>
     	<property name="quartzProperties">
 			<props>
 				<prop key="org.quartz.jobStore.class">org.springframework.scheduling.quartz.LocalDataSourceJobStore</prop>
