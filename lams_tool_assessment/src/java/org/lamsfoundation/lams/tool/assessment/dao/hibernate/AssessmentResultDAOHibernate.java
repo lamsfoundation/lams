@@ -54,9 +54,9 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
     
-    private static final String FIND_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
+    private static final String FIND_LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
     
     private static final String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select r.finishDate - r.startDate FROM "
 	    + AssessmentResult.class.getName()
@@ -96,7 +96,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     
     @Override
     public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_GRADE, new Object[] { userId, assessmentUid });
+	List list = getHibernateTemplate().find(FIND_LAST_ASSESSMENT_RESULT_GRADE, new Object[] { userId, assessmentUid });
 	if (list == null || list.size() == 0) {
 	    return null;   
 	} else {
