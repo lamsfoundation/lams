@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,9 +16,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
 /**
@@ -38,7 +35,10 @@ package org.quartz;
  * </p>
  * 
  * @see JobDetail
- * @see StatefulJob
+ * @see JobBuilder
+ * @see ExecuteInJTATransaction
+ * @see DisallowConcurrentExecution
+ * @see PersistJobDataAfterExecution
  * @see Trigger
  * @see Scheduler
  * 
@@ -70,11 +70,10 @@ public interface Job {
      * execution.
      * </p>
      * 
-     * @return void (nothing) if job is successful.
      * @throws JobExecutionException
      *           if there is an exception while executing the job.
      */
-    public void execute(JobExecutionContext context)
-            throws JobExecutionException;
+    void execute(JobExecutionContext context)
+        throws JobExecutionException;
 
 }

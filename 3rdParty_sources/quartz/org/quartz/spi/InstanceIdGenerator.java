@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -21,7 +21,7 @@ import org.quartz.SchedulerException;
 /**
  * <p>
  * An InstanceIdGenerator is responsible for generating the clusterwide unique 
- * instance id for a <code>Scheduler</code> nodde.
+ * instance id for a <code>Scheduler</code> node.
  * </p>
  * 
  * <p>
@@ -32,8 +32,7 @@ import org.quartz.SchedulerException;
  * 
  * @see org.quartz.simpl.SimpleInstanceIdGenerator
  */
-public interface InstanceIdGenerator
-{
+public interface InstanceIdGenerator {
     /**
      * Generate the instance id for a <code>Scheduler</code>
      * 

@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -21,12 +21,14 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.quartz.spi.TriggerFiredBundle;
 
@@ -35,29 +37,39 @@ import org.quartz.spi.TriggerFiredBundle;
 /**
  * A JobFactory that instantiates the Job instance (using the default no-arg
  * constructor, or more specifically: <code>class.newInstance()</code>), and
- * then attempts to set all values in the <code>JobExecutionContext</code>'s
- * <code>JobDataMap</code> onto bean properties of the <code>Job</code>.
+ * then attempts to set all values from the <code>SchedulerContext</code> and
+ * the <code>JobExecutionContext</code>'s merged <code>JobDataMap</code> onto 
+ * bean properties of the <code>Job</code>.
+ * 
+ * <p>Set the warnIfPropertyNotFound property to true if you'd like noisy logging in
+ * the case of values in the JobDataMap not mapping to properties on your Job
+ * class.  This may be useful for troubleshooting typos of property names, etc.
+ * but very noisy if you regularly (and purposely) have extra things in your
+ * JobDataMap.</p>
+ * 
+ * <p>Also of possible interest is the throwIfPropertyNotFound property which
+ * will throw exceptions on unmatched JobDataMap keys.</p>
  * 
  * @see org.quartz.spi.JobFactory
  * @see SimpleJobFactory
- * @see JobExecutionContext#getMergedJobDataMap()
+ * @see SchedulerContext
+ * @see org.quartz.JobExecutionContext#getMergedJobDataMap()
  * @see #setWarnIfPropertyNotFound(boolean)
  * @see #setThrowIfPropertyNotFound(boolean)
  * 
  * @author jhouse
  */
 public class PropertySettingJobFactory extends SimpleJobFactory {
-
-    private Log log = LogFactory.getLog(SimpleJobFactory.class);
-    
-    private boolean warnIfNotFound = true;
+    private boolean warnIfNotFound = false;
     private boolean throwIfNotFound = false;
     
-    public Job newJob(TriggerFiredBundle bundle) throws SchedulerException {
+    @Override
+    public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
 
-        Job job = super.newJob(bundle);
+        Job job = super.newJob(bundle, scheduler);
         
         JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.putAll(scheduler.getContext());
         jobDataMap.putAll(bundle.getJobDetail().getJobDataMap());
         jobDataMap.putAll(bundle.getTrigger().getJobDataMap());
 
@@ -71,187 +83,175 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
         BeanInfo bi = null;
         try {
             bi = Introspector.getBeanInfo(obj.getClass());
-        } catch (IntrospectionException e1) {
-            if(isThrowIfPropertyNotFound()) {
-                throw new SchedulerException("Unable to introspect Job class.", e1);
-            }
-            if(isWarnIfPropertyNotFound()) {
-                log.warn("Unable to introspect Job class.", e1);
-            }
+        } catch (IntrospectionException e) {
+            handleError("Unable to introspect Job class.", e);
         }
         
         PropertyDescriptor[] propDescs = bi.getPropertyDescriptors();
         
-        java.util.Iterator keys = data.keySet().iterator();
-        while (keys.hasNext()) {
-            String name = (String) keys.next();
+        // Get the wrapped entry set so don't have to incur overhead of wrapping for
+        // dirty flag checking since this is read only access
+        for (Iterator<?> entryIter = data.getWrappedMap().entrySet().iterator(); entryIter.hasNext();) {
+            Map.Entry<?,?> entry = (Map.Entry<?,?>)entryIter.next();
+            
+            String name = (String)entry.getKey();
             String c = name.substring(0, 1).toUpperCase(Locale.US);
             String methName = "set" + c + name.substring(1);
         
             java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
         
-            Class paramType = null;
+            Class<?> paramType = null;
             Object o = null;
             
             try {
                 if (setMeth == null) {
-                    if(isThrowIfPropertyNotFound()) {
-                        throw new SchedulerException(
-                                "No setter on Job class " + obj.getClass() + 
-                                " for property '" + name + "'");
-                    }
-                    if(isWarnIfPropertyNotFound()) {
-                        log.warn(
-                                "No setter on Job class " + obj.getClass() + 
-                                " for property '" + name + "'");
-                    }
+                    handleError(
+                        "No setter on Job class " + obj.getClass().getName() + 
+                        " for property '" + name + "'");
                     continue;
                 }
                 
                 paramType = setMeth.getParameterTypes()[0];
-                o = data.get(name);
+                o = entry.getValue();
                 
-                if (paramType.equals(int.class)) {
-                    if(o instanceof Integer)
-                        setMeth.invoke(obj, 
-                                new Object[]{o});
-                    else if(o instanceof String)
-                        setMeth.invoke(obj, 
-                                new Object[]{data.getIntegerFromString(name)});
-                } else if (paramType.equals(long.class)) {
-                    if(o instanceof Long)
-                        setMeth.invoke(obj, 
-                                new Object[]{o});
-                    else if(o instanceof String)
-                        setMeth.invoke(obj, 
-                                new Object[]{data.getLongFromString(name)});
-                } else if (paramType.equals(float.class)) {
-                    if(o instanceof Float)
-                        setMeth.invoke(obj, 
-                                new Object[]{o});
-                    else if(o instanceof String)
-                        setMeth.invoke(obj, 
-                                new Object[]{data.getFloatFromString(name)});
-                } else if (paramType.equals(double.class)) {
-                    if(o instanceof Double)
-                        setMeth.invoke(obj, 
-                                new Object[]{o});
-                    else if(o instanceof String)
-                        setMeth.invoke(obj, 
-                                new Object[]{data.getDoubleFromString(name)});
-                } else if (paramType.equals(boolean.class)) {
-                    if(o instanceof Boolean)
-                        setMeth.invoke(obj, 
-                                new Object[]{o});
-                    else if(o instanceof String)
-                        setMeth.invoke(obj, 
-                                new Object[]{data.getBooleanFromString(name)});
-                } else if (paramType.equals(String.class)) {
-                    if(o instanceof String)
-                        setMeth.invoke(obj, 
-                                new Object[]{o});
-                } else {
-                    if(paramType.isAssignableFrom(o.getClass())) {
-                        setMeth.invoke(obj, 
-                                new Object[]{o});
+                Object parm = null;
+                if (paramType.isPrimitive()) {
+                    if (o == null) {
+                        handleError(
+                            "Cannot set primitive property '" + name + 
+                            "' on Job class " + obj.getClass().getName() + 
+                            " to null.");
+                        continue;
                     }
-                    else
-                        throw new NoSuchMethodException();
+
+                    if (paramType.equals(int.class)) {
+                        if (o instanceof String) {                            
+                            parm = Integer.valueOf((String)o);
+                        } else if (o instanceof Integer) {
+                            parm = o;
+                        }
+                    } else if (paramType.equals(long.class)) {
+                        if (o instanceof String) {
+                            parm = Long.valueOf((String)o);
+                        } else if (o instanceof Long) {
+                            parm = o;
+                        }
+                    } else if (paramType.equals(float.class)) {
+                        if (o instanceof String) {
+                            parm = Float.valueOf((String)o);
+                        } else if (o instanceof Float) {
+                            parm = o;
+                        }
+                    } else if (paramType.equals(double.class)) {
+                        if (o instanceof String) {
+                            parm = Double.valueOf((String)o);
+                        } else if (o instanceof Double) {
+                            parm = o;
+                        }
+                    } else if (paramType.equals(boolean.class)) {
+                        if (o instanceof String) {
+                            parm = Boolean.valueOf((String)o);
+                        } else if (o instanceof Boolean) {
+                            parm = o;
+                        }
+                    } else if (paramType.equals(byte.class)) {
+                        if (o instanceof String) {
+                            parm = Byte.valueOf((String)o);
+                        } else if (o instanceof Byte) {
+                            parm = o;
+                        }
+                    } else if (paramType.equals(short.class)) {
+                        if (o instanceof String) {
+                            parm = Short.valueOf((String)o);
+                        } else if (o instanceof Short) {
+                            parm = o;
+                        }
+                    } else if (paramType.equals(char.class)) {
+                        if (o instanceof String) {
+                            String str = (String)o;
+                            if (str.length() == 1) {
+                                parm = Character.valueOf(str.charAt(0));
+                            }
+                        } else if (o instanceof Character) {
+                            parm = o;
+                        }
+                    }
+                } else if ((o != null) && (paramType.isAssignableFrom(o.getClass()))) {
+                    parm = o;
                 }
+                
+                // If the parameter wasn't originally null, but we didn't find a 
+                // matching parameter, then we are stuck.
+                if ((o != null) && (parm == null)) {
+                    handleError(
+                        "The setter on Job class " + obj.getClass().getName() + 
+                        " for property '" + name + 
+                        "' expects a " + paramType + 
+                        " but was given " + o.getClass().getName());
+                    continue;
+                }
+                                
+                setMeth.invoke(obj, new Object[]{ parm });
             } catch (NumberFormatException nfe) {
-                if(isThrowIfPropertyNotFound()) {
-                    throw new SchedulerException(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            " but was given " + o, nfe);
-                }
-                if(isWarnIfPropertyNotFound()) {
-                    log.warn(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            " but was given " + o, nfe);
-                }
-                continue;
-            } catch (NoSuchMethodException e) {
-                if(isThrowIfPropertyNotFound()) {
-                    throw new SchedulerException(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            " but was given " + o.getClass());
-                }
-                if(isWarnIfPropertyNotFound()) {
-                    log.warn(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            " but was given a " + o.getClass());
-                }
-                continue;
+                handleError(
+                    "The setter on Job class " + obj.getClass().getName() + 
+                    " for property '" + name + 
+                    "' expects a " + paramType + 
+                    " but was given " + o.getClass().getName(), nfe);
             } catch (IllegalArgumentException e) {
-                if(isThrowIfPropertyNotFound()) {
-                    throw new SchedulerException(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            " but was given " + o.getClass(),e );
-                }
-                if(isWarnIfPropertyNotFound()) {
-                    log.warn(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            " but was given a " + o.getClass(), e);
-                }
-                continue;
+                handleError(
+                    "The setter on Job class " + obj.getClass().getName() + 
+                    " for property '" + name + 
+                    "' expects a " + paramType + 
+                    " but was given " + o.getClass().getName(), e);
             } catch (IllegalAccessException e) {
-                if(isThrowIfPropertyNotFound()) {
-                    throw new SchedulerException(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' could not be accessed.", e);
-                }
-                if(isWarnIfPropertyNotFound()) {
-                    log.warn(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            "' could not be accessed.", e);
-                }
-                continue;
+                handleError(
+                    "The setter on Job class " + obj.getClass().getName() + 
+                    " for property '" + name + 
+                    "' could not be accessed.", e);
             } catch (InvocationTargetException e) {
-                if(isThrowIfPropertyNotFound()) {
-                    throw new SchedulerException(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' could not be accessed.", e);
-                }
-                if(isWarnIfPropertyNotFound()) {
-                    log.warn(
-                            "The setter on Job class " + obj.getClass() + 
-                            " for property '" + name + 
-                            "' expects a " + paramType + 
-                            "' could not be accessed.", e);
-                }
-                continue;
+                handleError(
+                    "The setter on Job class " + obj.getClass().getName() + 
+                    " for property '" + name + 
+                    "' could not be invoked.", e);
             }
         }
     }
+     
+    private void handleError(String message) throws SchedulerException {
+        handleError(message, null);
+    }
+    
+    private void handleError(String message, Exception e) throws SchedulerException {
+        if (isThrowIfPropertyNotFound()) {
+            throw new SchedulerException(message, e);
+        }
         
+        if (isWarnIfPropertyNotFound()) {
+            if (e == null) {
+                getLog().warn(message);
+            } else {
+                getLog().warn(message, e);
+            }
+        }
+    }
+    
     private java.lang.reflect.Method getSetMethod(String name,
             PropertyDescriptor[] props) {
         for (int i = 0; i < props.length; i++) {
             java.lang.reflect.Method wMeth = props[i].getWriteMethod();
         
-            if(wMeth == null)
+            if(wMeth == null) {
                 continue;
+            }
             
-            if(wMeth.getParameterTypes().length != 1)
+            if(wMeth.getParameterTypes().length != 1) {
                 continue;
+            }
             
-            if (wMeth.getName().equals(name)) return wMeth;
+            if (wMeth.getName().equals(name)) {
+                return wMeth;
+            }
         }
         
         return null;
@@ -300,6 +300,4 @@ public class PropertySettingJobFactory extends SimpleJobFactory {
     public void setWarnIfPropertyNotFound(boolean warnIfNotFound) {
         this.warnIfNotFound = warnIfNotFound;
     }
-        
-    
 }

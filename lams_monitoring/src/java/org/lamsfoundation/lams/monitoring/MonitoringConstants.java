@@ -36,9 +36,6 @@ public class MonitoringConstants {
     public static final String KEY_USER_ID = "userID";
     public static final String KEY_STAFF = "staff";
     public static final String KEY_LEARNER = "learners";
-    public static final String JOB_START_LESSON = "startScheduleLessonJob";
-    public static final String JOB_FINISH_LESSON = "finishScheduleLessonJob";
-    public static final String JOB_EMAIL_MESSAGE = "emailScheduleMessageJob";
     public static final String PARAM_LESSON_START_DATE = "lessonStartDate";
     public static final String PARAM_SCHEDULED_NUMBER_DAYS_TO_LESSON_FINISH = "scheduledNumberDaysToLessonFinish";
     public static final String PARAM_LEARNER_ID = "learnerID";

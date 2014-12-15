@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.utils;
 
 import java.sql.Connection;
@@ -47,8 +44,10 @@ public interface ConnectionProvider {
      * @return connection managed by this provider
      * @throws SQLException
      */
-    public Connection getConnection() throws SQLException;
+    Connection getConnection() throws SQLException;
     
     
-    public void shutdown() throws SQLException;
+    void shutdown() throws SQLException;
+    
+    void initialize() throws SQLException;
 }

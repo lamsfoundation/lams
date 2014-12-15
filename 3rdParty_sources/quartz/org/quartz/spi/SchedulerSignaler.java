@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,11 +15,10 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.spi;
 
+import org.quartz.JobKey;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 
 /**
@@ -38,8 +37,13 @@ public interface SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public void notifyTriggerListenersMisfired(Trigger trigger);
+    void notifyTriggerListenersMisfired(Trigger trigger);
 
-    public void signalSchedulingChange();
+    void notifySchedulerListenersFinalized(Trigger trigger);
 
+    void notifySchedulerListenersJobDeleted(JobKey jobKey);
+
+    void signalSchedulingChange(long candidateNewNextFireTime);
+
+    void notifySchedulerListenersError(String string, SchedulerException jpe);
 }

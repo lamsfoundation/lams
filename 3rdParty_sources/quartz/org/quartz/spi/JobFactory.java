@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -17,6 +17,7 @@
 package org.quartz.spi;
 
 import org.quartz.Job;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
 /**
@@ -56,9 +57,10 @@ public interface JobFactory {
      * @param bundle
      *            The TriggerFiredBundle from which the <code>JobDetail</code>
      *            and other info relating to the trigger firing can be obtained.
+     * @param scheduler a handle to the scheduler that is about to execute the job.
      * @throws SchedulerException if there is a problem instantiating the Job.
      * @return the newly instantiated Job
      */
-    public Job newJob(TriggerFiredBundle bundle) throws SchedulerException;
+    Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException;
 
 }

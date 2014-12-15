@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
 import java.io.ByteArrayInputStream;
@@ -27,7 +24,8 @@ import java.io.ObjectInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
+import org.quartz.spi.ClassLoadHelper;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -37,36 +35,6 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
 public class PostgreSQLDelegate extends StdJDBCDelegate {
-    /**
-     * <p>
-     * Create new PostgreSQLDelegate instance.
-     * </p>
-     * 
-     * @param logger
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     */
-    public PostgreSQLDelegate(Log log, String tablePrefix, String instanceId) {
-        super(log, tablePrefix, instanceId);
-    }
-
-    /**
-     * <p>
-     * Create new PostgreSQLDelegate instance.
-     * </p>
-     * 
-     * @param logger
-     *          the logger to use during execution
-     * @param tablePrefix
-     *          the prefix of all table names
-     * @param useProperties
-     *          use java.util.Properties for storage
-     */
-    public PostgreSQLDelegate(Log log, String tablePrefix, String instanceId,
-            Boolean useProperties) {
-        super(log, tablePrefix, instanceId, useProperties);
-    }
 
     //---------------------------------------------------------------------------
     // protected methods that can be overridden by subclasses
@@ -89,31 +57,38 @@ public class PostgreSQLDelegate extends StdJDBCDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
+    @Override           
     protected Object getObjectFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+        throws ClassNotFoundException, IOException, SQLException {
         InputStream binaryInput = null;
         byte[] bytes = rs.getBytes(colName);
         
         Object obj = null;
         
-        if(bytes != null) {
+        if(bytes != null && bytes.length != 0) {
             binaryInput = new ByteArrayInputStream(bytes);
         
             ObjectInputStream in = new ObjectInputStream(binaryInput);
-            obj = in.readObject();
-            in.close();
+            try {
+                obj = in.readObject();
+            } finally {
+                in.close();
+            }
+
         }
         
         return obj;
     }
 
-    protected Object getJobDetailFromBlob(ResultSet rs, String colName)
-            throws ClassNotFoundException, IOException, SQLException {
+    @Override           
+    protected Object getJobDataFromBlob(ResultSet rs, String colName)
+        throws ClassNotFoundException, IOException, SQLException {
         if (canUseProperties()) {
             InputStream binaryInput = null;
             byte[] bytes = rs.getBytes(colName);
-            if(bytes == null || bytes.length == 0)
+            if(bytes == null || bytes.length == 0) {
                 return null;
+            }
             binaryInput = new ByteArrayInputStream(bytes);
             return binaryInput;
         }

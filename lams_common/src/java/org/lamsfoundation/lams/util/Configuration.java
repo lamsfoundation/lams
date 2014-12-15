@@ -39,10 +39,13 @@ import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
 import org.lamsfoundation.lams.config.dao.IRegistrationDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -188,17 +191,13 @@ public class Configuration implements InitializingBean {
 	}
 
 	String refreshCacheIntervalString = Configuration.get(ConfigurationKeys.CONFIGURATION_CACHE_REFRESH_INTERVAL);
-	Long refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null : Long
+	Integer refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null : Integer
 		.valueOf(refreshCacheIntervalString);
 	if ((refreshCacheInterval != null) && (refreshCacheInterval > 0)) {
-	    SimpleTrigger trigger = new SimpleTrigger("configurationCacheRefreshTrigger", null);
-	    trigger.setVolatility(true);
-	    trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
-	    trigger.setRepeatInterval(Long.valueOf(refreshCacheInterval) * 60 * 1000);
-
-	    JobDetail jobDetail = new JobDetail("configurationCacheRefresh", null, ConfigurationRefreshCacheJob.class);
-	    // do not store in DB as the job will be recreated after LAMS restart anyway
-	    jobDetail.setVolatility(true);
+	    JobDetail jobDetail = JobBuilder.newJob(ConfigurationRefreshCacheJob.class)
+		    .withIdentity("configurationCacheRefresh").build();
+	    Trigger trigger = TriggerBuilder.newTrigger().withIdentity("configurationCacheRefreshTrigger")
+		    .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(refreshCacheInterval)).build();
 
 	    try {
 		Configuration.scheduler.scheduleJob(jobDetail, trigger);
@@ -290,7 +289,7 @@ public class Configuration implements InitializingBean {
 	Configuration.setSystemProperty(ConfigurationKeys.TRUSTSTORE_PASSWORD,
 		Configuration.get(ConfigurationKeys.TRUSTSTORE_PASSWORD));
 	updatePublicFolderName();
-	 configurationDAO.insertOrUpdateAll(Configuration.items.values());
+	Configuration.configurationDAO.insertOrUpdateAll(Configuration.items.values());
     }
 
     /**
@@ -322,7 +321,7 @@ public class Configuration implements InitializingBean {
     private void updatePublicFolderName() {
 	// LDEV-2430 update public folder name according to default server locale
 	WorkspaceFolder publicFolder = null;
-	List<WorkspaceFolder> list = configurationDAO.findByProperty(WorkspaceFolder.class,
+	List<WorkspaceFolder> list = Configuration.configurationDAO.findByProperty(WorkspaceFolder.class,
 		"workspaceFolderType", WorkspaceFolder.PUBLIC_SEQUENCES);
 
 	if ((list != null) && (list.size() > 0)) {
@@ -331,7 +330,7 @@ public class Configuration implements InitializingBean {
 	    Locale locale = new Locale(langCountry[0], langCountry[1]);
 	    publicFolder.setName(Configuration.messageService.getMessageSource().getMessage("public.folder.name", null,
 		    locale));
-	    configurationDAO.update(publicFolder);
+	    Configuration.configurationDAO.update(publicFolder);
 	}
     }
 }

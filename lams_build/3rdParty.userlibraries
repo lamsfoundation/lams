@@ -31,7 +31,6 @@
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.31-bin.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/jboss/jbossweb.jar" source="/3rdParty_sources/jbossweb"/>
-        <archive path="/lams_build/lib/quartz/quartz.jar" source="/3rdParty_sources/quartz"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-context-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-core-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-orm-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
@@ -43,5 +42,6 @@
         <archive path="/lams_build/lib/spring/aopalliance.jar"/>
         <archive path="/lams_build/lib/xstream/xstream-1.5.0-SNAPSHOT.jar" source="/3rdParty_sources/xstream"/>
         <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/joda/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
+        <archive path="/lams_build/lib/quartz/quartz-2.2.1.jar" source="/3rdParty_sources/quartz"/>
     </library>
 </eclipse-userlibraries>

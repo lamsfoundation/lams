@@ -227,6 +227,7 @@
 
 	 <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="applicationContextSchedulerContextKey" value="context.central"/>
+        <property name="schedulerName" value="LamsQuartzScheduler"/>
     	<property name="quartzProperties">
 			<props>
 				<prop key="org.quartz.jobStore.class">org.springframework.scheduling.quartz.LocalDataSourceJobStore</prop>
@@ -278,14 +279,13 @@
 	<bean name="resendMessagesJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="org.lamsfoundation.lams.events.ResendMessagesJob" />
 		<property name="name" value="Resend Messages Job"/>
-		<property name="group" value="DEFAULT"/>
+		<property name="durability" value="true" />
 	</bean>
 	
 	<bean id="resendMessagesJobTrigger" 
-                class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+                class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="resendMessagesJob" />
 		<property name="name" value="Resend Messages Job Trigger"/>
-		<property name="group" value="DEFAULT"/>
 		<property name="repeatInterval" value="3600000" />
 		<property name="startDelay" value="120000" />
 	</bean>

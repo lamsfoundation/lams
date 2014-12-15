@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,18 +15,16 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-import org.apache.commons.logging.Log;
+import org.quartz.JobKey;
+import org.quartz.spi.ClassLoadHelper;
+import org.slf4j.Logger;
 
 /**
  * Quartz JDBC delegate for DB2 v6 databases. <code>select count(name)</code>
@@ -36,31 +34,32 @@ import org.apache.commons.logging.Log;
  * @author James House
  */
 public class DB2v6Delegate extends StdJDBCDelegate {
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_JOBS = "SELECT COUNT(*) FROM "
-            + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS;
+            + TABLE_PREFIX_SUBST + TABLE_JOB_DETAILS
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_TRIGGERS_FOR_JOB = "SELECT COUNT(*) FROM "
             + TABLE_PREFIX_SUBST
             + TABLE_TRIGGERS
             + " WHERE "
+            + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " 
             + COL_JOB_NAME
             + " = ? AND " + COL_JOB_GROUP + " = ?";
 
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_TRIGGERS = "SELECT COUNT(*) FROM "
-            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS;
+            + TABLE_PREFIX_SUBST + TABLE_TRIGGERS
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
+    @SuppressWarnings("hiding")
     public static final String SELECT_NUM_CALENDARS = "SELECT COUNT(*) FROM "
-            + TABLE_PREFIX_SUBST + TABLE_CALENDARS;
+            + TABLE_PREFIX_SUBST + TABLE_CALENDARS
+            + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST;
 
-    public DB2v6Delegate(Log logger, String tablePrefix, String instanceId) {
-        super(logger, tablePrefix, instanceId);
-    }
-
-    public DB2v6Delegate(Log logger, String tablePrefix, String instanceId,
-            Boolean useProperties) {
-        super(logger, tablePrefix, instanceId, useProperties);
-    }
-
+    @Override
     public int selectNumJobs(Connection conn) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -76,19 +75,20 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            close(ps);
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
-    public int selectNumTriggersForJob(Connection conn, String jobName,
-            String groupName) throws SQLException {
+    @Override           
+    public int selectNumTriggersForJob(Connection conn, JobKey jobKey) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS_FOR_JOB));
-            ps.setString(1, jobName);
-            ps.setString(2, groupName);
+            ps.setString(1, jobKey.getName());
+            ps.setString(2, jobKey.getGroup());
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -97,10 +97,12 @@ public class DB2v6Delegate extends StdJDBCDelegate {
                 return 0;
             }
         } finally {
-            close(ps);
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
+    @Override
     public int selectNumTriggers(Connection conn) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -116,10 +118,12 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            close(ps);
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 
+    @Override           
     public int selectNumCalendars(Connection conn) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -135,16 +139,8 @@ public class DB2v6Delegate extends StdJDBCDelegate {
 
             return count;
         } finally {
-            close(ps);
-        }
-    }
-
-    private void close(Statement stmt) {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException ignore) {
-            }
+            closeResultSet(rs);
+            closeStatement(ps);
         }
     }
 }

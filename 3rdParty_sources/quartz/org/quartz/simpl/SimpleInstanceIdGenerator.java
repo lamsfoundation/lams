@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -28,13 +28,11 @@ import org.quartz.spi.InstanceIdGenerator;
  * @see InstanceIdGenerator
  * @see HostnameInstanceIdGenerator
  */
-public class SimpleInstanceIdGenerator implements InstanceIdGenerator
-{
+public class SimpleInstanceIdGenerator implements InstanceIdGenerator {
     public String generateInstanceId() throws SchedulerException {
         try {
             return InetAddress.getLocalHost().getHostName() + System.currentTimeMillis();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SchedulerException("Couldn't get host name!", e);
         }
     }

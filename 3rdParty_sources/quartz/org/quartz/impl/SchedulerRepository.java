@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl;
 
 import java.util.Collection;
@@ -45,7 +42,7 @@ public class SchedulerRepository {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private HashMap schedulers;
+    private HashMap<String, Scheduler> schedulers;
 
     private static SchedulerRepository inst;
 
@@ -58,7 +55,7 @@ public class SchedulerRepository {
      */
 
     private SchedulerRepository() {
-        schedulers = new HashMap();
+        schedulers = new HashMap<String, Scheduler>();
     }
 
     /*
@@ -70,17 +67,19 @@ public class SchedulerRepository {
      */
 
     public static synchronized SchedulerRepository getInstance() {
-        if (inst == null) inst = new SchedulerRepository();
+        if (inst == null) {
+            inst = new SchedulerRepository();
+        }
 
         return inst;
     }
 
     public synchronized void bind(Scheduler sched) throws SchedulerException {
 
-        if ((Scheduler) schedulers.get(sched.getSchedulerName()) != null)
-                throw new SchedulerException("Scheduler with name '"
-                        + sched.getSchedulerName() + "' already exists.",
-                        SchedulerException.ERR_BAD_CONFIGURATION);
+        if ((Scheduler) schedulers.get(sched.getSchedulerName()) != null) {
+            throw new SchedulerException("Scheduler with name '"
+                    + sched.getSchedulerName() + "' already exists.");
+        }
 
         schedulers.put(sched.getSchedulerName(), sched);
     }
@@ -90,10 +89,10 @@ public class SchedulerRepository {
     }
 
     public synchronized Scheduler lookup(String schedName) {
-        return (Scheduler) schedulers.get(schedName);
+        return schedulers.get(schedName);
     }
 
-    public synchronized Collection lookupAll() {
+    public synchronized Collection<Scheduler> lookupAll() {
         return java.util.Collections
                 .unmodifiableCollection(schedulers.values());
     }

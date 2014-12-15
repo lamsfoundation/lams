@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
 import java.sql.Connection;
@@ -42,6 +39,9 @@ public interface Semaphore {
      * Grants a lock on the identified resource to the calling thread (blocking
      * until it is available).
      * 
+     * @param conn Database connection used to establish lock.  Can be null if
+     * <code>{@link #requiresConnection()}</code> returns false.
+     * 
      * @return true if the lock was obtained.
      */
     boolean obtainLock(Connection conn, String lockName) throws LockException;
@@ -50,12 +50,14 @@ public interface Semaphore {
      * Release the lock on the identified resource if it is held by the calling
      * thread.
      */
-    void releaseLock(Connection conn, String lockName) throws LockException;
+    void releaseLock(String lockName) throws LockException;
 
     /**
-     * Determine whether the calling thread owns a lock on the identified
-     * resource.
+     * Whether this Semaphore implementation requires a database connection for
+     * its lock management operations.
+     * 
+     * @see #obtainLock(Connection, String)
+     * @see #releaseLock(String)
      */
-    boolean isLockOwner(Connection conn, String lockName) throws LockException;
-
+    boolean requiresConnection();
 }

@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.simpl;
 
 import java.util.Date;
@@ -46,6 +43,7 @@ import org.quartz.spi.TimeBroker;
  * 
  * @author James House
  */
+@SuppressWarnings("deprecation")
 public class SimpleTimeBroker implements TimeBroker {
 
     /*

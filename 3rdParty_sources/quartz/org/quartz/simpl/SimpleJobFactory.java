@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,10 +16,11 @@
  */
 package org.quartz.simpl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobDetail;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
@@ -35,19 +36,24 @@ import org.quartz.spi.TriggerFiredBundle;
  */
 public class SimpleJobFactory implements JobFactory {
 
-    private Log log = LogFactory.getLog(SimpleJobFactory.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
-    public Job newJob(TriggerFiredBundle bundle) throws SchedulerException {
+    protected Logger getLog() {
+        return log;
+    }
+    
+    public Job newJob(TriggerFiredBundle bundle, Scheduler Scheduler) throws SchedulerException {
 
         JobDetail jobDetail = bundle.getJobDetail();
-        Class jobClass = jobDetail.getJobClass();
+        Class<? extends Job> jobClass = jobDetail.getJobClass();
         try {
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug(
-                    "Producing instance of Job '" + jobDetail.getFullName() + 
+                    "Producing instance of Job '" + jobDetail.getKey() + 
                     "', class=" + jobClass.getName());
+            }
             
-            return (Job) jobClass.newInstance();
+            return jobClass.newInstance();
         } catch (Exception e) {
             SchedulerException se = new SchedulerException(
                     "Problem instantiating class '"
@@ -55,4 +61,5 @@ public class SimpleJobFactory implements JobFactory {
             throw se;
         }
     }
+
 }

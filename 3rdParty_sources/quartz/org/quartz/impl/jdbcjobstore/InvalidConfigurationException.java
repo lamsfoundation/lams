@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
 /**
@@ -29,6 +26,8 @@ package org.quartz.impl.jdbcjobstore;
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
 public class InvalidConfigurationException extends Exception {
+
+    private static final long serialVersionUID = 1836325935209404611L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

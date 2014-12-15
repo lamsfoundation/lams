@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,24 +16,29 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
-
-
 package org.quartz;
 
 /**
- * <p>
- * An interface to be implemented by objects that define spaces of time that
- * should be included or excluded from a <code>{@link Trigger}</code>'s
- * normal 'firing' schedule.
- * </p>
+ * An interface to be implemented by objects that define spaces of time during 
+ * which an associated <code>{@link Trigger}</code> may (not) fire. Calendars 
+ * do not define actual fire times, but rather are used to limit a 
+ * <code>Trigger</code> from firing on its normal schedule if necessary. Most 
+ * Calendars include all times by default and allow the user to specify times 
+ * to exclude. 
+ * 
+ * <p>As such, it is often useful to think of Calendars as being used to <I>exclude</I> a block
+ * of time - as opposed to <I>include</I> a block of time. (i.e. the 
+ * schedule &quot;fire every five minutes except on Sundays&quot; could be 
+ * implemented with a <code>SimpleTrigger</code> and a 
+ * <code>WeeklyCalendar</code> which excludes Sundays)</p>
+ * 
+ * <p>Implementations MUST take care of being properly <code>Cloneable</code> 
+ * and <code>Serializable</code>.</p>
  * 
  * @author James House
  * @author Juergen Donnerstag
  */
-public interface Calendar extends java.io.Serializable {
+public interface Calendar extends java.io.Serializable, java.lang.Cloneable {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,14 +63,14 @@ public interface Calendar extends java.io.Serializable {
      * Set a new base calendar or remove the existing one.
      * </p>
      */
-    public void setBaseCalendar(Calendar baseCalendar);
+    void setBaseCalendar(Calendar baseCalendar);
 
     /**
      * <p>
      * Get the base calendar. Will be null, if not set.
      * </p>
      */
-    public Calendar getBaseCalendar();
+    Calendar getBaseCalendar();
 
     /**
      * <p>
@@ -73,7 +78,7 @@ public interface Calendar extends java.io.Serializable {
      * Calendar.
      * </p>
      */
-    public boolean isTimeIncluded(long timeStamp);
+    boolean isTimeIncluded(long timeStamp);
 
     /**
      * <p>
@@ -81,7 +86,7 @@ public interface Calendar extends java.io.Serializable {
      * Calendar after the given time.
      * </p>
      */
-    public long getNextIncludedTime(long timeStamp);
+    long getNextIncludedTime(long timeStamp);
 
     /**
      * <p>
@@ -91,7 +96,7 @@ public interface Calendar extends java.io.Serializable {
      * 
      * @return null if no description was set.
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * <p>
@@ -100,5 +105,7 @@ public interface Calendar extends java.io.Serializable {
      * the description has no meaning to Quartz.
      * </p>
      */
-    public void setDescription(String description);
+    void setDescription(String description);
+    
+    Object clone();
 }

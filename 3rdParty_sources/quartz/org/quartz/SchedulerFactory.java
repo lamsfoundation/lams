@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,18 +16,13 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
 import java.util.Collection;
 
 /**
- * <p>
  * Provides a mechanism for obtaining client-usable handles to <code>Scheduler</code>
  * instances.
- * </p>
  * 
  * @see Scheduler
  * @see org.quartz.impl.StdSchedulerFactory
@@ -52,14 +47,14 @@ public interface SchedulerFactory {
      * @throws SchedulerException
      *           if there is a problem with the underlying <code>Scheduler</code>.
      */
-    public Scheduler getScheduler() throws SchedulerException;
+    Scheduler getScheduler() throws SchedulerException;
 
     /**
      * <p>
      * Returns a handle to the Scheduler with the given name, if it exists.
      * </p>
      */
-    public Scheduler getScheduler(String schedName) throws SchedulerException;
+    Scheduler getScheduler(String schedName) throws SchedulerException;
 
     /**
      * <p>
@@ -67,6 +62,6 @@ public interface SchedulerFactory {
      * within this jvm.).
      * </p>
      */
-    public Collection getAllSchedulers() throws SchedulerException;
+    Collection<Scheduler> getAllSchedulers() throws SchedulerException;
 
 }

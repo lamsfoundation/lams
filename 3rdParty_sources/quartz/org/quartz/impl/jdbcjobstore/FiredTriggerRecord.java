@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,12 +15,10 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
-import org.quartz.utils.Key;
+import org.quartz.JobKey;
+import org.quartz.TriggerKey;
 
 /**
  * <p>
@@ -30,6 +28,8 @@ import org.quartz.utils.Key;
  * @author James House
  */
 public class FiredTriggerRecord implements java.io.Serializable {
+
+    private static final long serialVersionUID = -7183096398865657533L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,19 +43,21 @@ public class FiredTriggerRecord implements java.io.Serializable {
 
     private long fireTimestamp;
 
+    private long scheduleTimestamp;
+    
     private String schedulerInstanceId;
 
-    private Key triggerKey;
+    private TriggerKey triggerKey;
 
     private String fireInstanceState;
 
-    private boolean triggerIsVolatile;
+    private JobKey jobKey;
 
-    private Key jobKey;
-
-    private boolean jobIsStateful;
+    private boolean jobDisallowsConcurrentExecution;
 
     private boolean jobRequestsRecovery;
+
+    private int priority;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,11 +75,15 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return fireTimestamp;
     }
 
-    public boolean isJobIsStateful() {
-        return jobIsStateful;
+    public long getScheduleTimestamp() {
+        return scheduleTimestamp;
     }
 
-    public Key getJobKey() {
+    public boolean isJobDisallowsConcurrentExecution() {
+        return jobDisallowsConcurrentExecution;
+    }
+
+    public JobKey getJobKey() {
         return jobKey;
     }
 
@@ -85,7 +91,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return schedulerInstanceId;
     }
 
-    public Key getTriggerKey() {
+    public TriggerKey getTriggerKey() {
         return triggerKey;
     }
 
@@ -101,11 +107,15 @@ public class FiredTriggerRecord implements java.io.Serializable {
         fireTimestamp = l;
     }
 
-    public void setJobIsStateful(boolean b) {
-        jobIsStateful = b;
+    public void setScheduleTimestamp(long l) {
+        scheduleTimestamp = l;
     }
 
-    public void setJobKey(Key key) {
+    public void setJobDisallowsConcurrentExecution(boolean b) {
+        jobDisallowsConcurrentExecution = b;
+    }
+
+    public void setJobKey(JobKey key) {
         jobKey = key;
     }
 
@@ -113,7 +123,7 @@ public class FiredTriggerRecord implements java.io.Serializable {
         schedulerInstanceId = string;
     }
 
-    public void setTriggerKey(Key key) {
+    public void setTriggerKey(TriggerKey key) {
         triggerKey = key;
     }
 
@@ -125,17 +135,19 @@ public class FiredTriggerRecord implements java.io.Serializable {
         return jobRequestsRecovery;
     }
 
-    public boolean isTriggerIsVolatile() {
-        return triggerIsVolatile;
-    }
-
     public void setJobRequestsRecovery(boolean b) {
         jobRequestsRecovery = b;
     }
 
-    public void setTriggerIsVolatile(boolean b) {
-        triggerIsVolatile = b;
+    public int getPriority() {
+        return priority;
     }
+    
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+    
 
 }
 

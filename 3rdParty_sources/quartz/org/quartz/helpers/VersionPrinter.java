@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,9 +16,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.helpers;
 
 import org.quartz.core.QuartzScheduler;
@@ -31,6 +28,12 @@ import org.quartz.core.QuartzScheduler;
  * @author James House
  */
 public class VersionPrinter {
+
+    /**
+     * Private constructor because this is a pure utility class.
+     */
+    private VersionPrinter() {
+    }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

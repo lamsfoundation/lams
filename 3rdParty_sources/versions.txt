@@ -38,7 +38,7 @@ opensaml 2.6.0
 
 openws 1.5.0
 
-Quartz 1.5.2
+Quartz 2.2.1
 
 Servlet API 3.1
 

@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.simpl;
 
 import org.quartz.spi.ClassLoadHelper;
@@ -36,6 +33,7 @@ import java.io.InputStream;
  * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * 
  * @author jhouse
+ * @author pl47ypus
  */
 public class SimpleClassLoadHelper implements ClassLoadHelper {
 
@@ -49,7 +47,7 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
 
     /**
      * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the oportunity to "steal" the class loader off of the calling
+     * including the opportunity to "steal" the class loader off of the calling
      * thread, which is the thread that is initializing Quartz.
      */
     public void initialize() {
@@ -58,8 +56,14 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return Class.forName(name);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Class<? extends T> loadClass(String name, Class<T> clazz)
+            throws ClassNotFoundException {
+        return (Class<? extends T>) loadClass(name);
     }
 
     /**
@@ -82,22 +86,26 @@ public class SimpleClassLoadHelper implements ClassLoadHelper {
         return getClassLoader().getResourceAsStream(name);
     }
 
-    private ClassLoader getClassLoader() {
+    /**
+     * Enable sharing of the class-loader with 3rd party.
+     *
+     * @return the class-loader user be the helper.
+     */
+    public ClassLoader getClassLoader() {
         // To follow the same behavior of Class.forName(...) I had to play
         // dirty (Supported by Sun, IBM & BEA JVMs)
-        // ToDo - Test it more.
         try {
             // Get a reference to this class' class-loader
             ClassLoader cl = this.getClass().getClassLoader();
-            // Create a method instance represnting the protected
+            // Create a method instance representing the protected
             // getCallerClassLoader method of class ClassLoader
             Method mthd = ClassLoader.class.getDeclaredMethod(
-                    "getCallerClassLoader", new Class[0]);
+                    "getCallerClassLoader", new Class<?>[0]);
             // Make the method accessible.
             AccessibleObject.setAccessible(new AccessibleObject[] {mthd}, true);
             // Try to get the caller's class-loader
             return (ClassLoader)mthd.invoke(cl, new Object[0]);
-        } catch (Exception all) {
+        } catch (Throwable all) {
             // Use this class' class-loader
             return this.getClass().getClassLoader();
         }

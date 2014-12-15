@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -13,10 +13,6 @@
  * License for the specific language governing permissions and limitations 
  * under the License.
  * 
- */
-
-/*
- * Previously Copyright (c) 2001-2004 James House
  */
 
 package org.quartz.impl.jdbcjobstore;
@@ -42,147 +38,158 @@ public interface Constants {
      */
 
     // Table names
-    public static final String TABLE_JOB_DETAILS = "JOB_DETAILS";
+    String TABLE_JOB_DETAILS = "JOB_DETAILS";
 
-    public static final String TABLE_TRIGGERS = "TRIGGERS";
+    String TABLE_TRIGGERS = "TRIGGERS";
 
-    public static final String TABLE_SIMPLE_TRIGGERS = "SIMPLE_TRIGGERS";
+    String TABLE_SIMPLE_TRIGGERS = "SIMPLE_TRIGGERS";
 
-    public static final String TABLE_CRON_TRIGGERS = "CRON_TRIGGERS";
+    String TABLE_CRON_TRIGGERS = "CRON_TRIGGERS";
 
-    public static final String TABLE_BLOB_TRIGGERS = "BLOB_TRIGGERS";
+    String TABLE_BLOB_TRIGGERS = "BLOB_TRIGGERS";
 
-    public static final String TABLE_FIRED_TRIGGERS = "FIRED_TRIGGERS";
+    String TABLE_FIRED_TRIGGERS = "FIRED_TRIGGERS";
 
-    public static final String TABLE_JOB_LISTENERS = "JOB_LISTENERS";
+    String TABLE_CALENDARS = "CALENDARS";
 
-    public static final String TABLE_TRIGGER_LISTENERS = "TRIGGER_LISTENERS";
+    String TABLE_PAUSED_TRIGGERS = "PAUSED_TRIGGER_GRPS";
 
-    public static final String TABLE_CALENDARS = "CALENDARS";
+    String TABLE_LOCKS = "LOCKS";
 
-    public static final String TABLE_PAUSED_TRIGGERS = "PAUSED_TRIGGER_GRPS";
-
-    public static final String TABLE_LOCKS = "LOCKS";
-
-    public static final String TABLE_SCHEDULER_STATE = "SCHEDULER_STATE";
+    String TABLE_SCHEDULER_STATE = "SCHEDULER_STATE";
 
     // TABLE_JOB_DETAILS columns names
-    public static final String COL_JOB_NAME = "JOB_NAME";
+    
+    String COL_SCHEDULER_NAME = "SCHED_NAME";
+    
+    String COL_JOB_NAME = "JOB_NAME";
 
-    public static final String COL_JOB_GROUP = "JOB_GROUP";
+    String COL_JOB_GROUP = "JOB_GROUP";
 
-    public static final String COL_IS_DURABLE = "IS_DURABLE";
+    String COL_IS_DURABLE = "IS_DURABLE";
 
-    public static final String COL_IS_VOLATILE = "IS_VOLATILE";
+    String COL_IS_VOLATILE = "IS_VOLATILE";
 
-    public static final String COL_IS_STATEFUL = "IS_STATEFUL";
+    String COL_IS_NONCONCURRENT = "IS_NONCONCURRENT";
 
-    public static final String COL_REQUESTS_RECOVERY = "REQUESTS_RECOVERY";
+    String COL_IS_UPDATE_DATA = "IS_UPDATE_DATA";
 
-    public static final String COL_JOB_DATAMAP = "JOB_DATA";
+    String COL_REQUESTS_RECOVERY = "REQUESTS_RECOVERY";
 
-    public static final String COL_JOB_CLASS = "JOB_CLASS_NAME";
+    String COL_JOB_DATAMAP = "JOB_DATA";
 
-    public static final String COL_DESCRIPTION = "DESCRIPTION";
+    String COL_JOB_CLASS = "JOB_CLASS_NAME";
 
-    // TABLE_JOB_LISTENERS columns names
-    public static final String COL_JOB_LISTENER = "JOB_LISTENER";
+    String COL_DESCRIPTION = "DESCRIPTION";
 
     // TABLE_TRIGGERS columns names
-    public static final String COL_TRIGGER_NAME = "TRIGGER_NAME";
+    String COL_TRIGGER_NAME = "TRIGGER_NAME";
 
-    public static final String COL_TRIGGER_GROUP = "TRIGGER_GROUP";
+    String COL_TRIGGER_GROUP = "TRIGGER_GROUP";
 
-    public static final String COL_NEXT_FIRE_TIME = "NEXT_FIRE_TIME";
+    String COL_NEXT_FIRE_TIME = "NEXT_FIRE_TIME";
 
-    public static final String COL_PREV_FIRE_TIME = "PREV_FIRE_TIME";
+    String COL_PREV_FIRE_TIME = "PREV_FIRE_TIME";
 
-    public static final String COL_TRIGGER_STATE = "TRIGGER_STATE";
+    String COL_TRIGGER_STATE = "TRIGGER_STATE";
 
-    public static final String COL_TRIGGER_TYPE = "TRIGGER_TYPE";
+    String COL_TRIGGER_TYPE = "TRIGGER_TYPE";
 
-    public static final String COL_START_TIME = "START_TIME";
+    String COL_START_TIME = "START_TIME";
 
-    public static final String COL_END_TIME = "END_TIME";
+    String COL_END_TIME = "END_TIME";
 
-    public static final String COL_MISFIRE_INSTRUCTION = "MISFIRE_INSTR";
+    String COL_PRIORITY = "PRIORITY";
 
-    public static final String ALIAS_COL_NEXT_FIRE_TIME = "ALIAS_NXT_FR_TM";
+    String COL_MISFIRE_INSTRUCTION = "MISFIRE_INSTR";
+
+    String ALIAS_COL_NEXT_FIRE_TIME = "ALIAS_NXT_FR_TM";
 
     // TABLE_SIMPLE_TRIGGERS columns names
-    public static final String COL_REPEAT_COUNT = "REPEAT_COUNT";
+    String COL_REPEAT_COUNT = "REPEAT_COUNT";
 
-    public static final String COL_REPEAT_INTERVAL = "REPEAT_INTERVAL";
+    String COL_REPEAT_INTERVAL = "REPEAT_INTERVAL";
 
-    public static final String COL_TIMES_TRIGGERED = "TIMES_TRIGGERED";
+    String COL_TIMES_TRIGGERED = "TIMES_TRIGGERED";
 
     // TABLE_CRON_TRIGGERS columns names
-    public static final String COL_CRON_EXPRESSION = "CRON_EXPRESSION";
+    String COL_CRON_EXPRESSION = "CRON_EXPRESSION";
 
     // TABLE_BLOB_TRIGGERS columns names
-    public static final String COL_BLOB = "BLOB_DATA";
+    String COL_BLOB = "BLOB_DATA";
 
-    public static final String COL_TIME_ZONE_ID = "TIME_ZONE_ID";
-
-    // TABLE_TRIGGER_LISTENERS
-    public static final String COL_TRIGGER_LISTENER = "TRIGGER_LISTENER";
+    String COL_TIME_ZONE_ID = "TIME_ZONE_ID";
 
     // TABLE_FIRED_TRIGGERS columns names
-    public static final String COL_INSTANCE_NAME = "INSTANCE_NAME";
+    String COL_INSTANCE_NAME = "INSTANCE_NAME";
 
-    public static final String COL_FIRED_TIME = "FIRED_TIME";
+    String COL_FIRED_TIME = "FIRED_TIME";
 
-    public static final String COL_ENTRY_ID = "ENTRY_ID";
+    String COL_SCHED_TIME = "SCHED_TIME";
+    
+    String COL_ENTRY_ID = "ENTRY_ID";
 
-    public static final String COL_ENTRY_STATE = "STATE";
+    String COL_ENTRY_STATE = "STATE";
 
     // TABLE_CALENDARS columns names
-    public static final String COL_CALENDAR_NAME = "CALENDAR_NAME";
+    String COL_CALENDAR_NAME = "CALENDAR_NAME";
 
-    public static final String COL_CALENDAR = "CALENDAR";
-
-    // TABLE_LOCKS columns names
-    public static final String COL_LOCK_NAME = "LOCK_NAME";
+    String COL_CALENDAR = "CALENDAR";
 
     // TABLE_LOCKS columns names
-    public static final String COL_LAST_CHECKIN_TIME = "LAST_CHECKIN_TIME";
+    String COL_LOCK_NAME = "LOCK_NAME";
 
-    public static final String COL_CHECKIN_INTERVAL = "CHECKIN_INTERVAL";
+    // TABLE_LOCKS columns names
+    String COL_LAST_CHECKIN_TIME = "LAST_CHECKIN_TIME";
 
-    public static final String COL_RECOVERER = "RECOVERER";
+    String COL_CHECKIN_INTERVAL = "CHECKIN_INTERVAL";
 
     // MISC CONSTANTS
-    public static final String DEFAULT_TABLE_PREFIX = "QRTZ_";
+    String DEFAULT_TABLE_PREFIX = "QRTZ_";
 
     // STATES
-    public final static String STATE_WAITING = "WAITING";
+    String STATE_WAITING = "WAITING";
 
-    public final static String STATE_ACQUIRED = "ACQUIRED";
+    String STATE_ACQUIRED = "ACQUIRED";
 
-    public final static String STATE_EXECUTING = "EXECUTING";
+    String STATE_EXECUTING = "EXECUTING";
 
-    public final static String STATE_COMPLETE = "COMPLETE";
+    String STATE_COMPLETE = "COMPLETE";
 
-    public final static String STATE_BLOCKED = "BLOCKED";
+    String STATE_BLOCKED = "BLOCKED";
 
-    public final static String STATE_ERROR = "ERROR";
+    String STATE_ERROR = "ERROR";
 
-    public final static String STATE_PAUSED = "PAUSED";
+    String STATE_PAUSED = "PAUSED";
 
-    public final static String STATE_PAUSED_BLOCKED = "PAUSED_BLOCKED";
+    String STATE_PAUSED_BLOCKED = "PAUSED_BLOCKED";
 
-    public final static String STATE_DELETED = "DELETED";
+    String STATE_DELETED = "DELETED";
 
-    public final static String STATE_MISFIRED = "MISFIRED";
+    /**
+     * @deprecated Whether a trigger has misfired is no longer a state, but 
+     * rather now identified dynamically by whether the trigger's next fire 
+     * time is more than the misfire threshold time in the past.
+     */
+    String STATE_MISFIRED = "MISFIRED";
 
-    public final static String ALL_GROUPS_PAUSED = "_$_ALL_GROUPS_PAUSED_$_";
+    String ALL_GROUPS_PAUSED = "_$_ALL_GROUPS_PAUSED_$_";
 
     // TRIGGER TYPES
-    public final static String TTYPE_SIMPLE = "SIMPLE";
+    /** Simple Trigger type. */
+    String TTYPE_SIMPLE = "SIMPLE";
 
-    public final static String TTYPE_CRON = "CRON";
+    /** Cron Trigger type. */
+    String TTYPE_CRON = "CRON";
 
-    public final static String TTYPE_BLOB = "BLOB";
+    /** Calendar Interval Trigger type. */
+    String TTYPE_CAL_INT = "CAL_INT";
+
+    /** Daily Time Interval Trigger type. */
+    String TTYPE_DAILY_TIME_INT = "DAILY_I";
+
+    /** A general blob Trigger type. */
+    String TTYPE_BLOB = "BLOB";
 }
 
 // EOF

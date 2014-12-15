@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<server>
+
+  <mbean code="org.quartz.ee.jmx.jboss.QuartzService"
+      name="user:service=QuartzService,name=QuartzService">
+
+    <!--
+        Wait until the DataSources  deployed. This option
+	ensures correct  deployment order at JBoss startup.
+	Change the 'QuartzDS' to your datasource name.
+	Important!==> this is NOT the JNDI name of the datasource.
+	(JNDI name for it is set in a separate xxx-service.xml file). 
+     -->
+    <!-- <depends>jboss.jca:service=LocalTxCM,name=QuartzDS</depends> -->
+    <depends>jboss.jca:service=DataSourceBinding,name=QuartzDS</depends> 
+    <!--
+        Wait for the deployment of XA-DataSource (if u have one ;)
+        The same as above, but for XA-compliant datasource.
+	Uncomment if you need it.
+    -->
+    <!--
+    <depends>jboss.jca:service=DataSourceBinding,name=QuartzDS-XA</depends> 
+    -->
+    <!--
+    <depends>jboss.jca:service=XATxCM,name=QuartzDS-XA</depends>
+    -->
+
+    <!--
+      JNDI name for locating Scheduler, "Quartz" is default.
+    -->
+    <!--
+    <attribute name="JndiName">Quartz</attribute>
+    -->
+
+    <!--
+       Call Scheduler.start() only if requested. Most of the time this 
+       should be true. In some special cases you may want to have 
+       scheduler service available but not run the jobs (for example, 
+       if you want to administer the jobs on a particular server, only).
+       Default value is true.
+    -->
+    <!--
+     <attribute name="StartScheduler">true</attribute>
+    -->
+
+    <!--
+      By default a Properties file named "quartz.properties" is
+      loaded from the 'current working directory'. If that fails,
+      then the "quartz.properties" file located (as a resource)
+      in the org/quartz package is loaded. If you wish to use a
+      file other than these defaults, you must either define the
+      system property 'org.quartz.properties' to point to the
+      file you want or set the PropertiesFile attribute. You
+      may also specify the properties directly by setting the
+      Properties attribute. You must use only one of these
+      methods to specify the properties.
+    -->
+
+    <!--
+      Initialize the SchedulerFactory with the contents
+      of the Properties file with the given name.
+    -->
+    <!--
+    <attribute name="PropertiesFile">quartz.properties</attribute>
+    -->
+
+    <!--
+      Initialized the SchedulerFactory with the contents
+      of the given Properties object.
+    -->
+    
+    <attribute name="Properties">
+      # Default Properties file for use by StdSchedulerFactory
+      # to create a Quartz Scheduler Instance, if a different
+      # properties file is not explicitly specified.
+      #
+
+      # org.quartz.scheduler.classLoadHelper.class = 
+   
+      org.quartz.scheduler.instanceName = DefaultQuartzScheduler
+      org.quartz.scheduler.rmi.export = false
+      org.quartz.scheduler.rmi.proxy = false
+      org.quartz.scheduler.xaTransacted = false
+
+      org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
+      org.quartz.threadPool.threadCount = 5
+      org.quartz.threadPool.threadPriority = 4
+
+      org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreCMT
+      org.quartz.jobStore.driverDelegateClass =  org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+      org.quartz.jobStore.dataSource = QUARTZ
+      org.quartz.jobStore.nonManagedTXDataSource = QUARTZ_NO_TX
+      org.quartz.jobStore.tablePrefix = QRTZ_
+      org.quartz.dataSource.QUARTZ.jndiURL = java:/jdbc/QuartzDS
+      org.quartz.dataSource.QUARTZ_NO_TX.jndiURL = java:/jdbc/QuartzNoTxDS
+     
+      
+    </attribute>
+    
+
+  </mbean>
+
+</server>

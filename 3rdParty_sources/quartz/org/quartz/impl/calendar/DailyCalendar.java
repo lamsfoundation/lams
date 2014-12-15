@@ -1,7 +1,10 @@
 package org.quartz.impl.calendar;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 /**
  * This implementation of the Calendar excludes (or includes - see below) a 
@@ -22,9 +25,10 @@ import java.util.Calendar;
  * set of times that are excluded <I>every day</I>.
  * 
  * @author Mike Funk, Aaron Craven
- * @version $Revision$ $Date$
  */
 public class DailyCalendar extends BaseCalendar {
+    static final long serialVersionUID = -7561220099904944039L;
+    
     private static final String invalidHourOfDay = "Invalid hour of day: ";
     private static final String invalidMinute = "Invalid minute: ";
     private static final String invalidSecond = "Invalid second: ";
@@ -34,7 +38,6 @@ public class DailyCalendar extends BaseCalendar {
     private static final long oneMillis = 1;
     private static final String colon = ":";
 
-    private String name;
     private int rangeStartingHourOfDay;
     private int rangeStartingMinute;
     private int rangeStartingSecond;
@@ -65,18 +68,21 @@ public class DailyCalendar extends BaseCalendar {
      *         time. Note this means that a time range may not cross daily 
      *         boundaries (10PM - 2AM)</LI>  
      * </UL>
+     * 
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * </p>
      *  
-     * @param name              the name for the <CODE>DailyCalendar</CODE>
      * @param rangeStartingTime a String representing the starting time for the
      *                          time range
      * @param rangeEndingTime   a String representing the ending time for the
      *                          the time range
      */
-    public DailyCalendar(String name,
-                         String rangeStartingTime,
+    public DailyCalendar(String rangeStartingTime,
                          String rangeEndingTime) {
         super();
-        this.name = name;
         setTimeRange(rangeStartingTime, rangeEndingTime);
     }
 
@@ -100,7 +106,12 @@ public class DailyCalendar extends BaseCalendar {
      *         boundaries (10PM - 2AM)</LI>  
      * </UL>
      * 
-     * @param name              the name for the <CODE>DailyCalendar</CODE>
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * </p>
+     * 
      * @param baseCalendar      the base calendar for this calendar instance
      *                          &ndash; see {@link BaseCalendar} for more
      *                          information on base calendar functionality
@@ -109,12 +120,10 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingTime   a String representing the ending time for the
      *                          time range
      */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
+    public DailyCalendar(org.quartz.Calendar baseCalendar,
                          String rangeStartingTime,
                          String rangeEndingTime) {
         super(baseCalendar);
-        this.name = name;
         setTimeRange(rangeStartingTime, rangeEndingTime);
     }
 
@@ -132,7 +141,12 @@ public class DailyCalendar extends BaseCalendar {
      *         boundaries (10PM - 2AM)</LI>  
      * </UL>
      * 
-     * @param name                   the name for the <CODE>DailyCalendar</CODE>
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * </p>
+     * 
      * @param rangeStartingHourOfDay the hour of the start of the time range
      * @param rangeStartingMinute    the minute of the start of the time range
      * @param rangeStartingSecond    the second of the start of the time range
@@ -144,8 +158,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingMillis      the millisecond of the start of the time 
      *                               range
      */
-    public DailyCalendar(String name,
-                         int rangeStartingHourOfDay,
+    public DailyCalendar(int rangeStartingHourOfDay,
                          int rangeStartingMinute,
                          int rangeStartingSecond,
                          int rangeStartingMillis,
@@ -154,7 +167,6 @@ public class DailyCalendar extends BaseCalendar {
                          int rangeEndingSecond,
                          int rangeEndingMillis) {
         super();
-        this.name = name;
         setTimeRange(rangeStartingHourOfDay,
                      rangeStartingMinute,
                      rangeStartingSecond,
@@ -179,8 +191,12 @@ public class DailyCalendar extends BaseCalendar {
      *         boundaries (10PM - 2AM)</LI>  
      * </UL> 
      * 
-     * @param name                      the name for the 
-     *                                  <CODE>DailyCalendar</CODE>
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * </p>
+     * 
      * @param baseCalendar              the base calendar for this calendar
      *                                  instance &ndash; see 
      *                                  {@link BaseCalendar} for more 
@@ -197,8 +213,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingMillis      the millisecond of the start of the time 
      *                               range
      */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
+    public DailyCalendar(org.quartz.Calendar baseCalendar,
                          int rangeStartingHourOfDay,
                          int rangeStartingMinute,
                          int rangeStartingSecond,
@@ -208,7 +223,6 @@ public class DailyCalendar extends BaseCalendar {
                          int rangeEndingSecond,
                          int rangeEndingMillis) {
         super(baseCalendar);
-        this.name = name;
         setTimeRange(rangeStartingHourOfDay,
                      rangeStartingMinute,
                      rangeStartingSecond,
@@ -235,17 +249,21 @@ public class DailyCalendar extends BaseCalendar {
      *         true</CODE>)</I></LI>  
      * </UL> 
      * 
-     * @param name                  the name for the <CODE>DailyCalendar</CODE>
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * </p>
+     * 
      * @param rangeStartingCalendar a java.util.Calendar representing the 
      *                              starting time for the time range
      * @param rangeEndingCalendar   a java.util.Calendar representing the ending
      *                              time for the time range
      */
-    public DailyCalendar(String name,
+    public DailyCalendar(
                          Calendar rangeStartingCalendar,
                          Calendar rangeEndingCalendar) {
         super();
-        this.name = name;
         setTimeRange(rangeStartingCalendar, rangeEndingCalendar);
     }
 
@@ -265,7 +283,12 @@ public class DailyCalendar extends BaseCalendar {
      *         true</CODE>)</I></LI>  
      * </UL> 
      * 
-     * @param name                  the name for the <CODE>DailyCalendar</CODE>
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * </p>
+     * 
      * @param baseCalendar          the base calendar for this calendar instance
      *                              &ndash; see {@link BaseCalendar} for more 
      *                              information on base calendar functionality
@@ -274,12 +297,10 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingCalendar   a java.util.Calendar representing the ending
      *                              time for the time range
      */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
+    public DailyCalendar(org.quartz.Calendar baseCalendar,
                          Calendar rangeStartingCalendar,
                          Calendar rangeEndingCalendar) {
         super(baseCalendar);
-        this.name = name;
         setTimeRange(rangeStartingCalendar, rangeEndingCalendar);
     }
 
@@ -297,20 +318,26 @@ public class DailyCalendar extends BaseCalendar {
      *         rangeEndingTime</CODE>)</I></LI>  
      * </UL> 
      * 
-     * @param name                      the name for the 
-     *                                  <CODE>DailyCalendar</CODE>
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>.
+     * You should use <code>{@link #DailyCalendar(org.quartz.Calendar, java.util.TimeZone, long, long)}</code>
+     * if you don't want the given <code>rangeStartingTimeInMillis</code> and
+     * <code>rangeEndingTimeInMillis</code> to be evaluated in the default 
+     * time zone.
+     * </p>
+     * 
      * @param rangeStartingTimeInMillis a long representing the starting time 
      *                                  for the time range
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    public DailyCalendar(String name,
-                         long rangeStartingTimeInMillis,
+    public DailyCalendar(long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super();
-        this.name = name;
         setTimeRange(rangeStartingTimeInMillis, 
-        		     rangeEndingTimeInMillis);
+                     rangeEndingTimeInMillis);
     }
 
     /**
@@ -327,8 +354,16 @@ public class DailyCalendar extends BaseCalendar {
      *         rangeEndingTime</CODE>)</I></LI>  
      * </UL> 
      * 
-     * @param name                      the name for the 
-     *                                  <CODE>DailyCalendar</CODE>
+     * <p>
+     * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
+     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>.
+     * You should use <code>{@link #DailyCalendar(org.quartz.Calendar, java.util.TimeZone, long, long)} </code>
+     * if you don't want the given <code>rangeStartingTimeInMillis</code> and
+     * <code>rangeEndingTimeInMillis</code> to be evaluated in the default 
+     * time zone.
+     * </p>
+     * 
      * @param baseCalendar              the base calendar for this calendar
      *                                  instance &ndash; see {@link 
      *                                  BaseCalendar} for more information on 
@@ -338,25 +373,87 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    public DailyCalendar(String name,
-                         org.quartz.Calendar baseCalendar,
+    public DailyCalendar(org.quartz.Calendar baseCalendar,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super(baseCalendar);
-        this.name = name;
         setTimeRange(rangeStartingTimeInMillis,
-        		     rangeEndingTimeInMillis);
+                     rangeEndingTimeInMillis);
+    }
+    
+    /**
+     * Create a <CODE>DailyCalendar</CODE> with a time range defined by the
+     * specified values and no <CODE>baseCalendar</CODE>. The values are 
+     * subject to the following considerations:
+     * <UL><LI>Only the time-of-day portion of the specified values will be
+     *         used</LI>
+     *     <LI>The starting time must be before the ending time of the defined
+     *         time range. Note this means that a time range may not cross
+     *         daily boundaries (10PM - 2AM). <I>(because only time value are
+     *         are used, it is possible for the two values to represent a valid
+     *         time range and <CODE>rangeStartingTime &gt; 
+     *         rangeEndingTime</CODE>)</I></LI>  
+     * </UL> 
+     * 
+     * @param timeZone                  the time zone for of the 
+     *                                  <code>DailyCalendar</code> which will 
+     *                                  also be used to resolve the given 
+     *                                  start/end times.                                 
+     * @param rangeStartingTimeInMillis a long representing the starting time 
+     *                                  for the time range
+     * @param rangeEndingTimeInMillis   a long representing the ending time for
+     *                                  the time range
+     */
+    public DailyCalendar(TimeZone timeZone,
+                         long rangeStartingTimeInMillis,
+                         long rangeEndingTimeInMillis) {
+        super(timeZone);
+        setTimeRange(rangeStartingTimeInMillis, 
+                     rangeEndingTimeInMillis);
     }
 
     /**
-     * Returns the name of the <CODE>DailyCalendar</CODE>
+     * Create a <CODE>DailyCalendar</CODE> with a time range defined by the
+     * specified values and the specified <CODE>baseCalendar</CODE>. The values
+     * are subject to the following considerations:
+     * <UL><LI>Only the time-of-day portion of the specified values will be
+     *         used</LI>
+     *     <LI>The starting time must be before the ending time of the defined
+     *         time range. Note this means that a time range may not cross
+     *         daily boundaries (10PM - 2AM). <I>(because only time value are
+     *         are used, it is possible for the two values to represent a valid
+     *         time range and <CODE>rangeStartingTime &gt; 
+     *         rangeEndingTime</CODE>)</I></LI>  
+     * </UL> 
      * 
-     * @return the name of the <CODE>DailyCalendar</CODE>
+     * @param baseCalendar              the base calendar for this calendar
+     *                                  instance &ndash; see {@link 
+     *                                  BaseCalendar} for more information on 
+     *                                  base calendar functionality
+     * @param timeZone                  the time zone for of the 
+     *                                  <code>DailyCalendar</code> which will 
+     *                                  also be used to resolve the given 
+     *                                  start/end times.                                 
+     * @param rangeStartingTimeInMillis a long representing the starting time 
+     *                                  for the time range
+     * @param rangeEndingTimeInMillis   a long representing the ending time for
+     *                                  the time range
      */
-    public String getName() {
-        return name;
+    public DailyCalendar(org.quartz.Calendar baseCalendar,
+                         TimeZone timeZone,
+                         long rangeStartingTimeInMillis,
+                         long rangeEndingTimeInMillis) {
+        super(baseCalendar, timeZone);
+        setTimeRange(rangeStartingTimeInMillis,
+                     rangeEndingTimeInMillis);
     }
 
+    @Override
+    public Object clone() {
+        DailyCalendar clone = (DailyCalendar) super.clone();
+        return clone;
+    }
+    
     /**
      * Determines whether the given time (in milliseconds) is 'included' by the
      * <CODE>BaseCalendar</CODE>
@@ -365,35 +462,28 @@ public class DailyCalendar extends BaseCalendar {
      * @return a boolean indicating whether the specified time is 'included' by
      *         the <CODE>BaseCalendar</CODE>
      */
+    @Override
     public boolean isTimeIncluded(long timeInMillis) {        
         if ((getBaseCalendar() != null) && 
-        		(getBaseCalendar().isTimeIncluded(timeInMillis) == false)) {
-        	return false;
+                (getBaseCalendar().isTimeIncluded(timeInMillis) == false)) {
+            return false;
         }
         
-        long startOfDayInMillis = getStartOfDayInMillis(timeInMillis);
-        long endOfDayInMillis = getEndOfDayInMillis(timeInMillis);
+        long startOfDayInMillis = getStartOfDayJavaCalendar(timeInMillis).getTime().getTime();
+        long endOfDayInMillis = getEndOfDayJavaCalendar(timeInMillis).getTime().getTime();
         long timeRangeStartingTimeInMillis = 
-        	getTimeRangeStartingTimeInMillis(timeInMillis);
+            getTimeRangeStartingTimeInMillis(timeInMillis);
         long timeRangeEndingTimeInMillis = 
-        	getTimeRangeEndingTimeInMillis(timeInMillis);
+            getTimeRangeEndingTimeInMillis(timeInMillis);
         if (!invertTimeRange) {
-	        if ((timeInMillis > startOfDayInMillis && 
-	        		timeInMillis < timeRangeStartingTimeInMillis) ||
-	            (timeInMillis > timeRangeEndingTimeInMillis && 
-	            	timeInMillis < endOfDayInMillis)) {
-	        	
-	        		return true;
-	        } else {
-	        	return false;
-	        }
+            return 
+                ((timeInMillis > startOfDayInMillis && 
+                    timeInMillis < timeRangeStartingTimeInMillis) ||
+                (timeInMillis > timeRangeEndingTimeInMillis && 
+                    timeInMillis < endOfDayInMillis));
         } else {
-        	if ((timeInMillis >= timeRangeStartingTimeInMillis) &&
-        			(timeInMillis <= timeRangeEndingTimeInMillis)) {
-        		return true;
-        	} else {
-        		return false;
-        	}
+            return ((timeInMillis >= timeRangeStartingTimeInMillis) &&
+                    (timeInMillis <= timeRangeEndingTimeInMillis));
         }
     }
 
@@ -406,56 +496,57 @@ public class DailyCalendar extends BaseCalendar {
      * @return the time in milliseconds representing the next time included
      *         after the specified time.
      */
+    @Override
     public long getNextIncludedTime(long timeInMillis) {
         long nextIncludedTime = timeInMillis + oneMillis;
         
         while (!isTimeIncluded(nextIncludedTime)) {
-        	if (!invertTimeRange) {
-	        	//If the time is in a range excluded by this calendar, we can
-	        	// move to the end of the excluded time range and continue 
-	        	// testing from there. Otherwise, if nextIncludedTime is 
-        		// excluded by the baseCalendar, ask it the next time it 
-        		// includes and begin testing from there. Failing this, add one
-        		// millisecond and continue testing.
-	        	if ((nextIncludedTime >= 
-	        			getTimeRangeStartingTimeInMillis(nextIncludedTime)) && 
-					(nextIncludedTime <= 
-						getTimeRangeEndingTimeInMillis(nextIncludedTime))) {
-	        		
-	        		nextIncludedTime = 
-	        			getTimeRangeEndingTimeInMillis(nextIncludedTime) + 
-							oneMillis;
-	        	} else if ((getBaseCalendar() != null) && 
-	        			(!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
-	        		nextIncludedTime = 
-	        			getBaseCalendar().getNextIncludedTime(nextIncludedTime);
-	        	} else {
-	        		nextIncludedTime++;
-	        	}
-        	} else {
-	        	//If the time is in a range excluded by this calendar, we can
-	        	// move to the end of the excluded time range and continue 
-	        	// testing from there. Otherwise, if nextIncludedTime is 
-        		// excluded by the baseCalendar, ask it the next time it 
-        		// includes and begin testing from there. Failing this, add one
-        		// millisecond and continue testing.
-        		if (nextIncludedTime < 
-        				getTimeRangeStartingTimeInMillis(nextIncludedTime)) {
-        			nextIncludedTime = 
-        				getTimeRangeStartingTimeInMillis(nextIncludedTime);
-        		} else if (nextIncludedTime > 
-        				getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
-        			//(move to start of next day)
-        			nextIncludedTime = getEndOfDayInMillis(nextIncludedTime);
-        			nextIncludedTime += 1l; 
-        		} else if ((getBaseCalendar() != null) && 
-	        			(!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
-	        		nextIncludedTime = 
-	        			getBaseCalendar().getNextIncludedTime(nextIncludedTime);
-	        	} else {
-	        		nextIncludedTime++;
-	        	}
-        	}
+            if (!invertTimeRange) {
+                //If the time is in a range excluded by this calendar, we can
+                // move to the end of the excluded time range and continue 
+                // testing from there. Otherwise, if nextIncludedTime is 
+                // excluded by the baseCalendar, ask it the next time it 
+                // includes and begin testing from there. Failing this, add one
+                // millisecond and continue testing.
+                if ((nextIncludedTime >= 
+                        getTimeRangeStartingTimeInMillis(nextIncludedTime)) && 
+                    (nextIncludedTime <= 
+                        getTimeRangeEndingTimeInMillis(nextIncludedTime))) {
+                    
+                    nextIncludedTime = 
+                        getTimeRangeEndingTimeInMillis(nextIncludedTime) + 
+                            oneMillis;
+                } else if ((getBaseCalendar() != null) && 
+                        (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
+                    nextIncludedTime = 
+                        getBaseCalendar().getNextIncludedTime(nextIncludedTime);
+                } else {
+                    nextIncludedTime++;
+                }
+            } else {
+                //If the time is in a range excluded by this calendar, we can
+                // move to the end of the excluded time range and continue 
+                // testing from there. Otherwise, if nextIncludedTime is 
+                // excluded by the baseCalendar, ask it the next time it 
+                // includes and begin testing from there. Failing this, add one
+                // millisecond and continue testing.
+                if (nextIncludedTime < 
+                        getTimeRangeStartingTimeInMillis(nextIncludedTime)) {
+                    nextIncludedTime = 
+                        getTimeRangeStartingTimeInMillis(nextIncludedTime);
+                } else if (nextIncludedTime > 
+                        getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
+                    //(move to start of next day)
+                    nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).getTime().getTime();
+                    nextIncludedTime += 1l; 
+                } else if ((getBaseCalendar() != null) && 
+                        (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
+                    nextIncludedTime = 
+                        getBaseCalendar().getNextIncludedTime(nextIncludedTime);
+                } else {
+                    nextIncludedTime++;
+                }
+            }
         }
         
         return nextIncludedTime;
@@ -471,13 +562,12 @@ public class DailyCalendar extends BaseCalendar {
      *         time range for the specified date.
      */
     public long getTimeRangeStartingTimeInMillis(long timeInMillis) {
-        Calendar rangeStartingTime = Calendar.getInstance();
-        rangeStartingTime.setTimeInMillis(timeInMillis);
+        Calendar rangeStartingTime = createJavaCalendar(timeInMillis);
         rangeStartingTime.set(Calendar.HOUR_OF_DAY, rangeStartingHourOfDay);
         rangeStartingTime.set(Calendar.MINUTE, rangeStartingMinute);
         rangeStartingTime.set(Calendar.SECOND, rangeStartingSecond);
         rangeStartingTime.set(Calendar.MILLISECOND, rangeStartingMillis);
-        return rangeStartingTime.getTimeInMillis();
+        return rangeStartingTime.getTime().getTime();
     }
 
     /**
@@ -490,13 +580,12 @@ public class DailyCalendar extends BaseCalendar {
      *         time range for the specified date.
      */
     public long getTimeRangeEndingTimeInMillis(long timeInMillis) {
-        Calendar rangeEndingTime = Calendar.getInstance();
-        rangeEndingTime.setTimeInMillis(timeInMillis);
+        Calendar rangeEndingTime = createJavaCalendar(timeInMillis);
         rangeEndingTime.set(Calendar.HOUR_OF_DAY, rangeEndingHourOfDay);
         rangeEndingTime.set(Calendar.MINUTE, rangeEndingMinute);
         rangeEndingTime.set(Calendar.SECOND, rangeEndingSecond);
         rangeEndingTime.set(Calendar.MILLISECOND, rangeEndingMillis);
-        return rangeEndingTime.getTimeInMillis();
+        return rangeEndingTime.getTime().getTime();
     }
 
     /**
@@ -506,7 +595,7 @@ public class DailyCalendar extends BaseCalendar {
      * @return a boolean indicating whether the time range is inverted
      */
     public boolean getInvertTimeRange() {
-    	return invertTimeRange;
+        return invertTimeRange;
     }
     
     /**
@@ -516,7 +605,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param flag the new value for the <CODE>invertTimeRange</CODE> flag.
      */
     public void setInvertTimeRange(boolean flag) {
-    	this.invertTimeRange = flag;
+        this.invertTimeRange = flag;
     }
     
     /**
@@ -525,18 +614,17 @@ public class DailyCalendar extends BaseCalendar {
      * 
      * @return the properteis of the DailyCalendar in a String format
      */
+    @Override
     public String toString() {
-        long todayInMillis = Calendar.getInstance().getTimeInMillis();
         NumberFormat numberFormatter = NumberFormat.getNumberInstance();
         numberFormatter.setMaximumFractionDigits(0);
         numberFormatter.setMinimumIntegerDigits(2);
         StringBuffer buffer = new StringBuffer();
-        buffer.append(getName());
-        buffer.append(": base calendar: [");
+        buffer.append("base calendar: [");
         if (getBaseCalendar() != null) {
-        	buffer.append(getBaseCalendar().toString());
+            buffer.append(getBaseCalendar().toString());
         } else {
-        	buffer.append("null");
+            buffer.append("null");
         }
         buffer.append("], time range: '");
         buffer.append(numberFormatter.format(rangeStartingHourOfDay));
@@ -557,9 +645,22 @@ public class DailyCalendar extends BaseCalendar {
         buffer.append(":");
         numberFormatter.setMinimumIntegerDigits(3);
         buffer.append(numberFormatter.format(rangeEndingMillis));
-        buffer.append("', inverted: " + 
-        		Boolean.toString(invertTimeRange) + "]");
+        buffer.append("', inverted: " + invertTimeRange + "]");
         return buffer.toString();
+    }
+    
+    /**
+     * Helper method to split the given string by the given delimiter.
+     */
+    private String[] split(String string, String delim) {
+        ArrayList<String> result = new ArrayList<String>();
+        
+        StringTokenizer stringTokenizer = new StringTokenizer(string, delim);
+        while (stringTokenizer.hasMoreTokens()) {
+            result.add(stringTokenizer.nextToken());
+        }
+        
+        return (String[])result.toArray(new String[result.size()]);
     }
     
     /**
@@ -571,68 +672,68 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingTimeString   a String representing the end time of the
      *                                excluded time range
      */
-    private void setTimeRange(String rangeStartingTimeString,
+    public void setTimeRange(String rangeStartingTimeString,
                               String rangeEndingTimeString) {
-    	String[] rangeStartingTime;
-    	int rangeStartingHourOfDay;
-    	int rangeStartingMinute;
-    	int rangeStartingSecond;
-    	int rangeStartingMillis;
-    	
-    	String[] rangeEndingTime;
-    	int rangeEndingHourOfDay;
-    	int rangeEndingMinute;
-    	int rangeEndingSecond;
-    	int rangeEndingMillis;
-    	
-    	rangeStartingTime = rangeStartingTimeString.split(colon);
+        String[] rangeStartingTime;
+        int rStartingHourOfDay;
+        int rStartingMinute;
+        int rStartingSecond;
+        int rStartingMillis;
+        
+        String[] rEndingTime;
+        int rEndingHourOfDay;
+        int rEndingMinute;
+        int rEndingSecond;
+        int rEndingMillis;
+        
+        rangeStartingTime = split(rangeStartingTimeString, colon);
         
         if ((rangeStartingTime.length < 2) || (rangeStartingTime.length > 4)) {
-        	throw new IllegalArgumentException("Invalid time string '" + 
-        			rangeStartingTimeString + "'");
+            throw new IllegalArgumentException("Invalid time string '" + 
+                    rangeStartingTimeString + "'");
         }
         
-        rangeStartingHourOfDay = Integer.parseInt(rangeStartingTime[0]);
-        rangeStartingMinute = Integer.parseInt(rangeStartingTime[1]);
+        rStartingHourOfDay = Integer.parseInt(rangeStartingTime[0]);
+        rStartingMinute = Integer.parseInt(rangeStartingTime[1]);
         if (rangeStartingTime.length > 2) {
-        	rangeStartingSecond = Integer.parseInt(rangeStartingTime[2]);
+            rStartingSecond = Integer.parseInt(rangeStartingTime[2]);
         } else {
-        	rangeStartingSecond = 0;
+            rStartingSecond = 0;
         }
         if (rangeStartingTime.length == 4) {
-	        rangeStartingMillis = Integer.parseInt(rangeStartingTime[3]);
+            rStartingMillis = Integer.parseInt(rangeStartingTime[3]);
         } else {
-        	rangeStartingMillis = 0;
+            rStartingMillis = 0;
         }
         
-        rangeEndingTime = rangeEndingTimeString.split(colon);
+        rEndingTime = split(rangeEndingTimeString, colon);
 
-        if ((rangeEndingTime.length < 2) || (rangeEndingTime.length > 4)) {
-        	throw new IllegalArgumentException("Invalid time string '" + 
-        			rangeEndingTimeString + "'");
+        if ((rEndingTime.length < 2) || (rEndingTime.length > 4)) {
+            throw new IllegalArgumentException("Invalid time string '" + 
+                    rangeEndingTimeString + "'");
         }
         
-        rangeEndingHourOfDay = Integer.parseInt(rangeEndingTime[0]);
-        rangeEndingMinute = Integer.parseInt(rangeEndingTime[1]);
-        if (rangeEndingTime.length > 2) {
-        	rangeEndingSecond = Integer.parseInt(rangeEndingTime[2]);
+        rEndingHourOfDay = Integer.parseInt(rEndingTime[0]);
+        rEndingMinute = Integer.parseInt(rEndingTime[1]);
+        if (rEndingTime.length > 2) {
+            rEndingSecond = Integer.parseInt(rEndingTime[2]);
         } else {
-        	rangeEndingSecond = 0;
+            rEndingSecond = 0;
         }
-        if (rangeEndingTime.length == 4) {
-        	rangeEndingMillis = Integer.parseInt(rangeEndingTime[3]);
+        if (rEndingTime.length == 4) {
+            rEndingMillis = Integer.parseInt(rEndingTime[3]);
         } else {
-        	rangeEndingMillis = 0;
+            rEndingMillis = 0;
         }
         
-        setTimeRange(rangeStartingHourOfDay,
-                     rangeStartingMinute,
-                     rangeStartingSecond,
-                     rangeStartingMillis,
-                     rangeEndingHourOfDay,
-                     rangeEndingMinute,
-                     rangeEndingSecond,
-                     rangeEndingMillis);
+        setTimeRange(rStartingHourOfDay,
+                     rStartingMinute,
+                     rStartingSecond,
+                     rStartingMillis,
+                     rEndingHourOfDay,
+                     rEndingMinute,
+                     rEndingSecond,
+                     rEndingMillis);
     }
 
     /**
@@ -650,7 +751,7 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingMillis      the millisecond of the start of the time 
      *                               range
      */
-    private void setTimeRange(int rangeStartingHourOfDay,
+    public void setTimeRange(int rangeStartingHourOfDay,
                               int rangeStartingMinute,
                               int rangeStartingSecond,
                               int rangeStartingMillis,
@@ -668,13 +769,13 @@ public class DailyCalendar extends BaseCalendar {
                  rangeEndingSecond,
                  rangeEndingMillis);
         
-        Calendar startCal = Calendar.getInstance();
+        Calendar startCal = createJavaCalendar();
         startCal.set(Calendar.HOUR_OF_DAY, rangeStartingHourOfDay);
         startCal.set(Calendar.MINUTE, rangeStartingMinute);
         startCal.set(Calendar.SECOND, rangeStartingSecond);
         startCal.set(Calendar.MILLISECOND, rangeStartingMillis);
         
-        Calendar endCal = Calendar.getInstance();
+        Calendar endCal = createJavaCalendar();
         endCal.set(Calendar.HOUR_OF_DAY, rangeEndingHourOfDay);
         endCal.set(Calendar.MINUTE, rangeEndingMinute);
         endCal.set(Calendar.SECOND, rangeEndingSecond);
@@ -682,14 +783,14 @@ public class DailyCalendar extends BaseCalendar {
         
         if (!startCal.before(endCal)) {
             throw new IllegalArgumentException(invalidTimeRange +
-            		rangeStartingHourOfDay + ":" +
-            		rangeStartingMinute + ":" +
-            		rangeStartingSecond + ":" +
-            		rangeStartingMillis + separator +
-            		rangeEndingHourOfDay + ":" +
-            		rangeEndingMinute + ":" +
-            		rangeEndingSecond + ":" +
-            		rangeEndingMillis);
+                    rangeStartingHourOfDay + ":" +
+                    rangeStartingMinute + ":" +
+                    rangeStartingSecond + ":" +
+                    rangeStartingMillis + separator +
+                    rangeEndingHourOfDay + ":" +
+                    rangeEndingMinute + ":" +
+                    rangeEndingSecond + ":" +
+                    rangeEndingMillis);
         }
         
         this.rangeStartingHourOfDay = rangeStartingHourOfDay;
@@ -711,8 +812,8 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingCalendar   a Calendar containing the end time for
      *                              the <CODE>DailyCalendar</CODE>
      */
-    private void setTimeRange(Calendar rangeStartingCalendar,
-    		                  Calendar rangeEndingCalendar) {
+    public void setTimeRange(Calendar rangeStartingCalendar,
+                              Calendar rangeEndingCalendar) {
         setTimeRange(
                 rangeStartingCalendar.get(Calendar.HOUR_OF_DAY),
                 rangeStartingCalendar.get(Calendar.MINUTE),
@@ -733,48 +834,11 @@ public class DailyCalendar extends BaseCalendar {
      * @param rangeEndingTime   the ending time (in milliseconds) for the time
      *                          range
      */
-    private void setTimeRange(long rangeStartingTime, 
-    		                  long rangeEndingTime) {
-    	Calendar startCal = Calendar.getInstance();
-    	Calendar endCal = Calendar.getInstance();
-    	startCal.setTimeInMillis(rangeStartingTime);
-    	endCal.setTimeInMillis(rangeEndingTime);
-    	
-    	setTimeRange(startCal, endCal);
-    }
-    
-    /**
-     * Returns the start of the given day in milliseconds
-     * 
-     * @param timeInMillis a time containing the desired date for the 
-     *                     start-of-day time.
-     * @return the start of the given day in milliseconds
-     */
-    private long getStartOfDayInMillis(long timeInMillis) {
-        Calendar startOfDay = Calendar.getInstance();
-        startOfDay.setTimeInMillis(timeInMillis);
-        startOfDay.set(Calendar.HOUR_OF_DAY, 0);
-        startOfDay.set(Calendar.MINUTE, 0);
-        startOfDay.set(Calendar.SECOND, 0);
-        startOfDay.set(Calendar.MILLISECOND, 0);
-        return startOfDay.getTimeInMillis();
-    }
-
-    /**
-     * Returns the end of the given day in milliseconds
-     * 
-     * @param timeInMillis a time containing the desired date for the 
-     *                     end-of-day time.
-     * @return the end of the given day in milliseconds
-     */
-    private long getEndOfDayInMillis(long timeInMillis) {
-        Calendar endOfDay = Calendar.getInstance();
-        endOfDay.setTimeInMillis(timeInMillis);
-        endOfDay.set(Calendar.HOUR_OF_DAY, 23);
-        endOfDay.set(Calendar.MINUTE, 59);
-        endOfDay.set(Calendar.SECOND, 59);
-        endOfDay.set(Calendar.MILLISECOND, 999);
-        return endOfDay.getTimeInMillis();
+    public void setTimeRange(long rangeStartingTime, 
+                              long rangeEndingTime) {
+        setTimeRange(
+            createJavaCalendar(rangeStartingTime), 
+            createJavaCalendar(rangeEndingTime));
     }
     
     /**

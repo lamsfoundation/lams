@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,15 +15,13 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.calendar;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.quartz.Calendar;
@@ -45,23 +43,33 @@ import org.quartz.Calendar;
  */
 public class HolidayCalendar extends BaseCalendar implements Calendar,
         Serializable {
-
+    static final long serialVersionUID = -7590908752291814693L;
+    
     // A sorted set to store the holidays
-    private TreeSet dates = new TreeSet();
+    private TreeSet<Date> dates = new TreeSet<Date>();
 
-    /**
-     * Constructor
-     */
     public HolidayCalendar() {
     }
 
-    /**
-     * Constructor
-     */
     public HolidayCalendar(Calendar baseCalendar) {
-        setBaseCalendar(baseCalendar);
+        super(baseCalendar);
     }
 
+    public HolidayCalendar(TimeZone timeZone) {
+        super(timeZone);
+    }
+
+    public HolidayCalendar(Calendar baseCalendar, TimeZone timeZone) {
+        super(baseCalendar, timeZone);
+    }
+
+    @Override
+    public Object clone() {
+        HolidayCalendar clone = (HolidayCalendar) super.clone();
+        clone.dates = new TreeSet<Date>(dates);
+        return clone;
+    }
+    
     /**
      * <p>
      * Determine whether the given time (in milliseconds) is 'included' by the
@@ -72,10 +80,13 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
      * Note that this Calendar is only has full-day precision.
      * </p>
      */
+    @Override
     public boolean isTimeIncluded(long timeStamp) {
-        if (super.isTimeIncluded(timeStamp) == false) return false;
+        if (super.isTimeIncluded(timeStamp) == false) {
+            return false;
+        }
 
-        Date lookFor = buildHoliday(new Date(timeStamp));
+        Date lookFor = getStartOfDayJavaCalendar(timeStamp).getTime();
 
         return !(dates.contains(lookFor));
     }
@@ -90,16 +101,17 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
      * Note that this Calendar is only has full-day precision.
      * </p>
      */
+    @Override
     public long getNextIncludedTime(long timeStamp) {
 
         // Call base calendar implementation first
         long baseTime = super.getNextIncludedTime(timeStamp);
-        if ((baseTime > 0) && (baseTime > timeStamp)) timeStamp = baseTime;
+        if ((baseTime > 0) && (baseTime > timeStamp)) {
+            timeStamp = baseTime;
+        }
 
         // Get timestamp for 00:00:00
-        long newTimeStamp = buildHoliday(timeStamp);
-
-        java.util.Calendar day = getJavaCalendar(newTimeStamp);
+        java.util.Calendar day = getStartOfDayJavaCalendar(timeStamp);
         while (isTimeIncluded(day.getTime().getTime()) == false) {
             day.add(java.util.Calendar.DATE, 1);
         }
@@ -114,7 +126,7 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
      * </p>
      */
     public void addExcludedDate(Date excludedDate) {
-        Date date = buildHoliday(excludedDate);
+        Date date = getStartOfDayJavaCalendar(excludedDate.getTime()).getTime();
         /*
          * System.err.println( "HolidayCalendar.add(): date=" +
          * excludedDate.toLocaleString());
@@ -123,7 +135,7 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
     }
 
     public void removeExcludedDate(Date dateToRemove) {
-        Date date = buildHoliday(dateToRemove);
+        Date date = getStartOfDayJavaCalendar(dateToRemove.getTime()).getTime();
         dates.remove(date);
     }
 
@@ -134,7 +146,7 @@ public class HolidayCalendar extends BaseCalendar implements Calendar,
      * significant.
      * </p>
      */
-    public SortedSet getExcludedDates() {
+    public SortedSet<Date> getExcludedDates() {
         return Collections.unmodifiableSortedSet(dates);
     }
 }

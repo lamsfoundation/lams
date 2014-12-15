@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
 import org.quartz.JobPersistenceException;
@@ -31,6 +28,9 @@ import org.quartz.JobPersistenceException;
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
 public class NoSuchDelegateException extends JobPersistenceException {
+
+    private static final long serialVersionUID = -4255865028975822979L;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -41,6 +41,10 @@ public class NoSuchDelegateException extends JobPersistenceException {
 
     public NoSuchDelegateException(String msg) {
         super(msg);
+    }
+
+    public NoSuchDelegateException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }
 

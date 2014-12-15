@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
 import org.quartz.JobPersistenceException;
@@ -34,6 +31,8 @@ import org.quartz.JobPersistenceException;
  */
 public class LockException extends JobPersistenceException {
 
+    private static final long serialVersionUID = 3993800462589137228L;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -46,7 +45,7 @@ public class LockException extends JobPersistenceException {
         super(msg);
     }
 
-    public LockException(String msg, Exception cause) {
+    public LockException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

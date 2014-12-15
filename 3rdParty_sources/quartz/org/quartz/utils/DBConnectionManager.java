@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.utils;
 
 import java.sql.Connection;
@@ -61,7 +58,7 @@ public class DBConnectionManager {
 
     private static DBConnectionManager instance = new DBConnectionManager();
 
-    private HashMap providers = new HashMap();
+    private HashMap<String, ConnectionProvider> providers = new HashMap<String, ConnectionProvider>();
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,11 +99,11 @@ public class DBConnectionManager {
      *              given name.
      */
     public Connection getConnection(String dsName) throws SQLException {
-        ConnectionProvider provider = (ConnectionProvider) providers
-                .get(dsName);
-        if (provider == null)
-                throw new SQLException("There is no DataSource named '"
-                        + dsName + "'");
+        ConnectionProvider provider = providers.get(dsName);
+        if (provider == null) {
+            throw new SQLException("There is no DataSource named '"
+                    + dsName + "'");
+        }
 
         return provider.getConnection();
     }
@@ -126,7 +123,6 @@ public class DBConnectionManager {
      * Shuts down database connections from the DataSource with the given name,
      * if applicable for the underlying provider.
      *
-     * @return a database connection
      * @exception SQLException
      *              if an error occurs, or there is no DataSource with the
      *              given name.
@@ -135,9 +131,10 @@ public class DBConnectionManager {
 
         ConnectionProvider provider = (ConnectionProvider) providers
         .get(dsName);
-        if (provider == null)
+        if (provider == null) {
             throw new SQLException("There is no DataSource named '"
                     + dsName + "'");
+        }
 
         provider.shutdown();
 

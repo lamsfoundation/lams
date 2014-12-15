@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,19 +16,17 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
+import org.quartz.Trigger.CompletedExecutionInstruction;
+
 /**
- * <p>
  * The interface to be implemented by classes that want to be informed when a
  * <code>{@link Trigger}</code> fires. In general, applications that use a
  * <code>Scheduler</code> will not have use for this mechanism.
- * </p>
  * 
- * @see Scheduler
+ * @see ListenerManager#addTriggerListener(TriggerListener, Matcher)
+ * @see Matcher
  * @see Trigger
  * @see JobListener
  * @see JobExecutionContext
@@ -50,7 +48,7 @@ public interface TriggerListener {
      * Get the name of the <code>TriggerListener</code>.
      * </p>
      */
-    public String getName();
+    String getName();
 
     /**
      * <p>
@@ -70,13 +68,14 @@ public interface TriggerListener {
      *          The <code>JobExecutionContext</code> that will be passed to
      *          the <code>Job</code>'s<code>execute(xx)</code> method.
      */
-    public void triggerFired(Trigger trigger, JobExecutionContext context);
+    void triggerFired(Trigger trigger, JobExecutionContext context);
 
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
      * has fired, and it's associated <code>{@link org.quartz.JobDetail}</code>
-     * is about to be executed.
+     * is about to be executed.  If the implementation vetos the execution (via
+     * returning <code>true</code>), the job's execute method will not be called.
      * </p>
      * 
      * <p>
@@ -90,7 +89,7 @@ public interface TriggerListener {
      *          The <code>JobExecutionContext</code> that will be passed to
      *          the <code>Job</code>'s<code>execute(xx)</code> method.
      */
-    public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context);
+    boolean vetoJobExecution(Trigger trigger, JobExecutionContext context);
 
     
     /**
@@ -109,7 +108,7 @@ public interface TriggerListener {
      * @param trigger
      *          The <code>Trigger</code> that has misfired.
      */
-    public void triggerMisfired(Trigger trigger);
+    void triggerMisfired(Trigger trigger);
 
     /**
      * <p>
@@ -124,11 +123,11 @@ public interface TriggerListener {
      * @param context
      *          The <code>JobExecutionContext</code> that was passed to the
      *          <code>Job</code>'s<code>execute(xx)</code> method.
-     * @param triggerIntructionCode
+     * @param triggerInstructionCode
      *          the result of the call on the <code>Trigger</code>'s<code>triggered(xx)</code>
      *          method.
      */
-    public void triggerComplete(Trigger trigger, JobExecutionContext context,
-            int triggerInstructionCode);
+    void triggerComplete(Trigger trigger, JobExecutionContext context,
+            CompletedExecutionInstruction triggerInstructionCode);
 
 }

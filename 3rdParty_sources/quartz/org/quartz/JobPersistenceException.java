@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,20 +16,17 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
 /**
- * <p>
  * An exception that is thrown to indicate that there has been a failure in the
  * scheduler's underlying persistence mechanism.
- * </p>
  * 
  * @author James House
  */
 public class JobPersistenceException extends SchedulerException {
+  
+    private static final long serialVersionUID = -8924958757341995694L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,18 +43,8 @@ public class JobPersistenceException extends SchedulerException {
      */
     public JobPersistenceException(String msg) {
         super(msg);
-        setErrorCode(ERR_PERSISTENCE);
     }
 
-    /**
-     * <p>
-     * Create a <code>JobPersistenceException</code> with the given message
-     * and error code.
-     * </p>
-     */
-    public JobPersistenceException(String msg, int errCode) {
-        super(msg, errCode);
-    }
 
     /**
      * <p>
@@ -65,19 +52,8 @@ public class JobPersistenceException extends SchedulerException {
      * and cause.
      * </p>
      */
-    public JobPersistenceException(String msg, Exception cause) {
+    public JobPersistenceException(String msg, Throwable cause) {
         super(msg, cause);
-        setErrorCode(ERR_PERSISTENCE);
-    }
-
-    /**
-     * <p>
-     * Create a <code>JobPersistenceException</code> with the given message,
-     * cause and error code.
-     * </p>
-     */
-    public JobPersistenceException(String msg, Exception cause, int errorCode) {
-        super(msg, cause, errorCode);
     }
 
 }

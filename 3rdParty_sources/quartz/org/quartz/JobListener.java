@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,20 +16,16 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
 /**
- * <p>
  * The interface to be implemented by classes that want to be informed when a
  * <code>{@link org.quartz.JobDetail}</code> executes. In general,
  * applications that use a <code>Scheduler</code> will not have use for this
  * mechanism.
- * </p>
  * 
- * @see Scheduler
+ * @see ListenerManager#addJobListener(JobListener, Matcher)
+ * @see Matcher
  * @see Job
  * @see JobExecutionContext
  * @see JobExecutionException
@@ -52,13 +48,13 @@ public interface JobListener {
      * Get the name of the <code>JobListener</code>.
      * </p>
      */
-    public String getName();
+    String getName();
 
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
      * is about to be executed (an associated <code>{@link Trigger}</code>
-     * has occured).
+     * has occurred).
      * </p>
      * 
      * <p>
@@ -68,19 +64,19 @@ public interface JobListener {
      * 
      * @see #jobExecutionVetoed(JobExecutionContext)
      */
-    public void jobToBeExecuted(JobExecutionContext context);
+    void jobToBeExecuted(JobExecutionContext context);
 
     /**
      * <p>
      * Called by the <code>{@link Scheduler}</code> when a <code>{@link org.quartz.JobDetail}</code>
      * was about to be executed (an associated <code>{@link Trigger}</code>
-     * has occured), but a <code>{@link TriggerListener}</code> vetoed it's 
+     * has occurred), but a <code>{@link TriggerListener}</code> vetoed it's 
      * execution.
      * </p>
      * 
      * @see #jobToBeExecuted(JobExecutionContext)
      */
-    public void jobExecutionVetoed(JobExecutionContext context);
+    void jobExecutionVetoed(JobExecutionContext context);
 
     
     /**
@@ -90,7 +86,7 @@ public interface JobListener {
      * <code>triggered(xx)</code> method has been called.
      * </p>
      */
-    public void jobWasExecuted(JobExecutionContext context,
+    void jobWasExecuted(JobExecutionContext context,
             JobExecutionException jobException);
 
 }

@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,29 +15,29 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobListener;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
+import org.quartz.ListenerManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerListener;
 import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
-import org.quartz.TriggerListener;
+import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.core.QuartzScheduler;
-import org.quartz.core.SchedulingContext;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -49,8 +49,7 @@ import org.quartz.spi.JobFactory;
  * 
  * @see org.quartz.Scheduler
  * @see org.quartz.core.QuartzScheduler
- * @see org.quartz.core.SchedulingContext
- * 
+ *
  * @author James House
  */
 public class StdScheduler implements Scheduler {
@@ -64,8 +63,6 @@ public class StdScheduler implements Scheduler {
      */
 
     private QuartzScheduler sched;
-
-    private SchedulingContext schedCtxt;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,9 +78,8 @@ public class StdScheduler implements Scheduler {
      * <code>QuartzScheduler</code> instance, and with the given <code>SchedulingContext</code>.
      * </p>
      */
-    public StdScheduler(QuartzScheduler sched, SchedulingContext schedCtxt) {
+    public StdScheduler(QuartzScheduler sched) {
         this.sched = sched;
-        this.schedCtxt = schedCtxt;
     }
 
     /*
@@ -114,12 +110,11 @@ public class StdScheduler implements Scheduler {
 
     public SchedulerMetaData getMetaData() {
         return new SchedulerMetaData(getSchedulerName(),
-                getSchedulerInstanceId(), getClass(), false, sched
-                        .runningSince() != null, isPaused(), isShutdown(),
-                sched.runningSince(), sched.numJobsExecuted(), sched
-                        .getJobStoreClass(), sched.supportsPersistence(), sched
-                        .getThreadPoolClass(), sched.getThreadPoolSize(), sched
-                        .getVersion());
+                getSchedulerInstanceId(), getClass(), false, isStarted(), 
+                isInStandbyMode(), isShutdown(), sched.runningSince(), 
+                sched.numJobsExecuted(), sched.getJobStoreClass(), 
+                sched.supportsPersistence(), sched.isClustered(), sched.getThreadPoolClass(), 
+                sched.getThreadPoolSize(), sched.getVersion());
 
     }
 
@@ -151,14 +146,12 @@ public class StdScheduler implements Scheduler {
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
-     * 
-     * @deprecated
-     * @see standby()
      */
-    public void pause() {
-        this.standby();
+    public void startDelayed(int seconds) throws SchedulerException {
+        sched.startDelayed(seconds);
     }
-    
+
+
     /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
@@ -169,19 +162,30 @@ public class StdScheduler implements Scheduler {
     }
     
     /**
+     * Whether the scheduler has been started.  
+     * 
+     * <p>
+     * Note: This only reflects whether <code>{@link #start()}</code> has ever
+     * been called on this Scheduler, so it will return <code>true</code> even 
+     * if the <code>Scheduler</code> is currently in standby mode or has been 
+     * since shutdown.
+     * </p>
+     * 
+     * @see #start()
+     * @see #isShutdown()
+     * @see #isInStandbyMode()
+     */    
+    public boolean isStarted() {
+        return (sched.runningSince() != null);
+    }
+    
+    /**
      * <p>
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public boolean isInStandbyMode() {
         return sched.isInStandbyMode();
-    }
-
-    /**
-     * @deprecated
-     */
-    public boolean isPaused() {
-        return isInStandbyMode();
     }
 
     /**
@@ -216,7 +220,7 @@ public class StdScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public List getCurrentlyExecutingJobs() {
+    public List<JobExecutionContext> getCurrentlyExecutingJobs() {
         return sched.getCurrentlyExecutingJobs();
     }
 
@@ -228,543 +232,355 @@ public class StdScheduler implements Scheduler {
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public void clear() throws SchedulerException {
+        sched.clear();
+    }
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public Date scheduleJob(JobDetail jobDetail, Trigger trigger)
-            throws SchedulerException {
-        return sched.scheduleJob(schedCtxt, jobDetail, trigger);
+        throws SchedulerException {
+        return sched.scheduleJob(jobDetail, trigger);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public Date scheduleJob(Trigger trigger) throws SchedulerException {
-        return sched.scheduleJob(schedCtxt, trigger);
+        return sched.scheduleJob(trigger);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public void addJob(JobDetail jobDetail, boolean replace)
+        throws SchedulerException {
+        sched.addJob(jobDetail, replace);
+    }
+
+    public void addJob(JobDetail jobDetail, boolean replace, boolean storeNonDurableWhileAwaitingScheduling)
             throws SchedulerException {
-        sched.addJob(schedCtxt, jobDetail, replace);
+        sched.addJob(jobDetail, replace, storeNonDurableWhileAwaitingScheduling);
+    }
+
+
+    public boolean deleteJobs(List<JobKey> jobKeys) throws SchedulerException {
+        return sched.deleteJobs(jobKeys);
+    }
+
+    public void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, boolean replace) throws SchedulerException {
+        sched.scheduleJobs(triggersAndJobs, replace);
+    }
+
+    public void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, boolean replace) throws SchedulerException {
+        sched.scheduleJob(jobDetail,  triggersForJob, replace);
+    }
+    
+    public boolean unscheduleJobs(List<TriggerKey> triggerKeys)
+            throws SchedulerException {
+        return sched.unscheduleJobs(triggerKeys);
+    }    
+    
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean deleteJob(JobKey jobKey)
+        throws SchedulerException {
+        return sched.deleteJob(jobKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public boolean deleteJob(String jobName, String groupName)
-            throws SchedulerException {
-        return sched.deleteJob(schedCtxt, jobName, groupName);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
-     * </p>
-     */
-    public boolean unscheduleJob(String triggerName, String groupName)
-            throws SchedulerException {
-        return sched.unscheduleJob(schedCtxt, triggerName, groupName);
+    public boolean unscheduleJob(TriggerKey triggerKey)
+        throws SchedulerException {
+        return sched.unscheduleJob(triggerKey);
     }
     
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public Date rescheduleJob(String triggerName,
-            String groupName, Trigger newTrigger) throws SchedulerException {
-        return sched.rescheduleJob(schedCtxt, triggerName, groupName, newTrigger);
+    public Date rescheduleJob(TriggerKey triggerKey,
+            Trigger newTrigger) throws SchedulerException {
+        return sched.rescheduleJob(triggerKey, newTrigger);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void triggerJob(String jobName, String groupName)
-            throws SchedulerException {
-        triggerJob(jobName, groupName, null);
+    public void triggerJob(JobKey jobKey)
+        throws SchedulerException {
+        triggerJob(jobKey, null);
     }
     
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void triggerJob(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException {
-        sched.triggerJob(schedCtxt, jobName, groupName, data);
+    public void triggerJob(JobKey jobKey, JobDataMap data)
+        throws SchedulerException {
+        sched.triggerJob(jobKey, data);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void triggerJobWithVolatileTrigger(String jobName, String groupName)
-            throws SchedulerException {
-        triggerJobWithVolatileTrigger(jobName, groupName, null);
+    public void pauseTrigger(TriggerKey triggerKey)
+        throws SchedulerException {
+        sched.pauseTrigger(triggerKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void triggerJobWithVolatileTrigger(String jobName, String groupName, JobDataMap data)
-            throws SchedulerException {
-        sched.triggerJobWithVolatileTrigger(schedCtxt, jobName, groupName, data);
+    public void pauseTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
+        sched.pauseTriggers(matcher);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void pauseTrigger(String triggerName, String groupName)
-            throws SchedulerException {
-        sched.pauseTrigger(schedCtxt, triggerName, groupName);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
-     * </p>
-     */
-    public void pauseTriggerGroup(String groupName) throws SchedulerException {
-        sched.pauseTriggerGroup(schedCtxt, groupName);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
-     * </p>
-     */
-    public void pauseJob(String jobName, String groupName)
-            throws SchedulerException {
-        sched.pauseJob(schedCtxt, jobName, groupName);
+    public void pauseJob(JobKey jobKey)
+        throws SchedulerException {
+        sched.pauseJob(jobKey);
     }
 
     /** 
      * @see org.quartz.Scheduler#getPausedTriggerGroups()
      */
-    public Set getPausedTriggerGroups() throws SchedulerException {
-        return sched.getPausedTriggerGroups(schedCtxt);
+    public Set<String> getPausedTriggerGroups() throws SchedulerException {
+        return sched.getPausedTriggerGroups();
     }
     
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void pauseJobGroup(String groupName) throws SchedulerException {
-        sched.pauseJobGroup(schedCtxt, groupName);
+    public void pauseJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        sched.pauseJobs(matcher);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeTrigger(String triggerName, String groupName)
-            throws SchedulerException {
-        sched.resumeTrigger(schedCtxt, triggerName, groupName);
+    public void resumeTrigger(TriggerKey triggerKey)
+        throws SchedulerException {
+        sched.resumeTrigger(triggerKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeTriggerGroup(String groupName) throws SchedulerException {
-        sched.resumeTriggerGroup(schedCtxt, groupName);
+    public void resumeTriggers(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
+        sched.resumeTriggers(matcher);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeJob(String jobName, String groupName)
-            throws SchedulerException {
-        sched.resumeJob(schedCtxt, jobName, groupName);
+    public void resumeJob(JobKey jobKey)
+        throws SchedulerException {
+        sched.resumeJob(jobKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public void resumeJobGroup(String groupName) throws SchedulerException {
-        sched.resumeJobGroup(schedCtxt, groupName);
+    public void resumeJobs(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        sched.resumeJobs(matcher);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public void pauseAll() throws SchedulerException {
-        sched.pauseAll(schedCtxt);
+        sched.pauseAll();
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public void resumeAll() throws SchedulerException {
-        sched.resumeAll(schedCtxt);
+        sched.resumeAll();
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public String[] getJobGroupNames() throws SchedulerException {
-        return sched.getJobGroupNames(schedCtxt);
+    public List<String> getJobGroupNames() throws SchedulerException {
+        return sched.getJobGroupNames();
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public Trigger[] getTriggersOfJob(String jobName, String groupName)
-            throws SchedulerException {
-        return sched.getTriggersOfJob(schedCtxt, jobName, groupName);
+    public List<? extends Trigger> getTriggersOfJob(JobKey jobKey)
+        throws SchedulerException {
+        return sched.getTriggersOfJob(jobKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public String[] getJobNames(String groupName) throws SchedulerException {
-        return sched.getJobNames(schedCtxt, groupName);
+    public Set<JobKey> getJobKeys(GroupMatcher<JobKey> matcher) throws SchedulerException {
+        return sched.getJobKeys(matcher);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public String[] getTriggerGroupNames() throws SchedulerException {
-        return sched.getTriggerGroupNames(schedCtxt);
+    public List<String> getTriggerGroupNames() throws SchedulerException {
+        return sched.getTriggerGroupNames();
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public String[] getTriggerNames(String groupName) throws SchedulerException {
-        return sched.getTriggerNames(schedCtxt, groupName);
+    public Set<TriggerKey> getTriggerKeys(GroupMatcher<TriggerKey> matcher) throws SchedulerException {
+        return sched.getTriggerKeys(matcher);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public JobDetail getJobDetail(String jobName, String jobGroup)
-            throws SchedulerException {
-        return sched.getJobDetail(schedCtxt, jobName, jobGroup);
+    public JobDetail getJobDetail(JobKey jobKey)
+        throws SchedulerException {
+        return sched.getJobDetail(jobKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public Trigger getTrigger(String triggerName, String triggerGroup)
-            throws SchedulerException {
-        return sched.getTrigger(schedCtxt, triggerName, triggerGroup);
+    public Trigger getTrigger(TriggerKey triggerKey)
+        throws SchedulerException {
+        return sched.getTrigger(triggerKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public int getTriggerState(String triggerName, String triggerGroup)
-            throws SchedulerException {
-        return sched.getTriggerState(schedCtxt, triggerName, triggerGroup);
+    public TriggerState getTriggerState(TriggerKey triggerKey)
+        throws SchedulerException {
+        return sched.getTriggerState(triggerKey);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public void addCalendar(String calName, Calendar calendar, boolean replace, boolean updateTriggers)
-            throws SchedulerException {
-        sched.addCalendar(schedCtxt, calName, calendar, replace, updateTriggers);
+        throws SchedulerException {
+        sched.addCalendar(calName, calendar, replace, updateTriggers);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public boolean deleteCalendar(String calName) throws SchedulerException {
-        return sched.deleteCalendar(schedCtxt, calName);
+        return sched.deleteCalendar(calName);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
     public Calendar getCalendar(String calName) throws SchedulerException {
-        return sched.getCalendar(schedCtxt, calName);
+        return sched.getCalendar(calName);
     }
 
     /**
      * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>,
-     * passing the <code>SchedulingContext</code> associated with this
-     * instance.
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    public String[] getCalendarNames() throws SchedulerException {
-        return sched.getCalendarNames(schedCtxt);
+    public List<String> getCalendarNames() throws SchedulerException {
+        return sched.getCalendarNames();
+    }
+
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean checkExists(JobKey jobKey) throws SchedulerException {
+        return sched.checkExists(jobKey);
+    }
+    
+   
+    /**
+     * <p>
+     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
+     * </p>
+     */
+    public boolean checkExists(TriggerKey triggerKey) throws SchedulerException {
+        return sched.checkExists(triggerKey);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     ///
-    /// Listener-related Methods
+    /// Other Methods
     ///
     ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addGlobalJobListener(JobListener jobListener) {
-        sched.addGlobalJobListener(jobListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addJobListener(JobListener jobListener) {
-        sched.addJobListener(jobListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeGlobalJobListener(JobListener jobListener) {
-        return sched.removeGlobalJobListener(jobListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeJobListener(String name) {
-        return sched.removeJobListener(name);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List getGlobalJobListeners() {
-        return sched.getGlobalJobListeners();
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public Set getJobListenerNames() {
-        return sched.getJobListenerNames();
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public JobListener getJobListener(String name) {
-        return sched.getJobListener(name);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addGlobalTriggerListener(TriggerListener triggerListener) {
-        sched.addGlobalTriggerListener(triggerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addTriggerListener(TriggerListener triggerListener) {
-        sched.addTriggerListener(triggerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeGlobalTriggerListener(TriggerListener triggerListener) {
-        return sched.removeGlobalTriggerListener(triggerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeTriggerListener(String name) {
-        return sched.removeTriggerListener(name);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List getGlobalTriggerListeners() {
-        return sched.getGlobalTriggerListeners();
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public Set getTriggerListenerNames() {
-        return sched.getTriggerListenerNames();
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public TriggerListener getTriggerListener(String name) {
-        return sched.getTriggerListener(name);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public void addSchedulerListener(SchedulerListener schedulerListener) {
-        sched.addSchedulerListener(schedulerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public boolean removeSchedulerListener(SchedulerListener schedulerListener) {
-        return sched.removeSchedulerListener(schedulerListener);
-    }
-
-    /**
-     * <p>
-     * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
-     * </p>
-     */
-    public List getSchedulerListeners() {
-        return sched.getSchedulerListeners();
-    }
-
-    public boolean interrupt(String jobName, String groupName) throws UnableToInterruptJobException {
-        return sched.interrupt(schedCtxt, jobName, groupName);
-    }
+    
 
     /**
      * @see org.quartz.Scheduler#setJobFactory(org.quartz.spi.JobFactory)
@@ -772,5 +588,21 @@ public class StdScheduler implements Scheduler {
     public void setJobFactory(JobFactory factory) throws SchedulerException {
         sched.setJobFactory(factory);
     }
-    
+
+    /**
+     * @see org.quartz.Scheduler#getListenerManager()
+     */
+    public ListenerManager getListenerManager() throws SchedulerException {
+        return sched.getListenerManager();
+    }
+
+    public boolean interrupt(JobKey jobKey) throws UnableToInterruptJobException {
+        return sched.interrupt(jobKey);
+    }
+
+    public boolean interrupt(String fireInstanceId) throws UnableToInterruptJobException {
+        return sched.interrupt(fireInstanceId);
+    }
+
+  
 }

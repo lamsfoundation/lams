@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,16 +15,12 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.spi;
 
 import java.util.Date;
 
 import org.quartz.Calendar;
 import org.quartz.JobDetail;
-import org.quartz.Trigger;
 
 /**
  * <p>
@@ -32,11 +28,13 @@ import org.quartz.Trigger;
  * JobStore to the <code>QuartzSchedulerThread</code>.
  * </p>
  * 
- * @see org.quartz.core.QuartzScheduler
+ * @see org.quartz.core.QuartzSchedulerThread
  * 
  * @author James House
  */
 public class TriggerFiredBundle implements java.io.Serializable {
+  
+    private static final long serialVersionUID = -6414106108306999265L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,7 +46,7 @@ public class TriggerFiredBundle implements java.io.Serializable {
 
     private JobDetail job;
 
-    private Trigger trigger;
+    private OperableTrigger trigger;
 
     private Calendar cal;
 
@@ -70,7 +68,7 @@ public class TriggerFiredBundle implements java.io.Serializable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public TriggerFiredBundle(JobDetail job, Trigger trigger, Calendar cal,
+    public TriggerFiredBundle(JobDetail job, OperableTrigger trigger, Calendar cal,
             boolean jobIsRecovering, Date fireTime, Date scheduledFireTime,
             Date prevFireTime, Date nextFireTime) {
         this.job = job;
@@ -95,7 +93,7 @@ public class TriggerFiredBundle implements java.io.Serializable {
         return job;
     }
 
-    public Trigger getTrigger() {
+    public OperableTrigger getTrigger() {
         return trigger;
     }
 

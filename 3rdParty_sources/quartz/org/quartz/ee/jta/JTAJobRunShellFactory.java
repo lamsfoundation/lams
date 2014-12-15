@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,16 +16,14 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.ee.jta;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerConfigException;
+import org.quartz.SchedulerException;
 import org.quartz.core.JobRunShell;
 import org.quartz.core.JobRunShellFactory;
-import org.quartz.core.SchedulingContext;
+import org.quartz.spi.TriggerFiredBundle;
 
 /**
  * <p>
@@ -53,10 +51,6 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
 
     private Scheduler scheduler;
 
-    private SchedulingContext schedCtxt;
-
-    private UserTransactionHelper userTxHelper;
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -65,8 +59,7 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public JTAJobRunShellFactory(UserTransactionHelper userTxHelper) {
-        this.userTxHelper = userTxHelper;
+    public JTAJobRunShellFactory() {
     }
 
     /*
@@ -86,10 +79,9 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
      * operations with the <code>JobStore</code>.
      * </p>
      */
-    public void initialize(Scheduler scheduler, SchedulingContext schedCtxt)
-            throws SchedulerConfigException {
-        this.scheduler = scheduler;
-        this.schedCtxt = schedCtxt;
+    public void initialize(Scheduler sched)
+        throws SchedulerConfigException {
+        this.scheduler = sched;
     }
 
     /**
@@ -99,19 +91,11 @@ public class JTAJobRunShellFactory implements JobRunShellFactory {
      * {@link org.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    public JobRunShell borrowJobRunShell() {
-        return new JTAJobRunShell(this, scheduler, schedCtxt, userTxHelper);
+    public JobRunShell createJobRunShell(TriggerFiredBundle bundle)
+            throws SchedulerException {
+        return new JTAJobRunShell(scheduler, bundle);
     }
 
-    /**
-     * <p>
-     * Called by the <class>{@link org.quartz.core.QuartzSchedulerThread}
-     * </code> to return instances of <code>
-     * {@link org.quartz.core.JobRunShell}</code>.
-     * </p>
-     */
-    public void returnJobRunShell(JobRunShell jobRunShell) {
-        jobRunShell.passivate();
-    }
+
 
 }

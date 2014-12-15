@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,21 +16,18 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
 /**
- * <p>
  * An exception that is thrown to indicate that there is a misconfiguration of
  * the <code>SchedulerFactory</code>- or one of the components it
  * configures.
- * </p>
  * 
  * @author James House
  */
 public class SchedulerConfigException extends SchedulerException {
+  
+    private static final long serialVersionUID = -5921239824646083098L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,7 +43,7 @@ public class SchedulerConfigException extends SchedulerException {
      * </p>
      */
     public SchedulerConfigException(String msg) {
-        super(msg, ERR_BAD_CONFIGURATION);
+        super(msg);
     }
 
     /**
@@ -55,9 +52,8 @@ public class SchedulerConfigException extends SchedulerException {
      * and cause.
      * </p>
      */
-    public SchedulerConfigException(String msg, Exception cause) {
+    public SchedulerConfigException(String msg, Throwable cause) {
         super(msg, cause);
-        setErrorCode(ERR_BAD_CONFIGURATION);
     }
 
 }

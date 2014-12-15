@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.xml;
 
 import java.util.ArrayList;
@@ -26,11 +23,14 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Reports QuartzMetaDataProcessor validation exceptions.
+ * Reports JobSchedulingDataLoader validation exceptions.
  * 
  * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
  */
 public class ValidationException extends Exception {
+
+    private static final long serialVersionUID = -1697832087051681357L;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -39,7 +39,7 @@ public class ValidationException extends Exception {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private Collection validationExceptions = new ArrayList();
+    private Collection<Exception> validationExceptions = new ArrayList<Exception>();
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,13 +69,30 @@ public class ValidationException extends Exception {
     /**
      * Constructor for ValidationException.
      * 
-     * @param validationExceptions
+     * @param errors
      *          collection of validation exceptions.
      */
-    public ValidationException(Collection errors) {
+    public ValidationException(Collection<Exception> errors) {
         this();
         this.validationExceptions = Collections
                 .unmodifiableCollection(validationExceptions);
+        initCause(errors.iterator().next());
+    }
+    
+
+    /**
+     * Constructor for ValidationException.
+     * 
+     * @param message
+     *          exception message.
+     * @param errors
+     *          collection of validation exceptions.
+     */
+    public ValidationException(String message, Collection<Exception> errors) {
+        this(message);
+        this.validationExceptions = Collections
+                .unmodifiableCollection(validationExceptions);
+        initCause(errors.iterator().next());
     }
 
     /*
@@ -91,7 +108,7 @@ public class ValidationException extends Exception {
      * 
      * @return collection of errors.
      */
-    public Collection getValidationExceptions() {
+    public Collection<Exception> getValidationExceptions() {
         return validationExceptions;
     }
 
@@ -100,6 +117,7 @@ public class ValidationException extends Exception {
      * 
      * @return the detail message string.
      */
+    @Override
     public String getMessage() {
         if (getValidationExceptions().size() == 0) { return super.getMessage(); }
 
@@ -107,9 +125,9 @@ public class ValidationException extends Exception {
 
         boolean first = true;
 
-        for (Iterator iter = getValidationExceptions().iterator(); iter
+        for (Iterator<Exception> iter = getValidationExceptions().iterator(); iter
                 .hasNext(); ) {
-            Exception e = (Exception) iter.next();
+            Exception e = iter.next();
 
             if (!first) {
                 sb.append('\n');
@@ -121,4 +139,6 @@ public class ValidationException extends Exception {
 
         return sb.toString();
     }
+    
+    
 }

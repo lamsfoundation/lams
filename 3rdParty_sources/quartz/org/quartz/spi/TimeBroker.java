@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.spi;
 
 import java.util.Date;
@@ -26,6 +23,8 @@ import org.quartz.SchedulerConfigException;
 import org.quartz.SchedulerException;
 
 /**
+ * <p>NOTE: TimeBroker is not currently used in the Quartz code base.</p>
+ *
  * <p>
  * The interface to be implemented by classes that want to provide a mechanism
  * by which the <code>{@link org.quartz.core.QuartzScheduler}</code> can
@@ -36,14 +35,14 @@ import org.quartz.SchedulerException;
  * In general, the default implementation of this interface (<code>{@link org.quartz.simpl.SimpleTimeBroker}</code>-
  * which simply uses <code>System.getCurrentTimeMillis()</code> )is
  * sufficient. However situations may exist where this default scheme is
- * lacking in its robustsness - especially when Quartz is used in a clustered
+ * lacking in its robustness - especially when Quartz is used in a clustered
  * configuration. For example, if one or more of the machines in the cluster
  * has a system time that varies by more than a few seconds from the clocks on
  * the other systems in the cluster, scheduling confusion will result.
  * </p>
  * 
  * @see org.quartz.core.QuartzScheduler
- * 
+ * @deprecated TimeBroker is not currently used in the Quartz code base.
  * @author James House
  */
 public interface TimeBroker {
@@ -65,7 +64,7 @@ public interface TimeBroker {
      *           with the error code set to
      *           SchedulerException.ERR_TIME_BROKER_FAILURE
      */
-    public Date getCurrentTime() throws SchedulerException;
+    Date getCurrentTime() throws SchedulerException;
 
     /**
      * <p>
@@ -73,7 +72,7 @@ public interface TimeBroker {
      * used, in order to give the it a chance to initialize.
      * </p>
      */
-    public void initialize() throws SchedulerConfigException;
+    void initialize() throws SchedulerConfigException;
 
     /**
      * <p>
@@ -82,6 +81,6 @@ public interface TimeBroker {
      * shutting down.
      * </p>
      */
-    public void shutdown();
+    void shutdown();
 
 }

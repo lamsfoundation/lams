@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,18 +16,16 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
 /**
- * <p>
  * The interface to be implemented by <code>{@link Job}s</code> that provide a 
- * mechanism for having their execution interrupted.  It is NOT a requirment
+ * mechanism for having their execution interrupted.  It is NOT a requirement
  * for jobs to implement this interface - in fact, for most people, none of
  * their jobs will.
- * </p>
+ * 
+ * <p>Interrupting a <code>Job</code> is very analogous in concept and 
+ * challenge to normal interruption of a <code>Thread</code> in Java. 
  * 
  * <p>
  * The means of actually interrupting the Job must be implemented within the
@@ -51,18 +49,22 @@ package org.quartz;
  * If the Job performs some form of blocking I/O or similar functions, you may
  * want to consider having the <code>Job.execute(..)</code> method store a
  * reference to the calling <code>Thread</code> as a member variable.  Then the
- * impplementation of this interfaces <code>interrupt()</code> method can call 
+ * Implementation of this interfaces <code>interrupt()</code> method can call 
  * <code>interrupt()</code> on that Thread.   Before attempting this, make
  * sure that you fully understand what <code>java.lang.Thread.interrupt()</code> 
  * does and doesn't do.  Also make sure that you clear the Job's member 
- * reference to the Thread when the execute(..) method exits (preferrably in a
+ * reference to the Thread when the execute(..) method exits (preferably in a
  * <code>finally</code> block.
  * </p>
  * 
+ * <p>
+ * See Example 7 (org.quartz.examples.example7.DumbInterruptableJob) for a simple
+ * implementation demonstration.
+ * </p>
  * @see Job
  * @see StatefulJob
- * @see Scheduler#interrupt(String, String)
- * @see org.quartz.examples.example7.DumbInterruptableJob
+ * @see Scheduler#interrupt(JobKey)
+ * @see Scheduler#interrupt(String)
  * 
  * @author James House
  */
@@ -82,12 +84,9 @@ public interface InterruptableJob extends Job {
      * interrupts the <code>Job</code>.
      * </p>
      * 
-     * @return void (nothing) if job interrupt is successful.
      * @throws UnableToInterruptJobException
      *           if there is an exception while interrupting the job.
      */
-    public void interrupt()
-            throws UnableToInterruptJobException;
-
-    
+    void interrupt()
+        throws UnableToInterruptJobException;
 }

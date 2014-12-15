@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.EmailScheduleMessageJobDTO;
+import org.lamsfoundation.lams.monitoring.quartz.job.EmailScheduleMessageJob;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -65,12 +66,15 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -99,6 +103,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
 
     private static final String TRIGGER_PREFIX_NAME = "emailMessageOnScheduleTrigger:";
+    private static final String JOB_PREFIX_NAME = "emailScheduleMessageJob:";
+
     private static IEventNotificationService eventNotificationService;
     private static IUserManagementService userManagementService;
     private static IAuditService auditService;
@@ -200,11 +206,13 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	}
 
-	String[] triggerNames = scheduler.getTriggerNames(Scheduler.DEFAULT_GROUP);
-	for (String triggerName : triggerNames) {
+	Set<TriggerKey> triggerKeys = scheduler
+		.getTriggerKeys(GroupMatcher.triggerGroupEquals(Scheduler.DEFAULT_GROUP));
+	for (TriggerKey triggerKey : triggerKeys) {
+	    String triggerName = triggerKey.getName();
 	    if (triggerName.startsWith(EmailNotificationsAction.TRIGGER_PREFIX_NAME)) {
-		Trigger trigger = scheduler.getTrigger(triggerName, Scheduler.DEFAULT_GROUP);
-		JobDetail jobDetail = scheduler.getJobDetail(trigger.getJobName(), Scheduler.DEFAULT_GROUP);
+		Trigger trigger = scheduler.getTrigger(triggerKey);
+		JobDetail jobDetail = scheduler.getJobDetail(trigger.getJobKey());
 		JobDataMap jobDataMap = jobDetail.getJobDataMap();
 
 		// filter triggers
@@ -258,10 +266,12 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    for (String userIdStr : userIdStrs) {
 		int userId = Integer.parseInt(userIdStr);
 		boolean isHtmlFormat = false;
-		isSuccessfullySent &= getEventNotificationService().sendMessage(null, userId,
-			IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
-				.getMessage("event.emailnotifications.email.subject", new Object[] {}), emailBody,
-			isHtmlFormat);
+		isSuccessfullySent &= getEventNotificationService().sendMessage(
+			null,
+			userId,
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
+			monitoringService.getMessageService().getMessage("event.emailnotifications.email.subject",
+				new Object[] {}), emailBody, isHtmlFormat);
 	    }
 
 	    JSONObject.put("isSuccessfullySent", isSuccessfullySent);
@@ -276,16 +286,17 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		TimeZone teacherTimeZone = teacher.getTimeZone();
 		Date scheduleDate = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, scheduleDateTeacherTimezone);
 
-		JobDetail emailScheduleMessageJob = getEmailScheduleMessageJob();
-		emailScheduleMessageJob.setName("emailScheduleMessageJob:" + now.getTimeInMillis());
-		emailScheduleMessageJob.setDescription("schedule email message to user(s)");
-		emailScheduleMessageJob.getJobDataMap().put("emailBody", emailBody);
-
+		// build job detail based on the bean class
+		JobDetail emailScheduleMessageJob = JobBuilder.newJob(EmailScheduleMessageJob.class)
+			.withIdentity(EmailNotificationsAction.JOB_PREFIX_NAME + now.getTimeInMillis())
+			.withDescription("schedule email message to user(s)").usingJobData("emailBody", emailBody)
+			.build();
 		copySearchParametersFromRequestToMap(request, emailScheduleMessageJob.getJobDataMap());
 
 		// create customized triggers
-		Trigger startLessonTrigger = new SimpleTrigger(EmailNotificationsAction.TRIGGER_PREFIX_NAME
-			+ now.getTimeInMillis(), Scheduler.DEFAULT_GROUP, scheduleDate);
+		Trigger startLessonTrigger = TriggerBuilder.newTrigger()
+			.withIdentity(EmailNotificationsAction.TRIGGER_PREFIX_NAME + now.getTimeInMillis())
+			.startAt(scheduleDate).build();
 		// start the scheduling job
 		Scheduler scheduler = getScheduler();
 		scheduler.scheduleJob(emailScheduleMessageJob, startLessonTrigger);
@@ -326,7 +337,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		return null;
 	    }
 	}
-	
+
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
@@ -468,16 +479,6 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	}
 
 	return EmailNotificationsAction.securityService;
-    }
-
-    /**
-     * 
-     * @return the bean that defines emailScheduleMessageJob.
-     */
-    private JobDetail getEmailScheduleMessageJob() {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
-	return (JobDetail) ctx.getBean(MonitoringConstants.JOB_EMAIL_MESSAGE);
     }
 
     /**

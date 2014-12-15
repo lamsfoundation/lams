@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,23 +16,19 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
-
 package org.quartz;
 
 /**
- * <p>
  * An exception that is thrown to indicate that a call to 
  * InterruptableJob.interrupt() failed without interrupting the Job.
- * </p>
  * 
  * @see org.quartz.InterruptableJob#interrupt()
  * 
  * @author James House
  */
 public class UnableToInterruptJobException extends SchedulerException {
+  
+    private static final long serialVersionUID = -490863760696463776L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,7 +52,7 @@ public class UnableToInterruptJobException extends SchedulerException {
      * Create a <code>UnableToInterruptJobException</code> with the given cause.
      * </p>
      */
-    public UnableToInterruptJobException(Exception cause) {
+    public UnableToInterruptJobException(Throwable cause) {
         super(cause);
     }
     

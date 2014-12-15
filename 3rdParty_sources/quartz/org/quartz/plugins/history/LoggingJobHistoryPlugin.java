@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,19 +15,18 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.plugins.history;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.JobListener;
+import org.quartz.impl.matchers.EverythingMatcher;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerPlugin;
 
 import java.text.MessageFormat;
@@ -291,7 +290,9 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     private String jobFailedMessage = "Job {1}.{0} execution failed at {2, date, HH:mm:ss MM/dd/yyyy} and reports: {8}";
 
     private String jobWasVetoedMessage = "Job {1}.{0} was vetoed.  It was to be fired (by trigger {4}.{3}) at: {2, date, HH:mm:ss MM/dd/yyyy}";
-    
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -311,15 +312,13 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Log getLog() {
-        return LogFactory.getLog(LoggingJobHistoryPlugin.class);
+    protected Logger getLog() {
+        return log;
     }
 
     /**
      * Get the message that is logged when a Job successfully completes its 
      * execution.
-     * 
-     * @return String
      */
     public String getJobSuccessMessage() {
         return jobSuccessMessage;
@@ -328,8 +327,6 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     /**
      * Get the message that is logged when a Job fails its 
      * execution.
-     * 
-     * @return String
      */
     public String getJobFailedMessage() {
         return jobFailedMessage;
@@ -337,8 +334,6 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
 
     /**
      * Get the message that is logged when a Job is about to execute.
-     * 
-     * @return String
      */
     public String getJobToBeFiredMessage() {
         return jobToBeFiredMessage;
@@ -348,7 +343,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * Set the message that is logged when a Job successfully completes its 
      * execution.
      * 
-     * @param jobCompleteMessage
+     * @param jobSuccessMessage
      *          String in java.text.MessageFormat syntax.
      */
     public void setJobSuccessMessage(String jobSuccessMessage) {
@@ -359,7 +354,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * Set the message that is logged when a Job fails its 
      * execution.
      * 
-     * @param jobCompleteMessage
+     * @param jobFailedMessage
      *          String in java.text.MessageFormat syntax.
      */
     public void setJobFailedMessage(String jobFailedMessage) {
@@ -379,8 +374,6 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
     /**
      * Get the message that is logged when a Job execution is vetoed by a
      * trigger listener.
-     * 
-     * @return String
      */
     public String getJobWasVetoedMessage() {
         return jobWasVetoedMessage;
@@ -390,7 +383,7 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * Set the message that is logged when a Job execution is vetoed by a
      * trigger listener.
      * 
-     * @param jobToBeFiredMessage
+     * @param jobWasVetoedMessage
      *          String in java.text.MessageFormat syntax.
      */
     public void setJobWasVetoedMessage(String jobWasVetoedMessage) {
@@ -414,10 +407,10 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String name, Scheduler scheduler)
-            throws SchedulerException {
-        this.name = name;
-        scheduler.addGlobalJobListener(this);
+    public void initialize(String pname, Scheduler scheduler,ClassLoadHelper classLoadHelper)
+        throws SchedulerException {
+        this.name = pname;
+        scheduler.getListenerManager().addJobListener(this, EverythingMatcher.allJobs());
     }
 
     public void start() {
@@ -465,11 +458,13 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         
         Trigger trigger = context.getTrigger();
 
-        Object[] args = {context.getJobDetail().getName(),
-                context.getJobDetail().getGroup(), new java.util.Date(),
-                trigger.getName(), trigger.getGroup(),
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                new Integer(context.getRefireCount())};
+        Object[] args = {
+            context.getJobDetail().getKey().getName(),
+            context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
+            trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+            Integer.valueOf(context.getRefireCount())
+        };
 
         getLog().info(MessageFormat.format(getJobToBeFiredMessage(), args));
     }
@@ -490,25 +485,30 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
             } 
             
             String errMsg = jobException.getMessage();
-            args = new Object[]{context.getJobDetail().getName(),
-                    context.getJobDetail().getGroup(), new java.util.Date(),
-                    trigger.getName(), trigger.getGroup(),
+            args = 
+                new Object[] {
+                    context.getJobDetail().getKey().getName(),
+                    context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+                    trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    new Integer(context.getRefireCount()), errMsg};
+                    Integer.valueOf(context.getRefireCount()), errMsg
+                };
             
             getLog().warn(MessageFormat.format(getJobFailedMessage(), args), jobException); 
-        }
-        else {
+        } else {
             if (!getLog().isInfoEnabled()) {
                 return;
             } 
             
             String result = String.valueOf(context.getResult());
-            args = new Object[]{context.getJobDetail().getName(),
-                    context.getJobDetail().getGroup(), new java.util.Date(),
-                    trigger.getName(), trigger.getGroup(),
+            args =
+                new Object[] {
+                    context.getJobDetail().getKey().getName(),
+                    context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+                    trigger.getKey().getName(), trigger.getKey().getGroup(),
                     trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    new Integer(context.getRefireCount()), result};
+                    Integer.valueOf(context.getRefireCount()), result
+                };
             
             getLog().info(MessageFormat.format(getJobSuccessMessage(), args));
         }
@@ -525,11 +525,13 @@ public class LoggingJobHistoryPlugin implements SchedulerPlugin, JobListener {
         
         Trigger trigger = context.getTrigger();
 
-        Object[] args = {context.getJobDetail().getName(),
-                context.getJobDetail().getGroup(), new java.util.Date(),
-                trigger.getName(), trigger.getGroup(),
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                new Integer(context.getRefireCount())};
+        Object[] args = {
+            context.getJobDetail().getKey().getName(),
+            context.getJobDetail().getKey().getGroup(), new java.util.Date(),
+            trigger.getKey().getName(), trigger.getKey().getGroup(),
+            trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+            Integer.valueOf(context.getRefireCount())
+        };
 
         getLog().info(MessageFormat.format(getJobWasVetoedMessage(), args));
     }

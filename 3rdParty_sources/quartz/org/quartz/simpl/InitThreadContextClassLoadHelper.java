@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.simpl;
 
 import org.quartz.spi.ClassLoadHelper;
@@ -36,6 +33,7 @@ import java.io.InputStream;
  * @see org.quartz.simpl.LoadingLoaderClassLoadHelper
  * 
  * @author jhouse
+ * @author pl47ypus
  */
 public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
 
@@ -60,7 +58,7 @@ public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
 
     /**
      * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the oportunity to "steal" the class loader off of the calling
+     * including the opportunity to "steal" the class loader off of the calling
      * thread, which is the thread that is initializing Quartz.
      */
     public void initialize() {
@@ -70,10 +68,16 @@ public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return initClassLoader.loadClass(name);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> Class<? extends T> loadClass(String name, Class<T> clazz)
+            throws ClassNotFoundException {
+        return (Class<? extends T>) loadClass(name);
+    }
+    
     /**
      * Finds a resource with a given name. This method returns null if no
      * resource with this name is found.
@@ -92,5 +96,14 @@ public class InitThreadContextClassLoadHelper implements ClassLoadHelper {
      */
     public InputStream getResourceAsStream(String name) {
         return initClassLoader.getResourceAsStream(name);
+    }
+
+    /**
+     * Enable sharing of the class-loader with 3rd party.
+     *
+     * @return the class-loader user be the helper.
+     */
+    public ClassLoader getClassLoader() {
+        return this.initClassLoader;
     }
 }

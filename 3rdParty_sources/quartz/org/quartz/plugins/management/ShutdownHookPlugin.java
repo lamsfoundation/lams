@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,15 +15,13 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.plugins.management;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.SchedulerPlugin;
 
 /**
@@ -44,12 +42,10 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private String name;
-
-    private Scheduler scheduler;
-
     private boolean cleanShutdown = true;
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -97,8 +93,8 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
         cleanShutdown = b;
     }
 
-    protected static Log getLog() {
-        return LogFactory.getLog(ShutdownHookPlugin.class);
+    protected Logger getLog() {
+        return log;
     }
 
     /*
@@ -118,15 +114,14 @@ public class ShutdownHookPlugin implements SchedulerPlugin {
      * @throws SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String name, final Scheduler scheduler)
-            throws SchedulerException {
-        this.name = name;
-        this.scheduler = scheduler;
+    public void initialize(String name, final Scheduler scheduler, ClassLoadHelper classLoadHelper)
+        throws SchedulerException {
 
         getLog().info("Registering Quartz shutdown hook.");
 
         Thread t = new Thread("Quartz Shutdown-Hook "
                 + scheduler.getSchedulerName()) {
+            @Override
             public void run() {
                 getLog().info("Shutting down Quartz...");
                 try {

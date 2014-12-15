@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,9 +15,6 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.spi;
 
 import org.quartz.Scheduler;
@@ -39,6 +36,13 @@ import org.quartz.SchedulerException;
  * If you use <code>{@link org.quartz.impl.StdSchedulerFactory}</code> to
  * initialize your Scheduler, it can also create and initialize your plugins -
  * look at the configuration docs for details.
+ * </p>
+ * 
+ * <p>
+ * If you need direct access your plugin, you can have it explicitly put a 
+ * reference to itself in the <code>Scheduler</code>'s 
+ * <code>SchedulerContext</code> as part of its
+ * <code>{@link #initialize(String, Scheduler)}</code> method.
  * </p>
  * 
  * @author James House
@@ -64,16 +68,26 @@ public interface SchedulerPlugin {
      * initialized.
      * </p>
      * 
+     * <p>
+     * If you need direct access your plugin, for example during <code>Job</code>
+     * execution, you can have this method explicitly put a 
+     * reference to this plugin in the <code>Scheduler</code>'s 
+     * <code>SchedulerContext</code>.
+     * </p>
+     * 
      * @param name
      *          The name by which the plugin is identified.
      * @param scheduler
      *          The scheduler to which the plugin is registered.
+     * @param loadHelper
+     *            The classLoadHelper the <code>SchedulerFactory</code> is
+     *            actually using
      * 
-     * @throws SchedulerConfigException
+     * @throws org.quartz.SchedulerConfigException
      *           if there is an error initializing.
      */
-    public void initialize(String name, Scheduler scheduler)
-            throws SchedulerException;
+    void initialize(String name, Scheduler scheduler, ClassLoadHelper loadHelper)
+        throws SchedulerException;
 
     /**
      * <p>
@@ -82,7 +96,7 @@ public interface SchedulerPlugin {
      * needs to.
      * </p>
      */
-    public void start();
+    void start();
 
     /**
      * <p>
@@ -91,6 +105,6 @@ public interface SchedulerPlugin {
      * down.
      * </p>
      */
-    public void shutdown();
+    void shutdown();
 
 }

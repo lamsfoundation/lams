@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,19 +16,14 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz;
 
 /**
- * <p>
  * An exception that can be thrown by a <code>{@link org.quartz.Job}</code>
  * to indicate to the Quartz <code>{@link Scheduler}</code> that an error
- * occured while executing, and whether or not the <code>Job</code> requests
+ * occurred while executing, and whether or not the <code>Job</code> requests
  * to be re-fired immediately (using the same <code>{@link JobExecutionContext}</code>,
  * or whether it wants to be unscheduled.
- * </p>
  * 
  * <p>
  * Note that if the flag for 'refire immediately' is set, the flags for
@@ -43,6 +38,8 @@ package org.quartz;
  */
 public class JobExecutionException extends SchedulerException {
 
+    private static final long serialVersionUID = 1326342535829043325L;
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -79,7 +76,7 @@ public class JobExecutionException extends SchedulerException {
      * Create a JobExcecutionException, with the given cause.
      * </p>
      */
-    public JobExecutionException(Exception cause) {
+    public JobExecutionException(Throwable cause) {
         super(cause);
     }
 
@@ -108,7 +105,7 @@ public class JobExecutionException extends SchedulerException {
      * the 're-fire immediately' flag set to the given value.
      * </p>
      */
-    public JobExecutionException(Exception cause, boolean refireImmediately) {
+    public JobExecutionException(Throwable cause, boolean refireImmediately) {
         super(cause);
 
         refire = refireImmediately;
@@ -117,12 +114,32 @@ public class JobExecutionException extends SchedulerException {
     /**
      * <p>
      * Create a JobExcecutionException with the given message, and underlying
+     * exception.
+     * </p>
+     */
+    public JobExecutionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+    
+    /**
+     * <p>
+     * Create a JobExcecutionException with the given message, and underlying
      * exception, and the 're-fire immediately' flag set to the given value.
      * </p>
      */
-    public JobExecutionException(String msg, Exception cause,
+    public JobExecutionException(String msg, Throwable cause,
             boolean refireImmediately) {
         super(msg, cause);
+
+        refire = refireImmediately;
+    }
+    
+    /**
+     * Create a JobExcecutionException with the given message and the 're-fire 
+     * immediately' flag set to the given value.
+     */
+    public JobExecutionException(String msg, boolean refireImmediately) {
+        super(msg);
 
         refire = refireImmediately;
     }
@@ -134,6 +151,10 @@ public class JobExecutionException extends SchedulerException {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
+
+    public void setRefireImmediately(boolean refire) {
+        this.refire = refire;
+    }
 
     public boolean refireImmediately() {
         return refire;

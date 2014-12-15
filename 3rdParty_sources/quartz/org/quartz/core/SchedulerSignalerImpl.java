@@ -1,6 +1,6 @@
 
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -16,11 +16,11 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.spi.SchedulerSignaler;
@@ -33,6 +33,8 @@ import org.quartz.spi.SchedulerSignaler;
  */
 public class SchedulerSignalerImpl implements SchedulerSignaler {
 
+    Logger log = LoggerFactory.getLogger(SchedulerSignalerImpl.class);
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -41,7 +43,8 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private QuartzScheduler sched;
+    protected QuartzScheduler sched;
+    protected QuartzSchedulerThread schedThread;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,19 +54,11 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    SchedulerSignalerImpl(QuartzScheduler sched) {
+    public SchedulerSignalerImpl(QuartzScheduler sched, QuartzSchedulerThread schedThread) {
         this.sched = sched;
-    }
-
-    public void notifyTriggerListenersMisfired(Trigger trigger) {
-        try {
-            sched.notifyTriggerListenersMisfired(trigger);
-        } catch (SchedulerException se) {
-            QuartzScheduler.getLog().error(
-                    "Error notifying listeners of trigger misfire.", se);
-            sched.notifySchedulerListenersError(
-                    "Error notifying listeners of trigger misfire.", se);
-        }
+        this.schedThread = schedThread;
+        
+        log.info("Initialized Scheduler Signaller of type: " + getClass());
     }
 
     /*
@@ -74,8 +69,30 @@ public class SchedulerSignalerImpl implements SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public void signalSchedulingChange() {
-        sched.notifySchedulerThread();
+    public void notifyTriggerListenersMisfired(Trigger trigger) {
+        try {
+            sched.notifyTriggerListenersMisfired(trigger);
+        } catch (SchedulerException se) {
+            sched.getLog().error(
+                    "Error notifying listeners of trigger misfire.", se);
+            sched.notifySchedulerListenersError(
+                    "Error notifying listeners of trigger misfire.", se);
+        }
     }
 
+    public void notifySchedulerListenersFinalized(Trigger trigger) {
+        sched.notifySchedulerListenersFinalized(trigger);
+    }
+
+    public void signalSchedulingChange(long candidateNewNextFireTime) {
+        schedThread.signalSchedulingChange(candidateNewNextFireTime);
+    }
+
+    public void notifySchedulerListenersJobDeleted(JobKey jobKey) {
+        sched.notifySchedulerListenersJobDeleted(jobKey);
+    }
+
+    public void notifySchedulerListenersError(String string, SchedulerException jpe) {
+        sched.notifySchedulerListenersError(string, jpe);
+    }
 }

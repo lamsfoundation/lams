@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2005 OpenSymphony 
+ * Copyright 2001-2009 Terracotta, Inc. 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
  * use this file except in compliance with the License. You may obtain a copy 
@@ -15,28 +15,21 @@
  * 
  */
 
-/*
- * Previously Copyright (c) 2001-2004 James House
- */
 package org.quartz.impl.jdbcjobstore;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * An interface for providing thread/resource locking in order to protect
- * resources from being altered by multiple threads at the same time.
+ * Internal database based lock handler for providing thread/resource locking 
+ * in order to protect resources from being altered by multiple threads at the 
+ * same time.
  * 
  * @author jhouse
  */
-public class StdRowLockSemaphore implements Semaphore, Constants,
-        StdJDBCConstants {
+public class StdRowLockSemaphore extends DBSemaphore {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,23 +40,12 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
      */
 
     public static final String SELECT_FOR_LOCK = "SELECT * FROM "
-            + TABLE_PREFIX_SUBST + TABLE_LOCKS + " WHERE " + COL_LOCK_NAME
-            + " = ? FOR UPDATE";
+            + TABLE_PREFIX_SUBST + TABLE_LOCKS + " WHERE " + COL_SCHEDULER_NAME + " = " + SCHED_NAME_SUBST
+            + " AND " + COL_LOCK_NAME + " = ? FOR UPDATE";
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    ThreadLocal lockOwners = new ThreadLocal();
-
-    //  java.util.HashMap threadLocksOb = new java.util.HashMap();
-    private String selectWithLockSQL = SELECT_FOR_LOCK;
-
-    private String tablePrefix;
+    public static final String INSERT_LOCK = "INSERT INTO "
+        + TABLE_PREFIX_SUBST + TABLE_LOCKS + "(" + COL_SCHEDULER_NAME + ", " + COL_LOCK_NAME + ") VALUES (" 
+        + SCHED_NAME_SUBST + ", ?)"; 
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,15 +55,14 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public StdRowLockSemaphore(String tablePrefix, String selectWithLockSQL) {
-        this.tablePrefix = tablePrefix;
-
-        if (selectWithLockSQL != null && selectWithLockSQL.trim().length() != 0)
-                this.selectWithLockSQL = selectWithLockSQL;
-
-        this.selectWithLockSQL = Util.rtp(this.selectWithLockSQL, tablePrefix);
+    public StdRowLockSemaphore() {
+        super(DEFAULT_TABLE_PREFIX, null, SELECT_FOR_LOCK, INSERT_LOCK);
     }
 
+    public StdRowLockSemaphore(String tablePrefix, String schedName, String selectWithLockSQL) {
+        super(tablePrefix, schedName, selectWithLockSQL != null ? selectWithLockSQL : SELECT_FOR_LOCK, INSERT_LOCK);
+    }
+    
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -90,56 +71,61 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    Log getLog() {
-        return LogFactory.getLog(getClass());
-        //return LogFactory.getLog("LOCK:"+Thread.currentThread().getName());
-    }
-
-    private HashSet getThreadLocks() {
-        HashSet threadLocks = (HashSet) lockOwners.get();
-        if (threadLocks == null) {
-            threadLocks = new HashSet();
-            lockOwners.set(threadLocks);
-        }
-        return threadLocks;
-    }
-
     /**
-     * Grants a lock on the identified resource to the calling thread (blocking
-     * until it is available).
-     * 
-     * @return true if the lock was obtained.
+     * Execute the SQL select for update that will lock the proper database row.
      */
-    public boolean obtainLock(Connection conn, String lockName)
-            throws LockException {
-
-        lockName = lockName.intern();
-
-        Log log = getLog();
+    @Override
+    protected void executeSQL(Connection conn, final String lockName, final String expandedSQL, final String expandedInsertSQL) throws LockException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        SQLException initCause = null;
         
-        if(log.isDebugEnabled())
-            log.debug(
-                "Lock '" + lockName + "' is desired by: "
-                        + Thread.currentThread().getName());
-        if (!isLockOwner(conn, lockName)) {
-
-            PreparedStatement ps = null;
-            ResultSet rs = null;
+        // attempt lock two times (to work-around possible race conditions in inserting the lock row the first time running)
+        int count = 0;
+        do {
+            count++;
             try {
-                ps = conn.prepareStatement(selectWithLockSQL);
+                ps = conn.prepareStatement(expandedSQL);
                 ps.setString(1, lockName);
-
                 
-                if(log.isDebugEnabled())
-                    log.debug(
-                        "Lock '" + lockName + "' is being obtained: "
-                                + Thread.currentThread().getName());
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(
+                        "Lock '" + lockName + "' is being obtained: " + 
+                        Thread.currentThread().getName());
+                }
                 rs = ps.executeQuery();
-                if (!rs.next())
+                if (!rs.next()) {
+                    getLog().debug(
+                            "Inserting new lock row for lock: '" + lockName + "' being obtained by thread: " + 
+                            Thread.currentThread().getName());
+                    rs.close();
+                    rs = null;
+                    ps.close();
+                    ps = null;
+                    ps = conn.prepareStatement(expandedInsertSQL);
+                    ps.setString(1, lockName);
+    
+                    int res = ps.executeUpdate();
+                    
+                    if(res != 1) {
+                        if(count < 3) {
+                            // pause a bit to give another thread some time to commit the insert of the new lock row
+                            try {
+                                Thread.sleep(1000L);
+                            } catch (InterruptedException ignore) {
+                                Thread.currentThread().interrupt();
+                            }
+                            // try again ...
+                            continue;
+                        }
+                    
                         throw new SQLException(Util.rtp(
-                                "No row exists in table " + TABLE_PREFIX_SUBST
-                                        + TABLE_LOCKS + " for lock named: "
-                                        + lockName, tablePrefix));
+                            "No row exists, and one could not be inserted in table " + TABLE_PREFIX_SUBST + TABLE_LOCKS + 
+                            " for lock named: " + lockName, getTablePrefix(), getSchedulerNameLiteral()));
+                    }
+                }
+                
+                return; // obtained lock, go
             } catch (SQLException sqle) {
                 //Exception src =
                 // (Exception)getThreadLocksObtainer().get(lockName);
@@ -147,73 +133,53 @@ public class StdRowLockSemaphore implements Semaphore, Constants,
                 //  src.printStackTrace();
                 //else
                 //  System.err.println("--- ***************** NO OBTAINER!");
-
-                if(log.isDebugEnabled())
-                    log.debug(
-                        "Lock '" + lockName + "' was not obtained by: "
-                                + Thread.currentThread().getName());
+    
+                if(initCause == null)
+                    initCause = sqle;
+                
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(
+                        "Lock '" + lockName + "' was not obtained by: " + 
+                        Thread.currentThread().getName() + (count < 3 ? " - will try again." : ""));
+                }
+                
+                if(count < 3) {
+                    // pause a bit to give another thread some time to commit the insert of the new lock row
+                    try {
+                        Thread.sleep(1000L);
+                    } catch (InterruptedException ignore) {
+                        Thread.currentThread().interrupt();
+                    }
+                    // try again ...
+                    continue;
+                }
+                
                 throw new LockException("Failure obtaining db row lock: "
                         + sqle.getMessage(), sqle);
             } finally {
-                if (rs != null) try {
-                    rs.close();
-                } catch (Exception ignore) {
+                if (rs != null) { 
+                    try {
+                        rs.close();
+                    } catch (Exception ignore) {
+                    }
                 }
-                if (ps != null) try {
-                    ps.close();
-                } catch (Exception ignore) {
+                if (ps != null) {
+                    try {
+                        ps.close();
+                    } catch (Exception ignore) {
+                    }
                 }
             }
-            if(log.isDebugEnabled())
-                log.debug(
-                    "Lock '" + lockName + "' given to: "
-                            + Thread.currentThread().getName());
-            getThreadLocks().add(lockName);
-            //getThreadLocksObtainer().put(lockName, new
-            // Exception("Obtainer..."));
-        } else
-            if(log.isDebugEnabled())
-                log.debug(
-                    "Lock '" + lockName + "' Is already owned by: "
-                            + Thread.currentThread().getName());
-
-        return true;
+        } while(count < 4);
+        
+        throw new LockException("Failure obtaining db row lock, reached maximum number of attempts. Initial exception (if any) attached as root cause.", initCause);
     }
 
-    /**
-     * Release the lock on the identified resource if it is held by the calling
-     * thread.
-     */
-    public void releaseLock(Connection conn, String lockName) {
-
-        lockName = lockName.intern();
-
-        if (isLockOwner(conn, lockName)) {
-            if(getLog().isDebugEnabled())
-                getLog().debug(
-                    "Lock '" + lockName + "' returned by: "
-                            + Thread.currentThread().getName());
-            getThreadLocks().remove(lockName);
-            //getThreadLocksObtainer().remove(lockName);
-        } else
-            if(getLog().isDebugEnabled())
-                getLog().warn(
-                    "Lock '" + lockName + "' attempt to retun by: "
-                            + Thread.currentThread().getName()
-                            + " -- but not owner!",
-                    new Exception("stack-trace of wrongful returner"));
-
+    protected String getSelectWithLockSQL() {
+        return getSQL();
     }
 
-    /**
-     * Determine whether the calling thread owns a lock on the identified
-     * resource.
-     */
-    public boolean isLockOwner(Connection conn, String lockName) {
-
-        lockName = lockName.intern();
-
-        return getThreadLocks().contains(lockName);
+    public void setSelectWithLockSQL(String selectWithLockSQL) {
+        setSQL(selectWithLockSQL);
     }
-
 }

@@ -83,6 +83,10 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.monitoring.quartz.job.CloseScheduleGateJob;
+import org.lamsfoundation.lams.monitoring.quartz.job.FinishScheduleLessonJob;
+import org.lamsfoundation.lams.monitoring.quartz.job.OpenScheduleGateJob;
+import org.lamsfoundation.lams.monitoring.quartz.job.StartScheduleLessonJob;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -105,11 +109,13 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -585,18 +591,20 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, startDate);
 
-	JobDetail startLessonJob = getStartScheduleLessonJob();
 	// setup the message for scheduling job
-	startLessonJob.setName("startLessonOnSchedule:" + lessonId);
-
-	startLessonJob.setDescription(requestedLesson.getLessonName() + ":"
-		+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()));
-	startLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId));
-	startLessonJob.getJobDataMap().put(MonitoringConstants.KEY_USER_ID, new Integer(userId));
+	JobDetail startLessonJob = JobBuilder
+		.newJob(StartScheduleLessonJob.class)
+		.withIdentity("startLessonOnSchedule:" + lessonId)
+		.withDescription(
+			requestedLesson.getLessonName() + ":"
+				+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()))
+		.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
+		.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
 
 	// create customized triggers
-	Trigger startLessonTrigger = new SimpleTrigger("startLessonOnScheduleTrigger:" + lessonId,
-		Scheduler.DEFAULT_GROUP, tzStartLessonDate);
+	Trigger startLessonTrigger = TriggerBuilder.newTrigger()
+		.withIdentity("startLessonOnScheduleTrigger:" + lessonId).startAt(tzStartLessonDate).build();
+
 	// start the scheduling job
 	try {
 	    requestedLesson.setScheduleStartDate(tzStartLessonDate);
@@ -619,19 +627,17 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	// we get the lesson want to finish
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	String triggerName = "finishLessonOnScheduleTrigger:" + lessonId;
+	Trigger finishLessonTrigger = null;
+	JobDetail finishLessonJob = null;
 	boolean alreadyScheduled = false;
 	try {
-	    // if trigger exists, the job was already scheduled and we need to (re)move the trigger
-	    alreadyScheduled = scheduler.getTrigger(triggerName, Scheduler.DEFAULT_GROUP) != null;
+	    finishLessonTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
+	    alreadyScheduled = finishLessonTrigger != null;
 	} catch (SchedulerException e) {
-	    MonitoringService.log.error(e);
+	    MonitoringService.log.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
 	}
 
-	Trigger finishLessonTrigger = null;
-	String finishLessonJobName = "finishLessonOnSchedule:" + lessonId;
-	JobDetail finishLessonJob = null;
 	Date endDate = null;
-
 	if (scheduledNumberDaysToLessonFinish > 0) {
 	    // calculate finish date
 	    Date startDate = (requestedLesson.getStartDateTime() != null) ? requestedLesson.getStartDateTime()
@@ -649,19 +655,23 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		throw new IllegalArgumentException("Lesson scheduled finish date is already in the past");
 	    }
 
-	    if (!alreadyScheduled) {
-		finishLessonJob = getFinishScheduleLessonJob();
+	    if (alreadyScheduled) {
+		finishLessonTrigger = finishLessonTrigger.getTriggerBuilder().startAt(endDate).build();
+	    } else {
 		// setup the message for scheduling job
-		finishLessonJob.setName(finishLessonJobName);
-		finishLessonJob.setDescription(requestedLesson.getLessonName() + ":"
-			+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()));
-		finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId));
-		finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_USER_ID, new Integer(userId));
-	    }
+		finishLessonJob = JobBuilder
+			.newJob(FinishScheduleLessonJob.class)
+			.withIdentity("finishLessonOnSchedule:" + lessonId)
+			.withDescription(
+				requestedLesson.getLessonName()
+					+ ":"
+					+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser()
+						.getFullName()))
+			.usingJobData(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId))
+			.usingJobData(MonitoringConstants.KEY_USER_ID, new Integer(userId)).build();
 
-	    // create customized triggers
-	    finishLessonTrigger = new SimpleTrigger(triggerName, Scheduler.DEFAULT_GROUP, endDate);
-	    finishLessonTrigger.setJobName(finishLessonJobName);
+		finishLessonTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(endDate).build();
+	    }
 	}
 
 	// start the scheduling job
@@ -670,13 +680,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    lessonDAO.updateLesson(requestedLesson);
 	    if (alreadyScheduled) {
 		if (scheduledNumberDaysToLessonFinish > 0) {
-		    scheduler.rescheduleJob(triggerName, Scheduler.DEFAULT_GROUP, finishLessonTrigger);
+		    scheduler.rescheduleJob(finishLessonTrigger.getKey(), finishLessonTrigger);
 		    if (MonitoringService.log.isDebugEnabled()) {
 			MonitoringService.log.debug("Finish lesson  [" + lessonId + "] job has been rescheduled to "
 				+ endDate);
 		    }
 		} else {
-		    scheduler.deleteJob(finishLessonJobName, Scheduler.DEFAULT_GROUP);
+		    scheduler.deleteJob(finishLessonTrigger.getJobKey());
 		    if (MonitoringService.log.isDebugEnabled()) {
 			MonitoringService.log.debug("Finish lesson  [" + lessonId + "] job has been removed");
 		    }
@@ -784,26 +794,28 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
 	    String lessonName) {
-
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("Running scheduler for gate " + scheduleGate.getActivityId() + "...");
 	}
-	JobDetail openScheduleGateJob = getOpenScheduleGateJob();
-	JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
+
 	// setup the message for scheduling job
-	openScheduleGateJob.setName("openGate:" + scheduleGate.getActivityId());
-	openScheduleGateJob.setDescription(scheduleGate.getTitle() + ":" + lessonName);
-	openScheduleGateJob.getJobDataMap().put("gateId", scheduleGate.getActivityId());
-	closeScheduleGateJob.setName("closeGate:" + scheduleGate.getActivityId());
-	closeScheduleGateJob.getJobDataMap().put("gateId", scheduleGate.getActivityId());
-	closeScheduleGateJob.setDescription(scheduleGate.getTitle() + ":" + lessonName);
+	JobDetail openScheduleGateJob = JobBuilder.newJob(OpenScheduleGateJob.class)
+		.withIdentity("openGate:" + scheduleGate.getActivityId())
+		.withDescription(scheduleGate.getTitle() + ":" + lessonName)
+		.usingJobData("gateId", scheduleGate.getActivityId()).build();
+	JobDetail closeScheduleGateJob = JobBuilder.newJob(CloseScheduleGateJob.class)
+		.withIdentity("closeGate:" + scheduleGate.getActivityId())
+		.withDescription(scheduleGate.getTitle() + ":" + lessonName)
+		.usingJobData("gateId", scheduleGate.getActivityId()).build();
 
 	// create customized triggers
-	Trigger openGateTrigger = new SimpleTrigger("openGateTrigger:" + scheduleGate.getActivityId(),
-		Scheduler.DEFAULT_GROUP, scheduleGate.getGateOpenTime(schedulingStartTime));
+	Trigger openGateTrigger = TriggerBuilder.newTrigger()
+		.withIdentity("openGateTrigger:" + scheduleGate.getActivityId())
+		.startAt(scheduleGate.getGateOpenTime(schedulingStartTime)).build();
 
-	Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger:" + scheduleGate.getActivityId(),
-		Scheduler.DEFAULT_GROUP, scheduleGate.getGateCloseTime(schedulingStartTime));
+	Trigger closeGateTrigger = TriggerBuilder.newTrigger()
+		.withIdentity("closeGateTrigger:" + scheduleGate.getActivityId())
+		.startAt(scheduleGate.getGateCloseTime(schedulingStartTime)).build();
 
 	// start the scheduling job
 	try {
@@ -816,8 +828,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    }
 
 	} catch (SchedulerException e) {
-	    throw new MonitoringServiceException("Error occurred at " + "[runGateScheduler]- fail to start scheduling",
-		    e);
+	    throw new MonitoringServiceException("Error occurred at [runGateScheduler] - fail to start scheduling", e);
 	}
 
 	if (MonitoringService.log.isDebugEnabled()) {
@@ -985,17 +996,14 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    // we un-schedule the gate from the scheduler if it's of a scheduled
 	    // gate (LDEV-1271)
 	    if (gate.isScheduleGate()) {
-
 		try {
-		    scheduler.unscheduleJob("openGateTrigger:" + gate.getActivityId(), Scheduler.DEFAULT_GROUP);
+		    scheduler.unscheduleJob(TriggerKey.triggerKey("openGateTrigger:" + gate.getActivityId()));
 		} catch (SchedulerException e) {
 		    MonitoringService.log.error(
 			    "Error unscheduling trigger for gate activity id:" + gate.getActivityId(), e);
 		    throw new MonitoringServiceException("Error unscheduling trigger for gate activity id:"
 			    + gate.getActivityId(), e);
-
 		}
-
 	    }
 
 	    activityDAO.update(gate);
@@ -1918,40 +1926,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		activities, null, // staff group
 		null);// lesson
 	return newLessonClass;
-    }
-
-    // ---------------------------------------------------------------------
-    // Helper Methods - scheduling
-    // ---------------------------------------------------------------------
-
-    /**
-     * Returns the bean that defines the open schedule gate job.
-     */
-    private JobDetail getOpenScheduleGateJob() {
-	return (JobDetail) applicationContext.getBean("openScheduleGateJob");
-    }
-
-    /**
-     * 
-     * @return the bean that defines start lesson on schedule job.
-     */
-    private JobDetail getStartScheduleLessonJob() {
-	return (JobDetail) applicationContext.getBean(MonitoringConstants.JOB_START_LESSON);
-    }
-
-    /**
-     * 
-     * @return the bean that defines start lesson on schedule job.
-     */
-    private JobDetail getFinishScheduleLessonJob() {
-	return (JobDetail) applicationContext.getBean(MonitoringConstants.JOB_FINISH_LESSON);
-    }
-
-    /**
-     * Returns the bean that defines the close schdule gate job.
-     */
-    private JobDetail getCloseScheduleGateJob() {
-	return (JobDetail) applicationContext.getBean("closeScheduleGateJob");
     }
 
     // ---------------------------------------------------------------------
