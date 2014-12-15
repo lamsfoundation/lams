@@ -210,7 +210,6 @@
 		<echo>Copying language files</echo>
 		<copy todir="assembly/lams.ear/lams-dictionary.jar">
 			<fileset dir="../lams_common/build/lib/language" />
-			<fileset dir="../lams_contentrepository/build/lib/language" />
 			<fileset dir="../lams_central/build/lib/language" />
 			<fileset dir="../lams_monitoring/build/lib/language" />
 			<fileset dir="../lams_learning/build/lib/language" />
@@ -597,12 +596,12 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/lucene/2.4" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/lucene/4.10" overwrite="true" verbose="true">
 			<fileset dir="lib/lucene">
 				<include name="lucene-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/lucene/2.4/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/lucene/4.10/module.xml"
 			  file="lib/lucene/lucene.module.xml" overwrite="true" verbose="true" />
 		
 		
