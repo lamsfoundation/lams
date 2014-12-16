@@ -60,6 +60,9 @@ public class LocaleFilter extends OncePerRequestFilter {
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 	    throws IOException, ServletException {
+	// setting encoding in standalone.xml does not do the trick (yet?), so set it here
+	 request.setCharacterEncoding("UTF-8");
+	
 	Locale preferredLocale = null;
 	String direction = null;
 	TimeZone tz = null;
