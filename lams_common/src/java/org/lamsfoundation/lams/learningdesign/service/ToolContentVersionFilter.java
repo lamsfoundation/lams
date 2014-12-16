@@ -142,7 +142,7 @@ public class ToolContentVersionFilter {
 	output.output(doc, new FileOutputStream(newToolFile));
     }
 
-    private void retrieveXML(Element root) throws JDOMException {
+    private void retrieveXML(Element root) throws JDOMException, IOException {
 	// collect all removed fields in this class
 	List<String> clzRemoveFlds = new ArrayList<String>();
 	for (RemovedField remove : removedFieldList) {

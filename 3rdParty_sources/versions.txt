@@ -25,6 +25,8 @@ httpunit 1.7
 
 JBoss Web 2.1.3
 
+jdom 1.1.2
+
 JSP API 2.3
 
 Joda Time 2.1

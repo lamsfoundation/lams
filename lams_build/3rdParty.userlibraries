@@ -13,7 +13,6 @@
         <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-validator.jar"/>
-        <archive path="/lams_build/lib/jdom/jdom.jar"/>
         <archive path="/lams_build/lib/reload/reload-diva.jar"/>
         <archive path="/lams_build/lib/reload/reload-jdom.jar"/>
         <archive path="/lams_build/lib/reload/reload-moonunit.jar"/>

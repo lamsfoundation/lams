@@ -566,16 +566,6 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/org/jdom/0.7" overwrite="true" verbose="true">
-			<fileset dir="lib/jdom">
-				<include name="jdom.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/jdom/0.7/module.xml"
-			  file="lib/jdom/jdom.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
 		<copy todir="${server.home}/modules/system/layers/base/org/verisign/joid/main" overwrite="true" verbose="true">
 			<fileset dir="lib/joid">
 				<include name="joid.jar" />

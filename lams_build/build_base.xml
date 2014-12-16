@@ -49,7 +49,7 @@
 			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
 			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
-			
+			<include name="org/jdom/main/jdom-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">

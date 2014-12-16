@@ -37,10 +37,8 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -151,7 +149,6 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
-import com.thoughtworks.xstream.converters.ConverterLookup;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
@@ -750,7 +747,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// create resources.xml file
 	Document resourcesDom = new Document();
 	Element resRoot = new Element(ExportToolContentService.IMS_TAG_RESOURCES);
-	resRoot.setChildren(resChildren);
+	resRoot.setContent(resChildren);
 	resourcesDom.setRootElement(resRoot);
 	File resFile = new File(FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_RESOURCES_FILE_NAME));
 	XMLOutputter resOutput = new XMLOutputter();
@@ -850,7 +847,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 
-	transRoot.setChildren(transChildren);
+	transRoot.setContent(transChildren);
 	transDom.setRootElement(transRoot);
 	File transFile = new File(FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_TRANSITION_FILE_NAME));
 	XMLOutputter transOutput = new XMLOutputter();
@@ -861,14 +858,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// create the properties file and conditions file - needed for gate
 	// showing gates when open and branches when
 	// determined
-	propertiesRoot.setChildren(propertiesChildren);
+	propertiesRoot.setContent(propertiesChildren);
 	propertiesDom.setRootElement(propertiesRoot);
 	File propertiesFile = new File(FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_PROPERTIES_FILE_NAME));
 	XMLOutputter propertiesOutput = new XMLOutputter();
 	propertiesOutput.output(propertiesDom, new FileOutputStream(propertiesFile));
 	log.debug("Export IMS: Properties file generated sucess: " + propertiesFile.getAbsolutePath());
 
-	conditionsRoot.setChildren(conditionsChildren);
+	conditionsRoot.setContent(conditionsChildren);
 	conditionsDom.setRootElement(conditionsRoot);
 	File conditionsFile = new File(FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_CONDITIONS_FILE_NAME));
 	XMLOutputter conditionsOutput = new XMLOutputter();
@@ -916,7 +913,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// Setup the property first
 	Element locpersProperty = new Element(ExportToolContentService.IMS_TAG_LOCPERS_PROPERTY);
 	locpersProperty.setAttribute(new Attribute(ExportToolContentService.IMS_ATTR_IDENTIFIER, propertyName));
-	locpersProperty.setChildren(new ArrayList());
+	locpersProperty.setContent(new ArrayList());
 	Element el = new Element(ExportToolContentService.IMS_TAG_DATATYPE);
 	el.setAttribute(new Attribute(ExportToolContentService.IMS_ATTR_DATATYPE, "boolean"));
 	locpersProperty.getChildren().add(el);
@@ -1151,7 +1148,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			+ activity.getToolContentID() + "] into resources XML node");
 		// build relations of TAGS
 		fileChildren.add(fileEle);
-		resEle.setChildren(fileChildren);
+		resEle.setContent(fileChildren);
 		resChildren.add(resEle);
 
 	    }
@@ -1164,7 +1161,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	while (iter.hasNext()) {
 	    Element child = (Element) iter.next();
 	    child.setNamespace(ns);
-	    if (child.hasChildren()) {
+	    if (child.getContentSize() > 0) {
 		updateNamespaceForChildren(child, ns);
 	    }
 	}
@@ -1479,9 +1476,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * @param fullFilePath
      * @param toolsErrorMsgs
      * @return version of the server that exported this file
+     * @throws IOException
      */
-    private String checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs) throws FileNotFoundException,
-	    JDOMException {
+    private String checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs) throws JDOMException,
+	    IOException {
 
 	SAXBuilder sax = new SAXBuilder();
 	Document doc = sax.build(new FileInputStream(fullFilePath), "UTF-8");
