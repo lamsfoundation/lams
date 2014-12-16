@@ -1,6 +1,8 @@
 package org.apache.lucene.index;
 
-/**
+import java.io.IOException;
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -26,16 +28,20 @@ public class LogDocMergePolicy extends LogMergePolicy {
   /** Default minimum segment size.  @see setMinMergeDocs */
   public static final int DEFAULT_MIN_MERGE_DOCS = 1000;
 
+  /** Sole constructor, setting all settings to their
+   *  defaults. */
   public LogDocMergePolicy() {
-    super();
     minMergeSize = DEFAULT_MIN_MERGE_DOCS;
-
-    // maxMergeSize is never used by LogDocMergePolicy; set
+    
+    // maxMergeSize(ForForcedMerge) are never used by LogDocMergePolicy; set
     // it to Long.MAX_VALUE to disable it
     maxMergeSize = Long.MAX_VALUE;
+    maxMergeSizeForForcedMerge = Long.MAX_VALUE;
   }
-  protected long size(SegmentInfo info) {
-    return info.docCount;
+
+  @Override
+  protected long size(SegmentCommitInfo info, IndexWriter writer) throws IOException {
+    return sizeDocs(info, writer);
   }
 
   /** Sets the minimum size for the lowest level segments.
@@ -58,4 +64,3 @@ public class LogDocMergePolicy extends LogMergePolicy {
     return (int) minMergeSize;
   }
 }
-

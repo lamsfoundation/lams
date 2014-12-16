@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,7 +17,8 @@ package org.apache.lucene.search;
  * limitations under the License.
  */
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.util.Arrays;
 
 
 /**
@@ -95,15 +96,13 @@ import java.io.Serializable;
  * <p>Created: Feb 12, 2004 10:53:57 AM
  *
  * @since   lucene 1.4
- * @version $Id$
  */
-public class Sort
-implements Serializable {
+public class Sort {
 
   /**
    * Represents sorting by computed relevance. Using this sort criteria returns
    * the same results as calling
-   * {@link Searcher#search(Query) Searcher#search()}without a sort criteria,
+   * {@link IndexSearcher#search(Query,int) IndexSearcher#search()}without a sort criteria,
    * only with slightly more overhead.
    */
   public static final Sort RELEVANCE = new Sort();
@@ -116,43 +115,11 @@ implements Serializable {
 
   /**
    * Sorts by computed relevance. This is the same sort criteria as calling
-   * {@link Searcher#search(Query) Searcher#search()}without a sort criteria,
+   * {@link IndexSearcher#search(Query,int) IndexSearcher#search()}without a sort criteria,
    * only with slightly more overhead.
    */
   public Sort() {
-    this(new SortField[] { SortField.FIELD_SCORE, SortField.FIELD_DOC });
-  }
-
-  /**
-   * Sorts by the terms in <code>field</code> then by index order (document
-   * number). The type of value in <code>field</code> is determined
-   * automatically.
-   * 
-   * @see SortField#AUTO
-   */
-  public Sort(String field) {
-    setSort(field, false);
-  }
-
-  /**
-   * Sorts possibly in reverse by the terms in <code>field</code> then by
-   * index order (document number). The type of value in <code>field</code> is
-   * determined automatically.
-   * 
-   * @see SortField#AUTO
-   */
-  public Sort(String field, boolean reverse) {
-    setSort(field, reverse);
-  }
-
-  /**
-   * Sorts in succession by the terms in each field. The type of value in
-   * <code>field</code> is determined automatically.
-   * 
-   * @see SortField#AUTO
-   */
-  public Sort(String[] fields) {
-    setSort(fields);
+    this(SortField.FIELD_SCORE);
   }
 
   /** Sorts by the criteria in the given SortField. */
@@ -161,36 +128,8 @@ implements Serializable {
   }
 
   /** Sorts in succession by the criteria in each SortField. */
-  public Sort(SortField[] fields) {
+  public Sort(SortField... fields) {
     setSort(fields);
-  }
-
-  /**
-   * Sets the sort to the terms in <code>field</code> then by index order
-   * (document number).
-   */
-  public final void setSort(String field) {
-    setSort(field, false);
-  }
-
-  /**
-   * Sets the sort to the terms in <code>field</code> possibly in reverse,
-   * then by index order (document number).
-   */
-  public void setSort(String field, boolean reverse) {
-    SortField[] nfields = new SortField[] {
-        new SortField(field, SortField.AUTO, reverse), SortField.FIELD_DOC };
-    fields = nfields;
-  }
-
-  /** Sets the sort to the terms in each field in succession. */
-  public void setSort(String[] fieldnames) {
-    final int n = fieldnames.length;
-    SortField[] nfields = new SortField[n];
-    for (int i = 0; i < n; ++i) {
-      nfields[i] = new SortField(fieldnames[i], SortField.AUTO);
-    }
-    fields = nfields;
   }
 
   /** Sets the sort to the given criteria. */
@@ -199,7 +138,7 @@ implements Serializable {
   }
 
   /** Sets the sort to the given criteria in succession. */
-  public void setSort(SortField[] fields) {
+  public void setSort(SortField... fields) {
     this.fields = fields;
   }
   
@@ -211,8 +150,33 @@ implements Serializable {
     return fields;
   }
 
+  /**
+   * Rewrites the SortFields in this Sort, returning a new Sort if any of the fields
+   * changes during their rewriting.
+   *
+   * @param searcher IndexSearcher to use in the rewriting
+   * @return {@code this} if the Sort/Fields have not changed, or a new Sort if there
+   *        is a change
+   * @throws IOException Can be thrown by the rewriting
+   * @lucene.experimental
+   */
+  public Sort rewrite(IndexSearcher searcher) throws IOException {
+    boolean changed = false;
+    
+    SortField[] rewrittenSortFields = new SortField[fields.length];
+    for (int i = 0; i < fields.length; i++) {
+      rewrittenSortFields[i] = fields[i].rewrite(searcher);
+      if (fields[i] != rewrittenSortFields[i]) {
+        changed = true;
+      }
+    }
+
+    return (changed) ? new Sort(rewrittenSortFields) : this;
+  }
+
+  @Override
   public String toString() {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
 
     for (int i = 0; i < fields.length; i++) {
       buffer.append(fields[i].toString());
@@ -222,4 +186,30 @@ implements Serializable {
 
     return buffer.toString();
   }
+
+  /** Returns true if <code>o</code> is equal to this. */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Sort)) return false;
+    final Sort other = (Sort)o;
+    return Arrays.equals(this.fields, other.fields);
+  }
+
+  /** Returns a hash code value for this object. */
+  @Override
+  public int hashCode() {
+    return 0x45aaf665 + Arrays.hashCode(fields);
+  }
+
+  /** Returns true if the relevance score is needed to sort documents. */
+  public boolean needsScores() {
+    for (SortField sortField : fields) {
+      if (sortField.needsScores()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }

@@ -1,6 +1,6 @@
 package org.apache.lucene.search.spans;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,130 +17,96 @@ package org.apache.lucene.search.spans;
  * limitations under the License.
  */
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.*;
+import org.apache.lucene.search.similarities.Similarity;
+import org.apache.lucene.search.similarities.Similarity.SimScorer;
+import org.apache.lucene.util.Bits;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Expert-only.  Public for use by other weight implementations
  */
-public class SpanWeight implements Weight {
+public class SpanWeight extends Weight {
   protected Similarity similarity;
-  protected float value;
-  protected float idf;
-  protected float queryNorm;
-  protected float queryWeight;
-
-  protected Set terms;
+  protected Map<Term,TermContext> termContexts;
   protected SpanQuery query;
+  protected Similarity.SimWeight stats;
 
-  public SpanWeight(SpanQuery query, Searcher searcher)
+  public SpanWeight(SpanQuery query, IndexSearcher searcher)
     throws IOException {
-    this.similarity = query.getSimilarity(searcher);
+    this.similarity = searcher.getSimilarity();
     this.query = query;
-    terms=new HashSet();
+    
+    termContexts = new HashMap<>();
+    TreeSet<Term> terms = new TreeSet<>();
     query.extractTerms(terms);
-
-    idf = this.query.getSimilarity(searcher).idf(terms, searcher);
+    final IndexReaderContext context = searcher.getTopReaderContext();
+    final TermStatistics termStats[] = new TermStatistics[terms.size()];
+    int i = 0;
+    for (Term term : terms) {
+      TermContext state = TermContext.build(context, term);
+      termStats[i] = searcher.termStatistics(term, state);
+      termContexts.put(term, state);
+      i++;
+    }
+    final String field = query.getField();
+    if (field != null) {
+      stats = similarity.computeWeight(query.getBoost(), 
+                                       searcher.collectionStatistics(query.getField()), 
+                                       termStats);
+    }
   }
 
+  @Override
   public Query getQuery() { return query; }
-  public float getValue() { return value; }
 
-  public float sumOfSquaredWeights() throws IOException {
-    queryWeight = idf * query.getBoost();         // compute query weight
-    return queryWeight * queryWeight;             // square it
+  @Override
+  public float getValueForNormalization() throws IOException {
+    return stats == null ? 1.0f : stats.getValueForNormalization();
   }
 
-  public void normalize(float queryNorm) {
-    this.queryNorm = queryNorm;
-    queryWeight *= queryNorm;                     // normalize query weight
-    value = queryWeight * idf;                    // idf for document
+  @Override
+  public void normalize(float queryNorm, float topLevelBoost) {
+    if (stats != null) {
+      stats.normalize(queryNorm, topLevelBoost);
+    }
   }
 
-  public Scorer scorer(IndexReader reader) throws IOException {
-    return new SpanScorer(query.getSpans(reader), this,
-                          similarity,
-                          reader.norms(query.getField()));
+  @Override
+  public Scorer scorer(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+    if (stats == null) {
+      return null;
+    } else {
+      return new SpanScorer(query.getSpans(context, acceptDocs, termContexts), this, similarity.simScorer(stats, context));
+    }
   }
 
-  public Explanation explain(IndexReader reader, int doc)
-    throws IOException {
-
-    ComplexExplanation result = new ComplexExplanation();
-    result.setDescription("weight("+getQuery()+" in "+doc+"), product of:");
-    String field = ((SpanQuery)getQuery()).getField();
-
-    StringBuffer docFreqs = new StringBuffer();
-    Iterator i = terms.iterator();
-    while (i.hasNext()) {
-      Term term = (Term)i.next();
-      docFreqs.append(term.text());
-      docFreqs.append("=");
-      docFreqs.append(reader.docFreq(term));
-
-      if (i.hasNext()) {
-        docFreqs.append(" ");
+  @Override
+  public Explanation explain(AtomicReaderContext context, int doc) throws IOException {
+    SpanScorer scorer = (SpanScorer) scorer(context, context.reader().getLiveDocs());
+    if (scorer != null) {
+      int newDoc = scorer.advance(doc);
+      if (newDoc == doc) {
+        float freq = scorer.sloppyFreq();
+        SimScorer docScorer = similarity.simScorer(stats, context);
+        ComplexExplanation result = new ComplexExplanation();
+        result.setDescription("weight("+getQuery()+" in "+doc+") [" + similarity.getClass().getSimpleName() + "], result of:");
+        Explanation scoreExplanation = docScorer.explain(doc, new Explanation(freq, "phraseFreq=" + freq));
+        result.addDetail(scoreExplanation);
+        result.setValue(scoreExplanation.getValue());
+        result.setMatch(true);          
+        return result;
       }
     }
-
-    Explanation idfExpl =
-      new Explanation(idf, "idf(" + field + ": " + docFreqs + ")");
-
-    // explain query weight
-    Explanation queryExpl = new Explanation();
-    queryExpl.setDescription("queryWeight(" + getQuery() + "), product of:");
-
-    Explanation boostExpl = new Explanation(getQuery().getBoost(), "boost");
-    if (getQuery().getBoost() != 1.0f)
-      queryExpl.addDetail(boostExpl);
-    queryExpl.addDetail(idfExpl);
-
-    Explanation queryNormExpl = new Explanation(queryNorm,"queryNorm");
-    queryExpl.addDetail(queryNormExpl);
-
-    queryExpl.setValue(boostExpl.getValue() *
-                       idfExpl.getValue() *
-                       queryNormExpl.getValue());
-
-    result.addDetail(queryExpl);
-
-    // explain field weight
-    ComplexExplanation fieldExpl = new ComplexExplanation();
-    fieldExpl.setDescription("fieldWeight("+field+":"+query.toString(field)+
-                             " in "+doc+"), product of:");
-
-    Explanation tfExpl = scorer(reader).explain(doc);
-    fieldExpl.addDetail(tfExpl);
-    fieldExpl.addDetail(idfExpl);
-
-    Explanation fieldNormExpl = new Explanation();
-    byte[] fieldNorms = reader.norms(field);
-    float fieldNorm =
-      fieldNorms!=null ? Similarity.decodeNorm(fieldNorms[doc]) : 0.0f;
-    fieldNormExpl.setValue(fieldNorm);
-    fieldNormExpl.setDescription("fieldNorm(field="+field+", doc="+doc+")");
-    fieldExpl.addDetail(fieldNormExpl);
-
-    fieldExpl.setMatch(Boolean.valueOf(tfExpl.isMatch()));
-    fieldExpl.setValue(tfExpl.getValue() *
-                       idfExpl.getValue() *
-                       fieldNormExpl.getValue());
-
-    result.addDetail(fieldExpl);
-    result.setMatch(fieldExpl.getMatch());
-
-    // combine them
-    result.setValue(queryExpl.getValue() * fieldExpl.getValue());
-
-    if (queryExpl.getValue() == 1.0f)
-      return fieldExpl;
-
-    return result;
+    
+    return new ComplexExplanation(false, 0.0f, "no matching term");
   }
 }

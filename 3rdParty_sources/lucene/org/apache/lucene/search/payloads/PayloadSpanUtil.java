@@ -1,7 +1,6 @@
 package org.apache.lucene.search.payloads;
 
-import org.apache.lucene.search.BooleanClause;
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,11 +20,18 @@ import org.apache.lucene.search.BooleanClause;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.DisjunctionMaxQuery;
 import org.apache.lucene.search.FilteredQuery;
@@ -33,49 +39,47 @@ import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.spans.PayloadSpans;
 import org.apache.lucene.search.spans.SpanNearQuery;
 import org.apache.lucene.search.spans.SpanOrQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanTermQuery;
+import org.apache.lucene.search.spans.Spans;
 
 /**
  * Experimental class to get set of payloads for most standard Lucene queries.
  * Operates like Highlighter - IndexReader should only contain doc of interest,
  * best to use MemoryIndex.
  *
- * <p/>
- * <font color="#FF0000">
-   * WARNING: The status of the <b>Payloads</b> feature is experimental.
-   * The APIs introduced here might change in the future and will not be
-   * supported anymore in such a case.</font>
+ * @lucene.experimental
  * 
  */
 public class PayloadSpanUtil {
-  private IndexReader reader;
+  private IndexReaderContext context;
 
   /**
-   * @param reader
+   * @param context
    *          that contains doc with payloads to extract
+   *          
+   * @see IndexReader#getContext()
    */
-  public PayloadSpanUtil(IndexReader reader) {
-    this.reader = reader;
+  public PayloadSpanUtil(IndexReaderContext context) {
+    this.context = context;
   }
 
   /**
    * Query should be rewritten for wild/fuzzy support.
    * 
-   * @param query
+   * @param query rewritten query
    * @return payloads Collection
-   * @throws IOException
+   * @throws IOException if there is a low-level I/O error
    */
-  public Collection getPayloadsForQuery(Query query) throws IOException {
-    Collection payloads = new ArrayList();
+  public Collection<byte[]> getPayloadsForQuery(Query query) throws IOException {
+    Collection<byte[]> payloads = new ArrayList<>();
     queryToSpanQuery(query, payloads);
     return payloads;
   }
 
-  private void queryToSpanQuery(Query query, Collection payloads)
+  private void queryToSpanQuery(Query query, Collection<byte[]> payloads)
       throws IOException {
     if (query instanceof BooleanQuery) {
       BooleanClause[] queryClauses = ((BooleanQuery) query).getClauses();
@@ -113,14 +117,14 @@ public class PayloadSpanUtil {
       queryToSpanQuery(((FilteredQuery) query).getQuery(), payloads);
     } else if (query instanceof DisjunctionMaxQuery) {
 
-      for (Iterator iterator = ((DisjunctionMaxQuery) query).iterator(); iterator
+      for (Iterator<Query> iterator = ((DisjunctionMaxQuery) query).iterator(); iterator
           .hasNext();) {
-        queryToSpanQuery((Query) iterator.next(), payloads);
+        queryToSpanQuery(iterator.next(), payloads);
       }
 
     } else if (query instanceof MultiPhraseQuery) {
       final MultiPhraseQuery mpq = (MultiPhraseQuery) query;
-      final List termArrays = mpq.getTermArrays();
+      final List<Term[]> termArrays = mpq.getTermArrays();
       final int[] positions = mpq.getPositions();
       if (positions.length > 0) {
 
@@ -131,19 +135,20 @@ public class PayloadSpanUtil {
           }
         }
 
-        final List[] disjunctLists = new List[maxPosition + 1];
+        @SuppressWarnings({"rawtypes","unchecked"}) final List<Query>[] disjunctLists =
+            new List[maxPosition + 1];
         int distinctPositions = 0;
 
         for (int i = 0; i < termArrays.size(); ++i) {
-          final Term[] termArray = (Term[]) termArrays.get(i);
-          List disjuncts = disjunctLists[positions[i]];
+          final Term[] termArray = termArrays.get(i);
+          List<Query> disjuncts = disjunctLists[positions[i]];
           if (disjuncts == null) {
-            disjuncts = (disjunctLists[positions[i]] = new ArrayList(
+            disjuncts = (disjunctLists[positions[i]] = new ArrayList<>(
                 termArray.length));
             ++distinctPositions;
           }
-          for (int j = 0; j < termArray.length; ++j) {
-            disjuncts.add(new SpanTermQuery(termArray[j]));
+          for (final Term term : termArray) {
+            disjuncts.add(new SpanTermQuery(term));
           }
         }
 
@@ -151,9 +156,9 @@ public class PayloadSpanUtil {
         int position = 0;
         final SpanQuery[] clauses = new SpanQuery[distinctPositions];
         for (int i = 0; i < disjunctLists.length; ++i) {
-          List disjuncts = disjunctLists[i];
+          List<Query> disjuncts = disjunctLists[i];
           if (disjuncts != null) {
-            clauses[position++] = new SpanOrQuery((SpanQuery[]) disjuncts
+            clauses[position++] = new SpanOrQuery(disjuncts
                 .toArray(new SpanQuery[disjuncts.size()]));
           } else {
             ++positionGaps;
@@ -171,19 +176,23 @@ public class PayloadSpanUtil {
     }
   }
 
-  private void getPayloads(Collection payloads, SpanQuery query)
+  private void getPayloads(Collection<byte []> payloads, SpanQuery query)
       throws IOException {
-    PayloadSpans spans = query.getPayloadSpans(reader);
-
-    while (spans.next() == true) {
-      if (spans.isPayloadAvailable()) {
-        Collection payload = spans.getPayload();
-        Iterator it = payload.iterator();
-        while (it.hasNext()) {
-          byte[] bytes = (byte[]) it.next();
-          payloads.add(bytes);
+    Map<Term,TermContext> termContexts = new HashMap<>();
+    TreeSet<Term> terms = new TreeSet<>();
+    query.extractTerms(terms);
+    for (Term term : terms) {
+      termContexts.put(term, TermContext.build(context, term));
+    }
+    for (AtomicReaderContext atomicReaderContext : context.leaves()) {
+      final Spans spans = query.getSpans(atomicReaderContext, atomicReaderContext.reader().getLiveDocs(), termContexts);
+      while (spans.next() == true) {
+        if (spans.isPayloadAvailable()) {
+          Collection<byte[]> payload = spans.getPayload();
+          for (byte [] bytes : payload) {
+            payloads.add(bytes);
+          }
         }
-
       }
     }
   }

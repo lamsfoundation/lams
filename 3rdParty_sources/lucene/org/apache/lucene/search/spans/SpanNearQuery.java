@@ -1,6 +1,6 @@
 package org.apache.lucene.search.spans;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,52 +19,66 @@ package org.apache.lucene.search.spans;
 
 import java.io.IOException;
 
-import java.util.Collection;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.ToStringUtils;
 
 /** Matches spans which are near one another.  One can specify <i>slop</i>, the
  * maximum number of intervening unmatched positions, as well as whether
  * matches are required to be in-order. */
-public class SpanNearQuery extends SpanQuery {
-  private List clauses;
-  private int slop;
-  private boolean inOrder;
+public class SpanNearQuery extends SpanQuery implements Cloneable {
+  protected List<SpanQuery> clauses;
+  protected int slop;
+  protected boolean inOrder;
 
-  private String field;
+  protected String field;
+  private boolean collectPayloads;
 
   /** Construct a SpanNearQuery.  Matches spans matching a span from each
    * clause, with up to <code>slop</code> total unmatched positions between
    * them.  * When <code>inOrder</code> is true, the spans from each clause
-   * must be * ordered as in <code>clauses</code>. */
+   * must be * ordered as in <code>clauses</code>.
+   * @param clauses the clauses to find near each other
+   * @param slop The slop value
+   * @param inOrder true if order is important
+   * */
   public SpanNearQuery(SpanQuery[] clauses, int slop, boolean inOrder) {
+    this(clauses, slop, inOrder, true);     
+  }
+  
+  public SpanNearQuery(SpanQuery[] clauses, int slop, boolean inOrder, boolean collectPayloads) {
 
     // copy clauses array into an ArrayList
-    this.clauses = new ArrayList(clauses.length);
+    this.clauses = new ArrayList<>(clauses.length);
     for (int i = 0; i < clauses.length; i++) {
       SpanQuery clause = clauses[i];
-      if (i == 0) {                               // check field
+      if (field == null) {                               // check field
         field = clause.getField();
-      } else if (!clause.getField().equals(field)) {
+      } else if (clause.getField() != null && !clause.getField().equals(field)) {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
       this.clauses.add(clause);
     }
-
+    this.collectPayloads = collectPayloads;
     this.slop = slop;
     this.inOrder = inOrder;
   }
 
   /** Return the clauses whose spans are matched. */
   public SpanQuery[] getClauses() {
-    return (SpanQuery[])clauses.toArray(new SpanQuery[clauses.size()]);
+    return clauses.toArray(new SpanQuery[clauses.size()]);
   }
 
   /** Return the maximum number of intervening unmatched positions permitted.*/
@@ -73,37 +87,24 @@ public class SpanNearQuery extends SpanQuery {
   /** Return true if matches are required to be in-order.*/
   public boolean isInOrder() { return inOrder; }
 
+  @Override
   public String getField() { return field; }
   
-  /** Returns a collection of all terms matched by this query.
-   * @deprecated use extractTerms instead
-   * @see #extractTerms(Set)
-   */
-  public Collection getTerms() {
-    Collection terms = new ArrayList();
-    Iterator i = clauses.iterator();
-    while (i.hasNext()) {
-      SpanQuery clause = (SpanQuery)i.next();
-      terms.addAll(clause.getTerms());
+  @Override
+  public void extractTerms(Set<Term> terms) {
+    for (final SpanQuery clause : clauses) {
+      clause.extractTerms(terms);
     }
-    return terms;
-  }
-  
-  public void extractTerms(Set terms) {
-	    Iterator i = clauses.iterator();
-	    while (i.hasNext()) {
-	      SpanQuery clause = (SpanQuery)i.next();
-	      clause.extractTerms(terms);
-	    }
   }  
   
 
+  @Override
   public String toString(String field) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("spanNear([");
-    Iterator i = clauses.iterator();
+    Iterator<SpanQuery> i = clauses.iterator();
     while (i.hasNext()) {
-      SpanQuery clause = (SpanQuery)i.next();
+      SpanQuery clause = i.next();
       buffer.append(clause.toString(field));
       if (i.hasNext()) {
         buffer.append(", ");
@@ -118,30 +119,28 @@ public class SpanNearQuery extends SpanQuery {
     return buffer.toString();
   }
 
-  public Spans getSpans(final IndexReader reader) throws IOException {
+  @Override
+  public Spans getSpans(final AtomicReaderContext context, Bits acceptDocs, Map<Term,TermContext> termContexts) throws IOException {
     if (clauses.size() == 0)                      // optimize 0-clause case
-      return new SpanOrQuery(getClauses()).getPayloadSpans(reader);
+      return new SpanOrQuery(getClauses()).getSpans(context, acceptDocs, termContexts);
 
     if (clauses.size() == 1)                      // optimize 1-clause case
-      return ((SpanQuery)clauses.get(0)).getPayloadSpans(reader);
+      return clauses.get(0).getSpans(context, acceptDocs, termContexts);
 
     return inOrder
-            ? (PayloadSpans) new NearSpansOrdered(this, reader)
-            : (PayloadSpans) new NearSpansUnordered(this, reader);
+            ? (Spans) new NearSpansOrdered(this, context, acceptDocs, termContexts, collectPayloads)
+            : (Spans) new NearSpansUnordered(this, context, acceptDocs, termContexts);
   }
 
-  public PayloadSpans getPayloadSpans(IndexReader reader) throws IOException {
-    return (PayloadSpans) getSpans(reader);
-  }
-
+  @Override
   public Query rewrite(IndexReader reader) throws IOException {
     SpanNearQuery clone = null;
     for (int i = 0 ; i < clauses.size(); i++) {
-      SpanQuery c = (SpanQuery)clauses.get(i);
+      SpanQuery c = clauses.get(i);
       SpanQuery query = (SpanQuery) c.rewrite(reader);
       if (query != c) {                     // clause rewrote: must clone
         if (clone == null)
-          clone = (SpanNearQuery) this.clone();
+          clone = this.clone();
         clone.clauses.set(i,query);
       }
     }
@@ -151,8 +150,22 @@ public class SpanNearQuery extends SpanQuery {
       return this;                         // no clauses rewrote
     }
   }
+  
+  @Override
+  public SpanNearQuery clone() {
+    int sz = clauses.size();
+    SpanQuery[] newClauses = new SpanQuery[sz];
+
+    for (int i = 0; i < sz; i++) {
+      newClauses[i] = (SpanQuery) clauses.get(i).clone();
+    }
+    SpanNearQuery spanNearQuery = new SpanNearQuery(newClauses, slop, inOrder);
+    spanNearQuery.setBoost(getBoost());
+    return spanNearQuery;
+  }
 
   /** Returns true iff <code>o</code> is equal to this. */
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof SpanNearQuery)) return false;
@@ -166,6 +179,7 @@ public class SpanNearQuery extends SpanQuery {
     return getBoost() == spanNearQuery.getBoost();
   }
 
+  @Override
   public int hashCode() {
     int result;
     result = clauses.hashCode();

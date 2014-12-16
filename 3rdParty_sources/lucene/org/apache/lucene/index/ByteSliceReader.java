@@ -1,6 +1,6 @@
 package org.apache.lucene.index;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,16 +17,18 @@ package org.apache.lucene.index;
  * limitations under the License.
  */
 
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
 import java.io.IOException;
+
+import org.apache.lucene.store.DataInput;
+import org.apache.lucene.store.DataOutput;
+import org.apache.lucene.util.ByteBlockPool;
 
 /* IndexInput that knows how to read the byte slices written
  * by Posting and PostingVector.  We read the bytes in
  * each slice until we hit the end of that slice at which
  * point we read the forwarding address of the next slice
  * and then jump to it.*/
-final class ByteSliceReader extends IndexInput {
+final class ByteSliceReader extends DataInput {
   ByteBlockPool pool;
   int bufferUpto;
   byte[] buffer;
@@ -47,16 +49,16 @@ final class ByteSliceReader extends IndexInput {
     this.endIndex = endIndex;
 
     level = 0;
-    bufferUpto = startIndex / DocumentsWriter.BYTE_BLOCK_SIZE;
-    bufferOffset = bufferUpto * DocumentsWriter.BYTE_BLOCK_SIZE;
+    bufferUpto = startIndex / ByteBlockPool.BYTE_BLOCK_SIZE;
+    bufferOffset = bufferUpto * ByteBlockPool.BYTE_BLOCK_SIZE;
     buffer = pool.buffers[bufferUpto];
-    upto = startIndex & DocumentsWriter.BYTE_BLOCK_MASK;
+    upto = startIndex & ByteBlockPool.BYTE_BLOCK_MASK;
 
-    final int firstSize = ByteBlockPool.levelSizeArray[0];
+    final int firstSize = ByteBlockPool.LEVEL_SIZE_ARRAY[0];
 
     if (startIndex+firstSize >= endIndex) {
       // There is only this one slice to read
-      limit = endIndex & DocumentsWriter.BYTE_BLOCK_MASK;
+      limit = endIndex & ByteBlockPool.BYTE_BLOCK_MASK;
     } else
       limit = upto+firstSize-4;
   }
@@ -66,6 +68,7 @@ final class ByteSliceReader extends IndexInput {
     return upto + bufferOffset == endIndex;
   }
 
+  @Override
   public byte readByte() {
     assert !eof();
     assert upto <= limit;
@@ -74,7 +77,7 @@ final class ByteSliceReader extends IndexInput {
     return buffer[upto++];
   }
 
-  public long writeTo(IndexOutput out) throws IOException {
+  public long writeTo(DataOutput out) throws IOException {
     long size = 0;
     while(true) {
       if (limit + bufferOffset == endIndex) {
@@ -97,14 +100,14 @@ final class ByteSliceReader extends IndexInput {
     // Skip to our next slice
     final int nextIndex = ((buffer[limit]&0xff)<<24) + ((buffer[1+limit]&0xff)<<16) + ((buffer[2+limit]&0xff)<<8) + (buffer[3+limit]&0xff);
 
-    level = ByteBlockPool.nextLevelArray[level];
-    final int newSize = ByteBlockPool.levelSizeArray[level];
+    level = ByteBlockPool.NEXT_LEVEL_ARRAY[level];
+    final int newSize = ByteBlockPool.LEVEL_SIZE_ARRAY[level];
 
-    bufferUpto = nextIndex / DocumentsWriter.BYTE_BLOCK_SIZE;
-    bufferOffset = bufferUpto * DocumentsWriter.BYTE_BLOCK_SIZE;
+    bufferUpto = nextIndex / ByteBlockPool.BYTE_BLOCK_SIZE;
+    bufferOffset = bufferUpto * ByteBlockPool.BYTE_BLOCK_SIZE;
 
     buffer = pool.buffers[bufferUpto];
-    upto = nextIndex & DocumentsWriter.BYTE_BLOCK_MASK;
+    upto = nextIndex & ByteBlockPool.BYTE_BLOCK_MASK;
 
     if (nextIndex + newSize >= endIndex) {
       // We are advancing to the final slice
@@ -117,6 +120,7 @@ final class ByteSliceReader extends IndexInput {
     }
   }
 
+  @Override
   public void readBytes(byte[] b, int offset, int len) {
     while(len > 0) {
       final int numLeft = limit-upto;
@@ -134,10 +138,4 @@ final class ByteSliceReader extends IndexInput {
       }
     }
   }
-
-  public long getFilePointer() {throw new RuntimeException("not implemented");}
-  public long length() {throw new RuntimeException("not implemented");}
-  public void seek(long pos) {throw new RuntimeException("not implemented");}
-  public void close() {throw new RuntimeException("not implemented");}
 }
-

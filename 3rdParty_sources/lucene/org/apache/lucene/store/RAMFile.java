@@ -1,6 +1,6 @@
 package org.apache.lucene.store;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,63 +18,52 @@ package org.apache.lucene.store;
  */
 
 import java.util.ArrayList;
-import java.io.Serializable;
 
-class RAMFile implements Serializable {
+import org.apache.lucene.util.Accountable;
 
-  private static final long serialVersionUID = 1l;
-
-  private ArrayList buffers = new ArrayList();
+/** 
+ * Represents a file in RAM as a list of byte[] buffers.
+ * @lucene.internal */
+public class RAMFile implements Accountable {
+  protected ArrayList<byte[]> buffers = new ArrayList<>();
   long length;
   RAMDirectory directory;
-  long sizeInBytes;                  // Only maintained if in a directory; updates synchronized on directory
-
-  // This is publicly modifiable via Directory.touchFile(), so direct access not supported
-  private long lastModified = System.currentTimeMillis();
+  protected long sizeInBytes;
 
   // File used as buffer, in no RAMDirectory
-  RAMFile() {}
+  public RAMFile() {}
   
   RAMFile(RAMDirectory directory) {
     this.directory = directory;
   }
 
   // For non-stream access from thread that might be concurrent with writing
-  synchronized long getLength() {
+  public synchronized long getLength() {
     return length;
   }
 
-  synchronized void setLength(long length) {
+  protected synchronized void setLength(long length) {
     this.length = length;
   }
 
-  // For non-stream access from thread that might be concurrent with writing
-  synchronized long getLastModified() {
-    return lastModified;
-  }
-
-  synchronized void setLastModified(long lastModified) {
-    this.lastModified = lastModified;
-  }
-
-  final synchronized byte[] addBuffer(int size) {
+  protected final byte[] addBuffer(int size) {
     byte[] buffer = newBuffer(size);
-    if (directory!=null)
-      synchronized (directory) {             // Ensure addition of buffer and adjustment to directory size are atomic wrt directory
-        buffers.add(buffer);
-        directory.sizeInBytes += size;
-        sizeInBytes += size;
-      }
-    else
+    synchronized(this) {
       buffers.add(buffer);
+      sizeInBytes += size;
+    }
+
+    if (directory != null) {
+      directory.sizeInBytes.getAndAdd(size);
+    }
     return buffer;
   }
 
-  final synchronized byte[] getBuffer(int index) {
-    return (byte[]) buffers.get(index);
+  protected final synchronized byte[] getBuffer(int index) {
+    return buffers.get(index);
   }
 
-  final synchronized int numBuffers() {
+  protected final synchronized int numBuffers() {
     return buffers.size();
   }
 
@@ -84,15 +73,13 @@ class RAMFile implements Serializable {
    * @param size size of allocated buffer.
    * @return allocated buffer.
    */
-  byte[] newBuffer(int size) {
+  protected byte[] newBuffer(int size) {
     return new byte[size];
   }
 
-  // Only valid if in a directory
-  long getSizeInBytes() {
-    synchronized (directory) {
-      return sizeInBytes;
-    }
+  @Override
+  public synchronized long ramBytesUsed() {
+    return sizeInBytes;
   }
   
 }

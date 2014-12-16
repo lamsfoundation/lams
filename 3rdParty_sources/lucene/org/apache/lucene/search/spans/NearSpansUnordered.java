@@ -1,6 +1,6 @@
 package org.apache.lucene.search.spans;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,20 +17,31 @@ package org.apache.lucene.search.spans;
  * limitations under the License.
  */
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.PriorityQueue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 
-class NearSpansUnordered implements PayloadSpans {
+/**
+ * Similar to {@link NearSpansOrdered}, but for the unordered case.
+ * 
+ * Expert:
+ * Only public for subclassing.  Most implementations should not need this class
+ */
+public class NearSpansUnordered extends Spans {
   private SpanNearQuery query;
 
-  private List ordered = new ArrayList();         // spans in query order
+  private List<SpansCell> ordered = new ArrayList<>();         // spans in query order
+  private Spans[] subSpans;  
   private int slop;                               // from query
 
   private SpansCell first;                        // linked list of spans
@@ -44,14 +55,13 @@ class NearSpansUnordered implements PayloadSpans {
   private boolean more = true;                    // true iff not done
   private boolean firstTime = true;               // true before first next()
 
-  private class CellQueue extends PriorityQueue {
+  private class CellQueue extends PriorityQueue<SpansCell> {
     public CellQueue(int size) {
-      initialize(size);
+      super(size);
     }
     
-    protected final boolean lessThan(Object o1, Object o2) {
-      SpansCell spans1 = (SpansCell)o1;
-      SpansCell spans2 = (SpansCell)o2;
+    @Override
+    protected final boolean lessThan(SpansCell spans1, SpansCell spans2) {
       if (spans1.doc() == spans2.doc()) {
         return NearSpansOrdered.docSpansOrdered(spans1, spans2);
       } else {
@@ -62,21 +72,23 @@ class NearSpansUnordered implements PayloadSpans {
 
 
   /** Wraps a Spans, and can be used to form a linked list. */
-  private class SpansCell implements PayloadSpans {
-    private PayloadSpans spans;
+  private class SpansCell extends Spans {
+    private Spans spans;
     private SpansCell next;
     private int length = -1;
     private int index;
 
-    public SpansCell(PayloadSpans spans, int index) {
+    public SpansCell(Spans spans, int index) {
       this.spans = spans;
       this.index = index;
     }
 
+    @Override
     public boolean next() throws IOException {
       return adjust(spans.next());
     }
 
+    @Override
     public boolean skipTo(int target) throws IOException {
       return adjust(spans.skipTo(target));
     }
@@ -98,37 +110,55 @@ class NearSpansUnordered implements PayloadSpans {
       return condition;
     }
 
+    @Override
     public int doc() { return spans.doc(); }
+    
+    @Override
     public int start() { return spans.start(); }
+    
+    @Override
     public int end() { return spans.end(); }
                     // TODO: Remove warning after API has been finalized
-    public Collection/*<byte[]>*/ getPayload() throws IOException {
-      return new ArrayList(spans.getPayload());
+    @Override
+    public Collection<byte[]> getPayload() throws IOException {
+      return new ArrayList<>(spans.getPayload());
     }
 
     // TODO: Remove warning after API has been finalized
-   public boolean isPayloadAvailable() {
+    @Override
+    public boolean isPayloadAvailable() throws IOException {
       return spans.isPayloadAvailable();
     }
 
+    @Override
+    public long cost() {
+      return spans.cost();
+    }
+
+    @Override
     public String toString() { return spans.toString() + "#" + index; }
   }
 
 
-  public NearSpansUnordered(SpanNearQuery query, IndexReader reader)
+  public NearSpansUnordered(SpanNearQuery query, AtomicReaderContext context, Bits acceptDocs, Map<Term,TermContext> termContexts)
     throws IOException {
     this.query = query;
     this.slop = query.getSlop();
 
     SpanQuery[] clauses = query.getClauses();
     queue = new CellQueue(clauses.length);
+    subSpans = new Spans[clauses.length];    
     for (int i = 0; i < clauses.length; i++) {
       SpansCell cell =
-        new SpansCell(clauses[i].getPayloadSpans(reader), i);
+        new SpansCell(clauses[i].getSpans(context, acceptDocs, termContexts), i);
       ordered.add(cell);
+      subSpans[i] = cell.spans;
     }
   }
-
+  public Spans[] getSubSpans() {
+    return subSpans;
+  }
+  @Override
   public boolean next() throws IOException {
     if (firstTime) {
       initList(true);
@@ -136,7 +166,7 @@ class NearSpansUnordered implements PayloadSpans {
       firstTime = false;
     } else if (more) {
       if (min().next()) { // trigger further scanning
-        queue.adjustTop(); // maintain queue
+        queue.updateTop(); // maintain queue
       } else {
         more = false;
       }
@@ -174,12 +204,13 @@ class NearSpansUnordered implements PayloadSpans {
       
       more = min().next();
       if (more) {
-        queue.adjustTop();                      // maintain queue
+        queue.updateTop();                      // maintain queue
       }
     }
     return false;                                 // no more matches
   }
 
+  @Override
   public boolean skipTo(int target) throws IOException {
     if (firstTime) {                              // initialize
       initList(false);
@@ -193,7 +224,7 @@ class NearSpansUnordered implements PayloadSpans {
     } else {                                      // normal case
       while (more && min().doc() < target) {      // skip as needed
         if (min().skipTo(target)) {
-          queue.adjustTop();
+          queue.updateTop();
         } else {
           more = false;
         }
@@ -202,20 +233,24 @@ class NearSpansUnordered implements PayloadSpans {
     return more && (atMatch() ||  next());
   }
 
-  private SpansCell min() { return (SpansCell)queue.top(); }
+  private SpansCell min() { return queue.top(); }
 
+  @Override
   public int doc() { return min().doc(); }
+  @Override
   public int start() { return min().start(); }
+  @Override
   public int end() { return max.end(); }
 
   // TODO: Remove warning after API has been finalized
   /**
    * WARNING: The List is not necessarily in order of the the positions
-   * @return
-   * @throws IOException
+   * @return Collection of <code>byte[]</code> payloads
+   * @throws IOException if there is a low-level I/O error
    */
-  public Collection/*<byte[]>*/ getPayload() throws IOException {
-    Set/*<byte[]*/ matchPayload = new HashSet();
+  @Override
+  public Collection<byte[]> getPayload() throws IOException {
+    Set<byte[]> matchPayload = new HashSet<>();
     for (SpansCell cell = first; cell != null; cell = cell.next) {
       if (cell.isPayloadAvailable()) {
         matchPayload.addAll(cell.getPayload());
@@ -225,7 +260,8 @@ class NearSpansUnordered implements PayloadSpans {
   }
 
   // TODO: Remove warning after API has been finalized
-  public boolean isPayloadAvailable() {
+  @Override
+  public boolean isPayloadAvailable() throws IOException {
     SpansCell pointer = min();
     while (pointer != null) {
       if (pointer.isPayloadAvailable()) {
@@ -236,7 +272,17 @@ class NearSpansUnordered implements PayloadSpans {
 
     return false;
   }
+  
+  @Override
+  public long cost() {
+    long minCost = Long.MAX_VALUE;
+    for (int i = 0; i < subSpans.length; i++) {
+      minCost = Math.min(minCost, subSpans[i].cost());
+    }
+    return minCost;
+  }
 
+  @Override
   public String toString() {
     return getClass().getName() + "("+query.toString()+")@"+
       (firstTime?"START":(more?(doc()+":"+start()+"-"+end()):"END"));
@@ -244,7 +290,7 @@ class NearSpansUnordered implements PayloadSpans {
 
   private void initList(boolean next) throws IOException {
     for (int i = 0; more && i < ordered.size(); i++) {
-      SpansCell cell = (SpansCell)ordered.get(i);
+      SpansCell cell = ordered.get(i);
       if (next)
         more = cell.next();                       // move to first entry
       if (more) {
@@ -253,8 +299,8 @@ class NearSpansUnordered implements PayloadSpans {
     }
   }
 
-  private void addToList(SpansCell cell) throws IOException {
-    if (last != null) {			  // add next to end of list
+  private void addToList(SpansCell cell) {
+    if (last != null) {  // add next to end of list
       last.next = cell;
     } else
       first = cell;
@@ -263,23 +309,23 @@ class NearSpansUnordered implements PayloadSpans {
   }
 
   private void firstToLast() {
-    last.next = first;			  // move first to end of list
+    last.next = first;  // move first to end of list
     last = first;
     first = first.next;
     last.next = null;
   }
 
-  private void queueToList() throws IOException {
+  private void queueToList() {
     last = first = null;
     while (queue.top() != null) {
-      addToList((SpansCell)queue.pop());
+      addToList(queue.pop());
     }
   }
   
   private void listToQueue() {
     queue.clear(); // rebuild queue
     for (SpansCell cell = first; cell != null; cell = cell.next) {
-      queue.put(cell);                      // add to queue from list
+      queue.add(cell);                      // add to queue from list
     }
   }
 

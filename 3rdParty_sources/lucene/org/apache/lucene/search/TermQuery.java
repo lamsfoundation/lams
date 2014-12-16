@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,139 +20,170 @@ package org.apache.lucene.search;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.DocsEnum;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.IndexReaderContext;
+import org.apache.lucene.index.ReaderUtil;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.index.TermState;
+import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.search.similarities.Similarity.SimScorer;
+import org.apache.lucene.search.similarities.Similarity;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.ToStringUtils;
 
 /** A Query that matches documents containing a term.
   This may be combined with other terms with a {@link BooleanQuery}.
   */
 public class TermQuery extends Query {
-  private Term term;
+  private final Term term;
+  private final int docFreq;
+  private final TermContext perReaderTermState;
 
-  private class TermWeight implements Weight {
-    private Similarity similarity;
-    private float value;
-    private float idf;
-    private float queryNorm;
-    private float queryWeight;
+  final class TermWeight extends Weight {
+    private final Similarity similarity;
+    private final Similarity.SimWeight stats;
+    private final TermContext termStates;
 
-    public TermWeight(Searcher searcher)
+    public TermWeight(IndexSearcher searcher, TermContext termStates)
       throws IOException {
-      this.similarity = getSimilarity(searcher);
-      idf = similarity.idf(term, searcher); // compute idf
+      assert termStates != null : "TermContext must not be null";
+      this.termStates = termStates;
+      this.similarity = searcher.getSimilarity();
+      this.stats = similarity.computeWeight(
+          getBoost(), 
+          searcher.collectionStatistics(term.field()), 
+          searcher.termStatistics(term, termStates));
     }
 
+    @Override
     public String toString() { return "weight(" + TermQuery.this + ")"; }
 
+    @Override
     public Query getQuery() { return TermQuery.this; }
-    public float getValue() { return value; }
 
-    public float sumOfSquaredWeights() {
-      queryWeight = idf * getBoost();             // compute query weight
-      return queryWeight * queryWeight;           // square it
+    @Override
+    public float getValueForNormalization() {
+      return stats.getValueForNormalization();
     }
 
-    public void normalize(float queryNorm) {
-      this.queryNorm = queryNorm;
-      queryWeight *= queryNorm;                   // normalize query weight
-      value = queryWeight * idf;                  // idf for document
+    @Override
+    public void normalize(float queryNorm, float topLevelBoost) {
+      stats.normalize(queryNorm, topLevelBoost);
     }
 
-    public Scorer scorer(IndexReader reader) throws IOException {
-      TermDocs termDocs = reader.termDocs(term);
-
-      if (termDocs == null)
+    @Override
+    public Scorer scorer(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+      assert termStates.topReaderContext == ReaderUtil.getTopLevelContext(context) : "The top-reader used to create Weight (" + termStates.topReaderContext + ") is not the same as the current reader's top-reader (" + ReaderUtil.getTopLevelContext(context);
+      final TermsEnum termsEnum = getTermsEnum(context);
+      if (termsEnum == null) {
         return null;
-
-      return new TermScorer(this, termDocs, similarity,
-                            reader.norms(term.field()));
+      }
+      DocsEnum docs = termsEnum.docs(acceptDocs, null);
+      assert docs != null;
+      return new TermScorer(this, docs, similarity.simScorer(stats, context));
     }
-
-    public Explanation explain(IndexReader reader, int doc)
-      throws IOException {
-
-      ComplexExplanation result = new ComplexExplanation();
-      result.setDescription("weight("+getQuery()+" in "+doc+"), product of:");
-
-      Explanation idfExpl =
-        new Explanation(idf, "idf(docFreq=" + reader.docFreq(term) +
-            ", numDocs=" + reader.numDocs() + ")");
-
-      // explain query weight
-      Explanation queryExpl = new Explanation();
-      queryExpl.setDescription("queryWeight(" + getQuery() + "), product of:");
-
-      Explanation boostExpl = new Explanation(getBoost(), "boost");
-      if (getBoost() != 1.0f)
-        queryExpl.addDetail(boostExpl);
-      queryExpl.addDetail(idfExpl);
-
-      Explanation queryNormExpl = new Explanation(queryNorm,"queryNorm");
-      queryExpl.addDetail(queryNormExpl);
-
-      queryExpl.setValue(boostExpl.getValue() *
-                         idfExpl.getValue() *
-                         queryNormExpl.getValue());
-
-      result.addDetail(queryExpl);
-
-      // explain field weight
-      String field = term.field();
-      ComplexExplanation fieldExpl = new ComplexExplanation();
-      fieldExpl.setDescription("fieldWeight("+term+" in "+doc+
-                               "), product of:");
-
-      Explanation tfExpl = scorer(reader).explain(doc);
-      fieldExpl.addDetail(tfExpl);
-      fieldExpl.addDetail(idfExpl);
-
-      Explanation fieldNormExpl = new Explanation();
-      byte[] fieldNorms = reader.norms(field);
-      float fieldNorm =
-        fieldNorms!=null ? Similarity.decodeNorm(fieldNorms[doc]) : 0.0f;
-      fieldNormExpl.setValue(fieldNorm);
-      fieldNormExpl.setDescription("fieldNorm(field="+field+", doc="+doc+")");
-      fieldExpl.addDetail(fieldNormExpl);
-      
-      fieldExpl.setMatch(Boolean.valueOf(tfExpl.isMatch()));
-      fieldExpl.setValue(tfExpl.getValue() *
-                         idfExpl.getValue() *
-                         fieldNormExpl.getValue());
-
-      result.addDetail(fieldExpl);
-      result.setMatch(fieldExpl.getMatch());
-      
-      // combine them
-      result.setValue(queryExpl.getValue() * fieldExpl.getValue());
-
-      if (queryExpl.getValue() == 1.0f)
-        return fieldExpl;
-
-      return result;
+    
+    /**
+     * Returns a {@link TermsEnum} positioned at this weights Term or null if
+     * the term does not exist in the given context
+     */
+    private TermsEnum getTermsEnum(AtomicReaderContext context) throws IOException {
+      final TermState state = termStates.get(context.ord);
+      if (state == null) { // term is not present in that reader
+        assert termNotInReader(context.reader(), term) : "no termstate found but term exists in reader term=" + term;
+        return null;
+      }
+      //System.out.println("LD=" + reader.getLiveDocs() + " set?=" + (reader.getLiveDocs() != null ? reader.getLiveDocs().get(0) : "null"));
+      final TermsEnum termsEnum = context.reader().terms(term.field()).iterator(null);
+      termsEnum.seekExact(term.bytes(), state);
+      return termsEnum;
+    }
+    
+    private boolean termNotInReader(AtomicReader reader, Term term) throws IOException {
+      // only called from assert
+      //System.out.println("TQ.termNotInReader reader=" + reader + " term=" + field + ":" + bytes.utf8ToString());
+      return reader.docFreq(term) == 0;
+    }
+    
+    @Override
+    public Explanation explain(AtomicReaderContext context, int doc) throws IOException {
+      Scorer scorer = scorer(context, context.reader().getLiveDocs());
+      if (scorer != null) {
+        int newDoc = scorer.advance(doc);
+        if (newDoc == doc) {
+          float freq = scorer.freq();
+          SimScorer docScorer = similarity.simScorer(stats, context);
+          ComplexExplanation result = new ComplexExplanation();
+          result.setDescription("weight("+getQuery()+" in "+doc+") [" + similarity.getClass().getSimpleName() + "], result of:");
+          Explanation scoreExplanation = docScorer.explain(doc, new Explanation(freq, "termFreq=" + freq));
+          result.addDetail(scoreExplanation);
+          result.setValue(scoreExplanation.getValue());
+          result.setMatch(true);
+          return result;
+        }
+      }
+      return new ComplexExplanation(false, 0.0f, "no matching term");      
     }
   }
 
   /** Constructs a query for the term <code>t</code>. */
   public TermQuery(Term t) {
+    this(t, -1);
+  }
+
+  /** Expert: constructs a TermQuery that will use the
+   *  provided docFreq instead of looking up the docFreq
+   *  against the searcher. */
+  public TermQuery(Term t, int docFreq) {
     term = t;
+    this.docFreq = docFreq;
+    perReaderTermState = null;
+  }
+  
+  /** Expert: constructs a TermQuery that will use the
+   *  provided docFreq instead of looking up the docFreq
+   *  against the searcher. */
+  public TermQuery(Term t, TermContext states) {
+    assert states != null;
+    term = t;
+    docFreq = states.docFreq();
+    perReaderTermState = states;
   }
 
   /** Returns the term of this query. */
   public Term getTerm() { return term; }
 
-  protected Weight createWeight(Searcher searcher) throws IOException {
-    return new TermWeight(searcher);
+  @Override
+  public Weight createWeight(IndexSearcher searcher) throws IOException {
+    final IndexReaderContext context = searcher.getTopReaderContext();
+    final TermContext termState;
+    if (perReaderTermState == null || perReaderTermState.topReaderContext != context) {
+      // make TermQuery single-pass if we don't have a PRTS or if the context differs!
+      termState = TermContext.build(context, term);
+    } else {
+     // PRTS was pre-build for this IS
+     termState = this.perReaderTermState;
+    }
+
+    // we must not ignore the given docFreq - if set use the given value (lie)
+    if (docFreq != -1)
+      termState.setDocFreq(docFreq);
+    
+    return new TermWeight(searcher, termState);
   }
 
-  public void extractTerms(Set terms) {
+  @Override
+  public void extractTerms(Set<Term> terms) {
     terms.add(getTerm());
   }
 
   /** Prints a user-readable version of this query. */
+  @Override
   public String toString(String field) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     if (!term.field().equals(field)) {
       buffer.append(term.field());
       buffer.append(":");
@@ -163,6 +194,7 @@ public class TermQuery extends Query {
   }
 
   /** Returns true iff <code>o</code> is equal to this. */
+  @Override
   public boolean equals(Object o) {
     if (!(o instanceof TermQuery))
       return false;
@@ -172,6 +204,7 @@ public class TermQuery extends Query {
   }
 
   /** Returns a hash code value for this object.*/
+  @Override
   public int hashCode() {
     return Float.floatToIntBits(getBoost()) ^ term.hashCode();
   }

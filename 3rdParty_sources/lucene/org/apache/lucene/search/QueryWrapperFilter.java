@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,68 +18,64 @@ package org.apache.lucene.search;
  */
 
 import java.io.IOException;
-import java.util.BitSet;
 
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.util.OpenBitSet;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.util.Bits;
 
 /** 
  * Constrains search results to only match those which also match a provided
  * query.  
  *
- * <p> This could be used, for example, with a {@link RangeQuery} on a suitably
+ * <p> This could be used, for example, with a {@link NumericRangeQuery} on a suitably
  * formatted date field to implement date filtering.  One could re-use a single
- * QueryFilter that matches, e.g., only documents modified within the last
- * week.  The QueryFilter and RangeQuery would only need to be reconstructed
- * once per day.
- *
- * @version $Id$
+ * CachingWrapperFilter(QueryWrapperFilter) that matches, e.g., only documents modified 
+ * within the last week.  This would only need to be reconstructed once per day.
  */
 public class QueryWrapperFilter extends Filter {
-  private Query query;
+  private final Query query;
 
   /** Constructs a filter which only matches documents matching
    * <code>query</code>.
    */
   public QueryWrapperFilter(Query query) {
+    if (query == null)
+      throw new NullPointerException("Query may not be null");
     this.query = query;
   }
-
-  /**
-   * @deprecated Use {@link #getDocIdSet(IndexReader)} instead.
-   */
-  public BitSet bits(IndexReader reader) throws IOException {
-    final BitSet bits = new BitSet(reader.maxDoc());
-
-    new IndexSearcher(reader).search(query, new HitCollector() {
-      public final void collect(int doc, float score) {
-        bits.set(doc);  // set bit for hit
-      }
-    });
-    return bits;
-  }
   
-  public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-    final OpenBitSet bits = new OpenBitSet(reader.maxDoc());
-
-    new IndexSearcher(reader).search(query, new HitCollector() {
-      public final void collect(int doc, float score) {
-        bits.set(doc);  // set bit for hit
-      }
-    });
-    return bits;
+  /** returns the inner Query */
+  public final Query getQuery() {
+    return query;
   }
 
+  @Override
+  public DocIdSet getDocIdSet(final AtomicReaderContext context, final Bits acceptDocs) throws IOException {
+    // get a private context that is used to rewrite, createWeight and score eventually
+    final AtomicReaderContext privateContext = context.reader().getContext();
+    final Weight weight = new IndexSearcher(privateContext).createNormalizedWeight(query);
+    return new DocIdSet() {
+      @Override
+      public DocIdSetIterator iterator() throws IOException {
+        return weight.scorer(privateContext, acceptDocs);
+      }
+      @Override
+      public boolean isCacheable() { return false; }
+    };
+  }
+
+  @Override
   public String toString() {
     return "QueryWrapperFilter(" + query + ")";
   }
 
+  @Override
   public boolean equals(Object o) {
     if (!(o instanceof QueryWrapperFilter))
       return false;
     return this.query.equals(((QueryWrapperFilter)o).query);
   }
 
+  @Override
   public int hashCode() {
     return query.hashCode() ^ 0x923F64B9;
   }

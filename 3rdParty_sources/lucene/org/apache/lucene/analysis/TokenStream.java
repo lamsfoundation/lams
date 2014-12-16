@@ -1,6 +1,6 @@
 package org.apache.lucene.analysis;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,94 +17,192 @@ package org.apache.lucene.analysis;
  * limitations under the License.
  */
 
-import org.apache.lucene.index.Payload;
-
 import java.io.IOException;
+import java.io.Closeable;
+import java.lang.reflect.Modifier;
 
-/** A TokenStream enumerates the sequence of tokens, either from
-  fields of a document or from query text.
-  <p>
-  This is an abstract class.  Concrete subclasses are:
-  <ul>
-  <li>{@link Tokenizer}, a TokenStream
-  whose input is a Reader; and
-  <li>{@link TokenFilter}, a TokenStream
-  whose input is another TokenStream.
-  </ul>
-  NOTE: subclasses must override {@link #next(Token)}.  It's
-  also OK to instead override {@link #next()} but that
-  method is now deprecated in favor of {@link #next(Token)}.
-  */
+import org.apache.lucene.analysis.tokenattributes.PackedTokenAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.util.Attribute;
+import org.apache.lucene.util.AttributeFactory;
+import org.apache.lucene.util.AttributeImpl;
+import org.apache.lucene.util.AttributeSource;
 
-public abstract class TokenStream {
+/**
+ * A <code>TokenStream</code> enumerates the sequence of tokens, either from
+ * {@link Field}s of a {@link Document} or from query text.
+ * <p>
+ * This is an abstract class; concrete subclasses are:
+ * <ul>
+ * <li>{@link Tokenizer}, a <code>TokenStream</code> whose input is a Reader; and
+ * <li>{@link TokenFilter}, a <code>TokenStream</code> whose input is another
+ * <code>TokenStream</code>.
+ * </ul>
+ * A new <code>TokenStream</code> API has been introduced with Lucene 2.9. This API
+ * has moved from being {@link Token}-based to {@link Attribute}-based. While
+ * {@link Token} still exists in 2.9 as a convenience class, the preferred way
+ * to store the information of a {@link Token} is to use {@link AttributeImpl}s.
+ * <p>
+ * <code>TokenStream</code> now extends {@link AttributeSource}, which provides
+ * access to all of the token {@link Attribute}s for the <code>TokenStream</code>.
+ * Note that only one instance per {@link AttributeImpl} is created and reused
+ * for every token. This approach reduces object creation and allows local
+ * caching of references to the {@link AttributeImpl}s. See
+ * {@link #incrementToken()} for further details.
+ * <p>
+ * <b>The workflow of the new <code>TokenStream</code> API is as follows:</b>
+ * <ol>
+ * <li>Instantiation of <code>TokenStream</code>/{@link TokenFilter}s which add/get
+ * attributes to/from the {@link AttributeSource}.
+ * <li>The consumer calls {@link TokenStream#reset()}.
+ * <li>The consumer retrieves attributes from the stream and stores local
+ * references to all attributes it wants to access.
+ * <li>The consumer calls {@link #incrementToken()} until it returns false
+ * consuming the attributes after each call.
+ * <li>The consumer calls {@link #end()} so that any end-of-stream operations
+ * can be performed.
+ * <li>The consumer calls {@link #close()} to release any resource when finished
+ * using the <code>TokenStream</code>.
+ * </ol>
+ * To make sure that filters and consumers know which attributes are available,
+ * the attributes must be added during instantiation. Filters and consumers are
+ * not required to check for availability of attributes in
+ * {@link #incrementToken()}.
+ * <p>
+ * You can find some example code for the new API in the analysis package level
+ * Javadoc.
+ * <p>
+ * Sometimes it is desirable to capture a current state of a <code>TokenStream</code>,
+ * e.g., for buffering purposes (see {@link CachingTokenFilter},
+ * TeeSinkTokenFilter). For this usecase
+ * {@link AttributeSource#captureState} and {@link AttributeSource#restoreState}
+ * can be used.
+ * <p>The {@code TokenStream}-API in Lucene is based on the decorator pattern.
+ * Therefore all non-abstract subclasses must be final or have at least a final
+ * implementation of {@link #incrementToken}! This is checked when Java
+ * assertions are enabled.
+ */
+public abstract class TokenStream extends AttributeSource implements Closeable {
+  
+  /** Default {@link AttributeFactory} instance that should be used for TokenStreams. */
+  public static final AttributeFactory DEFAULT_TOKEN_ATTRIBUTE_FACTORY =
+    AttributeFactory.getStaticImplementation(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, PackedTokenAttributeImpl.class);
 
-  /** Returns the next token in the stream, or null at EOS.
-   *  @deprecated The returned Token is a "full private copy" (not
-   *  re-used across calls to next()) but will be slower
-   *  than calling {@link #next(Token)} instead.. */
-  public Token next() throws IOException {
-    final Token reusableToken = new Token();
-    Token nextToken = next(reusableToken);
-
-    if (nextToken != null) {
-      Payload p = nextToken.getPayload();
-      if (p != null) {
-        nextToken.setPayload((Payload) p.clone());
-      }
-    }
-
-    return nextToken;
-  }
-
-  /** Returns the next token in the stream, or null at EOS.
-   *  When possible, the input Token should be used as the
-   *  returned Token (this gives fastest tokenization
-   *  performance), but this is not required and a new Token
-   *  may be returned. Callers may re-use a single Token
-   *  instance for successive calls to this method.
-   *  <p>
-   *  This implicitly defines a "contract" between 
-   *  consumers (callers of this method) and 
-   *  producers (implementations of this method 
-   *  that are the source for tokens):
-   *  <ul>
-   *   <li>A consumer must fully consume the previously 
-   *       returned Token before calling this method again.</li>
-   *   <li>A producer must call {@link Token#clear()}
-   *       before setting the fields in it & returning it</li>
-   *  </ul>
-   *  Also, the producer must make no assumptions about a
-   *  Token after it has been returned: the caller may
-   *  arbitrarily change it.  If the producer needs to hold
-   *  onto the token for subsequent calls, it must clone()
-   *  it before storing it.
-   *  Note that a {@link TokenFilter} is considered a consumer.
-   *  @param reusableToken a Token that may or may not be used to
-   *  return; this parameter should never be null (the callee
-   *  is not required to check for null before using it, but it is a
-   *  good idea to assert that it is not null.)
-   *  @return next token in the stream or null if end-of-stream was hit
+  /**
+   * A TokenStream using the default attribute factory.
    */
-  public Token next(final Token reusableToken) throws IOException {
-    // We don't actually use inputToken, but still add this assert
-    assert reusableToken != null;
-    return next();
+  protected TokenStream() {
+    super(DEFAULT_TOKEN_ATTRIBUTE_FACTORY);
+    assert assertFinal();
+  }
+  
+  /**
+   * A TokenStream that uses the same attributes as the supplied one.
+   */
+  protected TokenStream(AttributeSource input) {
+    super(input);
+    assert assertFinal();
+  }
+  
+  /**
+   * A TokenStream using the supplied AttributeFactory for creating new {@link Attribute} instances.
+   */
+  protected TokenStream(AttributeFactory factory) {
+    super(factory);
+    assert assertFinal();
+  }
+  
+  private boolean assertFinal() {
+    try {
+      final Class<?> clazz = getClass();
+      if (!clazz.desiredAssertionStatus())
+        return true;
+      assert clazz.isAnonymousClass() ||
+        (clazz.getModifiers() & (Modifier.FINAL | Modifier.PRIVATE)) != 0 ||
+        Modifier.isFinal(clazz.getMethod("incrementToken").getModifiers()) :
+        "TokenStream implementation classes or at least their incrementToken() implementation must be final";
+      return true;
+    } catch (NoSuchMethodException nsme) {
+      return false;
+    }
+  }
+  
+  /**
+   * Consumers (i.e., {@link IndexWriter}) use this method to advance the stream to
+   * the next token. Implementing classes must implement this method and update
+   * the appropriate {@link AttributeImpl}s with the attributes of the next
+   * token.
+   * <P>
+   * The producer must make no assumptions about the attributes after the method
+   * has been returned: the caller may arbitrarily change it. If the producer
+   * needs to preserve the state for subsequent calls, it can use
+   * {@link #captureState} to create a copy of the current attribute state.
+   * <p>
+   * This method is called for every token of a document, so an efficient
+   * implementation is crucial for good performance. To avoid calls to
+   * {@link #addAttribute(Class)} and {@link #getAttribute(Class)},
+   * references to all {@link AttributeImpl}s that this stream uses should be
+   * retrieved during instantiation.
+   * <p>
+   * To ensure that filters and consumers know which attributes are available,
+   * the attributes must be added during instantiation. Filters and consumers
+   * are not required to check for availability of attributes in
+   * {@link #incrementToken()}.
+   * 
+   * @return false for end of stream; true otherwise
+   */
+  public abstract boolean incrementToken() throws IOException;
+  
+  /**
+   * This method is called by the consumer after the last token has been
+   * consumed, after {@link #incrementToken()} returned <code>false</code>
+   * (using the new <code>TokenStream</code> API). Streams implementing the old API
+   * should upgrade to use this feature.
+   * <p/>
+   * This method can be used to perform any end-of-stream operations, such as
+   * setting the final offset of a stream. The final offset of a stream might
+   * differ from the offset of the last token eg in case one or more whitespaces
+   * followed after the last token, but a WhitespaceTokenizer was used.
+   * <p>
+   * Additionally any skipped positions (such as those removed by a stopfilter)
+   * can be applied to the position increment, or any adjustment of other
+   * attributes where the end-of-stream value may be important.
+   * <p>
+   * If you override this method, always call {@code super.end()}.
+   * 
+   * @throws IOException If an I/O error occurs
+   */
+  public void end() throws IOException {
+    clearAttributes(); // LUCENE-3849: don't consume dirty atts
+    PositionIncrementAttribute posIncAtt = getAttribute(PositionIncrementAttribute.class);
+    if (posIncAtt != null) {
+      posIncAtt.setPositionIncrement(0);
+    }
   }
 
-  /** Resets this stream to the beginning. This is an
-   *  optional operation, so subclasses may or may not
-   *  implement this method. Reset() is not needed for
-   *  the standard indexing process. However, if the Tokens 
-   *  of a TokenStream are intended to be consumed more than 
-   *  once, it is necessary to implement reset().  Note that
-   *  if your TokenStream caches tokens and feeds them back
-   *  again after a reset, it is imperative that you
-   *  clone the tokens when you store them away (on the
-   *  first pass) as well as when you return them (on future
-   *  passes after reset()).
+  /**
+   * This method is called by a consumer before it begins consumption using
+   * {@link #incrementToken()}.
+   * <p>
+   * Resets this stream to a clean state. Stateful implementations must implement
+   * this method so that they can be reused, just as if they had been created fresh.
+   * <p>
+   * If you override this method, always call {@code super.reset()}, otherwise
+   * some internal state will not be correctly reset (e.g., {@link Tokenizer} will
+   * throw {@link IllegalStateException} on further usage).
    */
   public void reset() throws IOException {}
   
-  /** Releases resources associated with this stream. */
+  /** Releases resources associated with this stream.
+   * <p>
+   * If you override this method, always call {@code super.close()}, otherwise
+   * some internal state will not be correctly reset (e.g., {@link Tokenizer} will
+   * throw {@link IllegalStateException} on reuse).
+   */
+  @Override
   public void close() throws IOException {}
+  
 }

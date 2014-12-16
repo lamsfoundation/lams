@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,48 +18,44 @@ package org.apache.lucene.search;
  */
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
-
-/** A Scorer for queries with a required subscorer and an excluding (prohibited) subscorer.
+/** A Scorer for queries with a required subscorer
+ * and an excluding (prohibited) sub DocIdSetIterator.
  * <br>
- * This <code>Scorer</code> implements {@link Scorer#skipTo(int)},
+ * This <code>Scorer</code> implements {@link Scorer#advance(int)},
  * and it uses the skipTo() on the given scorers.
  */
-public class ReqExclScorer extends Scorer {
-  private Scorer reqScorer, exclScorer;
+class ReqExclScorer extends Scorer {
+  private Scorer reqScorer;
+  private DocIdSetIterator exclDisi;
+  private int doc = -1;
 
   /** Construct a <code>ReqExclScorer</code>.
    * @param reqScorer The scorer that must match, except where
-   * @param exclScorer indicates exclusion.
+   * @param exclDisi indicates exclusion.
    */
-  public ReqExclScorer(
-      Scorer reqScorer,
-      Scorer exclScorer) {
-    super(null); // No similarity used.
+  public ReqExclScorer(Scorer reqScorer, DocIdSetIterator exclDisi) {
+    super(reqScorer.weight);
     this.reqScorer = reqScorer;
-    this.exclScorer = exclScorer;
+    this.exclDisi = exclDisi;
   }
 
-  private boolean firstTime = true;
-  
-  public boolean next() throws IOException {
-    if (firstTime) {
-      if (! exclScorer.next()) {
-        exclScorer = null; // exhausted at start
-      }
-      firstTime = false;
-    }
+  @Override
+  public int nextDoc() throws IOException {
     if (reqScorer == null) {
-      return false;
+      return doc;
     }
-    if (! reqScorer.next()) {
+    doc = reqScorer.nextDoc();
+    if (doc == NO_MORE_DOCS) {
       reqScorer = null; // exhausted, nothing left
-      return false;
+      return doc;
     }
-    if (exclScorer == null) {
-      return true; // reqScorer.next() already returned true
+    if (exclDisi == null) {
+      return doc;
     }
-    return toNonExcluded();
+    return doc = toNonExcluded();
   }
   
   /** Advance to non excluded doc.
@@ -73,73 +69,68 @@ public class ReqExclScorer extends Scorer {
    * Advances reqScorer a non excluded required doc, if any.
    * @return true iff there is a non excluded required doc.
    */
-  private boolean toNonExcluded() throws IOException {
-    int exclDoc = exclScorer.doc();
+  private int toNonExcluded() throws IOException {
+    int exclDoc = exclDisi.docID();
+    int reqDoc = reqScorer.docID(); // may be excluded
     do {  
-      int reqDoc = reqScorer.doc(); // may be excluded
       if (reqDoc < exclDoc) {
-        return true; // reqScorer advanced to before exclScorer, ie. not excluded
+        return reqDoc; // reqScorer advanced to before exclScorer, ie. not excluded
       } else if (reqDoc > exclDoc) {
-        if (! exclScorer.skipTo(reqDoc)) {
-          exclScorer = null; // exhausted, no more exclusions
-          return true;
+        exclDoc = exclDisi.advance(reqDoc);
+        if (exclDoc == NO_MORE_DOCS) {
+          exclDisi = null; // exhausted, no more exclusions
+          return reqDoc;
         }
-        exclDoc = exclScorer.doc();
         if (exclDoc > reqDoc) {
-          return true; // not excluded
+          return reqDoc; // not excluded
         }
       }
-    } while (reqScorer.next());
+    } while ((reqDoc = reqScorer.nextDoc()) != NO_MORE_DOCS);
     reqScorer = null; // exhausted, nothing left
-    return false;
+    return NO_MORE_DOCS;
   }
 
-  public int doc() {
-    return reqScorer.doc(); // reqScorer may be null when next() or skipTo() already return false
+  @Override
+  public int docID() {
+    return doc;
   }
 
   /** Returns the score of the current document matching the query.
-   * Initially invalid, until {@link #next()} is called the first time.
+   * Initially invalid, until {@link #nextDoc()} is called the first time.
    * @return The score of the required scorer.
    */
+  @Override
   public float score() throws IOException {
     return reqScorer.score(); // reqScorer may be null when next() or skipTo() already return false
   }
   
-  /** Skips to the first match beyond the current whose document number is
-   * greater than or equal to a given target.
-   * <br>When this method is used the {@link #explain(int)} method should not be used.
-   * @param target The target document number.
-   * @return true iff there is such a match.
-   */
-  public boolean skipTo(int target) throws IOException {
-    if (firstTime) {
-      firstTime = false;
-      if (! exclScorer.skipTo(target)) {
-        exclScorer = null; // exhausted
-      }
-    }
-    if (reqScorer == null) {
-      return false;
-    }
-    if (exclScorer == null) {
-      return reqScorer.skipTo(target);
-    }
-    if (! reqScorer.skipTo(target)) {
-      reqScorer = null;
-      return false;
-    }
-    return toNonExcluded();
+  @Override
+  public int freq() throws IOException {
+    return reqScorer.freq();
   }
 
-  public Explanation explain(int doc) throws IOException {
-    Explanation res = new Explanation();
-    if (exclScorer.skipTo(doc) && (exclScorer.doc() == doc)) {
-      res.setDescription("excluded");
-    } else {
-      res.setDescription("not excluded");
-      res.addDetail(reqScorer.explain(doc));
+  @Override
+  public Collection<ChildScorer> getChildren() {
+    return Collections.singleton(new ChildScorer(reqScorer, "MUST"));
+  }
+
+  @Override
+  public int advance(int target) throws IOException {
+    if (reqScorer == null) {
+      return doc = NO_MORE_DOCS;
     }
-    return res;
+    if (exclDisi == null) {
+      return doc = reqScorer.advance(target);
+    }
+    if (reqScorer.advance(target) == NO_MORE_DOCS) {
+      reqScorer = null;
+      return doc = NO_MORE_DOCS;
+    }
+    return doc = toNonExcluded();
+  }
+
+  @Override
+  public long cost() {
+    return reqScorer.cost();
   }
 }

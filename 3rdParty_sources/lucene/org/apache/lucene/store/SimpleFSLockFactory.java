@@ -1,6 +1,6 @@
 package org.apache.lucene.store;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -22,12 +22,10 @@ import java.io.IOException;
 
 /**
  * <p>Implements {@link LockFactory} using {@link
- * File#createNewFile()}.  This is the default LockFactory
- * for {@link FSDirectory}.</p>
+ * File#createNewFile()}.</p>
  *
- * <p><b>NOTE:</b> the <a target="_top"
- * href="http://java.sun.com/j2se/1.4.2/docs/api/java/io/File.html#createNewFile()">javadocs
- * for <code>File.createNewFile</code></a> contain a vague
+ * <p><b>NOTE:</b> the {@linkplain File#createNewFile() javadocs
+ * for <code>File.createNewFile()</code>} contain a vague
  * yet spooky warning about not using the API for file
  * locking.  This warning was added due to <a target="_top"
  * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4676183">this
@@ -39,10 +37,18 @@ import java.io.IOException;
  * is hit when trying to create a writer, in which case you
  * need to explicitly clear the lock file first.  You can
  * either manually remove the file, or use the {@link
- * org.apache.lucene.index.IndexReader#unlock(Directory)}
+ * org.apache.lucene.index.IndexWriter#unlock(Directory)}
  * API.  But, first be certain that no writer is in fact
  * writing to the index otherwise you can easily corrupt
  * your index.</p>
+ *
+ * <p>Special care needs to be taken if you change the locking
+ * implementation: First be certain that no writer is in fact
+ * writing to the index otherwise you can easily corrupt
+ * your index. Be sure to do the LockFactory change all Lucene
+ * instances and clean up all leftover lock files before starting
+ * the new configuration for the first time. Different implementations
+ * can not work together!</p>
  *
  * <p>If you suspect that this or any other LockFactory is
  * not working properly in your environment, you can easily
@@ -52,24 +58,16 @@ import java.io.IOException;
  * @see LockFactory
  */
 
-public class SimpleFSLockFactory extends LockFactory {
-
-  /**
-   * Directory specified by <code>org.apache.lucene.lockDir</code>
-   * system property.  If that is not set, then <code>java.io.tmpdir</code>
-   * system property is used.
-   */
-
-  private File lockDir;
+public class SimpleFSLockFactory extends FSLockFactory {
 
   /**
    * Create a SimpleFSLockFactory instance, with null (unset)
-   * lock directory.  This is package-private and is only
-   * used by FSDirectory when creating this LockFactory via
-   * the System property
-   * org.apache.lucene.store.FSDirectoryLockFactoryClass.
+   * lock directory. When you pass this factory to a {@link FSDirectory}
+   * subclass, the lock directory is automatically set to the
+   * directory itself. Be sure to create one instance for each directory
+   * your create!
    */
-  SimpleFSLockFactory() throws IOException {
+  public SimpleFSLockFactory() {
     this((File) null);
   }
 
@@ -77,7 +75,7 @@ public class SimpleFSLockFactory extends LockFactory {
    * Instantiate using the provided directory (as a File instance).
    * @param lockDir where lock files should be created.
    */
-  public SimpleFSLockFactory(File lockDir) throws IOException {
+  public SimpleFSLockFactory(File lockDir) {
     setLockDir(lockDir);
   }
 
@@ -85,21 +83,11 @@ public class SimpleFSLockFactory extends LockFactory {
    * Instantiate using the provided directory name (String).
    * @param lockDirName where lock files should be created.
    */
-  public SimpleFSLockFactory(String lockDirName) throws IOException {
-    lockDir = new File(lockDirName);
-    setLockDir(lockDir);
+  public SimpleFSLockFactory(String lockDirName) {
+    setLockDir(new File(lockDirName));
   }
 
-  /**
-   * Set the lock directory.  This is package-private and is
-   * only used externally by FSDirectory when creating this
-   * LockFactory via the System property
-   * org.apache.lucene.store.FSDirectoryLockFactoryClass.
-   */
-  void setLockDir(File lockDir) throws IOException {
-    this.lockDir = lockDir;
-  }
-
+  @Override
   public Lock makeLock(String lockName) {
     if (lockPrefix != null) {
       lockName = lockPrefix + "-" + lockName;
@@ -107,6 +95,7 @@ public class SimpleFSLockFactory extends LockFactory {
     return new SimpleFSLock(lockDir, lockName);
   }
 
+  @Override
   public void clearLock(String lockName) throws IOException {
     if (lockDir.exists()) {
       if (lockPrefix != null) {
@@ -118,7 +107,7 @@ public class SimpleFSLockFactory extends LockFactory {
       }
     }
   }
-};
+}
 
 class SimpleFSLock extends Lock {
 
@@ -130,6 +119,7 @@ class SimpleFSLock extends Lock {
     lockFile = new File(lockDir, lockFileName);
   }
 
+  @Override
   public boolean obtain() throws IOException {
 
     // Ensure that lockDir exists and is a directory:
@@ -138,21 +128,36 @@ class SimpleFSLock extends Lock {
         throw new IOException("Cannot create directory: " +
                               lockDir.getAbsolutePath());
     } else if (!lockDir.isDirectory()) {
+      // TODO: NoSuchDirectoryException instead?
       throw new IOException("Found regular file where directory expected: " + 
                             lockDir.getAbsolutePath());
     }
-    return lockFile.createNewFile();
+    
+    try {
+      return lockFile.createNewFile();
+    } catch (IOException ioe) {
+      // On Windows, on concurrent createNewFile, the 2nd process gets "access denied".
+      // In that case, the lock was not aquired successfully, so return false.
+      // We record the failure reason here; the obtain with timeout (usually the
+      // one calling us) will use this as "root cause" if it fails to get the lock.
+      failureReason = ioe;
+      return false;
+    }
   }
 
-  public void release() throws LockReleaseFailedException {
-    if (lockFile.exists() && !lockFile.delete())
+  @Override
+  public void close() throws LockReleaseFailedException {
+    if (lockFile.exists() && !lockFile.delete()) {
       throw new LockReleaseFailedException("failed to delete " + lockFile);
+    }
   }
 
+  @Override
   public boolean isLocked() {
     return lockFile.exists();
   }
 
+  @Override
   public String toString() {
     return "SimpleFSLock@" + lockFile;
   }

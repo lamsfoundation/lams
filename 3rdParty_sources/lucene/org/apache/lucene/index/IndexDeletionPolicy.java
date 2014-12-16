@@ -1,6 +1,6 @@
 package org.apache.lucene.index;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,6 +19,8 @@ package org.apache.lucene.index;
 
 import java.util.List;
 import java.io.IOException;
+
+import org.apache.lucene.store.Directory;
 
 /**
  * <p>Expert: policy for deletion of stale {@link IndexCommit index commits}. 
@@ -46,9 +48,16 @@ import java.io.IOException;
  * target="top"
  * href="http://issues.apache.org/jira/browse/LUCENE-710">LUCENE-710</a>
  * for details.</p>
+ *
+ * <p>Implementers of sub-classes should make sure that {@link #clone()}
+ * returns an independent instance able to work with any other {@link IndexWriter}
+ * or {@link Directory} instance.</p>
  */
 
-public interface IndexDeletionPolicy {
+public abstract class IndexDeletionPolicy {
+
+  /** Sole constructor, typically called by sub-classes constructors. */
+  protected IndexDeletionPolicy() {}
 
   /**
    * <p>This is called once when a writer is first
@@ -69,8 +78,10 @@ public interface IndexDeletionPolicy {
    * @param commits List of current 
    * {@link IndexCommit point-in-time commits},
    *  sorted by age (the 0th one is the oldest commit).
+   *  Note that for a new index this method is invoked with
+   *  an empty list.
    */
-  public void onInit(List commits) throws IOException;
+  public abstract void onInit(List<? extends IndexCommit> commits) throws IOException;
 
   /**
    * <p>This is called each time the writer completed a commit.
@@ -81,13 +92,10 @@ public interface IndexDeletionPolicy {
    * by calling method {@link IndexCommit#delete delete()} 
    * of {@link IndexCommit}.</p>
    * 
-   * <p>If writer has <code>autoCommit = true</code> then
-   * this method will in general be called many times during
-   * one instance of {@link IndexWriter}.  If
-   * <code>autoCommit = false</code> then this method is
-   * only called once when {@link IndexWriter#close} is
-   * called, or not at all if the {@link IndexWriter#abort}
-   * is called. 
+   * <p>This method is only called when {@link
+   * IndexWriter#commit} or {@link IndexWriter#close} is
+   * called, or possibly not at all if the {@link
+   * IndexWriter#rollback} is called.
    *
    * <p><u>Note:</u> the last CommitPoint is the most recent one,
    * i.e. the "front index state". Be careful not to delete it,
@@ -97,5 +105,5 @@ public interface IndexDeletionPolicy {
    * @param commits List of {@link IndexCommit},
    *  sorted by age (the 0th one is the oldest commit).
    */
-  public void onCommit(List commits) throws IOException;
+  public abstract void onCommit(List<? extends IndexCommit> commits) throws IOException;
 }

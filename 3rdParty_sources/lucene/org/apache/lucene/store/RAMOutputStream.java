@@ -1,6 +1,6 @@
 package org.apache.lucene.store;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,17 +18,20 @@ package org.apache.lucene.store;
  */
 
 import java.io.IOException;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
+
+import org.apache.lucene.util.Accountable;
 
 /**
  * A memory-resident {@link IndexOutput} implementation.
- * 
- * @version $Id$
+ *
+ * @lucene.internal
  */
-
-public class RAMOutputStream extends IndexOutput {
+public class RAMOutputStream extends IndexOutput implements Accountable {
   static final int BUFFER_SIZE = 1024;
 
-  private RAMFile file;
+  private final RAMFile file;
 
   private byte[] currentBuffer;
   private int currentBufferIndex;
@@ -36,23 +39,30 @@ public class RAMOutputStream extends IndexOutput {
   private int bufferPosition;
   private long bufferStart;
   private int bufferLength;
+  
+  private final Checksum crc;
 
   /** Construct an empty output buffer. */
   public RAMOutputStream() {
-    this(new RAMFile());
+    this(new RAMFile(), false);
   }
 
-  RAMOutputStream(RAMFile f) {
+  public RAMOutputStream(RAMFile f, boolean checksum) {
     file = f;
 
     // make sure that we switch to the
     // first needed buffer lazily
     currentBufferIndex = -1;
     currentBuffer = null;
+    if (checksum) {
+      crc = new BufferedChecksum(new CRC32());
+    } else {
+      crc = null;
+    }
   }
 
   /** Copy the current contents of this buffer to the named output. */
-  public void writeTo(IndexOutput out) throws IOException {
+  public void writeTo(DataOutput out) throws IOException {
     flush();
     final long end = file.length;
     long pos = 0;
@@ -63,52 +73,67 @@ public class RAMOutputStream extends IndexOutput {
       if (nextPos > end) {                        // at the last buffer
         length = (int)(end - pos);
       }
-      out.writeBytes((byte[])file.getBuffer(buffer++), length);
+      out.writeBytes(file.getBuffer(buffer++), length);
       pos = nextPos;
     }
   }
 
-  /** Resets this to an empty buffer. */
-  public void reset() {
-    try {
-      seek(0);
-    } catch (IOException e) {                     // should never happen
-      throw new RuntimeException(e.toString());
+  /** Copy the current contents of this buffer to output
+   *  byte array */
+  public void writeTo(byte[] bytes, int offset) throws IOException {
+    flush();
+    final long end = file.length;
+    long pos = 0;
+    int buffer = 0;
+    int bytesUpto = offset;
+    while (pos < end) {
+      int length = BUFFER_SIZE;
+      long nextPos = pos + length;
+      if (nextPos > end) {                        // at the last buffer
+        length = (int)(end - pos);
+      }
+      System.arraycopy(file.getBuffer(buffer++), 0, bytes, bytesUpto, length);
+      bytesUpto += length;
+      pos = nextPos;
     }
-
-    file.setLength(0);
   }
 
+  /** Resets this to an empty file. */
+  public void reset() {
+    currentBuffer = null;
+    currentBufferIndex = -1;
+    bufferPosition = 0;
+    bufferStart = 0;
+    bufferLength = 0;
+    file.setLength(0);
+    if (crc != null) {
+      crc.reset();
+    }
+  }
+
+  @Override
   public void close() throws IOException {
     flush();
   }
 
-  public void seek(long pos) throws IOException {
-    // set the file length in case we seek back
-    // and flush() has not been called yet
-    setFileLength();
-    if (pos < bufferStart || pos >= bufferStart + bufferLength) {
-      currentBufferIndex = (int) (pos / BUFFER_SIZE);
-      switchCurrentBuffer();
-    }
-
-    bufferPosition = (int) (pos % BUFFER_SIZE);
-  }
-
-  public long length() {
-    return file.length;
-  }
-
+  @Override
   public void writeByte(byte b) throws IOException {
     if (bufferPosition == bufferLength) {
       currentBufferIndex++;
       switchCurrentBuffer();
     }
+    if (crc != null) {
+      crc.update(b);
+    }
     currentBuffer[bufferPosition++] = b;
   }
 
+  @Override
   public void writeBytes(byte[] b, int offset, int len) throws IOException {
     assert b != null;
+    if (crc != null) {
+      crc.update(b, offset, len);
+    }
     while (len > 0) {
       if (bufferPosition ==  bufferLength) {
         currentBufferIndex++;
@@ -124,11 +149,11 @@ public class RAMOutputStream extends IndexOutput {
     }
   }
 
-  private final void switchCurrentBuffer() throws IOException {
+  private final void switchCurrentBuffer() {
     if (currentBufferIndex == file.numBuffers()) {
       currentBuffer = file.addBuffer(BUFFER_SIZE);
     } else {
-      currentBuffer = (byte[]) file.getBuffer(currentBufferIndex);
+      currentBuffer = file.getBuffer(currentBufferIndex);
     }
     bufferPosition = 0;
     bufferStart = (long) BUFFER_SIZE * (long) currentBufferIndex;
@@ -142,17 +167,28 @@ public class RAMOutputStream extends IndexOutput {
     }
   }
 
+  @Override
   public void flush() throws IOException {
-    file.setLastModified(System.currentTimeMillis());
     setFileLength();
   }
 
+  @Override
   public long getFilePointer() {
     return currentBufferIndex < 0 ? 0 : bufferStart + bufferPosition;
   }
 
   /** Returns byte usage of all buffers. */
-  public long sizeInBytes() {
-    return file.numBuffers() * BUFFER_SIZE;
+  @Override
+  public long ramBytesUsed() {
+    return (long) file.numBuffers() * (long) BUFFER_SIZE;
+  }
+
+  @Override
+  public long getChecksum() throws IOException {
+    if (crc == null) {
+      throw new IllegalStateException("internal RAMOutputStream created with checksum disabled");
+    } else {
+      return crc.getValue();
+    }
   }
 }

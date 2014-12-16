@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,20 +17,35 @@ package org.apache.lucene.search;
  * limitations under the License.
  */
 
-/** Expert: Returned by low-level search implementations.
- * @see TopDocs */
-public class ScoreDoc implements java.io.Serializable {
-  /** Expert: The score of this document for the query. */
+/** Holds one hit in {@link TopDocs}. */
+
+public class ScoreDoc {
+
+  /** The score of this document for the query. */
   public float score;
 
-  /** Expert: A hit document's number.
-   * @see Searcher#doc(int)
-   */
+  /** A hit document's number.
+   * @see IndexSearcher#doc(int) */
   public int doc;
 
-  /** Expert: Constructs a ScoreDoc. */
+  /** Only set by {@link TopDocs#merge} */
+  public int shardIndex;
+
+  /** Constructs a ScoreDoc. */
   public ScoreDoc(int doc, float score) {
+    this(doc, score, -1);
+  }
+
+  /** Constructs a ScoreDoc. */
+  public ScoreDoc(int doc, float score, int shardIndex) {
     this.doc = doc;
     this.score = score;
+    this.shardIndex = shardIndex;
+  }
+  
+  // A convenience method for debugging.
+  @Override
+  public String toString() {
+    return "doc=" + doc + " score=" + score + " shardIndex=" + shardIndex;
   }
 }

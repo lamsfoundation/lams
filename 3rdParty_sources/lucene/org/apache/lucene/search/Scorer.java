@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,75 +18,85 @@ package org.apache.lucene.search;
  */
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+
+import org.apache.lucene.index.DocsEnum;
 
 /**
  * Expert: Common scoring functionality for different types of queries.
  *
  * <p>
- * A <code>Scorer</code> either iterates over documents matching a
- * query in increasing order of doc Id, or provides an explanation of
- * the score for a query for a given document.
+ * A <code>Scorer</code> iterates over documents matching a
+ * query in increasing order of doc Id.
  * </p>
  * <p>
  * Document scores are computed using a given <code>Similarity</code>
  * implementation.
  * </p>
- * @see BooleanQuery#setAllowDocsOutOfOrder
+ *
+ * <p><b>NOTE</b>: The values Float.Nan,
+ * Float.NEGATIVE_INFINITY and Float.POSITIVE_INFINITY are
+ * not valid scores.  Certain collectors (eg {@link
+ * TopScoreDocCollector}) will not properly collect hits
+ * with these scores.
  */
-public abstract class Scorer extends DocIdSetIterator {
-  private Similarity similarity;
+public abstract class Scorer extends DocsEnum {
+  /** the Scorer's parent Weight. in some cases this may be null */
+  // TODO can we clean this up?
+  protected final Weight weight;
 
-  /** Constructs a Scorer.
-   * @param similarity The <code>Similarity</code> implementation used by this scorer.
+  /**
+   * Constructs a Scorer
+   * @param weight The scorers <code>Weight</code>.
    */
-  protected Scorer(Similarity similarity) {
-    this.similarity = similarity;
-  }
-
-  /** Returns the Similarity implementation used by this scorer. */
-  public Similarity getSimilarity() {
-    return this.similarity;
-  }
-
-  /** Scores and collects all matching documents.
-   * @param hc The collector to which all matching documents are passed through
-   * {@link HitCollector#collect(int, float)}.
-   * <br>When this method is used the {@link #explain(int)} method should not be used.
-   */
-  public void score(HitCollector hc) throws IOException {
-    while (next()) {
-      hc.collect(doc(), score());
-    }
-  }
-
-  /** Expert: Collects matching documents in a range.  Hook for optimization.
-   * Note that {@link #next()} must be called once before this method is called
-   * for the first time.
-   * @param hc The collector to which all matching documents are passed through
-   * {@link HitCollector#collect(int, float)}.
-   * @param max Do not score documents past this.
-   * @return true if more matching documents may remain.
-   */
-  protected boolean score(HitCollector hc, int max) throws IOException {
-    while (doc() < max) {
-      hc.collect(doc(), score());
-      if (!next())
-        return false;
-    }
-    return true;
+  protected Scorer(Weight weight) {
+    this.weight = weight;
   }
 
   /** Returns the score of the current document matching the query.
-   * Initially invalid, until {@link #next()} or {@link #skipTo(int)}
-   * is called the first time.
+   * Initially invalid, until {@link #nextDoc()} or {@link #advance(int)}
+   * is called the first time, or when called from within
+   * {@link Collector#collect}.
    */
   public abstract float score() throws IOException;
-
-  /** Returns an explanation of the score for a document.
-   * <br>When this method is used, the {@link #next()}, {@link #skipTo(int)} and
-   * {@link #score(HitCollector)} methods should not be used.
-   * @param doc The document number for the explanation.
+  
+  /** returns parent Weight
+   * @lucene.experimental
    */
-  public abstract Explanation explain(int doc) throws IOException;
-
+  public Weight getWeight() {
+    return weight;
+  }
+  
+  /** Returns child sub-scorers
+   * @lucene.experimental */
+  public Collection<ChildScorer> getChildren() {
+    return Collections.emptyList();
+  }
+  
+  /** A child Scorer and its relationship to its parent.
+   * the meaning of the relationship depends upon the parent query. 
+   * @lucene.experimental */
+  public static class ChildScorer {
+    /**
+     * Child Scorer. (note this is typically a direct child, and may
+     * itself also have children).
+     */
+    public final Scorer child;
+    /**
+     * An arbitrary string relating this scorer to the parent.
+     */
+    public final String relationship;
+    
+    /**
+     * Creates a new ChildScorer node with the specified relationship.
+     * <p>
+     * The relationship can be any be any string that makes sense to 
+     * the parent Scorer. 
+     */
+    public ChildScorer(Scorer child, String relationship) {
+      this.child = child;
+      this.relationship = relationship;
+    }
+  }
 }

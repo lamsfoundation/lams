@@ -1,6 +1,6 @@
 package org.apache.lucene.index;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,23 +17,33 @@ package org.apache.lucene.index;
  * limitations under the License.
  */
 
+import java.io.Closeable;
 import java.io.IOException;
 
 /** <p>Expert: {@link IndexWriter} uses an instance
  *  implementing this interface to execute the merges
  *  selected by a {@link MergePolicy}.  The default
  *  MergeScheduler is {@link ConcurrentMergeScheduler}.</p>
- * <p><b>NOTE:</b> This API is new and still experimental
- * (subject to change suddenly in the next release)</p>
+ *  <p>Implementers of sub-classes should make sure that {@link #clone()}
+ *  returns an independent instance able to work with any {@link IndexWriter}
+ *  instance.</p>
+ * @lucene.experimental
 */
+public abstract class MergeScheduler implements Closeable {
 
-public abstract class MergeScheduler {
+  /** Sole constructor. (For invocation by subclass 
+   *  constructors, typically implicit.) */
+  protected MergeScheduler() {
+  }
 
-  /** Run the merges provided by {@link IndexWriter#getNextMerge()}. */
-  abstract void merge(IndexWriter writer)
-    throws CorruptIndexException, IOException;
+  /** Run the merges provided by {@link IndexWriter#getNextMerge()}.
+   * @param writer the {@link IndexWriter} to obtain the merges from.
+   * @param trigger the {@link MergeTrigger} that caused this merge to happen
+   * @param newMergesFound <code>true</code> iff any new merges were found by the caller otherwise <code>false</code>
+   * */
+  public abstract void merge(IndexWriter writer, MergeTrigger trigger, boolean newMergesFound) throws IOException;
 
   /** Close this MergeScheduler. */
-  abstract void close()
-    throws CorruptIndexException, IOException;
+  @Override
+  public abstract void close() throws IOException;
 }

@@ -1,6 +1,6 @@
 package org.apache.lucene.search.spans;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,13 +17,19 @@ package org.apache.lucene.search.spans;
  * limitations under the License.
  */
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.DocsAndPositionsEnum;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.index.TermState;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.ToStringUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /** Matches spans containing a term. */
@@ -36,23 +42,17 @@ public class SpanTermQuery extends SpanQuery {
   /** Return the term whose spans are matched. */
   public Term getTerm() { return term; }
 
+  @Override
   public String getField() { return term.field(); }
   
-  /** Returns a collection of all terms matched by this query.
-   * @deprecated use extractTerms instead
-   * @see #extractTerms(Set)
-   */
-  public Collection getTerms() {
-    Collection terms = new ArrayList();
+  @Override
+  public void extractTerms(Set<Term> terms) {
     terms.add(term);
-    return terms;
-  }
-  public void extractTerms(Set terms) {
-	  terms.add(term);
   }
 
+  @Override
   public String toString(String field) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     if (term.field().equals(field))
       buffer.append(term.text());
     else
@@ -61,27 +61,72 @@ public class SpanTermQuery extends SpanQuery {
     return buffer.toString();
   }
 
-  /** Returns true iff <code>o</code> is equal to this. */
-  public boolean equals(Object o) {
-    if (!(o instanceof SpanTermQuery))
-      return false;
-    SpanTermQuery other = (SpanTermQuery)o;
-    return (this.getBoost() == other.getBoost())
-      && this.term.equals(other.term);
-  }
-
-  /** Returns a hash code value for this object.*/
+  @Override
   public int hashCode() {
-    return Float.floatToIntBits(getBoost()) ^ term.hashCode() ^ 0xD23FE494;
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((term == null) ? 0 : term.hashCode());
+    return result;
   }
 
-  public Spans getSpans(final IndexReader reader) throws IOException {
-    return new TermSpans(reader.termPositions(term), term);
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    SpanTermQuery other = (SpanTermQuery) obj;
+    if (term == null) {
+      if (other.term != null)
+        return false;
+    } else if (!term.equals(other.term))
+      return false;
+    return true;
   }
 
+  @Override
+  public Spans getSpans(final AtomicReaderContext context, Bits acceptDocs, Map<Term,TermContext> termContexts) throws IOException {
+    TermContext termContext = termContexts.get(term);
+    final TermState state;
+    if (termContext == null) {
+      // this happens with span-not query, as it doesn't include the NOT side in extractTerms()
+      // so we seek to the term now in this segment..., this sucks because its ugly mostly!
+      final Fields fields = context.reader().fields();
+      if (fields != null) {
+        final Terms terms = fields.terms(term.field());
+        if (terms != null) {
+          final TermsEnum termsEnum = terms.iterator(null);
+          if (termsEnum.seekExact(term.bytes())) { 
+            state = termsEnum.termState();
+          } else {
+            state = null;
+          }
+        } else {
+          state = null;
+        }
+      } else {
+        state = null;
+      }
+    } else {
+      state = termContext.get(context.ord);
+    }
+    
+    if (state == null) { // term is not present in that reader
+      return TermSpans.EMPTY_TERM_SPANS;
+    }
+    
+    final TermsEnum termsEnum = context.reader().terms(term.field()).iterator(null);
+    termsEnum.seekExact(term.bytes(), state);
+    
+    final DocsAndPositionsEnum postings = termsEnum.docsAndPositions(acceptDocs, null, DocsAndPositionsEnum.FLAG_PAYLOADS);
 
-  public PayloadSpans getPayloadSpans(IndexReader reader) throws IOException {
-    return (PayloadSpans) getSpans(reader);
+    if (postings != null) {
+      return new TermSpans(postings, term);
+    } else {
+      // term does exist, but has no positions
+      throw new IllegalStateException("field \"" + term.field() + "\" was indexed without position data; cannot run SpanTermQuery (term=" + term.text() + ")");
+    }
   }
-
 }

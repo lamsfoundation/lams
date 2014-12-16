@@ -1,6 +1,6 @@
 package org.apache.lucene.store;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,7 +17,6 @@ package org.apache.lucene.store;
  * limitations under the License.
  */
 
-import java.net.Socket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,80 +37,68 @@ import java.io.OutputStream;
 
 public class VerifyingLockFactory extends LockFactory {
 
-  LockFactory lf;
-  byte id;
-  String host;
-  int port;
+  final LockFactory lf;
+  final InputStream in;
+  final OutputStream out;
 
   private class CheckedLock extends Lock {
-    private Lock lock;
+    private final Lock lock;
 
     public CheckedLock(Lock lock) {
       this.lock = lock;
     }
 
-    private void verify(byte message) {
-      try {
-        Socket s = new Socket(host, port);
-        OutputStream out = s.getOutputStream();
-        out.write(id);
-        out.write(message);
-        InputStream in = s.getInputStream();
-        int result = in.read();
-        in.close();
-        out.close();
-        s.close();
-        if (result != 0)
-          throw new RuntimeException("lock was double acquired");
-      } catch (Exception e) {
-        throw new RuntimeException(e);
+    private void verify(byte message) throws IOException {
+      out.write(message);
+      out.flush();
+      final int ret = in.read();
+      if (ret < 0) {
+        throw new IllegalStateException("Lock server died because of locking error.");
+      }
+      if (ret != message) {
+        throw new IOException("Protocol violation.");
       }
     }
 
-    public synchronized boolean obtain(long lockWaitTimeout)
-      throws LockObtainFailedException, IOException {
-      boolean obtained = lock.obtain(lockWaitTimeout);
+    @Override
+    public synchronized boolean obtain() throws IOException {
+      boolean obtained = lock.obtain();
       if (obtained)
         verify((byte) 1);
       return obtained;
     }
 
-    public synchronized boolean obtain()
-      throws LockObtainFailedException, IOException {
-      return lock.obtain();
-    }
-
-    public synchronized boolean isLocked() {
+    @Override
+    public synchronized boolean isLocked() throws IOException {
       return lock.isLocked();
     }
 
-    public synchronized void release() throws IOException {
+    @Override
+    public synchronized void close() throws IOException {
       if (isLocked()) {
         verify((byte) 0);
-        lock.release();
+        lock.close();
       }
     }
   }
 
   /**
-   * @param id should be a unique id across all clients
    * @param lf the LockFactory that we are testing
-   * @param host host or IP where {@link LockVerifyServer}
-            is running
-   * @param port the port {@link LockVerifyServer} is
-            listening on
+   * @param in the socket's input to {@link LockVerifyServer}
+   * @param out the socket's output to {@link LockVerifyServer}
   */
-  public VerifyingLockFactory(byte id, LockFactory lf, String host, int port) throws IOException {
-    this.id = id;
+  public VerifyingLockFactory(LockFactory lf, InputStream in, OutputStream out) throws IOException {
     this.lf = lf;
-    this.host = host;
-    this.port = port;
+    this.in = in;
+    this.out = out;
   }
 
+  @Override
   public synchronized Lock makeLock(String lockName) {
     return new CheckedLock(lf.makeLock(lockName));
   }
 
+  @Override
   public synchronized void clearLock(String lockName)
     throws IOException {
     lf.clearLock(lockName);

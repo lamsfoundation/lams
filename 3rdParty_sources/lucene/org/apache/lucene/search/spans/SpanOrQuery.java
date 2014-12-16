@@ -1,6 +1,6 @@
 package org.apache.lucene.search.spans;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -23,71 +23,80 @@ import java.util.List;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.PriorityQueue;
 import org.apache.lucene.util.ToStringUtils;
 import org.apache.lucene.search.Query;
 
 /** Matches the union of its clauses.*/
-public class SpanOrQuery extends SpanQuery {
-  private List clauses;
+public class SpanOrQuery extends SpanQuery implements Cloneable {
+  private List<SpanQuery> clauses;
   private String field;
 
   /** Construct a SpanOrQuery merging the provided clauses. */
-  public SpanOrQuery(SpanQuery[] clauses) {
+  public SpanOrQuery(SpanQuery... clauses) {
 
     // copy clauses array into an ArrayList
-    this.clauses = new ArrayList(clauses.length);
+    this.clauses = new ArrayList<>(clauses.length);
     for (int i = 0; i < clauses.length; i++) {
-      SpanQuery clause = clauses[i];
-      if (i == 0) {                               // check field
-        field = clause.getField();
-      } else if (!clause.getField().equals(field)) {
-        throw new IllegalArgumentException("Clauses must have same field.");
-      }
-      this.clauses.add(clause);
+      addClause(clauses[i]);
     }
   }
 
-  /** Return the clauses whose spans are matched. */
-  public SpanQuery[] getClauses() {
-    return (SpanQuery[])clauses.toArray(new SpanQuery[clauses.size()]);
-  }
-
-  public String getField() { return field; }
-
-  /** Returns a collection of all terms matched by this query.
-   * @deprecated use extractTerms instead
-   * @see #extractTerms(Set)
-   */
-  public Collection getTerms() {
-    Collection terms = new ArrayList();
-    Iterator i = clauses.iterator();
-    while (i.hasNext()) {
-      SpanQuery clause = (SpanQuery)i.next();
-      terms.addAll(clause.getTerms());
+  /** Adds a clause to this query */
+  public final void addClause(SpanQuery clause) {
+    if (field == null) {
+      field = clause.getField();
+    } else if (clause.getField() != null && !clause.getField().equals(field)) {
+      throw new IllegalArgumentException("Clauses must have same field.");
     }
-    return terms;
+    this.clauses.add(clause);
   }
   
-  public void extractTerms(Set terms) {
-    Iterator i = clauses.iterator();
-    while (i.hasNext()) {
-      SpanQuery clause = (SpanQuery)i.next();
+  /** Return the clauses whose spans are matched. */
+  public SpanQuery[] getClauses() {
+    return clauses.toArray(new SpanQuery[clauses.size()]);
+  }
+
+  @Override
+  public String getField() { return field; }
+
+  @Override
+  public void extractTerms(Set<Term> terms) {
+    for(final SpanQuery clause: clauses) {
       clause.extractTerms(terms);
     }
   }
+  
+  @Override
+  public SpanOrQuery clone() {
+    int sz = clauses.size();
+    SpanQuery[] newClauses = new SpanQuery[sz];
 
+    for (int i = 0; i < sz; i++) {
+      newClauses[i] = (SpanQuery) clauses.get(i).clone();
+    }
+    SpanOrQuery soq = new SpanOrQuery(newClauses);
+    soq.setBoost(getBoost());
+    return soq;
+  }
+
+  @Override
   public Query rewrite(IndexReader reader) throws IOException {
     SpanOrQuery clone = null;
     for (int i = 0 ; i < clauses.size(); i++) {
-      SpanQuery c = (SpanQuery)clauses.get(i);
+      SpanQuery c = clauses.get(i);
       SpanQuery query = (SpanQuery) c.rewrite(reader);
       if (query != c) {                     // clause rewrote: must clone
         if (clone == null)
-          clone = (SpanOrQuery) this.clone();
+          clone = this.clone();
         clone.clauses.set(i,query);
       }
     }
@@ -98,12 +107,13 @@ public class SpanOrQuery extends SpanQuery {
     }
   }
 
+  @Override
   public String toString(String field) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("spanOr([");
-    Iterator i = clauses.iterator();
+    Iterator<SpanQuery> i = clauses.iterator();
     while (i.hasNext()) {
-      SpanQuery clause = (SpanQuery)i.next();
+      SpanQuery clause = i.next();
       buffer.append(clause.toString(field));
       if (i.hasNext()) {
         buffer.append(", ");
@@ -114,6 +124,7 @@ public class SpanOrQuery extends SpanQuery {
     return buffer.toString();
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
@@ -121,11 +132,11 @@ public class SpanOrQuery extends SpanQuery {
     final SpanOrQuery that = (SpanOrQuery) o;
 
     if (!clauses.equals(that.clauses)) return false;
-    if (!field.equals(that.field)) return false;
 
     return getBoost() == that.getBoost();
   }
 
+  @Override
   public int hashCode() {
     int h = clauses.hashCode();
     h ^= (h << 10) | (h >>> 23);
@@ -134,14 +145,13 @@ public class SpanOrQuery extends SpanQuery {
   }
 
 
-  private class SpanQueue extends PriorityQueue {
+  private class SpanQueue extends PriorityQueue<Spans> {
     public SpanQueue(int size) {
-      initialize(size);
+      super(size);
     }
 
-    protected final boolean lessThan(Object o1, Object o2) {
-      Spans spans1 = (Spans)o1;
-      Spans spans2 = (Spans)o2;
+    @Override
+    protected final boolean lessThan(Spans spans1, Spans spans2) {
       if (spans1.doc() == spans2.doc()) {
         if (spans1.start() == spans2.start()) {
           return spans1.end() < spans2.end();
@@ -154,30 +164,30 @@ public class SpanOrQuery extends SpanQuery {
     }
   }
 
-  public PayloadSpans getPayloadSpans(final IndexReader reader) throws IOException {
-    return (PayloadSpans)getSpans(reader);
-  }
-
-  public Spans getSpans(final IndexReader reader) throws IOException {
+  @Override
+  public Spans getSpans(final AtomicReaderContext context, final Bits acceptDocs, final Map<Term,TermContext> termContexts) throws IOException {
     if (clauses.size() == 1)                      // optimize 1-clause case
-      return ((SpanQuery)clauses.get(0)).getPayloadSpans(reader);
+      return (clauses.get(0)).getSpans(context, acceptDocs, termContexts);
 
-    return new PayloadSpans() {
+    return new Spans() {
         private SpanQueue queue = null;
+        private long cost;
 
         private boolean initSpanQueue(int target) throws IOException {
           queue = new SpanQueue(clauses.size());
-          Iterator i = clauses.iterator();
+          Iterator<SpanQuery> i = clauses.iterator();
           while (i.hasNext()) {
-            PayloadSpans spans = ((SpanQuery)i.next()).getPayloadSpans(reader);
+            Spans spans = i.next().getSpans(context, acceptDocs, termContexts);
+            cost += spans.cost();
             if (   ((target == -1) && spans.next())
                 || ((target != -1) && spans.skipTo(target))) {
-              queue.put(spans);
+              queue.add(spans);
             }
           }
           return queue.size() != 0;
         }
 
+        @Override
         public boolean next() throws IOException {
           if (queue == null) {
             return initSpanQueue(-1);
@@ -188,7 +198,7 @@ public class SpanOrQuery extends SpanQuery {
           }
 
           if (top().next()) { // move to next
-            queue.adjustTop();
+            queue.updateTop();
             return true;
           }
 
@@ -196,50 +206,65 @@ public class SpanOrQuery extends SpanQuery {
           return queue.size() != 0;
         }
 
-        private PayloadSpans top() { return (PayloadSpans)queue.top(); }
+        private Spans top() { return queue.top(); }
 
+        @Override
         public boolean skipTo(int target) throws IOException {
           if (queue == null) {
             return initSpanQueue(target);
           }
-
+  
+          boolean skipCalled = false;
           while (queue.size() != 0 && top().doc() < target) {
             if (top().skipTo(target)) {
-              queue.adjustTop();
+              queue.updateTop();
             } else {
               queue.pop();
             }
+            skipCalled = true;
           }
-
-          return queue.size() != 0;
+  
+          if (skipCalled) {
+            return queue.size() != 0;
+          }
+          return next();
         }
 
+        @Override
         public int doc() { return top().doc(); }
+        @Override
         public int start() { return top().start(); }
+        @Override
         public int end() { return top().end(); }
 
-      // TODO: Remove warning after API has been finalized
-      public Collection/*<byte[]>*/ getPayload() throws IOException {
-        ArrayList result = null;
-        PayloadSpans theTop = top();
+      @Override
+      public Collection<byte[]> getPayload() throws IOException {
+        ArrayList<byte[]> result = null;
+        Spans theTop = top();
         if (theTop != null && theTop.isPayloadAvailable()) {
-          result = new ArrayList(theTop.getPayload());
+          result = new ArrayList<>(theTop.getPayload());
         }
         return result;
       }
 
-      // TODO: Remove warning after API has been finalized
-     public boolean isPayloadAvailable() {
-        PayloadSpans top = top();
+      @Override
+      public boolean isPayloadAvailable() throws IOException {
+        Spans top = top();
         return top != null && top.isPayloadAvailable();
       }
 
+      @Override
       public String toString() {
           return "spans("+SpanOrQuery.this+")@"+
             ((queue == null)?"START"
              :(queue.size()>0?(doc()+":"+start()+"-"+end()):"END"));
         }
 
+      @Override
+      public long cost() {
+        return cost;
+      }
+      
       };
   }
 

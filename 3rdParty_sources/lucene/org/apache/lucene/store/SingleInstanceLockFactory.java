@@ -1,6 +1,6 @@
 package org.apache.lucene.store;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -33,8 +33,9 @@ import java.util.HashSet;
 
 public class SingleInstanceLockFactory extends LockFactory {
 
-  private HashSet locks = new HashSet();
+  private HashSet<String> locks = new HashSet<>();
 
+  @Override
   public Lock makeLock(String lockName) {
     // We do not use the LockPrefix at all, because the private
     // HashSet instance effectively scopes the locking to this
@@ -42,6 +43,7 @@ public class SingleInstanceLockFactory extends LockFactory {
     return new SingleInstanceLock(locks, lockName);
   }
 
+  @Override
   public void clearLock(String lockName) throws IOException {
     synchronized(locks) {
       if (locks.contains(lockName)) {
@@ -49,37 +51,41 @@ public class SingleInstanceLockFactory extends LockFactory {
       }
     }
   }
-};
+}
 
 class SingleInstanceLock extends Lock {
 
   String lockName;
-  private HashSet locks;
+  private HashSet<String> locks;
 
-  public SingleInstanceLock(HashSet locks, String lockName) {
+  public SingleInstanceLock(HashSet<String> locks, String lockName) {
     this.locks = locks;
     this.lockName = lockName;
   }
 
+  @Override
   public boolean obtain() throws IOException {
     synchronized(locks) {
       return locks.add(lockName);
     }
   }
 
-  public void release() {
+  @Override
+  public void close() {
     synchronized(locks) {
       locks.remove(lockName);
     }
   }
 
+  @Override
   public boolean isLocked() {
     synchronized(locks) {
       return locks.contains(lockName);
     }
   }
 
+  @Override
   public String toString() {
-      return "SingleInstanceLock: " + lockName;
+    return super.toString() + ": " + lockName;
   }
 }

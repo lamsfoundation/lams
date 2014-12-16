@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,35 +17,44 @@ package org.apache.lucene.search;
  * limitations under the License.
  */
 
-import java.util.BitSet;
 import java.io.IOException;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.util.DocIdBitSet;
 
-/** Abstract base class providing a mechanism to use a subset of an index
- *  for restriction or permission of index search results.
- *  <p>
- *  <b>Note:</b> In Lucene 3.0 {@link #bits(IndexReader)} will be removed
- *  and {@link #getDocIdSet(IndexReader)} will be defined as abstract.
- *  All implementing classes must therefore implement {@link #getDocIdSet(IndexReader)}
- *  in order to work with Lucene 3.0.
+import org.apache.lucene.index.AtomicReader; // javadocs
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.util.Bits;
+
+/** 
+ *  Abstract base class for restricting which documents may
+ *  be returned during searching.
  */
-public abstract class Filter implements java.io.Serializable {
+public abstract class Filter {
+  
   /**
-   * @return A BitSet with true for documents which should be permitted in
-   * search results, and false for those that should not.
-   * @deprecated Use {@link #getDocIdSet(IndexReader)} instead.
+   * Creates a {@link DocIdSet} enumerating the documents that should be
+   * permitted in search results. <b>NOTE:</b> null can be
+   * returned if no documents are accepted by this Filter.
+   * <p>
+   * Note: This method will be called once per segment in
+   * the index during searching.  The returned {@link DocIdSet}
+   * must refer to document IDs for that segment, not for
+   * the top-level reader.
+   * 
+   * @param context a {@link AtomicReaderContext} instance opened on the index currently
+   *         searched on. Note, it is likely that the provided reader info does not
+   *         represent the whole underlying index i.e. if the index has more than
+   *         one segment the given reader only represents a single segment.
+   *         The provided context is always an atomic context, so you can call 
+   *         {@link AtomicReader#fields()}
+   *         on the context's reader, for example.
+   *
+   * @param acceptDocs
+   *          Bits that represent the allowable docs to match (typically deleted docs
+   *          but possibly filtering other documents)
+   *          
+   * @return a DocIdSet that provides the documents which should be permitted or
+   *         prohibited in search results. <b>NOTE:</b> <code>null</code> should be returned if
+   *         the filter doesn't accept any documents otherwise internal optimization might not apply
+   *         in the case an <i>empty</i> {@link DocIdSet} is returned.
    */
-  public BitSet bits(IndexReader reader) throws IOException {
-    return null;
-  }
-	
-  /**
-   * @return a DocIdSet that provides the documents which should be
-   * permitted or prohibited in search results.
-   * @see DocIdBitSet
-   */
-  public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-    return new DocIdBitSet(bits(reader));
-  }
+  public abstract DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException;
 }

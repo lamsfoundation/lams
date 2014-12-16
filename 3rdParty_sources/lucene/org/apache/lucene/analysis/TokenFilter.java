@@ -1,6 +1,6 @@
 package org.apache.lucene.analysis;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,30 +19,54 @@ package org.apache.lucene.analysis;
 
 import java.io.IOException;
 
-/** A TokenFilter is a TokenStream whose input is another token stream.
+/** A TokenFilter is a TokenStream whose input is another TokenStream.
   <p>
-  This is an abstract class.
-  NOTE: subclasses must override {@link #next(Token)}.  It's
-  also OK to instead override {@link #next()} but that
-  method is now deprecated in favor of {@link #next(Token)}.
+  This is an abstract class; subclasses must override {@link #incrementToken()}.
+  @see TokenStream
   */
 public abstract class TokenFilter extends TokenStream {
   /** The source of tokens for this filter. */
-  protected TokenStream input;
+  protected final TokenStream input;
 
   /** Construct a token stream filtering the given input. */
   protected TokenFilter(TokenStream input) {
+    super(input);
     this.input = input;
   }
-
-  /** Close the input TokenStream. */
+  
+  /** 
+   * {@inheritDoc}
+   * <p> 
+   * <b>NOTE:</b> 
+   * The default implementation chains the call to the input TokenStream, so
+   * be sure to call <code>super.end()</code> first when overriding this method.
+   */
+  @Override
+  public void end() throws IOException {
+    input.end();
+  }
+  
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <b>NOTE:</b> 
+   * The default implementation chains the call to the input TokenStream, so
+   * be sure to call <code>super.close()</code> when overriding this method.
+   */
+  @Override
   public void close() throws IOException {
     input.close();
   }
 
-  /** Reset the filter as well as the input TokenStream. */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <b>NOTE:</b> 
+   * The default implementation chains the call to the input TokenStream, so
+   * be sure to call <code>super.reset()</code> when overriding this method.
+   */
+  @Override
   public void reset() throws IOException {
-    super.reset();
     input.reset();
   }
 }

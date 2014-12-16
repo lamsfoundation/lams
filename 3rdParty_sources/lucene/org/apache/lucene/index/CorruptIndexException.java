@@ -1,4 +1,6 @@
-/**
+package org.apache.lucene.index;
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,8 +17,6 @@
  * limitations under the License.
  */
 
-package org.apache.lucene.index;
-
 import java.io.IOException;
 
 /**
@@ -24,7 +24,13 @@ import java.io.IOException;
  * an inconsistency in the index.
  */
 public class CorruptIndexException extends IOException {
+  /** Create exception with a message only */
   public CorruptIndexException(String message) {
     super(message);
+  }
+  
+  /** Create exception with message and root cause. */
+  public CorruptIndexException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

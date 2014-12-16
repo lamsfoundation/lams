@@ -1,6 +1,6 @@
 package org.apache.lucene.store;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,10 +17,13 @@ package org.apache.lucene.store;
  * limitations under the License.
  */
 
+import java.io.Closeable;
 import java.io.IOException;
 
+import org.apache.lucene.util.ThreadInterruptedException;
+
 /** An interprocess mutex lock.
- * <p>Typical use might look like:<pre>
+ * <p>Typical use might look like:<pre class="prettyprint">
  * new Lock.With(directory.makeLock("my.lock")) {
  *     public Object doBody() {
  *       <i>... code to execute while locked ...</i>
@@ -28,11 +31,11 @@ import java.io.IOException;
  *   }.run();
  * </pre>
  *
- *
- * @version $Id$
  * @see Directory#makeLock(String)
+ *
+ * @lucene.internal
  */
-public abstract class Lock {
+public abstract class Lock implements Closeable {
 
   /** How long {@link #obtain(long)} waits, in milliseconds,
    *  in between attempts to acquire the lock. */
@@ -43,7 +46,8 @@ public abstract class Lock {
   public static final long LOCK_OBTAIN_WAIT_FOREVER = -1;
 
   /** Attempts to obtain exclusive access and immediately return
-   *  upon success or failure.
+   *  upon success or failure.  Use {@link #close} to
+   *  release the lock.
    * @return true iff exclusive access is obtained
    */
   public abstract boolean obtain() throws IOException;
@@ -68,7 +72,7 @@ public abstract class Lock {
    *         out of bounds
    * @throws IOException if obtain() throws IOException
    */
-  public boolean obtain(long lockWaitTimeout) throws LockObtainFailedException, IOException {
+  public final boolean obtain(long lockWaitTimeout) throws IOException {
     failureReason = null;
     boolean locked = obtain();
     if (lockWaitTimeout < 0 && lockWaitTimeout != LOCK_OBTAIN_WAIT_FOREVER)
@@ -82,16 +86,12 @@ public abstract class Lock {
         if (failureReason != null) {
           reason += ": " + failureReason;
         }
-        LockObtainFailedException e = new LockObtainFailedException(reason);
-        if (failureReason != null) {
-          e.initCause(failureReason);
-        }
-        throw e;
+        throw new LockObtainFailedException(reason, failureReason);
       }
       try {
         Thread.sleep(LOCK_POLL_INTERVAL);
-      } catch (InterruptedException e) {
-        throw new IOException(e.toString());
+      } catch (InterruptedException ie) {
+        throw new ThreadInterruptedException(ie);
       }
       locked = obtain();
     }
@@ -99,11 +99,11 @@ public abstract class Lock {
   }
 
   /** Releases exclusive access. */
-  public abstract void release() throws IOException;
+  public abstract void close() throws IOException;
 
   /** Returns true if the resource is currently locked.  Note that one must
    * still call {@link #obtain()} before using the resource. */
-  public abstract boolean isLocked();
+  public abstract boolean isLocked() throws IOException;
 
 
   /** Utility class for executing code with exclusive access. */
@@ -129,14 +129,15 @@ public abstract class Lock {
      * be obtained
      * @throws IOException if {@link Lock#obtain} throws IOException
      */
-    public Object run() throws LockObtainFailedException, IOException {
+    public Object run() throws IOException {
       boolean locked = false;
       try {
          locked = lock.obtain(lockWaitTimeout);
          return doBody();
       } finally {
-        if (locked)
-	      lock.release();
+        if (locked) {
+          lock.close();
+        }
       }
     }
   }

@@ -1,6 +1,6 @@
 package org.apache.lucene.index;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,372 +19,113 @@ package org.apache.lucene.index;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.search.DefaultSimilarity;
-import org.apache.lucene.store.BufferedIndexInput;
+import org.apache.lucene.codecs.Codec;
+import org.apache.lucene.codecs.DocValuesFormat;
+import org.apache.lucene.codecs.DocValuesProducer;
+import org.apache.lucene.codecs.FieldInfosFormat;
+import org.apache.lucene.codecs.StoredFieldsReader;
+import org.apache.lucene.codecs.TermVectorsReader;
+import org.apache.lucene.index.FieldInfo.DocValuesType;
+import org.apache.lucene.store.CompoundFileDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.util.BitVector;
+import org.apache.lucene.store.IOContext;
+import org.apache.lucene.util.Accountable;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.CloseableThreadLocal;
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.RamUsageEstimator;
+import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.util.Version;
 
 /**
- * @version $Id$
+ * IndexReader implementation over a single segment. 
+ * <p>
+ * Instances pointing to the same segment (but with different deletes, etc)
+ * may share the same core data.
+ * @lucene.experimental
  */
-class SegmentReader extends DirectoryIndexReader {
-  private String segment;
-  private SegmentInfo si;
-  private int readBufferSize;
+public final class SegmentReader extends AtomicReader implements Accountable {
 
-  FieldInfos fieldInfos;
-  private FieldsReader fieldsReader;
+  private static final long BASE_RAM_BYTES_USED =
+        RamUsageEstimator.shallowSizeOfInstance(SegmentReader.class)
+      + RamUsageEstimator.shallowSizeOfInstance(SegmentDocValues.class);
+  private static final long LONG_RAM_BYTES_USED = RamUsageEstimator.shallowSizeOfInstance(Long.class);
+        
+  private final SegmentCommitInfo si;
+  private final Bits liveDocs;
 
-  TermInfosReader tis;
-  TermVectorsReader termVectorsReaderOrig = null;
-  CloseableThreadLocal termVectorsLocal = new CloseableThreadLocal();
+  // Normally set to si.docCount - si.delDocCount, unless we
+  // were created as an NRT reader from IW, in which case IW
+  // tells us the docCount:
+  private final int numDocs;
 
-  BitVector deletedDocs = null;
-  private boolean deletedDocsDirty = false;
-  private boolean normsDirty = false;
-  private boolean undeleteAll = false;
-  private int pendingDeleteCount;
-
-  private boolean rollbackDeletedDocsDirty = false;
-  private boolean rollbackNormsDirty = false;
-  private boolean rollbackUndeleteAll = false;
-  private int rollbackPendingDeleteCount;
-  private boolean readOnly;
-
-  IndexInput freqStream;
-  IndexInput proxStream;
-
-  // optionally used for the .nrm file shared by multiple norms
-  private IndexInput singleNormStream;
-
-  // Compound File Reader when based on a compound file segment
-  CompoundFileReader cfsReader = null;
-  CompoundFileReader storeCFSReader = null;
+  final SegmentCoreReaders core;
+  final SegmentDocValues segDocValues;
   
-  // indicates the SegmentReader with which the resources are being shared,
-  // in case this is a re-opened reader
-  private SegmentReader referencedSegmentReader = null;
+  final CloseableThreadLocal<Map<String,Object>> docValuesLocal = new CloseableThreadLocal<Map<String,Object>>() {
+    @Override
+    protected Map<String,Object> initialValue() {
+      return new HashMap<>();
+    }
+  };
+
+  final CloseableThreadLocal<Map<String,Bits>> docsWithFieldLocal = new CloseableThreadLocal<Map<String,Bits>>() {
+    @Override
+    protected Map<String,Bits> initialValue() {
+      return new HashMap<>();
+    }
+  };
+
+  final Map<String,DocValuesProducer> dvProducersByField = new HashMap<>();
+  final Set<DocValuesProducer> dvProducers = Collections.newSetFromMap(new IdentityHashMap<DocValuesProducer,Boolean>());
   
-  private class Norm {
-    volatile int refCount;
-    boolean useSingleNormStream;
-    
-    public synchronized void incRef() {
-      assert refCount > 0;
-      refCount++;
-    }
+  final FieldInfos fieldInfos;
 
-    public synchronized void decRef() throws IOException {
-      assert refCount > 0;
-      if (refCount == 1) {
-        close();
-      }
-      refCount--;
-
-    }
-    
-    public Norm(IndexInput in, boolean useSingleNormStream, int number, long normSeek)
-    {
-      refCount = 1;
-      this.in = in;
-      this.number = number;
-      this.normSeek = normSeek;
-      this.useSingleNormStream = useSingleNormStream;
-    }
-
-    private IndexInput in;
-    private byte[] bytes;
-    private boolean dirty;
-    private int number;
-    private long normSeek;
-    private boolean rollbackDirty;
-
-    private void reWrite(SegmentInfo si) throws IOException {
-      // NOTE: norms are re-written in regular directory, not cfs
-      si.advanceNormGen(this.number);
-      IndexOutput out = directory().createOutput(si.getNormFileName(this.number));
-      try {
-        out.writeBytes(bytes, maxDoc());
-      } finally {
-        out.close();
-      }
-      this.dirty = false;
-    }
-    
-    /** Closes the underlying IndexInput for this norm.
-     * It is still valid to access all other norm properties after close is called.
-     * @throws IOException
-     */
-    private synchronized void close() throws IOException {
-      if (in != null && !useSingleNormStream) {
-        in.close();
-      }
-      in = null;
-    }
-  }
+  private final List<Long> dvGens = new ArrayList<>();
   
   /**
-   * Increments the RC of this reader, as well as
-   * of all norms this reader is using
-   */
-  public synchronized void incRef() {
-    super.incRef();
-    Iterator it = norms.values().iterator();
-    while (it.hasNext()) {
-      Norm norm = (Norm) it.next();
-      norm.incRef();
-    }
-  }
-  
-  /**
-   * only increments the RC of this reader, not tof 
-   * he norms. This is important whenever a reopen()
-   * creates a new SegmentReader that doesn't share
-   * the norms with this one 
-   */
-  private synchronized void incRefReaderNotNorms() {
-    super.incRef();
-  }
-
-  public synchronized void decRef() throws IOException {
-    super.decRef();
-    Iterator it = norms.values().iterator();
-    while (it.hasNext()) {
-      Norm norm = (Norm) it.next();
-      norm.decRef();
-    }
-  }
-  
-  private synchronized void decRefReaderNotNorms() throws IOException {
-    super.decRef();
-  }
-  
-  Map norms = new HashMap();
-  
-  /** The class which implements SegmentReader. */
-  private static Class IMPL;
-  static {
-    try {
-      String name =
-        System.getProperty("org.apache.lucene.SegmentReader.class",
-                           SegmentReader.class.getName());
-      IMPL = Class.forName(name);
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException("cannot load SegmentReader class: " + e, e);
-    } catch (SecurityException se) {
-      try {
-        IMPL = Class.forName(SegmentReader.class.getName());
-      } catch (ClassNotFoundException e) {
-        throw new RuntimeException("cannot load default SegmentReader class: " + e, e);
-      }
-    }
-  }
-
-  private static Class READONLY_IMPL;
-  static {
-    try {
-      String name =
-        System.getProperty("org.apache.lucene.ReadOnlySegmentReader.class",
-                           ReadOnlySegmentReader.class.getName());
-      READONLY_IMPL = Class.forName(name);
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException("cannot load ReadOnlySegmentReader class: " + e, e);
-    } catch (SecurityException se) {
-      try {
-        READONLY_IMPL = Class.forName(ReadOnlySegmentReader.class.getName());
-      } catch (ClassNotFoundException e) {
-        throw new RuntimeException("cannot load default ReadOnlySegmentReader class: " + e, e);
-      }
-    }
-  }
-
-  /**
+   * Constructs a new SegmentReader with a new core.
    * @throws CorruptIndexException if the index is corrupt
    * @throws IOException if there is a low-level IO error
    */
-  public static SegmentReader get(SegmentInfo si) throws CorruptIndexException, IOException {
-    return get(READ_ONLY_DEFAULT, si.dir, si, null, false, false, BufferedIndexInput.BUFFER_SIZE, true);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  public static SegmentReader get(boolean readOnly, SegmentInfo si) throws CorruptIndexException, IOException {
-    return get(readOnly, si.dir, si, null, false, false, BufferedIndexInput.BUFFER_SIZE, true);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  static SegmentReader get(SegmentInfo si, boolean doOpenStores) throws CorruptIndexException, IOException {
-    return get(READ_ONLY_DEFAULT, si.dir, si, null, false, false, BufferedIndexInput.BUFFER_SIZE, doOpenStores);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  public static SegmentReader get(SegmentInfo si, int readBufferSize) throws CorruptIndexException, IOException {
-    return get(READ_ONLY_DEFAULT, si.dir, si, null, false, false, readBufferSize, true);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  static SegmentReader get(SegmentInfo si, int readBufferSize, boolean doOpenStores) throws CorruptIndexException, IOException {
-    return get(READ_ONLY_DEFAULT, si.dir, si, null, false, false, readBufferSize, doOpenStores);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  static SegmentReader get(boolean readOnly, SegmentInfo si, int readBufferSize, boolean doOpenStores) throws CorruptIndexException, IOException {
-    return get(readOnly, si.dir, si, null, false, false, readBufferSize, doOpenStores);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  public static SegmentReader get(boolean readOnly, SegmentInfos sis, SegmentInfo si,
-                                  boolean closeDir) throws CorruptIndexException, IOException {
-    return get(readOnly, si.dir, si, sis, closeDir, true, BufferedIndexInput.BUFFER_SIZE, true);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  public static SegmentReader get(Directory dir, SegmentInfo si,
-                                  SegmentInfos sis,
-                                  boolean closeDir, boolean ownDir,
-                                  int readBufferSize)
-    throws CorruptIndexException, IOException {
-    return get(READ_ONLY_DEFAULT, dir, si, sis, closeDir, ownDir, readBufferSize, true);
-  }
-
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  public static SegmentReader get(boolean readOnly,
-                                  Directory dir,
-                                  SegmentInfo si,
-                                  SegmentInfos sis,
-                                  boolean closeDir, boolean ownDir,
-                                  int readBufferSize,
-                                  boolean doOpenStores)
-    throws CorruptIndexException, IOException {
-    SegmentReader instance;
-    try {
-      if (readOnly)
-        instance = (SegmentReader)READONLY_IMPL.newInstance();
-      else
-        instance = (SegmentReader)IMPL.newInstance();
-    } catch (Exception e) {
-      throw new RuntimeException("cannot load SegmentReader class: " + e, e);
-    }
-    instance.init(dir, sis, closeDir, readOnly);
-    instance.initialize(si, readBufferSize, doOpenStores);
-    return instance;
-  }
-
-  private void initialize(SegmentInfo si, int readBufferSize, boolean doOpenStores) throws CorruptIndexException, IOException {
-    segment = si.name;
+  // TODO: why is this public?
+  public SegmentReader(SegmentCommitInfo si, int termInfosIndexDivisor, IOContext context) throws IOException {
     this.si = si;
-    this.readBufferSize = readBufferSize;
-
+    // TODO if the segment uses CFS, we may open the CFS file twice: once for
+    // reading the FieldInfos (if they are not gen'd) and second time by
+    // SegmentCoreReaders. We can open the CFS here and pass to SCR, but then it
+    // results in less readable code (resource not closed where it was opened).
+    // Best if we could somehow read FieldInfos in SCR but not keep it there, but
+    // constructors don't allow returning two things...
+    fieldInfos = readFieldInfos(si);
+    core = new SegmentCoreReaders(this, si.info.dir, si, context, termInfosIndexDivisor);
+    segDocValues = new SegmentDocValues();
+    
     boolean success = false;
-
+    final Codec codec = si.info.getCodec();
     try {
-      // Use compound file directory for some files, if it exists
-      Directory cfsDir = directory();
-      if (si.getUseCompoundFile()) {
-        cfsReader = new CompoundFileReader(directory(), segment + "." + IndexFileNames.COMPOUND_FILE_EXTENSION, readBufferSize);
-        cfsDir = cfsReader;
+      if (si.hasDeletions()) {
+        // NOTE: the bitvector is stored using the regular directory, not cfs
+        liveDocs = codec.liveDocsFormat().readLiveDocs(directory(), si, IOContext.READONCE);
+      } else {
+        assert si.getDelCount() == 0;
+        liveDocs = null;
+      }
+      numDocs = si.info.getDocCount() - si.getDelCount();
+
+      if (fieldInfos.hasDocValues()) {
+        initDocValuesProducers(codec);
       }
 
-      final Directory storeDir;
-
-      if (doOpenStores) {
-        if (si.getDocStoreOffset() != -1) {
-          if (si.getDocStoreIsCompoundFile()) {
-            storeCFSReader = new CompoundFileReader(directory(), si.getDocStoreSegment() + "." + IndexFileNames.COMPOUND_FILE_STORE_EXTENSION, readBufferSize);
-            storeDir = storeCFSReader;
-          } else {
-            storeDir = directory();
-          }
-        } else {
-          storeDir = cfsDir;
-        }
-      } else
-        storeDir = null;
-
-      fieldInfos = new FieldInfos(cfsDir, segment + ".fnm");
-
-      boolean anyProx = false;
-      final int numFields = fieldInfos.size();
-      for(int i=0;!anyProx && i<numFields;i++)
-        if (!fieldInfos.fieldInfo(i).omitTf)
-          anyProx = true;
-
-      final String fieldsSegment;
-
-      if (si.getDocStoreOffset() != -1)
-        fieldsSegment = si.getDocStoreSegment();
-      else
-        fieldsSegment = segment;
-
-      if (doOpenStores) {
-        fieldsReader = new FieldsReader(storeDir, fieldsSegment, fieldInfos, readBufferSize,
-                                        si.getDocStoreOffset(), si.docCount);
-
-        // Verify two sources of "maxDoc" agree:
-        if (si.getDocStoreOffset() == -1 && fieldsReader.size() != si.docCount) {
-          throw new CorruptIndexException("doc counts differ for segment " + si.name + ": fieldsReader shows " + fieldsReader.size() + " but segmentInfo shows " + si.docCount);
-        }
-      }
-
-      tis = new TermInfosReader(cfsDir, segment, fieldInfos, readBufferSize);
-      
-      loadDeletedDocs();
-
-      // make sure that all index files have been read or are kept open
-      // so that if an index update removes them we'll still have them
-      freqStream = cfsDir.openInput(segment + ".frq", readBufferSize);
-      if (anyProx)
-        proxStream = cfsDir.openInput(segment + ".prx", readBufferSize);
-      openNorms(cfsDir, readBufferSize);
-
-      if (doOpenStores && fieldInfos.hasVectors()) { // open term vector files only as needed
-        final String vectorsSegment;
-        if (si.getDocStoreOffset() != -1)
-          vectorsSegment = si.getDocStoreSegment();
-        else
-          vectorsSegment = segment;
-        termVectorsReaderOrig = new TermVectorsReader(storeDir, vectorsSegment, fieldInfos, readBufferSize, si.getDocStoreOffset(), si.docCount);
-      }
       success = true;
     } finally {
-
       // With lock-less commits, it's entirely possible (and
       // fine) to hit a FileNotFound exception above.  In
       // this case, we want to explicitly close any subset
@@ -395,716 +136,514 @@ class SegmentReader extends DirectoryIndexReader {
       }
     }
   }
-  
-  private void loadDeletedDocs() throws IOException {
-    // NOTE: the bitvector is stored using the regular directory, not cfs
-    if (hasDeletions(si)) {
-      deletedDocs = new BitVector(directory(), si.getDelFileName());
-     
-      assert si.getDelCount() == deletedDocs.count() : 
-        "delete count mismatch: info=" + si.getDelCount() + " vs BitVector=" + deletedDocs.count();
 
-      // Verify # deletes does not exceed maxDoc for this
-      // segment:
-      assert si.getDelCount() <= maxDoc() : 
-        "delete count mismatch: " + deletedDocs.count() + ") exceeds max doc (" + maxDoc() + ") for segment " + si.name;
-
-    } else
-      assert si.getDelCount() == 0;
+  /** Create new SegmentReader sharing core from a previous
+   *  SegmentReader and loading new live docs from a new
+   *  deletes file.  Used by openIfChanged. */
+  SegmentReader(SegmentCommitInfo si, SegmentReader sr) throws IOException {
+    this(si, sr,
+         si.info.getCodec().liveDocsFormat().readLiveDocs(si.info.dir, si, IOContext.READONCE),
+         si.info.getDocCount() - si.getDelCount());
   }
-  
-  protected synchronized DirectoryIndexReader doReopen(SegmentInfos infos) throws CorruptIndexException, IOException {
-    DirectoryIndexReader newReader;
-    
-    if (infos.size() == 1) {
-      SegmentInfo si = infos.info(0);
-      if (segment.equals(si.name) && si.getUseCompoundFile() == SegmentReader.this.si.getUseCompoundFile()) {
-        newReader = reopenSegment(si);
-      } else { 
-        // segment not referenced anymore, reopen not possible
-        // or segment format changed
-        newReader = SegmentReader.get(readOnly, infos, infos.info(0), false);
-      }
-    } else {
-      if (readOnly)
-        return new ReadOnlyMultiSegmentReader(directory, infos, closeDirectory, new SegmentReader[] {this}, null, null);
-      else
-        return new MultiSegmentReader(directory, infos, closeDirectory, new SegmentReader[] {this}, null, null, false);
-    }
-    
-    return newReader;
-  }
-  
-  synchronized SegmentReader reopenSegment(SegmentInfo si) throws CorruptIndexException, IOException {
-    boolean deletionsUpToDate = (this.si.hasDeletions() == si.hasDeletions()) 
-                                  && (!si.hasDeletions() || this.si.getDelFileName().equals(si.getDelFileName()));
-    boolean normsUpToDate = true;
 
+  /** Create new SegmentReader sharing core from a previous
+   *  SegmentReader and using the provided in-memory
+   *  liveDocs.  Used by IndexWriter to provide a new NRT
+   *  reader */
+  SegmentReader(SegmentCommitInfo si, SegmentReader sr, Bits liveDocs, int numDocs) throws IOException {
+    this.si = si;
+    this.liveDocs = liveDocs;
+    this.numDocs = numDocs;
+    this.core = sr.core;
+    core.incRef();
+    this.segDocValues = sr.segDocValues;
     
-    boolean[] fieldNormsChanged = new boolean[fieldInfos.size()];
-    if (normsUpToDate) {
-      for (int i = 0; i < fieldInfos.size(); i++) {
-        if (!this.si.getNormFileName(i).equals(si.getNormFileName(i))) {
-          normsUpToDate = false;
-          fieldNormsChanged[i] = true;
-        }
-      }
-    }
-
-    if (normsUpToDate && deletionsUpToDate) {
-      return this;
-    }    
+//    System.out.println("[" + Thread.currentThread().getName() + "] SR.init: sharing reader: " + sr + " for gens=" + sr.genDVProducers.keySet());
     
-
-      // clone reader
-    SegmentReader clone;
-    if (readOnly) 
-      clone = new ReadOnlySegmentReader();
-    else
-      clone = new SegmentReader();
-
+    // increment refCount of DocValuesProducers that are used by this reader
     boolean success = false;
     try {
-      clone.readOnly = readOnly;
-      clone.directory = directory;
-      clone.si = si;
-      clone.segment = segment;
-      clone.readBufferSize = readBufferSize;
-      clone.cfsReader = cfsReader;
-      clone.storeCFSReader = storeCFSReader;
-  
-      clone.fieldInfos = fieldInfos;
-      clone.tis = tis;
-      clone.freqStream = freqStream;
-      clone.proxStream = proxStream;
-      clone.termVectorsReaderOrig = termVectorsReaderOrig;
-  
-      
-      // we have to open a new FieldsReader, because it is not thread-safe
-      // and can thus not be shared among multiple SegmentReaders
-      // TODO: Change this in case FieldsReader becomes thread-safe in the future
-      final String fieldsSegment;
-  
-      Directory storeDir = directory();
-      
-      if (si.getDocStoreOffset() != -1) {
-        fieldsSegment = si.getDocStoreSegment();
-        if (storeCFSReader != null) {
-          storeDir = storeCFSReader;
-        }
+      final Codec codec = si.info.getCodec();
+      if (si.getFieldInfosGen() == -1) {
+        fieldInfos = sr.fieldInfos;
       } else {
-        fieldsSegment = segment;
-        if (cfsReader != null) {
-          storeDir = cfsReader;
-        }
-      }
-  
-      if (fieldsReader != null) {
-        clone.fieldsReader = new FieldsReader(storeDir, fieldsSegment, fieldInfos, readBufferSize,
-                                        si.getDocStoreOffset(), si.docCount);
+        fieldInfos = readFieldInfos(si);
       }
       
-      
-      if (!deletionsUpToDate) {
-        // load deleted docs
-        clone.deletedDocs = null;
-        clone.loadDeletedDocs();
-      } else {
-        clone.deletedDocs = this.deletedDocs;
+      if (fieldInfos.hasDocValues()) {
+        initDocValuesProducers(codec);
       }
-  
-      clone.norms = new HashMap();
-      if (!normsUpToDate) {
-        // load norms
-        for (int i = 0; i < fieldNormsChanged.length; i++) {
-          // copy unchanged norms to the cloned reader and incRef those norms
-          if (!fieldNormsChanged[i]) {
-            String curField = fieldInfos.fieldInfo(i).name;
-            Norm norm = (Norm) this.norms.get(curField);
-            norm.incRef();
-            clone.norms.put(curField, norm);
-          }
-        }
-        
-        clone.openNorms(si.getUseCompoundFile() ? cfsReader : directory(), readBufferSize);
-      } else {
-        Iterator it = norms.keySet().iterator();
-        while (it.hasNext()) {
-          String field = (String) it.next();
-          Norm norm = (Norm) norms.get(field);
-          norm.incRef();
-          clone.norms.put(field, norm);
-        }
-      }
-  
-      if (clone.singleNormStream == null) {
-        for (int i = 0; i < fieldInfos.size(); i++) {
-          FieldInfo fi = fieldInfos.fieldInfo(i);
-          if (fi.isIndexed && !fi.omitNorms) {
-            Directory d = si.getUseCompoundFile() ? cfsReader : directory();
-            String fileName = si.getNormFileName(fi.number);
-            if (si.hasSeparateNorms(fi.number)) {
-              continue;
-            }  
-  
-            if (fileName.endsWith("." + IndexFileNames.NORMS_EXTENSION)) {
-              clone.singleNormStream = d.openInput(fileName, readBufferSize);    
-              break;
-            }
-          }
-        }  
-      }    
-  
       success = true;
     } finally {
-      if (this.referencedSegmentReader != null) {
-        // this reader shares resources with another SegmentReader,
-        // so we increment the other readers refCount. We don't
-        // increment the refCount of the norms because we did
-        // that already for the shared norms
-        clone.referencedSegmentReader = this.referencedSegmentReader;
-        referencedSegmentReader.incRefReaderNotNorms();
-      } else {
-        // this reader wasn't reopened, so we increment this
-        // readers refCount
-        clone.referencedSegmentReader = this;
-        incRefReaderNotNorms();
-      }
-      
       if (!success) {
-        // An exception occured during reopen, we have to decRef the norms
-        // that we incRef'ed already and close singleNormsStream and FieldsReader
-        clone.decRef();
+        doClose();
       }
     }
-    
-    return clone;
   }
 
-  protected void commitChanges() throws IOException {
-    if (deletedDocsDirty) {               // re-write deleted
-      si.advanceDelGen();
+  // initialize the per-field DocValuesProducer
+  @SuppressWarnings("deprecation")
+  private void initDocValuesProducers(Codec codec) throws IOException {
+    final Directory dir = core.cfsReader != null ? core.cfsReader : si.info.dir;
+    final DocValuesFormat dvFormat = codec.docValuesFormat();
 
-      // We can write directly to the actual name (vs to a
-      // .tmp & renaming it) because the file is not live
-      // until segments file is written:
-      deletedDocs.write(directory(), si.getDelFileName());
+    int termsIndexDivisor = getTermInfosIndexDivisor();
+    if (!si.hasFieldUpdates()) {
+      // simple case, no DocValues updates
+      final DocValuesProducer dvp = segDocValues.getDocValuesProducer(-1L, si, IOContext.READ, dir, dvFormat, fieldInfos, termsIndexDivisor);
+      dvGens.add(-1L);
+      dvProducers.add(dvp);
+      for (FieldInfo fi : fieldInfos) {
+        if (!fi.hasDocValues()) continue;
+        assert fi.getDocValuesGen() == -1;
+        dvProducersByField.put(fi.name, dvp);
+      }
+      return;
+    }
+
+    Version ver = si.info.getVersion();
+    if (ver != null && ver.onOrAfter(Version.LUCENE_4_9_0)) {
+      DocValuesProducer baseProducer = null;
+      for (FieldInfo fi : fieldInfos) {
+        if (!fi.hasDocValues()) continue;
+        long docValuesGen = fi.getDocValuesGen();
+        if (docValuesGen == -1) {
+          if (baseProducer == null) {
+//        System.out.println("[" + Thread.currentThread().getName() + "] SR.initDocValuesProducers: segInfo=" + si + "; gen=" + docValuesGen + "; field=" + fi.name);
+            // the base producer gets all the fields, so the Codec can validate properly
+            baseProducer = segDocValues.getDocValuesProducer(docValuesGen, si, IOContext.READ, dir, dvFormat, fieldInfos, termsIndexDivisor);
+            dvGens.add(docValuesGen);
+            dvProducers.add(baseProducer);
+          }
+//        System.out.println("[" + Thread.currentThread().getName() + "] SR.initDocValuesProducers: segInfo=" + si + "; gen=" + docValuesGen + "; field=" + fi.name);
+          dvProducersByField.put(fi.name, baseProducer);
+        } else {
+          assert !dvGens.contains(docValuesGen);
+//        System.out.println("[" + Thread.currentThread().getName() + "] SR.initDocValuesProducers: segInfo=" + si + "; gen=" + docValuesGen + "; field=" + fi.name);
+          final DocValuesProducer dvp = segDocValues.getDocValuesProducer(docValuesGen, si, IOContext.READ, dir, dvFormat, new FieldInfos(new FieldInfo[] { fi }), termsIndexDivisor);
+          dvGens.add(docValuesGen);
+          dvProducers.add(dvp);
+          dvProducersByField.put(fi.name, dvp);
+        }
+      }
+    } else {
+      // For pre-4.9 indexes, especially with doc-values updates, multiple
+      // FieldInfos could belong to the same dvGen. Therefore need to make sure
+      // we initialize each DocValuesProducer once per gen.
+      Map<Long,List<FieldInfo>> genInfos = new HashMap<>();
+      for (FieldInfo fi : fieldInfos) {
+        if (!fi.hasDocValues()) continue;
+        List<FieldInfo> genFieldInfos = genInfos.get(fi.getDocValuesGen());
+        if (genFieldInfos == null) {
+          genFieldInfos = new ArrayList<>();
+          genInfos.put(fi.getDocValuesGen(), genFieldInfos);
+        }
+        genFieldInfos.add(fi);
+      }
       
-      si.setDelCount(si.getDelCount()+pendingDeleteCount);
-    }
-    if (undeleteAll && si.hasDeletions()) {
-      si.clearDelGen();
-      si.setDelCount(0);
-    }
-    if (normsDirty) {               // re-write norms
-      si.setNumFields(fieldInfos.size());
-      Iterator it = norms.values().iterator();
-      while (it.hasNext()) {
-        Norm norm = (Norm) it.next();
-        if (norm.dirty) {
-          norm.reWrite(si);
+      for (Map.Entry<Long,List<FieldInfo>> e : genInfos.entrySet()) {
+        long docValuesGen = e.getKey();
+        List<FieldInfo> infos = e.getValue();
+        final DocValuesProducer dvp;
+        if (docValuesGen == -1) {
+          // we need to send all FieldInfos to gen=-1, but later we need to
+          // record the DVP only for the "true" gen=-1 fields (not updated)
+          dvp = segDocValues.getDocValuesProducer(docValuesGen, si, IOContext.READ, dir, dvFormat, fieldInfos, termsIndexDivisor);
+        } else {
+          dvp = segDocValues.getDocValuesProducer(docValuesGen, si, IOContext.READ, dir, dvFormat, new FieldInfos(infos.toArray(new FieldInfo[infos.size()])), termsIndexDivisor);
+        }
+        dvGens.add(docValuesGen);
+        dvProducers.add(dvp);
+        for (FieldInfo fi : infos) {
+          dvProducersByField.put(fi.name, dvp);
         }
       }
     }
-    deletedDocsDirty = false;
-    normsDirty = false;
-    undeleteAll = false;
   }
-
-  FieldsReader getFieldsReader() {
-    return fieldsReader;
-  }
-
-  protected void doClose() throws IOException {
-    boolean hasReferencedReader = (referencedSegmentReader != null);
-
-    termVectorsLocal.close();
-
-    if (hasReferencedReader) {
-      referencedSegmentReader.decRefReaderNotNorms();
-      referencedSegmentReader = null;
-    }
-
-    deletedDocs = null;
-
-    // close the single norms stream
-    if (singleNormStream != null) {
-      // we can close this stream, even if the norms
-      // are shared, because every reader has it's own 
-      // singleNormStream
-      singleNormStream.close();
-      singleNormStream = null;
+  
+  /**
+   * Reads the most recent {@link FieldInfos} of the given segment info.
+   * 
+   * @lucene.internal
+   */
+  static FieldInfos readFieldInfos(SegmentCommitInfo info) throws IOException {
+    final Directory dir;
+    final boolean closeDir;
+    if (info.getFieldInfosGen() == -1 && info.info.getUseCompoundFile()) {
+      // no fieldInfos gen and segment uses a compound file
+      dir = new CompoundFileDirectory(info.info.dir,
+          IndexFileNames.segmentFileName(info.info.name, "", IndexFileNames.COMPOUND_FILE_EXTENSION),
+          IOContext.READONCE,
+          false);
+      closeDir = true;
+    } else {
+      // gen'd FIS are read outside CFS, or the segment doesn't use a compound file
+      dir = info.info.dir;
+      closeDir = false;
     }
     
-    // re-opened SegmentReaders have their own instance of FieldsReader
-    if (fieldsReader != null) {
-      fieldsReader.close();
-    }
-
-    if (!hasReferencedReader) { 
-      // close everything, nothing is shared anymore with other readers
-      if (tis != null) {
-        tis.close();
+    try {
+      final String segmentSuffix = info.getFieldInfosGen() == -1 ? "" : Long.toString(info.getFieldInfosGen(), Character.MAX_RADIX);
+      Codec codec = info.info.getCodec();
+      FieldInfosFormat fisFormat = codec.fieldInfosFormat();
+      return fisFormat.getFieldInfosReader().read(dir, info.info.name, segmentSuffix, IOContext.READONCE);
+    } finally {
+      if (closeDir) {
+        dir.close();
       }
+    }
+  }
   
-      if (freqStream != null)
-        freqStream.close();
-      if (proxStream != null)
-        proxStream.close();
-  
-      if (termVectorsReaderOrig != null)
-        termVectorsReaderOrig.close();
-  
-      if (cfsReader != null)
-        cfsReader.close();
-  
-      if (storeCFSReader != null)
-        storeCFSReader.close();
-      
-      // maybe close directory
-      super.doClose();
+  @Override
+  public Bits getLiveDocs() {
+    ensureOpen();
+    return liveDocs;
+  }
+
+  @Override
+  protected void doClose() throws IOException {
+    //System.out.println("SR.close seg=" + si);
+    try {
+      core.decRef();
+    } finally {
+      dvProducersByField.clear();
+      try {
+        IOUtils.close(docValuesLocal, docsWithFieldLocal);
+      } finally {
+        segDocValues.decRef(dvGens);
+      }
     }
   }
 
-  static boolean hasDeletions(SegmentInfo si) throws IOException {
-    // Don't call ensureOpen() here (it could affect performance)
-    return si.hasDeletions();
-  }
-
-  public boolean hasDeletions() {
-    // Don't call ensureOpen() here (it could affect performance)
-    return deletedDocs != null;
-  }
-
-  static boolean usesCompoundFile(SegmentInfo si) throws IOException {
-    return si.getUseCompoundFile();
-  }
-
-  static boolean hasSeparateNorms(SegmentInfo si) throws IOException {
-    return si.hasSeparateNorms();
-  }
-
-  protected void doDelete(int docNum) {
-    if (deletedDocs == null)
-      deletedDocs = new BitVector(maxDoc());
-    deletedDocsDirty = true;
-    undeleteAll = false;
-    if (!deletedDocs.getAndSet(docNum))
-      pendingDeleteCount++;
-  }
-
-  protected void doUndeleteAll() {
-      deletedDocs = null;
-      deletedDocsDirty = false;
-      undeleteAll = true;
-  }
-
-  List files() throws IOException {
-    return new ArrayList(si.files());
-  }
-
-  public TermEnum terms() {
+  @Override
+  public FieldInfos getFieldInfos() {
     ensureOpen();
-    return tis.terms();
-  }
-
-  public TermEnum terms(Term t) throws IOException {
-    ensureOpen();
-    return tis.terms(t);
-  }
-
-  FieldInfos getFieldInfos() {
     return fieldInfos;
   }
 
-  /**
-   * @throws CorruptIndexException if the index is corrupt
-   * @throws IOException if there is a low-level IO error
-   */
-  public synchronized Document document(int n, FieldSelector fieldSelector) throws CorruptIndexException, IOException {
+  /** Expert: retrieve thread-private {@link
+   *  StoredFieldsReader}
+   *  @lucene.internal */
+  public StoredFieldsReader getFieldsReader() {
     ensureOpen();
-    if (isDeleted(n))
-      throw new IllegalArgumentException
-              ("attempt to access a deleted document");
-    return fieldsReader.doc(n, fieldSelector);
+    return core.fieldsReaderLocal.get();
+  }
+  
+  @Override
+  public void document(int docID, StoredFieldVisitor visitor) throws IOException {
+    checkBounds(docID);
+    getFieldsReader().visitDocument(docID, visitor);
   }
 
-  public synchronized boolean isDeleted(int n) {
-    return (deletedDocs != null && deletedDocs.get(n));
-  }
-
-  public TermDocs termDocs() throws IOException {
+  @Override
+  public Fields fields() {
     ensureOpen();
-    return new SegmentTermDocs(this);
+    return core.fields;
   }
 
-  public TermPositions termPositions() throws IOException {
-    ensureOpen();
-    return new SegmentTermPositions(this);
-  }
-
-  public int docFreq(Term t) throws IOException {
-    ensureOpen();
-    TermInfo ti = tis.get(t);
-    if (ti != null)
-      return ti.docFreq;
-    else
-      return 0;
-  }
-
+  @Override
   public int numDocs() {
     // Don't call ensureOpen() here (it could affect performance)
-    int n = maxDoc();
-    if (deletedDocs != null)
-      n -= deletedDocs.count();
-    return n;
+    return numDocs;
   }
 
+  @Override
   public int maxDoc() {
     // Don't call ensureOpen() here (it could affect performance)
-    return si.docCount;
+    return si.info.getDocCount();
   }
 
-  public void setTermInfosIndexDivisor(int indexDivisor) throws IllegalStateException {
-    tis.setIndexDivisor(indexDivisor);
-  }
-
-  public int getTermInfosIndexDivisor() {
-    return tis.getIndexDivisor();
-  }
-
-  /**
-   * @see IndexReader#getFieldNames(IndexReader.FieldOption fldOption)
-   */
-  public Collection getFieldNames(IndexReader.FieldOption fieldOption) {
+  /** Expert: retrieve thread-private {@link
+   *  TermVectorsReader}
+   *  @lucene.internal */
+  public TermVectorsReader getTermVectorsReader() {
     ensureOpen();
+    return core.termVectorsLocal.get();
+  }
 
-    Set fieldSet = new HashSet();
-    for (int i = 0; i < fieldInfos.size(); i++) {
-      FieldInfo fi = fieldInfos.fieldInfo(i);
-      if (fieldOption == IndexReader.FieldOption.ALL) {
-        fieldSet.add(fi.name);
-      }
-      else if (!fi.isIndexed && fieldOption == IndexReader.FieldOption.UNINDEXED) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.omitTf && fieldOption == IndexReader.FieldOption.OMIT_TF) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.storePayloads && fieldOption == IndexReader.FieldOption.STORES_PAYLOADS) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.isIndexed && fieldOption == IndexReader.FieldOption.INDEXED) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.isIndexed && fi.storeTermVector == false && fieldOption == IndexReader.FieldOption.INDEXED_NO_TERMVECTOR) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.storeTermVector == true &&
-               fi.storePositionWithTermVector == false &&
-               fi.storeOffsetWithTermVector == false &&
-               fieldOption == IndexReader.FieldOption.TERMVECTOR) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.isIndexed && fi.storeTermVector && fieldOption == IndexReader.FieldOption.INDEXED_WITH_TERMVECTOR) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.storePositionWithTermVector && fi.storeOffsetWithTermVector == false && fieldOption == IndexReader.FieldOption.TERMVECTOR_WITH_POSITION) {
-        fieldSet.add(fi.name);
-      }
-      else if (fi.storeOffsetWithTermVector && fi.storePositionWithTermVector == false && fieldOption == IndexReader.FieldOption.TERMVECTOR_WITH_OFFSET) {
-        fieldSet.add(fi.name);
-      }
-      else if ((fi.storeOffsetWithTermVector && fi.storePositionWithTermVector) &&
-                fieldOption == IndexReader.FieldOption.TERMVECTOR_WITH_POSITION_OFFSET) {
-        fieldSet.add(fi.name);
-      }
+  @Override
+  public Fields getTermVectors(int docID) throws IOException {
+    TermVectorsReader termVectorsReader = getTermVectorsReader();
+    if (termVectorsReader == null) {
+      return null;
     }
-    return fieldSet;
-  }
-
-
-  public synchronized boolean hasNorms(String field) {
-    ensureOpen();
-    return norms.containsKey(field);
-  }
-
-  static byte[] createFakeNorms(int size) {
-    byte[] ones = new byte[size];
-    Arrays.fill(ones, DefaultSimilarity.encodeNorm(1.0f));
-    return ones;
-  }
-
-  private byte[] ones;
-  private byte[] fakeNorms() {
-    if (ones==null) ones=createFakeNorms(maxDoc());
-    return ones;
-  }
-
-  // can return null if norms aren't stored
-  protected synchronized byte[] getNorms(String field) throws IOException {
-    Norm norm = (Norm) norms.get(field);
-    if (norm == null) return null;  // not indexed, or norms not stored
-    synchronized(norm) {
-      if (norm.bytes == null) {                     // value not yet read
-        byte[] bytes = new byte[maxDoc()];
-        norms(field, bytes, 0);
-        norm.bytes = bytes;                         // cache it
-        // it's OK to close the underlying IndexInput as we have cached the
-        // norms and will never read them again.
-        norm.close();
-      }
-      return norm.bytes;
-    }
-  }
-
-  // returns fake norms if norms aren't available
-  public synchronized byte[] norms(String field) throws IOException {
-    ensureOpen();
-    byte[] bytes = getNorms(field);
-    if (bytes==null) bytes=fakeNorms();
-    return bytes;
-  }
-
-  protected void doSetNorm(int doc, String field, byte value)
-          throws IOException {
-    Norm norm = (Norm) norms.get(field);
-    if (norm == null)                             // not an indexed field
-      return;
-
-    norm.dirty = true;                            // mark it dirty
-    normsDirty = true;
-
-    norms(field)[doc] = value;                    // set the value
-  }
-
-  /** Read norms into a pre-allocated array. */
-  public synchronized void norms(String field, byte[] bytes, int offset)
-    throws IOException {
-
-    ensureOpen();
-    Norm norm = (Norm) norms.get(field);
-    if (norm == null) {
-      System.arraycopy(fakeNorms(), 0, bytes, offset, maxDoc());
-      return;
-    }
-    
-    synchronized(norm) {
-      if (norm.bytes != null) {                     // can copy from cache
-        System.arraycopy(norm.bytes, 0, bytes, offset, maxDoc());
-        return;
-      }
-
-    // Read from disk.  norm.in may be shared across  multiple norms and
-    // should only be used in a synchronized context.
-      IndexInput normStream;
-      if (norm.useSingleNormStream) {
-        normStream = singleNormStream;
-      } else {
-        normStream = norm.in;
-      }
-      normStream.seek(norm.normSeek);
-      normStream.readBytes(bytes, offset, maxDoc());
-    }
-  }
-
-
-  private void openNorms(Directory cfsDir, int readBufferSize) throws IOException {
-    long nextNormSeek = SegmentMerger.NORMS_HEADER.length; //skip header (header unused for now)
-    int maxDoc = maxDoc();
-    for (int i = 0; i < fieldInfos.size(); i++) {
-      FieldInfo fi = fieldInfos.fieldInfo(i);
-      if (norms.containsKey(fi.name)) {
-        // in case this SegmentReader is being re-opened, we might be able to
-        // reuse some norm instances and skip loading them here
-        continue;
-      }
-      if (fi.isIndexed && !fi.omitNorms) {
-        Directory d = directory();
-        String fileName = si.getNormFileName(fi.number);
-        if (!si.hasSeparateNorms(fi.number)) {
-          d = cfsDir;
-        }
-        
-        // singleNormFile means multiple norms share this file
-        boolean singleNormFile = fileName.endsWith("." + IndexFileNames.NORMS_EXTENSION);
-        IndexInput normInput = null;
-        long normSeek;
-
-        if (singleNormFile) {
-          normSeek = nextNormSeek;
-          if (singleNormStream==null) {
-            singleNormStream = d.openInput(fileName, readBufferSize);
-          }
-          // All norms in the .nrm file can share a single IndexInput since
-          // they are only used in a synchronized context.
-          // If this were to change in the future, a clone could be done here.
-          normInput = singleNormStream;
-        } else {
-          normSeek = 0;
-          normInput = d.openInput(fileName);
-        }
-
-        norms.put(fi.name, new Norm(normInput, singleNormFile, fi.number, normSeek));
-        nextNormSeek += maxDoc; // increment also if some norms are separate
-      }
-    }
-  }
-
-  // for testing only
-  boolean normsClosed() {
-    if (singleNormStream != null) {
-      return false;
-    }
-    Iterator it = norms.values().iterator();
-    while (it.hasNext()) {
-      Norm norm = (Norm) it.next();
-      if (norm.refCount > 0) {
-        return false;
-      }
-    }
-    return true;
+    checkBounds(docID);
+    return termVectorsReader.get(docID);
   }
   
-  // for testing only
-  boolean normsClosed(String field) {
-      Norm norm = (Norm) norms.get(field);
-      return norm.refCount == 0;
-  }
-
-  /**
-   * Create a clone from the initial TermVectorsReader and store it in the ThreadLocal.
-   * @return TermVectorsReader
-   */
-  private TermVectorsReader getTermVectorsReader() {
-    assert termVectorsReaderOrig != null;
-    TermVectorsReader tvReader = (TermVectorsReader)termVectorsLocal.get();
-    if (tvReader == null) {
-      try {
-        tvReader = (TermVectorsReader)termVectorsReaderOrig.clone();
-      } catch (CloneNotSupportedException cnse) {
-        return null;
-      }
-      termVectorsLocal.set(tvReader);
+  private void checkBounds(int docID) {
+    if (docID < 0 || docID >= maxDoc()) {       
+      throw new IndexOutOfBoundsException("docID must be >= 0 and < maxDoc=" + maxDoc() + " (got docID=" + docID + ")");
     }
-    return tvReader;
-  }
-  
-  /** Return a term frequency vector for the specified document and field. The
-   *  vector returned contains term numbers and frequencies for all terms in
-   *  the specified field of this document, if the field had storeTermVector
-   *  flag set.  If the flag was not set, the method returns null.
-   * @throws IOException
-   */
-  public TermFreqVector getTermFreqVector(int docNumber, String field) throws IOException {
-    // Check if this field is invalid or has no stored term vector
-    ensureOpen();
-    FieldInfo fi = fieldInfos.fieldInfo(field);
-    if (fi == null || !fi.storeTermVector || termVectorsReaderOrig == null) 
-      return null;
-    
-    TermVectorsReader termVectorsReader = getTermVectorsReader();
-    if (termVectorsReader == null)
-      return null;
-    
-    return termVectorsReader.get(docNumber, field);
   }
 
-
-  public void getTermFreqVector(int docNumber, String field, TermVectorMapper mapper) throws IOException {
-    ensureOpen();
-    FieldInfo fi = fieldInfos.fieldInfo(field);
-    if (fi == null || !fi.storeTermVector || termVectorsReaderOrig == null)
-      return;
-
-    TermVectorsReader termVectorsReader = getTermVectorsReader();
-    if (termVectorsReader == null)
-    {
-      return;
-    }
-
-
-    termVectorsReader.get(docNumber, field, mapper);
-  }
-
-
-  public void getTermFreqVector(int docNumber, TermVectorMapper mapper) throws IOException {
-    ensureOpen();
-    if (termVectorsReaderOrig == null)
-      return;
-
-    TermVectorsReader termVectorsReader = getTermVectorsReader();
-    if (termVectorsReader == null)
-      return;
-
-    termVectorsReader.get(docNumber, mapper);
-  }
-
-  /** Return an array of term frequency vectors for the specified document.
-   *  The array contains a vector for each vectorized field in the document.
-   *  Each vector vector contains term numbers and frequencies for all terms
-   *  in a given vectorized field.
-   *  If no such fields existed, the method returns null.
-   * @throws IOException
-   */
-  public TermFreqVector[] getTermFreqVectors(int docNumber) throws IOException {
-    ensureOpen();
-    if (termVectorsReaderOrig == null)
-      return null;
-    
-    TermVectorsReader termVectorsReader = getTermVectorsReader();
-    if (termVectorsReader == null)
-      return null;
-    
-    return termVectorsReader.get(docNumber);
-  }
-  
-  /** Returns the field infos of this segment */
-  FieldInfos fieldInfos() {
-    return fieldInfos;
+  @Override
+  public String toString() {
+    // SegmentInfo.toString takes dir and number of
+    // *pending* deletions; so we reverse compute that here:
+    return si.toString(si.info.dir, si.info.getDocCount() - numDocs - si.getDelCount());
   }
   
   /**
    * Return the name of the segment this reader is reading.
    */
-  String getSegmentName() {
-    return segment;
+  public String getSegmentName() {
+    return si.info.name;
   }
   
   /**
-   * Return the SegmentInfo of the segment this reader is reading.
+   * Return the SegmentInfoPerCommit of the segment this reader is reading.
    */
-  SegmentInfo getSegmentInfo() {
+  public SegmentCommitInfo getSegmentInfo() {
     return si;
   }
 
-  void setSegmentInfo(SegmentInfo info) {
-    si = info;
+  /** Returns the directory this index resides in. */
+  public Directory directory() {
+    // Don't ensureOpen here -- in certain cases, when a
+    // cloned/reopened reader needs to commit, it may call
+    // this method on the closed original reader
+    return si.info.dir;
   }
 
-  void startCommit() {
-    super.startCommit();
-    rollbackDeletedDocsDirty = deletedDocsDirty;
-    rollbackNormsDirty = normsDirty;
-    rollbackUndeleteAll = undeleteAll;
-    rollbackPendingDeleteCount = pendingDeleteCount;
-    Iterator it = norms.values().iterator();
-    while (it.hasNext()) {
-      Norm norm = (Norm) it.next();
-      norm.rollbackDirty = norm.dirty;
+  // This is necessary so that cloned SegmentReaders (which
+  // share the underlying postings data) will map to the
+  // same entry in the FieldCache.  See LUCENE-1579.
+  @Override
+  public Object getCoreCacheKey() {
+    // NOTE: if this ever changes, be sure to fix
+    // SegmentCoreReader.notifyCoreClosedListeners to match!
+    // Today it passes "this" as its coreCacheKey:
+    return core;
+  }
+
+  @Override
+  public Object getCombinedCoreAndDeletesKey() {
+    return this;
+  }
+
+  /** Returns term infos index divisor originally passed to
+   *  {@link #SegmentReader(SegmentCommitInfo, int, IOContext)}. */
+  public int getTermInfosIndexDivisor() {
+    return core.termsIndexDivisor;
+  }
+
+  // returns the FieldInfo that corresponds to the given field and type, or
+  // null if the field does not exist, or not indexed as the requested
+  // DovDocValuesType.
+  private FieldInfo getDVField(String field, DocValuesType type) {
+    FieldInfo fi = fieldInfos.fieldInfo(field);
+    if (fi == null) {
+      // Field does not exist
+      return null;
+    }
+    if (fi.getDocValuesType() == null) {
+      // Field was not indexed with doc values
+      return null;
+    }
+    if (fi.getDocValuesType() != type) {
+      // Field DocValues are different than requested type
+      return null;
+    }
+
+    return fi;
+  }
+  
+  @Override
+  public NumericDocValues getNumericDocValues(String field) throws IOException {
+    ensureOpen();
+    Map<String,Object> dvFields = docValuesLocal.get();
+
+    Object previous = dvFields.get(field);
+    if (previous != null && previous instanceof NumericDocValues) {
+      return (NumericDocValues) previous;
+    } else {
+      FieldInfo fi = getDVField(field, DocValuesType.NUMERIC);
+      if (fi == null) {
+        return null;
+      }
+      DocValuesProducer dvProducer = dvProducersByField.get(field);
+      assert dvProducer != null;
+      NumericDocValues dv = dvProducer.getNumeric(fi);
+      dvFields.put(field, dv);
+      return dv;
     }
   }
 
-  void rollbackCommit() {
-    super.rollbackCommit();
-    deletedDocsDirty = rollbackDeletedDocsDirty;
-    normsDirty = rollbackNormsDirty;
-    undeleteAll = rollbackUndeleteAll;
-    pendingDeleteCount = rollbackPendingDeleteCount;
-    Iterator it = norms.values().iterator();
-    while (it.hasNext()) {
-      Norm norm = (Norm) it.next();
-      norm.dirty = norm.rollbackDirty;
+  @Override
+  public Bits getDocsWithField(String field) throws IOException {
+    ensureOpen();
+    Map<String,Bits> dvFields = docsWithFieldLocal.get();
+
+    Bits previous = dvFields.get(field);
+    if (previous != null) {
+      return previous;
+    } else {
+      FieldInfo fi = fieldInfos.fieldInfo(field);
+      if (fi == null) {
+        // Field does not exist
+        return null;
+      }
+      if (fi.getDocValuesType() == null) {
+        // Field was not indexed with doc values
+        return null;
+      }
+      DocValuesProducer dvProducer = dvProducersByField.get(field);
+      assert dvProducer != null;
+      Bits dv = dvProducer.getDocsWithField(fi);
+      dvFields.put(field, dv);
+      return dv;
+    }
+  }
+
+  @Override
+  public BinaryDocValues getBinaryDocValues(String field) throws IOException {
+    ensureOpen();
+    FieldInfo fi = getDVField(field, DocValuesType.BINARY);
+    if (fi == null) {
+      return null;
+    }
+
+    Map<String,Object> dvFields = docValuesLocal.get();
+
+    BinaryDocValues dvs = (BinaryDocValues) dvFields.get(field);
+    if (dvs == null) {
+      DocValuesProducer dvProducer = dvProducersByField.get(field);
+      assert dvProducer != null;
+      dvs = dvProducer.getBinary(fi);
+      dvFields.put(field, dvs);
+    }
+
+    return dvs;
+  }
+
+  @Override
+  public SortedDocValues getSortedDocValues(String field) throws IOException {
+    ensureOpen();
+    Map<String,Object> dvFields = docValuesLocal.get();
+    
+    Object previous = dvFields.get(field);
+    if (previous != null && previous instanceof SortedDocValues) {
+      return (SortedDocValues) previous;
+    } else {
+      FieldInfo fi = getDVField(field, DocValuesType.SORTED);
+      if (fi == null) {
+        return null;
+      }
+      DocValuesProducer dvProducer = dvProducersByField.get(field);
+      assert dvProducer != null;
+      SortedDocValues dv = dvProducer.getSorted(fi);
+      dvFields.put(field, dv);
+      return dv;
+    }
+  }
+  
+  @Override
+  public SortedNumericDocValues getSortedNumericDocValues(String field) throws IOException {
+    ensureOpen();
+    Map<String,Object> dvFields = docValuesLocal.get();
+
+    Object previous = dvFields.get(field);
+    if (previous != null && previous instanceof SortedNumericDocValues) {
+      return (SortedNumericDocValues) previous;
+    } else {
+      FieldInfo fi = getDVField(field, DocValuesType.SORTED_NUMERIC);
+      if (fi == null) {
+        return null;
+      }
+      DocValuesProducer dvProducer = dvProducersByField.get(field);
+      assert dvProducer != null;
+      SortedNumericDocValues dv = dvProducer.getSortedNumeric(fi);
+      dvFields.put(field, dv);
+      return dv;
+    }
+  }
+
+  @Override
+  public SortedSetDocValues getSortedSetDocValues(String field) throws IOException {
+    ensureOpen();
+    Map<String,Object> dvFields = docValuesLocal.get();
+    
+    Object previous = dvFields.get(field);
+    if (previous != null && previous instanceof SortedSetDocValues) {
+      return (SortedSetDocValues) previous;
+    } else {
+      FieldInfo fi = getDVField(field, DocValuesType.SORTED_SET);
+      if (fi == null) {
+        return null;
+      }
+      DocValuesProducer dvProducer = dvProducersByField.get(field);
+      assert dvProducer != null;
+      SortedSetDocValues dv = dvProducer.getSortedSet(fi);
+      dvFields.put(field, dv);
+      return dv;
+    }
+  }
+
+  @Override
+  public NumericDocValues getNormValues(String field) throws IOException {
+    ensureOpen();
+    return core.getNormValues(fieldInfos, field);
+  }
+  
+  @Override
+  public void addCoreClosedListener(CoreClosedListener listener) {
+    ensureOpen();
+    core.addCoreClosedListener(listener);
+  }
+  
+  @Override
+  public void removeCoreClosedListener(CoreClosedListener listener) {
+    ensureOpen();
+    core.removeCoreClosedListener(listener);
+  }
+  
+  @Override
+  public long ramBytesUsed() {
+    ensureOpen();
+    long ramBytesUsed = BASE_RAM_BYTES_USED;
+    ramBytesUsed += dvGens.size() * LONG_RAM_BYTES_USED;
+    ramBytesUsed += dvProducers.size() * RamUsageEstimator.NUM_BYTES_OBJECT_REF;
+    ramBytesUsed += dvProducersByField.size() * 2 * RamUsageEstimator.NUM_BYTES_OBJECT_REF;
+    if (dvProducers != null) {
+      for (DocValuesProducer producer : dvProducers) {
+        ramBytesUsed += producer.ramBytesUsed();
+      }
+    }
+    if (core != null) {
+      ramBytesUsed += core.ramBytesUsed();
+    }
+    return ramBytesUsed;
+  }
+  
+  @Override
+  public void checkIntegrity() throws IOException {
+    ensureOpen();
+    
+    // stored fields
+    getFieldsReader().checkIntegrity();
+    
+    // term vectors
+    TermVectorsReader termVectorsReader = getTermVectorsReader();
+    if (termVectorsReader != null) {
+      termVectorsReader.checkIntegrity();
+    }
+    
+    // terms/postings
+    if (core.fields != null) {
+      core.fields.checkIntegrity();
+    }
+    
+    // norms
+    if (core.normsProducer != null) {
+      core.normsProducer.checkIntegrity();
+    }
+    
+    // docvalues
+    if (dvProducers != null) {
+      for (DocValuesProducer producer : dvProducers) {
+        producer.checkIntegrity();
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 package org.apache.lucene.search;
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,18 +17,20 @@ package org.apache.lucene.search;
  */
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /** A Scorer for queries with a required part and an optional part.
  * Delays skipTo() on the optional part until a score() is needed.
  * <br>
- * This <code>Scorer</code> implements {@link Scorer#skipTo(int)}.
+ * This <code>Scorer</code> implements {@link Scorer#advance(int)}.
  */
-public class ReqOptSumScorer extends Scorer {
+class ReqOptSumScorer extends Scorer {
   /** The scorers passed from the constructor.
    * These are set to null as soon as their next() or skipTo() returns false.
    */
-  private Scorer reqScorer;
-  private Scorer optScorer;
+  protected Scorer reqScorer;
+  protected Scorer optScorer;
 
   /** Construct a <code>ReqOptScorer</code>.
    * @param reqScorer The required scorer. This must match.
@@ -38,61 +40,69 @@ public class ReqOptSumScorer extends Scorer {
       Scorer reqScorer,
       Scorer optScorer)
   {
-    super(null); // No similarity used.
+    super(reqScorer.weight);
+    assert reqScorer != null;
+    assert optScorer != null;
     this.reqScorer = reqScorer;
     this.optScorer = optScorer;
   }
 
-  private boolean firstTimeOptScorer = true;
-
-  public boolean next() throws IOException {
-    return reqScorer.next();
+  @Override
+  public int nextDoc() throws IOException {
+    return reqScorer.nextDoc();
   }
-
-  public boolean skipTo(int target) throws IOException {
-    return reqScorer.skipTo(target);
+  
+  @Override
+  public int advance(int target) throws IOException {
+    return reqScorer.advance(target);
   }
-
-  public int doc() {
-    return reqScorer.doc();
+  
+  @Override
+  public int docID() {
+    return reqScorer.docID();
   }
-
+  
   /** Returns the score of the current document matching the query.
-   * Initially invalid, until {@link #next()} is called the first time.
+   * Initially invalid, until {@link #nextDoc()} is called the first time.
    * @return The score of the required scorer, eventually increased by the score
    * of the optional scorer when it also matches the current document.
    */
+  @Override
   public float score() throws IOException {
-    int curDoc = reqScorer.doc();
+    // TODO: sum into a double and cast to float if we ever send required clauses to BS1
+    int curDoc = reqScorer.docID();
     float reqScore = reqScorer.score();
-    if (firstTimeOptScorer) {
-      firstTimeOptScorer = false;
-      if (! optScorer.skipTo(curDoc)) {
-        optScorer = null;
-        return reqScore;
-      }
-    } else if (optScorer == null) {
+    if (optScorer == null) {
       return reqScore;
-    } else if ((optScorer.doc() < curDoc) && (! optScorer.skipTo(curDoc))) {
+    }
+    
+    int optScorerDoc = optScorer.docID();
+    if (optScorerDoc < curDoc && (optScorerDoc = optScorer.advance(curDoc)) == NO_MORE_DOCS) {
       optScorer = null;
       return reqScore;
     }
-    // assert (optScorer != null) && (optScorer.doc() >= curDoc);
-    return (optScorer.doc() == curDoc)
-       ? reqScore + optScorer.score()
-       : reqScore;
+    
+    return optScorerDoc == curDoc ? reqScore + optScorer.score() : reqScore;
   }
 
-  /** Explain the score of a document.
-   * @todo Also show the total score.
-   * See BooleanScorer.explain() on how to do this.
-   */
-  public Explanation explain(int doc) throws IOException {
-    Explanation res = new Explanation();
-    res.setDescription("required, optional");
-    res.addDetail(reqScorer.explain(doc));
-    res.addDetail(optScorer.explain(doc));
-    return res;
+  @Override
+  public int freq() throws IOException {
+    // we might have deferred advance()
+    score();
+    return (optScorer != null && optScorer.docID() == reqScorer.docID()) ? 2 : 1;
+  }
+
+  @Override
+  public Collection<ChildScorer> getChildren() {
+    ArrayList<ChildScorer> children = new ArrayList<>(2);
+    children.add(new ChildScorer(reqScorer, "MUST"));
+    children.add(new ChildScorer(optScorer, "SHOULD"));
+    return children;
+  }
+
+  @Override
+  public long cost() {
+    return reqScorer.cost();
   }
 }
 

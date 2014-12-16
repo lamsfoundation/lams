@@ -1,6 +1,6 @@
 package org.apache.lucene.util;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,7 +19,9 @@ package org.apache.lucene.util;
 
 import java.io.IOException;
 import org.apache.lucene.search.DocIdSetIterator;
- 
+
+/** OpenBitSet with added methods to bulk-update the bits
+ *  from a {@link DocIdSetIterator}. */ 
 public class OpenBitSetDISI extends OpenBitSet {
 
   /** Construct an OpenBitSetDISI with its bits set
@@ -47,8 +49,10 @@ public class OpenBitSetDISI extends OpenBitSet {
    * constructor.
    */   
   public void inPlaceOr(DocIdSetIterator disi) throws IOException {
-    while (disi.next() && (disi.doc() < size())) {
-      fastSet(disi.doc());
+    int doc;
+    long size = size();
+    while ((doc = disi.nextDoc()) < size) {
+      fastSet(doc);
     }
   }
 
@@ -59,20 +63,15 @@ public class OpenBitSetDISI extends OpenBitSet {
    * constructor.
    */   
   public void inPlaceAnd(DocIdSetIterator disi) throws IOException {
-    int index = nextSetBit(0);
-    int lastNotCleared = -1;
-    while ((index != -1) && disi.skipTo(index)) {
-      while ((index != -1) && (index < disi.doc())) {
-        fastClear(index);
-        index = nextSetBit(index + 1);
-      }
-      if (index == disi.doc()) {
-        lastNotCleared = index;
-        index++;
-      }
-      assert (index == -1) || (index > disi.doc());
+    int bitSetDoc = nextSetBit(0);
+    int disiDoc;
+    while (bitSetDoc != -1 && (disiDoc = disi.advance(bitSetDoc)) != DocIdSetIterator.NO_MORE_DOCS) {
+      clear(bitSetDoc, disiDoc);
+      bitSetDoc = nextSetBit(disiDoc + 1);
     }
-    clear(lastNotCleared+1, size());
+    if (bitSetDoc != -1) {
+      clear(bitSetDoc, size());
+    }
   }
 
   /**
@@ -82,8 +81,10 @@ public class OpenBitSetDISI extends OpenBitSet {
    * constructor.
    */   
   public void inPlaceNot(DocIdSetIterator disi) throws IOException {
-    while (disi.next() && (disi.doc() < size())) {
-      fastClear(disi.doc());
+    int doc;
+    long size = size();
+    while ((doc = disi.nextDoc()) < size) {
+      fastClear(doc);
     }
   }
 
@@ -94,8 +95,10 @@ public class OpenBitSetDISI extends OpenBitSet {
    * constructor.
    */   
   public void inPlaceXor(DocIdSetIterator disi) throws IOException {
-    while (disi.next() && (disi.doc() < size())) {
-      fastFlip(disi.doc());
+    int doc;
+    long size = size();
+    while ((doc = disi.nextDoc()) < size) {
+      fastFlip(doc);
     }
   }
 }

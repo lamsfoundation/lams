@@ -1,6 +1,6 @@
 package org.apache.lucene.index;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,311 +17,337 @@ package org.apache.lucene.index;
  * limitations under the License.
  */
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import java.io.IOException;
-import java.util.*;
+import org.apache.lucene.index.FieldInfo.DocValuesType;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 
-/** Access to the Fieldable Info file that describes document fields and whether or
- *  not they are indexed. Each segment has a separate Fieldable Info file. Objects
- *  of this class are thread-safe for multiple readers, but only one thread can
- *  be adding documents at a time, with no other reader or writer threads
- *  accessing this object.
+/** 
+ * Collection of {@link FieldInfo}s (accessible by number or by name).
+ *  @lucene.experimental
  */
-final class FieldInfos {
+public class FieldInfos implements Iterable<FieldInfo> {
+  private final boolean hasFreq;
+  private final boolean hasProx;
+  private final boolean hasPayloads;
+  private final boolean hasOffsets;
+  private final boolean hasVectors;
+  private final boolean hasNorms;
+  private final boolean hasDocValues;
   
-  static final byte IS_INDEXED = 0x1;
-  static final byte STORE_TERMVECTOR = 0x2;
-  static final byte STORE_POSITIONS_WITH_TERMVECTOR = 0x4;
-  static final byte STORE_OFFSET_WITH_TERMVECTOR = 0x8;
-  static final byte OMIT_NORMS = 0x10;
-  static final byte STORE_PAYLOADS = 0x20;
-  static final byte OMIT_TF = 0x40;
-  
-  private ArrayList byNumber = new ArrayList();
-  private HashMap byName = new HashMap();
-
-  FieldInfos() { }
-
-  /**
-   * Construct a FieldInfos object using the directory and the name of the file
-   * IndexInput
-   * @param d The directory to open the IndexInput from
-   * @param name The name of the file to open the IndexInput from in the Directory
-   * @throws IOException
-   */
-  FieldInfos(Directory d, String name) throws IOException {
-    IndexInput input = d.openInput(name);
-    try {
-      read(input);
-    } finally {
-      input.close();
-    }
-  }
-
-  /**
-   * Returns a deep clone of this FieldInfos instance.
-   */
-  synchronized public Object clone() {
-    FieldInfos fis = new FieldInfos();
-    final int numField = byNumber.size();
-    for(int i=0;i<numField;i++) {
-      FieldInfo fi = (FieldInfo) ((FieldInfo) byNumber.get(i)).clone();
-      fis.byNumber.add(fi);
-      fis.byName.put(fi.name, fi);
-    }
-    return fis;
-  }
-
-  /** Adds field info for a Document. */
-  synchronized public void add(Document doc) {
-    List fields = doc.getFields();
-    Iterator fieldIterator = fields.iterator();
-    while (fieldIterator.hasNext()) {
-      Fieldable field = (Fieldable) fieldIterator.next();
-      add(field.name(), field.isIndexed(), field.isTermVectorStored(), field.isStorePositionWithTermVector(),
-              field.isStoreOffsetWithTermVector(), field.getOmitNorms());
-    }
-  }
-
-  /** Returns true if any fields do not omitTf */
-  boolean hasProx() {
-    final int numFields = byNumber.size();
-    for(int i=0;i<numFields;i++)
-      if (!fieldInfo(i).omitTf)
-        return true;
-    return false;
-  }
+  private final SortedMap<Integer,FieldInfo> byNumber = new TreeMap<>();
+  private final HashMap<String,FieldInfo> byName = new HashMap<>();
+  private final Collection<FieldInfo> values; // for an unmodifiable iterator
   
   /**
-   * Add fields that are indexed. Whether they have termvectors has to be specified.
-   * 
-   * @param names The names of the fields
-   * @param storeTermVectors Whether the fields store term vectors or not
-   * @param storePositionWithTermVector treu if positions should be stored.
-   * @param storeOffsetWithTermVector true if offsets should be stored
+   * Constructs a new FieldInfos from an array of FieldInfo objects
    */
-  synchronized public void addIndexed(Collection names, boolean storeTermVectors, boolean storePositionWithTermVector, 
-                         boolean storeOffsetWithTermVector) {
-    Iterator i = names.iterator();
-    while (i.hasNext()) {
-      add((String)i.next(), true, storeTermVectors, storePositionWithTermVector, storeOffsetWithTermVector);
+  public FieldInfos(FieldInfo[] infos) {
+    boolean hasVectors = false;
+    boolean hasProx = false;
+    boolean hasPayloads = false;
+    boolean hasOffsets = false;
+    boolean hasFreq = false;
+    boolean hasNorms = false;
+    boolean hasDocValues = false;
+    
+    for (FieldInfo info : infos) {
+      if (info.number < 0) {
+        throw new IllegalArgumentException("illegal field number: " + info.number + " for field " + info.name);
+      }
+      FieldInfo previous = byNumber.put(info.number, info);
+      if (previous != null) {
+        throw new IllegalArgumentException("duplicate field numbers: " + previous.name + " and " + info.name + " have: " + info.number);
+      }
+      previous = byName.put(info.name, info);
+      if (previous != null) {
+        throw new IllegalArgumentException("duplicate field names: " + previous.number + " and " + info.number + " have: " + info.name);
+      }
+      
+      hasVectors |= info.hasVectors();
+      hasProx |= info.isIndexed() && info.getIndexOptions().compareTo(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS) >= 0;
+      hasFreq |= info.isIndexed() && info.getIndexOptions() != IndexOptions.DOCS_ONLY;
+      hasOffsets |= info.isIndexed() && info.getIndexOptions().compareTo(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS) >= 0;
+      hasNorms |= info.hasNorms();
+      hasDocValues |= info.hasDocValues();
+      hasPayloads |= info.hasPayloads();
     }
-  }
-
-  /**
-   * Assumes the fields are not storing term vectors.
-   * 
-   * @param names The names of the fields
-   * @param isIndexed Whether the fields are indexed or not
-   * 
-   * @see #add(String, boolean)
-   */
-  synchronized public void add(Collection names, boolean isIndexed) {
-    Iterator i = names.iterator();
-    while (i.hasNext()) {
-      add((String)i.next(), isIndexed);
-    }
-  }
-
-  /**
-   * Calls 5 parameter add with false for all TermVector parameters.
-   * 
-   * @param name The name of the Fieldable
-   * @param isIndexed true if the field is indexed
-   * @see #add(String, boolean, boolean, boolean, boolean)
-   */
-  synchronized public void add(String name, boolean isIndexed) {
-    add(name, isIndexed, false, false, false, false);
-  }
-
-  /**
-   * Calls 5 parameter add with false for term vector positions and offsets.
-   * 
-   * @param name The name of the field
-   * @param isIndexed  true if the field is indexed
-   * @param storeTermVector true if the term vector should be stored
-   */
-  synchronized public void add(String name, boolean isIndexed, boolean storeTermVector){
-    add(name, isIndexed, storeTermVector, false, false, false);
+    
+    this.hasVectors = hasVectors;
+    this.hasProx = hasProx;
+    this.hasPayloads = hasPayloads;
+    this.hasOffsets = hasOffsets;
+    this.hasFreq = hasFreq;
+    this.hasNorms = hasNorms;
+    this.hasDocValues = hasDocValues;
+    this.values = Collections.unmodifiableCollection(byNumber.values());
   }
   
-  /** If the field is not yet known, adds it. If it is known, checks to make
-   *  sure that the isIndexed flag is the same as was given previously for this
-   *  field. If not - marks it as being indexed.  Same goes for the TermVector
-   * parameters.
-   * 
-   * @param name The name of the field
-   * @param isIndexed true if the field is indexed
-   * @param storeTermVector true if the term vector should be stored
-   * @param storePositionWithTermVector true if the term vector with positions should be stored
-   * @param storeOffsetWithTermVector true if the term vector with offsets should be stored
-   */
-  synchronized public void add(String name, boolean isIndexed, boolean storeTermVector,
-                  boolean storePositionWithTermVector, boolean storeOffsetWithTermVector) {
-
-    add(name, isIndexed, storeTermVector, storePositionWithTermVector, storeOffsetWithTermVector, false);
-  }
-
-    /** If the field is not yet known, adds it. If it is known, checks to make
-   *  sure that the isIndexed flag is the same as was given previously for this
-   *  field. If not - marks it as being indexed.  Same goes for the TermVector
-   * parameters.
-   *
-   * @param name The name of the field
-   * @param isIndexed true if the field is indexed
-   * @param storeTermVector true if the term vector should be stored
-   * @param storePositionWithTermVector true if the term vector with positions should be stored
-   * @param storeOffsetWithTermVector true if the term vector with offsets should be stored
-   * @param omitNorms true if the norms for the indexed field should be omitted
-   */
-  synchronized public void add(String name, boolean isIndexed, boolean storeTermVector,
-                  boolean storePositionWithTermVector, boolean storeOffsetWithTermVector, boolean omitNorms) {
-    add(name, isIndexed, storeTermVector, storePositionWithTermVector,
-        storeOffsetWithTermVector, omitNorms, false, false);
+  /** Returns true if any fields have freqs */
+  public boolean hasFreq() {
+    return hasFreq;
   }
   
-  /** If the field is not yet known, adds it. If it is known, checks to make
-   *  sure that the isIndexed flag is the same as was given previously for this
-   *  field. If not - marks it as being indexed.  Same goes for the TermVector
-   * parameters.
-   *
-   * @param name The name of the field
-   * @param isIndexed true if the field is indexed
-   * @param storeTermVector true if the term vector should be stored
-   * @param storePositionWithTermVector true if the term vector with positions should be stored
-   * @param storeOffsetWithTermVector true if the term vector with offsets should be stored
-   * @param omitNorms true if the norms for the indexed field should be omitted
-   * @param storePayloads true if payloads should be stored for this field
-   * @param omitTf true if term freqs should be omitted for this field
+  /** Returns true if any fields have positions */
+  public boolean hasProx() {
+    return hasProx;
+  }
+
+  /** Returns true if any fields have payloads */
+  public boolean hasPayloads() {
+    return hasPayloads;
+  }
+
+  /** Returns true if any fields have offsets */
+  public boolean hasOffsets() {
+    return hasOffsets;
+  }
+  
+  /** Returns true if any fields have vectors */
+  public boolean hasVectors() {
+    return hasVectors;
+  }
+  
+  /** Returns true if any fields have norms */
+  public boolean hasNorms() {
+    return hasNorms;
+  }
+  
+  /** Returns true if any fields have DocValues */
+  public boolean hasDocValues() {
+    return hasDocValues;
+  }
+  
+  /** Returns the number of fields */
+  public int size() {
+    assert byNumber.size() == byName.size();
+    return byNumber.size();
+  }
+  
+  /**
+   * Returns an iterator over all the fieldinfo objects present,
+   * ordered by ascending field number
    */
-  synchronized public FieldInfo add(String name, boolean isIndexed, boolean storeTermVector,
-                       boolean storePositionWithTermVector, boolean storeOffsetWithTermVector,
-                       boolean omitNorms, boolean storePayloads, boolean omitTf) {
-    FieldInfo fi = fieldInfo(name);
-    if (fi == null) {
-      return addInternal(name, isIndexed, storeTermVector, storePositionWithTermVector, storeOffsetWithTermVector, omitNorms, storePayloads, omitTf);
-    } else {
-      fi.update(isIndexed, storeTermVector, storePositionWithTermVector, storeOffsetWithTermVector, omitNorms, storePayloads, omitTf);
-    }
-    return fi;
-  }
-
-  synchronized public FieldInfo add(FieldInfo fieldInfo) {
-    FieldInfo fi = fieldInfo(fieldInfo.name);
-    if (fi == null) {
-      return addInternal(fieldInfo.name, fieldInfo.isIndexed, fieldInfo.storeTermVector,
-                         fieldInfo.storePositionWithTermVector, fieldInfo.storeOffsetWithTermVector,
-                         fieldInfo.omitNorms, fieldInfo.storePayloads, fieldInfo.omitTf);
-    } else {
-      fi.update(fieldInfo);
-    }
-    return fi;
-  }
-
-  private FieldInfo addInternal(String name, boolean isIndexed,
-                                boolean storeTermVector, boolean storePositionWithTermVector, 
-                                boolean storeOffsetWithTermVector, boolean omitNorms, boolean storePayloads, boolean omitTf) {
-    FieldInfo fi =
-      new FieldInfo(name, isIndexed, byNumber.size(), storeTermVector, storePositionWithTermVector,
-              storeOffsetWithTermVector, omitNorms, storePayloads, omitTf);
-    byNumber.add(fi);
-    byName.put(name, fi);
-    return fi;
-  }
-
-  public int fieldNumber(String fieldName) {
-    FieldInfo fi = fieldInfo(fieldName);
-    return (fi != null) ? fi.number : -1;
-  }
-
-  public FieldInfo fieldInfo(String fieldName) {
-    return (FieldInfo) byName.get(fieldName);
+  // TODO: what happens if in fact a different order is used?
+  @Override
+  public Iterator<FieldInfo> iterator() {
+    return values.iterator();
   }
 
   /**
-   * Return the fieldName identified by its number.
-   * 
-   * @param fieldNumber
-   * @return the fieldName or an empty string when the field
-   * with the given number doesn't exist.
+   * Return the fieldinfo object referenced by the field name
+   * @return the FieldInfo object or null when the given fieldName
+   * doesn't exist.
    */  
-  public String fieldName(int fieldNumber) {
-	FieldInfo fi = fieldInfo(fieldNumber);
-	return (fi != null) ? fi.name : "";
+  public FieldInfo fieldInfo(String fieldName) {
+    return byName.get(fieldName);
   }
 
   /**
    * Return the fieldinfo object referenced by the fieldNumber.
-   * @param fieldNumber
+   * @param fieldNumber field's number.
    * @return the FieldInfo object or null when the given fieldNumber
    * doesn't exist.
-   */  
+   * @throws IllegalArgumentException if fieldNumber is negative
+   */
   public FieldInfo fieldInfo(int fieldNumber) {
-	return (fieldNumber >= 0) ? (FieldInfo) byNumber.get(fieldNumber) : null;
+    if (fieldNumber < 0) {
+      throw new IllegalArgumentException("Illegal field number: " + fieldNumber);
+    }
+    return byNumber.get(fieldNumber);
   }
+  
+  static final class FieldNumbers {
+    
+    private final Map<Integer,String> numberToName;
+    private final Map<String,Integer> nameToNumber;
+    // We use this to enforce that a given field never
+    // changes DV type, even across segments / IndexWriter
+    // sessions:
+    private final Map<String,DocValuesType> docValuesType;
 
-  public int size() {
-    return byNumber.size();
-  }
+    // TODO: we should similarly catch an attempt to turn
+    // norms back on after they were already ommitted; today
+    // we silently discard the norm but this is badly trappy
+    private int lowestUnassignedFieldNumber = -1;
+    
+    FieldNumbers() {
+      this.nameToNumber = new HashMap<>();
+      this.numberToName = new HashMap<>();
+      this.docValuesType = new HashMap<>();
+    }
+    
+    /**
+     * Returns the global field number for the given field name. If the name
+     * does not exist yet it tries to add it with the given preferred field
+     * number assigned if possible otherwise the first unassigned field number
+     * is used as the field number.
+     */
+    synchronized int addOrGet(String fieldName, int preferredFieldNumber, DocValuesType dvType) {
+      if (dvType != null) {
+        DocValuesType currentDVType = docValuesType.get(fieldName);
+        if (currentDVType == null) {
+          docValuesType.put(fieldName, dvType);
+        } else if (currentDVType != null && currentDVType != dvType) {
+          throw new IllegalArgumentException("cannot change DocValues type from " + currentDVType + " to " + dvType + " for field \"" + fieldName + "\"");
+        }
+      }
+      Integer fieldNumber = nameToNumber.get(fieldName);
+      if (fieldNumber == null) {
+        final Integer preferredBoxed = Integer.valueOf(preferredFieldNumber);
 
-  public boolean hasVectors() {
-    boolean hasVectors = false;
-    for (int i = 0; i < size(); i++) {
-      if (fieldInfo(i).storeTermVector) {
-        hasVectors = true;
-        break;
+        if (preferredFieldNumber != -1 && !numberToName.containsKey(preferredBoxed)) {
+          // cool - we can use this number globally
+          fieldNumber = preferredBoxed;
+        } else {
+          // find a new FieldNumber
+          while (numberToName.containsKey(++lowestUnassignedFieldNumber)) {
+            // might not be up to date - lets do the work once needed
+          }
+          fieldNumber = lowestUnassignedFieldNumber;
+        }
+        
+        numberToName.put(fieldNumber, fieldName);
+        nameToNumber.put(fieldName, fieldNumber);
+      }
+
+      return fieldNumber.intValue();
+    }
+
+    synchronized void verifyConsistent(Integer number, String name, DocValuesType dvType) {
+      if (name.equals(numberToName.get(number)) == false) {
+        throw new IllegalArgumentException("field number " + number + " is already mapped to field name \"" + numberToName.get(number) + "\", not \"" + name + "\"");
+      }
+      if (number.equals(nameToNumber.get(name)) == false) {
+        throw new IllegalArgumentException("field name \"" + name + "\" is already mapped to field number \"" + nameToNumber.get(name) + "\", not \"" + number + "\"");
+      }
+      DocValuesType currentDVType = docValuesType.get(name);
+      if (dvType != null && currentDVType != null && dvType != currentDVType) {
+        throw new IllegalArgumentException("cannot change DocValues type from " + currentDVType + " to " + dvType + " for field \"" + name + "\"");
       }
     }
-    return hasVectors;
-  }
 
-  public void write(Directory d, String name) throws IOException {
-    IndexOutput output = d.createOutput(name);
-    try {
-      write(output);
-    } finally {
-      output.close();
+    /**
+     * Returns true if the {@code fieldName} exists in the map and is of the
+     * same {@code dvType}.
+     */
+    synchronized boolean contains(String fieldName, DocValuesType dvType) {
+      // used by IndexWriter.updateNumericDocValue
+      if (!nameToNumber.containsKey(fieldName)) {
+        return false;
+      } else {
+        // only return true if the field has the same dvType as the requested one
+        return dvType == docValuesType.get(fieldName);
+      }
+    }
+    
+    synchronized void clear() {
+      numberToName.clear();
+      nameToNumber.clear();
+      docValuesType.clear();
+    }
+
+    synchronized void setDocValuesType(int number, String name, DocValuesType dvType) {
+      verifyConsistent(number, name, dvType);
+      docValuesType.put(name, dvType);
     }
   }
+  
+  static final class Builder {
+    private final HashMap<String,FieldInfo> byName = new HashMap<>();
+    final FieldNumbers globalFieldNumbers;
 
-  public void write(IndexOutput output) throws IOException {
-    output.writeVInt(size());
-    for (int i = 0; i < size(); i++) {
-      FieldInfo fi = fieldInfo(i);
-      byte bits = 0x0;
-      if (fi.isIndexed) bits |= IS_INDEXED;
-      if (fi.storeTermVector) bits |= STORE_TERMVECTOR;
-      if (fi.storePositionWithTermVector) bits |= STORE_POSITIONS_WITH_TERMVECTOR;
-      if (fi.storeOffsetWithTermVector) bits |= STORE_OFFSET_WITH_TERMVECTOR;
-      if (fi.omitNorms) bits |= OMIT_NORMS;
-      if (fi.storePayloads) bits |= STORE_PAYLOADS;
-      if (fi.omitTf) bits |= OMIT_TF;
-      
-      output.writeString(fi.name);
-      output.writeByte(bits);
+    Builder() {
+      this(new FieldNumbers());
+    }
+    
+    /**
+     * Creates a new instance with the given {@link FieldNumbers}. 
+     */
+    Builder(FieldNumbers globalFieldNumbers) {
+      assert globalFieldNumbers != null;
+      this.globalFieldNumbers = globalFieldNumbers;
+    }
+
+    public void add(FieldInfos other) {
+      for(FieldInfo fieldInfo : other){ 
+        add(fieldInfo);
+      }
+    }
+   
+    /** NOTE: this method does not carry over termVector
+     *  booleans nor docValuesType; the indexer chain
+     *  (TermVectorsConsumerPerField, DocFieldProcessor) must
+     *  set these fields when they succeed in consuming
+     *  the document */
+    public FieldInfo addOrUpdate(String name, IndexableFieldType fieldType) {
+      // TODO: really, indexer shouldn't even call this
+      // method (it's only called from DocFieldProcessor);
+      // rather, each component in the chain should update
+      // what it "owns".  EG fieldType.indexOptions() should
+      // be updated by maybe FreqProxTermsWriterPerField:
+      return addOrUpdateInternal(name, -1, fieldType.indexed(), false,
+                                 fieldType.omitNorms(), false,
+                                 fieldType.indexOptions(), fieldType.docValueType(), null);
+    }
+
+    private FieldInfo addOrUpdateInternal(String name, int preferredFieldNumber, boolean isIndexed,
+        boolean storeTermVector,
+        boolean omitNorms, boolean storePayloads, IndexOptions indexOptions, DocValuesType docValues, DocValuesType normType) {
+      FieldInfo fi = fieldInfo(name);
+      if (fi == null) {
+        // This field wasn't yet added to this in-RAM
+        // segment's FieldInfo, so now we get a global
+        // number for this field.  If the field was seen
+        // before then we'll get the same name and number,
+        // else we'll allocate a new one:
+        final int fieldNumber = globalFieldNumbers.addOrGet(name, preferredFieldNumber, docValues);
+        fi = new FieldInfo(name, isIndexed, fieldNumber, storeTermVector, omitNorms, storePayloads, indexOptions, docValues, normType, -1, null);
+        assert !byName.containsKey(fi.name);
+        globalFieldNumbers.verifyConsistent(Integer.valueOf(fi.number), fi.name, fi.getDocValuesType());
+        byName.put(fi.name, fi);
+      } else {
+        fi.update(isIndexed, storeTermVector, omitNorms, storePayloads, indexOptions);
+
+        if (docValues != null) {
+          // Only pay the synchronization cost if fi does not already have a DVType
+          boolean updateGlobal = !fi.hasDocValues();
+          if (updateGlobal) {
+            // Must also update docValuesType map so it's
+            // aware of this field's DocValueType.  This will throw IllegalArgumentException if
+            // an illegal type change was attempted.
+            globalFieldNumbers.setDocValuesType(fi.number, name, docValues);
+          }
+
+          fi.setDocValuesType(docValues); // this will also perform the consistency check.
+        }
+
+        if (!fi.omitsNorms() && normType != null) {
+          fi.setNormValueType(normType);
+        }
+      }
+      return fi;
+    }
+    
+    public FieldInfo add(FieldInfo fi) {
+      // IMPORTANT - reuse the field number if possible for consistent field numbers across segments
+      return addOrUpdateInternal(fi.name, fi.number, fi.isIndexed(), fi.hasVectors(),
+                 fi.omitsNorms(), fi.hasPayloads(),
+                 fi.getIndexOptions(), fi.getDocValuesType(), fi.getNormType());
+    }
+    
+    public FieldInfo fieldInfo(String fieldName) {
+      return byName.get(fieldName);
+    }
+    
+    final FieldInfos finish() {
+      return new FieldInfos(byName.values().toArray(new FieldInfo[byName.size()]));
     }
   }
-
-  private void read(IndexInput input) throws IOException {
-    int size = input.readVInt();//read in the size
-    for (int i = 0; i < size; i++) {
-      String name = input.readString().intern();
-      byte bits = input.readByte();
-      boolean isIndexed = (bits & IS_INDEXED) != 0;
-      boolean storeTermVector = (bits & STORE_TERMVECTOR) != 0;
-      boolean storePositionsWithTermVector = (bits & STORE_POSITIONS_WITH_TERMVECTOR) != 0;
-      boolean storeOffsetWithTermVector = (bits & STORE_OFFSET_WITH_TERMVECTOR) != 0;
-      boolean omitNorms = (bits & OMIT_NORMS) != 0;
-      boolean storePayloads = (bits & STORE_PAYLOADS) != 0;
-      boolean omitTf = (bits & OMIT_TF) != 0;
-      
-      addInternal(name, isIndexed, storeTermVector, storePositionsWithTermVector, storeOffsetWithTermVector, omitNorms, storePayloads, omitTf);
-    }    
-  }
-
 }

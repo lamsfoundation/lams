@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,22 +19,27 @@ package org.apache.lucene.search;
 
 import org.apache.lucene.util.PriorityQueue;
 
-final class PhraseQueue extends PriorityQueue {
+final class PhraseQueue extends PriorityQueue<PhrasePositions> {
   PhraseQueue(int size) {
-    initialize(size);
+    super(size);
   }
 
-  protected final boolean lessThan(Object o1, Object o2) {
-    PhrasePositions pp1 = (PhrasePositions)o1;
-    PhrasePositions pp2 = (PhrasePositions)o2;
+  @Override
+  protected final boolean lessThan(PhrasePositions pp1, PhrasePositions pp2) {
     if (pp1.doc == pp2.doc) 
       if (pp1.position == pp2.position)
         // same doc and pp.position, so decide by actual term positions. 
         // rely on: pp.position == tp.position - offset. 
-        return pp1.offset < pp2.offset;
-      else
+        if (pp1.offset == pp2.offset) {
+          return pp1.ord < pp2.ord;
+        } else {
+          return pp1.offset < pp2.offset;
+        }
+      else {
         return pp1.position < pp2.position;
-    else
+      }
+    else {
       return pp1.doc < pp2.doc;
+    }
   }
 }

@@ -1,6 +1,6 @@
 package org.apache.lucene.analysis.snowball;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,19 +19,43 @@ package org.apache.lucene.analysis.snowball;
 
 import java.io.IOException;
 
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tr.TurkishLowerCaseFilter; // javadoc @link
 import org.tartarus.snowball.SnowballProgram;
 
 /**
  * A filter that stems words using a Snowball-generated stemmer.
  *
  * Available stemmers are listed in {@link org.tartarus.snowball.ext}.
+ * <p><b>NOTE</b>: SnowballFilter expects lowercased text.
+ * <ul>
+ *  <li>For the Turkish language, see {@link TurkishLowerCaseFilter}.
+ *  <li>For other languages, see {@link LowerCaseFilter}.
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * Note: This filter is aware of the {@link KeywordAttribute}. To prevent
+ * certain terms from being passed to the stemmer
+ * {@link KeywordAttribute#isKeyword()} should be set to <code>true</code>
+ * in a previous {@link TokenStream}.
+ *
+ * Note: For including the original term as well as the stemmed version, see
+ * {@link org.apache.lucene.analysis.miscellaneous.KeywordRepeatFilterFactory}
+ * </p>
+ *
+ *
  */
-public class SnowballFilter extends TokenFilter {
+public final class SnowballFilter extends TokenFilter {
 
-  private SnowballProgram stemmer;
+  private final SnowballProgram stemmer;
+
+  private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
+  private final KeywordAttribute keywordAttr = addAttribute(KeywordAttribute.class);
 
   public SnowballFilter(TokenStream input, SnowballProgram stemmer) {
     super(input);
@@ -50,27 +74,36 @@ public class SnowballFilter extends TokenFilter {
    */
   public SnowballFilter(TokenStream in, String name) {
     super(in);
-    try {      
-      Class stemClass = Class.forName("org.tartarus.snowball.ext." + name + "Stemmer");
-      stemmer = (SnowballProgram) stemClass.newInstance();
+    //Class.forName is frowned upon in place of the ResourceLoader but in this case,
+    // the factory will use the other constructor so that the program is already loaded.
+    try {
+      Class<? extends SnowballProgram> stemClass =
+        Class.forName("org.tartarus.snowball.ext." + name + "Stemmer").asSubclass(SnowballProgram.class);
+      stemmer = stemClass.newInstance();
     } catch (Exception e) {
-      throw new RuntimeException(e.toString());
+      throw new IllegalArgumentException("Invalid stemmer class specified: " + name, e);
     }
   }
 
   /** Returns the next input Token, after being stemmed */
-  public final Token next(final Token reusableToken) throws IOException {
-    assert reusableToken != null;
-    Token nextToken = input.next(reusableToken);
-    if (nextToken == null)
-      return null;
-    String originalTerm = nextToken.term();
-    stemmer.setCurrent(originalTerm);
-    stemmer.stem();
-    String finalTerm = stemmer.getCurrent();
-    // Don't bother updating, if it is unchanged.
-    if (!originalTerm.equals(finalTerm))
-      nextToken.setTermBuffer(finalTerm);
-    return nextToken;
+  @Override
+  public final boolean incrementToken() throws IOException {
+    if (input.incrementToken()) {
+      if (!keywordAttr.isKeyword()) {
+        char termBuffer[] = termAtt.buffer();
+        final int length = termAtt.length();
+        stemmer.setCurrent(termBuffer, length);
+        stemmer.stem();
+        final char finalTerm[] = stemmer.getCurrentBuffer();
+        final int newLength = stemmer.getCurrentBufferLength();
+        if (finalTerm != termBuffer)
+          termAtt.copyBuffer(finalTerm, 0, newLength);
+        else
+          termAtt.setLength(newLength);
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 }

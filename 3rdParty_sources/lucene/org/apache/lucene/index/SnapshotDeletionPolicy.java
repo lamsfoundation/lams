@@ -1,6 +1,6 @@
 package org.apache.lucene.index;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,113 +18,247 @@ package org.apache.lucene.index;
  */
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.io.IOException;
+
 import org.apache.lucene.store.Directory;
 
-/** A {@link IndexDeletionPolicy} that wraps around any other
- *  {@link IndexDeletionPolicy} and adds the ability to hold and
- *  later release a single "snapshot" of an index.  While
- *  the snapshot is held, the {@link IndexWriter} will not
- *  remove any files associated with it even if the index is
- *  otherwise being actively, arbitrarily changed.  Because
- *  we wrap another arbitrary {@link IndexDeletionPolicy}, this
- *  gives you the freedom to continue using whatever {@link
- *  IndexDeletionPolicy} you would normally want to use with your
- *  index.  Note that you can re-use a single instance of
- *  SnapshotDeletionPolicy across multiple writers as long
- *  as they are against the same index Directory.  Any
- *  snapshot held when a writer is closed will "survive"
- *  when the next writer is opened.
- *
- * <p><b>WARNING</b>: This API is a new and experimental and
- * may suddenly change.</p> */
+/**
+ * An {@link IndexDeletionPolicy} that wraps any other
+ * {@link IndexDeletionPolicy} and adds the ability to hold and later release
+ * snapshots of an index. While a snapshot is held, the {@link IndexWriter} will
+ * not remove any files associated with it even if the index is otherwise being
+ * actively, arbitrarily changed. Because we wrap another arbitrary
+ * {@link IndexDeletionPolicy}, this gives you the freedom to continue using
+ * whatever {@link IndexDeletionPolicy} you would normally want to use with your
+ * index.
+ * 
+ * <p>
+ * This class maintains all snapshots in-memory, and so the information is not
+ * persisted and not protected against system failures. If persistence is
+ * important, you can use {@link PersistentSnapshotDeletionPolicy}.
+ * 
+ * @lucene.experimental
+ */
+public class SnapshotDeletionPolicy extends IndexDeletionPolicy {
 
-public class SnapshotDeletionPolicy implements IndexDeletionPolicy {
+  /** Records how many snapshots are held against each
+   *  commit generation */
+  protected final Map<Long,Integer> refCounts = new HashMap<>();
 
-  private IndexCommit lastCommit;
-  private IndexDeletionPolicy primary;
-  private String snapshot;
+  /** Used to map gen to IndexCommit. */
+  protected final Map<Long,IndexCommit> indexCommits = new HashMap<>();
 
+  /** Wrapped {@link IndexDeletionPolicy} */
+  private final IndexDeletionPolicy primary;
+
+  /** Most recently committed {@link IndexCommit}. */
+  protected IndexCommit lastCommit;
+
+  /** Used to detect misuse */
+  private boolean initCalled;
+
+  /** Sole constructor, taking the incoming {@link
+   *  IndexDeletionPolicy} to wrap. */
   public SnapshotDeletionPolicy(IndexDeletionPolicy primary) {
     this.primary = primary;
   }
 
-  public synchronized void onInit(List commits) throws IOException {
-    primary.onInit(wrapCommits(commits));
-    lastCommit = (IndexCommit) commits.get(commits.size()-1);
-  }
-
-  public synchronized void onCommit(List commits) throws IOException {
+  @Override
+  public synchronized void onCommit(List<? extends IndexCommit> commits)
+      throws IOException {
     primary.onCommit(wrapCommits(commits));
-    lastCommit = (IndexCommit) commits.get(commits.size()-1);
+    lastCommit = commits.get(commits.size() - 1);
   }
 
-  /** Take a snapshot of the most recent commit to the
-   *  index.  You must call release() to free this snapshot.
-   *  Note that while the snapshot is held, the files it
-   *  references will not be deleted, which will consume
-   *  additional disk space in your index. If you take a
-   *  snapshot at a particularly bad time (say just before
-   *  you call optimize()) then in the worst case this could
-   *  consume an extra 1X of your total index size, until
-   *  you release the snapshot. */
-  // TODO 3.0: change this to return IndexCommit instead
-  public synchronized IndexCommitPoint snapshot() {
-    if (snapshot == null)
-      snapshot = lastCommit.getSegmentsFileName();
-    else
-      throw new IllegalStateException("snapshot is already set; please call release() first");
+  @Override
+  public synchronized void onInit(List<? extends IndexCommit> commits)
+      throws IOException {
+    initCalled = true;
+    primary.onInit(wrapCommits(commits));
+    for(IndexCommit commit : commits) {
+      if (refCounts.containsKey(commit.getGeneration())) {
+        indexCommits.put(commit.getGeneration(), commit);
+      }
+    }
+    if (!commits.isEmpty()) {
+      lastCommit = commits.get(commits.size() - 1);
+    }
+  }
+
+  /**
+   * Release a snapshotted commit.
+   * 
+   * @param commit
+   *          the commit previously returned by {@link #snapshot}
+   */
+  public synchronized void release(IndexCommit commit) throws IOException {
+    long gen = commit.getGeneration();
+    releaseGen(gen);
+  }
+
+  /** Release a snapshot by generation. */
+  protected void releaseGen(long gen) throws IOException {
+    if (!initCalled) {
+      throw new IllegalStateException("this instance is not being used by IndexWriter; be sure to use the instance returned from writer.getConfig().getIndexDeletionPolicy()");
+    }
+    Integer refCount = refCounts.get(gen);
+    if (refCount == null) {
+      throw new IllegalArgumentException("commit gen=" + gen + " is not currently snapshotted");
+    }
+    int refCountInt = refCount.intValue();
+    assert refCountInt > 0;
+    refCountInt--;
+    if (refCountInt == 0) {
+      refCounts.remove(gen);
+      indexCommits.remove(gen);
+    } else {
+      refCounts.put(gen, refCountInt);
+    }
+  }
+
+  /** Increments the refCount for this {@link IndexCommit}. */
+  protected synchronized void incRef(IndexCommit ic) {
+    long gen = ic.getGeneration();
+    Integer refCount = refCounts.get(gen);
+    int refCountInt;
+    if (refCount == null) {
+      indexCommits.put(gen, lastCommit);
+      refCountInt = 0;
+    } else {
+      refCountInt = refCount.intValue();
+    }
+    refCounts.put(gen, refCountInt+1);
+  }
+
+  /**
+   * Snapshots the last commit and returns it. Once a commit is 'snapshotted,' it is protected
+   * from deletion (as long as this {@link IndexDeletionPolicy} is used). The
+   * snapshot can be removed by calling {@link #release(IndexCommit)} followed
+   * by a call to {@link IndexWriter#deleteUnusedFiles()}.
+   *
+   * <p>
+   * <b>NOTE:</b> while the snapshot is held, the files it references will not
+   * be deleted, which will consume additional disk space in your index. If you
+   * take a snapshot at a particularly bad time (say just before you call
+   * forceMerge) then in the worst case this could consume an extra 1X of your
+   * total index size, until you release the snapshot.
+   * 
+   * @throws IllegalStateException
+   *           if this index does not have any commits yet
+   * @return the {@link IndexCommit} that was snapshotted.
+   */
+  public synchronized IndexCommit snapshot() throws IOException {
+    if (!initCalled) {
+      throw new IllegalStateException("this instance is not being used by IndexWriter; be sure to use the instance returned from writer.getConfig().getIndexDeletionPolicy()");
+    }
+    if (lastCommit == null) {
+      // No commit yet, eg this is a new IndexWriter:
+      throw new IllegalStateException("No index commit to snapshot");
+    }
+
+    incRef(lastCommit);
+
     return lastCommit;
   }
 
-  /** Release the currently held snapshot. */
-  public synchronized void release() {
-    if (snapshot != null)
-      snapshot = null;
-    else
-      throw new IllegalStateException("snapshot was not set; please call snapshot() first");
+  /** Returns all IndexCommits held by at least one snapshot. */
+  public synchronized List<IndexCommit> getSnapshots() {
+    return new ArrayList<>(indexCommits.values());
   }
 
-  private class MyCommitPoint extends IndexCommit {
-    IndexCommit cp;
-    MyCommitPoint(IndexCommit cp) {
+  /** Returns the total number of snapshots currently held. */
+  public synchronized int getSnapshotCount() {
+    int total = 0;
+    for(Integer refCount : refCounts.values()) {
+      total += refCount.intValue();
+    }
+
+    return total;
+  }
+
+  /** Retrieve an {@link IndexCommit} from its generation;
+   *  returns null if this IndexCommit is not currently
+   *  snapshotted  */
+  public synchronized IndexCommit getIndexCommit(long gen) {
+    return indexCommits.get(gen);
+  }
+
+  /** Wraps each {@link IndexCommit} as a {@link
+   *  SnapshotCommitPoint}. */
+  private List<IndexCommit> wrapCommits(List<? extends IndexCommit> commits) {
+    List<IndexCommit> wrappedCommits = new ArrayList<>(commits.size());
+    for (IndexCommit ic : commits) {
+      wrappedCommits.add(new SnapshotCommitPoint(ic));
+    }
+    return wrappedCommits;
+  }
+
+  /** Wraps a provided {@link IndexCommit} and prevents it
+   *  from being deleted. */
+  private class SnapshotCommitPoint extends IndexCommit {
+
+    /** The {@link IndexCommit} we are preventing from deletion. */
+    protected IndexCommit cp;
+
+    /** Creates a {@code SnapshotCommitPoint} wrapping the provided
+     *  {@link IndexCommit}. */
+    protected SnapshotCommitPoint(IndexCommit cp) {
       this.cp = cp;
     }
-    public String getSegmentsFileName() {
-      return cp.getSegmentsFileName();
+
+    @Override
+    public String toString() {
+      return "SnapshotDeletionPolicy.SnapshotCommitPoint(" + cp + ")";
     }
-    public Collection getFileNames() throws IOException {
-      return cp.getFileNames();
+
+    @Override
+    public void delete() {
+      synchronized (SnapshotDeletionPolicy.this) {
+        // Suppress the delete request if this commit point is
+        // currently snapshotted.
+        if (!refCounts.containsKey(cp.getGeneration())) {
+          cp.delete();
+        }
+      }
     }
+
+    @Override
     public Directory getDirectory() {
       return cp.getDirectory();
     }
-    public void delete() {
-      synchronized(SnapshotDeletionPolicy.this) {
-        // Suppress the delete request if this commit point is
-        // our current snapshot.
-        if (snapshot == null || !snapshot.equals(getSegmentsFileName()))
-          cp.delete();
-      }
+
+    @Override
+    public Collection<String> getFileNames() throws IOException {
+      return cp.getFileNames();
     }
-    public boolean isDeleted() {
-      return cp.isDeleted();
-    }
-    public long getVersion() {
-      return cp.getVersion();
-    }
+
+    @Override
     public long getGeneration() {
       return cp.getGeneration();
     }
-  }
 
-  private List wrapCommits(List commits) {
-    final int count = commits.size();
-    List myCommits = new ArrayList(count);
-    for(int i=0;i<count;i++)
-      myCommits.add(new MyCommitPoint((IndexCommit) commits.get(i)));
-    return myCommits;
+    @Override
+    public String getSegmentsFileName() {
+      return cp.getSegmentsFileName();
+    }
+
+    @Override
+    public Map<String, String> getUserData() throws IOException {
+      return cp.getUserData();
+    }
+
+    @Override
+    public boolean isDeleted() {
+      return cp.isDeleted();
+    }
+
+    @Override
+    public int getSegmentCount() {
+      return cp.getSegmentCount();
+    }
   }
 }

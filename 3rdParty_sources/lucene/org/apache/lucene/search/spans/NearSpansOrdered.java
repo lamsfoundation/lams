@@ -1,6 +1,6 @@
 package org.apache.lucene.search.spans;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,14 +17,22 @@ package org.apache.lucene.search.spans;
  * limitations under the License.
  */
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.util.ArrayUtil;
+import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.InPlaceMergeSorter;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /** A Spans that is formed from the ordered subspans of a SpanNearQuery
  * where the subspans do not overlap and have a maximum slop between them.
@@ -43,14 +51,18 @@ import java.util.Collection;
  * matches twice:
  * <pre>t1 t2 .. t3      </pre>
  * <pre>      t1 .. t2 t3</pre>
+ *
+ *
+ * Expert:
+ * Only public for subclassing.  Most implementations should not need this class
  */
-class NearSpansOrdered implements PayloadSpans {
+public class NearSpansOrdered extends Spans {
   private final int allowedSlop;
   private boolean firstTime = true;
   private boolean more = false;
 
   /** The spans in the same order as the SpanNearQuery */
-  private final PayloadSpans[] subSpans;
+  private final Spans[] subSpans;
 
   /** Indicates that all subSpans have same doc() */
   private boolean inSameDoc = false;
@@ -58,55 +70,88 @@ class NearSpansOrdered implements PayloadSpans {
   private int matchDoc = -1;
   private int matchStart = -1;
   private int matchEnd = -1;
-  private List/*<byte[]>*/ matchPayload;
+  private List<byte[]> matchPayload;
 
-  private final PayloadSpans[] subSpansByDoc;
-  private final Comparator spanDocComparator = new Comparator() {
-    public int compare(Object o1, Object o2) {
-      return ((Spans)o1).doc() - ((Spans)o2).doc();
+  private final Spans[] subSpansByDoc;
+  // Even though the array is probably almost sorted, InPlaceMergeSorter will likely
+  // perform better since it has a lower overhead than TimSorter for small arrays
+  private final InPlaceMergeSorter sorter = new InPlaceMergeSorter() {
+    @Override
+    protected void swap(int i, int j) {
+      ArrayUtil.swap(subSpansByDoc, i, j);
+    }
+    @Override
+    protected int compare(int i, int j) {
+      return subSpansByDoc[i].doc() - subSpansByDoc[j].doc();
     }
   };
-  
-  private SpanNearQuery query;
 
-  public NearSpansOrdered(SpanNearQuery spanNearQuery, IndexReader reader)
+  private SpanNearQuery query;
+  private boolean collectPayloads = true;
+  
+  public NearSpansOrdered(SpanNearQuery spanNearQuery, AtomicReaderContext context, Bits acceptDocs, Map<Term,TermContext> termContexts) throws IOException {
+    this(spanNearQuery, context, acceptDocs, termContexts, true);
+  }
+
+  public NearSpansOrdered(SpanNearQuery spanNearQuery, AtomicReaderContext context, Bits acceptDocs, Map<Term,TermContext> termContexts, boolean collectPayloads)
   throws IOException {
     if (spanNearQuery.getClauses().length < 2) {
       throw new IllegalArgumentException("Less than 2 clauses: "
                                          + spanNearQuery);
     }
+    this.collectPayloads = collectPayloads;
     allowedSlop = spanNearQuery.getSlop();
     SpanQuery[] clauses = spanNearQuery.getClauses();
-    subSpans = new PayloadSpans[clauses.length];
-    matchPayload = new LinkedList();
-    subSpansByDoc = new PayloadSpans[clauses.length];
+    subSpans = new Spans[clauses.length];
+    matchPayload = new LinkedList<>();
+    subSpansByDoc = new Spans[clauses.length];
     for (int i = 0; i < clauses.length; i++) {
-      subSpans[i] = clauses[i].getPayloadSpans(reader);
+      subSpans[i] = clauses[i].getSpans(context, acceptDocs, termContexts);
       subSpansByDoc[i] = subSpans[i]; // used in toSameDoc()
     }
     query = spanNearQuery; // kept for toString() only.
   }
 
   // inherit javadocs
+  @Override
   public int doc() { return matchDoc; }
 
   // inherit javadocs
+  @Override
   public int start() { return matchStart; }
 
   // inherit javadocs
+  @Override
   public int end() { return matchEnd; }
+  
+  public Spans[] getSubSpans() {
+    return subSpans;
+  }  
 
   // TODO: Remove warning after API has been finalized
-  public Collection/*<byte[]>*/ getPayload() throws IOException {
+  // TODO: Would be nice to be able to lazy load payloads
+  @Override
+  public Collection<byte[]> getPayload() throws IOException {
     return matchPayload;
   }
 
   // TODO: Remove warning after API has been finalized
- public boolean isPayloadAvailable() {
+  @Override
+  public boolean isPayloadAvailable() {
     return matchPayload.isEmpty() == false;
   }
 
+  @Override
+  public long cost() {
+    long minCost = Long.MAX_VALUE;
+    for (int i = 0; i < subSpans.length; i++) {
+      minCost = Math.min(minCost, subSpans[i].cost());
+    }
+    return minCost;
+  }
+
   // inherit javadocs
+  @Override
   public boolean next() throws IOException {
     if (firstTime) {
       firstTime = false;
@@ -118,11 +163,14 @@ class NearSpansOrdered implements PayloadSpans {
       }
       more = true;
     }
-    matchPayload.clear();
+    if(collectPayloads) {
+      matchPayload.clear();
+    }
     return advanceAfterOrdered();
   }
 
   // inherit javadocs
+  @Override
   public boolean skipTo(int target) throws IOException {
     if (firstTime) {
       firstTime = false;
@@ -141,7 +189,9 @@ class NearSpansOrdered implements PayloadSpans {
         return false;
       }
     }
-    matchPayload.clear();
+    if(collectPayloads) {
+      matchPayload.clear();
+    }
     return advanceAfterOrdered();
   }
   
@@ -161,7 +211,7 @@ class NearSpansOrdered implements PayloadSpans {
 
   /** Advance the subSpans to the same document */
   private boolean toSameDoc() throws IOException {
-    Arrays.sort(subSpansByDoc, spanDocComparator);
+    sorter.sort(0, subSpansByDoc.length);
     int firstIndex = 0;
     int maxDoc = subSpansByDoc[subSpansByDoc.length - 1].doc();
     while (subSpansByDoc[firstIndex].doc() != maxDoc) {
@@ -186,8 +236,6 @@ class NearSpansOrdered implements PayloadSpans {
   }
   
   /** Check whether two Spans in the same document are ordered.
-   * @param spans1 
-   * @param spans2 
    * @return true iff spans1 starts before spans2
    *              or the spans start at the same position,
    *              and spans1 ends before spans2.
@@ -234,17 +282,22 @@ class NearSpansOrdered implements PayloadSpans {
   private boolean shrinkToAfterShortestMatch() throws IOException {
     matchStart = subSpans[subSpans.length - 1].start();
     matchEnd = subSpans[subSpans.length - 1].end();
+    Set<byte[]> possibleMatchPayloads = new HashSet<>();
     if (subSpans[subSpans.length - 1].isPayloadAvailable()) {
-      matchPayload.addAll(subSpans[subSpans.length - 1].getPayload());
+      possibleMatchPayloads.addAll(subSpans[subSpans.length - 1].getPayload());
     }
+
+    Collection<byte[]> possiblePayload = null;
+    
     int matchSlop = 0;
     int lastStart = matchStart;
     int lastEnd = matchEnd;
     for (int i = subSpans.length - 2; i >= 0; i--) {
-      PayloadSpans prevSpans = subSpans[i];
-      
-      if (subSpans[i].isPayloadAvailable()) {
-        matchPayload.addAll(0, subSpans[i].getPayload());
+      Spans prevSpans = subSpans[i];
+      if (collectPayloads && prevSpans.isPayloadAvailable()) {
+        Collection<byte[]> payload = prevSpans.getPayload();
+        possiblePayload = new ArrayList<>(payload.size());
+        possiblePayload.addAll(payload);
       }
       
       int prevStart = prevSpans.start();
@@ -265,9 +318,19 @@ class NearSpansOrdered implements PayloadSpans {
           } else { // prevSpans still before (lastStart, lastEnd)
             prevStart = ppStart;
             prevEnd = ppEnd;
+            if (collectPayloads && prevSpans.isPayloadAvailable()) {
+              Collection<byte[]> payload = prevSpans.getPayload();
+              possiblePayload = new ArrayList<>(payload.size());
+              possiblePayload.addAll(payload);
+            }
           }
         }
       }
+
+      if (collectPayloads && possiblePayload != null) {
+        possibleMatchPayloads.addAll(possiblePayload);
+      }
+      
       assert prevStart <= matchStart;
       if (matchStart > prevEnd) { // Only non overlapping spans add to slop.
         matchSlop += (matchStart - prevEnd);
@@ -280,9 +343,17 @@ class NearSpansOrdered implements PayloadSpans {
       lastStart = prevStart;
       lastEnd = prevEnd;
     }
-    return matchSlop <= allowedSlop; // ordered and allowed slop
+    
+    boolean match = matchSlop <= allowedSlop;
+    
+    if(collectPayloads && match && possibleMatchPayloads.size() > 0) {
+      matchPayload.addAll(possibleMatchPayloads);
+    }
+
+    return match; // ordered and allowed slop
   }
 
+  @Override
   public String toString() {
     return getClass().getName() + "("+query.toString()+")@"+
       (firstTime?"START":(more?(doc()+":"+start()+"-"+end()):"END"));

@@ -1,6 +1,6 @@
 package org.apache.lucene.index;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,80 +17,114 @@ package org.apache.lucene.index;
  * limitations under the License.
  */
 
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.lucene.util.BytesRef;
+
 /**
   A Term represents a word from text.  This is the unit of search.  It is
   composed of two elements, the text of the word, as a string, and the name of
-  the field that the text occured in, an interned string.
+  the field that the text occurred in.
 
   Note that terms may represent more than words from text fields, but also
   things like dates, email addresses, urls, etc.  */
 
-public final class Term implements Comparable, java.io.Serializable {
+public final class Term implements Comparable<Term> {
   String field;
-  String text;
+  BytesRef bytes;
+
+  /** Constructs a Term with the given field and bytes.
+   * <p>Note that a null field or null bytes value results in undefined
+   * behavior for most Lucene APIs that accept a Term parameter. 
+   *
+   * <p>WARNING: the provided BytesRef is not copied, but used directly.
+   * Therefore the bytes should not be modified after construction, for
+   * example, you should clone a copy by {@link BytesRef#deepCopyOf}
+   * rather than pass reused bytes from a TermsEnum.
+   */
+  public Term(String fld, BytesRef bytes) {
+    field = fld;
+    this.bytes = bytes;
+  }
 
   /** Constructs a Term with the given field and text.
    * <p>Note that a null field or null text value results in undefined
    * behavior for most Lucene APIs that accept a Term parameter. */
-  public Term(String fld, String txt) {
-    this(fld, txt, true);
+  public Term(String fld, String text) {
+    this(fld, new BytesRef(text));
   }
 
   /** Constructs a Term with the given field and empty text.
    * This serves two purposes: 1) reuse of a Term with the same field.
    * 2) pattern for a query.
    * 
-   * @param fld
+   * @param fld field's name
    */
   public Term(String fld) {
-    this(fld, "", true);
+    this(fld, new BytesRef());
   }
 
-  Term(String fld, String txt, boolean intern) {
-    field = intern ? fld.intern() : fld;	  // field names are interned
-    text = txt;					  // unless already known to be
-  }
-
-  /** Returns the field of this term, an interned string.   The field indicates
+  /** Returns the field of this term.   The field indicates
     the part of a document which this term came from. */
   public final String field() { return field; }
 
   /** Returns the text of this term.  In the case of words, this is simply the
     text of the word.  In the case of dates and other types, this is an
     encoding of the object as a string.  */
-  public final String text() { return text; }
+  public final String text() { 
+    return toString(bytes);
+  }
   
-  /**
-   * Optimized construction of new Terms by reusing same field as this Term
-   * - avoids field.intern() overhead 
-   * @param text The text of the new term (field is implicitly same as this Term instance)
-   * @return A new Term
-   */
-  public Term createTerm(String text)
-  {
-      return new Term(field,text,false);
+  /** Returns human-readable form of the term text. If the term is not unicode,
+   * the raw bytes will be printed instead. */
+  public static final String toString(BytesRef termText) {
+    // the term might not be text, but usually is. so we make a best effort
+    CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
+        .onMalformedInput(CodingErrorAction.REPORT)
+        .onUnmappableCharacter(CodingErrorAction.REPORT);
+    try {
+      return decoder.decode(ByteBuffer.wrap(termText.bytes, termText.offset, termText.length)).toString();
+    } catch (CharacterCodingException e) {
+      return termText.toString();
+    }
   }
 
-  /** Compares two terms, returning true iff they have the same
-      field and text. */
-  public final boolean equals(Object o) {
-    if (o == this)
+  /** Returns the bytes of this term. */
+  public final BytesRef bytes() { return bytes; }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
       return true;
-    if (o == null)
+    if (obj == null)
       return false;
-    if (!(o instanceof Term))
+    if (getClass() != obj.getClass())
       return false;
-    Term other = (Term)o;
-    return field == other.field && text.equals(other.text);
+    Term other = (Term) obj;
+    if (field == null) {
+      if (other.field != null)
+        return false;
+    } else if (!field.equals(other.field))
+      return false;
+    if (bytes == null) {
+      if (other.bytes != null)
+        return false;
+    } else if (!bytes.equals(other.bytes))
+      return false;
+    return true;
   }
 
-  /** Combines the hashCode() of the field and the text. */
-  public final int hashCode() {
-    return field.hashCode() + text.hashCode();
-  }
-
-  public int compareTo(Object other) {
-    return compareTo((Term)other);
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((field == null) ? 0 : field.hashCode());
+    result = prime * result + ((bytes == null) ? 0 : bytes.hashCode());
+    return result;
   }
 
   /** Compares two terms, returning a negative integer if this
@@ -98,25 +132,27 @@ public final class Term implements Comparable, java.io.Serializable {
     argument, and a positive integer if this term belongs after the argument.
 
     The ordering of terms is first by field, then by text.*/
+  @Override
   public final int compareTo(Term other) {
-    if (field == other.field)			  // fields are interned
-      return text.compareTo(other.text);
-    else
+    if (field.equals(other.field)) {
+      return bytes.compareTo(other.bytes);
+    } else {
       return field.compareTo(other.field);
+    }
   }
 
-  /** Resets the field and text of a Term. */
-  final void set(String fld, String txt) {
+  /** 
+   * Resets the field and text of a Term. 
+   * <p>WARNING: the provided BytesRef is not copied, but used directly.
+   * Therefore the bytes should not be modified after construction, for
+   * example, you should clone a copy rather than pass reused bytes from
+   * a TermsEnum.
+   */
+  final void set(String fld, BytesRef bytes) {
     field = fld;
-    text = txt;
+    this.bytes = bytes;
   }
 
-  public final String toString() { return field + ":" + text; }
-
-  private void readObject(java.io.ObjectInputStream in)
-    throws java.io.IOException, ClassNotFoundException
-  {
-      in.defaultReadObject();
-      field = field.intern();
-  }
+  @Override
+  public final String toString() { return field + ":" + text(); }
 }

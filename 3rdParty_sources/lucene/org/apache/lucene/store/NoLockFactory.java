@@ -1,6 +1,6 @@
 package org.apache.lucene.store;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,7 +21,6 @@ import java.io.IOException;
 
 /**
  * Use this {@link LockFactory} to disable locking entirely.
- * This LockFactory is used when you call {@link FSDirectory#setDisableLocks}.
  * Only one instance of this lock is created.  You should call {@link
  * #getNoLockFactory()} to get the instance.
  *
@@ -33,30 +32,38 @@ public class NoLockFactory extends LockFactory {
   // Single instance returned whenever makeLock is called.
   private static NoLock singletonLock = new NoLock();
   private static NoLockFactory singleton = new NoLockFactory();
+  
+  private NoLockFactory() {}
 
   public static NoLockFactory getNoLockFactory() {
     return singleton;
   }
 
+  @Override
   public Lock makeLock(String lockName) {
     return singletonLock;
   }
 
-  public void clearLock(String lockName) {};
-};
+  @Override
+  public void clearLock(String lockName) {}
+}
 
 class NoLock extends Lock {
+  @Override
   public boolean obtain() throws IOException {
     return true;
   }
 
-  public void release() {
+  @Override
+  public void close() {
   }
 
+  @Override
   public boolean isLocked() {
     return false;
   }
 
+  @Override
   public String toString() {
     return "NoLock";
   }

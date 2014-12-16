@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,10 +20,10 @@ package org.apache.lucene.search;
 import java.util.ArrayList;
 
 /** Expert: Describes the score computation for document and query. */
-public class Explanation implements java.io.Serializable {
+public class Explanation {
   private float value;                            // the value of this node
   private String description;                     // what it represents
-  private ArrayList details;                      // sub-explanations
+  private ArrayList<Explanation> details;                      // sub-explanations
 
   public Explanation() {}
 
@@ -70,22 +70,23 @@ public class Explanation implements java.io.Serializable {
   public Explanation[] getDetails() {
     if (details == null)
       return null;
-    return (Explanation[])details.toArray(new Explanation[0]);
+    return details.toArray(new Explanation[0]);
   }
 
   /** Adds a sub-node to this explanation node. */
   public void addDetail(Explanation detail) {
     if (details == null)
-      details = new ArrayList();
+      details = new ArrayList<>();
     details.add(detail);
   }
 
   /** Render an explanation as text. */
+  @Override
   public String toString() {
     return toString(0);
   }
   protected String toString(int depth) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for (int i = 0; i < depth; i++) {
       buffer.append("  ");
     }
@@ -105,7 +106,7 @@ public class Explanation implements java.io.Serializable {
 
   /** Render an explanation as HTML. */
   public String toHtml() {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("<ul>\n");
 
     buffer.append("<li>");

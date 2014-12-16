@@ -1,6 +1,6 @@
 package org.apache.lucene.analysis.snowball;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,42 +18,71 @@ package org.apache.lucene.analysis.snowball;
  */
 
 import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
 import org.apache.lucene.analysis.standard.*;
+import org.apache.lucene.analysis.tr.TurkishLowerCaseFilter;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.util.Version;
 
 import java.io.Reader;
-import java.util.Set;
 
 /** Filters {@link StandardTokenizer} with {@link StandardFilter}, {@link
  * LowerCaseFilter}, {@link StopFilter} and {@link SnowballFilter}.
  *
- * Available stemmers are listed in {@link net.sf.snowball.ext}.  The name of a
+ * Available stemmers are listed in org.tartarus.snowball.ext.  The name of a
  * stemmer is the part of the class name before "Stemmer", e.g., the stemmer in
  * {@link org.tartarus.snowball.ext.EnglishStemmer} is named "English".
+ *
+ * <p><b>NOTE</b>: This class uses the same {@link Version}
+ * dependent settings as {@link StandardAnalyzer}, with the following addition:
+ * <ul>
+ *   <li> As of 3.1, uses {@link TurkishLowerCaseFilter} for Turkish language.
+ * </ul>
+ * </p>
+ * @deprecated (3.1) Use the language-specific analyzer in modules/analysis instead. 
+ * This analyzer will be removed in Lucene 5.0
  */
-public class SnowballAnalyzer extends Analyzer {
+@Deprecated
+public final class SnowballAnalyzer extends Analyzer {
   private String name;
-  private Set stopSet;
+  private CharArraySet stopSet;
+  private final Version matchVersion;
 
   /** Builds the named analyzer with no stop words. */
-  public SnowballAnalyzer(String name) {
+  public SnowballAnalyzer(Version matchVersion, String name) {
     this.name = name;
+    this.matchVersion = matchVersion;
   }
 
   /** Builds the named analyzer with the given stop words. */
-  public SnowballAnalyzer(String name, String[] stopWords) {
-    this(name);
-    stopSet = StopFilter.makeStopSet(stopWords);
+  public SnowballAnalyzer(Version matchVersion, String name, CharArraySet stopWords) {
+    this(matchVersion, name);
+    stopSet = CharArraySet.unmodifiableSet(CharArraySet.copy(matchVersion,
+        stopWords));
   }
 
   /** Constructs a {@link StandardTokenizer} filtered by a {@link
-      StandardFilter}, a {@link LowerCaseFilter} and a {@link StopFilter}. */
-  public TokenStream tokenStream(String fieldName, Reader reader) {
-    TokenStream result = new StandardTokenizer(reader);
-    result = new StandardFilter(result);
-    result = new LowerCaseFilter(result);
+      StandardFilter}, a {@link LowerCaseFilter}, a {@link StopFilter},
+      and a {@link SnowballFilter} */
+  @Override
+  public TokenStreamComponents createComponents(String fieldName, Reader reader) {
+    Tokenizer tokenizer = new StandardTokenizer(matchVersion, reader);
+    TokenStream result = new StandardFilter(matchVersion, tokenizer);
+    // remove the possessive 's for english stemmers
+    if (matchVersion.onOrAfter(Version.LUCENE_3_1) && 
+        (name.equals("English") || name.equals("Porter") || name.equals("Lovins")))
+      result = new EnglishPossessiveFilter(result);
+    // Use a special lowercase filter for turkish, the stemmer expects it.
+    if (matchVersion.onOrAfter(Version.LUCENE_3_1) && name.equals("Turkish"))
+      result = new TurkishLowerCaseFilter(result);
+    else
+      result = new LowerCaseFilter(matchVersion, result);
     if (stopSet != null)
-      result = new StopFilter(result, stopSet);
+      result = new StopFilter(matchVersion,
+                              result, stopSet);
     result = new SnowballFilter(result, name);
-    return result;
+    return new TokenStreamComponents(tokenizer, result);
   }
 }

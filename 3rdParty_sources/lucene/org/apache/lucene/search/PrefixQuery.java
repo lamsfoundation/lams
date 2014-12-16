@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,55 +19,47 @@ package org.apache.lucene.search;
 
 import java.io.IOException;
 
+import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.ToStringUtils;
 
 /** A Query that matches documents containing terms with a specified prefix. A PrefixQuery
- * is built by QueryParser for input like <code>app*</code>. */
-public class PrefixQuery extends Query {
+ * is built by QueryParser for input like <code>app*</code>.
+ *
+ * <p>This query uses the {@link
+ * MultiTermQuery#CONSTANT_SCORE_AUTO_REWRITE_DEFAULT}
+ * rewrite method. */
+public class PrefixQuery extends MultiTermQuery {
   private Term prefix;
 
   /** Constructs a query for terms starting with <code>prefix</code>. */
   public PrefixQuery(Term prefix) {
+    super(prefix.field());
     this.prefix = prefix;
   }
 
   /** Returns the prefix of this query. */
   public Term getPrefix() { return prefix; }
-
-  public Query rewrite(IndexReader reader) throws IOException {
-    BooleanQuery query = new BooleanQuery(true);
-    TermEnum enumerator = reader.terms(prefix);
-    try {
-      String prefixText = prefix.text();
-      String prefixField = prefix.field();
-      do {
-        Term term = enumerator.term();
-        if (term != null &&
-            term.text().startsWith(prefixText) &&
-            term.field() == prefixField) // interned comparison 
-        {
-          TermQuery tq = new TermQuery(term);	  // found a match
-          tq.setBoost(getBoost());                // set the boost
-          query.add(tq, BooleanClause.Occur.SHOULD);		  // add to query
-          //System.out.println("added " + term);
-        } else {
-          break;
-        }
-      } while (enumerator.next());
-    } finally {
-      enumerator.close();
+  
+  @Override  
+  protected TermsEnum getTermsEnum(Terms terms, AttributeSource atts) throws IOException {
+    TermsEnum tenum = terms.iterator(null);
+    
+    if (prefix.bytes().length == 0) {
+      // no prefix -- match all terms for this field:
+      return tenum;
     }
-    return query;
+    return new PrefixTermsEnum(tenum, prefix.bytes());
   }
 
   /** Prints a user-readable version of this query. */
+  @Override
   public String toString(String field) {
-    StringBuffer buffer = new StringBuffer();
-    if (!prefix.field().equals(field)) {
-      buffer.append(prefix.field());
+    StringBuilder buffer = new StringBuilder();
+    if (!getField().equals(field)) {
+      buffer.append(getField());
       buffer.append(":");
     }
     buffer.append(prefix.text());
@@ -76,17 +68,29 @@ public class PrefixQuery extends Query {
     return buffer.toString();
   }
 
-  /** Returns true iff <code>o</code> is equal to this. */
-  public boolean equals(Object o) {
-    if (!(o instanceof PrefixQuery))
-      return false;
-    PrefixQuery other = (PrefixQuery)o;
-    return (this.getBoost() == other.getBoost())
-      && this.prefix.equals(other.prefix);
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((prefix == null) ? 0 : prefix.hashCode());
+    return result;
   }
 
-  /** Returns a hash code value for this object.*/
-  public int hashCode() {
-    return Float.floatToIntBits(getBoost()) ^ prefix.hashCode() ^ 0x6634D93C;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    PrefixQuery other = (PrefixQuery) obj;
+    if (prefix == null) {
+      if (other.prefix != null)
+        return false;
+    } else if (!prefix.equals(other.prefix))
+      return false;
+    return true;
   }
+
 }

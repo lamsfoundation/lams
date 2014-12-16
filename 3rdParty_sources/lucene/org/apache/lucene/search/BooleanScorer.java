@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,104 +18,215 @@ package org.apache.lucene.search;
  */
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-final class BooleanScorer extends Scorer {
-  private SubScorer scorers = null;
-  private BucketTable bucketTable = new BucketTable();
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.DocsEnum;
+import org.apache.lucene.search.BooleanQuery.BooleanWeight;
 
-  private int maxCoord = 1;
-  private float[] coordFactors = null;
+/* Description from Doug Cutting (excerpted from
+ * LUCENE-1483):
+ *
+ * BooleanScorer uses an array to score windows of
+ * 2K docs. So it scores docs 0-2K first, then docs 2K-4K,
+ * etc. For each window it iterates through all query terms
+ * and accumulates a score in table[doc%2K]. It also stores
+ * in the table a bitmask representing which terms
+ * contributed to the score. Non-zero scores are chained in
+ * a linked list. At the end of scoring each window it then
+ * iterates through the linked list and, if the bitmask
+ * matches the boolean constraints, collects a hit. For
+ * boolean queries with lots of frequent terms this can be
+ * much faster, since it does not need to update a priority
+ * queue for each posting, instead performing constant-time
+ * operations per posting. The only downside is that it
+ * results in hits being delivered out-of-order within the
+ * window, which means it cannot be nested within other
+ * scorers. But it works well as a top-level scorer.
+ *
+ * The new BooleanScorer2 implementation instead works by
+ * merging priority queues of postings, albeit with some
+ * clever tricks. For example, a pure conjunction (all terms
+ * required) does not require a priority queue. Instead it
+ * sorts the posting streams at the start, then repeatedly
+ * skips the first to to the last. If the first ever equals
+ * the last, then there's a hit. When some terms are
+ * required and some terms are optional, the conjunction can
+ * be evaluated first, then the optional terms can all skip
+ * to the match and be added to the score. Thus the
+ * conjunction can reduce the number of priority queue
+ * updates for the optional terms. */
 
-  private int requiredMask = 0;
-  private int prohibitedMask = 0;
-  private int nextMask = 1;
-
-  private final int minNrShouldMatch;
-
-  BooleanScorer(Similarity similarity) {
-    this(similarity, 1);
-  }
+final class BooleanScorer extends BulkScorer {
   
-  BooleanScorer(Similarity similarity, int minNrShouldMatch) {
-    super(similarity);
-    this.minNrShouldMatch = minNrShouldMatch;
-  }
-  
-  static final class SubScorer {
-    public Scorer scorer;
-    public boolean done;
-    public boolean required = false;
-    public boolean prohibited = false;
-    public HitCollector collector;
-    public SubScorer next;
+  private static final class BooleanScorerCollector extends Collector {
+    private BucketTable bucketTable;
+    private int mask;
+    private Scorer scorer;
+    
+    public BooleanScorerCollector(int mask, BucketTable bucketTable) {
+      this.mask = mask;
+      this.bucketTable = bucketTable;
+    }
+    
+    @Override
+    public void collect(final int doc) throws IOException {
+      final BucketTable table = bucketTable;
+      final int i = doc & BucketTable.MASK;
+      final Bucket bucket = table.buckets[i];
+      
+      if (bucket.doc != doc) {                    // invalid bucket
+        bucket.doc = doc;                         // set doc
+        bucket.score = scorer.score();            // initialize score
+        bucket.bits = mask;                       // initialize mask
+        bucket.coord = 1;                         // initialize coord
 
-    public SubScorer(Scorer scorer, boolean required, boolean prohibited,
-                     HitCollector collector, SubScorer next)
-      throws IOException {
+        bucket.next = table.first;                // push onto valid list
+        table.first = bucket;
+      } else {                                    // valid bucket
+        bucket.score += scorer.score();           // increment score
+        bucket.bits |= mask;                      // add bits in mask
+        bucket.coord++;                           // increment coord
+      }
+    }
+    
+    @Override
+    public void setNextReader(AtomicReaderContext context) {
+      // not needed by this implementation
+    }
+    
+    @Override
+    public void setScorer(Scorer scorer) {
       this.scorer = scorer;
-      this.done = !scorer.next();
-      this.required = required;
+    }
+    
+    @Override
+    public boolean acceptsDocsOutOfOrder() {
+      return true;
+    }
+
+  }
+  
+  static final class Bucket {
+    int doc = -1;            // tells if bucket is valid
+    double score;             // incremental score
+    // TODO: break out bool anyProhibited, int
+    // numRequiredMatched; then we can remove 32 limit on
+    // required clauses
+    int bits;                // used for bool constraints
+    int coord;               // count of terms in score
+    Bucket next;             // next valid bucket
+  }
+  
+  /** A simple hash table of document scores within a range. */
+  static final class BucketTable {
+    public static final int SIZE = 1 << 11;
+    public static final int MASK = SIZE - 1;
+
+    final Bucket[] buckets = new Bucket[SIZE];
+    Bucket first = null;                          // head of valid list
+  
+    public BucketTable() {
+      // Pre-fill to save the lazy init when collecting
+      // each sub:
+      for(int idx=0;idx<SIZE;idx++) {
+        buckets[idx] = new Bucket();
+      }
+    }
+
+    public Collector newCollector(int mask) {
+      return new BooleanScorerCollector(mask, this);
+    }
+
+    public int size() { return SIZE; }
+  }
+
+  static final class SubScorer {
+    public BulkScorer scorer;
+    // TODO: re-enable this if BQ ever sends us required clauses
+    //public boolean required = false;
+    public boolean prohibited;
+    public Collector collector;
+    public SubScorer next;
+    public boolean more;
+
+    public SubScorer(BulkScorer scorer, boolean required, boolean prohibited,
+        Collector collector, SubScorer next) {
+      if (required) {
+        throw new IllegalArgumentException("this scorer cannot handle required=true");
+      }
+      this.scorer = scorer;
+      this.more = true;
+      // TODO: re-enable this if BQ ever sends us required clauses
+      //this.required = required;
       this.prohibited = prohibited;
       this.collector = collector;
       this.next = next;
     }
   }
-
-  final void add(Scorer scorer, boolean required, boolean prohibited)
-    throws IOException {
-    int mask = 0;
-    if (required || prohibited) {
-      if (nextMask == 0)
-        throw new IndexOutOfBoundsException
-          ("More than 32 required/prohibited clauses in query.");
-      mask = nextMask;
-      nextMask = nextMask << 1;
-    } else
-      mask = 0;
-
-    if (!prohibited)
-      maxCoord++;
-
-    if (prohibited)
-      prohibitedMask |= mask;                     // update prohibited mask
-    else if (required)
-      requiredMask |= mask;                       // update required mask
-
-    scorers = new SubScorer(scorer, required, prohibited,
-                            bucketTable.newCollector(mask), scorers);
-  }
-
-  private final void computeCoordFactors() {
-    coordFactors = new float[maxCoord];
-    for (int i = 0; i < maxCoord; i++)
-      coordFactors[i] = getSimilarity().coord(i, maxCoord-1);
-  }
-
+  
+  private SubScorer scorers = null;
+  private BucketTable bucketTable = new BucketTable();
+  private final float[] coordFactors;
+  // TODO: re-enable this if BQ ever sends us required clauses
+  //private int requiredMask = 0;
+  private final int minNrShouldMatch;
   private int end;
   private Bucket current;
+  // Any time a prohibited clause matches we set bit 0:
+  private static final int PROHIBITED_MASK = 1;
 
-  public void score(HitCollector hc) throws IOException {
-    next();
-    score(hc, Integer.MAX_VALUE);
+  private final Weight weight;
+
+  BooleanScorer(BooleanWeight weight, boolean disableCoord, int minNrShouldMatch,
+      List<BulkScorer> optionalScorers, List<BulkScorer> prohibitedScorers, int maxCoord) throws IOException {
+    this.minNrShouldMatch = minNrShouldMatch;
+    this.weight = weight;
+
+    for (BulkScorer scorer : optionalScorers) {
+      scorers = new SubScorer(scorer, false, false, bucketTable.newCollector(0), scorers);
+    }
+    
+    for (BulkScorer scorer : prohibitedScorers) {
+      scorers = new SubScorer(scorer, false, true, bucketTable.newCollector(PROHIBITED_MASK), scorers);
+    }
+
+    coordFactors = new float[optionalScorers.size() + 1];
+    for (int i = 0; i < coordFactors.length; i++) {
+      coordFactors[i] = disableCoord ? 1.0f : weight.coord(i, maxCoord); 
+    }
   }
 
-  protected boolean score(HitCollector hc, int max) throws IOException {
-    if (coordFactors == null)
-      computeCoordFactors();
+  @Override
+  public boolean score(Collector collector, int max) throws IOException {
 
     boolean more;
     Bucket tmp;
-    
+    FakeScorer fs = new FakeScorer();
+
+    // The internal loop will set the score and doc before calling collect.
+    collector.setScorer(fs);
     do {
       bucketTable.first = null;
       
       while (current != null) {         // more queued 
 
         // check prohibited & required
-        if ((current.bits & prohibitedMask) == 0 && 
-            (current.bits & requiredMask) == requiredMask) {
+        if ((current.bits & PROHIBITED_MASK) == 0) {
+
+          // TODO: re-enable this if BQ ever sends us required
+          // clauses
+          //&& (current.bits & requiredMask) == requiredMask) {
           
-          if (current.doc >= max){
+          // NOTE: Lucene always passes max =
+          // Integer.MAX_VALUE today, because we never embed
+          // a BooleanScorer inside another (even though
+          // that should work)... but in theory an outside
+          // app could pass a different max so we must check
+          // it:
+          if (current.doc >= max) {
             tmp = current;
             current = current.next;
             tmp.next = bucketTable.first;
@@ -124,7 +235,10 @@ final class BooleanScorer extends Scorer {
           }
           
           if (current.coord >= minNrShouldMatch) {
-            hc.collect(current.doc, current.score * coordFactors[current.coord]);
+            fs.score = (float) (current.score * coordFactors[current.coord]);
+            fs.doc = current.doc;
+            fs.freq = current.coord;
+            collector.collect(current.doc);
           }
         }
         
@@ -141,10 +255,9 @@ final class BooleanScorer extends Scorer {
       more = false;
       end += BucketTable.SIZE;
       for (SubScorer sub = scorers; sub != null; sub = sub.next) {
-        if (!sub.done) {
-          sub.done = !sub.scorer.score(sub.collector, end);
-          if (!sub.done)
-            more = true;
+        if (sub.more) {
+          sub.more = sub.scorer.score(sub.collector, end);
+          more |= sub.more;
         }
       }
       current = bucketTable.first;
@@ -154,112 +267,9 @@ final class BooleanScorer extends Scorer {
     return false;
   }
 
-  public int doc() { return current.doc; }
-
-  public boolean next() throws IOException {
-    boolean more;
-    do {
-      while (bucketTable.first != null) {         // more queued
-        current = bucketTable.first;
-        bucketTable.first = current.next;         // pop the queue
-
-        // check prohibited & required, and minNrShouldMatch
-        if ((current.bits & prohibitedMask) == 0 &&
-            (current.bits & requiredMask) == requiredMask &&
-            current.coord >= minNrShouldMatch) {
-          return true;
-        }
-      }
-
-      // refill the queue
-      more = false;
-      end += BucketTable.SIZE;
-      for (SubScorer sub = scorers; sub != null; sub = sub.next) {
-        Scorer scorer = sub.scorer;
-        while (!sub.done && scorer.doc() < end) {
-          sub.collector.collect(scorer.doc(), scorer.score());
-          sub.done = !scorer.next();
-        }
-        if (!sub.done) {
-          more = true;
-        }
-      }
-    } while (bucketTable.first != null || more);
-
-    return false;
-  }
-
-  public float score() {
-    if (coordFactors == null)
-      computeCoordFactors();
-    return current.score * coordFactors[current.coord];
-  }
-
-  static final class Bucket {
-    int doc = -1;                                 // tells if bucket is valid
-    float       score;                            // incremental score
-    int bits;                                     // used for bool constraints
-    int coord;                                    // count of terms in score
-    Bucket      next;                             // next valid bucket
-  }
-
-  /** A simple hash table of document scores within a range. */
-  static final class BucketTable {
-    public static final int SIZE = 1 << 11;
-    public static final int MASK = SIZE - 1;
-
-    final Bucket[] buckets = new Bucket[SIZE];
-    Bucket first = null;                          // head of valid list
-  
-    public BucketTable() {}
-
-    public final int size() { return SIZE; }
-
-    public HitCollector newCollector(int mask) {
-      return new Collector(mask, this);
-    }
-  }
-
-  static final class Collector extends HitCollector {
-    private BucketTable bucketTable;
-    private int mask;
-    public Collector(int mask, BucketTable bucketTable) {
-      this.mask = mask;
-      this.bucketTable = bucketTable;
-    }
-    public final void collect(final int doc, final float score) {
-      final BucketTable table = bucketTable;
-      final int i = doc & BucketTable.MASK;
-      Bucket bucket = table.buckets[i];
-      if (bucket == null)
-        table.buckets[i] = bucket = new Bucket();
-      
-      if (bucket.doc != doc) {                    // invalid bucket
-        bucket.doc = doc;                         // set doc
-        bucket.score = score;                     // initialize score
-        bucket.bits = mask;                       // initialize mask
-        bucket.coord = 1;                         // initialize coord
-
-        bucket.next = table.first;                // push onto valid list
-        table.first = bucket;
-      } else {                                    // valid bucket
-        bucket.score += score;                    // increment score
-        bucket.bits |= mask;                      // add bits in mask
-        bucket.coord++;                           // increment coord
-      }
-    }
-  }
-
-  public boolean skipTo(int target) {
-    throw new UnsupportedOperationException();
-  }
-
-  public Explanation explain(int doc) {
-    throw new UnsupportedOperationException();
-  }
-
+  @Override
   public String toString() {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("boolean(");
     for (SubScorer sub = scorers; sub != null; sub = sub.next) {
       buffer.append(sub.scorer.toString());
@@ -268,5 +278,4 @@ final class BooleanScorer extends Scorer {
     buffer.append(")");
     return buffer.toString();
   }
-
 }

@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,6 +17,7 @@ package org.apache.lucene.search;
  * limitations under the License.
  */
 
+import java.util.Arrays;
 
 /**
  * Expert: A ScoreDoc which also contains information about
@@ -34,30 +35,46 @@ package org.apache.lucene.search;
  * <p>Created: Feb 11, 2004 1:23:38 PM
  *
  * @since   lucene 1.4
- * @version $Id$
  * @see ScoreDoc
  * @see TopFieldDocs
  */
-public class FieldDoc
-extends ScoreDoc {
+public class FieldDoc extends ScoreDoc {
 
-	/** Expert: The values which are used to sort the referenced document.
-	 * The order of these will match the original sort criteria given by a
-	 * Sort object.  Each Object will be either an Integer, Float or String,
-	 * depending on the type of values in the terms of the original field.
-	 * @see Sort
-	 * @see Searcher#search(Query,Filter,int,Sort)
-	 */
-	public Comparable[] fields;
+  /** Expert: The values which are used to sort the referenced document.
+   * The order of these will match the original sort criteria given by a
+   * Sort object.  Each Object will have been returned from
+   * the <code>value</code> method corresponding
+   * FieldComparator used to sort this field.
+   * @see Sort
+   * @see IndexSearcher#search(Query,Filter,int,Sort)
+   */
+  public Object[] fields;
 
-	/** Expert: Creates one of these objects with empty sort information. */
-	public FieldDoc (int doc, float score) {
-		super (doc, score);
-	}
+  /** Expert: Creates one of these objects with empty sort information. */
+  public FieldDoc(int doc, float score) {
+    super (doc, score);
+  }
 
-	/** Expert: Creates one of these objects with the given sort information. */
-	public FieldDoc (int doc, float score, Comparable[] fields) {
-		super (doc, score);
-		this.fields = fields;
-	}
+  /** Expert: Creates one of these objects with the given sort information. */
+  public FieldDoc(int doc, float score, Object[] fields) {
+    super (doc, score);
+    this.fields = fields;
+  }
+  
+  /** Expert: Creates one of these objects with the given sort information. */
+  public FieldDoc(int doc, float score, Object[] fields, int shardIndex) {
+    super (doc, score, shardIndex);
+    this.fields = fields;
+  }
+  
+  // A convenience method for debugging.
+  @Override
+  public String toString() {
+    // super.toString returns the doc and score information, so just add the
+    // fields information
+    StringBuilder sb = new StringBuilder(super.toString());
+    sb.append(" fields=");
+    sb.append(Arrays.toString(fields));
+    return sb.toString();
+  }
 }

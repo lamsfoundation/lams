@@ -1,6 +1,6 @@
 package org.apache.lucene.search;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,16 +17,14 @@ package org.apache.lucene.search;
  * limitations under the License.
  */
 
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.Similarity;
-import org.apache.lucene.search.Weight;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.util.ToStringUtils;
+import org.apache.lucene.util.Bits;
 
 import java.util.Set;
+import java.io.IOException;
 
 /**
  * A query that matches all documents.
@@ -34,92 +32,97 @@ import java.util.Set;
  */
 public class MatchAllDocsQuery extends Query {
 
-  public MatchAllDocsQuery() {
-  }
-
   private class MatchAllScorer extends Scorer {
-
-    final IndexReader reader;
-    int id;
-    final int maxId;
     final float score;
+    private int doc = -1;
+    private final int maxDoc;
+    private final Bits liveDocs;
 
-    MatchAllScorer(IndexReader reader, Similarity similarity, Weight w) {
-      super(similarity);
-      this.reader = reader;
-      id = -1;
-      maxId = reader.maxDoc() - 1;
-      score = w.getValue();
+    MatchAllScorer(IndexReader reader, Bits liveDocs, Weight w, float score) {
+      super(w);
+      this.liveDocs = liveDocs;
+      this.score = score;
+      maxDoc = reader.maxDoc();
     }
 
-    public Explanation explain(int doc) {
-      return null; // not called... see MatchAllDocsWeight.explain()
+    @Override
+    public int docID() {
+      return doc;
     }
 
-    public int doc() {
-      return id;
-    }
-
-    public boolean next() {
-      while (id < maxId) {
-        id++;
-        if (!reader.isDeleted(id)) {
-          return true;
-        }
+    @Override
+    public int nextDoc() throws IOException {
+      doc++;
+      while(liveDocs != null && doc < maxDoc && !liveDocs.get(doc)) {
+        doc++;
       }
-      return false;
+      if (doc == maxDoc) {
+        doc = NO_MORE_DOCS;
+      }
+      return doc;
     }
-
+    
+    @Override
     public float score() {
       return score;
     }
 
-    public boolean skipTo(int target) {
-      id = target - 1;
-      return next();
+    @Override
+    public int freq() {
+      return 1;
     }
 
+    @Override
+    public int advance(int target) throws IOException {
+      doc = target-1;
+      return nextDoc();
+    }
+
+    @Override
+    public long cost() {
+      return maxDoc;
+    }
   }
 
-  private class MatchAllDocsWeight implements Weight {
-    private Similarity similarity;
+  private class MatchAllDocsWeight extends Weight {
     private float queryWeight;
     private float queryNorm;
 
-    public MatchAllDocsWeight(Searcher searcher) {
-      this.similarity = searcher.getSimilarity();
+    public MatchAllDocsWeight(IndexSearcher searcher) {
     }
 
+    @Override
     public String toString() {
       return "weight(" + MatchAllDocsQuery.this + ")";
     }
 
+    @Override
     public Query getQuery() {
       return MatchAllDocsQuery.this;
     }
 
-    public float getValue() {
-      return queryWeight;
-    }
-
-    public float sumOfSquaredWeights() {
+    @Override
+    public float getValueForNormalization() {
       queryWeight = getBoost();
       return queryWeight * queryWeight;
     }
 
-    public void normalize(float queryNorm) {
-      this.queryNorm = queryNorm;
+    @Override
+    public void normalize(float queryNorm, float topLevelBoost) {
+      this.queryNorm = queryNorm * topLevelBoost;
       queryWeight *= this.queryNorm;
     }
 
-    public Scorer scorer(IndexReader reader) {
-      return new MatchAllScorer(reader, similarity, this);
+    @Override
+    public Scorer scorer(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+      return new MatchAllScorer(context.reader(), acceptDocs, this, queryWeight);
     }
 
-    public Explanation explain(IndexReader reader, int doc) {
+    @Override
+    public Explanation explain(AtomicReaderContext context, int doc) {
       // explain query weight
       Explanation queryExpl = new ComplexExplanation
-        (true, getValue(), "MatchAllDocsQuery, product of:");
+        (true, queryWeight, "MatchAllDocsQuery, product of:");
       if (getBoost() != 1.0f) {
         queryExpl.addDetail(new Explanation(getBoost(),"boost"));
       }
@@ -129,20 +132,24 @@ public class MatchAllDocsQuery extends Query {
     }
   }
 
-  protected Weight createWeight(Searcher searcher) {
+  @Override
+  public Weight createWeight(IndexSearcher searcher) {
     return new MatchAllDocsWeight(searcher);
   }
 
-  public void extractTerms(Set terms) {
+  @Override
+  public void extractTerms(Set<Term> terms) {
   }
 
+  @Override
   public String toString(String field) {
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("MatchAllDocsQuery");
+    StringBuilder buffer = new StringBuilder();
+    buffer.append("*:*");
     buffer.append(ToStringUtils.boost(getBoost()));
     return buffer.toString();
   }
 
+  @Override
   public boolean equals(Object o) {
     if (!(o instanceof MatchAllDocsQuery))
       return false;
@@ -150,6 +157,7 @@ public class MatchAllDocsQuery extends Query {
     return this.getBoost() == other.getBoost();
   }
 
+  @Override
   public int hashCode() {
     return Float.floatToIntBits(getBoost()) ^ 0x1AA71190;
   }

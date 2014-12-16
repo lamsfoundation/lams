@@ -1,6 +1,6 @@
 package org.apache.lucene.analysis.standard;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,198 +17,96 @@ package org.apache.lucene.analysis.standard;
  * limitations under the License.
  */
 
-import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.util.WordlistLoader;
+import org.apache.lucene.util.Version;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Set;
 
 /**
  * Filters {@link StandardTokenizer} with {@link StandardFilter}, {@link
- * LowerCaseFilter} and {@link StopFilter}, using a list of English stop words.
+ * LowerCaseFilter} and {@link StopFilter}, using a list of
+ * English stop words.
  *
- * @version $Id$
+ * <a name="version"/>
+ * <p>You may specify the {@link Version}
+ * compatibility when creating StandardAnalyzer:
+ * <ul>
+ *   <li> As of 3.4, Hiragana and Han characters are no longer wrongly split
+ *        from their combining characters. If you use a previous version number,
+ *        you get the exact broken behavior for backwards compatibility.
+ *   <li> As of 3.1, StandardTokenizer implements Unicode text segmentation,
+ *        and StopFilter correctly handles Unicode 4.0 supplementary characters
+ *        in stopwords.  {@link ClassicTokenizer} and {@link ClassicAnalyzer}
+ *        are the pre-3.1 implementations of StandardTokenizer and
+ *        StandardAnalyzer.
+ * </ul>
  */
-public class StandardAnalyzer extends Analyzer {
-  private Set stopSet;
-
-  /**
-   * Specifies whether deprecated acronyms should be replaced with HOST type.
-   * This is false by default to support backward compatibility.
-   * 
-   * @deprecated this should be removed in the next release (3.0).
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   */
-  private boolean replaceInvalidAcronym = defaultReplaceInvalidAcronym;
-
-  private static boolean defaultReplaceInvalidAcronym;
-
-  // Default to true (fixed the bug), unless the system prop is set
-  static {
-    final String v = System.getProperty("org.apache.lucene.analysis.standard.StandardAnalyzer.replaceInvalidAcronym");
-    if (v == null || v.equals("true"))
-      defaultReplaceInvalidAcronym = true;
-    else
-      defaultReplaceInvalidAcronym = false;
-  }
-
-  /**
-   *
-   * @return true if new instances of StandardTokenizer will
-   * replace mischaracterized acronyms
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   * @deprecated This will be removed (hardwired to true) in 3.0
-   */
-  public static boolean getDefaultReplaceInvalidAcronym() {
-    return defaultReplaceInvalidAcronym;
-  }
-
-  /**
-   *
-   * @param replaceInvalidAcronym Set to true to have new
-   * instances of StandardTokenizer replace mischaracterized
-   * acronyms by default.  Set to false to preseve the
-   * previous (before 2.4) buggy behavior.  Alternatively,
-   * set the system property
-   * org.apache.lucene.analysis.standard.StandardAnalyzer.replaceInvalidAcronym
-   * to false.
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   * @deprecated This will be removed (hardwired to true) in 3.0
-   */
-  public static void setDefaultReplaceInvalidAcronym(boolean replaceInvalidAcronym) {
-    defaultReplaceInvalidAcronym = replaceInvalidAcronym;
-  }
-
-
-  /** An array containing some common English words that are usually not
-  useful for searching. */
-  public static final String[] STOP_WORDS = StopAnalyzer.ENGLISH_STOP_WORDS;
-
-  /** Builds an analyzer with the default stop words ({@link #STOP_WORDS}). */
-  public StandardAnalyzer() {
-    this(STOP_WORDS);
-  }
-
-  /** Builds an analyzer with the given stop words. */
-  public StandardAnalyzer(Set stopWords) {
-    stopSet = stopWords;
-  }
-
-  /** Builds an analyzer with the given stop words. */
-  public StandardAnalyzer(String[] stopWords) {
-    stopSet = StopFilter.makeStopSet(stopWords);
-  }
-
-  /** Builds an analyzer with the stop words from the given file.
-   * @see WordlistLoader#getWordSet(File)
-   */
-  public StandardAnalyzer(File stopwords) throws IOException {
-    stopSet = WordlistLoader.getWordSet(stopwords);
-  }
-
-  /** Builds an analyzer with the stop words from the given reader.
-   * @see WordlistLoader#getWordSet(Reader)
-   */
-  public StandardAnalyzer(Reader stopwords) throws IOException {
-    stopSet = WordlistLoader.getWordSet(stopwords);
-  }
-
-  /**
-   *
-   * @param replaceInvalidAcronym Set to true if this analyzer should replace mischaracterized acronyms in the StandardTokenizer
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   *
-   * @deprecated Remove in 3.X and make true the only valid value
-   */
-  public StandardAnalyzer(boolean replaceInvalidAcronym) {
-    this(STOP_WORDS);
-    this.replaceInvalidAcronym = replaceInvalidAcronym;
-  }
-
-  /**
-   *  @param stopwords The stopwords to use
-   * @param replaceInvalidAcronym Set to true if this analyzer should replace mischaracterized acronyms in the StandardTokenizer
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   *
-   * @deprecated Remove in 3.X and make true the only valid value
-   */
-  public StandardAnalyzer(Reader stopwords, boolean replaceInvalidAcronym) throws IOException{
-    this(stopwords);
-    this.replaceInvalidAcronym = replaceInvalidAcronym;
-  }
-
-  /**
-   * @param stopwords The stopwords to use
-   * @param replaceInvalidAcronym Set to true if this analyzer should replace mischaracterized acronyms in the StandardTokenizer
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   *
-   * @deprecated Remove in 3.X and make true the only valid value
-   */
-  public StandardAnalyzer(File stopwords, boolean replaceInvalidAcronym) throws IOException{
-    this(stopwords);
-    this.replaceInvalidAcronym = replaceInvalidAcronym;
-  }
-
-  /**
-   *
-   * @param stopwords The stopwords to use
-   * @param replaceInvalidAcronym Set to true if this analyzer should replace mischaracterized acronyms in the StandardTokenizer
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   *
-   * @deprecated Remove in 3.X and make true the only valid value
-   */
-  public StandardAnalyzer(String [] stopwords, boolean replaceInvalidAcronym) throws IOException{
-    this(stopwords);
-    this.replaceInvalidAcronym = replaceInvalidAcronym;
-  }
-
-  /**
-   * @param stopwords The stopwords to use
-   * @param replaceInvalidAcronym Set to true if this analyzer should replace mischaracterized acronyms in the StandardTokenizer
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   *
-   * @deprecated Remove in 3.X and make true the only valid value
-   */
-  public StandardAnalyzer(Set stopwords, boolean replaceInvalidAcronym) throws IOException{
-    this(stopwords);
-    this.replaceInvalidAcronym = replaceInvalidAcronym;
-  }
-
-  /** Constructs a {@link StandardTokenizer} filtered by a {@link
-  StandardFilter}, a {@link LowerCaseFilter} and a {@link StopFilter}. */
-  public TokenStream tokenStream(String fieldName, Reader reader) {
-    StandardTokenizer tokenStream = new StandardTokenizer(reader, replaceInvalidAcronym);
-    tokenStream.setMaxTokenLength(maxTokenLength);
-    TokenStream result = new StandardFilter(tokenStream);
-    result = new LowerCaseFilter(result);
-    result = new StopFilter(result, stopSet);
-    return result;
-  }
-
-  private static final class SavedStreams {
-    StandardTokenizer tokenStream;
-    TokenStream filteredTokenStream;
-  }
-
+public final class StandardAnalyzer extends StopwordAnalyzerBase {
+  
   /** Default maximum allowed token length */
   public static final int DEFAULT_MAX_TOKEN_LENGTH = 255;
 
   private int maxTokenLength = DEFAULT_MAX_TOKEN_LENGTH;
 
+  /** An unmodifiable set containing some common English words that are usually not
+  useful for searching. */
+  public static final CharArraySet STOP_WORDS_SET = StopAnalyzer.ENGLISH_STOP_WORDS_SET; 
+
+  /** Builds an analyzer with the given stop words.
+   * @param stopWords stop words */
+  public StandardAnalyzer(CharArraySet stopWords) {
+    super(stopWords);
+  }
+
+  /**
+   * @deprecated Use {@link #StandardAnalyzer(CharArraySet)}
+   */
+  @Deprecated
+  public StandardAnalyzer(Version matchVersion, CharArraySet stopWords) {
+    super(matchVersion, stopWords);
+  }
+
+  /** Builds an analyzer with the default stop words ({@link #STOP_WORDS_SET}).
+   */
+  public StandardAnalyzer() {
+    this(STOP_WORDS_SET);
+  }
+
+  /**
+   * @deprecated Use {@link #StandardAnalyzer()}
+   */
+  @Deprecated
+  public StandardAnalyzer(Version matchVersion) {
+    this(matchVersion, STOP_WORDS_SET);
+  }
+
+  /** Builds an analyzer with the stop words from the given reader.
+   * @see WordlistLoader#getWordSet(Reader)
+   * @param stopwords Reader to read stop words from */
+  public StandardAnalyzer(Reader stopwords) throws IOException {
+    this(loadStopwordSet(stopwords));
+  }
+
+  /**
+   * @deprecated Use {@link #StandardAnalyzer()}
+   */
+  @Deprecated
+  public StandardAnalyzer(Version matchVersion, Reader stopwords) throws IOException {
+    this(matchVersion, loadStopwordSet(stopwords, matchVersion));
+  }
+
   /**
    * Set maximum allowed token length.  If a token is seen
    * that exceeds this length then it is discarded.  This
    * setting only takes effect the next time tokenStream or
-   * reusableTokenStream is called.
+   * tokenStream is called.
    */
   public void setMaxTokenLength(int length) {
     maxTokenLength = length;
@@ -220,45 +118,20 @@ public class StandardAnalyzer extends Analyzer {
   public int getMaxTokenLength() {
     return maxTokenLength;
   }
-  
-  public TokenStream reusableTokenStream(String fieldName, Reader reader) throws IOException {
-    SavedStreams streams = (SavedStreams) getPreviousTokenStream();
-    if (streams == null) {
-      streams = new SavedStreams();
-      setPreviousTokenStream(streams);
-      streams.tokenStream = new StandardTokenizer(reader);
-      streams.filteredTokenStream = new StandardFilter(streams.tokenStream);
-      streams.filteredTokenStream = new LowerCaseFilter(streams.filteredTokenStream);
-      streams.filteredTokenStream = new StopFilter(streams.filteredTokenStream, stopSet);
-    } else {
-      streams.tokenStream.reset(reader);
-    }
-    streams.tokenStream.setMaxTokenLength(maxTokenLength);
-    
-    streams.tokenStream.setReplaceInvalidAcronym(replaceInvalidAcronym);
 
-    return streams.filteredTokenStream;
-  }
-
-  /**
-   *
-   * @return true if this Analyzer is replacing mischaracterized acronyms in the StandardTokenizer
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   * @deprecated This will be removed (hardwired to true) in 3.0
-   */
-  public boolean isReplaceInvalidAcronym() {
-    return replaceInvalidAcronym;
-  }
-
-  /**
-   *
-   * @param replaceInvalidAcronym Set to true if this Analyzer is replacing mischaracterized acronyms in the StandardTokenizer
-   *
-   * See https://issues.apache.org/jira/browse/LUCENE-1068
-   * @deprecated This will be removed (hardwired to true) in 3.0
-   */
-  public void setReplaceInvalidAcronym(boolean replaceInvalidAcronym) {
-    this.replaceInvalidAcronym = replaceInvalidAcronym;
+  @Override
+  protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
+    final StandardTokenizer src = new StandardTokenizer(getVersion(), reader);
+    src.setMaxTokenLength(maxTokenLength);
+    TokenStream tok = new StandardFilter(getVersion(), src);
+    tok = new LowerCaseFilter(getVersion(), tok);
+    tok = new StopFilter(getVersion(), tok, stopwords);
+    return new TokenStreamComponents(src, tok) {
+      @Override
+      protected void setReader(final Reader reader) throws IOException {
+        src.setMaxTokenLength(StandardAnalyzer.this.maxTokenLength);
+        super.setReader(reader);
+      }
+    };
   }
 }

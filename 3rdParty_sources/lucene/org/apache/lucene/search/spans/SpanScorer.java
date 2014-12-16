@@ -1,6 +1,6 @@
 package org.apache.lucene.search.spans;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,91 +17,95 @@ package org.apache.lucene.search.spans;
  * limitations under the License.
  */
 
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.Similarity;
-import org.apache.lucene.search.Weight;
-
 import java.io.IOException;
+
+import org.apache.lucene.search.Weight;
+import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.similarities.Similarity;
 
 /**
  * Public for extension only.
  */
 public class SpanScorer extends Scorer {
   protected Spans spans;
-  protected Weight weight;
-  protected byte[] norms;
-  protected float value;
 
-  protected boolean firstTime = true;
   protected boolean more = true;
 
   protected int doc;
   protected float freq;
-
-  protected SpanScorer(Spans spans, Weight weight, Similarity similarity, byte[] norms)
-    throws IOException {
-    super(similarity);
+  protected int numMatches;
+  protected final Similarity.SimScorer docScorer;
+  
+  protected SpanScorer(Spans spans, Weight weight, Similarity.SimScorer docScorer)
+  throws IOException {
+    super(weight);
+    this.docScorer = docScorer;
     this.spans = spans;
-    this.norms = norms;
-    this.weight = weight;
-    this.value = weight.getValue();
+
     doc = -1;
+    more = spans.next();
   }
 
-  public boolean next() throws IOException {
-    if (firstTime) {
-      more = spans.next();
-      firstTime = false;
+  @Override
+  public int nextDoc() throws IOException {
+    if (!setFreqCurrentDoc()) {
+      doc = NO_MORE_DOCS;
     }
-    return setFreqCurrentDoc();
+    return doc;
   }
 
-  public boolean skipTo(int target) throws IOException {
-    if (firstTime) {
-      more = spans.skipTo(target);
-      firstTime = false;
-    }
-    if (! more) {
-      return false;
+  @Override
+  public int advance(int target) throws IOException {
+    if (!more) {
+      return doc = NO_MORE_DOCS;
     }
     if (spans.doc() < target) { // setFreqCurrentDoc() leaves spans.doc() ahead
       more = spans.skipTo(target);
     }
-    return setFreqCurrentDoc();
+    if (!setFreqCurrentDoc()) {
+      doc = NO_MORE_DOCS;
+    }
+    return doc;
   }
-
+  
   protected boolean setFreqCurrentDoc() throws IOException {
-    if (! more) {
+    if (!more) {
       return false;
     }
     doc = spans.doc();
     freq = 0.0f;
+    numMatches = 0;
     do {
       int matchLength = spans.end() - spans.start();
-      freq += getSimilarity().sloppyFreq(matchLength);
+      freq += docScorer.computeSlopFactor(matchLength);
+      numMatches++;
       more = spans.next();
     } while (more && (doc == spans.doc()));
     return true;
   }
 
-  public int doc() { return doc; }
+  @Override
+  public int docID() { return doc; }
 
+  @Override
   public float score() throws IOException {
-    float raw = getSimilarity().tf(freq) * value; // raw score
-    return raw * Similarity.decodeNorm(norms[doc]); // normalize
+    return docScorer.score(doc, freq);
   }
-
-  public Explanation explain(final int doc) throws IOException {
-    Explanation tfExplanation = new Explanation();
-
-    skipTo(doc);
-
-    float phraseFreq = (doc() == doc) ? freq : 0.0f;
-    tfExplanation.setValue(getSimilarity().tf(phraseFreq));
-    tfExplanation.setDescription("tf(phraseFreq=" + phraseFreq + ")");
-
-    return tfExplanation;
+  
+  @Override
+  public int freq() throws IOException {
+    return numMatches;
   }
-
+  
+  /** Returns the intermediate "sloppy freq" adjusted for edit distance 
+   *  @lucene.internal */
+  // only public so .payloads can see it.
+  public float sloppyFreq() throws IOException {
+    return freq;
+  }
+  
+  @Override
+  public long cost() {
+    return spans.cost();
+  }
 }

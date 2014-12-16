@@ -1,6 +1,6 @@
 package org.apache.lucene.analysis.standard;
 
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,120 +17,186 @@ package org.apache.lucene.analysis.standard;
  * limitations under the License.
  */
 
-/*
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
-NOTE: if you change StandardTokenizerImpl.jflex and need to regenerate
-      the tokenizer, remember to use JRE 1.4 to run jflex (before
-      Lucene 3.0).  This grammar now uses constructs (eg :digit:,
-      :letter:) whose meaning can vary according to the JRE used to
-      run jflex.  See
-      https://issues.apache.org/jira/browse/LUCENE-1126 for details.
-
-*/
-
-import org.apache.lucene.analysis.Token;
-
+/**
+ * This class implements Word Break rules from the Unicode Text Segmentation 
+ * algorithm, as specified in 
+ * <a href="http://unicode.org/reports/tr29/">Unicode Standard Annex #29</a>. 
+ * <p/>
+ * Tokens produced are of the following types:
+ * <ul>
+ *   <li>&lt;ALPHANUM&gt;: A sequence of alphabetic and numeric characters</li>
+ *   <li>&lt;NUM&gt;: A number</li>
+ *   <li>&lt;SOUTHEAST_ASIAN&gt;: A sequence of characters from South and Southeast
+ *       Asian languages, including Thai, Lao, Myanmar, and Khmer</li>
+ *   <li>&lt;IDEOGRAPHIC&gt;: A single CJKV ideographic character</li>
+ *   <li>&lt;HIRAGANA&gt;: A single hiragana character</li>
+ *   <li>&lt;KATAKANA&gt;: A sequence of katakana characters</li>
+ *   <li>&lt;HANGUL&gt;: A sequence of Hangul characters</li>
+ * </ul>
+ */
 %%
 
-%class StandardTokenizerImpl
-%unicode
+%unicode 6.3
 %integer
+%final
+%public
+%class StandardTokenizerImpl
+%implements StandardTokenizerInterface
 %function getNextToken
-%pack
 %char
+%buffer 255
+
+// UAX#29 WB4. X (Extend | Format)* --> X
+//
+HangulEx            = [\p{Script:Hangul}&&[\p{WB:ALetter}\p{WB:Hebrew_Letter}]] [\p{WB:Format}\p{WB:Extend}]*
+HebrewOrALetterEx   = [\p{WB:HebrewLetter}\p{WB:ALetter}]                       [\p{WB:Format}\p{WB:Extend}]*
+NumericEx           = [\p{WB:Numeric}[\p{Blk:HalfAndFullForms}&&\p{Nd}]]        [\p{WB:Format}\p{WB:Extend}]*
+KatakanaEx          = \p{WB:Katakana}                                           [\p{WB:Format}\p{WB:Extend}]* 
+MidLetterEx         = [\p{WB:MidLetter}\p{WB:MidNumLet}\p{WB:SingleQuote}]      [\p{WB:Format}\p{WB:Extend}]* 
+MidNumericEx        = [\p{WB:MidNum}\p{WB:MidNumLet}\p{WB:SingleQuote}]         [\p{WB:Format}\p{WB:Extend}]*
+ExtendNumLetEx      = \p{WB:ExtendNumLet}                                       [\p{WB:Format}\p{WB:Extend}]*
+HanEx               = \p{Script:Han}                                            [\p{WB:Format}\p{WB:Extend}]*
+HiraganaEx          = \p{Script:Hiragana}                                       [\p{WB:Format}\p{WB:Extend}]*
+SingleQuoteEx       = \p{WB:Single_Quote}                                       [\p{WB:Format}\p{WB:Extend}]*
+DoubleQuoteEx       = \p{WB:Double_Quote}                                       [\p{WB:Format}\p{WB:Extend}]*
+HebrewLetterEx      = \p{WB:Hebrew_Letter}                                      [\p{WB:Format}\p{WB:Extend}]*
+RegionalIndicatorEx = \p{WB:RegionalIndicator}                                  [\p{WB:Format}\p{WB:Extend}]*
+ComplexContextEx    = \p{LB:Complex_Context}                                    [\p{WB:Format}\p{WB:Extend}]*
 
 %{
+  /** Alphanumeric sequences */
+  public static final int WORD_TYPE = StandardTokenizer.ALPHANUM;
+  
+  /** Numbers */
+  public static final int NUMERIC_TYPE = StandardTokenizer.NUM;
+  
+  /**
+   * Chars in class \p{Line_Break = Complex_Context} are from South East Asian
+   * scripts (Thai, Lao, Myanmar, Khmer, etc.).  Sequences of these are kept 
+   * together as as a single token rather than broken up, because the logic
+   * required to break them at word boundaries is too complex for UAX#29.
+   * <p>
+   * See Unicode Line Breaking Algorithm: http://www.unicode.org/reports/tr14/#SA
+   */
+  public static final int SOUTH_EAST_ASIAN_TYPE = StandardTokenizer.SOUTHEAST_ASIAN;
+  
+  public static final int IDEOGRAPHIC_TYPE = StandardTokenizer.IDEOGRAPHIC;
+  
+  public static final int HIRAGANA_TYPE = StandardTokenizer.HIRAGANA;
+  
+  public static final int KATAKANA_TYPE = StandardTokenizer.KATAKANA;
+  
+  public static final int HANGUL_TYPE = StandardTokenizer.HANGUL;
 
-public static final int ALPHANUM          = StandardTokenizer.ALPHANUM;
-public static final int APOSTROPHE        = StandardTokenizer.APOSTROPHE;
-public static final int ACRONYM           = StandardTokenizer.ACRONYM;
-public static final int COMPANY           = StandardTokenizer.COMPANY;
-public static final int EMAIL             = StandardTokenizer.EMAIL;
-public static final int HOST              = StandardTokenizer.HOST;
-public static final int NUM               = StandardTokenizer.NUM;
-public static final int CJ                = StandardTokenizer.CJ;
-/**
- * @deprecated this solves a bug where HOSTs that end with '.' are identified
- *             as ACRONYMs. It is deprecated and will be removed in the next
- *             release.
- */
-public static final int ACRONYM_DEP       = StandardTokenizer.ACRONYM_DEP;
-
-public static final String [] TOKEN_TYPES = StandardTokenizer.TOKEN_TYPES;
-
-public final int yychar()
-{
+  public final int yychar()
+  {
     return yychar;
-}
+  }
 
-/**
- * Fills Lucene token with the current token text.
- */
-final void getText(Token t) {
-  t.setTermBuffer(zzBuffer, zzStartRead, zzMarkedPos-zzStartRead);
-}
+  /**
+   * Fills CharTermAttribute with the current token text.
+   */
+  public final void getText(CharTermAttribute t) {
+    t.copyBuffer(zzBuffer, zzStartRead, zzMarkedPos-zzStartRead);
+  }
+  
+  /**
+   * Sets the scanner buffer size in chars
+   */
+   public final void setBufferSize(int numChars) {
+     ZZ_BUFFERSIZE = numChars;
+     char[] newZzBuffer = new char[ZZ_BUFFERSIZE];
+     System.arraycopy(zzBuffer, 0, newZzBuffer, 0, Math.min(zzBuffer.length, ZZ_BUFFERSIZE));
+     zzBuffer = newZzBuffer;
+   }
 %}
-
-THAI       = [\u0E00-\u0E59]
-
-// basic word: a sequence of digits & letters (includes Thai to enable ThaiAnalyzer to function)
-ALPHANUM   = ({LETTER}|{THAI}|[:digit:])+
-
-// internal apostrophes: O'Reilly, you're, O'Reilly's
-// use a post-filter to remove possesives
-APOSTROPHE =  {ALPHA} ("'" {ALPHA})+
-
-// acronyms: U.S.A., I.B.M., etc.
-// use a post-filter to remove dots
-ACRONYM    =  {LETTER} "." ({LETTER} ".")+
-
-ACRONYM_DEP	= {ALPHANUM} "." ({ALPHANUM} ".")+
-
-// company names like AT&T and Excite@Home.
-COMPANY    =  {ALPHA} ("&"|"@") {ALPHA}
-
-// email addresses
-EMAIL      =  {ALPHANUM} (("."|"-"|"_") {ALPHANUM})* "@" {ALPHANUM} (("."|"-") {ALPHANUM})+
-
-// hostname
-HOST       =  {ALPHANUM} ((".") {ALPHANUM})+
-
-// floating point, serial, model numbers, ip addresses, etc.
-// every other segment must have at least one digit
-NUM        = ({ALPHANUM} {P} {HAS_DIGIT}
-           | {HAS_DIGIT} {P} {ALPHANUM}
-           | {ALPHANUM} ({P} {HAS_DIGIT} {P} {ALPHANUM})+
-           | {HAS_DIGIT} ({P} {ALPHANUM} {P} {HAS_DIGIT})+
-           | {ALPHANUM} {P} {HAS_DIGIT} ({P} {ALPHANUM} {P} {HAS_DIGIT})+
-           | {HAS_DIGIT} {P} {ALPHANUM} ({P} {HAS_DIGIT} {P} {ALPHANUM})+)
-
-// punctuation
-P	         = ("_"|"-"|"/"|"."|",")
-
-// at least one digit
-HAS_DIGIT  = ({LETTER}|[:digit:])* [:digit:] ({LETTER}|[:digit:])*
-
-ALPHA      = ({LETTER})+
-
-// From the JFlex manual: "the expression that matches everything of <a> not matched by <b> is !(!<a>|<b>)"
-LETTER     = !(![:letter:]|{CJ})
-
-// Chinese and Japanese (but NOT Korean, which is included in [:letter:])
-CJ         = [\u3100-\u312f\u3040-\u309F\u30A0-\u30FF\u31F0-\u31FF\u3300-\u337f\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff65-\uff9f]
-
-WHITESPACE = \r\n | [ \r\n\t\f]
 
 %%
 
-{ALPHANUM}                                                     { return ALPHANUM; }
-{APOSTROPHE}                                                   { return APOSTROPHE; }
-{ACRONYM}                                                      { return ACRONYM; }
-{COMPANY}                                                      { return COMPANY; }
-{EMAIL}                                                        { return EMAIL; }
-{HOST}                                                         { return HOST; }
-{NUM}                                                          { return NUM; }
-{CJ}                                                           { return CJ; }
-{ACRONYM_DEP}                                                  { return ACRONYM_DEP; }
+// UAX#29 WB1.   sot   ÷
+//        WB2.     ÷   eot
+//
+<<EOF>> { return StandardTokenizerInterface.YYEOF; }
 
-/** Ignore the rest */
-. | {WHITESPACE}                                               { /* ignore */ }
+// UAX#29 WB8.   Numeric × Numeric
+//        WB11.  Numeric (MidNum | MidNumLet | Single_Quote) × Numeric
+//        WB12.  Numeric × (MidNum | MidNumLet | Single_Quote) Numeric
+//        WB13a. (ALetter | Hebrew_Letter | Numeric | Katakana | ExtendNumLet) × ExtendNumLet
+//        WB13b. ExtendNumLet × (ALetter | Hebrew_Letter | Numeric | Katakana) 
+//
+{ExtendNumLetEx}* {NumericEx} ( ( {ExtendNumLetEx}* | {MidNumericEx} ) {NumericEx} )* {ExtendNumLetEx}* 
+  { return NUMERIC_TYPE; }
+
+// subset of the below for typing purposes only!
+{HangulEx}+
+  { return HANGUL_TYPE; }
+  
+{KatakanaEx}+
+  { return KATAKANA_TYPE; }
+
+// UAX#29 WB5.   (ALetter | Hebrew_Letter) × (ALetter | Hebrew_Letter)
+//        WB6.   (ALetter | Hebrew_Letter) × (MidLetter | MidNumLet | Single_Quote) (ALetter | Hebrew_Letter)
+//        WB7.   (ALetter | Hebrew_Letter) (MidLetter | MidNumLet | Single_Quote) × (ALetter | Hebrew_Letter)
+//        WB7a.  Hebrew_Letter × Single_Quote
+//        WB7b.  Hebrew_Letter × Double_Quote Hebrew_Letter
+//        WB7c.  Hebrew_Letter Double_Quote × Hebrew_Letter
+//        WB9.   (ALetter | Hebrew_Letter) × Numeric
+//        WB10.  Numeric × (ALetter | Hebrew_Letter)
+//        WB13.  Katakana × Katakana
+//        WB13a. (ALetter | Hebrew_Letter | Numeric | Katakana | ExtendNumLet) × ExtendNumLet
+//        WB13b. ExtendNumLet × (ALetter | Hebrew_Letter | Numeric | Katakana) 
+//
+{ExtendNumLetEx}*  ( {KatakanaEx}          ( {ExtendNumLetEx}*   {KatakanaEx}                           )*
+                   | ( {HebrewLetterEx}    ( {SingleQuoteEx}     | {DoubleQuoteEx}  {HebrewLetterEx}    )
+                     | {NumericEx}         ( ( {ExtendNumLetEx}* | {MidNumericEx} ) {NumericEx}         )*
+                     | {HebrewOrALetterEx} ( ( {ExtendNumLetEx}* | {MidLetterEx}  ) {HebrewOrALetterEx} )*
+                     )+
+                   )
+({ExtendNumLetEx}+ ( {KatakanaEx}          ( {ExtendNumLetEx}*   {KatakanaEx}                           )*
+                   | ( {HebrewLetterEx}    ( {SingleQuoteEx}     | {DoubleQuoteEx}  {HebrewLetterEx}    )
+                     | {NumericEx}         ( ( {ExtendNumLetEx}* | {MidNumericEx} ) {NumericEx}         )*
+                     | {HebrewOrALetterEx} ( ( {ExtendNumLetEx}* | {MidLetterEx}  ) {HebrewOrALetterEx} )*
+                     )+
+                   )
+)*
+{ExtendNumLetEx}* 
+  { return WORD_TYPE; }
+
+
+// From UAX #29:
+//
+//    [C]haracters with the Line_Break property values of Contingent_Break (CB), 
+//    Complex_Context (SA/South East Asian), and XX (Unknown) are assigned word 
+//    boundary property values based on criteria outside of the scope of this
+//    annex.  That means that satisfactory treatment of languages like Chinese
+//    or Thai requires special handling.
+// 
+// In Unicode 6.3, only one character has the \p{Line_Break = Contingent_Break}
+// property: U+FFFC ( ￼ ) OBJECT REPLACEMENT CHARACTER.
+//
+// In the ICU implementation of UAX#29, \p{Line_Break = Complex_Context}
+// character sequences (from South East Asian scripts like Thai, Myanmar, Khmer,
+// Lao, etc.) are kept together.  This grammar does the same below.
+//
+// See also the Unicode Line Breaking Algorithm:
+//
+//    http://www.unicode.org/reports/tr14/#SA
+//
+{ComplexContextEx}+ { return SOUTH_EAST_ASIAN_TYPE; }
+
+// UAX#29 WB14.  Any ÷ Any
+//
+{HanEx} { return IDEOGRAPHIC_TYPE; }
+{HiraganaEx} { return HIRAGANA_TYPE; }
+
+
+// UAX#29 WB3.   CR × LF
+//        WB3a.  (Newline | CR | LF) ÷
+//        WB3b.  ÷ (Newline | CR | LF)
+//        WB13c. Regional_Indicator × Regional_Indicator
+//        WB14.  Any ÷ Any
+//
+{RegionalIndicatorEx} {RegionalIndicatorEx}+ | [^]
+  { /* Break so we don't hit fall-through warning: */ break; /* Not numeric, word, ideographic, hiragana, or SE Asian -- ignore it. */ }
