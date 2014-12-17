@@ -265,6 +265,11 @@
 		<servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
 
 	</servlet>
+   <servlet>
+      <servlet-name>LaunchLearnerUrlServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.LaunchLearnerUrlServlet</servlet-class>
+
+   </servlet>
 	<servlet>
 		<servlet-name>editLD</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.authoring.web.EditOnFlyServlet</servlet-class>
@@ -514,6 +519,10 @@
 		<servlet-name>dumpWDDX</servlet-name>
 		<url-pattern>/servlet/dumpWDDX</url-pattern>
 	</servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>LaunchLearnerUrlServlet</servlet-name>
+      <url-pattern>/r/*</url-pattern>
+   </servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>editLD</servlet-name>
 		<url-pattern>/eof/authoring/editLearningDesign</url-pattern>
