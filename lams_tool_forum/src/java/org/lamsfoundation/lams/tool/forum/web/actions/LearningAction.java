@@ -213,7 +213,8 @@ public class LearningAction extends Action {
 	// Indicate don't restrict number of chars by allowNumber = 0
 	Long forumId = forum.getUid();
 	Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
-	int allowNumber = forum.isLimitedInput() || forum.isAllowRichEditor() ? forum.getLimitedChar() : 0;
+	int minCharacters = forum.isLimitedMinCharacters() ? forum.getMinCharacters() : 0;
+	int maxCharacters = forum.isLimitedMaxCharacters() || forum.isAllowRichEditor() ? forum.getMaxCharacters() : 0;
 
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ForumConstants.ATTR_FORUM_ID, forumId);
@@ -229,7 +230,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_RATE, forum.getMaximumRate());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_NEW_TOPICS, forum.isAllowNewTopic());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_RICH_EDITOR, allowRichEditor);
-	sessionMap.put(ForumConstants.ATTR_LIMITED_CHARS, new Integer(allowNumber));
+	sessionMap.put(ForumConstants.ATTR_MIN_CHARACTERS, new Integer(minCharacters));
+	sessionMap.put(ForumConstants.ATTR_MAX_CHARACTERS, new Integer(maxCharacters));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, forum.getTitle());
 	sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION, forum.getInstructions());

@@ -1124,7 +1124,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    toolContentObj.setDefineLater(Boolean.FALSE);
 	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
 		    .get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setLimitedChar(5000); // this is the default value
+	    toolContentObj.setMaxCharacters(5000); // this is the default value
 	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    toolContentObj.setReflectInstructions(null);
 

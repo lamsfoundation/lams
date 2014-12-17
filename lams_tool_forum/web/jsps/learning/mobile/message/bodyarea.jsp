@@ -1,18 +1,18 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <div>
-	<%-- Does not user general tag because this field need keep compatible with FCKEditor's content --%>
+	<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
 	<lams:STRUTS-textarea rows="10" cols="60" tabindex="2" property="message.body" styleId="messageBody" />
 	<BR>
 	
 	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
-	<c:if test="${sessionMap.limitedChars > 0}">
+	<c:if test="${sessionMap.maxCharacters > 0}">
 		<fmt:message key="lable.char.left" />:  
 		<span id="charleftDiv"></span>
 		<input type="hidden" name="limitCount" id="limitCount" />
+		
 		<script type="text/javascript">
-					<!--
-					var limit = <c:out value="${sessionMap.limitedChars}"/>;
+					var limit = <c:out value="${sessionMap.maxCharacters}"/>;
 					var bodyTxt = document.getElementById("messageBody");
 					var limitCount = document.getElementById("limitCount");
 					
@@ -33,7 +33,6 @@
 					
 					bodyTxt.onkeydown = calculateLeft;
 					bodyTxt.onkeyup = calculateLeft;
-					-->
 		</script>
 	</c:if>
 		

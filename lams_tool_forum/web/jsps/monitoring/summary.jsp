@@ -328,13 +328,30 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.authoring.advance.min.limited.input" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.limitedMinCharacters == true}">
+					<fmt:message key="label.on" />, ${forum.minCharacters}
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="label.authoring.advance.limited.input" />
 		</td>
 		
 		<td>
 			<c:choose>
-				<c:when test="${forum.limitedInput == true}">
-					<fmt:message key="label.on" />, ${forum.limitedChar}
+				<c:when test="${forum.limitedMaxCharacters == true}">
+					<fmt:message key="label.on" />, ${forum.maxCharacters}
 				</c:when>
 				<c:otherwise>
 					<fmt:message key="label.off" />

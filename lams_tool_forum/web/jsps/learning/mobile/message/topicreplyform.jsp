@@ -15,7 +15,7 @@
 		
 		<div class="space-bottom-top">
 		<div class="right-buttons">
-			<button type="submit" data-theme="b" class="noLineHeight">
+			<button type="submit" data-theme="b" class="noLineHeight" id="submit-button">
 				<fmt:message key="button.submit" />
 			</button>
 			<c:set var="backToTopic">

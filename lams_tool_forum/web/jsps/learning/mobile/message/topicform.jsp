@@ -19,7 +19,7 @@
 	<div class="right-buttons">
 	<tr>
 		<td>
-		<button type="submit" data-theme="b" >
+		<button type="submit" data-theme="b" id="submit-button">
 			<fmt:message key="button.submit" />
 		</button>
 		<c:set var="backToForum">
