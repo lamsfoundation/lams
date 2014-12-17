@@ -134,13 +134,13 @@
 
 		function openLearner( lessonId ) {
 			if (isMac) {
-				learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+				learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
 			} else {
 				if (learnWin && !learnWin.closed ) {
-					learnWin.location = '../home.do?method=learner&lessonID='+lessonId;		
+					learnWin.location = 'home.do?method=learner&lessonID='+lessonId;		
 					learnWin.focus();
 				} else {
-					learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+					learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
 				}
 			}
 		}
