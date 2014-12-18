@@ -50,11 +50,10 @@ public class NotebookEntryDAO extends LAMSBaseDAO implements INotebookEntryDAO {
 							+ " where user_id=? and external_id_type=?"
 							+ " order by external_signature desc, create_date desc";
 	
-	
-	public void saveOrUpdate(NotebookEntry notebookEntry) {
-		this.saveOrUpdate(notebookEntry);
-		this.getSession().flush();
-	}
+        public void saveOrUpdate(NotebookEntry notebookEntry) {
+        	insertOrUpdate(notebookEntry);
+        	this.getSession().flush();
+        }
 
 	public List<NotebookEntry> get(Long id, Integer idType, String signature, Integer userID) {
 		return (List<NotebookEntry>)(doFind(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG, new Object[]{id, idType, signature, userID}));

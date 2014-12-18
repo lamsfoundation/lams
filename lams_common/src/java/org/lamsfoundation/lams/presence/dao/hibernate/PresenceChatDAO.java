@@ -64,7 +64,7 @@ public class PresenceChatDAO extends LAMSBaseDAO implements IPresenceChatDAO {
 
     @Override
     public void saveOrUpdate(Object object) {
-	this.saveOrUpdate(object);
+	insertOrUpdate(object);
 	this.getSession().flush();
     }
 
