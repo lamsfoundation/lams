@@ -58,7 +58,7 @@ ALTER TABLE lams_qtz_FIRED_TRIGGERS ADD COLUMN is_nonconcurrent bool;
 UPDATE lams_qtz_FIRED_TRIGGERS SET is_nonconcurrent = is_stateful;
 ALTER TABLE lams_qtz_FIRED_TRIGGERS DROP COLUMN is_stateful;
 
--- add new 'sched_name' column to all tables
+-- add new 'sched_name' columnD to all tables
 
 ALTER TABLE lams_qtz_BLOB_TRIGGERS ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
 ALTER TABLE lams_qtz_CALENDARS ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAULT 'LAMS' FIRST;
