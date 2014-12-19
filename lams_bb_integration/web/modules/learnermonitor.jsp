@@ -30,10 +30,42 @@
 <%@ page import="blackboard.portal.servlet.*"%>
 <%@ page import="blackboard.portal.data.*"%>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.dto.LearnerProgressDTO"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 
 <bbNG:genericPage title="LAMS Options" ctxId="ctx">
+
+	<bbNG:cssBlock> 
+	<style type="text/css"> 
+		#progress-area {
+			text-align: center; 
+			border: #d3d3d3 1px solid;
+			margin: 10px;
+			padding: 10px 10px 2px;
+		}
+		.smalltext {
+			text-align:right;
+			font-size: 0.75em;
+		}
+		.super {
+			position:relative;
+			bottom:0.5em;
+			color:red;
+			font-size:0.8em;
+		}
+		.progress-header {
+			text-align:center;
+			font-weight: bold;
+			padding-top: 5px; 
+			padding-bottom:5px;
+		}
+		.left-text-align{
+			text-align: left;
+		}
+	</style> 
+	</bbNG:cssBlock>
+ 
 <%
     // Authorise current user for Course Access (automatic redirect)
     try{
@@ -133,6 +165,10 @@
 		}
 	}
     boolean isScoreAvailable = (current_score != null);
+    
+	String strLessonId = request.getParameter("lsid").trim();
+	long lessonId = Long.parseLong(strLessonId);    
+	LearnerProgressDTO learnerProgressDto = LamsSecurityUtil.getLearnerProgress(ctx, lessonId);
 %>
 
     <%-- Breadcrumbs --%>
@@ -165,11 +201,36 @@
    			<img src="<%=learningDesignImageUrl%>">
    		</div>
     <% } %>
-     
-    <% if(isScoreAvailable) { %>
-    	<div style="text-align: center; margin-top: 10px;">
-   			You have completed this lesson.
-   		</div>
+    
+   <%=learnerProgressDto.getActivitiesCompleted()%> out of approximately <%=learnerProgressDto.getActivityCount()%>
+    ! <%=learnerProgressDto.getAttemptedActivities()%>! <%=learnerProgressDto.getLessonComplete()%>
+    <% if(learnerProgressDto.getAttemptedActivities() > 0 || learnerProgressDto.getLessonComplete()) { %>
+	    <div id="progress-area">
+	    	<div class="progress-header">
+	    		Your Lesson Progress
+	    	</div>
+	    	
+	    	<% if(!learnerProgressDto.getLessonComplete()) { %>
+		    	<p class="left-text-align">
+		    		Lesson is not yet completed.
+		    	</p>
+		    	
+		    	<p class="left-text-align">
+		    		You have completed: <%=learnerProgressDto.getActivitiesCompleted()%> out of approximately <%=learnerProgressDto.getActivityCount()%> activities 
+		    		<span class="super">[*]</span>
+		    	</p>
+		    	
+		    	<div class="smalltext">
+		    		<span class="super">*</span>
+		    		Total activities depend on your learning path.
+		    	</div>
+		    	
+	    	 <% } else { %>
+	    	 	<p>
+		    		You have completed this lesson.
+		    	</p>
+	    	 <% } %>
+	    </div>
     <% } %>
 
     <bbNG:jsBlock>

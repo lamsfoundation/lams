@@ -45,7 +45,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 
 import blackboard.persist.PersistenceException;
 import blackboard.platform.context.Context;
@@ -317,6 +319,81 @@ public class LamsSecurityUtil {
 	    // return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
 	    return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes()
 		    .getNamedItem("lessonId").getNodeValue());
+	} catch (MalformedURLException e) {
+	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
+		    + "', please check lams.properties", e);
+	} catch (IllegalStateException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (RemoteException e) {
+	    throw new RuntimeException("Unable to start LAMS lesson, RMI Remote Exception", e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new RuntimeException("Unable to start LAMS lesson, Unsupported Encoding Exception", e);
+	} catch (ConnectException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (Exception e) {
+	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
+	}
+
+    }
+    
+    /**
+     * getLearnerProgress in current lesson through a LAMS webservice
+     * 
+     * @param ctx
+     *            the blackboard contect, contains session data
+     * @param lsId
+     *            the lesson id for which you wish to retrieve progress
+     *            
+     * @return the learning session id
+     */
+    public static LearnerProgressDTO getLearnerProgress(Context ctx, long lsId) {
+	String serverId = getServerID();
+	String serverAddr = getServerAddress();
+	String serverKey = getServerKey();
+	String courseId = ctx.getCourse().getCourseId();
+	String username = ctx.getUser().getUserName();
+
+	if (serverId == null || serverAddr == null || serverKey == null) {
+	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
+	}
+
+	try {
+
+	    String timestamp = new Long(System.currentTimeMillis()).toString();
+	    String hash = generateAuthenticationHash(timestamp, username, serverId);
+
+	    String serviceURL = serverAddr + "/services/xml/LessonManager?method=singleStudentProgress" + "&serverId="
+		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
+		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
+		    + URLEncoder.encode(courseId, "utf8") + "&lsId=" + new Long(lsId).toString() + "&progressUser="
+		    + URLEncoder.encode(username, "utf8");
+
+	    logger.info("Retirieving learner progress: " + serviceURL);
+
+	    // InputStream is = url.openConnection().getInputStream();
+	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+
+	    // parse xml response
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document document = db.parse(is);
+
+	    // get the lesson id from the response
+	    NamedNodeMap learnerProgress = document.getElementsByTagName("LearnerProgress").item(0).getAttributes();
+	    boolean lessonComplete = Boolean.parseBoolean(learnerProgress.getNamedItem("lessonComplete").getNodeValue());
+	    int activitiesCompleted = Integer.parseInt(learnerProgress.getNamedItem("activitiesCompleted").getNodeValue());
+	    int attemptedActivities = Integer.parseInt(learnerProgress.getNamedItem("attemptedActivities").getNodeValue());
+	    int activityCount = Integer.parseInt(learnerProgress.getNamedItem("activityCount").getNodeValue());
+
+	    LearnerProgressDTO learnerProgressDto = new LearnerProgressDTO(activityCount, attemptedActivities,
+		    activitiesCompleted, lessonComplete);
+	    
+	    return learnerProgressDto;
+
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
 		    + "', please check lams.properties", e);
