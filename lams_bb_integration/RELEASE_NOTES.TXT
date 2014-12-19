@@ -64,3 +64,7 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 1.2.6 Release Fixes
 ===================
 * LDEV-3382: Add datetime parameter check to LoginRequest
+
+1.2.7 Release Fixes
+===================
+* LDEV-3402: Add "your progress" widget to the lesson page
