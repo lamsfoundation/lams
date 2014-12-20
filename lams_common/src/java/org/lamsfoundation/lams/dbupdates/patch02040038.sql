@@ -73,17 +73,18 @@ ALTER TABLE lams_qtz_TRIGGERS ADD COLUMN sched_name VARCHAR(120) NOT NULL DEFAUL
 
 -- drop all primary and foreign key constraints, so that we can define new ones
 
-ALTER TABLE lams_qtz_TRIGGERS DROP FOREIGN KEY lams_qtz_triggers_ibfk_1;
+ALTER TABLE lams_qtz_TRIGGERS DROP FOREIGN KEY lams_qtz_TRIGGERS_ibfk_1;
 ALTER TABLE lams_qtz_TRIGGERS DROP INDEX job_name;
-ALTER TABLE lams_qtz_BLOB_TRIGGERS DROP FOREIGN KEY lams_qtz_blob_triggers_ibfk_1;
+ALTER TABLE lams_qtz_BLOB_TRIGGERS DROP FOREIGN KEY lams_qtz_BLOB_TRIGGERS_ibfk_1;
 ALTER TABLE lams_qtz_BLOB_TRIGGERS DROP PRIMARY KEY;
-ALTER TABLE lams_qtz_SIMPLE_TRIGGERS DROP FOREIGN KEY lams_qtz_simple_triggers_ibfk_1;
+ALTER TABLE lams_qtz_SIMPLE_TRIGGERS DROP FOREIGN KEY lams_qtz_SIMPLE_TRIGGERS_ibfk_1;
 ALTER TABLE lams_qtz_SIMPLE_TRIGGERS DROP PRIMARY KEY;
-ALTER TABLE lams_qtz_CRON_TRIGGERS DROP FOREIGN KEY lams_qtz_cron_triggers_ibfk_1;
+ALTER TABLE lams_qtz_CRON_TRIGGERS DROP FOREIGN KEY lams_qtz_CRON_TRIGGERS_ibfk_1;
 ALTER TABLE lams_qtz_CRON_TRIGGERS DROP PRIMARY KEY;
 ALTER TABLE lams_qtz_JOB_DETAILS DROP PRIMARY KEY;
 ALTER TABLE lams_qtz_JOB_DETAILS ADD PRIMARY KEY (sched_name, job_name, job_group);
 ALTER TABLE lams_qtz_TRIGGERS DROP PRIMARY KEY;
+
 
 -- add all primary and foreign key constraints, based on new columns
 
