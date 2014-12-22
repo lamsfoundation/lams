@@ -106,11 +106,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						window.location.href = url;
 						break;
+					case 204:
+						msg = "<fmt:message key='error.learner.not.finished' />";
+						document.getElementById("message").innerHTML = msg;
+						break;
 					case 404: //status 404 Not Found
 						msg = "<fmt:message key='error.message.404' />.";
 						alert(msg);
 						break;
-					case 500: //status 500 Internal Server Error
+					case 500: // status 500 Internal Server Error
 						msg = "<p><fmt:message key='error.system.learner'><fmt:param>Status 500</fmt:param></fmt:message></p>";
 						document.getElementById("message").innerHTML = msg;
 						break;

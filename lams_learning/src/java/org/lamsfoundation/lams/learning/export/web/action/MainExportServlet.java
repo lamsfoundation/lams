@@ -121,21 +121,23 @@ public class MainExportServlet extends HttpServlet {
 		    throw new ExportPortfolioException("Lesson with ID: " + lesson.getLessonId()
 			    + " does not allow export portfolio for learners");
 		}
+
 		if (!securityService.isLessonLearner(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
-		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a learner in the lesson");
+		    // the way that LAMS works here will make 403 actually send 200, so it's better to use 500 
+		    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The user is not a learner in the lesson");
 		    return;
 		}
-
 		LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(currentUserId,
 			lesson.getLessonId());
-		if (learnerProgress == null || !learnerProgress.isComplete()) {
-		    log.error("Learner with ID: " + currentUserId + " has not finished lesson with ID: "
-			    + lesson.getLessonId());
-		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The learner has not finished the lesson");
+		if ((learnerProgress == null) || !learnerProgress.isComplete()) {
+		    MainExportServlet.log.error("Learner with ID: " + currentUserId
+			    + " has not finished lesson with ID: " + lesson.getLessonId());
+		    response.sendError(HttpServletResponse.SC_NO_CONTENT, "The learner has not finished the lesson");
 		    return;
 		}
 	    } else if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a learner in the lesson");
+		// the way that LAMS works here will make 403 actually send 200, so it's better to use 500 
+		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The user is not a learner in the lesson");
 		return;
 	    }
 
@@ -147,7 +149,8 @@ public class MainExportServlet extends HttpServlet {
 		    + learnerLogin + ".zip";
 	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
+		// the way that LAMS works here will make 403 actually send 200, so it's better to use 500 
+		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The user is not a monitor in the lesson");
 		return;
 	    }
 
