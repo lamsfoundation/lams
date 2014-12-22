@@ -111,23 +111,21 @@ public class MainExportServlet extends HttpServlet {
 	IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this
 		.getServletContext());
 	ILessonService lessonService = ExportPortfolioServiceProxy.getLessonService(this.getServletContext());
-	ISecurityService securityService = ExportPortfolioServiceProxy.getSecurityService(this
-		.getServletContext());
+	ISecurityService securityService = ExportPortfolioServiceProxy.getSecurityService(this.getServletContext());
 	Lesson lesson = lessonService.getLesson(lessonID);
+	ToolAccessMode accessMode = ToolAccessMode.TEACHER.toString().equals(role) ? ToolAccessMode.TEACHER : null;
 
 	if (mode.equals(ToolAccessMode.LEARNER.toString())) {
-	    if (!lesson.getLearnerExportAvailable()) {
-		throw new ExportPortfolioException("Lesson with ID: " + lesson.getLessonId()
-			+ " does not allow export portfolio for learners");
-	    }
-	    ToolAccessMode accessMode = ToolAccessMode.TEACHER.toString().equals(role) ? ToolAccessMode.TEACHER : null;
-
 	    if (accessMode == null) {
-		if (!securityService.isLessonLearner(lesson.getLessonId(), currentUserId, "export portfolio",
-			false)) {
+		if (!lesson.getLearnerExportAvailable()) {
+		    throw new ExportPortfolioException("Lesson with ID: " + lesson.getLessonId()
+			    + " does not allow export portfolio for learners");
+		}
+		if (!securityService.isLessonLearner(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
 		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a learner in the lesson");
 		    return;
 		}
+
 		LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(currentUserId,
 			lesson.getLessonId());
 		if (learnerProgress == null || !learnerProgress.isComplete()) {
@@ -136,12 +134,9 @@ public class MainExportServlet extends HttpServlet {
 		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The learner has not finished the lesson");
 		    return;
 		}
-	    } else {
-		if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio",
-			false)) {
-		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a learner in the lesson");
-		    return;
-		}
+	    } else if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a learner in the lesson");
+		return;
 	    }
 
 	    portfolios = exportService.exportPortfolioForStudent(userIdParam == null ? currentUserId : userIdParam,
@@ -155,7 +150,7 @@ public class MainExportServlet extends HttpServlet {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return;
 	    }
-	    
+
 	    // done in the monitoring environment
 	    portfolios = exportService.exportPortfolioForTeacher(lessonID, cookies);
 	    exportFilename = ExportPortfolioConstants.EXPORT_TEACHER_PREFIX + " " + portfolios.getLessonName() + ".zip";
