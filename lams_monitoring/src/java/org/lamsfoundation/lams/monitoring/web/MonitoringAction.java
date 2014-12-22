@@ -142,10 +142,9 @@ public class MonitoringAction extends LamsDispatchAction {
     private static ITimezoneService timezoneService;
 
     private static ILessonService lessonService;
-    
+
     private static ISecurityService securityService;
 
-    
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -393,7 +392,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
 	    } catch (SecurityException e) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation or lesson");
+		response.sendError(HttpServletResponse.SC_FORBIDDEN,
+			"User is not a monitor in the organisation or lesson");
 		return null;
 	    }
 
@@ -1006,12 +1006,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
-	
+
 	JSONObject responseJSON = new JSONObject();
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	LessonDetailsDTO lessonDetails = lesson.getLessonDetails();
 	String contentFolderId = lessonDetails.getContentFolderID();
-
 
 	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 
@@ -1085,7 +1084,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		    activityJSON.put("x", ((OptionsWithSequencesActivity) activity).getStartXcoord());
 		    activityJSON.put("y", ((OptionsWithSequencesActivity) activity).getStartYcoord());
 		} else if ((parentActivity != null)
-			&& ((Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId()) || (Activity.PARALLEL_ACTIVITY_TYPE == parentActivity
+			&& ((Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId())
+				|| (Activity.PARALLEL_ACTIVITY_TYPE == parentActivity.getActivityTypeId()) || (Activity.FLOATING_ACTIVITY_TYPE == parentActivity
 				.getActivityTypeId()))) {
 		    // Optional Activity children had coordinates relative to parent
 		    activityJSON.put("x", parentActivity.getXcoord() + activity.getXcoord());
@@ -1211,7 +1211,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
-	    
+
 	    flashMessage = new FlashMessage("startPreviewSession", new Long(lessonID));
 	} catch (Exception e) {
 	    flashMessage = handleException(e, "startPreviewSession", monitoringService);
@@ -1275,7 +1275,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 	return MonitoringAction.lessonService;
     }
-    
+
     private ISecurityService getSecurityService() {
 	if (MonitoringAction.securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
