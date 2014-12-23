@@ -202,8 +202,6 @@
    		</div>
     <% } %>
     
-   <%=learnerProgressDto.getActivitiesCompleted()%> out of approximately <%=learnerProgressDto.getActivityCount()%>
-    ! <%=learnerProgressDto.getAttemptedActivities()%>! <%=learnerProgressDto.getLessonComplete()%>
     <% if(learnerProgressDto.getAttemptedActivities() > 0 || learnerProgressDto.getLessonComplete()) { %>
 	    <div id="progress-area">
 	    	<div class="progress-header">
