@@ -37,7 +37,7 @@
     </content-handlers>
     
 	<application-defs>
-        <application handle="lamswz" type="shared" use-ssl="false" name="LAMS" can-allow-guest="false" small-icon="" large-icon="">
+        <application handle="lamswz" type="shared" use-ssl="false" name="LAMS links" can-allow-guest="false" small-icon="" large-icon="">
             <description lang="en_US">application-def description goes here</description>
             <links>
                 <link>
