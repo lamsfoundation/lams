@@ -65,7 +65,7 @@
         }
         
         //redirect to preview lesson
-        String previewUrl = LamsSecurityUtil.generateRequestURL(ctx, "learnerStrictAuth", lsId);
+        String previewUrl = LamsSecurityUtil.generateRequestURL(ctx, "learnerStrictAuth", "" + lsId);
         response.sendRedirect(previewUrl);
 	%>
 

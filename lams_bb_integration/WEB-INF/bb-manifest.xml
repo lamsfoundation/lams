@@ -35,6 +35,32 @@
             </icons>
         </content-handler>
     </content-handlers>
+    
+	<application-defs>
+        <application handle="lamswz" type="shared" use-ssl="false" name="LAMS" can-allow-guest="false" small-icon="" large-icon="">
+            <description lang="en_US">application-def description goes here</description>
+            <links>
+                <link>
+                    <type value="course_tool" />
+                    <name value="LAMS Monitor" />
+                    <url value="links/monitor.jsp" />
+                    <description value="Monitor the learners' progress" />
+                    <icons>
+                        <listitem value="images/logo.gif"/>
+                    </icons>
+                </link>
+                <link>
+                    <type value="course_tool"/>
+                    <name value="LAMS Author"/>
+                    <url value="links/author.jsp" />
+                    <description value="Author new or edit existing LAMS sequences" />
+                    <icons>
+                        <listitem value="images/logo.gif"/>
+                    </icons>
+                </link>
+            </links>
+        </application>
+    </application-defs>
         
     <!-- code permissions required for proper operation -->
     <permissions>
