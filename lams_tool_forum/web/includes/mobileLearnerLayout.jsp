@@ -20,27 +20,15 @@
 		<!-- ********************  javascript from header.jsp ********************** -->
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-		<script type="text/javascript">
-			function closeAndRefreshParentMonitoringWindow() {
-				refreshParentMonitoringWindow();
-				window.close();
-			}  				
-		</script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.mobile.js"></script>	
 		<!-- End of javascript from header.jsp -->
 		
 		<script type="text/javascript">
-			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
-		</script>		
-		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
-		<script type="text/javascript">
-			function removeAtt(mapID){
-				removeItemAttachmentUrl =  removeItemAttachmentUrl + "?sessionMapID="+ mapID;
-				removeItemAttachment();
-			}
+			var removeItemAttachmentUrl = '<html:rewrite page="/learning/deleteAttachment.do" />';
+			var warning = '<fmt:message key="warn.minimum.number.characters" />';
 		</script>
-		
-		<script src="${lams}includes/javascript/jquery.js"></script>
-		<script src="${lams}includes/javascript/jquery.mobile.js"></script>		
+		<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>	
 		
 	</lams:head>
 	<body class="large-font">

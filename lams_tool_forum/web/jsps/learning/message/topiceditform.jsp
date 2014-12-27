@@ -4,9 +4,7 @@
 	<fmt:message key="message.label.subject" />
 </div>
 
-
-<html:text size="50" tabindex="1" property="message.subject"
-	maxlength="60" />
+<html:text size="50" tabindex="1" property="message.subject" maxlength="60" />
 <html:errors property="message.subject" />
 
 <div class="field-name title-space-top">
@@ -29,6 +27,7 @@
 	</div>
 
 </c:if>
+
 <div class="space-bottom-top">
 	<div class="right-buttons">
 		<html:submit styleClass="button" styleId="submit-button">
@@ -43,6 +42,5 @@
 			styleClass="button">
 			<fmt:message key="button.cancel" />
 		</html:button>
-
 	</div>
 </div>

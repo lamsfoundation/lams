@@ -63,15 +63,6 @@
 				});
 			});
 			
-			function removeAtt(mapID){
-				removeItemAttachmentUrl =  removeItemAttachmentUrl + "?sessionMapID="+ mapID;
-				removeItemAttachment();
-			}
-			
-			function closeAndRefreshParentMonitoringWindow() {
-				refreshParentMonitoringWindow();
-				window.close();
-			}
 		</script>			
 		
 	</lams:head>

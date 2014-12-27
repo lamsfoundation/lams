@@ -22,12 +22,3 @@
 <script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
-
-<script type="text/javascript">
-	function closeAndRefreshParentMonitoringWindow() {
-		refreshParentMonitoringWindow();
-		window.close();
-	}  				
-</script>
-
-

@@ -1,90 +1,157 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <div>
-<c:choose>
-	<c:when test="${sessionMap.allowRichEditor}">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<lams:CKEditor id="message.body" value="${formBean.message.body}" contentFolderID="${sessionMap.learnerContentFolder}"
-				toolbarSet="DefaultLearner">
-		</lams:CKEditor>
-	</c:when>
 	
-	<c:otherwise>
+	<%-- for validateForm() method --%>
+	<input type="hidden" name="minCharactersEnabled" id="min-characters-enabled" value="${sessionMap.minCharacters > 0}"/>
 	
-		<%-- Does not user general tag becuase this field need keep compatible with CKEditor's content --%>
-		<lams:STRUTS-textarea rows="10" cols="60" tabindex="2" property="message.body" styleId="messageBody" />
-		<BR>
+	<c:if test="${sessionMap.minCharacters > 0}">
+		<div class="info">
+			<fmt:message key="info.minimum.number.characters" >
+				<fmt:param>${sessionMap.minCharacters}</fmt:param>
+			</fmt:message>
+		</div>
+	</c:if>
+
+	<c:choose>
+		<c:when test="${sessionMap.allowRichEditor}">
+			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+			<lams:CKEditor id="message.body" value="${formBean.message.body}" 
+					contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
+			</lams:CKEditor>
+		</c:when>
 		
-		<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
-		<c:if test="${sessionMap.maxCharacters > 0}">
-			<fmt:message key="lable.char.left" />: <span id="char-left-div"></span>
-			<input type="hidden" name="limitCount" id="max-limit-count" />
-			<br>
+		<c:otherwise>
+			<%-- Does not user general tag becuase this field need keep compatible with CKEditor's content --%>
+			<lams:STRUTS-textarea rows="10" cols="60" tabindex="2" property="message.body"/>
+		</c:otherwise>
+	</c:choose>
+	<BR>
+		
+	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
+	<c:if test="${sessionMap.maxCharacters > 0}">
+		<fmt:message key="lable.char.left" />: <span id="char-left-div"></span>
+		<input type="hidden" name="limitCount" id="max-limit-count" />
+		<br>
 				
-			<script type="text/javascript">
-				var limit = <c:out value="${sessionMap.maxCharacters}"/>;
-				var bodyTxt = document.getElementById("messageBody");
-				var limitCount = document.getElementById("max-limit-count");
+		<script type="text/javascript">
+		$(document).ready(function() {
+			
+			// Whether content has exceeded the maximum characters.
+			var isNewlyInstantiated = true;
+			var isCkeditor = ${sessionMap.allowRichEditor};
+			var limit = <c:out value="${sessionMap.maxCharacters}"/>;
+			var ckeditor = (isCkeditor) ? CKEDITOR.instances["message.body"] : null;
+			
+			//character count fuction
+			var counter = function(evt) {
+				
+				var value = isCkeditor ? ckeditor.getSnapshot() 
+						: $('textarea[id="message.body__lamstextarea"]').val();
+				var charactersCount = getNumberOfCharacters(value, isCkeditor);
+				
+				//limit is not exceeded
+				if (charactersCount <= limit || isNewlyInstantiated) {
+					
+					isNewlyInstantiated = false;
 
-				var showDiv = document.getElementById("char-left-div");
-				var count = limit - bodyTxt.value.length;
-				limitCount.value = count;
-				showDiv.innerHTML = count;
-				function calculateLeft() {
-					if (this.value.length > limit) {
-						this.value = this.value.substring(0, limit);
-						//fix a bug: when change "this.value", onchange event won't be fired any more. So this will 
-						//manually handle onchange event. It is a kind of crack coding!
-						filterData(
-								document.getElementById('messageBody'),
-								document
-										.getElementById('message.body__lamshidden'));
+					if (isCkeditor) {
+						ckeditor.fire( 'updateSnapshot' );	
+					}
+					
+					var count = (limit - charactersCount) > 0 ? limit - charactersCount : 0;
+					$('#max-limit-count').val(count);
+					$('#char-left-div').html(count);
+				
+				//limit exceeded in case of CKEditor
+				} else if (isCkeditor) {
+					//detect key pressed
+					var key = ((evt.data === undefined) || (evt.data.$ === undefined)) ? null : evt.data.$.keyCode || evt.data.$.charCode;	
+					
+					//don't block backspace and del 
+					if (key == 8 || key == 46) {
+						return;
+					}
+					
+					//evt.cancel();
+					ckeditor.execCommand( 'undo' );
+					
+				//limit exceeded in case of textarea 
+				} else {
+					this.value = this.value.substring(0, limit);
+					//fix a bug: when change "this.value", onchange event won't be fired any more. So this will 
+					//manually handle onchange event. It is a kind of crack coding!
+					filterData(document.getElementById('message.body__lamstextarea'),
+							document.getElementById('message.body__lamshidden'));
 						
-					} else {
-						var count = limit - this.value.length;
-						limitCount.value = count;
-						showDiv.innerHTML = count;
-					}
 				}
+			};
+			
+			//assign function
+			if (isCkeditor) {
+			    // @todo Make this more elegant (.on('change') once we upgrade to Ckeditor 4
+			    //ckeditor.on('key', counter);
+			    ckeditor.on('paste', counter);
+				ckeditor.on('afterCommandExec', counter);
+				ckeditor.on("instanceReady", function(){                    
+				     this.document.on("keyup", counter);
+				});
+				//count characters initially
+			    ckeditor.on('instanceReady', counter);
+			      
+			} else {
+				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				//count characters initially
+				counter();
+			}
 
-				bodyTxt.onkeydown = calculateLeft;
-				bodyTxt.onkeyup = calculateLeft;
-			</script>
-		</c:if>
+		});
+		</script>
+	</c:if>
 			
-		<c:if test="${sessionMap.minCharacters > 0}">
-			<fmt:message key="label.char.required" />: <span id="char-required-div"></span>
-			<input type="hidden" name="limitCount" id="min-limit-count" />
+	<c:if test="${sessionMap.minCharacters > 0}">
+		<fmt:message key="label.char.required" />: <span id="char-required-div"></span>
 			
-			<script type="text/javascript">
-			document.observe("dom:loaded", function() {
-				var limit = <c:out value="${sessionMap.minCharacters}"/>;
-				var bodyTxt = document.getElementById("messageBody");
-				var button = document.getElementById("submit-button");
-				var limitCount = document.getElementById("min-limit-count");
-				var showDiv = document.getElementById("char-required-div");
+		<script type="text/javascript">
+		$(document).ready(function() {
+
+			var isCkeditor = ${sessionMap.allowRichEditor};
+			var ckeditor = isCkeditor ? CKEDITOR.instances["message.body"] : null;
+			
+			//character count fuction
+			var counter = function() {
+				var value = isCkeditor ? ckeditor.getSnapshot() 
+						: $('textarea[id="message.body__lamstextarea"]').val();
+			    
+				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
-				function calculateRequired() {
-					
-					if (bodyTxt.value.length >= limit) {
-						button.style.visibility="visible";
-					} else {
-						button.style.visibility="hidden";
-					}
-					
-					var count = (limit - bodyTxt.value.length) > 0 ? limit - bodyTxt.value.length : 0;
-					limitCount.value = count;
-					showDiv.innerHTML = count;
-				}
-				calculateRequired();
+				var limit = <c:out value="${sessionMap.minCharacters}"/>;
+				var count = (limit - charactersCount) > 0 ? limit - charactersCount : 0;
+				$('#char-required-div').html(count);
+			};
+			
+			//assign function
+			if (isCkeditor) {
+			    // @todo Make this more elegant (.on('change') once we upgrade to Ckeditor 4 
+			    ckeditor.on('paste', counter);
+				ckeditor.on('afterCommandExec', counter);
+				ckeditor.on("instanceReady", function(){                    
+				     this.document.on("keyup", counter);
+				});
+				//count characters initially
+			    ckeditor.on('instanceReady', counter);
+			      
+			} else {
+				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				//count characters initially
+				counter();
+			}
 
-				bodyTxt.onkeyup = calculateRequired;
-			});
-			</script>			
-		</c:if>
-	</c:otherwise>
-</c:choose>
-<BR>
-<html:errors property="message.body" />
+		});
+		</script>			
+	</c:if>
+		
+	<BR>
+	<html:errors property="message.body" />
 
 <div>

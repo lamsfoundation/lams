@@ -62,15 +62,15 @@
 </p>
 
 <p>
-	<html:checkbox property="forum.allowUpload" styleClass="noBorder" styleId="allowUpload"/>
-	<label for="allowUpload">
+	<html:checkbox property="forum.allowUpload" styleId="allow-upload" styleClass="noBorder"/>
+	<label for="allow-upload">
 		<fmt:message key="label.authoring.advance.allow.upload" />
 	</label>
 </p>
 
 <p>
-	<html:checkbox property="forum.allowRichEditor" styleId="richEditor" styleClass="noBorder"/>
-	<label for="richEditor">
+	<html:checkbox property="forum.allowRichEditor" styleId="rich-editor" styleClass="noBorder"/>
+	<label for="rich-editor">
 		<fmt:message key="label.authoring.advance.use.richeditor" />
 	</label>
 </p>
@@ -202,7 +202,6 @@
 
 <script type="text/javascript">
 
-	var rich = document.getElementById("richEditor");
 	var limitedMinCharacters = document.getElementById("limited-min-characters");
 	var minCharacters = document.getElementById("min-characters");
 	var limitedMaxCharacters = document.getElementById("limited-max-characters");
@@ -213,30 +212,17 @@
 	function initAdvanced() {
 		if (limitedMinCharacters.checked) {
 			minCharacters.disabled = false;
-			rich.checked = false;
 		} else {
 			minCharacters.disabled = true;
 		}
 
 		if (limitedMaxCharacters.checked) {
 			maxCharacters.disabled = false;
-			rich.checked = false;
 		} else {
 			maxCharacters.disabled = true;
 		}
 	}
 
-	rich.onclick = function() {
-		if (this.checked) {
-			minCharacters.disabled = true;
-			limitedMinCharacters.checked = false;
-			maxCharacters.disabled = true;
-			limitedMaxCharacters.checked = false;
-		} else {
-			minCharacters.disabled = false;
-			maxCharacters.disabled = false;
-		}
-	}
 	initAdvanced();
 
 	minCharacters.onblur = checkIntValue;

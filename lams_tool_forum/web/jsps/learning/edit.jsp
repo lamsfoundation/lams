@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
-<html:form action="/learning/updateTopic.do" focus="message.subject" enctype="multipart/form-data">
+<html:form action="/learning/updateTopic.do" onsubmit="return validateForm()"
+		focus="message.subject" enctype="multipart/form-data">
+		
 	<html:hidden property="sessionMapID"/>	
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
