@@ -30,7 +30,7 @@
 
 <div class="space-bottom-top">
 	<div class="right-buttons">
-		<html:submit styleClass="button" styleId="submit-button">
+		<html:submit styleClass="button">
 			<fmt:message key="button.submit" />
 		</html:submit>
 		<c:set var="backToTopic">

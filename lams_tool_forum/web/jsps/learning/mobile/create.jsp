@@ -2,7 +2,9 @@
 
 <div data-role="page" data-cache="false">
 
-	<html:form action="/learning/createTopic.do" method="post" focus="message.subject" enctype="multipart/form-data">
+	<html:form action="/learning/createTopic.do" styleId="topic-form"
+			method="post" focus="message.subject" enctype="multipart/form-data">
+			
 		<html:hidden property="sessionMapID" />
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<c:set var="sessionMapID" value="${formBean.sessionMapID}" />

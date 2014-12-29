@@ -5,7 +5,7 @@
 <c:set var="continue"><html:rewrite page="/learning/newReflection.do?sessionMapID=${sessionMapID}" /></c:set>
 <c:set var="finish"><html:rewrite page="/learning/finish.do?sessionMapID=${sessionMapID}" /></c:set>
 
-<div data-role="page" data-dom-cache="false">
+<div data-role="page" data-cache="false">
 
 	<script type="text/javascript">
 		function finishForum() {
@@ -119,10 +119,10 @@
 				
 				<c:if test='${sessionMap.allowNewTopics}'>
 				
-						<a name="newtopic" href="${newtopic}" data-rel="dialog"  data-role="button"
-								 data-theme="c" data-icon="plus" onclick="this.href += '&reqID=' + (new Date()).getTime();"> <!--class="${buttonClass}"  disabled="${sessionMap.finishedLock}" -->
-							<fmt:message key="label.newtopic" />
-						</a>
+					<a name="newtopic" href="${newtopic}" data-rel="dialog"  data-role="button"
+							data-theme="c" data-icon="plus" onclick="this.href += '&reqID=' + (new Date()).getTime();"> <!--class="${buttonClass}"  disabled="${sessionMap.finishedLock}" -->
+						<fmt:message key="label.newtopic" />
+					</a>
 					
 				</c:if>
 		

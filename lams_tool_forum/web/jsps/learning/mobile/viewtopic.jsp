@@ -30,7 +30,7 @@
 			//var for jquery.jRating.js
 			var pathToImageFolder = "${lams}images/css/"; 
 			window.close();
-		</script>		
+		</script>
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 		<script src="${lams}includes/javascript/jquery.mobile.js" type="text/javascript"></script>	
@@ -67,7 +67,7 @@
 		
 	</lams:head>
 	<body class="large-font">
-<div data-role="page" data-dom-cache="false">
+<div data-role="page" data-cache="false">
 
 	<div data-role="header" data-theme="b">
 		<a id="backToForum"	href="${backToForum}" data-role="button" data-icon="arrow-l">
@@ -85,8 +85,7 @@
 			</div>
 			<h3>
 				<fmt:message key="title.message.view.topic" />
-			</h3>
-	
+			</h3>	
 		</div>
 	
 		<c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
@@ -103,20 +102,20 @@
 	                  </c:when> 
 	                  <c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 or sessionMap.maximumReply eq 0)}">
 	                        <div class="info">
-	                                <fmt:message key="label.postingLimits.topic.reminder.min">
-	                                        <fmt:param value="${sessionMap.minimumReply}" />
-	                                        <fmt:param value="${numOfPosts}" />
-	                                        <fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
-	                                </fmt:message>
+	                        	<fmt:message key="label.postingLimits.topic.reminder.min">
+	                            	<fmt:param value="${sessionMap.minimumReply}" />
+	                            	<fmt:param value="${numOfPosts}" />
+	                            	<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
+	                            </fmt:message>
 	                        </div>
 	                  </c:when> 
 	                  <c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply eq 0 or sessionMap.maximumReply ne 0)}">
 	                        <div class="info">
-	                                <fmt:message key="label.postingLimits.topic.reminder.max">
-	                                        <fmt:param value="${sessionMap.maximumReply}" />
-	                                        <fmt:param value="${numOfPosts}" />
-	                                        <fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
-	                                </fmt:message>
+	                        	<fmt:message key="label.postingLimits.topic.reminder.max">
+	                            	<fmt:param value="${sessionMap.maximumReply}" />
+	                            	<fmt:param value="${numOfPosts}" />
+	                            	<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
+	                        	</fmt:message>
 	                        </div>
 	                  </c:when>
 	            </c:choose>
@@ -174,9 +173,3 @@
 
 	</body>
 </lams:html>
-
-
-
-
-
-
