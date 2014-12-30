@@ -865,8 +865,8 @@ public class AuthoringAction extends Action {
 	    if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
 		return errors;
 	    }
-	    if (!form.getForum().isAllowRichEditor() && form.getForum().isLimitedInput()) {
-		if (form.getForum().getLimitedChar() <= 0) {
+	    if (!form.getForum().isAllowRichEditor() && form.getForum().isLimitedMaxCharacters()) {
+		if (form.getForum().getMaxCharacters() <= 0) {
 		    ActionMessage error = new ActionMessage("error.limit.char.less.zero");
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 		}

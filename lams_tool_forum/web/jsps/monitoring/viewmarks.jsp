@@ -1,4 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
+
+<script type="text/javascript">
+	function closeAndRefreshParentMonitoringWindow() {
+		refreshParentMonitoringWindow();
+		window.close();
+	}  				
+</script>
+
 <table cellpadding="0">
 <c:if test="${empty report}">
 	<tr>

@@ -70,15 +70,6 @@
 				location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&reqUid=" />"+reqIDVar.getTime();;
 			}
 		
-			function removeAtt(mapID){
-				removeItemAttachmentUrl =  removeItemAttachmentUrl + "?sessionMapID="+ mapID;
-				removeItemAttachment();
-			}
-			
-			function closeAndRefreshParentMonitoringWindow() {
-				refreshParentMonitoringWindow();
-				window.close();
-			} 
 		</script>		
 		
 	</lams:head>
@@ -201,16 +192,3 @@
 
 	</body>
 </lams:html>
-
-
-
-
-
-
-
-
-
-
-
-
-

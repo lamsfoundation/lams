@@ -9,6 +9,7 @@
 	<c:set var="replytopic">
 		<html:rewrite page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />
 	</c:set>
+	
 	<div style="margin-left:<c:out value="${indentSize}"/>em;">
 		<table cellspacing="0" class="forum">
 			<tr>
@@ -23,6 +24,7 @@
 					</c:choose>
 				</th>
 			</tr>
+			
 			<tr class="ui-btn-up-d">
 				<td class="posted-by" >
 					<c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
@@ -39,6 +41,7 @@
 					</c:if>
 				</td>
 			</tr>
+			
 			<tr class="ui-btn-up-d">
 				<td>
 					<c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
@@ -53,8 +56,8 @@
 			<c:if test="${((msgDto.released && msgDto.isAuthor) || sessionMap.mode=='teacher') && (not empty msgDto.mark)}">
 				<tr class="ui-btn-up-d">
 					<td>
-						<span class="field-name"><fmt:message
-								key="lable.topic.title.mark" />
+						<span class="field-name">
+							<fmt:message key="lable.topic.title.mark" />
 						</span>
 						<BR>
 						<fmt:formatNumber value="${msgDto.mark}"  maxFractionDigits="2"/>
@@ -77,6 +80,7 @@
 					</td>
 				</tr>
 			</c:if>
+			
 			<tr class="ui-btn-up-d">
 				<td>
 					<div class="right-buttons">
@@ -94,7 +98,8 @@
 					
 							<!--  Reply Button -->
 							<c:if test="${(not sessionMap.finishedLock) && (not noMorePosts)}">
-								<a href="${replytopic}" data-role="button" class="ui-btn ui-corner-right ui-controlgroup-last ui-btn-up-c" data-theme="c">
+								<a href="${replytopic}" data-rel="dialog" data-role="button" class="ui-btn ui-corner-right ui-controlgroup-last ui-btn-up-c" data-theme="c"
+										onclick="this.href += '&reqID=' + (new Date()).getTime();">
 									<fmt:message key="label.reply" />
 								</a>
 							</c:if>
@@ -103,7 +108,7 @@
 					</div>
 				</td>
 			</tr>
+			
 		</table>
 	</div>
 </c:forEach>
-

@@ -82,8 +82,10 @@ public interface ForumConstants {
     public static final String ATTR_MINIMUM_RATE = "minimumRate";
     
     public static final String ATTR_MAXIMUM_RATE = "maximumRate";
+    
+    public static final String ATTR_MIN_CHARACTERS = "minCharacters";
 
-    public static final String ATTR_LIMITED_CHARS = "limitedChars";
+    public static final String ATTR_MAX_CHARACTERS = "maxCharacters";
 
     public static final String ATTR_LOCK_WHEN_FINISHED = "lockedWhenFinished";
 

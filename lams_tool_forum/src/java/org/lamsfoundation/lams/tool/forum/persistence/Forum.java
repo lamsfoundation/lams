@@ -90,10 +90,14 @@ public class Forum implements Cloneable {
     private ForumUser createdBy;
 
     private Set messages;
+    
+    private int minCharacters;
+    
+    private boolean limitedMinCharacters;
 
-    private int limitedChar;
+    private int maxCharacters;
 
-    private boolean limitedInput;
+    private boolean limitedMaxCharacters;
 
     private boolean reflectOnActivity;
 
@@ -418,29 +422,53 @@ public class Forum implements Cloneable {
 	
 	return toContent;
     }
+    
+    /**
+     * @hibernate.property column="min_characters"
+     * @return
+     */
+    public int getMinCharacters() {
+	return minCharacters;
+    }
+
+    public void setMinCharacters(int minCharacters) {
+	this.minCharacters = minCharacters;
+    }
+    
+    /**
+     * @hibernate.property column="limited_min_characters"
+     * @return
+     */
+    public boolean isLimitedMinCharacters() {
+	return limitedMinCharacters;
+    }
+
+    public void setLimitedMinCharacters(boolean limitedMinCharacters) {
+	this.limitedMinCharacters = limitedMinCharacters;
+    }
 
     /**
      * @hibernate.property column="limited_of_chars"
      * @return
      */
-    public int getLimitedChar() {
-	return limitedChar;
+    public int getMaxCharacters() {
+	return maxCharacters;
     }
 
-    public void setLimitedChar(int limitedChar) {
-	this.limitedChar = limitedChar;
+    public void setMaxCharacters(int maxCharacters) {
+	this.maxCharacters = maxCharacters;
     }
 
     /**
      * @hibernate.property column="limited_input_flag"
      * @return
      */
-    public boolean isLimitedInput() {
-	return limitedInput;
+    public boolean isLimitedMaxCharacters() {
+	return limitedMaxCharacters;
     }
 
-    public void setLimitedInput(boolean limitedInput) {
-	this.limitedInput = limitedInput;
+    public void setLimitedMaxCharacters(boolean limitedMaxCharacters) {
+	this.limitedMaxCharacters = limitedMaxCharacters;
     }
 
     /**

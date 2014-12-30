@@ -96,7 +96,8 @@ public class ForumForm extends ActionForm {
     	forum.setAllowEdit(false);
     	forum.setAllowAnonym(false);
     	forum.setAllowRichEditor(false);
-    	forum.setLimitedInput(false);
+    	forum.setLimitedMinCharacters(false);
+    	forum.setLimitedMaxCharacters(false);
     	forum.setLockWhenFinished(false);
     	forum.setAllowNewTopic(false);
     	forum.setAllowUpload(false);
