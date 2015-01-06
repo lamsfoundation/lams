@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.forum.persistence;
 
@@ -31,33 +31,33 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class ForumToolSessionDao extends HibernateDaoSupport {
 
-	private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + ForumToolSession.class.getName() + " where session_id=?";
-	private static final String SQL_QUERY_FIND_BY_CONTENT_ID = "select s from " + Forum.class.getName()+ " as f, " +
-													ForumToolSession.class.getName() + " as s" + 
-													" where f.contentId=? and s.forum.uid=f.uid";
-	
-	public ForumToolSession getBySessionId(Long sessionId) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID,sessionId);
-		if(list == null || list.isEmpty())
-			return null;
-		return (ForumToolSession) list.get(0);
-	}
-	
-	public void saveOrUpdate(ForumToolSession session){
-		this.getHibernateTemplate().saveOrUpdate(session);
-	}
+    private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + ForumToolSession.class.getName()
+	    + " where session_id=?";
+    private static final String SQL_QUERY_FIND_BY_CONTENT_ID = "select s from " + Forum.class.getName() + " as f, "
+	    + ForumToolSession.class.getName() + " as s" + " where f.contentId=? and s.forum.uid=f.uid";
 
-	public List getByContentId(Long contentID) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_CONTENT_ID,contentID);
-		return list;
-	}
+    public ForumToolSession getBySessionId(Long sessionId) {
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, sessionId);
+	if (list == null || list.isEmpty())
+	    return null;
+	return (ForumToolSession) list.get(0);
+    }
 
-	public void delete(Long sessionId) {
-		ForumToolSession session = getBySessionId(sessionId);
-		this.getHibernateTemplate().delete(session);
-	}
+    public void saveOrUpdate(ForumToolSession session) {
+	this.getHibernateTemplate().saveOrUpdate(session);
+    }
 
-	public void delete(ForumToolSession session){
-		this.getHibernateTemplate().delete(session);
-	}
+    public List<ForumToolSession> getByContentId(Long contentID) {
+	List<ForumToolSession> list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_CONTENT_ID, contentID);
+	return list;
+    }
+
+    public void delete(Long sessionId) {
+	ForumToolSession session = getBySessionId(sessionId);
+	this.getHibernateTemplate().delete(session);
+    }
+
+    public void delete(ForumToolSession session) {
+	this.getHibernateTemplate().delete(session);
+    }
 }

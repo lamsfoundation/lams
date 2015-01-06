@@ -1,21 +1,33 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="tool"><lams:WebAppURL /></c:set>
 
 <%-- If you change this file, remember to update the copy made for CNG-12 --%>
 
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-
-<c:set var="lams">
- 		<lams:LAMSURL />
-</c:set>
-
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
+
 <style media="screen,projection" type="text/css">
 	#message-area {
 		margin-bottom: 20px;
 		display: none;
+	}
+	
+	.collapsed-headers {
+		padding-bottom: 20px;
+	}
+	
+	#buttons {
+		margin-bottom: 80px;
+		margin-top: 20px;
+	}
+	
+	.tablesorter, .pager {
+		width: 60%;
+		<c:if test="${forum.reflectOnActivity}">width: 97%;</c:if>
+		margin-left: 10px;
 	}
 </style>
 
@@ -36,6 +48,8 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 
 <script type="text/javascript">
 
@@ -55,6 +69,83 @@
 			}
 		);
 	}
+	
+  	$(document).ready(function(){
+	    
+		$(".tablesorter").tablesorter({
+			theme: 'blue',
+		    widthFixed: true
+		});
+		
+		$(".tablesorter").each(function() {
+			$(this).tablesorterPager({
+				savePages: false,
+				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?isReflectOnActivity=${forum.reflectOnActivity}&page={page}&size={size}&{sortList:column}&sessionId=" + $(this).attr('data-session-id'),
+				ajaxProcessing: function (data, table) {
+			    	if (data && data.hasOwnProperty('rows')) {
+			    		var rows = [],
+			            json = {};
+			    		
+						for (i = 0; i < data.rows.length; i++){
+							var userData = data.rows[i];
+							
+							rows += '<tr>';
+							
+							rows += '<td>';
+							rows += 	userData["userName"];
+							rows += '</td>';
+							
+							rows += '<td  align="right">';
+							rows += 	userData["numberOfPosts"];
+							rows += '</td>';
+
+							rows += '<td align="center">';
+							
+							rows += 	(userData["anyPostsMarked"]) ? '<fmt:message key="label.yes"/>' : '<fmt:message key="label.no"/>';
+							
+							var viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
+							rows += 	'<a href="javascript:launchPopup(\'' + viewUserMarkUrl + '\')" style="margin-left: 7px;" styleClass="button">';
+							rows += 		'<fmt:message key="lable.topic.title.mark" />';
+							rows += 	'</a>';
+							
+							rows += '</td>';
+							
+							if (${forum.reflectOnActivity}) {
+								rows += '<td style="width:50%;">';
+								rows += 	(userData["notebookEntry"] == 'null') ? '-' : userData["notebookEntry"];
+								rows += '</td>';
+							}
+							
+							rows += '</tr>';
+						}
+			            
+						json.total = data.total_rows;
+						json.rows = $(rows);
+						return json;
+			            
+			    	}
+				},					
+			    container: $(this).next(".pager"),
+			    output: '{startRow} to {endRow} ({totalRows})',// possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
+			    // if true, the table will remain the same height no matter how many records are displayed. The space is made up by an empty
+			    // table row set to a height to compensate; default is false
+			    fixedHeight: true,
+			    // remove rows from the table to speed up the sort of large tables.
+			    // setting this to false, only hides the non-visible rows; needed if you plan to add/remove rows with the pager enabled.
+			    removeRows: false,
+			    // css class names of pager arrows
+			    cssNext: '.tablesorter-next', // next page arrow
+				cssPrev: '.tablesorter-prev', // previous page arrow
+				cssFirst: '.tablesorter-first', // go to first page arrow
+				cssLast: '.tablesorter-last', // go to last page arrow
+				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
+				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
+				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
+				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
+				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+			})
+		});
+  	})
 </script>
 
 <h1>
@@ -64,128 +155,6 @@
     <c:out value="${instruction}" escapeXml="false"/>
 </div>
 <br/>
-<c:forEach var="element" items="${sessionUserMap}">
-	<c:set var="toolSessionDto" value="${element.key}" />
-	<c:set var="userlist" value="${element.value}" />
-	
-	<!--For release marks feature-->
-	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
-	<div id="message-area"></div>
-
-	<c:if test="${isGroupedActivity}">	
-		<h2>
-			<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
-		</h2>
-	</c:if>
-        
-	<table cellpadding="0" class="small-space-top alternative-color">
-		<c:forEach var="user" items="${userlist}" varStatus="status">
-			<c:if test="${status.first}">
-				<tr>
-					<th>
-						<fmt:message key="monitoring.user.fullname"/>
-					</th>
-					<c:if test="${user.hasRefection}">
-						<th align="center">
-							<fmt:message key="monitoring.user.reflection"/>
-						</th>
-					</c:if>
-					<th align="center">
-						<fmt:message key="monitoring.marked.question"/>
-					</th>
-				</tr>
-			</c:if>
-			<tr>
-				<td>
-					<c:out value="${user.fullName}" escapeXml="true" />
-				</td>
-				<c:if test="${user.hasRefection}">
-				<td align="center">
-						<c:set var="viewReflection">
-							<c:url value="/monitoring/viewReflection.do?toolSessionID=${toolSessionDto.sessionID}&userUid=${user.userUid}"/>
-						</c:set>
-						<html:link href="javascript:launchPopup('${viewReflection}')">
-							<fmt:message key="label.view" />
-						</html:link>
-				</td>
-				</c:if>
-				<td align="center">
-					<c:choose>
-					<c:when test="${user.anyPostsMarked}">
-						<fmt:message key="label.yes"/>
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.no"/>
-					</c:otherwise>
-					</c:choose>
-					<c:url value="/monitoring/viewUserMark.do" var="viewuserurl">
-						<c:param name="userID" value="${user.userUid}" />
-						<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
-					</c:url>
-					<html:link href="javascript:launchPopup('${viewuserurl}')" style="float: right;" styleClass="button">
-						<fmt:message key="lable.topic.title.mark" />
-					</html:link>
-				</td>
-			</tr>
-		</c:forEach>
-		<c:if test="${empty userlist}">
-			<tr>
-				<td colspan="3">
-					<b><fmt:message key="message.monitoring.summary.no.users" /></b>
-				</td>
-			</tr>
-		</c:if>
- 	 </table>
-
-	<table cellpadding="0">
-		<tr>
-			<td>
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:form action="/learning/viewForum.do" target="_blank">
-						<html:hidden property="mode" value="teacher"/>
-						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:hidden property="hideReflection" value="true"/>
-						<html:submit property="viewForum" styleClass="button">
-							<fmt:message key="label.monitoring.summary.view.forum" />
-						</html:submit>
-					</html:form>
-				</div>
-				<!-- 
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:form action="/monitoring/viewAllMarks" target="_blank">
-						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:submit property="Mark" styleClass="button">
-							<fmt:message key="lable.topic.title.mark" />
-						</html:submit>
-					</html:form>
-				</div>
-				 -->
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:button property="releaseMarks" onclick="releaseMarks(${toolSessionDto.sessionID})" styleClass="button">
-						<fmt:message key="button.release.mark" />
-					</html:button>
-				</div>
-				<div style="float:left;padding:5px;margin-left:5px">
-					<html:form action="/monitoring/downloadMarks">
-						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:submit property="downloadMarks" styleClass="button">
-							<fmt:message key="message.download.marks" />
-						</html:submit>
-					</html:form>
-				</div>
-				<div style="float:left;padding:9px">
-					<c:url value="/monitoring.do" var="refreshMonitoring">
-						<c:param name="contentFolderID" value="${contentFolderID}"/>
-						<c:param name="toolContentID" value="${toolContentID}" />
-					</c:url>
-					<html:link href="${refreshMonitoring}" styleClass="button">
-							<fmt:message key="label.refresh" />
-					</html:link>
-				</div>
-			</td>
-		</tr>
-	</table>
-</c:forEach>
 
 <c:if test="${empty sessionUserMap}">
 	<p>
@@ -193,301 +162,97 @@
 	</p>
 </c:if>
 
-<h1 style="padding-bottom: 10px;">
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+<c:forEach var="sessionDto" items="${sessionDtos}">
+	
+	<!--For release marks feature-->
+	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
+	<div id="message-area"></div>
 
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-
-<table class="alternative-color">	
-
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.lock.on.finished" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.lockWhenFinished == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
+	<c:if test="${isGroupedActivity}">	
+		<h2>
+			<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" />
+		</h2>
+	</c:if>
 	
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.allow.edit" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.allowEdit == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.allow.rate.postings" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.allowRateMessages}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.minimum.reply" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.minimumRate == 0}">
-					<fmt:message key="label.authoring.advance.no.minimum" />
-				</c:when>
-				<c:otherwise>
-					${forum.minimumRate}
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.maximum.reply" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.maximumRate == 0}">
-					<fmt:message key="label.authoring.advance.no.maximum" />
-				</c:when>
-				<c:otherwise>
-					${forum.maximumRate}
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.allow.upload" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.allowUpload == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.use.richeditor" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.allowRichEditor == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.min.limited.input" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.limitedMinCharacters == true}">
-					<fmt:message key="label.on" />, ${forum.minCharacters}
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.limited.input" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.limitedMaxCharacters == true}">
-					<fmt:message key="label.on" />, ${forum.maxCharacters}
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.allow.new.topics" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.allowNewTopic == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advance.number.reply" />
-		</td>
-		
-		<td>
-			<fmt:message key="label.authoring.advance.minimum.reply" />
-			<c:choose>
-				<c:when test="${forum.minimumReply != 0}">
-					${forum.minimumReply}
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.authoring.advance.no.minimum" />
-				</c:otherwise>
-			</c:choose>
-			<br />
-			
-			<fmt:message key="label.authoring.advance.maximum.reply" />
-			<c:choose>
-				<c:when test="${forum.maximumReply != 0}">
-					${forum.maximumReply}
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.authoring.advance.no.maximum" />
-				</c:otherwise>
-			</c:choose>
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advanced.send.emails.to" /> <fmt:message key="label.authoring.advanced.learners" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.notifyLearnersOnForumPosting == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advanced.send.emails.to" /> <fmt:message key="label.authoring.advanced.teachers" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.notifyTeachersOnForumPosting == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advanced.notify.mark.release" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.notifyLearnersOnMarkRelease == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${forum.reflectOnActivity == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${forum.reflectOnActivity == true}">
+	<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
+		<thead>
 			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>
-					<lams:out value="${forum.reflectInstructions}" escapeHtml="true" />
-				</td>
+				<th>
+					<fmt:message key="monitoring.user.fullname"/>
+				</th>
+				<th width="100px" class="sorter-false">
+					Number of posts
+				</th>
+				<th width="100px" align="center" class="sorter-false">
+					<fmt:message key="monitoring.marked.question"/>
+				</th>
+				<c:if test="${forum.reflectOnActivity}">
+					<th align="center" class="sorter-false">
+						<fmt:message key="monitoring.user.reflection"/>
+					</th>
+				</c:if>
 			</tr>
-		</c:when>
-	</c:choose>
-	
-</table>
-</div>
+		</thead>
+			
+		<tbody>
+		</tbody>
+	</table>
+		
+	<!-- pager -->
+	<div class="pager">
+		<form>
+			<img class="tablesorter-first"/>
+			<img class="tablesorter-prev"/>
+			<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+			<img class="tablesorter-next"/>
+			<img class="tablesorter-last"/>
+			<select class="pagesize">
+				<option selected="selected" value="10">10</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+				<option value="40">40</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+			</select>
+		</form>
+	</div>
 
-<%@include file="daterestriction.jsp"%>
+	<div id="buttons">
+		<div style="float:left;padding:5px;margin-left:5px">
+			<html:form action="/learning/viewForum.do" target="_blank">
+				<html:hidden property="mode" value="teacher"/>
+				<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
+				<html:hidden property="hideReflection" value="true"/>
+				<html:submit property="viewForum" styleClass="button">
+					<fmt:message key="label.monitoring.summary.view.forum" />
+				</html:submit>
+			</html:form>
+		</div>
+		<div style="float:left;padding:5px;margin-left:5px">
+			<html:button property="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" styleClass="button">
+				<fmt:message key="button.release.mark" />
+			</html:button>
+		</div>
+		<div style="float:left;padding:5px;margin-left:5px">
+			<html:form action="/monitoring/downloadMarks">
+				<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
+				<html:submit property="downloadMarks" styleClass="button">
+					<fmt:message key="message.download.marks" />
+				</html:submit>
+			</html:form>
+		</div>
+		<div style="float:left;padding:9px">
+			<c:url value="/monitoring.do" var="refreshMonitoring">
+				<c:param name="contentFolderID" value="${contentFolderID}"/>
+				<c:param name="toolContentID" value="${toolContentID}" />
+			</c:url>
+			<html:link href="${refreshMonitoring}" styleClass="button">
+					<fmt:message key="label.refresh" />
+			</html:link>
+		</div>
+	</div>
+</c:forEach>
+
+<%@include file="parts/advanceOptions.jsp"%>
+
+<%@include file="parts/daterestriction.jsp"%>

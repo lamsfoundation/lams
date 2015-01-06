@@ -1,13 +1,12 @@
 <%@include file="/common/taglibs.jsp"%>
 
-<h1 style="padding-bottom: 10px;">
+<h1 class="collapsed-headers">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="restrictUsageTreeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),'<lams:LAMSURL/>');" >
 		<fmt:message key="monitor.summary.date.restriction" />
 	</a>
 </h1>
-<br />
 
 <div class="monitoring-advanced" id="restrictUsageDiv" style="display:none; ">
 

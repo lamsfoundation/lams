@@ -102,40 +102,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<!-- B: Monitoring -->
 	<definition name="tiles:/monitoring/forum/main" extends="tiles:tab:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.init"/>
+    		<put name="pageTitleKey" value="page.title.monitoring.init"/>
 		<put name="header" value="/jsps/monitoring/header.jsp"/>    	
-    	<put name="body" value="/jsps/monitoring/monitoring.jsp"/>
+    		<put name="body" value="/jsps/monitoring/monitoring.jsp"/>
 	</definition>
 	<definition name="tiles:/monitoring/forum/defineLater" extends="tiles:tab:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
-    	<put name="header" value="/jsps/authoring/definelaterheader.jsp"/>
-    	<put name="body" value="/jsps/authoring/definelater.jsp"/>
+    		<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
+    		<put name="header" value="/jsps/authoring/definelaterheader.jsp"/>
+    		<put name="body" value="/jsps/authoring/definelater.jsp"/>
 	</definition>
 	<definition name="tiles:/monitoring/forum/defineLaterForbidden" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
-    	<put name="header" value="/jsps/authoring/header.jsp"/>
-    	<put name="body" value="/jsps/authoring/definelaterforbid.jsp"/>
+    		<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
+    		<put name="header" value="/jsps/authoring/header.jsp"/>
+    		<put name="body" value="/jsps/authoring/definelaterforbid.jsp"/>
 	</definition>
 	
 	<definition name="tiles:/monitoring/forum/viewMark" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
-    	<put name="body" value="/jsps/monitoring/viewmarks.jsp"/>
+    		<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
+    		<put name="body" value="/jsps/monitoring/viewmarks.jsp"/>
 	</definition>
 	<definition name="tiles:/monitoring/forum/editUserMark" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.edit.user.mark"/>
-    	<put name="body" value="/jsps/monitoring/updatemarks.jsp"/>
+    		<put name="pageTitleKey" value="page.title.monitoring.edit.user.mark"/>
+    		<put name="body" value="/jsps/monitoring/updatemarks.jsp"/>
 	</definition>
 	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
-    	<put name="body" value="/jsps/monitoring/message/viewtopic.jsp"/>
+    		<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
+    		<put name="body" value="/jsps/monitoring/message/viewtopic.jsp"/>
 	</definition>
 	<definition name="tiles:/monitoring/forum/viewTopicTree" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
-    	<put name="body" value="/jsps/monitoring/message/viewtopictree.jsp"/>
-	</definition>
-	<definition name="tiles:/monitoring/forum/viewReflection" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.view.reflection"/>
-    	<put name="body" value="/jsps/monitoring/notebook.jsp"/>
+    		<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
+    		<put name="body" value="/jsps/monitoring/message/viewtopictree.jsp"/>
 	</definition>
 	
 	<!-- E: Monitoring -->
