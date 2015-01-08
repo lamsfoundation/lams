@@ -222,7 +222,7 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    List getMessagesByUserUid(Long userId, Long sessionId);
+    List<MessageDTO> getMessagesByUserUid(Long userId, Long sessionId);
 
     /**
      * Get how many post of this user post in a special session. DOES NOT include posts from author.

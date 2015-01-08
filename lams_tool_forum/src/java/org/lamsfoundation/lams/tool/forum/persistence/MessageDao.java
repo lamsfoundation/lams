@@ -70,7 +70,7 @@ public class MessageDao extends HibernateDaoSupport {
      * @param sessionId
      * @return
      */
-    public List getRootTopics(Long sessionId) {
+    public List<Message> getRootTopics(Long sessionId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_TOPICS, sessionId);
     }
 
@@ -80,7 +80,7 @@ public class MessageDao extends HibernateDaoSupport {
      * @param forumUid
      * @return
      */
-    public List getTopicsFromAuthor(Long forumUid) {
+    public List<Message> getTopicsFromAuthor(Long forumUid) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPICS_FROM_AUTHOR, forumUid);
     }
 
@@ -97,7 +97,7 @@ public class MessageDao extends HibernateDaoSupport {
      * @param parentId
      * @return
      */
-    public List getChildrenTopics(Long parentId) {
+    public List<Message> getChildrenTopics(Long parentId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_CHILDREN, parentId);
     }
 
@@ -108,7 +108,7 @@ public class MessageDao extends HibernateDaoSupport {
      * @param sessionId
      * @return
      */
-    public List getByUserAndSession(Long userUid, Long sessionId) {
+    public List<Message> getByUserAndSession(Long userUid, Long sessionId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_BY_USER_SESSION, new Object[] { userUid, sessionId });
     }
 
@@ -118,7 +118,7 @@ public class MessageDao extends HibernateDaoSupport {
      * @param sessionId
      * @return
      */
-    public List getBySession(Long sessionId) {
+    public List<Message> getBySession(Long sessionId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION, sessionId);
     }
 

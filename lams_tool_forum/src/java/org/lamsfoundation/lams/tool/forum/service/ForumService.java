@@ -490,8 +490,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public List getMessagesByUserUid(Long userId, Long sessionId) {
-	List list = messageDao.getByUserAndSession(userId, sessionId);
+    public List<MessageDTO> getMessagesByUserUid(Long userId, Long sessionId) {
+	List<Message> list = messageDao.getByUserAndSession(userId, sessionId);
 
 	return MessageDTO.getMessageDTO(list);
     }
@@ -504,8 +504,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public void releaseMarksForSession(Long sessionID) {
 	// udate release mark date for each message.
-	List list = messageDao.getBySession(sessionID);
-	Iterator iter = list.iterator();
+	List<Message> list = messageDao.getBySession(sessionID);
+	Iterator<Message> iter = list.iterator();
 	ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
 	Forum forum = session.getForum();
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(ForumConstants.TOOL_SIGNATURE,
@@ -518,7 +518,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	while (iter.hasNext()) {
-	    Message msg = (Message) iter.next();
+	    Message msg = iter.next();
 	    ForumReport report = msg.getReport();
 	    if (report != null) {
 		report.setDateMarksReleased(new Date());

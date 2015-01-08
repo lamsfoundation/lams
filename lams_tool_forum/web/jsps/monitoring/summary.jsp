@@ -25,8 +25,7 @@
 	}
 	
 	.tablesorter, .pager {
-		width: 60%;
-		<c:if test="${forum.reflectOnActivity}">width: 97%;</c:if>
+		width: 97%;
 		margin-left: 10px;
 	}
 </style>
@@ -74,7 +73,9 @@
 	    
 		$(".tablesorter").tablesorter({
 			theme: 'blue',
-		    widthFixed: true
+		    widthFixed: true,
+		    sortInitialOrder: 'desc',
+            sortList: [[0]] 
 		});
 		
 		$(".tablesorter").each(function() {
@@ -99,15 +100,20 @@
 							rows += 	userData["numberOfPosts"];
 							rows += '</td>';
 
+							//anyPostsMarked column
 							rows += '<td align="center">';
-							
-							rows += 	(userData["anyPostsMarked"]) ? '<fmt:message key="label.yes"/>' : '<fmt:message key="label.no"/>';
-							
-							var viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
-							rows += 	'<a href="javascript:launchPopup(\'' + viewUserMarkUrl + '\')" style="margin-left: 7px;" styleClass="button">';
-							rows += 		'<fmt:message key="lable.topic.title.mark" />';
-							rows += 	'</a>';
-							
+							if (userData["numberOfPosts"] == 0) {
+								rows += "-";
+								
+							} else {
+								var anyPostsMarked = (userData["anyPostsMarked"]) ? '<fmt:message key="label.yes"/>' : '<fmt:message key="label.no"/>';
+								rows += anyPostsMarked;	
+								
+								var viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
+								rows += 	'<a href="javascript:launchPopup(\'' + viewUserMarkUrl + '\')" style="margin-left: 7px;" styleClass="button">';
+								rows += 		'<fmt:message key="lable.topic.title.mark" />';
+								rows += 	'</a>';
+							}
 							rows += '</td>';
 							
 							if (${forum.reflectOnActivity}) {
@@ -180,10 +186,10 @@
 				<th>
 					<fmt:message key="monitoring.user.fullname"/>
 				</th>
-				<th width="100px" class="sorter-false">
-					Number of posts
+				<th width="100px">
+					<fmt:message key="label.number.of.posts"/>
 				</th>
-				<th width="100px" align="center" class="sorter-false">
+				<th width="130px" align="center" class="sorter-false">
 					<fmt:message key="monitoring.marked.question"/>
 				</th>
 				<c:if test="${forum.reflectOnActivity}">

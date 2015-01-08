@@ -67,7 +67,6 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
-import org.lamsfoundation.lams.tool.forum.dto.UserDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
@@ -78,7 +77,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumUserComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.util.SessionDTOComparator;
-import org.lamsfoundation.lams.tool.forum.util.UserDTOComparator;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -117,9 +115,6 @@ public class MonitoringAction extends Action {
 	}
 
 	// ***************** Marks Functions ********************
-	if (param.equals("viewAllMarks")) {
-	    return viewAllMarks(mapping, form, request, response);
-	}
 	if (param.equals("downloadMarks")) {
 	    return downloadMarks(mapping, form, request, response);
 	}
@@ -193,8 +188,6 @@ public class MonitoringAction extends Action {
 	Forum forum = forumService.getForumByContentId(toolContentId);
 	request.setAttribute("forum", forum);
 
-	boolean hasReflection = forum.isReflectOnActivity();
-
 	List<ForumToolSession> sessions = forumService.getSessionsByContentId(toolContentId);
 
 	Set<SessionDTO> sessionDtos = new TreeSet<SessionDTO>(
@@ -242,10 +235,17 @@ public class MonitoringAction extends Action {
 	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
 
 	int sorting = ForumConstants.SORT_BY_NO;
-	if (isSort1 != null && isSort1.equals(0)) {
+	if ((isSort1 != null) && isSort1.equals(0)) {
 	    sorting = ForumConstants.SORT_BY_USER_NAME_ASC;
-	} else if (isSort1 != null && isSort1.equals(1)) {
+	    
+	} else if ((isSort1 != null) && isSort1.equals(1)) {
 	    sorting = ForumConstants.SORT_BY_USER_NAME_DESC;
+	    
+	} else if ((isSort2 != null) && isSort2.equals(0)) {
+	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC;
+	    
+	} else if ((isSort2 != null) && isSort2.equals(1)) {
+	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC;
 	}
 
 	List<ForumUser> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting);
@@ -263,7 +263,7 @@ public class MonitoringAction extends Action {
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
-	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName()));
+	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getLastName() + " " + user.getFirstName()));
 
 	    int numberOfPosts = 0;
 	    boolean isAnyPostsMarked = false;
@@ -594,37 +594,6 @@ public class MonitoringAction extends Action {
     // ==========================================================================================
 
     /**
-     * View all user marks for a special Session ID
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	// only one param for session scope marks
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-
-	// create sessionMap
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
-	sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_SESSION);
-
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
-	// get tool session scope topics
-	forumService = getForumService();
-	List topicList = forumService.getAllTopicsFromSession(sessionID);
-
-	Map<ForumUser, List<MessageDTO>> topicsByUser = getTopicsSortedByAuthor(topicList);
-	request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
-	return mapping.findForward("success");
-    }
-
-    /**
      * View a special user's mark
      * 
      * @param mapping
@@ -648,13 +617,11 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// get this user's all topics
 	forumService = getForumService();
-	List<MessageDTO> messageList = forumService.getMessagesByUserUid(userUid, sessionId);
+	List<MessageDTO> messages = forumService.getMessagesByUserUid(userUid, sessionId);
+	request.setAttribute(ForumConstants.ATTR_MESSAGES, messages);
+	
 	ForumUser user = forumService.getUser(userUid);
-
-	// each back to web page
-	Map<ForumUser, List<MessageDTO>> report = new TreeMap(new ForumUserComparator());
-	report.put(user, messageList);
-	request.setAttribute(ForumConstants.ATTR_REPORT, report);
+	request.setAttribute(ForumConstants.ATTR_USER, user);
 
 	return mapping.findForward("success");
     }
@@ -671,7 +638,7 @@ public class MonitoringAction extends Action {
     private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	MarkForm markForm = (MarkForm) form;
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(markForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(markForm.getSessionMapID());
 	String updateMode = (String) sessionMap.get(ForumConstants.PARAM_UPDATE_MODE);
 	// view forum mode
 	if (StringUtils.isBlank(updateMode)) {
@@ -770,19 +737,10 @@ public class MonitoringAction extends Action {
 
 	// echo back to topic list page: it depends which screen is come from: view special user mark, or view all user
 	// marks.
-	if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_SESSION)) {
-	    List topicList = forumService.getAllTopicsFromSession(sessionId);
-	    Map<ForumUser, List<MessageDTO>> topicsByUser = getTopicsSortedByAuthor(topicList);
-	    request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
-	    // listMark or listAllMark.
-	    return mapping.findForward("success");
-
-	} else if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_USER)) {
-	    List<MessageDTO> messageList = forumService.getMessagesByUserUid(user.getUid(), sessionId);
-	    Map<ForumUser, List<MessageDTO>> topicMap = new TreeMap(new ForumUserComparator());
-	    topicMap.put(user, messageList);
-	    request.setAttribute(ForumConstants.ATTR_REPORT, topicMap);
-	    // listMark or listAllMark.
+	if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_USER)) {
+	    List<MessageDTO> messages = forumService.getMessagesByUserUid(user.getUid(), sessionId);
+	    request.setAttribute(ForumConstants.ATTR_MESSAGES, messages);
+	    // listMark
 	    return mapping.findForward("success");
 
 	} else { // mark from view forum

@@ -94,14 +94,14 @@ public class MessageDTO {
 	 * @param msgList
 	 * @return
 	 */
-	public static List<MessageDTO> getMessageDTO(List msgList){
+	public static List<MessageDTO> getMessageDTO(List<Message> msgList){
 		List<MessageDTO> retSet = new ArrayList<MessageDTO>();
 		if(msgList == null || msgList.isEmpty())
 			return retSet;
 		
-		Iterator iter = msgList.iterator();
+		Iterator<Message> iter = msgList.iterator();
 		while(iter.hasNext()){
-			Message msg = (Message) iter.next();
+			Message msg = iter.next();
 			MessageDTO msgDto = new MessageDTO();
 			msgDto.setMessage(msg);
 			if(msg.getCreatedBy() != null)

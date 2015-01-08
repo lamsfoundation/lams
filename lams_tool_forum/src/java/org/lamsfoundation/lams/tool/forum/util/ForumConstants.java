@@ -37,6 +37,8 @@ public interface ForumConstants {
     public static final int SORT_BY_NO = 0;
     public static final int SORT_BY_USER_NAME_ASC = 1;
     public static final int SORT_BY_USER_NAME_DESC = 2;
+    public static final int SORT_BY_NUMBER_OF_POSTS_ASC = 3;
+    public static final int SORT_BY_NUMBER_OF_POSTS_DESC = 4;
 
     // See LDEV652
     // For old style (Fiona's description): The oldest topic is at the top, does not depends the reply date etc.
@@ -132,7 +134,7 @@ public interface ForumConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
-    public static final String ATTR_REPORT = "report";
+    public static final String ATTR_MESSAGES = "messages";
 
     public static final String PARAM_UPDATE_MODE = "updateMode";
 
@@ -166,8 +168,6 @@ public interface ForumConstants {
     public static final String ATTR_MINIMUM_REPLY = "minimumReply";
 
     public static final String ATTR_MAXIMUM_REPLY = "maximumReply";
-
-    public static final String MARK_UPDATE_FROM_SESSION = "listAllMarks";
 
     public static final String MARK_UPDATE_FROM_USER = "listMarks";
 

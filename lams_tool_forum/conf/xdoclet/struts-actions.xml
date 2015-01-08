@@ -311,15 +311,6 @@
 			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
 		</action>
 		
-		<action path="/monitoring/viewAllMarks"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			name="emptyForm"
-			scope="request"
-			validate="false"
-			parameter="viewAllMarks" >
-			<forward name="success" path="tiles:/monitoring/forum/viewMark" />
-		</action>
-		
 		<!--  EDIT MARK		 -->
 		<action path="/monitoring/viewUserMark"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
