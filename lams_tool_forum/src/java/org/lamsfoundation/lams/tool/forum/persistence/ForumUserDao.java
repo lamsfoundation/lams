@@ -44,10 +44,9 @@ public class ForumUserDao extends HibernateDaoSupport {
     private static final String SQL_QUERY_FIND_BY_SESSION_AND_QUESTION_LIMIT = "from user in class ForumUser "
 	    + "where user.session.sessionId=:sessionId order by ";
 
-    private static final String SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS = "SELECT user, COUNT(message.uid) AS postCount FROM "
-	    + Message.class.getName() + " as message "
-	    + " RIGHT JOIN ForumUser as user "
-	    + " WHERE user.session.sessionId=:sessionId GROUP BY user.userId ORDER BY postCount ";
+    private static final String SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS = "SELECT user FROM "
+	    + Message.class.getName() + " as message " + " RIGHT JOIN message.createdBy as user "
+	    + " WHERE user.session.sessionId=:sessionId GROUP BY user.userId ORDER BY ";
 
     private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION = "SELECT COUNT(*) from "
 	    + ForumUser.class.getName() + " as user where user.session.sessionId=?";
@@ -95,21 +94,29 @@ public class ForumUserDao extends HibernateDaoSupport {
 	case ForumConstants.SORT_BY_USER_NAME_DESC:
 	    sortingOrder = "user.lastName DESC, user.firstName DESC";
 	    break;
+	case ForumConstants.SORT_BY_LAST_POSTING_ASC:
+	    sortingOrder = " message.body ASC";
+	    break;
+	case ForumConstants.SORT_BY_LAST_POSTING_DESC:
+	    sortingOrder = " message.body DESC";
+	    break;
 	case ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC:
-	    sortingOrder = "ASC";
+	    sortingOrder = " COUNT(message) ASC";
 	    break;
 	case ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC:
-	    sortingOrder = "DESC";
+	    sortingOrder = " COUNT(message) DESC";
 	    break;
 	}
 
 	if (sorting == ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC
 		|| sorting == ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC) {
-	    
-	   String SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS = "SELECT user FROM "
-		    + Message.class.getName() + " as message "
-		    + " RIGHT JOIN message.createdBy as user "
-		    + " WHERE user.session.sessionId=:sessionId GROUP BY user.userId ORDER BY COUNT(message) ";
+
+	    List list = getSession().createQuery(SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS + sortingOrder)
+		    .setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size).list();
+	    return list;
+
+	} else if (sorting == ForumConstants.SORT_BY_LAST_POSTING_ASC
+		|| sorting == ForumConstants.SORT_BY_LAST_POSTING_DESC) {
 
 	    List list = getSession().createQuery(SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS + sortingOrder)
 		    .setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size).list();

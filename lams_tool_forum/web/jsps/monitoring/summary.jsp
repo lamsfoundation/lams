@@ -28,6 +28,12 @@
 		width: 97%;
 		margin-left: 10px;
 	}
+	
+	.posted-date {
+		font-size: 10px;
+		color: #666;
+		padding-left: 30px;
+	}
 </style>
 
 <script type="text/javascript">
@@ -81,7 +87,7 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?isReflectOnActivity=${forum.reflectOnActivity}&page={page}&size={size}&{sortList:column}&sessionId=" + $(this).attr('data-session-id'),
+				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?isReflectOnActivity=${forum.reflectOnActivity}&isAllowRichEditor=${forum.allowRichEditor}&page={page}&size={size}&{sortList:column}&sessionId=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 			    	if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -94,6 +100,12 @@
 							
 							rows += '<td>';
 							rows += 	userData["userName"];
+							rows += '</td>';
+							
+							rows += '<td>';
+							if ( userData["lastMessage"] != null) {
+								rows += userData["lastMessage"] + "<div class='posted-date'>" + userData["lastEdited"] + "</div>";
+							}
 							rows += '</td>';
 							
 							rows += '<td  align="right">';
@@ -117,7 +129,7 @@
 							rows += '</td>';
 							
 							if (${forum.reflectOnActivity}) {
-								rows += '<td style="width:50%;">';
+								rows += '<td>';
 								rows += 	(userData["notebookEntry"] == 'null') ? '-' : userData["notebookEntry"];
 								rows += '</td>';
 							}
@@ -183,8 +195,11 @@
 	<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
 		<thead>
 			<tr>
-				<th>
+				<th width="20%">
 					<fmt:message key="monitoring.user.fullname"/>
+				</th>
+				<th <c:if test="${forum.reflectOnActivity}">width="30%"</c:if>>
+					<fmt:message key="label.latest.posting"/>
 				</th>
 				<th width="100px">
 					<fmt:message key="label.number.of.posts"/>
@@ -193,7 +208,7 @@
 					<fmt:message key="monitoring.marked.question"/>
 				</th>
 				<c:if test="${forum.reflectOnActivity}">
-					<th align="center" class="sorter-false">
+					<th width="30%" align="center" class="sorter-false">
 						<fmt:message key="monitoring.user.reflection"/>
 					</th>
 				</c:if>

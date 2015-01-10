@@ -15,17 +15,15 @@
 	</p>		
 	
 	<p>
-			<c:set var="viewtopic">
-				<html:rewrite page="/monitoring/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
-			</c:set>
-			<html:link href="javascript:launchPopup('${viewtopic}','viewtopic')">
-				<c:out value="${topic.message.subject}" />
-			</html:link>
-			<c:if test="${topic.hasAttachment}">
-				<img src="<html:rewrite page="/images/paperclip.gif"/>">
-			</c:if>
-		
-		
+		<c:set var="viewtopic">
+			<html:rewrite page="/monitoring/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
+		</c:set>
+		<html:link href="javascript:launchPopup('${viewtopic}','viewtopic')">
+			<c:out value="${topic.message.subject}" />
+		</html:link>
+		<c:if test="${topic.hasAttachment}">
+			<img src="<html:rewrite page="/images/paperclip.gif"/>">
+		</c:if>
 	</p>
 	
 	<table>
@@ -62,6 +60,7 @@
 							<c:url value="/monitoring/viewUserMark.do"/>?userID=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
 						</c:set>
 					</c:if>
+					
 					<c:if test="${sessionMap.updateMode == 'viewForum'}">
 						<c:set var="cancelUrl">
 							<c:url value="/learning/viewTopic.do"/>?sessionMapID=${formBean.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
