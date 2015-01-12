@@ -57,7 +57,7 @@
 					
 					<c:if test="${sessionMap.updateMode == 'listMarks'}">
 						<c:set var="cancelUrl">
-							<c:url value="/monitoring/viewUserMark.do"/>?userID=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
+							<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${formBean.sessionMapID}&userUid=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
 						</c:set>
 					</c:if>
 					

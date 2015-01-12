@@ -1,6 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="tool"><lams:WebAppURL /></c:set>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="forum" value="${sessionMap.forum}" />
 
 <%-- If you change this file, remember to update the copy made for CNG-12 --%>
 
@@ -28,19 +33,13 @@
 		width: 97%;
 		margin-left: 10px;
 	}
-	
-	.posted-date {
-		font-size: 10px;
-		color: #666;
-		padding-left: 30px;
-	}
 </style>
 
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
 		lams: '${lams}',
-		submissionDeadline: '${submissionDeadline}',
+		submissionDeadline: '${sessionMap.submissionDeadline}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
@@ -87,7 +86,7 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?isReflectOnActivity=${forum.reflectOnActivity}&isAllowRichEditor=${forum.allowRichEditor}&page={page}&size={size}&{sortList:column}&sessionId=" + $(this).attr('data-session-id'),
+				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?sessionMapID=${sessionMapID}&page={page}&size={size}&{sortList:column}&sessionId=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 			    	if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -103,8 +102,8 @@
 							rows += '</td>';
 							
 							rows += '<td>';
-							if ( userData["lastMessage"] != null) {
-								rows += userData["lastMessage"] + "<div class='posted-date'>" + userData["lastEdited"] + "</div>";
+							if ( userData["lastMessageDate"] != null) {
+								rows += userData["lastMessageDate"];
 							}
 							rows += '</td>';
 							
@@ -121,7 +120,7 @@
 								var anyPostsMarked = (userData["anyPostsMarked"]) ? '<fmt:message key="label.yes"/>' : '<fmt:message key="label.no"/>';
 								rows += anyPostsMarked;	
 								
-								var viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
+								var viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${sessionMapID}&userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
 								rows += 	'<a href="javascript:launchPopup(\'' + viewUserMarkUrl + '\')" style="margin-left: 7px;" styleClass="button">';
 								rows += 		'<fmt:message key="lable.topic.title.mark" />';
 								rows += 	'</a>';
@@ -174,19 +173,19 @@
 </div>
 <br/>
 
-<c:if test="${empty sessionUserMap}">
+<c:if test="${empty sessionMap.sessionDtos}">
 	<p>
 		<fmt:message key="message.monitoring.summary.no.session" />
 	</p>
 </c:if>
 
-<c:forEach var="sessionDto" items="${sessionDtos}">
+<c:forEach var="sessionDto" items="${sessionMap.sessionDtos}">
 	
 	<!--For release marks feature-->
 	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
 	<div id="message-area"></div>
 
-	<c:if test="${isGroupedActivity}">	
+	<c:if test="${sessionMap.isGroupedActivity}">	
 		<h2>
 			<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" />
 		</h2>
@@ -199,7 +198,7 @@
 					<fmt:message key="monitoring.user.fullname"/>
 				</th>
 				<th <c:if test="${forum.reflectOnActivity}">width="30%"</c:if>>
-					<fmt:message key="label.latest.posting"/>
+					<fmt:message key="label.latest.posting.date"/>
 				</th>
 				<th width="100px">
 					<fmt:message key="label.number.of.posts"/>

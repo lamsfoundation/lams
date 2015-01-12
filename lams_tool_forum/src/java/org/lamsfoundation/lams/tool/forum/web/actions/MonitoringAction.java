@@ -188,22 +188,33 @@ public class MonitoringAction extends Action {
 	Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	forumService = getForumService();
 
+	// create sessionMap
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
 	Forum forum = forumService.getForumByContentId(toolContentId);
-	request.setAttribute("forum", forum);
+	sessionMap.put("forum", forum);
 
 	List<ForumToolSession> sessions = forumService.getSessionsByContentId(toolContentId);
 
 	Set<SessionDTO> sessionDtos = new TreeSet<SessionDTO>(new SessionDTOComparator());
 	// build a map with all users in the forumSessionList
 	for (ForumToolSession session : sessions) {
+	    Long sessionId = session.getSessionId();
 	    SessionDTO sessionDto = new SessionDTO();
 
-	    sessionDto.setSessionID(session.getSessionId());
+	    sessionDto.setSessionID(sessionId);
 	    sessionDto.setSessionName(session.getSessionName());
+
+	    // used for storing data for MonitoringAction.getUsers() serving tablesorter paging
+	    List<MessageDTO> topics = forumService.getAllTopicsFromSession(sessionId);
+	    Map<ForumUser, List<MessageDTO>> topicsByUser = getTopicsSortedByAuthor(topics);
+	    sessionDto.setTopicsByUser(topicsByUser);
 
 	    sessionDtos.add(sessionDto);
 	}
-	request.setAttribute("sessionDtos", sessionDtos);
+	sessionMap.put(ForumConstants.ATTR_SESSION_DTOS, sessionDtos);
 
 	// check if there is submission deadline
 	Date submissionDeadline = forum.getSubmissionDeadline();
@@ -213,11 +224,11 @@ public class MonitoringAction extends Action {
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-	    request.setAttribute(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	}
 
 	boolean isGroupedActivity = forumService.isGroupedActivity(toolContentId);
-	request.setAttribute("isGroupedActivity", isGroupedActivity);
+	sessionMap.put("isGroupedActivity", isGroupedActivity);
     }
 
     /**
@@ -226,14 +237,17 @@ public class MonitoringAction extends Action {
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	forumService = getForumService();
+	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapId);
+
+	// teacher timezone
 	HttpSession ss = SessionManager.getSession();
 	org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
 		.getAttribute(AttributeNames.USER);
 	TimeZone teacherTimeZone = teacher.getTimeZone();
 
 	Long sessionId = WebUtil.readLongParam(request, "sessionId");
-	Boolean isReflectOnActivity = WebUtil.readBooleanParam(request, "isReflectOnActivity");
-	Boolean isAllowRichEditor = WebUtil.readBooleanParam(request, "isAllowRichEditor");
 
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
@@ -254,7 +268,7 @@ public class MonitoringAction extends Action {
 
 	} else if ((isSort2 != null) && isSort2.equals(1)) {
 	    sorting = ForumConstants.SORT_BY_LAST_POSTING_DESC;
-	    
+
 	} else if ((isSort3 != null) && isSort3.equals(0)) {
 	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC;
 
@@ -262,11 +276,17 @@ public class MonitoringAction extends Action {
 	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC;
 	}
 
-	List<ForumUser> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting);
+	Set<SessionDTO> sessionDtos = (Set<SessionDTO>) sessionMap.get(ForumConstants.ATTR_SESSION_DTOS);
+	SessionDTO currentSessionDto = null;
+	for (SessionDTO sessionDto : sessionDtos) {
+	    if (sessionDto.getSessionID().equals(sessionId)) {
+		currentSessionDto = sessionDto;
+		break;
+	    }
+	}
+	Map<ForumUser, List<MessageDTO>> topicsByUser = currentSessionDto.getTopicsByUser();
 
-	// sort and create DTO list
-	List<MessageDTO> topics = forumService.getAllTopicsFromSession(sessionId);
-	Map<ForumUser, List<MessageDTO>> topicsByUser = getTopicsSortedByAuthor(topics);
+	List<ForumUser> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting);
 
 	JSONArray rows = new JSONArray();
 
@@ -287,21 +307,13 @@ public class MonitoringAction extends Action {
 		TreeSet<MessageDTO> messages = new TreeSet<MessageDTO>(new MessageDTOByDateComparator());
 		messages.addAll(topicsByUser.get(user));
 
-		//encode lastMessage suitable for tablesorter
 		MessageDTO lastMessage = messages.last();
-		String lastMessageText = lastMessage.getMessage().getBody();
-		lastMessageText = StringEscapeUtils.escapeCsv(lastMessageText);
-		if (isAllowRichEditor && lastMessageText.startsWith("\"") && lastMessageText.length()>2) {
-		    lastMessageText = lastMessageText.substring(1, lastMessageText.length()-1);
-		}
-		responseRow.put("lastMessage", lastMessageText);
 
-		//format lastEdited date
-		Date lastEdited = (lastMessage.getMessage().getUpdated() == null) ? lastMessage.getMessage()
-			.getCreated() : lastMessage.getMessage().getUpdated();
-		lastEdited = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, lastEdited);
-		DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
-		responseRow.put("lastEdited", dateFormatter.format(lastEdited));
+		// format lastEdited date
+		Date lastMessageDate = lastMessage.getMessage().getCreated();
+		lastMessageDate = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, lastMessageDate);
+		DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
+		responseRow.put("lastMessageDate", dateFormatter.format(lastMessageDate));
 
 		numberOfPosts = messages.size();
 		for (MessageDTO message : messages) {
@@ -314,7 +326,8 @@ public class MonitoringAction extends Action {
 	    responseRow.put("anyPostsMarked", isAnyPostsMarked);
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
-	    if (isReflectOnActivity) {
+	    Forum forum = (Forum) sessionMap.get("forum");
+	    if (forum.isReflectOnActivity()) {
 		NotebookEntry notebookEntry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 			ForumConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 
@@ -642,13 +655,14 @@ public class MonitoringAction extends Action {
 	Long sessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
 	// create sessionMap
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapId);
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_USER);
 
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// get this user's all topics
 	forumService = getForumService();
 	List<MessageDTO> messages = forumService.getMessagesByUserUid(userUid, sessionId);

@@ -108,6 +108,8 @@ public interface ForumConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
     
     public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
+    
+    public static final String ATTR_SESSION_DTOS = "sessionDtos";
 
     // for submission deadline
 
