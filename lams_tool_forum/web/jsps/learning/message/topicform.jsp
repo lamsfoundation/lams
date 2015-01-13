@@ -27,15 +27,15 @@
 
 	<tr class="right-buttons">
 		<td>
-			<html:submit styleClass="button">
-				<fmt:message key="button.submit" />
-			</html:submit>
-			<c:set var="backToForum">
-				<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
-			</c:set>
 			<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="button">
 				<fmt:message key="button.cancel" />
 			</html:button>
+			<c:set var="backToForum">
+				<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
+			</c:set>
+			<html:submit styleClass="button">
+				<fmt:message key="button.submit" />
+			</html:submit>
 		</td>
 	</tr>
 
