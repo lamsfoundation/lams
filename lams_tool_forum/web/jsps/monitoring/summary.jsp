@@ -101,14 +101,14 @@
 							rows += 	userData["userName"];
 							rows += '</td>';
 							
-							rows += '<td>';
+							rows += '<td align="right">';
+							rows += 	userData["numberOfPosts"];
+							rows += '</td>';
+
+							rows += '<td align="right">';
 							if ( userData["lastMessageDate"] != null) {
 								rows += userData["lastMessageDate"];
 							}
-							rows += '</td>';
-							
-							rows += '<td  align="right">';
-							rows += 	userData["numberOfPosts"];
 							rows += '</td>';
 
 							//anyPostsMarked column
@@ -194,20 +194,27 @@
 	<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
 		<thead>
 			<tr>
-				<th width="20%">
+				<th width="25%">
 					<fmt:message key="monitoring.user.fullname"/>
 				</th>
-				<th <c:if test="${forum.reflectOnActivity}">width="30%"</c:if>>
-					<fmt:message key="label.latest.posting.date"/>
-				</th>
-				<th width="100px">
+				<th width="5%" align="center"> 
 					<fmt:message key="label.number.of.posts"/>
 				</th>
-				<th width="130px" align="center" class="sorter-false">
+				<c:choose>
+				  <c:when test="${forum.reflectOnActivity}">
+				     <th width="10%" align="center">
+				  </c:when>
+				  <c:otherwise>
+				     <th width="25%" align="center">
+				  </c:otherwise>
+				</c:choose>
+					<fmt:message key="label.latest.posting.date"/>
+				</th>
+				<th width="10%" align="center" class="sorter-false">
 					<fmt:message key="monitoring.marked.question"/>
 				</th>
 				<c:if test="${forum.reflectOnActivity}">
-					<th width="30%" align="center" class="sorter-false">
+					<th width="40%" align="center" class="sorter-false">
 						<fmt:message key="monitoring.user.reflection"/>
 					</th>
 				</c:if>
