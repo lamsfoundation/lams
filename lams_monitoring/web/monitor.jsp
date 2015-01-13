@@ -40,6 +40,7 @@
 			hasContentFrame = false,
 			presenceEnabled =  false,
 			hasDialog = false,
+			enableExportPortfolio = ${enableExportPortfolio},
 			
 			LAMS_URL = '<lams:LAMSURL/>',
 			
@@ -339,25 +340,32 @@
 		<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
 			<a id="helpButton" target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
 			   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
-			   <fmt:message key="button.help"/></a>
+				<fmt:message key="button.help"/>
+			</a>
 			<a id="refreshButton" class="button" title="<fmt:message key='button.refresh.tooltip'/>"
 			   href="#" onClick="javascript:refreshMonitor('sequence')">
-			   <fmt:message key="button.refresh"/></a>
-			<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
-			   href="#"
-			   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
-			   <fmt:message key="button.export"/></a>
-			<c:if test="${lesson.liveEditEnabled}">
+				<fmt:message key="button.refresh"/>
+			</a>
+			<c:if test="${enableExportPortfolio}">
+				<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
+				   href="#"
+				   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
+					<fmt:message key="button.export"/>
+				</a>
+			</c:if>
+			<c:if test="${enableLiveEdit && lesson.liveEditEnabled}">
 				<a id="liveEditButton" class="button" title="<fmt:message key='button.live.edit.tooltip'/>"
 			       href="#"
 			  	   onClick="javascript:openLiveEdit()">
-				 <fmt:message key='button.live.edit'/></a>
+					<fmt:message key='button.live.edit'/>
+				</a>
 			</c:if>
 			<a class="button" title="<fmt:message key='button.close.branching.tooltip'/>"
 			  id="closeBranchingButton"
 			  href="#"
 			  onClick="javascript:closeBranchingSequence()">
-			 <fmt:message key='button.close.branching'/></a>
+				<fmt:message key='button.close.branching'/>
+			</a>
 		</div>
 		<div id="sequenceCanvas"></div>
 		<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">

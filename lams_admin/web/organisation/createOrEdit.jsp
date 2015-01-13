@@ -82,56 +82,94 @@
 			</html-el:select>
 		</td>
 	</tr>
+	
 	<logic:equal name="OrganisationForm" property="typeId" value="2">
 	<tr>
 		<td colspan=2>
-			<html-el:checkbox property="courseAdminCanAddNewUsers" />
-			<fmt:message key="admin.can.add.user"/>
+			<html-el:checkbox property="courseAdminCanAddNewUsers" styleId="course-admin-can-add-new-users" />
+			<label for="course-admin-can-add-new-users">
+				<fmt:message key="admin.can.add.user"/>
+			</label>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
-			<html-el:checkbox property="courseAdminCanBrowseAllUsers" />
-			<fmt:message key="admin.can.browse.user"/>
+			<html-el:checkbox property="courseAdminCanBrowseAllUsers" styleId="course-admin-can-browse-all-users"/>
+			<label for="course-admin-can-browse-all-users">
+				<fmt:message key="admin.can.browse.user"/>
+			</label>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
-			<html-el:checkbox property="courseAdminCanChangeStatusOfCourse" />
-			<fmt:message key="admin.can.change.status"/>
+			<html-el:checkbox property="courseAdminCanChangeStatusOfCourse" styleId="course-admin-can-change-status-of-course"/>
+			<label for="course-admin-can-change-status-of-course">
+				<fmt:message key="admin.can.change.status"/>
+			</label>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
-			<html-el:checkbox property="enableCourseNotifications" />
-			<fmt:message key="admin.enable.course.notifications"/>
+			<html-el:checkbox property="enableCourseNotifications" styleId="enable-course-notifications"/>
+			<label for="enable-course-notifications">
+				<fmt:message key="admin.enable.course.notifications"/>
+			</label>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
 			<html-el:checkbox onclick="unSelectLearnerGradebook();" styleId="enableGradebookForMonitors" property="enableGradebookForMonitors" />
-			<fmt:message key="admin.gradebook.monitor.enable"/>
+			<label for="enableGradebookForMonitors">
+				<fmt:message key="admin.gradebook.monitor.enable"/>
+			</label>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
 			<html-el:checkbox onclick="selectMonitorGradebook();" styleId="enableGradebookForLearners" property="enableGradebookForLearners" />
-			<fmt:message key="admin.gradebook.learner.enable"/>
+			<label for="enableGradebookForLearners">
+				<fmt:message key="admin.gradebook.learner.enable"/>
+			</label>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
-			<html-el:checkbox property="enableSingleActivityLessons" />
-			<fmt:message key="config.authoring.single.activity"/>
+			<html-el:checkbox property="enableSingleActivityLessons" styleId="enable-single-activity-lessons"/>
+			<label for="enable-single-activity-lessons">
+				<fmt:message key="config.authoring.single.activity"/>
+			</label>
 		</td>
 	</tr>
 	</logic:equal>
+	
+	<tr>
+		<td colspan=2>
+			<html-el:checkbox property="enableLiveEdit" styleId="enable-live-edit"/>
+			<!-- to overcome nasty DynaActionForm bug (http://www.coderanch.com/t/46408/Struts/DynaValidatorActionForm-checkboxes) -->
+			<input type="hidden" name="enableLiveEdit" value="false">
+			<label for="enable-live-edit">
+				<fmt:message key="config.live.edit"/>
+			</label>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<html-el:checkbox property="enableExportPortfolio" styleId="enable-export-portfolio"/>			
+			<!-- to overcome nasty DynaActionForm bug (http://www.coderanch.com/t/46408/Struts/DynaValidatorActionForm-checkboxes) -->
+			<input type="hidden" name="enableExportPortfolio" value="false">
+			<label for="enable-export-portfolio">
+				<fmt:message key="config.export.portfolio"/>
+			</label>
+		</td>
+	</tr>
+	
 	<logic:notEmpty name="OrganisationForm" property="orgId">
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td><logic:equal name="OrganisationForm" property="typeId" value="2"><fmt:message key="msg.group.organisation_id"/></logic:equal>
+		<td>
+			<logic:equal name="OrganisationForm" property="typeId" value="2"><fmt:message key="msg.group.organisation_id"/></logic:equal>
 			<logic:equal name="OrganisationForm" property="typeId" value="3"><fmt:message key="msg.subgroup.organisation_id"/></logic:equal>
 			<bean:write name="OrganisationForm" property="orgId" />.
 		</td>
@@ -140,6 +178,7 @@
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	</logic:notEmpty>
+	
 	<tr>
 		<td colspan=2 class="align-right">
 			<html-el:submit styleId="saveButton" styleClass="button"><fmt:message key="admin.save"/></html-el:submit>

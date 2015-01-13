@@ -99,6 +99,12 @@ public class Organisation implements Serializable, Comparable {
     
     /** persistent field */
     private Boolean enableSingleActivityLessons;
+    
+    /** persistent field */
+    private Boolean enableLiveEdit;
+    
+    /** persistent field */
+    private Boolean enableExportPortfolio;
 
     /** persistent field */
     private Date archivedDate;
@@ -115,6 +121,8 @@ public class Organisation implements Serializable, Comparable {
 	this.enableGradebookForLearners = Boolean.FALSE;
 	this.enableGradebookForMonitors = Boolean.FALSE;
 	this.enableSingleActivityLessons = Boolean.FALSE;
+	this.enableLiveEdit = Boolean.FALSE;
+	this.enableExportPortfolio = Boolean.FALSE;
     }
 
     public Integer getOrganisationId() {
@@ -330,5 +338,21 @@ public class Organisation implements Serializable, Comparable {
 
     public void setEnableSingleActivityLessons(Boolean enableSingleActivityLessons) {
         this.enableSingleActivityLessons = enableSingleActivityLessons;
+    }
+    
+    public Boolean getEnableLiveEdit() {
+        return enableLiveEdit;
+    }
+
+    public void setEnableLiveEdit(Boolean enableLiveEdit) {
+        this.enableLiveEdit = enableLiveEdit;
+    }
+    
+    public Boolean getEnableExportPortfolio() {
+        return enableExportPortfolio;
+    }
+
+    public void setEnableExportPortfolio(Boolean enableExportPortfolio) {
+        this.enableExportPortfolio = enableExportPortfolio;
     }
 }

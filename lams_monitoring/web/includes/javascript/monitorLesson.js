@@ -1527,22 +1527,28 @@ function loadLearnerProgressPage(pageNumber){
 	if (!learnerProgressCellsTemplate) {
 		// fill the placeholder, after all required variables were initialised
 		learnerProgressCellsTemplate =
-		  '<tr><td class="progressBarLabel" id="progressBarLabel;00;"><div>;11;</div>'
-		+ '<a class="button" title="' 
-		+ LABELS.EXPORT_PORTFOLIO_LEARNER_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
-		+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
-		+ lessonId + '&userID=;00;\',\'ExportPortfolio\',240,640,true)">'
-		+ LABELS.EXPORT_PORTFOLIO
-		+ '</a>'
-		/* + <a class="button" title="'
-		+ LABELS.TIME_CHART_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
-		+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
-		+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
-		+ LABELS.TIME_CHART 
-		+ '</a>'*/
-		+ '<a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'
-		+ LABELS.EMAIL_BUTTON
-		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
+		  '<tr><td class="progressBarLabel" id="progressBarLabel;00;"><div>;11;</div>';
+		
+		if (enableExportPortfolio) {
+			learnerProgressCellsTemplate +=
+				'<a class="button" title="' 
+				+ LABELS.EXPORT_PORTFOLIO_LEARNER_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
+				+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
+				+ lessonId + '&userID=;00;\',\'ExportPortfolio\',240,640,true)">'
+				+ LABELS.EXPORT_PORTFOLIO
+				+ '</a>';
+		}
+
+		learnerProgressCellsTemplate +=
+			/* + <a class="button" title="'
+			+ LABELS.TIME_CHART_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
+			+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
+			+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
+			+ LABELS.TIME_CHART 
+			+ '</a>'*/
+			'<a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'
+			+ LABELS.EMAIL_BUTTON
+			+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
 	
 	// remove existing progress bars
