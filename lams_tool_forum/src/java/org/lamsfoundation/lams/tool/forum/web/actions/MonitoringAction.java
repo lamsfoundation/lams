@@ -297,7 +297,7 @@ public class MonitoringAction extends Action {
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
-	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put("userName", StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 
 	    int numberOfPosts = 0;
 	    boolean isAnyPostsMarked = false;
@@ -332,7 +332,7 @@ public class MonitoringAction extends Action {
 			ForumConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 
 		String reflection = (notebookEntry == null) ? null : notebookEntry.getEntry();
-		responseRow.put("notebookEntry", reflection);
+		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml(reflection));
 	    }
 
 	    rows.put(responseRow);
