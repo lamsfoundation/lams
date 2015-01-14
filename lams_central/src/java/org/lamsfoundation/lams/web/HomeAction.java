@@ -210,7 +210,10 @@ public class HomeAction extends DispatchAction {
 	    Boolean isPortfolioEnabled = lesson.getLearnerExportAvailable() != null ? lesson
 		    .getLearnerExportAvailable() : Boolean.TRUE;
 	    Organisation organisation = lesson.getOrganisation();
-	    isPortfolioEnabled &= organisation.getEnableExportPortfolio();
+	    //in case of preview lesson (organisation is null) don't check organisation's settings
+	    if (organisation != null) {
+		isPortfolioEnabled &= organisation.getEnableExportPortfolio();
+	    }
 
 	    req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
 	    req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String.valueOf(isPortfolioEnabled));
