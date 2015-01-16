@@ -662,6 +662,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		File svgFile = new File(svgPath);
 		if (svgFile.canRead()){
 		    FileUtils.copyFile(svgFile, new File(destinationPath));
+		    // remove the file as its icons refer to LAMS Community server instead of local resources
+		    // and should not be used in Monitoring
+		    svgFile.delete();
 		}
 		
 		destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.PNG_IMAGE_FILE_NAME);
