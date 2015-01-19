@@ -432,6 +432,16 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public ForumUser getUserByUserAndSession(Long userId, Long sessionId) {
 	return forumUserDao.getByUserIdAndSessionId(userId, sessionId);
     }
+    
+    @Override
+    public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting) {
+	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting);
+    }
+    
+    @Override
+    public int getCountUsersBySession(Long sessionId) {
+	return forumUserDao.getCountUsersBySession(sessionId);
+    }
 
     @Override
     public void createUser(ForumUser forumUser) {
@@ -470,18 +480,18 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public List getSessionsByContentId(Long contentID) {
+    public List<ForumToolSession> getSessionsByContentId(Long contentID) {
 	return forumToolSessionDao.getByContentId(contentID);
     }
 
     @Override
-    public List getUsersBySessionId(Long sessionID) {
+    public List<ForumUser> getUsersBySessionId(Long sessionID) {
 	return forumUserDao.getBySessionId(sessionID);
     }
 
     @Override
-    public List getMessagesByUserUid(Long userId, Long sessionId) {
-	List list = messageDao.getByUserAndSession(userId, sessionId);
+    public List<MessageDTO> getMessagesByUserUid(Long userId, Long sessionId) {
+	List<Message> list = messageDao.getByUserAndSession(userId, sessionId);
 
 	return MessageDTO.getMessageDTO(list);
     }
@@ -494,8 +504,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public void releaseMarksForSession(Long sessionID) {
 	// udate release mark date for each message.
-	List list = messageDao.getBySession(sessionID);
-	Iterator iter = list.iterator();
+	List<Message> list = messageDao.getBySession(sessionID);
+	Iterator<Message> iter = list.iterator();
 	ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
 	Forum forum = session.getForum();
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(ForumConstants.TOOL_SIGNATURE,
@@ -508,7 +518,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	while (iter.hasNext()) {
-	    Message msg = (Message) iter.next();
+	    Message msg = iter.next();
 	    ForumReport report = msg.getReport();
 	    if (report != null) {
 		report.setDateMarksReleased(new Date());
@@ -1095,6 +1105,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return content;
     }
 
+    @Override
     public List<MessageDTO> getAllTopicsFromSession(Long sessionID) {
 	return MessageDTO.getMessageDTO(messageDao.getBySession(sessionID));
     }

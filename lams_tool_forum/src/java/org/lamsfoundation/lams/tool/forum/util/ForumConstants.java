@@ -33,6 +33,14 @@ public interface ForumConstants {
     public static final String TOOL_SIGNATURE = "lafrum11";
 
     public static final String TOOL_CONTENT_HANDLER_NAME = "forumToolContentHandler";
+    
+    public static final int SORT_BY_NO = 0;
+    public static final int SORT_BY_USER_NAME_ASC = 1;
+    public static final int SORT_BY_USER_NAME_DESC = 2;
+    public static final int SORT_BY_LAST_POSTING_ASC = 3;
+    public static final int SORT_BY_LAST_POSTING_DESC = 4;
+    public static final int SORT_BY_NUMBER_OF_POSTS_ASC = 5;
+    public static final int SORT_BY_NUMBER_OF_POSTS_DESC = 6;
 
     // See LDEV652
     // For old style (Fiona's description): The oldest topic is at the top, does not depends the reply date etc.
@@ -93,13 +101,15 @@ public interface ForumConstants {
 
     public static final String DELETED_AUTHORING_TOPICS_LIST = "deletedAuthoringTopicList";
 
-    public static final String USER_UID = "userID";
+    public static final String USER_UID = "userUid";
 
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
     
     public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
+    
+    public static final String ATTR_SESSION_DTOS = "sessionDtos";
 
     // for submission deadline
 
@@ -128,7 +138,7 @@ public interface ForumConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
-    public static final String ATTR_REPORT = "report";
+    public static final String ATTR_MESSAGES = "messages";
 
     public static final String PARAM_UPDATE_MODE = "updateMode";
 
@@ -162,8 +172,6 @@ public interface ForumConstants {
     public static final String ATTR_MINIMUM_REPLY = "minimumReply";
 
     public static final String ATTR_MAXIMUM_REPLY = "maximumReply";
-
-    public static final String MARK_UPDATE_FROM_SESSION = "listAllMarks";
 
     public static final String MARK_UPDATE_FROM_USER = "listMarks";
 

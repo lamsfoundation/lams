@@ -1,5 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
+<c:set var="tool"><lams:WebAppURL /></c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+
 <input type="hidden" name="currentTab" id="currentTab" />
 <div id="header">
 

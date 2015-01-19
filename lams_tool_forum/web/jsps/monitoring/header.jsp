@@ -23,8 +23,9 @@
 		selectTab(tabId);
 		
     	//for statistic page change:
-    	if(tabId == 3)
-    		doStatistic();	 		
+    	if(tabId == 3) {
+    		doStatistic();
+    	}
 	}
 	
 	function doStatistic(){

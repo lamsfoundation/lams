@@ -24,21 +24,26 @@
 package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
+import java.util.Date;
 
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 /**
- * Root topics comparator.
+ * Topics comparator, compares by post date.
  * 
  * @author Andrey Balan
  */
-public class MessageDtoComparator implements Comparator<MessageDTO> {
+public class MessageDTOByDateComparator implements Comparator<MessageDTO> {
 
     @Override
     public int compare(MessageDTO o1, MessageDTO o2) {
 	if (o1 != null && o2 != null) {
-	    return o1.getMessage().getSequenceId() - o2.getMessage().getSequenceId();
+	    Date o1Date = (o1.getMessage().getUpdated() == null) ? o1.getMessage().getCreated() : o1.getMessage()
+		    .getUpdated();
+	    Date o2Date = (o2.getMessage().getUpdated() == null) ? o2.getMessage().getCreated() : o2.getMessage()
+		    .getUpdated();
+
+	    return o1Date.compareTo(o2Date);
 	} else if (o1 != null) {
 	    return 1;
 	} else {

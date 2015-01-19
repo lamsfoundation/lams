@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.forum.service;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
@@ -36,12 +35,10 @@ import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
-import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -86,6 +83,10 @@ public interface IForumService {
      * @throws PersistenceException
      */
     Forum getForumByContentId(Long contentID) throws PersistenceException;
+    
+    List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting);
+    
+    int getCountUsersBySession(Long sessionId);
 
     // ************************************************************************************
     // Topic Method
@@ -221,7 +222,7 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    List getMessagesByUserUid(Long userId, Long sessionId);
+    List<MessageDTO> getMessagesByUserUid(Long userId, Long sessionId);
 
     /**
      * Get how many post of this user post in a special session. DOES NOT include posts from author.
@@ -258,7 +259,7 @@ public interface IForumService {
      * @param contentID
      * @return List
      */
-    List getSessionsByContentId(Long contentID);
+    List<ForumToolSession> getSessionsByContentId(Long contentID);
 
     /**
      * Get all message according to the given session ID.
@@ -292,7 +293,7 @@ public interface IForumService {
      * @param sessionID
      * @return
      */
-    List getUsersBySessionId(Long sessionID);
+    List<ForumUser> getUsersBySessionId(Long sessionID);
 
     /**
      * Get user by uid

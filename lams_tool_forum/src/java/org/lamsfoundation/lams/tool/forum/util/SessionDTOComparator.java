@@ -18,32 +18,23 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
 
-/**
- * Root topics comparator.
- * 
- * @author Andrey Balan
- */
-public class MessageDtoComparator implements Comparator<MessageDTO> {
-
-    @Override
-    public int compare(MessageDTO o1, MessageDTO o2) {
+public class SessionDTOComparator implements Comparator<SessionDTO> {
+    public int compare(SessionDTO o1, SessionDTO o2) {
 	if (o1 != null && o2 != null) {
-	    return o1.getMessage().getSequenceId() - o2.getMessage().getSequenceId();
+	    return o1.getSessionName().compareTo(o2.getSessionName());
 	} else if (o1 != null) {
 	    return 1;
 	} else {
 	    return -1;
 	}
     }
-
 }

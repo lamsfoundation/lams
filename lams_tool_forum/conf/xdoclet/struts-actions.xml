@@ -294,6 +294,11 @@
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
 		    scope="request"
 		    parameter="releaseMark" >
+		</action>		
+		<action path="/monitoring/getUsers" 
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+		    scope="request"
+		    parameter="getUsers" >
 		</action>
 	
 		<action path="/monitoring/downloadMarks"
@@ -304,15 +309,6 @@
 			validate="false"
 			parameter="downloadMarks" >
 			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
-		</action>
-		
-		<action path="/monitoring/viewAllMarks"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			name="emptyForm"
-			scope="request"
-			validate="false"
-			parameter="viewAllMarks" >
-			<forward name="success" path="tiles:/monitoring/forum/viewMark" />
 		</action>
 		
 		<!--  EDIT MARK		 -->
@@ -354,11 +350,6 @@
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
 			parameter="viewTopicTree">
 			<forward name="success" path="tiles:/monitoring/forum/viewTopicTree" />
-		</action>
-		<action path="/monitoring/viewReflection"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="tiles:/monitoring/forum/viewReflection" />
 		</action>
 		
 		<action path="/monitoring/setSubmissionDeadline"

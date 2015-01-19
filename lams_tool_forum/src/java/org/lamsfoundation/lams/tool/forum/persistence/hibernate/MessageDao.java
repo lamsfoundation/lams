@@ -55,88 +55,57 @@ public class MessageDao extends LAMSBaseDAO implements IMessageDAO {
 	    + Message.class.getName() + " m "
 	    + " where m.createdBy.userId=? and m.toolSession.sessionId=? and m.isAuthored = false";
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#saveOrUpdate(org.lamsfoundation.lams.tool.forum.persistence.Message)
-	 */
     @Override
-	public void saveOrUpdate(Message message) {
+    public void saveOrUpdate(Message message) {
 	this.getSession().saveOrUpdate(message);
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#update(org.lamsfoundation.lams.tool.forum.persistence.Message)
-	 */
     @Override
-	public void update(Message message) {
+    public void update(Message message) {
 	this.getSession().saveOrUpdate(message);
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#getById(java.lang.Long)
-	 */
     @Override
-	public Message getById(Long messageId) {
+    public Message getById(Long messageId) {
 	return (Message) getSession().get(Message.class, messageId);
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#getRootTopics(java.lang.Long)
-	 */
     @Override
-	public List getRootTopics(Long sessionId) {
-	return this.doFind(SQL_QUERY_FIND_ROOT_TOPICS, sessionId);
+    public List<Message> getRootTopics(Long sessionId) {
+	return (List<Message>) this.doFind(SQL_QUERY_FIND_ROOT_TOPICS, sessionId);
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#getTopicsFromAuthor(java.lang.Long)
-	 */
     @Override
-	public List getTopicsFromAuthor(Long forumUid) {
-	return this.doFind(SQL_QUERY_FIND_TOPICS_FROM_AUTHOR, forumUid);
+    public List<Message> getTopicsFromAuthor(Long forumUid) {
+	return (List<Message>) this.doFind(SQL_QUERY_FIND_TOPICS_FROM_AUTHOR, forumUid);
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#delete(java.lang.Long)
-	 */
     @Override
-	public void delete(Long uid) {
+    public void delete(Long uid) {
 	Message msg = getById(uid);
 	if (msg != null) {
 	    this.getSession().delete(msg);
 	}
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#getChildrenTopics(java.lang.Long)
-	 */
     @Override
-	public List getChildrenTopics(Long parentId) {
-	return this.doFind(SQL_QUERY_FIND_CHILDREN, parentId);
+    public List<Message> getChildrenTopics(Long parentId) {
+	return (List<Message>) this.doFind(SQL_QUERY_FIND_CHILDREN, parentId);
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#getByUserAndSession(java.lang.Long, java.lang.Long)
-	 */
     @Override
-	public List getByUserAndSession(Long userUid, Long sessionId) {
-	return this.doFind(SQL_QUERY_BY_USER_SESSION, new Object[] { userUid, sessionId });
+    public List<Message> getByUserAndSession(Long userUid, Long sessionId) {
+	return (List<Message>) this.doFind(SQL_QUERY_BY_USER_SESSION, new Object[] { userUid, sessionId });
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#getBySession(java.lang.Long)
-	 */
     @Override
-	public List getBySession(Long sessionId) {
-	return this.doFind(SQL_QUERY_BY_SESSION, sessionId);
+    public List<Message> getBySession(Long sessionId) {
+	return (List<Message>) this.doFind(SQL_QUERY_BY_SESSION, sessionId);
     }
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IMessageDAO#getTopicsNum(java.lang.Long, java.lang.Long)
-	 */
-    @Override
-	public int getTopicsNum(Long userID, Long sessionId) {
-	List list = this.doFind(SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION,
-		new Object[] { userID, sessionId });
+   @Override
+    public int getTopicsNum(Long userID, Long sessionId) {
+	List list = this.doFind(SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION, new Object[] { userID, sessionId });
 	if (list != null && list.size() > 0)
 	    return ((Number) list.get(0)).intValue();
 	else

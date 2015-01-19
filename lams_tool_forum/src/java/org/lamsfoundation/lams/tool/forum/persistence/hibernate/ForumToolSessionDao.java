@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
@@ -36,53 +36,38 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ForumToolSessionDao extends LAMSBaseDAO implements IForumToolSessionDAO {
 
-	private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + ForumToolSession.class.getName() + " where session_id=?";
-	private static final String SQL_QUERY_FIND_BY_CONTENT_ID = "select s from " + Forum.class.getName()+ " as f, " +
-													ForumToolSession.class.getName() + " as s" + 
-													" where f.contentId=? and s.forum.uid=f.uid";
-	
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumToolSessionDAO#getBySessionId(java.lang.Long)
-	 */
-	@Override
-	public ForumToolSession getBySessionId(Long sessionId) {
-		List list = this.doFind(SQL_QUERY_FIND_BY_SESSION_ID,sessionId);
-		if(list == null || list.isEmpty())
-			return null;
-		return (ForumToolSession) list.get(0);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumToolSessionDAO#saveOrUpdate(org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession)
-	 */
-	@Override
-	public void saveOrUpdate(ForumToolSession session){
-		this.getSession().saveOrUpdate(session);
-	}
+    private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + ForumToolSession.class.getName()
+	    + " where session_id=?";
+    private static final String SQL_QUERY_FIND_BY_CONTENT_ID = "select s from " + Forum.class.getName() + " as f, "
+	    + ForumToolSession.class.getName() + " as s" + " where f.contentId=? and s.forum.uid=f.uid";
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumToolSessionDAO#getByContentId(java.lang.Long)
-	 */
-	@Override
-	public List getByContentId(Long contentID) {
-		List list = this.doFind(SQL_QUERY_FIND_BY_CONTENT_ID,contentID);
-		return list;
-	}
+    @Override
+    public ForumToolSession getBySessionId(Long sessionId) {
+	List list = this.doFind(SQL_QUERY_FIND_BY_SESSION_ID, sessionId);
+	if (list == null || list.isEmpty())
+	    return null;
+	return (ForumToolSession) list.get(0);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumToolSessionDAO#delete(java.lang.Long)
-	 */
-	@Override
-	public void delete(Long sessionId) {
-		ForumToolSession session = getBySessionId(sessionId);
-		this.getSession().delete(session);
-	}
+   @Override
+    public void saveOrUpdate(ForumToolSession session) {
+	this.getSession().saveOrUpdate(session);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.forum.persistence.hibernate.IForumToolSessionDAO#delete(org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession)
-	 */
-	@Override
-	public void delete(ForumToolSession session){
-		this.getSession().delete(session);
-	}
+    @Override
+    public List<ForumToolSession> getByContentId(Long contentID) {
+	List list = this.doFind(SQL_QUERY_FIND_BY_CONTENT_ID, contentID);
+	return list;
+    }
+
+    @Override
+    public void delete(Long sessionId) {
+	ForumToolSession session = getBySessionId(sessionId);
+	this.getSession().delete(session);
+    }
+
+    @Override
+    public void delete(ForumToolSession session) {
+	this.getSession().delete(session);
+    }
 }

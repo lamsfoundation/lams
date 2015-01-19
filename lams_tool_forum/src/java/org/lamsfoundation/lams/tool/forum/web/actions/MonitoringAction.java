@@ -29,8 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,10 +41,12 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -59,11 +61,13 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.config.ForwardConfig;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
-import org.lamsfoundation.lams.tool.forum.dto.UserDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
@@ -71,7 +75,11 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.util.ForumUserComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
+import org.lamsfoundation.lams.tool.forum.util.MessageDTOByDateComparator;
+import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
+import org.lamsfoundation.lams.tool.forum.util.SessionDTOComparator;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -90,42 +98,6 @@ public class MonitoringAction extends Action {
 
     private IForumService forumService;
 
-    private class SessionDTOComparator implements Comparator<SessionDTO> {
-	public int compare(SessionDTO o1, SessionDTO o2) {
-	    if (o1 != null && o2 != null) {
-		return o1.getSessionName().compareTo(o2.getSessionName());
-	    } else if (o1 != null) {
-		return 1;
-	    } else {
-		return -1;
-	    }
-	}
-    }
-
-    private class ForumUserComparator implements Comparator<ForumUser> {
-	public int compare(ForumUser o1, ForumUser o2) {
-	    if (o1 != null && o2 != null) {
-		return o1.getLoginName().compareTo(o2.getLoginName());
-	    } else if (o1 != null) {
-		return 1;
-	    } else {
-		return -1;
-	    }
-	}
-    }
-
-    private class UserDTOComparator implements Comparator<UserDTO> {
-	public int compare(UserDTO o1, UserDTO o2) {
-	    if (o1 != null && o2 != null) {
-		return o1.getLoginName().compareTo(o2.getLoginName());
-	    } else if (o1 != null) {
-		return 1;
-	    } else {
-		return -1;
-	    }
-	}
-    }
-
     /**
      * Action method entry.
      */
@@ -137,14 +109,15 @@ public class MonitoringAction extends Action {
 	if (param.equals("init")) {
 	    return init(mapping, form, request, response);
 	}
-	//refresh statistic page by Ajax call.
+	// refresh statistic page by Ajax call.
 	if (param.equals("statistic")) {
 	    return statistic(mapping, form, request, response);
 	}
-	// ***************** Marks Functions ********************
-	if (param.equals("viewAllMarks")) {
-	    return viewAllMarks(mapping, form, request, response);
+	if (param.equals("getUsers")) {
+	    return getUsers(mapping, form, request, response);
 	}
+
+	// ***************** Marks Functions ********************
 	if (param.equals("downloadMarks")) {
 	    return downloadMarks(mapping, form, request, response);
 	}
@@ -170,10 +143,6 @@ public class MonitoringAction extends Action {
 	    return viewTopicTree(mapping, form, request, response);
 	}
 
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
-	}
-	
 	// **************** Date restriction *****************
 	if (param.equals("setSubmissionDeadline")) {
 	    return setSubmissionDeadline(mapping, form, request, response);
@@ -188,7 +157,7 @@ public class MonitoringAction extends Action {
     private ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	//set back tool content ID
+	// set back tool content ID
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
@@ -201,14 +170,13 @@ public class MonitoringAction extends Action {
 	summary(request);
 	viewInstructions(request);
 	viewActivity(request);
-	statistic(request);
+	// statistic(request);
 
 	return mapping.findForward("load");
     }
 
     /**
-     * The initial method for monitoring. List all users according to given
-     * Content ID.
+     * The initial method for monitoring. List all users according to given Content ID.
      * 
      * @param mapping
      * @param form
@@ -217,80 +185,162 @@ public class MonitoringAction extends Action {
      * @return
      */
     private void summary(HttpServletRequest request) {
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
+	Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	forumService = getForumService();
-	
-	// get session from shared session.
-	HttpSession ss = SessionManager.getSession();
-	
-	List sessionsList = forumService.getSessionsByContentId(toolContentID);
 
-	// A forum clone required for listing the advanced options LDEV-1662
-	Forum forumClone = null;
+	// create sessionMap
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Forum forum = forumService.getForumByContentId(toolContentId);
+	sessionMap.put("forum", forum);
+
+	List<ForumToolSession> sessions = forumService.getSessionsByContentId(toolContentId);
+
+	Set<SessionDTO> sessionDtos = new TreeSet<SessionDTO>(new SessionDTOComparator());
+	// build a map with all users in the forumSessionList
+	for (ForumToolSession session : sessions) {
+	    Long sessionId = session.getSessionId();
+	    SessionDTO sessionDto = new SessionDTO();
+
+	    sessionDto.setSessionID(sessionId);
+	    sessionDto.setSessionName(session.getSessionName());
+
+	    // used for storing data for MonitoringAction.getUsers() serving tablesorter paging
+	    List<MessageDTO> topics = forumService.getAllTopicsFromSession(sessionId);
+	    Map<ForumUser, List<MessageDTO>> topicsByUser = getTopicsSortedByAuthor(topics);
+	    sessionDto.setTopicsByUser(topicsByUser);
+
+	    sessionDtos.add(sessionDto);
+	}
+	sessionMap.put(ForumConstants.ATTR_SESSION_DTOS, sessionDtos);
 
 	// check if there is submission deadline
-	Date submissionDeadline = forumService.getForumByContentId(toolContentID).getSubmissionDeadline();
-	
+	Date submissionDeadline = forum.getSubmissionDeadline();
 	if (submissionDeadline != null) {
-		org.lamsfoundation.lams.usermanagement.dto.UserDTO learnerDto = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
-		TimeZone learnerTimeZone = learnerDto.getTimeZone();
-		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-		request.setAttribute(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    HttpSession ss = SessionManager.getSession();
+	    org.lamsfoundation.lams.usermanagement.dto.UserDTO learnerDto = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
+		    .getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	}
-	
-	
-	Map sessionUsersMap = new TreeMap(this.new SessionDTOComparator());
-	// build a map with all users in the forumSessionList
-	Iterator it = sessionsList.iterator();
-	while (it.hasNext()) {
-	    SessionDTO sessionDto = new SessionDTO();
-	    ForumToolSession fts = (ForumToolSession) it.next();
-	    boolean hasReflection = fts.getForum().isReflectOnActivity();
 
-	    if (forumClone == null) {
-		forumClone = (Forum) fts.getForum().clone();
-		request.setAttribute("forum", forumClone);
+	boolean isGroupedActivity = forumService.isGroupedActivity(toolContentId);
+	sessionMap.put("isGroupedActivity", isGroupedActivity);
+    }
+
+    /**
+     * Refreshes user list.
+     */
+    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	forumService = getForumService();
+	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapId);
+
+	// teacher timezone
+	HttpSession ss = SessionManager.getSession();
+	org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
+		.getAttribute(AttributeNames.USER);
+	TimeZone teacherTimeZone = teacher.getTimeZone();
+
+	Long sessionId = WebUtil.readLongParam(request, "sessionId");
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
+	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
+	Integer isSort3 = WebUtil.readIntParam(request, "column[2]", true);
+
+	int sorting = ForumConstants.SORT_BY_NO;
+	if ((isSort1 != null) && isSort1.equals(0)) {
+	    sorting = ForumConstants.SORT_BY_USER_NAME_ASC;
+
+	} else if ((isSort1 != null) && isSort1.equals(1)) {
+	    sorting = ForumConstants.SORT_BY_USER_NAME_DESC;
+
+	} else if ((isSort2 != null) && isSort2.equals(0)) {
+	    sorting = ForumConstants.SORT_BY_LAST_POSTING_ASC;
+
+	} else if ((isSort2 != null) && isSort2.equals(1)) {
+	    sorting = ForumConstants.SORT_BY_LAST_POSTING_DESC;
+
+	} else if ((isSort3 != null) && isSort3.equals(0)) {
+	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC;
+
+	} else if ((isSort3 != null) && isSort3.equals(1)) {
+	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC;
+	}
+
+	Set<SessionDTO> sessionDtos = (Set<SessionDTO>) sessionMap.get(ForumConstants.ATTR_SESSION_DTOS);
+	SessionDTO currentSessionDto = null;
+	for (SessionDTO sessionDto : sessionDtos) {
+	    if (sessionDto.getSessionID().equals(sessionId)) {
+		currentSessionDto = sessionDto;
+		break;
 	    }
+	}
+	Map<ForumUser, List<MessageDTO>> topicsByUser = currentSessionDto.getTopicsByUser();
 
-	    sessionDto.setSessionID(fts.getSessionId());
-	    sessionDto.setSessionName(fts.getSessionName());
-	    List userList = forumService.getUsersBySessionId(fts.getSessionId());
+	List<ForumUser> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting);
 
-	    //sort and create DTO list
-	    List topicList = forumService.getAllTopicsFromSession(fts.getSessionId());
-	    Map topicsByUser = getTopicsSortedByAuthor(topicList);
+	JSONArray rows = new JSONArray();
 
-	    Set<UserDTO> dtoList = new TreeSet<UserDTO>(this.new UserDTOComparator());
-	    Iterator iter = userList.iterator();
-	    while (iter.hasNext()) {
-		ForumUser user = (ForumUser) iter.next();
-		UserDTO userDTO = new UserDTO(user);
-		userDTO.setHasRefection(hasReflection);
+	JSONObject responcedata = new JSONObject();
+	responcedata.put("total_rows", forumService.getCountUsersBySession(sessionId));
 
-		userDTO.setAnyPostsMarked(false);
-		userDTO.setNoOfPosts(0);
+	for (ForumUser user : users) {
 
-		List<MessageDTO> messages = (List<MessageDTO>) topicsByUser.get(user);
-		if (messages != null && messages.size() > 0) {
-		    userDTO.setNoOfPosts(messages.size());
-		    for (MessageDTO message : messages) {
-			if (message.getMark() != null) {
-			    userDTO.setAnyPostsMarked(true);
-			    break;
-			}
+	    JSONObject responseRow = new JSONObject();
+	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
+	    responseRow.put("userName", StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+
+	    int numberOfPosts = 0;
+	    boolean isAnyPostsMarked = false;
+	    if (topicsByUser.get(user) != null) {
+
+		// sort messages by date
+		TreeSet<MessageDTO> messages = new TreeSet<MessageDTO>(new MessageDTOByDateComparator());
+		messages.addAll(topicsByUser.get(user));
+
+		MessageDTO lastMessage = messages.last();
+
+		// format lastEdited date
+		Date lastMessageDate = lastMessage.getMessage().getCreated();
+		lastMessageDate = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, lastMessageDate);
+		DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
+		responseRow.put("lastMessageDate", dateFormatter.format(lastMessageDate));
+
+		numberOfPosts = messages.size();
+		for (MessageDTO message : messages) {
+		    if (message.getMark() != null) {
+			isAnyPostsMarked = true;
+			break;
 		    }
 		}
-		dtoList.add(userDTO);
+	    }
+	    responseRow.put("anyPostsMarked", isAnyPostsMarked);
+	    responseRow.put("numberOfPosts", numberOfPosts);
+
+	    Forum forum = (Forum) sessionMap.get("forum");
+	    if (forum.isReflectOnActivity()) {
+		NotebookEntry notebookEntry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+			ForumConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+
+		String reflection = (notebookEntry == null) ? null : notebookEntry.getEntry();
+		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml(reflection));
 	    }
 
-	    sessionUsersMap.put(sessionDto, dtoList);
+	    rows.put(responseRow);
 	}
-
-	boolean isGroupedActivity = forumService.isGroupedActivity(toolContentID);
-	request.setAttribute("isGroupedActivity", isGroupedActivity);
-	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-	request.setAttribute("sessionUserMap", sessionUsersMap);
+	responcedata.put("rows", rows);
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responcedata.toString()));
+	return null;
     }
 
     /**
@@ -370,7 +420,7 @@ public class MonitoringAction extends Action {
 		    cell.setCellValue(DateFormat.getInstance().format(dto.getMessage().getCreated()));
 
 		    cell = row.createCell(idx++);
-		    
+
 		    if (dto.getMessage() != null && dto.getMessage().getReport() != null
 			    && dto.getMessage().getReport().getMark() != null) {
 			cell.setCellValue(NumberUtil.formatLocalisedNumber(dto.getMessage().getReport().getMark(),
@@ -420,7 +470,7 @@ public class MonitoringAction extends Action {
      */
     private void viewActivity(HttpServletRequest request) {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	
+
 	forumService = getForumService();
 	Forum forum = forumService.getForumByContentId(toolContentID);
 	String title = forum.getTitle();
@@ -462,7 +512,7 @@ public class MonitoringAction extends Action {
 	statistic(request);
 	return mapping.findForward("success");
     }
-    
+
     /**
      * Performs all necessary actions for showing statistic page.
      * 
@@ -472,7 +522,7 @@ public class MonitoringAction extends Action {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	forumService = getForumService();
-	Map sessionTopicsMap = new TreeMap<SessionDTO, List<MessageDTO>>(this.new SessionDTOComparator());
+	Map sessionTopicsMap = new TreeMap<SessionDTO, List<MessageDTO>>(new SessionDTOComparator());
 	Map sessionAvaMarkMap = new HashMap();
 	Map sessionTotalMsgMap = new HashMap();
 
@@ -542,32 +592,6 @@ public class MonitoringAction extends Action {
 	return mapping.findForward("success");
     }
 
-    private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long uid = WebUtil.readLongParam(request, ForumConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	ForumUser user = forumService.getUser(uid);
-	NotebookEntry notebookEntry = forumService.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ForumConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-	ForumToolSession session = forumService.getSessionBySessionId(sessionID);
-
-	UserDTO userDTO = new UserDTO(user);
-	if (notebookEntry == null) {
-	    userDTO.setFinishReflection(false);
-	    userDTO.setReflect(null);
-	} else {
-	    userDTO.setFinishReflection(true);
-	    userDTO.setReflect(notebookEntry.getEntry());
-	}
-	userDTO.setReflectInstrctions(session.getForum().getReflectInstructions());
-
-	request.setAttribute("userDTO", userDTO);
-	return mapping.findForward("success");
-    }
-
     /**
      * View topic subject, content and attachement.
      * 
@@ -591,7 +615,7 @@ public class MonitoringAction extends Action {
 
     private ActionForward releaseMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	//get service then update report table
+	// get service then update report table
 	forumService = getForumService();
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	forumService.releaseMarksForSession(sessionID);
@@ -617,37 +641,6 @@ public class MonitoringAction extends Action {
     // ==========================================================================================
 
     /**
-     * View all user marks for a special Session ID
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	//only one param for session scope marks
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-
-	//create sessionMap
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
-	sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_SESSION);
-
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
-	//get tool session scope topics
-	forumService = getForumService();
-	List topicList = forumService.getAllTopicsFromSession(sessionID);
-
-	Map topicsByUser = getTopicsSortedByAuthor(topicList);
-	request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
-	return mapping.findForward("success");
-    }
-
-    /**
      * View a special user's mark
      * 
      * @param mapping
@@ -661,23 +654,22 @@ public class MonitoringAction extends Action {
 	Long userUid = new Long(WebUtil.readLongParam(request, ForumConstants.USER_UID));
 	Long sessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
-	//create sessionMap
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	// create sessionMap
+	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapId);
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_USER);
 
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	//get this user's all topics
+	// get this user's all topics
 	forumService = getForumService();
-	List<MessageDTO> messageList = forumService.getMessagesByUserUid(userUid, sessionId);
-	ForumUser user = forumService.getUser(userUid);
+	List<MessageDTO> messages = forumService.getMessagesByUserUid(userUid, sessionId);
+	request.setAttribute(ForumConstants.ATTR_MESSAGES, messages);
 
-	// each back to web page
-	Map<ForumUser, List<MessageDTO>> report = new TreeMap(this.new ForumUserComparator());
-	report.put(user, messageList);
-	request.setAttribute(ForumConstants.ATTR_REPORT, report);
+	ForumUser user = forumService.getUser(userUid);
+	request.setAttribute(ForumConstants.ATTR_USER, user);
 
 	return mapping.findForward("success");
     }
@@ -694,9 +686,10 @@ public class MonitoringAction extends Action {
     private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	MarkForm markForm = (MarkForm) form;
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(markForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		markForm.getSessionMapID());
 	String updateMode = (String) sessionMap.get(ForumConstants.PARAM_UPDATE_MODE);
-	//view forum mode
+	// view forum mode
 	if (StringUtils.isBlank(updateMode)) {
 	    sessionMap.put(ForumConstants.PARAM_UPDATE_MODE, ForumConstants.MARK_UPDATE_FROM_FORUM);
 	    sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, markForm.getTopicID());
@@ -724,7 +717,7 @@ public class MonitoringAction extends Action {
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
 	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens 
+	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
 	// as it has a link from the view topic screen back to View Forum screen.
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
@@ -774,7 +767,7 @@ public class MonitoringAction extends Action {
 	    return mapping.getInputForward();
 	}
 
-	//update message report
+	// update message report
 
 	forumService = getForumService();
 	ForumReport report = msg.getReport();
@@ -783,7 +776,8 @@ public class MonitoringAction extends Action {
 	    msg.setReport(report);
 	}
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(markForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		markForm.getSessionMapID());
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	String updateMode = (String) sessionMap.get(ForumConstants.PARAM_UPDATE_MODE);
 
@@ -791,26 +785,18 @@ public class MonitoringAction extends Action {
 	report.setComment(markForm.getComment());
 	forumService.updateContainedReport(msg);
 
-	//echo back to topic list page: it depends which screen is come from: view special user mark, or view all user marks. 
-	if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_SESSION)) {
-	    List topicList = forumService.getAllTopicsFromSession(sessionId);
-	    Map topicsByUser = getTopicsSortedByAuthor(topicList);
-	    request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
-	    //listMark or listAllMark.
+	// echo back to topic list page: it depends which screen is come from: view special user mark, or view all user
+	// marks.
+	if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_USER)) {
+	    List<MessageDTO> messages = forumService.getMessagesByUserUid(user.getUid(), sessionId);
+	    request.setAttribute(ForumConstants.ATTR_MESSAGES, messages);
+	    // listMark
 	    return mapping.findForward("success");
-	    
-	} else if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_USER)) {
-	    List<MessageDTO> messageList = forumService.getMessagesByUserUid(user.getUid(), sessionId);
-	    Map<ForumUser, List<MessageDTO>> topicMap = new TreeMap(this.new ForumUserComparator());
-	    topicMap.put(user, messageList);
-	    request.setAttribute(ForumConstants.ATTR_REPORT, topicMap);
-	    //listMark or listAllMark.
-	    return mapping.findForward("success");
-	    
-	} else { //mark from view forum
-	    //display root topic rather than leaf one
+
+	} else { // mark from view forum
+		 // display root topic rather than leaf one
 	    Long rootTopicId = forumService.getRootTopicId(msg.getUid());
-	    
+
 	    ForwardConfig redirectConfig = mapping.findForwardConfig("viewTopic");
 	    ActionRedirect redirect = new ActionRedirect(redirectConfig);
 	    redirect.addParameter(ForumConstants.ATTR_SESSION_MAP_ID, markForm.getSessionMapID());
@@ -820,7 +806,7 @@ public class MonitoringAction extends Action {
 	}
 
     }
-    
+
     /**
      * Set Submission Deadline
      * 
@@ -833,16 +819,17 @@ public class MonitoringAction extends Action {
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	forumService = getForumService();
-		
+
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Forum forum = forumService.getForumByContentId(contentID);
-	
+
 	Long dateParameter = WebUtil.readLongParam(request, ForumConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
-	    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
+	    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
+		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
 	}
@@ -851,8 +838,6 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
-    
-
 
     // ==========================================================================================
     // Utility methods
@@ -873,26 +858,25 @@ public class MonitoringAction extends Action {
     }
 
     /**
-     * @param topicList
+     * @param topics
      * @return
      */
-    private Map getTopicsSortedByAuthor(List topicList) {
-	Map<ForumUser, List<MessageDTO>> topicsByUser = new TreeMap(this.new ForumUserComparator());
-	Iterator iter = topicList.iterator();
-	forumService = getForumService();
-	while (iter.hasNext()) {
-	    MessageDTO dto = (MessageDTO) iter.next();
-	    if (dto.getMessage().getIsAuthored()) {
+    private Map<ForumUser, List<MessageDTO>> getTopicsSortedByAuthor(List<MessageDTO> topics) {
+	Map<ForumUser, List<MessageDTO>> topicsByUser = new TreeMap<ForumUser, List<MessageDTO>>(
+		new ForumUserComparator());
+	for (MessageDTO topic : topics) {
+	    if (topic.getMessage().getIsAuthored()) {
 		continue;
 	    }
-	    dto.getMessage().getReport();
-	    ForumUser user = (ForumUser) dto.getMessage().getCreatedBy().clone();
-	    List<MessageDTO> list = topicsByUser.get(user);
-	    if (list == null) {
-		list = new ArrayList<MessageDTO>();
-		topicsByUser.put(user, list);
+	    topic.getMessage().getReport();
+	    ForumUser user = (ForumUser) topic.getMessage().getCreatedBy().clone();
+
+	    List<MessageDTO> topicsByUserExist = topicsByUser.get(user);
+	    if (topicsByUserExist == null) {
+		topicsByUserExist = new ArrayList<MessageDTO>();
+		topicsByUser.put(user, topicsByUserExist);
 	    }
-	    list.add(dto);
+	    topicsByUserExist.add(topic);
 	}
 	return topicsByUser;
     }
