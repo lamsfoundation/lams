@@ -389,9 +389,11 @@ public class LearningDesignService implements ILearningDesignService {
 	}
 
 	String fileExtension;
-	if ((imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG)
-		|| (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY)) {
+	if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) {
 	    fileExtension = ".svg";
+	} else if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY){
+	    // mark it as a special version of SVG as it contains icons that refer to LAMS Community server
+	    fileExtension = ".export.svg";
 	} else {
 	    fileExtension = ".png";
 	}
