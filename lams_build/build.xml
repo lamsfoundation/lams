@@ -730,6 +730,15 @@
 	        </filterset>
 		</copy>
 		
+		<!-- DELETE org/wildfly/clustering/web/undertow module. This module is used by default
+		 (no reconfiguration possible) by Wildfly shared-session (LAMS SSO) to store web sessions as
+		 DistributableSessions with Infinispan cache. When this module is not present - InMemorySessionManager
+		 is used instead. DistributableSessions for shared-session are buggy under wildfly 8.2.0, we don't
+		 use them till migration to Wildfly 9.x -->
+		<delete >
+			<fileset dir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow" />
+		</delete>
+		
 		<!-- Mark EAR for WildFly deployment -->
 		<delete >
 			<fileset dir="${server.home}/standalone/deployments" includes="lams.ear.*"/>

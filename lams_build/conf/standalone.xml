@@ -326,15 +326,11 @@
                 <local-cache name="default" />
             </cache-container>
             <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
-                <local-cache name="passivation">
-                    <transaction mode="NON_XA" locking="OPTIMISTIC"/>
-                    <locking isolation="READ_COMMITTED"/>
-                    <!-- <file-store passivation="true" purge="false"/> -->
+                <local-cache name="passivation" batching="true">
+                    <file-store passivation="true" purge="false"/>
                 </local-cache>
-                <local-cache name="persistent">
-                    <transaction mode="NON_XA" locking="OPTIMISTIC"/>
-                    <locking isolation="READ_COMMITTED"/>
-                    <!-- <file-store passivation="false" purge="false"/> -->
+                <local-cache name="persistent" batching="true">
+                    <file-store passivation="false" purge="false"/>
                 </local-cache>
             </cache-container>
             <cache-container name="hibernate" default-cache="local-query" module="org.hibernate" start="EAGER">
