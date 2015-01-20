@@ -132,6 +132,24 @@
 			</meta>
 		</property>
 		
+		<property name="enableLiveEdit"
+			type="java.lang.Boolean" column="enable_live_edit"
+			not-null="true" length="1">
+			<meta attribute="field-description">
+				@hibernate.property column="enable_live_edit"
+				length="1" not-null="true"
+			</meta>
+		</property>
+		
+		<property name="enableExportPortfolio"
+			type="java.lang.Boolean" column="enable_export_portfolio"
+			not-null="true" length="1">
+			<meta attribute="field-description">
+				@hibernate.property column="enable_export_portfolio"
+				length="1" not-null="true"
+			</meta>
+		</property>
+		
 
 		<!-- Associations -->
 

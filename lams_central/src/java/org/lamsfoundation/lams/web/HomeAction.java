@@ -206,10 +206,17 @@ public class HomeAction extends DispatchAction {
 	    if (mode != null) {
 		req.setAttribute(AttributeNames.PARAM_MODE, mode);
 	    }
+	    
+	    Boolean isPortfolioEnabled = lesson.getLearnerExportAvailable() != null ? lesson
+		    .getLearnerExportAvailable() : Boolean.TRUE;
+	    Organisation organisation = lesson.getOrganisation();
+	    //in case of preview lesson (organisation is null) don't check organisation's settings
+	    if (organisation != null) {
+		isPortfolioEnabled &= organisation.getEnableExportPortfolio();
+	    }
 
 	    req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
-	    req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String.valueOf(lesson
-		    .getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable() : Boolean.TRUE));
+	    req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String.valueOf(isPortfolioEnabled));
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
 		    String.valueOf(lesson.getLearnerPresenceAvailable()));
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, String.valueOf(lesson.getLearnerImAvailable()));

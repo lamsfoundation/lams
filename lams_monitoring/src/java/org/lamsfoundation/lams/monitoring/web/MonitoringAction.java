@@ -926,6 +926,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
 		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
+	request.setAttribute("enableLiveEdit", organisation.getEnableLiveEdit());
+	request.setAttribute("enableExportPortfolio", organisation.getEnableExportPortfolio());
 	request.setAttribute("lesson", lessonDTO);
 
 	return mapping.findForward("monitorLesson");
