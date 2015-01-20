@@ -166,7 +166,7 @@ function initLessonTab(){
 		},
 		'buttons' : [
 		             {
-		            	'text'   : 'Save',
+		            	'text'   : LABELS.SAVE_BUTTON,
 		            	'id'     : 'classDialogSaveButton',
 		            	'click'  : function() {
 		            		var removedLearners = [],
@@ -209,7 +209,7 @@ function initLessonTab(){
 						}
 		             },
 		             {
-		            	'text'   : 'Cancel',
+		            	'text'   : LABELS.CANCEL_BUTTON,
 		            	'id'     : 'classDialogCancelButton',
 		            	'click'  : function() {
 							$(this).dialog('close');
@@ -1532,23 +1532,23 @@ function loadLearnerProgressPage(pageNumber){
 		if (enableExportPortfolio) {
 			learnerProgressCellsTemplate +=
 				'<a class="button" title="' 
-				+ LABELS.EXPORT_PORTFOLIO_LEARNER_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
-				+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
-				+ lessonId + '&userID=;00;\',\'ExportPortfolio\',240,640,true)">'
-				+ LABELS.EXPORT_PORTFOLIO
+		+ LABELS.EXPORT_PORTFOLIO_LEARNER_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
+		+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
+		+ lessonId + '&userID=;00;\',\'ExportPortfolio\',240,640,true)">'
+		+ LABELS.EXPORT_PORTFOLIO
 				+ '</a>';
 		}
 
 		learnerProgressCellsTemplate +=
-			/* + <a class="button" title="'
-			+ LABELS.TIME_CHART_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
-			+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
-			+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
-			+ LABELS.TIME_CHART 
-			+ '</a>'*/
+		/* + <a class="button" title="'
+		+ LABELS.TIME_CHART_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
+		+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
+		+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
+		+ LABELS.TIME_CHART 
+		+ '</a>'*/
 			'<a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'
-			+ LABELS.EMAIL_BUTTON
-			+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
+		+ LABELS.EMAIL_BUTTON
+		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
 	
 	// remove existing progress bars

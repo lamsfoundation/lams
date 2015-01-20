@@ -61,6 +61,8 @@
 				EMAIL_BUTTON : '<fmt:message key="button.email"/>',
 				CLOSE_BUTTON : '<fmt:message key="button.close"/>',
 				NOTIFCATIONS : '<fmt:message key="email.notifications"/>',
+				SAVE_BUTTON : '<fmt:message key="button.save"/>',
+				CANCEL_BUTTON : '<fmt:message key="button.cancel"/>',
 				LEARNER_FINISHED_COUNT : '<fmt:message key="learner.finished.count"/>',
 				LEARNER_FINISHED_DIALOG_TITLE : '<fmt:message key="learner.finished.dialog.title"/>',
 				LESSON_PRESENCE_ENABLE_ALERT : '<fmt:message key="lesson.enable.presence.alert"/>',
@@ -274,10 +276,10 @@
 				</td>
 				<td>
 					<c:if test="${enableExportPortfolio}">
-						<input type="checkbox" id="exportAvailableField"
-							<c:if test="${lesson.learnerExportAvailable}">
-								checked="checked"
-							</c:if> 
+					<input type="checkbox" id="exportAvailableField"
+						<c:if test="${lesson.learnerExportAvailable}">
+							checked="checked"
+						</c:if> 
 						/>
 						<fmt:message key="lesson.enable.portfolio"/>
 						<br />
@@ -293,7 +295,6 @@
 						<fmt:message key="lesson.presence.count"/>)
 					</span>
 					<br />
-					
 					<input type="checkbox" id="imAvailableField"
 						<c:if test="${not lesson.learnerPresenceAvailable}">
 							disabled="disabled"
@@ -355,9 +356,9 @@
 				<fmt:message key="button.refresh"/>
 			</a>
 			<c:if test="${enableExportPortfolio}">
-				<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
-				   href="#"
-				   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
+			<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
+			   href="#"
+			   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
 					<fmt:message key="button.export"/>
 				</a>
 			</c:if>
