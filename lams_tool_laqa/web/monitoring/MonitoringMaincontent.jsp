@@ -198,13 +198,7 @@
 				    	}
 					},					
 				    container: $(this).next(".pager"),
-				    output: '{startRow} to {endRow} ({totalRows})',// possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
-				    // if true, the table will remain the same height no matter how many records are displayed. The space is made up by an empty
-				    // table row set to a height to compensate; default is false
-				    fixedHeight: true,
-				    // remove rows from the table to speed up the sort of large tables.
-				    // setting this to false, only hides the non-visible rows; needed if you plan to add/remove rows with the pager enabled.
-				    removeRows: false,
+				    output: '{startRow} to {endRow} ({totalRows})',
 				    // css class names of pager arrows
 				    cssNext: '.tablesorter-next', // next page arrow
 					cssPrev: '.tablesorter-prev', // previous page arrow
