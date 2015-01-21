@@ -95,10 +95,10 @@ public class ForumUserDao extends HibernateDaoSupport {
 	    sortingOrder = "user.lastName DESC, user.firstName DESC";
 	    break;
 	case ForumConstants.SORT_BY_LAST_POSTING_ASC:
-	    sortingOrder = " MAX(message.created) ASC";
+	    sortingOrder = " MAX(message.updated) ASC";
 	    break;
 	case ForumConstants.SORT_BY_LAST_POSTING_DESC:
-	    sortingOrder = " MAX(message.created) DESC";
+	    sortingOrder = " MAX(message.updated) DESC";
 	    break;
 	case ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC:
 	    sortingOrder = " COUNT(message) ASC";

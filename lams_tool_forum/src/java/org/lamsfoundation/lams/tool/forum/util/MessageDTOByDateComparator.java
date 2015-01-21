@@ -18,9 +18,9 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
@@ -38,12 +38,11 @@ public class MessageDTOByDateComparator implements Comparator<MessageDTO> {
     @Override
     public int compare(MessageDTO o1, MessageDTO o2) {
 	if (o1 != null && o2 != null) {
-	    Date o1Date = (o1.getMessage().getUpdated() == null) ? o1.getMessage().getCreated() : o1.getMessage()
-		    .getUpdated();
-	    Date o2Date = (o2.getMessage().getUpdated() == null) ? o2.getMessage().getCreated() : o2.getMessage()
-		    .getUpdated();
+	    Date o1Date = o1.getMessage().getUpdated();
+	    Date o2Date = o2.getMessage().getUpdated();
 
-	    return o1Date.compareTo(o2Date);
+	    return o1Date.compareTo(o2Date) == 0 ? o1.getMessage().getUid().compareTo(o2.getMessage().getUid())
+		    : o1Date.compareTo(o2Date);
 	} else if (o1 != null) {
 	    return 1;
 	} else {
