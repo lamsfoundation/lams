@@ -87,10 +87,12 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	voteService.hideOpenVote(voteUsrAttempt);
 
 	String toolContentID = voteMonitoringForm.getToolContentID();
+	String contentFolderID = voteMonitoringForm.getContentFolderID();
 	
 	ActionRedirect redirect = new ActionRedirect(
 		mapping.findForwardConfig(VoteAppConstants.MONITORING_STARTER_REDIRECT));
 	redirect.addParameter(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
+	redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return redirect;
     }
 
@@ -109,10 +111,12 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	voteService.showOpenVote(voteUsrAttempt);
 
 	String toolContentID = voteMonitoringForm.getToolContentID();
+	String contentFolderID = voteMonitoringForm.getContentFolderID();
 	
 	ActionRedirect redirect = new ActionRedirect(
 		mapping.findForwardConfig(VoteAppConstants.MONITORING_STARTER_REDIRECT));
 	redirect.addParameter(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
+	redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return redirect;
     }
 
