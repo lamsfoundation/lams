@@ -950,7 +950,7 @@ GeneralInitLib = {
 				return;
 			}
 			
-		    $(this).css('visibility', 'visible').height(+$(this).contents().find('svg').attr('height') + 20);
+		    $(this).css('visibility', 'visible').height(+$(this).contents().find('svg').attr('height') + 40);
 		});
 		
 		// there should be no focus, just highlight
