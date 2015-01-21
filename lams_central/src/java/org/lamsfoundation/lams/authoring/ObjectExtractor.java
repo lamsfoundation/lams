@@ -2163,7 +2163,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    throws WDDXProcessorConversionException {
 	Tool tool = toolDAO.getToolByID(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_ID));
 	toolActivity.setTool(tool);
-	
+
 	// copy content if its the default one
 	Long toolContentId = WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_CONTENT_ID);
 	if (toolContentId.equals(tool.getDefaultToolContentId())) {
@@ -2175,7 +2175,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 	}
 	if (log.isDebugEnabled()) {
-	    log.debug("In tool activity UUID" + activityDetails.get(WDDXTAGS.ACTIVITY_UIID) + " tool content id "
+	    log.debug("In tool activity UUID "
+		    + WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_UIID) + " tool content id "
 		    + toolContentId);
 	}
 	toolActivity.setToolContentId(toolContentId);
@@ -2184,7 +2185,7 @@ public class ObjectExtractor implements IObjectExtractor {
     private void buildToolActivity(ToolActivity toolActivity, JSONObject activityDetails) throws JSONException {
 	Tool tool = toolDAO.getToolByID(JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_ID));
 	toolActivity.setTool(tool);
-	
+
 	// copy content if its the default one
 	Long toolContentId = JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_CONTENT_ID);
 	if (toolContentId == null || toolContentId.equals(tool.getDefaultToolContentId())) {
@@ -2721,7 +2722,18 @@ public class ObjectExtractor implements IObjectExtractor {
 	    entry.setGateOpenWhenConditionMet(gateOpenWhenConditionMet);
 	}
 
+	Group existingGroup = entry.getGroup();
+	if (existingGroup != null && !existingGroup.getGroupId().equals(group.getGroupId())) {
+	    existingGroup.getBranchActivities().remove(entry);
+	}
 	entry.setGroup(group);
+	if (group != null) {
+	    if (group.getBranchActivities() == null) {
+		group.setBranchActivities(new HashSet<BranchActivityEntry>());
+	    }
+	    group.getBranchActivities().add(entry);
+	}
+	
 	entry.setCondition(condition);
 
 	if (branchingActivity.isConditionGate()) {
@@ -2861,7 +2873,18 @@ public class ObjectExtractor implements IObjectExtractor {
 	    entry.setGateOpenWhenConditionMet(gateOpenWhenConditionMet);
 	}
 
+	Group existingGroup = entry.getGroup();
+	if (existingGroup != null && !existingGroup.getGroupId().equals(group.getGroupId())) {
+	    existingGroup.getBranchActivities().remove(entry);
+	}
 	entry.setGroup(group);
+	if (group != null) {
+	    if (group.getBranchActivities() == null) {
+		group.setBranchActivities(new HashSet<BranchActivityEntry>());
+	    }
+	    group.getBranchActivities().add(entry);
+	}
+	
 	entry.setCondition(condition);
 
 	if (branchingActivity.isConditionGate()) {
