@@ -148,14 +148,12 @@
 								rows += '<tr>';
 								rows += '<td>';
 								
-								if (${content.usernameVisible == 'true'}) {
-									rows += '<div>';
-									rows += 	'<span class="field-name">';
-									rows += 		userData["userName"];
-									rows += 	'</span> ';
-									rows += 	userData["attemptTime"];
-									rows += '</div>';
-								}
+								rows += 	'<div>';
+								rows += 		'<span class="field-name">';
+								rows += 			userData["userName"];
+								rows += 		'</span> ';
+								rows += 		userData["attemptTime"];
+								rows +=		'</div>';
 								
 								rows += 	'<div class="user-answer">';
 								if (userData["visible"] == 'true') {
