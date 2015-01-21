@@ -29,10 +29,18 @@
 		margin-top: 20px;
 	}
 	
+	.tablesorter-holder {
+		padding-right: 20px;
+	}
+	
 	.tablesorter, .pager {
-		width: 97%;
 		margin-left: 10px;
 	}
+	
+	.box {
+		display: block;
+	}
+	
 </style>
 
 <script type="text/javascript">
@@ -53,6 +61,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 
 <script type="text/javascript">
@@ -78,9 +87,12 @@
 	    
 		$(".tablesorter").tablesorter({
 			theme: 'blue',
-		    widthFixed: true,
 		    sortInitialOrder: 'desc',
-            sortList: [[0]] 
+            sortList: [[0]],
+            widgets: [ "resizable" ],
+            widgetOptions: {
+            	resizable: true
+            }
 		});
 		
 		$(".tablesorter").each(function() {
@@ -143,13 +155,7 @@
 			    	}
 				},					
 			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',// possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
-			    // if true, the table will remain the same height no matter how many records are displayed. The space is made up by an empty
-			    // table row set to a height to compensate; default is false
-			    fixedHeight: true,
-			    // remove rows from the table to speed up the sort of large tables.
-			    // setting this to false, only hides the non-visible rows; needed if you plan to add/remove rows with the pager enabled.
-			    removeRows: false,
+			    output: '{startRow} to {endRow} ({totalRows})',
 			    // css class names of pager arrows
 			    cssNext: '.tablesorter-next', // next page arrow
 				cssPrev: '.tablesorter-prev', // previous page arrow
@@ -191,6 +197,7 @@
 		</h2>
 	</c:if>
 	
+	<div class="tablesorter-holder">
 	<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
 		<thead>
 			<tr>
@@ -242,6 +249,7 @@
 				<option value="100">100</option>
 			</select>
 		</form>
+	</div>
 	</div>
 
 	<div id="buttons">
