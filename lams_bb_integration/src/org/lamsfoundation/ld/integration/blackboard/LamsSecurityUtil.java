@@ -623,7 +623,10 @@ public class LamsSecurityUtil {
 	if (localeStr == null)
 	    return "XX";
 	String[] split = localeStr.split("_");
-	return split[1];
+	
+	//default country set to AU
+	String country = split.length > 1 ? split[1] : "AU";
+	return country;
     }
 
 }
