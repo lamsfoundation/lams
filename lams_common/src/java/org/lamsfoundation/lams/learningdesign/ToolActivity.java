@@ -152,6 +152,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 		newGradebookAct.setActivity(newToolActivity);
 		newGradebookAct.setLearner(gradebookAct.getLearner());
 		newGradebookAct.setMark(gradebookAct.getMark());
+		newGradebookAct.setUpdateDate(gradebookAct.getUpdateDate());
 	    }
 	}
 	newToolActivity.setGradebookUserActivities(newGradebookUserActivities);

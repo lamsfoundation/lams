@@ -23,6 +23,8 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook;
 
+import java.util.Date;
+
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -41,15 +43,18 @@ public class GradebookUserActivity {
     private Double mark;
     private String feedback;
     private Boolean markedInGradebook;
+    private Date updateDate;
 
     public GradebookUserActivity() {
 	markedInGradebook = false;
+	updateDate = new Date();
     }
     
     public GradebookUserActivity(ToolActivity activity, User learner){
 	this.activity = activity;
 	this.learner = learner;
 	markedInGradebook = false;
+	updateDate = new Date();
     }
 
     /**
@@ -120,5 +125,15 @@ public class GradebookUserActivity {
         this.markedInGradebook = markedInGradebook;
     }
     
-    
+    /**
+     * @hibernate.property column="update_date"
+     * @return
+     */
+    public Date getUpdateDate() {
+	return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+	this.updateDate = updateDate;
+    }
 }
