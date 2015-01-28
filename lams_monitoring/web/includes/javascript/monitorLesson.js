@@ -189,6 +189,7 @@ function initLessonTab(){
 		            		
 		            		$.ajax({
 		            			url : LAMS_URL + 'monitoring/monitoring.do',
+		            			type : 'POST',
 		            			cache : false,
 		            			data : {
 		            				'method'    	  : 'updateLessonClass',
@@ -1270,7 +1271,7 @@ function showClassDialog(){
 	var learners = [];
 	var monitors = [];
 	
-	// fetch available and alredy participation learners and monitors
+	// fetch available and already participating learners and monitors
 	$.ajax({
 		dataType : 'json',
 		url : LAMS_URL + 'monitoring/monitoring.do',
