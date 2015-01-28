@@ -283,8 +283,7 @@
 	</target>
 
 	
-	<target name="_build-war" 
-		    depends="_build-webdoclet, _build-manifest, _copy-language, _jsp-plaincopy, _jsp-precompile">
+	<target name="_build-war" depends="_build-webdoclet, _build-manifest, _copy-language, _copy-jsp">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
 		
@@ -395,111 +394,9 @@
 	</target>
 	
 	
-	<!-- =================================================================== -->
-	<!-- JSP precompilation                                   				 -->
-	<!-- =================================================================== -->
-	
-	<!-- Runs if jsp.precompile setting is set in lams_build/common.properties -->
-	<target name="_jsp-precompile" if="jsp.precompile" depends="_compile-java">
-		<!-- Internal target: Precompiles JSP files. -->
-		<echo>${ant.project.name}: Precompiling JSP files</echo>
-		
-		<!-- Work on a copy of web files, not originals
-             Copy them to build.war directory first for processing -->
-		<echo>${ant.project.name}: Copying web files for building</echo>
-	 	<copy todir="${basedir}/build/war" overwrite="true">
-			<fileset dir="${conf.web.dir}">
-				<include name="**"/>
-				<!-- These were created or copied in _build-webdoclet task -->
-				<exclude name="WEB-INF/web.xml"/>
-				<exclude name="WEB-INF/struts-config.xml"/>
-				<exclude name="WEB-INF/validation.xml"/>
-			</fileset>
-	 	</copy>
-		
-		<!-- Define JSP compiler
-		<path id="jsp.precompile.classpath">
-			<path refid="product.classpath"/>
-			<fileset dir="${server.home}/modules/system/layers/base">
-				<include name="org/jboss/common-core/main/jboss-common-core-*.jar" />
-			</fileset>
-			
-			<fileset dir="${server.home}/standalone/deploymentsers/jbossweb.deployer">
-				<include name="*.jar" />
-			</fileset>
-		</path>
-		 -->
-		
-		<taskdef name="jasper2"
-				 classname="org.apache.jasper.JspC"
-			     classpathref="libs.classpath"
-		/>
-		
-		<!-- Generate Java files and put servlet mappings in web.xml file -->
-		<echo>${ant.project.name}: Generating Java source files from JSP pages</echo>
-		<jasper2 uriroot="${basedir}/build/war"
-			webXmlFragment="${basedir}/build/war/WEB-INF/generated_web.xml"
-			outputDir="${basedir}/build/war/WEB-INF/src"
-			package="${product.path.jsp}"
-			addWebXmlMappings="true"
-			validateXml="false"
-			failOnError="true"
-		/>
-
-		<!-- Compile Java files generated from JSPs -->
-		<echo>${ant.project.name}: Compiling JSP classes</echo>
-		
-		<!-- Make src folder if it does not exist i.e. no JSPs were compiled in previous step -->
-		<mkdir dir="${basedir}/build/war/WEB-INF/src"/>
-		<mkdir dir="${basedir}/build/war/WEB-INF/classes"/>
-	    <javac destdir="${basedir}/build/war/WEB-INF/classes"
-			   compiler="modern"
-               source="1.8"
-			   target="1.8"
-	           debug="off"
-			   includeantruntime="false"
-	    	   failonerror="true"
-	           srcdir="${basedir}/build/war/WEB-INF/src" 
-		  	   excludes="**/*.smap"
-	    	   classpathref="libs.classpath">
-	      <compilerarg line="-encoding utf-8"/>
-	      <include name="**" />
-	      <exclude name="tags/**" />
-	    </javac>
-		
-		<!-- Prepare files for WAR so copy processing results to assembly dir,
-		     excluding plain JSP and tags -->
-		<echo>${ant.project.name}: Copying compiled and remaining web resources</echo>
-		<copy todir="${basedir}/build/war/assembly">
-			<fileset dir="${basedir}/build/war">
-				<include name="**"/>
-				<exclude name="assembly/"/>
-				<exclude name="WEB-INF/src/"/>
-				<exclude name="WEB-INF/tags/"/>
-				<exclude name="WEB-INF/tlds/"/>
-				<exclude name="WEB-INF/web.xml"/>
-				<!-- Make double sure that unwanted files are not copied -->
-				<exclude name="**/*.java"/>
-				<exclude name="**/*.jsp"/>
-				<exclude name="**/*.tag"/>
-				<exclude name="**/*.tld"/>
-			</fileset>
-		</copy>
-		
-		<echo>${ant.project.name}: Copying additional libraries</echo>
-	 	<copy todir="${basedir}/build/war/assembly/WEB-INF/lib" flatten="true" verbose="true">
-			<fileset dir="${basedir}/lib" erroronmissingdir="false">
-				<include name="**/*"/>
-			</fileset>
-	 	</copy>
-	</target>
-			
-	
-	<!-- Runs if jsp.precompile setting is NOT set in lams_build/common.properties 
-		 JSPs will be compiled at runtime, which is default behaviour allowing hotdeploy -->
-	<target name="_jsp-plaincopy" unless="jsp.precompile">
+	<target name="_copy-jsp">
 		<!-- Internal target: Copies JSP files. -->
-		<echo>${ant.project.name}: Copying JSP files without precompilation</echo>
+		<echo>${ant.project.name}: Copying JSP files</echo>
 
 		<!-- No processing is needed so copy files straight to assembly dir to create WAR -->
 		<echo>Copying web resources</echo>
