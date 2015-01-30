@@ -38,6 +38,9 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     private static final String GET_GRADEBOOK_USER_LESSON = "from GradebookUserLesson gles where "
 	    + "gles.learner.userId=:userID and gles.lesson.lessonId=:lessonID";
+    
+    private static final String GET_GRADEBOOK_USER_LESSONS = "from GradebookUserLesson gles where "
+	    + "gles.lesson.lessonId=:lessonID";
 
     private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradebookUserActivity gact where " +
     		"gact.learner=:userID and gact.activity in (select distinct tses.toolActivity from ToolSession tses where tses.lesson=:lessonID)";
@@ -87,7 +90,14 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 	}
 
 	return null;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<GradebookUserLesson> getGradebookUserDataForLesson(Long lessonID) {
+	List<GradebookUserLesson> result = getSession().createQuery(GET_GRADEBOOK_USER_LESSONS).setLong("lessonID", lessonID.longValue())
+		.list();
 
+	return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -101,7 +111,6 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 	}
 
 	return 0.0;
-
     }
 
     @SuppressWarnings("unchecked")

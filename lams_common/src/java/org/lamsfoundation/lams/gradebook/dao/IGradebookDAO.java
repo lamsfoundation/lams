@@ -18,38 +18,39 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dao; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dao;
 
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
- 
-public interface IGradebookDAO extends IBaseDAO{
-    
-    public GradebookUserLesson getGradebookUserDataForLesson(Long lessonID, Integer userID);
-    
-    public GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID);
-    
-    public Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID);
-    
-    public List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID);
-    
-    public Double getAverageMarkForLesson(Long lessonID);
-    
-    public long getAverageDurationLesson(Long lessonID);
-    
-    public long getAverageDurationForActivity(Long activityID);
-    
-    public Double getAverageMarkForActivity(Long activityID);
-    
-    public Double getAverageMarkForGroupedActivity(Long activityID, Long groupID);
-    
-    public long getAverageDurationForGroupedActivity(Long activityID, Long groupID);
+
+public interface IGradebookDAO extends IBaseDAO {
+
+    GradebookUserLesson getGradebookUserDataForLesson(Long lessonID, Integer userID);
+
+    List<GradebookUserLesson> getGradebookUserDataForLesson(Long lessonID);
+
+    GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID);
+
+    Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID);
+
+    List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID);
+
+    Double getAverageMarkForLesson(Long lessonID);
+
+    long getAverageDurationLesson(Long lessonID);
+
+    long getAverageDurationForActivity(Long activityID);
+
+    Double getAverageMarkForActivity(Long activityID);
+
+    Double getAverageMarkForGroupedActivity(Long activityID, Long groupID);
+
+    long getAverageDurationForGroupedActivity(Long activityID, Long groupID);
 
 }
- 

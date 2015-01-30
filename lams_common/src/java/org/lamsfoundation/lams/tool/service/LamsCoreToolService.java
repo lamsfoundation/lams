@@ -32,6 +32,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -461,6 +462,43 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	}
+    }
+    
+    @Override
+    public Long getActivityMaxPossibleMark(ToolActivity activity) {
+	SortedMap<String, ToolOutputDefinition> map = getOutputDefinitionsFromTool(activity.getToolContentId(),
+		ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
+
+	Set<ActivityEvaluation> actEvals = activity.getActivityEvaluations();
+
+	if (map != null) {
+	    for (String key : map.keySet()) {
+		ToolOutputDefinition definition = map.get(key);
+		if (actEvals != null && actEvals.size() > 0) {
+
+		    // get first evaluation
+		    ActivityEvaluation actEval = actEvals.iterator().next();
+
+		    if (actEval.getToolOutputDefinition().equals(key)) {
+
+			Object upperLimit = definition.getEndValue();
+			if (upperLimit != null && upperLimit instanceof Long) {
+			    return (Long) upperLimit;
+			}
+			break;
+		    }
+		} else {
+		    if (definition.isDefaultGradebookMark() != null && definition.isDefaultGradebookMark()) {
+			Object upperLimit = definition.getEndValue();
+			if (upperLimit != null && upperLimit instanceof Long) {
+			    return (Long) upperLimit;
+			}
+			break;
+		    }
+		}
+	    }
+	}
+	return null;
     }
 
     @Override

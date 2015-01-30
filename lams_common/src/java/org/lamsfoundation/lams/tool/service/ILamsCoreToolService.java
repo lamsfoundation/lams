@@ -255,6 +255,14 @@ public interface ILamsCoreToolService {
      */
     SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession,
 	    Integer learnerId) throws ToolException;
+    
+    /**
+     * Get activity's max possible mark.
+     * 
+     * @param activity
+     * @return activity's max possible mark if available, null otherwise
+     */
+    Long getActivityMaxPossibleMark(ToolActivity activity);
 
     /**
      * Update the tool session data.

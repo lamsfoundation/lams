@@ -127,7 +127,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 	<bbNG:cssFile href="../includes/css/folders.css" />
 	<bbNG:cssBlock> 
 	<style type="text/css"> 
-		#monitor-button {
+		#monitor-button, #sync-button {
 			visibility:hidden;
 		}
 		#buttons {
@@ -138,6 +138,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 
 	<bbNG:jsFile href="includes/javascript/yahoo-dom-event.js" />
 	<bbNG:jsFile href="includes/javascript/treeview-min.js" />
+	<bbNG:jsFile href="includes/javascript/jquery.js" />
 	
 	<bbNG:breadcrumbBar environment="CTRL_PANEL" isContent="false">
 		<bbNG:breadcrumb>LAMS Monitor</bbNG:breadcrumb>
@@ -153,7 +154,12 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 				Monitor this lesson
 			</button>
 		</span>
-	</div> 
+		<span id="sync-button" class="yui-button yui-link-button">
+			<button id="sync-button-but" onclick="syncMarks(); return false;">
+				Sync marks with LAMS server
+			</button>
+		</span>
+	</div>
 	
 	<div id="treeDiv"></div>
 
@@ -168,6 +174,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 			
 			var visibility = (seqId != 0) ? 'visible' : 'hidden';
 		    document.getElementById('monitor-button').style.visibility=visibility;
+		    document.getElementById('sync-button').style.visibility=visibility;
 		}
 		
         // Open the LAMS Seuence Monitor Window
@@ -195,6 +202,34 @@ public String getChild(Content f, ContentDbLoader cLoader) {
             
             return false;
         }
+        
+        // Open the LAMS Seuence Monitor Window
+        function syncMarks() {
+        	$("#sync-button-but").hide();
+        	
+        	//var monitorWin2 = window.open('../GradebookSync?lsId='  + sequenceId,'mWindow','width=1024,height=768,resizable');
+           // monitorWin2.focus();
+           // return;
+        	
+	        $.ajax({
+	        	async: false,
+	            url: '../GradebookSync',
+	            data: 'lsId='  + sequenceId,
+	            type: 'post',
+	            success: function (response) {
+	                $("#sync-button-but").show();
+	            	alert(response);
+	            },
+	            error: function (request, status, error) {
+	                $("#sync-button-but").show();
+	                //alert(request.responseText);
+	               // alert(request.status);
+	                alert(error);
+	            }
+	       	});
+            
+            return false;
+        }
 
 		var tree = new YAHOO.widget.TreeView("treeDiv", <%= strOut %>);
 		tree.getNodeByIndex(1).expand(true);
@@ -202,6 +237,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 		tree.subscribe('clickEvent',function(oArgs) {
 			seqSelected(oArgs.node.data.id, oArgs.node.label);
 		});
+
 	</script>
 </bbNG:jsBlock>
 </bbNG:learningSystemPage>

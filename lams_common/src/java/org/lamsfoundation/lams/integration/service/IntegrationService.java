@@ -89,12 +89,27 @@ public class IntegrationService implements IIntegrationService {
 	this.service = service;
     }
 
+    @Override
     public ExtServerOrgMap getExtServerOrgMap(String serverId) {
 	List list = service.findByProperty(ExtServerOrgMap.class, "serverid", serverId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
 	    return (ExtServerOrgMap) list.get(0);
+	}
+    }
+    
+    @Override
+    public ExtCourseClassMap getExtCourseClassMap(Integer extServerOrgMapId, String extCourseId) {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("courseid", extCourseId);
+	properties.put("extServerOrgMap.sid", extServerOrgMapId);
+	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
+
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return (ExtCourseClassMap) list.get(0);
 	}
     }
 
@@ -132,34 +147,29 @@ public class IntegrationService implements IIntegrationService {
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId,
 	    Boolean isTeacher, Boolean prefix) throws UserInfoValidationException {
-	ExtCourseClassMap map;
 	Organisation org;
 	User user = userMap.getUser();
 	
-	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("courseid", extCourseId);
-	properties.put("extServerOrgMap.sid", serverMap.getSid());
-	List<ExtCourseClassMap> mapList = service.findByProperties(ExtCourseClassMap.class, properties);
-	if (mapList == null || mapList.size() == 0) {
+	ExtCourseClassMap extCourseClassMap = getExtCourseClassMap(serverMap.getSid(), extCourseId);
+	if (extCourseClassMap == null) {
 	    //create new ExtCourseClassMap
 	    
 	    org = createOrganisation(serverMap, user, extCourseId, extCourseName, countryIsoCode,
 		    langIsoCode, parentOrgId, prefix);
-	    map = new ExtCourseClassMap();
-	    map.setCourseid(extCourseId);
-	    map.setExtServerOrgMap(serverMap);
-	    map.setOrganisation(org);
-	    service.save(map);
+	    extCourseClassMap = new ExtCourseClassMap();
+	    extCourseClassMap.setCourseid(extCourseId);
+	    extCourseClassMap.setExtServerOrgMap(serverMap);
+	    extCourseClassMap.setOrganisation(org);
+	    service.save(extCourseClassMap);
 	    
 	} else {
-	    map = mapList.get(0);
-	    org = map.getOrganisation();
+	    org = extCourseClassMap.getOrganisation();
 
 	    // update external course name if if has changed
 	    String requestedCourseName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
 	    if (extCourseName != null && !org.getName().equals(requestedCourseName)) {
-		
-		//validate org name
+
+		// validate org name
 		if (!ValidationUtil.isOrgNameValid(requestedCourseName)) {
 		    throw new UserInfoValidationException(
 			    "Can't create organisation due to validation error: "
@@ -167,7 +177,7 @@ public class IntegrationService implements IIntegrationService {
 				    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:"
 				    + requestedCourseName);
 		}
-		
+
 		org.setName(requestedCourseName);
 		service.updateOrganisationandWorkspaceNames(org);
 	    }
@@ -175,7 +185,7 @@ public class IntegrationService implements IIntegrationService {
 	
 	updateUserRoles(user, org, isTeacher);
 	
-	return map;
+	return extCourseClassMap;
     }
 
     private void updateUserRoles(User user, Organisation org, Boolean isTeacher) {
@@ -203,6 +213,13 @@ public class IntegrationService implements IIntegrationService {
 		service.save(uo);
 	    }
 	}
+    }
+    
+    public List<ExtUserUseridMap> getExtUserUseridMapByServerMap(ExtServerOrgMap serverMap) {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("extServerOrgMap.sid", serverMap.getSid());
+	List list = service.findByProperties(ExtUserUseridMap.class, properties);
+	return list;
     }
 
     @Override
@@ -540,7 +557,7 @@ public class IntegrationService implements IIntegrationService {
 	    if (extServerLesson != null && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
 		ExtServerOrgMap serverMap = extServerLesson.getExtServer();
 
-		ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, user);
+		ExtUserUseridMap extUserUseridMap = getExtUserUseridMapByUserId(serverMap, user.getUserId());
 		if (extUserUseridMap != null) {
 		    String extUsername = extUserUseridMap.getExtUsername();
 
@@ -571,10 +588,10 @@ public class IntegrationService implements IIntegrationService {
 	}
     }
 
-    private ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, User user) {
+    private ExtUserUseridMap getExtUserUseridMapByUserId(ExtServerOrgMap serverMap, Integer userId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
-	properties.put("user.userId", user.getUserId());
+	properties.put("user.userId", userId);
 	List list = service.findByProperties(ExtUserUseridMap.class, properties);
 	if (list == null || list.size() == 0) {
 	    return null;
