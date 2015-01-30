@@ -49,6 +49,7 @@ import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 
+import blackboard.data.user.User;
 import blackboard.persist.PersistenceException;
 import blackboard.platform.context.Context;
 import blackboard.portal.data.ExtraInfo;
@@ -150,7 +151,8 @@ public class LamsSecurityUtil {
 	}
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
-	String username = ctx.getUser().getUserName();
+	 User user = ctx.getUser();
+	String username = user.getUserName();
 	String hash = generateAuthenticationHash(timestamp, username, serverId);
 
 	String authenticateParameters = "&serverId=" + serverId + "&datetime=" + timestamp + "&hashValue=" + hash

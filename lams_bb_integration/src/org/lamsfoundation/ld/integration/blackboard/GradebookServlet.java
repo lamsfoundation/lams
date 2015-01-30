@@ -47,6 +47,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
+import org.lamsfoundation.ld.util.LineitemUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -85,10 +86,10 @@ import blackboard.portal.servlet.PortalUtil;
 public class GradebookServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3587062723412672084L;
-    static Logger logger = Logger.getLogger(GradebookServlet.class);
+    private static Logger logger = Logger.getLogger(GradebookServlet.class);
 
     /**
-     * Receives call from Lams ab lesson completion. After that get the latest marks for this user in this lesson and stores it in DB. <br>
+     * Receives call from Lams ab lesson completion. After that get the latest marks for this user in this lesson and stores it in DB. 
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -158,10 +159,7 @@ public class GradebookServlet extends HttpServlet {
 		throw new ServletException("User not found with userName:" + userName);
 	    }
 
-	    String serverAddr = LamsSecurityUtil.getServerAddress();
-
-	    Document document = null;
-	    String serviceURL = serverAddr + "/services/xml/LessonManager?"
+	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(ctx) + "&courseId="
 		    + "&method=toolOutputsUser&lsId=" + lamsLessonIdParam + "&outputsUser="
 		    + URLEncoder.encode(userName, "UTF8");
@@ -188,7 +186,7 @@ public class GradebookServlet extends HttpServlet {
 	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder db = dbf.newDocumentBuilder();
-	    document = db.parse(is);
+	    Document document = db.parse(is);
 	    
 	    
 	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
@@ -216,55 +214,21 @@ public class GradebookServlet extends HttpServlet {
 		
 	    }
             
-            //get lineitemid from the storage (bbContentId -> lineitemid)
-    	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
-    	    ExtraInfo ei = pei.getExtraInfo();
-    	    String lineitemIdStr = ei.getValue(bbContentId);
-	
-	    //TODO remove the following paragraph after a while. (It deals with lineitems created in versions after 1.2 and before 1.2.3)
-	    Lineitem lineitem = null;
-	    if (lineitemIdStr == null) {
-        	CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
-        	LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
-        
-        	List<Course> userCourses = cLoader.loadByUserId(ctx.getUserId());
-        
-        	// search for appropriate lineitem
-        	lineitem = null;
-        	for (Course userCourse : userCourses) {
-        	    List<Lineitem> lineitems = lineitemLoader.loadByCourseId(userCourse.getId());
-        
-        	    for (Lineitem lineitemIter : lineitems) {
-        		if (lineitemIter.getAssessmentId() != null && lineitemIter.getAssessmentId().equals(lamsLessonIdParam)) {
-        		    lineitem = lineitemIter;
-        		    break;
-        		}
-        	    }
-        	}
-       	    } else {
-       	    
-		Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
-		LineitemDbLoader lineitemLoader = (LineitemDbLoader) bbPm.getLoader(LineitemDbLoader.TYPE);
-		lineitem = lineitemLoader.loadById(lineitemId);
-       	    }
-
-	    if (lineitem == null) {
-		throw new ServletException("lineitem not found");
-	    }
+	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, ctx, lamsLessonIdParam);
 
 	    // store new score
 	    CourseMembershipDbLoader memLoader = (CourseMembershipDbLoader) bbPm
 		    .getLoader(CourseMembershipDbLoader.TYPE);
 	    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
 	    ScoreDbPersister scorePersister = (ScoreDbPersister) bbPm.getPersister(ScoreDbPersister.TYPE);
-	    CourseMembership cms = memLoader.loadByCourseAndUserId(lineitem.getCourseId(), ctx.getUserId());
-	    Score current_score = null;
+	    CourseMembership courseMembership = memLoader.loadByCourseAndUserId(lineitem.getCourseId(), ctx.getUserId());
+	    Score currentScore = null;
 	    try {
-		current_score = scoreLoader.loadByCourseMembershipIdAndLineitemId(cms.getId(), lineitem.getId());
+		currentScore = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitem.getId());
 	    } catch (KeyNotFoundException c) {
-		current_score = new Score();
-		current_score.setLineitemId(lineitem.getId());
-		current_score.setCourseMembershipId(cms.getId());
+		currentScore = new Score();
+		currentScore.setLineitemId(lineitem.getId());
+		currentScore.setCourseMembershipId(courseMembership.getId());
 	    }
 
 	    //set score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and lineitme of type Complete/Incomplete) we set 0
@@ -272,9 +236,9 @@ public class GradebookServlet extends HttpServlet {
 	    if (maxResult > 0) {
 		gradebookMark = (userResult / maxResult) * Constants.GRADEBOOK_POINTS_POSSIBLE;
 	    }
-	    current_score.setGrade(new DecimalFormat("##.##").format(gradebookMark));
-	    current_score.validate();
-	    scorePersister.persist(current_score);
+	    currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
+	    currentScore.validate();
+	    scorePersister.persist(currentScore);
 	    
 	} catch (MalformedURLException e) {
 	    throw new ServletException("Unable to get LAMS learning designs, bad URL: "

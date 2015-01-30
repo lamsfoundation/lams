@@ -52,6 +52,7 @@ import blackboard.persist.Id;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbLoader;
+import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.gradebook.LineitemDbLoader;
 import blackboard.persist.gradebook.LineitemDbPersister;
 import blackboard.persist.gradebook.ext.OutcomeDefinitionScaleDbLoader;
@@ -226,7 +227,7 @@ public class LineitemUtil {
 	ExtraInfo ei = pei.getExtraInfo();
 	String lineitemIdStr = ei.getValue(bbContentId);
 	
-	//TODO remove the following paragraph after a while. (It removes lineitems created in versions after 1.2 and before 1.2.3)
+	//TODO remove the entire following if-paragraph (incl. internal content) after a while. (It removes lineitems created in versions after 1.2 and before 1.2.3)
 	if (lineitemIdStr == null) {
 	    // get stored bbContentId -> lamsLessonId.
 	    PortalExtraInfo portalExtraInfo = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
@@ -268,5 +269,54 @@ public class LineitemUtil {
 	
 	Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
 	return lineitemId;
+    }
+    
+    /**
+     * Gets existing lineitem object.
+     * @throws ServletException 
+     * @throws PersistenceException 
+     */
+    public static Lineitem getLineitem(String bbContentId, Context ctx, String lamsLessonIdParam) throws ServletException, PersistenceException {
+	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	
+	// get lineitemid from the storage (bbContentId -> lineitemid)
+	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
+	ExtraInfo ei = pei.getExtraInfo();
+	String lineitemIdStr = ei.getValue(bbContentId);
+
+	// TODO remove the entire following if-paragraph (incl. internal content) after a while. (It deals with
+	// lineitems created in versions after 1.2 and before 1.2.3)
+	Lineitem lineitem = null;
+	if (lineitemIdStr == null) {
+	    CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
+	    LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
+
+	    List<Course> userCourses = cLoader.loadByUserId(ctx.getUserId());
+
+	    // search for appropriate lineitem
+	    lineitem = null;
+	    for (Course userCourse : userCourses) {
+		List<Lineitem> lineitems = lineitemLoader.loadByCourseId(userCourse.getId());
+
+		for (Lineitem lineitemIter : lineitems) {
+		    if (lineitemIter.getAssessmentId() != null
+			    && lineitemIter.getAssessmentId().equals(lamsLessonIdParam)) {
+			lineitem = lineitemIter;
+			break;
+		    }
+		}
+	    }
+	} else {
+
+	    Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
+	    LineitemDbLoader lineitemLoader = (LineitemDbLoader) bbPm.getLoader(LineitemDbLoader.TYPE);
+	    lineitem = lineitemLoader.loadById(lineitemId);
+	}
+
+	if (lineitem == null) {
+	    throw new ServletException("Lineitem was not found for contentId:" + bbContentId);
+	}
+
+	return lineitem;
     }
 }
