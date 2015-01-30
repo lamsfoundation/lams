@@ -135,8 +135,9 @@ public class GradebookSyncServlet extends HttpServlet {
 		return;
 	    }
 
+	    String username = ctx.getUser().getUserName();
 	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
-		    + LamsSecurityUtil.generateAuthenticateParameters(ctx)
+		    + LamsSecurityUtil.generateAuthenticateParameters(username)
 		    + "&method=gradebookMarksLesson&lsId=" + lamsLessonIdParam;
 
 	    URL url = new URL(serviceURL);
@@ -172,7 +173,7 @@ public class GradebookSyncServlet extends HttpServlet {
 	    Long lessonMaxPossibleMark = new Long(lesson.getAttributes().getNamedItem("lessonMaxPossibleMark").getNodeValue());
 	    NodeList learnerResults = lesson.getChildNodes();
 
-	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, ctx, lamsLessonIdParam);
+	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, ctx.getUserId(), lamsLessonIdParam);
 	    //in order to reduce DB queries we get scores and courseMemberships all at once
 	    BbList<Score> dbScores = scoreLoader.loadByLineitemId(lineitem.getId());
 	    BbList<CourseMembership> courseMemberships = courseMemLoader.loadByCourseId(lineitem.getCourseId(), null, true);

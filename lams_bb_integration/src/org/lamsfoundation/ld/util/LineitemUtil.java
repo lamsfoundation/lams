@@ -276,7 +276,7 @@ public class LineitemUtil {
      * @throws ServletException 
      * @throws PersistenceException 
      */
-    public static Lineitem getLineitem(String bbContentId, Context ctx, String lamsLessonIdParam) throws ServletException, PersistenceException {
+    public static Lineitem getLineitem(String bbContentId, Id userId, String lamsLessonIdParam) throws ServletException, PersistenceException {
 	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
 	
 	// get lineitemid from the storage (bbContentId -> lineitemid)
@@ -291,7 +291,7 @@ public class LineitemUtil {
 	    CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
 	    LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
 
-	    List<Course> userCourses = cLoader.loadByUserId(ctx.getUserId());
+	    List<Course> userCourses = cLoader.loadByUserId(userId);
 
 	    // search for appropriate lineitem
 	    lineitem = null;
