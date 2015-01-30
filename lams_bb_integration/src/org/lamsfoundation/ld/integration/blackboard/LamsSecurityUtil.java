@@ -49,7 +49,6 @@ import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 
-import blackboard.data.user.User;
 import blackboard.persist.PersistenceException;
 import blackboard.platform.context.Context;
 import blackboard.portal.data.ExtraInfo;
@@ -140,7 +139,7 @@ public class LamsSecurityUtil {
      * Generates default
      * @throws UnsupportedEncodingException 
      */
-    public static String generateAuthenticateParameters(Context ctx) throws UnsupportedEncodingException {
+    public static String generateAuthenticateParameters(String username) throws UnsupportedEncodingException {
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
 	String reqSrc = getReqSrc();
@@ -151,8 +150,6 @@ public class LamsSecurityUtil {
 	}
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
-	 User user = ctx.getUser();
-	String username = user.getUserName();
 	String hash = generateAuthenticationHash(timestamp, username, serverId);
 
 	String authenticateParameters = "&serverId=" + serverId + "&datetime=" + timestamp + "&hashValue=" + hash
@@ -176,7 +173,9 @@ public class LamsSecurityUtil {
         //$request = "$CFG->lamslesson_serverurl/services/LearningDesignSVG?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . 
         //$hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=" . $lang . 
         //"&ldId=" . $ldid . "&svgFormat=" . $format;
-	String url = serverAddr + "/services/LearningDesignSVG?" + generateAuthenticateParameters(ctx) + "&svgFormat=" + svgFormat;
+	String username = ctx.getUser().getUserName();
+	String url = serverAddr + "/services/LearningDesignSVG?" + generateAuthenticateParameters(username)
+		+ "&svgFormat=" + svgFormat;
 
 	logger.info("LAMS Req: " + url);
 

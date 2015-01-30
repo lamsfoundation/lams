@@ -154,13 +154,14 @@ public class GradebookServlet extends HttpServlet {
 	    // get user list, but no role info since there are no course info
 	    UserDbLoader userLoader = (UserDbLoader) bbPm.getLoader(UserDbLoader.TYPE);
 	    User user = userLoader.loadByUserName(userName);
-
+	    
 	    if (user == null) {
 		throw new ServletException("User not found with userName:" + userName);
 	    }
+	    Id userId = user.getId();
 
 	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
-		    + LamsSecurityUtil.generateAuthenticateParameters(ctx) + "&courseId="
+		    + LamsSecurityUtil.generateAuthenticateParameters(userName) + "&courseId="
 		    + "&method=toolOutputsUser&lsId=" + lamsLessonIdParam + "&outputsUser="
 		    + URLEncoder.encode(userName, "UTF8");
 	    
@@ -214,14 +215,14 @@ public class GradebookServlet extends HttpServlet {
 		
 	    }
             
-	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, ctx, lamsLessonIdParam);
+	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, userId, lamsLessonIdParam);
 
 	    // store new score
 	    CourseMembershipDbLoader memLoader = (CourseMembershipDbLoader) bbPm
 		    .getLoader(CourseMembershipDbLoader.TYPE);
 	    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
 	    ScoreDbPersister scorePersister = (ScoreDbPersister) bbPm.getPersister(ScoreDbPersister.TYPE);
-	    CourseMembership courseMembership = memLoader.loadByCourseAndUserId(lineitem.getCourseId(), ctx.getUserId());
+	    CourseMembership courseMembership = memLoader.loadByCourseAndUserId(lineitem.getCourseId(), userId);
 	    Score currentScore = null;
 	    try {
 		currentScore = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitem.getId());
