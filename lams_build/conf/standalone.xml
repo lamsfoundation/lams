@@ -259,7 +259,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="false">
+                <datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="false" jta="true">
 				    <connection-url>@db.url.run@</connection-url>
 				    <driver>MySQL</driver>
 				    <connection-property name="characterEncoding">utf8</connection-property>
@@ -352,7 +352,7 @@
             <cache-container name="hibernate" default-cache="local-query" module="org.hibernate" start="EAGER">
                 <local-cache name="entity" start="EAGER" statistics-enabled="true">
                     <transaction mode="NON_XA"/>
-                    <eviction strategy="LRU" max-entries="5000"/>
+                    <eviction strategy="LRU" max-entries="50000"/>
                     <expiration max-idle="100000" lifespan="1000000"/>
                 </local-cache>
                 <local-cache name="local-query" start="EAGER" statistics-enabled="true" >
