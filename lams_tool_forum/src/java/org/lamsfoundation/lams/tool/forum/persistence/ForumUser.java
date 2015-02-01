@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 /**
  * 
  * @hibernate.class table="tl_lafrum11_forum_user"
+ * @hibernate.cache usage = "transactional" 
  * @author Steve.Ni
  * 
  * @version $Revision$

@@ -34,6 +34,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Andrey Balan
  * 
  * @hibernate.class table="tl_lafrum11_message_rating"
+ * @hibernate.cache usage = "transactional"
+ * 
  */
 public class MessageRating implements Serializable {
 

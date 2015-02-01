@@ -32,6 +32,7 @@ import java.util.Date;
  * @author ruslan
  * 
  * @hibernate.class table="tl_lafrum11_timestamp"
+ * @hibernate.cache usage = "transactional"
  * 
  */
 public class Timestamp implements Cloneable {

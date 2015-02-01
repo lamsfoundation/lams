@@ -29,7 +29,8 @@ package org.lamsfoundation.lams.tool.forum.persistence;
  * @author Steve.Ni
  *
  * @hibernate.class table="tl_lafrum11_message_seq"
- *
+ * @hibernate.cache usage = "transactional"
+ * 
  */
 public class MessageSeq {
 
@@ -48,7 +49,7 @@ public class MessageSeq {
 		this.uid = uid;
 	}
 	/**
-	 * @hibernate.many-to-one column="root_message_uid"
+	 * @hibernate.many-to-one column="root_message_uid" outer-join="true" 
 	 * 	cascade="none"
 	 */
 	public Message getRootMessage() {
@@ -58,7 +59,7 @@ public class MessageSeq {
 		this.rootMessage = rootTopicUid;
 	}
 	/**
-	 * @hibernate.many-to-one column="message_uid"
+	 * @hibernate.many-to-one column="message_uid" outer-join="true" 
 	 * 	cascade="none"
 	 */
 	public Message getMessage() {

@@ -30,7 +30,8 @@ import java.util.Date;
 /**
  *
  * @hibernate.class  table="tl_lafrum11_report"
- *
+ * @hibernate.cache usage = "transactional"
+ *  
  */
 public class ForumReport {
 	

@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @hibernate.class table="tl_lafrum11_tool_session"
+ * @hibernate.cache usage = "transactional" 
  * @author Steve.Ni
  * 
  * @version $Revision$

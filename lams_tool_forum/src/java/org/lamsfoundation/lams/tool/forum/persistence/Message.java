@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
  * @author conradb
  * 
  * @hibernate.class table="tl_lafrum11_message"
+ * @hibernate.cache usage = "transactional"
  * 
  */
 public class Message implements Cloneable {

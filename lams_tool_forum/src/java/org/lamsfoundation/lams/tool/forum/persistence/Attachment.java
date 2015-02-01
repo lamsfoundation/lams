@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
  * 
  *
  * @hibernate.class table="tl_lafrum11_attachment"
+ * @hibernate.cache usage = "transactional" 
  *
  */
 public class Attachment implements Cloneable{

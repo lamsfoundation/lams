@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
  * @author conradb
  * 
  * @hibernate.class table="tl_lafrum11_forum"
+ * @hibernate.cache usage = "transactional" 
  * 
  */
 public class Forum implements Cloneable {
