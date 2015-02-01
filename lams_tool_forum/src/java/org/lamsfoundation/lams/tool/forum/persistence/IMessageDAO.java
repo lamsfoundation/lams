@@ -10,6 +10,8 @@ public interface IMessageDAO extends IBaseDAO {
 
     void update(Message message);
 
+    Message getByIdForUpdate(Long messageId);
+    
     Message getById(Long messageId);
 
     /**

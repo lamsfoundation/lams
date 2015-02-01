@@ -299,6 +299,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return message;
     }
 
+    private Message getMessageForUpdate(Long messageUid) throws PersistenceException {
+    	return messageDao.getByIdForUpdate(messageUid);
+    }
+    
     public Message getMessage(Long messageUid) throws PersistenceException {
 	return messageDao.getById(messageUid);
     }
@@ -333,7 +337,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public Message replyTopic(Long parentId, Long sessionId, Message replyMessage) throws PersistenceException {
 	// set parent
-	Message parent = this.getMessage(parentId);
+	Message parent = this.getMessageForUpdate(parentId);
 	replyMessage.setParent(parent);
 	replyMessage.setForum(parent.getForum());
 	// parent sessionID maybe empty if created by author role. So given sessionId is exactly value.

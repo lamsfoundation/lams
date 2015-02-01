@@ -661,7 +661,7 @@ public class LearningAction extends Action {
      * @return
      * @throws InterruptedException
      */
-    private synchronized ActionForward replyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward replyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException {
 
 	MessageForm messageForm = (MessageForm) form;

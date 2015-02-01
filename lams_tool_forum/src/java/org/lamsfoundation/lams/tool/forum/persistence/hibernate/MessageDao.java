@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
 import java.util.List;
 
+import org.hibernate.LockOptions;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.IMessageDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
@@ -64,6 +65,11 @@ public class MessageDao extends LAMSBaseDAO implements IMessageDAO {
     public void update(Message message) {
 	this.getSession().saveOrUpdate(message);
     }
+
+    @Override
+	public Message getByIdForUpdate(Long messageId) {
+    	return (Message) getSession().get(Message.class, messageId, LockOptions.UPGRADE);
+	}
 
     @Override
     public Message getById(Long messageId) {
