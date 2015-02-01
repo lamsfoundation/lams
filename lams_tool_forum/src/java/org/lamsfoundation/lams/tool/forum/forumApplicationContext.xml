@@ -166,6 +166,8 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
+			    <prop key="get*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>
+			    <prop key="is*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>			
 				<prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
