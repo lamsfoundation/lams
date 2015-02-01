@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
  * 
  * @author Marcin Cieslak
  * @hibernate.class table="lams_planner_activity_metadata"
+ * @hibernate.cache usage = "transactional" 
  */
 public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneable {
 

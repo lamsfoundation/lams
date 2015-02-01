@@ -14,7 +14,9 @@
 <class name="org.lamsfoundation.lams.learningdesign.Activity" table="lams_learning_activity" discriminator-value="0">
     <meta attribute="class-description" inherit="false">@hibernate.class table="lams_learning_activity"</meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
-
+	
+	<cache usage="transactional"/>
+    
     <id name="activityId" type="java.lang.Long" column="activity_id">
         <meta attribute="field-description">@hibernate.id generator-class="native" type="java.lang.Long" column="activity_id"</meta>
         <generator class="native" />
