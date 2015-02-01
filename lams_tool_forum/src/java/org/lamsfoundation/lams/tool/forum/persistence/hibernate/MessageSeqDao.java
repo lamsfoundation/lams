@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.criterion.Restrictions;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.IMessageSeqDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
@@ -51,7 +52,8 @@ public class MessageSeqDao extends LAMSBaseDAO implements IMessageSeqDAO {
 	 */
     @Override
 	public List getTopicThread(Long rootTopicId) {
-	return doFind(SQL_QUERY_FIND_TOPIC_THREAD, rootTopicId);
+    	return getSession().createCriteria(MessageSeq.class).add(Restrictions.eq("rootMessage.uid", rootTopicId)).list();
+//    	return doFind(SQL_QUERY_FIND_TOPIC_THREAD, rootTopicId);
     }
 
     /* (non-Javadoc)
