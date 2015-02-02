@@ -157,7 +157,6 @@ public class ProfileSaveAction extends Action {
 
 	// replace UserDTO in the shared session
 	HttpSession ss = SessionManager.getSession();
-	ss.removeAttribute(AttributeNames.USER);
 	ss.setAttribute(AttributeNames.USER, requestor.getUserDTO());
 
 	return mapping.findForward("profile");

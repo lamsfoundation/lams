@@ -75,7 +75,6 @@ public class TutorialAction extends DispatchAction {
 	user.getPagesWithDisabledTutorials().add(pageString);
 	getService().save(user);
 
-	ss.removeAttribute(AttributeNames.USER);
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 
 	return null;
@@ -102,7 +101,6 @@ public class TutorialAction extends DispatchAction {
 	user.getPagesWithDisabledTutorials().remove(pageString);
 	getService().save(user);
 
-	ss.removeAttribute(AttributeNames.USER);
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 
 	return null;
@@ -156,7 +154,6 @@ public class TutorialAction extends DispatchAction {
 	user.setTutorialsDisabled(true);
 	getService().save(user);
 
-	ss.removeAttribute(AttributeNames.USER);
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 
 	return null;

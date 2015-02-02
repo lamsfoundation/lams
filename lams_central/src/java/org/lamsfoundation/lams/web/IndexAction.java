@@ -105,8 +105,7 @@ public class IndexAction extends Action {
 	    User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
 	    user.setFirstLogin(false);
 	    getUserManagementService().save(user);
-	    ss.removeAttribute(AttributeNames.USER);
-	    ss.setAttribute(AttributeNames.USER, user.getUserDTO());
+	    userDTO.setFirstLogin(false);
 	}
 
 	// check if user is flagged as needing to change their password

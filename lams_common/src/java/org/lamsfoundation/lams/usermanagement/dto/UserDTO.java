@@ -33,10 +33,10 @@ import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 /**
  * @author Manpreet Minhas
  */
-public class UserDTO implements Serializable{
+public class UserDTO implements Serializable {
 
     private static final long serialVersionUID = 5299784226270953691L;
-    
+
     private Integer userID;
     private String firstName;
     private String lastName;
@@ -237,4 +237,7 @@ public class UserDTO implements Serializable{
 	return firstLogin;
     }
 
+    public void setFirstLogin(Boolean firstLogin) {
+	this.firstLogin = firstLogin;
+    }
 }

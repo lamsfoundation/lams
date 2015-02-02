@@ -254,8 +254,6 @@ public class LamsCommunityLoginAction extends LamsDispatchAction {
 	// Update the user session, set the logged into lamscommunity flag
 	UserDTO userDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	userDTO.setLoggedIntoLamsCommunity(true);
-	HttpSession sharedsession = SessionManager.getSession();
-	sharedsession.setAttribute(AttributeNames.USER, userDTO);
 	
 	String timestamp = "" + new Date().getTime();
 	String hash = LamsCommunityUtil.createAuthenticationHash(timestamp, user.getLamsCommunityUsername(), user.getLamsCommunityToken(), serverID, serverKey);
