@@ -68,3 +68,9 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 1.2.7 Release Fixes
 ===================
 * LDEV-3402: Add "your progress" widget to the lesson page
+
+1.2.8 Release Fixes
+===================
+* LDEV-3423: Fixed Exception on getting mark from LAMS server after lesson is completed
+* LDEV-3424: Add new feature to integrations to be able to sync all marks in the lesson
+
