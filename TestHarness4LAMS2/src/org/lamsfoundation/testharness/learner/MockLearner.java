@@ -65,7 +65,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String ACTIVITY_FINISHED_FLAG = "The next task is loading.";
     private static final String LESSON_FINISHED_FLAG = "LessonComplete.do";
     private static final String LOAD_TOOL_ACTIVITY_FLAG = "Load Tool Activity";
-    private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(.+)\\&");
+    private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(sessionMapID-\\d+)");
     private static final Pattern TOOL_SESSION_ID_PATTERN = Pattern.compile("var TOOL_SESSION_ID = '(\\d+)'");
     private static final String FINISH_SUBSTRING = "finish.do";
 
@@ -637,7 +637,6 @@ public class MockLearner extends MockUser implements Runnable {
 		} catch (InterruptedException e) {
 		    MockLearner.log.error("Interrupted waiting between question list refresh in scratchie");
 		}
-		String url = resp.getURL().toString() + "&reqId=" + System.currentTimeMillis();
 		WebResponse questionRefreshResp = (WebResponse) new Call(wc, test, username
 			+ " refreshes Scratchie question list", refreshQuestionsURL).execute();
 		asText = questionRefreshResp.getText();
