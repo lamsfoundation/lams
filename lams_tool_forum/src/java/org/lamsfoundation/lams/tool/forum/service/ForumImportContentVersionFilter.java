@@ -40,4 +40,12 @@ public class ForumImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(Forum.class, "offlineInstructions");
 	this.removeField(Forum.class, "attachments");
     }
+    
+    /**
+     * Import 20121109 version content to 20140102 version tool server.
+     */
+    public void up20140102To20141216() {
+	this.renameField(Forum.class, "limitedChar", "maxCharacters");
+	this.renameField(Forum.class, "limitedInput", "limitedMaxCharacters");
+    }
 }
