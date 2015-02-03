@@ -40,8 +40,21 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 	    
 	    if (f.getIsFolder()) {
 		
-			BbList cList = cLoader.loadChildren(f.getId());
-			Content[] cArray = (Content[]) cList.toArray(new Content[0]);
+			BbList<Content> cList = cLoader.loadChildren(f.getId());
+			Content[] cArray = cList.toArray(new Content[0]);
+			//sort content by title
+			Arrays.sort(cArray, new Comparator<Content>() {
+			    @Override
+			    public int compare(Content o1, Content o2) {
+				if (o1 != null && o2 != null) {
+				    return o1.getTitle().compareToIgnoreCase(o2.getTitle());
+				} else if (o1 != null)
+				    return 1;
+				else
+				    return -1;
+			    }
+			});
+			
 			String title = f.getTitle();
 			if (title.indexOf("'") != -1) {
 			    title = title.replace("'", "\\'");
@@ -165,6 +178,36 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 
 <bbNG:jsBlock>
 	<script language="JavaScript" type="text/javascript">
+    
+	    var $j = jQuery.noConflict();
+	    
+	    // Open the LAMS Seuence Monitor Window
+	    function syncMarks() {
+	    	$j("#sync-button-but").hide();
+	    	
+	    	//var monitorWin2 = window.open('../GradebookSync?lsId='  + sequenceId,'mWindow','width=1024,height=768,resizable');
+	       // monitorWin2.focus();
+	       // return;
+	    	
+	        $j.ajax({
+	        	async: false,
+	            url: '../GradebookSync',
+	            data: 'lsId='  + sequenceId,
+	            type: 'post',
+	            success: function (response) {
+	            	$j("#sync-button-but").show();
+	            	alert(response);
+	            },
+	            error: function (request, status, error) {
+	            	$j("#sync-button-but").show();
+	                //alert(request.responseText);
+	               // alert(request.status);
+	                alert(error);
+	            }
+	       	});
+	        
+	        return false;
+	    }
 		
         var sequenceId = null;
         var monitorWin = null;
@@ -202,34 +245,6 @@ public String getChild(Content f, ContentDbLoader cLoader) {
             
             return false;
         }
-        
-        // Open the LAMS Seuence Monitor Window
-        function syncMarks() {
-        	$("#sync-button-but").hide();
-        	
-        	//var monitorWin2 = window.open('../GradebookSync?lsId='  + sequenceId,'mWindow','width=1024,height=768,resizable');
-           // monitorWin2.focus();
-           // return;
-        	
-	        $.ajax({
-	        	async: false,
-	            url: '../GradebookSync',
-	            data: 'lsId='  + sequenceId,
-	            type: 'post',
-	            success: function (response) {
-	                $("#sync-button-but").show();
-	            	alert(response);
-	            },
-	            error: function (request, status, error) {
-	                $("#sync-button-but").show();
-	                //alert(request.responseText);
-	               // alert(request.status);
-	                alert(error);
-	            }
-	       	});
-            
-            return false;
-        }
 
 		var tree = new YAHOO.widget.TreeView("treeDiv", <%= strOut %>);
 		tree.getNodeByIndex(1).expand(true);
@@ -240,5 +255,6 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 
 	</script>
 </bbNG:jsBlock>
+
 </bbNG:learningSystemPage>
 </bbData:context>
