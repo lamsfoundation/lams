@@ -7,7 +7,7 @@ SET FOREIGN_KEY_CHECKS=0;
 ALTER TABLE tl_lafrum11_forum ADD COLUMN min_characters integer DEFAULT 0; 
 ALTER TABLE tl_lafrum11_forum ADD COLUMN limited_min_characters tinyint DEFAULT 0;
 
-UPDATE lams_tool SET tool_version='20140102' WHERE tool_signature='lafrum11';
+UPDATE lams_tool SET tool_version='20141216' WHERE tool_signature='lafrum11';
 
 ----------------------Put all sql statements above here-------------------------
 
