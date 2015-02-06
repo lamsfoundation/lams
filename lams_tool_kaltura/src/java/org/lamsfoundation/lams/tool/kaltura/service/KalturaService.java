@@ -204,15 +204,17 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	    Iterator iter = items.iterator();
 	    while (iter.hasNext()) {
 		KalturaItem item = (KalturaItem) iter.next();
-		if (item.isCreateByAuthor()) {
-		    kalturaUserDao.saveOrUpdate(item.getCreatedBy());
-		    kalturaItemDao.insert(item);
-		} else {
+		if (!item.isCreateByAuthor()) {
 		    iter.remove();
 		}
 	    }
 	}
+	
 	kalturaDao.saveOrUpdate(toContent);
+	for (KalturaItem item : (Set<KalturaItem>)items) {
+	    kalturaUserDao.saveOrUpdate(item.getCreatedBy());
+	    kalturaItemDao.insert(item);
+	}
     }
     
     @Override
