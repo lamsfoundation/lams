@@ -98,7 +98,6 @@ public class GradebookServlet extends HttpServlet {
 	try {
 	    // get Blackboard context
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
-	    Context ctx = ctxMgr.setContext(request);
 
 	    // get Parameter values
 	    String userName = request.getParameter(Constants.PARAM_USER_ID);
@@ -137,6 +136,7 @@ public class GradebookServlet extends HttpServlet {
 	    
 	    // exit method as it was created in version prior to 1.2.1 and thus don't have lineitem
 	    if (bbContentId == null) {
+		response.sendError(HttpServletResponse.SC_CONFLICT, "exit method as it was created in version prior to 1.2.1 and thus don't have lineitem");
 	    	return;
 	    }
 	    
@@ -148,6 +148,7 @@ public class GradebookServlet extends HttpServlet {
             Content bbContent = (Content)contentDbLoader.loadById( contentId );
             //check isGradecenter option is ON 
             if (!bbContent.getIsDescribed()) {//(isDescribed field is used for storing isGradecenter parameter)
+        	response.sendError(HttpServletResponse.SC_BAD_REQUEST, "exit method as Gradecenter option is OFF");
                 return;
             }
 
@@ -159,6 +160,8 @@ public class GradebookServlet extends HttpServlet {
 		throw new ServletException("User not found with userName:" + userName);
 	    }
 	    Id userId = user.getId();
+	    //do not remove the following line: it's required to instantiate the object
+	    logger.info(bbContent.getTitle());
 
 	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(userName) + "&courseId="
@@ -216,6 +219,8 @@ public class GradebookServlet extends HttpServlet {
 	    }
             
 	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, userId, lamsLessonIdParam);
+	    //do not remove the following line: it's required to instantiate the object
+	    logger.info("Record score for " +lineitem.getName() + " lesson. It now has "+ lineitem.getScores().size() + " scores.");
 
 	    // store new score
 	    CourseMembershipDbLoader memLoader = (CourseMembershipDbLoader) bbPm
