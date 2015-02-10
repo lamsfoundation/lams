@@ -361,7 +361,14 @@ public class LamsSecurityUtil {
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
 	String courseId = ctx.getCourse().getCourseId();
+	
 	String username = ctx.getUser().getUserName();
+	String firstName = ctx.getUser().getGivenName();
+	String lastName = ctx.getUser().getFamilyName();
+	String email = ctx.getUser().getEmailAddress();
+	String locale = ctx.getUser().getLocale();
+	String country = getCountry(locale);
+	String lang = getLanguage(locale);
 
 	if (serverId == null || serverAddr == null || serverKey == null) {
 	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
@@ -375,8 +382,9 @@ public class LamsSecurityUtil {
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?method=singleStudentProgress" + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "utf8") + "&lsId=" + new Long(lsId).toString() + "&progressUser="
-		    + URLEncoder.encode(username, "utf8");
+		    + URLEncoder.encode(courseId, "utf8") + "&country=" + country + "&lang=" + lang + "&firstName="
+		    + URLEncoder.encode(firstName, "UTF-8") + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
+		    + "&email=" + URLEncoder.encode(email, "UTF-8") + "&lsId=" + new Long(lsId).toString();
 
 	    logger.info("Retirieving learner progress: " + serviceURL);
 
