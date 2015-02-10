@@ -41,6 +41,7 @@ import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -48,6 +49,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
+import org.xml.sax.SAXException;
 
 import blackboard.persist.PersistenceException;
 import blackboard.platform.context.Context;
@@ -348,10 +350,14 @@ public class LamsSecurityUtil {
      *            the blackboard contect, contains session data
      * @param lsId
      *            the lesson id for which you wish to retrieve progress
-     *            
+     * 
      * @return the learning session id
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
      */
-    public static LearnerProgressDTO getLearnerProgress(Context ctx, long lsId) {
+    public static LearnerProgressDTO getLearnerProgress(Context ctx, long lsId) throws ParserConfigurationException,
+	    IOException, SAXException {
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
@@ -396,22 +402,20 @@ public class LamsSecurityUtil {
 	    return learnerProgressDto;
 
 	} catch (MalformedURLException e) {
-	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
+	    throw new RuntimeException("Unable to get LearnerProgress, bad URL: '" + serverAddr
 		    + "', please check lams.properties", e);
 	} catch (IllegalStateException e) {
 	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
 	} catch (RemoteException e) {
-	    throw new RuntimeException("Unable to start LAMS lesson, RMI Remote Exception", e);
+	    throw new RuntimeException("Unable to get LearnerProgress, RMI Remote Exception", e);
 	} catch (UnsupportedEncodingException e) {
-	    throw new RuntimeException("Unable to start LAMS lesson, Unsupported Encoding Exception", e);
+	    throw new RuntimeException("Unable to get LearnerProgress, Unsupported Encoding Exception", e);
 	} catch (ConnectException e) {
 	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
-	} catch (Exception e) {
-	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
 	}
 
     }
