@@ -124,7 +124,6 @@ public class LessonManagerServlet extends HttpServlet {
 	String lang = request.getParameter(CentralConstants.PARAM_LANG);
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	String filePath = request.getParameter(CentralConstants.PARAM_FILEPATH);
-	String progressUser = request.getParameter(CentralConstants.PARAM_PROGRESS_USER);
 	String outputsUser = request.getParameter("outputsUser");
 	String learnerIds = request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 	String monitorIds = request.getParameter(CentralConstants.PARAM_MONITOR_IDS);
@@ -197,9 +196,13 @@ public class LessonManagerServlet extends HttpServlet {
 		element = getAllStudentProgress(document, serverId, datetime, hashValue, username, lsId, courseId);
 
 	    } else if (method.equals(CentralConstants.METHOD_SINGLE_STUDENT_PROGRESS)) {
+		String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
+		String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
+		String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+		
 		lsId = new Long(lsIdStr);
-		element = getSingleStudentProgress(document, serverId, datetime, hashValue, username, lsId, courseId,
-			progressUser);
+		element = getSingleStudentProgress(document, serverId, datetime, hashValue, username, firstName,
+			lastName, lang, country, email, lsId, courseId);
 
 	    } else if (method.equals(CentralConstants.METHOD_IMPORT)) {
 
@@ -435,11 +438,11 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     public Element getSingleStudentProgress(Document document, String serverId, String datetime, String hashValue,
-	    String username, long lsId, String courseID, String progressUser) throws RemoteException {
+	    String username, String firstName, String lastName, String language, String country, String email,
+	    long lsId, String courseID) throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
 
 	    Element element = document.createElement(CentralConstants.ELEM_LESSON_PROGRESS);
@@ -448,10 +451,14 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (lesson != null) {
 		int activitiesTotal = lesson.getLearningDesign().getActivities().size();
 
-		ExtUserUseridMap progressUserMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(
-			serverMap, progressUser);
+		// create new user if required
+		final boolean usePrefix = true;
+		final boolean isUpdateUserDetails = false;
+		ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getImplicitExtUserUseridMap(
+			serverMap, username, firstName, lastName, language, country, email, usePrefix,
+			isUpdateUserDetails);
 
-		LearnerProgress learnProg = LessonManagerServlet.lessonService.getUserProgressForLesson(progressUserMap
+		LearnerProgress learnProg = LessonManagerServlet.lessonService.getUserProgressForLesson(userMap
 			.getUser().getUserId(), lsId);
 
 		Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
@@ -472,9 +479,9 @@ public class LessonManagerServlet extends HttpServlet {
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED, ""
 				+ attemptedActivities);
 			// learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + progressUserMap.getSid());
+			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + userMap.getSid());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, progressUser);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, username);
 			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
 		    }
 		} else {
@@ -484,9 +491,9 @@ public class LessonManagerServlet extends HttpServlet {
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED, "0");
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED, "0");
 			// learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + progressUserMap.getSid());
+			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + userMap.getSid());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, progressUser);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, username);
 			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
 		    }
 		}
