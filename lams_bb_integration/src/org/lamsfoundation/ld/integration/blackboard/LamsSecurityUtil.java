@@ -337,6 +337,9 @@ public class LamsSecurityUtil {
 	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
+	} catch (IOException e) {
+		    throw new RuntimeException("Unable to start LAMS lesson. " + e.getMessage()
+			    + " Please contact your system administrator.", e);
 	} catch (Exception e) {
 	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
 	}
@@ -352,12 +355,8 @@ public class LamsSecurityUtil {
      *            the lesson id for which you wish to retrieve progress
      * 
      * @return the learning session id
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
      */
-    public static LearnerProgressDTO getLearnerProgress(Context ctx, long lsId) throws ParserConfigurationException,
-	    IOException, SAXException {
+    public static LearnerProgressDTO getLearnerProgress(Context ctx, long lsId) {
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
@@ -416,6 +415,11 @@ public class LamsSecurityUtil {
 	    throw new RuntimeException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
+	} catch (IOException e) {
+	    throw new RuntimeException("Unable to get LearnerProgress. " + e.getMessage()
+		    + " Please contact your system administrator.", e);
+	} catch (Exception e) {
+	    throw new RuntimeException("Unable to get LearnerProgress. Please contact your system administrator.", e);
 	}
 
     }
@@ -431,13 +435,13 @@ public class LamsSecurityUtil {
 	URL url = new URL(serviceURL);
 	URLConnection conn = url.openConnection();
 	if (!(conn instanceof HttpURLConnection)) {
-	    throw new RuntimeException("Unable to open connection to: " + serviceURL);
+	    throw new IOException("Unable to open connection to: " + serviceURL);
 	}
 
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
 
 	if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-	    throw new RuntimeException("LAMS server responded with HTTP response code: " + httpConn.getResponseCode()
+	    throw new IOException("LAMS server responded with HTTP response code: " + httpConn.getResponseCode()
 		    + ", HTTP response message: " + httpConn.getResponseMessage());
 	}
 
