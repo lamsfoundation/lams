@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -62,6 +63,17 @@ public interface IScratchieService {
      * @param toolSessionId
      */
     ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
+    
+    List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);    
+    
+    /**
+     * Save or update burningQuestion into database.
+     * 
+     * @param sessionId
+     * @param itemUid
+     * @param question
+     */
+    void saveBurningQuestion(Long sessionId, Long itemUid, String question);
     
     ScratchieAnswer getScratchieAnswerByUid (Long answerUid);
 

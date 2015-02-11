@@ -59,20 +59,16 @@
 	       	});
 		}
 
-		function finish(){
+		function finish(method){
 			var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
 			var	finishConfirmed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;
 			
 			if (finishConfirmed) {
 				document.getElementById("finishButton").disabled = true;
-				document.location.href ='<c:url value="/learning/showResults.do?sessionMapID=${sessionMapID}"/>';
+				document.location.href ='<c:url value="/learning/' + method + '.do?sessionMapID=${sessionMapID}"/>';
 				
 				return false;
 			}
-		}
-		
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
 		var refreshIntervalId = null;

@@ -15,6 +15,13 @@
 </c:if>
 
 <p>
+	<html:checkbox property="scratchie.burningQuestionsEnabled" styleClass="noBorder" styleId="burningQuestionsEnabled"/>
+	<label for="burningQuestionsEnabled">
+		<fmt:message key="label.authoring.advanced.burning.questions" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="scratchie.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
 	<label for="reflectOn">
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />

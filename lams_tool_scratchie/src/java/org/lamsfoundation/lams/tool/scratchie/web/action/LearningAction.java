@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -59,6 +60,7 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
@@ -106,6 +108,12 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
+	}
+	if (param.equals("showBurningQuestions")) {
+	    return showBurningQuestions(mapping, form, request, response);
+	}
+	if (param.equals("saveBurningQuestions")) {
+	    return saveBurningQuestions(mapping, form, request, response);
 	}
 	if (param.equals("showResults")) {
 	    return showResults(mapping, form, request, response);
@@ -202,6 +210,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	sessionMap.put(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED, scratchie.isBurningQuestionsEnabled());
 	// reflection information
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, isReflectOnActivity);
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_INSTRUCTION, scratchie.getReflectInstructions());
@@ -250,6 +259,25 @@ public class LearningAction extends Action {
 	// for teacher in monitoring display the number of attempt.
 	if (mode.isTeacher()) {
 	    LearningAction.service.getScratchesOrder(items, toolSessionId);
+	}
+
+	// populate items with the existing burning questions for displaying purposes
+	if (scratchie.isBurningQuestionsEnabled()) {
+
+	    List<ScratchieBurningQuestion> burningQuestions = LearningAction.service
+		    .getBurningQuestionsBySession(toolSessionId);
+	    for (ScratchieItem item : items) {
+
+		// find corresponding burningQuestion
+		String question = "";
+		for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
+		    if (burningQuestion.getScratchieItem().getUid().equals(item.getUid())) {
+			question = burningQuestion.getQuestion();
+			break;
+		    }
+		}
+		item.setBurningQuestion(question);
+	    }
 	}
 
 	// calculate max score
@@ -436,6 +464,7 @@ public class LearningAction extends Action {
 		sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
+	boolean isBurningQuestionsEnabled = (Boolean) sessionMap.get(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED);
 
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
@@ -457,8 +486,13 @@ public class LearningAction extends Action {
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
 	double percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
 	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);
+	
+	// show burning questions page if it's enabled
+	if (isBurningQuestionsEnabled) {
+	    
+	}
 
-	// Create reflectList if reflection is enabled.
+	// display other groups' notebooks
 	if (isReflectOnActivity) {
 	    List<ReflectDTO> reflections = LearningAction.service.getReflectionList(toolSession.getScratchie()
 		    .getContentId());
@@ -521,6 +555,106 @@ public class LearningAction extends Action {
 	}
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
+    
+    /**
+     * Displays burning questions page.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ScratchieApplicationException
+     */
+    private ActionForward showBurningQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ScratchieApplicationException {
+	initializeScratchieService();
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
+
+	// in case of the leader we should let all other learners see Next Activity button
+	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
+	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
+	    tryExecute(new Callable<Object>() {
+		@Override
+		public Object call() throws ScratchieApplicationException {
+		    LearningAction.service.setScratchingFinished(toolSessionId);
+		    return null;
+		}
+	    });
+	}
+
+	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    /**
+     * Submit reflection form input database. Only leaders can submit reflections.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ScratchieApplicationException
+     */
+    private ActionForward saveBurningQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ScratchieApplicationException {
+	initializeScratchieService();
+
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
+	final Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	Collection<ScratchieItem> items = (Collection<ScratchieItem>) sessionMap.get(ScratchieConstants.ATTR_ITEM_LIST);	
+	
+	for (int i = 0; i < items.size(); i++) {
+	    final Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID + i);
+	    ScratchieItem item = null;
+	    for (ScratchieItem itemIter : items) {
+		if (itemIter.getUid().equals(itemUid)) {
+		    item = itemIter;
+		    break;
+		}
+	    }
+	    
+	    final String question = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX + i);
+	    //question = question.replaceAll("[\n\r\f]", "");
+	    
+	    //if burning question is not blank save it
+	    if (StringUtils.isNotBlank(question)) {
+		
+		//skip updating if the value wasn't changed
+		if (item.getBurningQuestion() != null && item.getBurningQuestion().equals(question)) {
+		    continue;
+		}
+		
+		// update new entry
+		tryExecute(new Callable<Object>() {
+		    @Override
+		    public Object call() throws ScratchieApplicationException {
+			LearningAction.service.saveBurningQuestion(sessionId, itemUid, question);
+			return null;
+		    }
+		});
+		
+		//update question in sessionMap
+		item.setBurningQuestion(question);
+	    }
+	    
+	}
+
+	boolean isNotebookSubmitted = sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ENTRY) != null;
+	if (scratchie.isReflectOnActivity() && !isNotebookSubmitted) {
+	    return newReflection(mapping, form, request, response);
+	} else {
+	    return showResults(mapping, form, request, response);
+	}
+
+    }
 
     /**
      * Display empty reflection form.
@@ -569,7 +703,7 @@ public class LearningAction extends Action {
 	    });
 	}
 
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	return mapping.findForward(ScratchieConstants.NOTEBOOK);
     }
 
     /**
