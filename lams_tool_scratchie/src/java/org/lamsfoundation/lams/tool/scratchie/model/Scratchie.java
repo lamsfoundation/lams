@@ -264,11 +264,11 @@ public class Scratchie implements Cloneable {
      * 
      * @return
      */
-    public Set getScratchieItems() {
+    public Set<ScratchieItem> getScratchieItems() {
 	return scratchieItems;
     }
 
-    public void setScratchieItems(Set scratchieItems) {
+    public void setScratchieItems(Set<ScratchieItem> scratchieItems) {
 	this.scratchieItems = scratchieItems;
     }
 

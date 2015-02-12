@@ -29,9 +29,6 @@ import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieBurningQuestionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 
 public class ScratchieBurningQuestionDAOHibernate extends BaseDAOHibernate implements ScratchieBurningQuestionDAO {
-
-    private static final String FIND_BY_SESSION_AND_ANSWER = "from " + ScratchieBurningQuestion.class.getName()
-	    + " as r where r.sessionId = ? and r.scratchieItem.uid=?";
     
     private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieBurningQuestion.class.getName()
 	    + " as r where r.sessionId=? and r.scratchieItem.uid = ?";
@@ -39,23 +36,12 @@ public class ScratchieBurningQuestionDAOHibernate extends BaseDAOHibernate imple
     private static final String FIND_BY_SESSION = "from " + ScratchieBurningQuestion.class.getName()
 	    + " as r where r.sessionId=? order by r.scratchieItem.orderId asc";
 
-    private static final String FIND_VIEW_COUNT_BY_SESSION = "select count(*) from "
-	    + ScratchieBurningQuestion.class.getName() + " as r where  r.sessionId=?";
-    
-    @Override
-    public ScratchieBurningQuestion getBurningQuestion(Long answerUid, Long sessionId) {
-	List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, answerUid });
-	if (list == null || list.size() == 0)
-	    return null;
-	return (ScratchieBurningQuestion) list.get(0);
-    }
+    private static final String FIND_BY_ITEM_UID = "from " + ScratchieBurningQuestion.class.getName()
+	    + " as r where r.scratchieItem.uid=? order by r.sessionId asc";
 
     @Override
-    public int getBurningQuestionCountTotal(Long sessionId) {
-	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_SESSION, new Object[] { sessionId});
-	if (list == null || list.size() == 0)
-	    return 0;
-	return ((Number) list.get(0)).intValue();
+    public List<ScratchieBurningQuestion> getBurningQuestionsByItemUid(Long itemUid) {
+	return getHibernateTemplate().find(FIND_BY_ITEM_UID, new Object[] { itemUid});
     }
     
     @Override

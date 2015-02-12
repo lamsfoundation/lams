@@ -32,7 +32,7 @@
 	//query for leader status (only in case there is notebook at the end of activity and leader hasn't answered it yet)
 	var checkLeaderIntervalId = null;
 	if (${!isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook && mode != "teacher"}) {
-		checkLeaderIntervalId = setInterval("checkLeaderSubmittedNotebook();",20000);// ask for leader status every 20 seconds
+		checkLeaderIntervalId = setInterval("checkLeaderSubmittedNotebook();",2000);// ask for leader status every 20 seconds
 	}
 	
 	//check Leader Submitted Notebook and if true show finishButton

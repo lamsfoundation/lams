@@ -14,6 +14,11 @@
 	    vertical-align:text-top;
 	    padding-top:2px;
 	}
+	.burning-question-dto {
+		padding-left: 30px; 
+		padding-bottom: 5px; 
+		width:96%;
+	}
 </style>
 
 <script type="text/javascript">
@@ -87,8 +92,37 @@
 			
 		</c:forEach>
 		
-		<!-- Display reflection entries -->
+		<!-- Display burningQuestionDtos -->
+		<c:forEach var="burningQuestionDto" items="${sessionMap.burningQuestionDtos}" varStatus="i">
+			jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid({
+				datatype: "local",
+				height: 'auto',
+				autowidth: true,
+				shrinkToFit: false,
+			   	colNames:['#',
+						"<fmt:message key='label.monitoring.summary.user.name' />",
+					    "<fmt:message key='label.burning.questions' />"
+				],
+			   	colModel:[
+			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
+			   		{name:'groupName', index:'groupName', width:200},
+			   		{name:'feedback', index:'feedback', width:570}
+			   	],
+			   	caption: "${burningQuestionDto.item.title}"
+			});
+		    <c:forEach var="entry" items="${burningQuestionDto.groupNameToBurningQuestion}" varStatus="i">
+		    	<c:set var="groupName" value="${entry.key}"/>
+		    	<c:set var="burningQuestion" value="${entry.value}"/>
+		    
+		    	jQuery("#burningQuestions${burningQuestionDto.item.uid}").addRowData(${i.index + 1}, {
+		   			id:"${i.index + 1}",
+		   	     	groupName:"${groupName}",
+			   	    feedback:"<lams:out value='${burningQuestion}' escapeHtml='true' />"
+		   	   	});
+	        </c:forEach>
+        </c:forEach>
 		
+		<!-- Display reflection entries -->
 		jQuery("#reflections").jqGrid({
 			datatype: "local",
 			height: 'auto',
@@ -200,15 +234,17 @@
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <h1><c:out value="${scratchie.title}" escapeXml="true"/></h1>
 
-<div class"instructions space-top space-bottom>
-<c:out value="${scratchie.instructions }" escapeXml="false" />
+<div class"instructions space-top space-bottom">
+	<c:out value="${scratchie.instructions }" escapeXml="false" />
 </div>
+
 <c:choose>
 	<c:when test="${empty summaryList}">
 		<div align="center">
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 		</div>	
 	</c:when>
+	
 	<c:otherwise>
 	
 		<div style="padding-left: 20px; margin-bottom: 10px; margin-top: 15px;">
@@ -264,11 +300,26 @@
 			</select>
 		</div>
 		
-		<!-- Display reflection entries -->
-		
-		<c:if test="${sessionMap.reflectOn}">
+		<!-- Display burningQuestionDtos -->
+		<c:if test="${scratchie.burningQuestionsEnabled}">
 		
 			<div class="section-header">
+				<H1>
+					<fmt:message key="label.burning.questions" />
+				</H1>
+			</div>
+			
+			<c:forEach var="burningQuestionDto" items="${sessionMap.burningQuestionDtos}" varStatus="i">
+				<div class="burning-question-dto">
+					<table id="burningQuestions${burningQuestionDto.item.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				</div>
+			</c:forEach>
+		</c:if>
+		
+		<!-- Display reflection entries -->
+		<c:if test="${sessionMap.reflectOn}">
+		
+			<div class="section-header" style="margin-top: 30px;">
 				<H1>
 					<fmt:message key="label.learners.feedback" />
 					
@@ -284,7 +335,6 @@
 			<div style="padding-left: 30px; width:96%;">
 				<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
 			</div>
-			
 		</c:if>
 		
 		<div class="bottom-buttons">

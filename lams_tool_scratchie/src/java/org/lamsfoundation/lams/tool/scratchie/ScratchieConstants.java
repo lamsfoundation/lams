@@ -146,6 +146,8 @@ public class ScratchieConstants {
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
     
     public static final String ATTR_REFLECTIONS = "reflections";
+    
+    public static final String ATTR_BURNING_QUESTIONS_DTOS = "burningQuestionDtos";
 
     public static final String ATTR_USER_UID = "userUid";
     

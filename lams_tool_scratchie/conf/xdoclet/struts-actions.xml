@@ -204,7 +204,10 @@
 		
 		<action path="/learning/saveBurningQuestions"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			parameter="saveBurningQuestions" >
+			name="reflectionForm"
+			validate="false" 
+			parameter="saveBurningQuestions" 
+			scope="request">
 			<forward name="notebook" path="/pages/learning/notebook.jsp" />
 			<forward name="success" path="/pages/learning/results.jsp" />
 		</action>

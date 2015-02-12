@@ -21,18 +21,31 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.tool.scratchie.dao;
+package org.lamsfoundation.lams.tool.scratchie.dto;
 
-import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 
-public interface ScratchieBurningQuestionDAO extends DAO {
-
-    List<ScratchieBurningQuestion> getBurningQuestionsByItemUid(Long itemUid);
+public class BurningQuestionDTO {
+    private ScratchieItem item;
     
-    ScratchieBurningQuestion getBurningQuestionBySessionAndItem(Long sessionId, Long itemUid);
+    private Map<String, String> groupNameToBurningQuestion;
     
-    List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
+    public ScratchieItem getItem() {
+	return item;
+    }
 
+    public void setItem(ScratchieItem item) {
+	this.item = item;
+    }
+
+    public Map<String, String> getGroupNameToBurningQuestion() {
+	return groupNameToBurningQuestion;
+    }
+
+    public void setGroupNameToBurningQuestion(Map<String, String> leaderNameToBurningQuestion) {
+	this.groupNameToBurningQuestion = leaderNameToBurningQuestion;
+    }
 }

@@ -195,7 +195,7 @@ public class LearningAction extends Action {
 	    notebookEntry = LearningAction.service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	}
-	String entryText = (notebookEntry == null) ? new String() : notebookEntry.getEntry();
+	String entryText = (notebookEntry == null) ? null : notebookEntry.getEntry();
 
 	// basic information
 	sessionMap.put(ScratchieConstants.ATTR_TITLE, scratchie.getTitle());
@@ -262,9 +262,10 @@ public class LearningAction extends Action {
 	}
 
 	// populate items with the existing burning questions for displaying purposes
+	List<ScratchieBurningQuestion> burningQuestions = null;
 	if (scratchie.isBurningQuestionsEnabled()) {
 
-	    List<ScratchieBurningQuestion> burningQuestions = LearningAction.service
+	    burningQuestions = LearningAction.service
 		    .getBurningQuestionsBySession(toolSessionId);
 	    for (ScratchieItem item : items) {
 
@@ -311,6 +312,11 @@ public class LearningAction extends Action {
 	    
 	//show learning.jsp page
 	} else {
+	    
+	    //make non leaders also wait for burning questions submit
+	    isWaitingForLeaderToSubmitNotebook |= scratchie.isBurningQuestionsEnabled()
+		    && (burningQuestions == null || burningQuestions.isEmpty());
+	    
 	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, (Boolean) isScratchingFinished);
 	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
 		    (Boolean) isWaitingForLeaderToSubmitNotebook);
@@ -335,7 +341,7 @@ public class LearningAction extends Action {
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
 
 	// set scratched flag for display purpose
-	Set<ScratchieItem> items = LearningAction.service.getItemsWithIndicatedScratches(toolSessionId);
+	Collection<ScratchieItem> items = LearningAction.service.getItemsWithIndicatedScratches(toolSessionId);
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 
 	// refresh leadership status
@@ -361,6 +367,7 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
 		sessionMapID);
 	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
+	boolean isBurningQuestionsEnabled = (Boolean) sessionMap.get(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
@@ -373,6 +380,14 @@ public class LearningAction extends Action {
 		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	}
 	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
+	
+	// make non leaders also wait for burning questions submit
+	List<ScratchieBurningQuestion> burningQuestions = null;
+	if (isBurningQuestionsEnabled) {
+	    burningQuestions = LearningAction.service.getBurningQuestionsBySession(toolSessionId);
+	}
+	isWaitingForLeaderToSubmitNotebook |= isBurningQuestionsEnabled
+		&& (burningQuestions == null || burningQuestions.isEmpty());
 
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK, isWaitingForLeaderToSubmitNotebook);
@@ -464,7 +479,6 @@ public class LearningAction extends Action {
 		sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
-	boolean isBurningQuestionsEnabled = (Boolean) sessionMap.get(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED);
 
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
@@ -486,11 +500,6 @@ public class LearningAction extends Action {
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
 	double percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
 	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);
-	
-	// show burning questions page if it's enabled
-	if (isBurningQuestionsEnabled) {
-	    
-	}
 
 	// display other groups' notebooks
 	if (isReflectOnActivity) {
@@ -515,6 +524,7 @@ public class LearningAction extends Action {
 
 	    request.setAttribute(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
+	
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
 
@@ -574,6 +584,10 @@ public class LearningAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
+	
+	// set scratched flag for display purpose
+	Collection<ScratchieItem> items = (Collection<ScratchieItem>) sessionMap.get(ScratchieConstants.ATTR_ITEM_LIST);
+	LearningAction.service.getItemsWithIndicatedScratches(toolSessionId, items);
 
 	// in case of the leader we should let all other learners see Next Activity button
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);

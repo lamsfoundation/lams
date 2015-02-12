@@ -16,6 +16,10 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	<style type="text/css">
+    	#scratches {border-spacing: 0;}
+    	#scratches tr td { padding: 12px 15px; }
+    	#scratches a, #scratches a:hover {border-bottom: none;}
+    	.scartchie-image {border: 0;}
     </style>
 
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
@@ -37,18 +41,42 @@
 		<h1>
 			<c:out value="${scratchie.title}" escapeXml="true"/>
 		</h1>
-		<h2><fmt:message key="label.burning.questions" />:</h2>
 		
 		<form id="burning-questions" name="burning-questions" method="post" action="<c:url value='/learning/saveBurningQuestions.do?sessionMapID=${sessionMapID}'/>" onsubmit="disableFinishButton();">
 		
-			<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
-				<input type="hidden" name="itemUid${status.index}" value="${item.uid}" />
+		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="j">
+			<h3><c:out value="${item.title}" escapeXml="true"/></h3>
+			<div><c:out value="${item.description}" escapeXml="false"/></div>
 			
-				<h3><c:out value="${item.title}" escapeXml="true"/></h3>
-				<textarea cols="60" rows="8" name="burningQuestion${status.index}" class="text-area" >${item.burningQuestion}</textarea>
-			</c:forEach>
+			<table id="scratches" class="alternative-color">
+				<c:forEach var="answer" items="${item.answers}" varStatus="status">
+					<tr>
+						<td style="width: 40px;">
+							<c:choose>
+								<c:when test="${answer.scratched && answer.correct}">
+									<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image">
+								</c:when>
+								<c:when test="${answer.scratched && !answer.correct}">
+									<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" class="scartchie-image">
+								</c:when>
+								<c:otherwise>
+									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image">
+								</c:otherwise>
+							</c:choose>
+						</td>
+								
+						<td style="vertical-align: middle;">
+							${answer.description} 
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
 			
-		</form>
+			<h4><fmt:message key="label.burning.question" /></h4>
+			<input type="hidden" name="itemUid${j.index}" value="${item.uid}" />
+			<textarea cols="55" rows="5" name="burningQuestion${j.index}" class="text-area" >${item.burningQuestion}</textarea>
+			<br>	<br><br>		
+		</c:forEach>
 		
 		<div class="space-bottom-top align-right">
 			<html:button property="finish-button" styleId="finish-button" onclick="submitForm()" styleClass="button">
