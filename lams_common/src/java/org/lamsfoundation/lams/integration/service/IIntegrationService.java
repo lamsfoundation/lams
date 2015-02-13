@@ -69,6 +69,17 @@ public interface IIntegrationService {
      */
     ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
 	    throws UserInfoFetchException, UserInfoValidationException;
+    
+    /**
+     * Returns ExtUserUseridMap from DB, and null if it doesn't exist
+     * 
+     * @param serverMap
+     * @param userId
+     * @return
+     */
+   // ExtUserUseridMap getExtUserUseridMapByUserId(ExtServerOrgMap serverMap, Integer userId);
+    
+    List<ExtUserUseridMap> getExtUserUseridMapByServerMap(ExtServerOrgMap serverMap);
 
     /**
      * Returns ExtUserUseridMap from DB, and null if it doesn't exist
@@ -83,6 +94,15 @@ public interface IIntegrationService {
     ExtServerOrgMap getExtServerOrgMap(Integer sid);
 
     ExtServerOrgMap getExtServerOrgMap(String serverId);
+    
+    /**
+     * Returns ExtCourseClassMap. If ExtCourseClassMap doesn't existent - returns null and does not create a new ExtCourseClassMap.
+     * 
+     * @param extServerOrgMapId
+     * @param extCourseId
+     * @return ExtCourseClassMap if it exists, null otherwise
+     */
+    ExtCourseClassMap getExtCourseClassMap(Integer extServerOrgMapId, String extCourseId);
 
     /**
      * @param serverMap

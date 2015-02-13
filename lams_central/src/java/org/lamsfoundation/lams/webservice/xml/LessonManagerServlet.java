@@ -30,6 +30,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -83,6 +85,8 @@ public class LessonManagerServlet extends HttpServlet {
     private static IExportToolContentService exportService = null;
 
     private static ILamsCoreToolService toolService = null;
+    
+    private static IGradebookService gradebookService = null;
 
     private static IUserManagementService userManagementService = null;
 
@@ -120,7 +124,6 @@ public class LessonManagerServlet extends HttpServlet {
 	String lang = request.getParameter(CentralConstants.PARAM_LANG);
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	String filePath = request.getParameter(CentralConstants.PARAM_FILEPATH);
-	String progressUser = request.getParameter(CentralConstants.PARAM_PROGRESS_USER);
 	String outputsUser = request.getParameter("outputsUser");
 	String learnerIds = request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 	String monitorIds = request.getParameter(CentralConstants.PARAM_MONITOR_IDS);
@@ -193,9 +196,13 @@ public class LessonManagerServlet extends HttpServlet {
 		element = getAllStudentProgress(document, serverId, datetime, hashValue, username, lsId, courseId);
 
 	    } else if (method.equals(CentralConstants.METHOD_SINGLE_STUDENT_PROGRESS)) {
+		String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
+		String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
+		String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+		
 		lsId = new Long(lsIdStr);
-		element = getSingleStudentProgress(document, serverId, datetime, hashValue, username, lsId, courseId,
-			progressUser);
+		element = getSingleStudentProgress(document, serverId, datetime, hashValue, username, firstName,
+			lastName, lang, country, email, lsId, courseId);
 
 	    } else if (method.equals(CentralConstants.METHOD_IMPORT)) {
 
@@ -212,6 +219,17 @@ public class LessonManagerServlet extends HttpServlet {
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsIdStr);
+		
+	    } else if (method.equals("gradebookMarksUser")) {
+		lsId = new Long(lsIdStr);
+		element = getGradebookMarks(document, serverId, datetime, hashValue, username, lsId, null, outputsUser);
+		
+	    } else if (method.equals("gradebookMarksLesson")) {
+		lsId = new Long(lsIdStr);
+		element = getGradebookMarks(document, serverId, datetime, hashValue, username, lsId, null, null);
+		
+	    } else if (method.equals("gradebookMarksCourse")) {
+		element = getGradebookMarks(document, serverId, datetime, hashValue, username, null, courseId, null);
 
 	    } else if (method.equals("toolOutputsAllUsers")) {
 		lsId = new Long(lsIdStr);
@@ -420,11 +438,11 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     public Element getSingleStudentProgress(Document document, String serverId, String datetime, String hashValue,
-	    String username, long lsId, String courseID, String progressUser) throws RemoteException {
+	    String username, String firstName, String lastName, String language, String country, String email,
+	    long lsId, String courseID) throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
 
 	    Element element = document.createElement(CentralConstants.ELEM_LESSON_PROGRESS);
@@ -433,10 +451,14 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (lesson != null) {
 		int activitiesTotal = lesson.getLearningDesign().getActivities().size();
 
-		ExtUserUseridMap progressUserMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(
-			serverMap, progressUser);
+		// create new user if required
+		final boolean usePrefix = true;
+		final boolean isUpdateUserDetails = false;
+		ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getImplicitExtUserUseridMap(
+			serverMap, username, firstName, lastName, language, country, email, usePrefix,
+			isUpdateUserDetails);
 
-		LearnerProgress learnProg = LessonManagerServlet.lessonService.getUserProgressForLesson(progressUserMap
+		LearnerProgress learnProg = LessonManagerServlet.lessonService.getUserProgressForLesson(userMap
 			.getUser().getUserId(), lsId);
 
 		Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
@@ -457,9 +479,9 @@ public class LessonManagerServlet extends HttpServlet {
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED, ""
 				+ attemptedActivities);
 			// learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + progressUserMap.getSid());
+			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + userMap.getSid());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, progressUser);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, username);
 			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
 		    }
 		} else {
@@ -469,9 +491,9 @@ public class LessonManagerServlet extends HttpServlet {
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED, "0");
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED, "0");
 			// learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + progressUserMap.getSid());
+			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + userMap.getSid());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, progressUser);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_USERNAME, username);
 			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
 		    }
 		}
@@ -613,6 +635,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 	LessonManagerServlet.toolService = (ILamsCoreToolService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("lamsCoreToolService");
+	
+	LessonManagerServlet.gradebookService = (IGradebookService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("gradebookService");
 
 	LessonManagerServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
@@ -791,6 +816,131 @@ public class LessonManagerServlet extends HttpServlet {
 	    }
 
 	}
+    }
+    
+    /**
+     * This method gets the tool outputs for a lesson or a specific user and returns them in XML format.
+     * 
+     * @param document
+     * @param serverId
+     * @param datetime
+     * @param hashValue
+     * @param username
+     * @param lessonId
+     * @param courseID
+     * @param outputsUser
+     *            if outputsUser is null return results for the whole lesson, otherwise - for the specified learner
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public Element getGradebookMarks(Document document, String serverId, String datetime, String hashValue,
+	    String username, Long lessonIdParam, String courseId, String outputsUser)
+	    throws Exception {
+
+	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	
+	List<Lesson> lessons = new LinkedList<Lesson>();
+	if (courseId != null) {
+	    
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap.getSid(),
+		    courseId);
+	    if (orgMap == null) {
+		LessonManagerServlet.log.debug("No course exists for: " + courseId
+			+ ". Cannot get tool outputs report.");
+		throw new Exception("Course with courseId: " + courseId + " could not be found");
+	    }  
+	    Integer organisationId = orgMap.getOrganisation().getOrganisationId();
+	    
+	    lessons.addAll(lessonService.getLessonsByGroup(organisationId));
+	    
+	} else {
+	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lessonIdParam);
+	    if (lesson == null) {
+		LessonManagerServlet.log.debug("No lesson exists for: " + lessonIdParam
+			+ ". Cannot get tool outputs report.");
+		throw new Exception("Lesson with lessonID: " + lessonIdParam + " could not be found for learner progresses");
+	    }
+	    lessons.add(lesson);
+	}
+	
+	// Create the root node of the xml document
+	Element gradebookMarksElement = document.createElement("GradebookMarks");
+
+	for (Lesson lesson : lessons) {
+	    Long lessonId = lesson.getLessonId();
+	    Element lessonElement = document.createElement(CentralConstants.ELEM_LESSON);
+	    lessonElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
+	    lessonElement.setAttribute("lessonName", lesson.getLessonName());
+
+	    // calculate lesson's MaxPossibleMark
+	    Set<ToolActivity> activities = getLessonActivities(lesson);
+	    Long lessonMaxPossibleMark = 0L;
+	    for (ToolActivity activity : activities) {
+		Long activityMaxPossibleMark = LessonManagerServlet.toolService.getActivityMaxPossibleMark(activity);
+		if (activityMaxPossibleMark != null) {
+		    lessonMaxPossibleMark += activityMaxPossibleMark;
+		}
+	    }
+	    lessonElement.setAttribute("lessonMaxPossibleMark", lessonMaxPossibleMark.toString());
+
+	    //get gradebook marks from DB
+	    List<GradebookUserLesson> gradebookUserLessons = new LinkedList<GradebookUserLesson>();
+	    // if outputsUser is null we build results for the whole lesson, otherwise - for the specified learner
+	    if (outputsUser != null) {
+
+		ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(
+			serverMap, outputsUser);
+		if (userMap == null) {
+		    throw new Exception("No user exists for: " + outputsUser + ". Cannot get tool outputs report.");
+		}
+		User user = userMap.getUser();
+		Integer userId = user.getUserId();
+		
+		GradebookUserLesson gradebookUserLesson = gradebookService.getGradebookUserLesson(lessonId, userId);
+		if (gradebookUserLesson == null) {
+		    gradebookUserLesson = new GradebookUserLesson(lesson, user);
+		}
+		gradebookUserLessons.add(gradebookUserLesson);
+
+	    } else {
+		gradebookUserLessons.addAll(gradebookService.getGradebookUserLesson(lessonId));
+		LessonManagerServlet.log.debug("Getting tool ouputs report for: " + lessonId
+			+ ". With learning design: " + lesson.getLearningDesign().getLearningDesignId());
+	    }
+	    
+	    List<ExtUserUseridMap> allUsers = integrationService.getExtUserUseridMapByServerMap(serverMap);
+
+	    for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
+		Integer userId = gradebookUserLesson.getLearner().getUserId();
+		
+		//find user
+		ExtUserUseridMap extUser = null;
+		for (ExtUserUseridMap extUserIter : allUsers) {
+		    if (extUserIter.getUser().getUserId().equals(userId)) {
+			extUser = extUserIter;
+			break;
+		    }
+		}
+		
+		if (extUser == null) {
+		    throw new Exception("User with userId: " + userId + " doesn't belong to extServer: "
+			    + serverMap.getSid());
+		}
+
+		Element learnerElement = document.createElement("Learner");
+		learnerElement.setAttribute("extUsername", extUser.getExtUsername());
+		String userTotalMark = gradebookUserLesson.getMark() == null ? "" : gradebookUserLesson.getMark().toString();
+		learnerElement.setAttribute("userTotalMark", userTotalMark);
+
+		lessonElement.appendChild(learnerElement);
+	    }
+	    
+	    gradebookMarksElement.appendChild(lessonElement);
+	}
+
+	return gradebookMarksElement;
     }
 
     /**
