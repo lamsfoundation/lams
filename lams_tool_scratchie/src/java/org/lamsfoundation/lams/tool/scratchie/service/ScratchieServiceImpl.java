@@ -64,16 +64,19 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
+import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieBurningQuestionDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieConfigItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieUserDAO;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -107,6 +110,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     private ScratchieSessionDAO scratchieSessionDao;
 
     private ScratchieAnswerVisitDAO scratchieAnswerVisitDao;
+    
+    private ScratchieBurningQuestionDAO scratchieBurningQuestionDao;
     
     private ScratchieConfigItemDAO scratchieConfigItemDao;
 
@@ -416,6 +421,30 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 
     }
+    
+    @Override
+    public List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId) {
+	return scratchieBurningQuestionDao.getBurningQuestionsBySession(sessionId);
+    }
+    
+    @Override
+    public void saveBurningQuestion(Long sessionId, Long itemUid, String question) {
+	
+	ScratchieBurningQuestion burningQuestion = scratchieBurningQuestionDao.getBurningQuestionBySessionAndItem(sessionId, itemUid);
+	
+	if (burningQuestion == null) {
+	    burningQuestion = new ScratchieBurningQuestion();
+	    ScratchieItem item = scratchieItemDao.getByUid(itemUid);
+	    burningQuestion.setScratchieItem(item);
+	    burningQuestion.setSessionId(sessionId);
+	    burningQuestion.setAccessDate(new Date());	    
+	}
+	burningQuestion.setQuestion(question);
+
+	scratchieBurningQuestionDao.saveObject(burningQuestion);
+    }
+    
+
 
     @Override
     public ScratchieAnswer getScratchieAnswerByUid(Long answerUid) {
@@ -531,12 +560,18 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId) {
-	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(toolSessionId);
+    public Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId) {
 
 	Scratchie scratchie = this.getScratchieBySessionId(toolSessionId);
 	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
+
+	return getItemsWithIndicatedScratches(toolSessionId, items);
+    }
+    
+    @Override
+    public Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, Collection<ScratchieItem> items) {
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(toolSessionId);
 
 	for (ScratchieItem item : items) {
 
@@ -560,6 +595,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    boolean isItemUnraveled = this.isItemUnraveled(item, userLogs);
 	    item.setUnraveled(isItemUnraveled);
 	}
+	
 	return items;
     }
 
@@ -721,6 +757,47 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 
 	return groupSummaryList;
+    }
+    
+    @Override
+    public List<BurningQuestionDTO> getBurningQuestionDtos(Scratchie scratchie) {
+	
+	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	items.addAll(scratchie.getScratchieItems());
+
+	// get all available leaders associated with this content as only leaders have reflections
+	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
+	
+	List<BurningQuestionDTO> burningQuestionDtos = new LinkedList<BurningQuestionDTO>();
+	for (ScratchieItem item : items) {
+	    BurningQuestionDTO burningQuestionDTO = new BurningQuestionDTO();
+	    burningQuestionDTO.setItem(item);
+	    
+	    List<ScratchieBurningQuestion> burningQuestions = scratchieBurningQuestionDao
+		    .getBurningQuestionsByItemUid(item.getUid());
+	    
+	    Map<String, String> groupNameToBurningQuestion = new LinkedHashMap<String, String>();
+	    for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
+		
+		//find corresponding session
+		ScratchieSession session = null;
+		for (ScratchieSession sessionIter : sessionList) {
+		    if (burningQuestion.getSessionId().equals(sessionIter.getSessionId())) {
+			session = sessionIter;
+			break;
+		    }
+		}
+		
+		String groupName = StringEscapeUtils.escapeJavaScript(session.getSessionName());
+		String burningQuestionText = StringEscapeUtils.escapeJavaScript(burningQuestion.getQuestion());
+		groupNameToBurningQuestion.put(groupName, burningQuestionText);
+	    }
+	    burningQuestionDTO.setGroupNameToBurningQuestion(groupNameToBurningQuestion);
+	    
+	    burningQuestionDtos.add(burningQuestionDTO);
+	}
+
+	return burningQuestionDtos;
     }
 
     @Override
@@ -1490,6 +1567,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     public void setScratchieAnswerVisitDao(ScratchieAnswerVisitDAO scratchieItemVisitDao) {
 	this.scratchieAnswerVisitDao = scratchieItemVisitDao;
+    }
+    
+    public void setScratchieBurningQuestionDao(ScratchieBurningQuestionDAO scratchieBurningQuestionDao) {
+	this.scratchieBurningQuestionDao = scratchieBurningQuestionDao;
     }
     
     public void setScratchieConfigItemDao(ScratchieConfigItemDAO scratchieConfigItemDao) {

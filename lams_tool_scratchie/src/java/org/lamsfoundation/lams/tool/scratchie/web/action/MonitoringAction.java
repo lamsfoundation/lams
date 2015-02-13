@@ -45,6 +45,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
@@ -130,6 +131,12 @@ public class MonitoringAction extends Action {
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, scratchie.isReflectOnActivity());
+	
+	// Create BurningQuestionsDtos if BurningQuestions is enabled.
+	if (scratchie.isBurningQuestionsEnabled()) {
+	    List<BurningQuestionDTO> burningQuestionDtos = service.getBurningQuestionDtos(scratchie);
+	    sessionMap.put(ScratchieConstants.ATTR_BURNING_QUESTIONS_DTOS, burningQuestionDtos);
+	}
 
 	// Create reflectList if reflection is enabled.
 	if (scratchie.isReflectOnActivity()) {

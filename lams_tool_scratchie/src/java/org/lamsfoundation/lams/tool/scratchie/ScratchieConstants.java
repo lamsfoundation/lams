@@ -36,6 +36,8 @@ public class ScratchieConstants {
 
     // for action forward name
     public static final String SUCCESS = "success";
+    
+    public static final String NOTEBOOK = "notebook";
 
     public static final String ERROR = "error";
 
@@ -66,6 +68,10 @@ public class ScratchieConstants {
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 
     public static final String ATTR_ITEM_LIST = "itemList";
+    
+    public static final String ATTR_BURNING_QUESTION_PREFIX = "burningQuestion";
+    
+    public static final String ATTR_BURNING_QUESTIONS = "burningQuestions";
     
     public static final String ATTR_ITEM_ORDER_ID_PREFIX = "itemOrderId";
     
@@ -130,14 +136,18 @@ public class ScratchieConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
-
+    
     public static final String ATTR_REFLECTION_ON = "reflectOn";
+
+    public static final String ATTR_IS_BURNING_QUESTIONS_ENABLED = "isBurningQuestionsEnabled";
 
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
     
     public static final String ATTR_REFLECTIONS = "reflections";
+    
+    public static final String ATTR_BURNING_QUESTIONS_DTOS = "burningQuestionDtos";
 
     public static final String ATTR_USER_UID = "userUid";
     

@@ -19,7 +19,24 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${sessionMap.scratchie.extraPoint == true}">
+				<c:when test="${sessionMap.scratchie.extraPoint}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.burning.questions" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.burningQuestionsEnabled}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -36,7 +53,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${sessionMap.scratchie.reflectOnActivity == true}">
+				<c:when test="${sessionMap.scratchie.reflectOnActivity}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -47,7 +64,7 @@
 	</tr>
 	
 	<c:choose>
-		<c:when test="${sessionMap.scratchie.reflectOnActivity == true}">
+		<c:when test="${sessionMap.scratchie.reflectOnActivity}">
 			<tr>
 				<td>
 					<fmt:message key="monitor.summary.td.notebookInstructions" />

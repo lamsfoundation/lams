@@ -32,7 +32,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 
 /**
- * 
  * Scratchie Form.
  * 
  * @struts.form name="scratchieForm"
@@ -72,6 +71,7 @@ public class ScratchieForm extends ActionForm {
 	    scratchie.setDefineLater(false);
 	    scratchie.setReflectOnActivity(false);
 	    scratchie.setExtraPoint(false);
+	    scratchie.setBurningQuestionsEnabled(false);
 	}
     }
 

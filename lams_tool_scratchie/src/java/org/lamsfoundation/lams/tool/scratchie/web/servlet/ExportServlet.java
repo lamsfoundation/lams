@@ -25,6 +25,7 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.servlet;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -134,7 +135,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	// set complete flag for display purpose
-	Set<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionID);
+	Collection<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionID);
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 
 	// Add flag to indicate whether to render user notebook entries

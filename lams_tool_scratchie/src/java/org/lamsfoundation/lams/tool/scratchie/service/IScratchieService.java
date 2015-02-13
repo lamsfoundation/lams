@@ -30,10 +30,12 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -62,6 +64,17 @@ public interface IScratchieService {
      * @param toolSessionId
      */
     ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
+    
+    List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);    
+    
+    /**
+     * Save or update burningQuestion into database.
+     * 
+     * @param sessionId
+     * @param itemUid
+     * @param question
+     */
+    void saveBurningQuestion(Long sessionId, Long itemUid, String question);
     
     ScratchieAnswer getScratchieAnswerByUid (Long answerUid);
 
@@ -158,13 +171,22 @@ public interface IScratchieService {
      * @param user
      */
     void getScratchesOrder(Collection<ScratchieItem> items, Long toolSessionId);
-
+    
     /**
      * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their scratched.
      * 
      * @param scratchieItemList
+     * @param item item parameter is optional. In case it's provided - these item collection is used instead of quering DB 
      */
-    Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
+    Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
+
+    /**
+     * The same as getItemsWithIndicatedScratches(Long toolSessionId), but items are provided as parameter and not queried from DB.
+     * 
+     * @param scratchieItemList
+     * @param item this item collection is used instead of quering DB 
+     */
+    Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, Collection<ScratchieItem> items);
 
     /**
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
@@ -200,6 +222,14 @@ public interface IScratchieService {
     List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders);
     
     List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
+    
+    /**
+     * Get BurningQuestionDtos used for summary tab
+     * 
+     * @param scratchie
+     * @return
+     */
+    List<BurningQuestionDTO> getBurningQuestionDtos(Scratchie scratchie);
     
     /**
      * Export excel spreadheet

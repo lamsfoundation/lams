@@ -83,6 +83,9 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
+		function editBurningQuestions(){
+			document.location.href='<c:url value="/learning/showBurningQuestions.do?sessionMapID=${sessionMapID}"/>';
+		}
     </script>
 </lams:head>
 
@@ -112,6 +115,38 @@
 				<fmt:param>${score}%</fmt:param>
 			</fmt:message>
 		</h3>
+		
+		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
+			<div class="small-space-top">
+				<h3><fmt:message key="label.burning.questions" />:</h3>
+				
+				<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
+					<table>
+						<tr>
+							<td width="30%">
+								<c:out value="${item.title}" escapeXml="true"/>
+							</td>						
+							<td>
+								<c:choose>
+									<c:when test="${empty item.burningQuestion}">
+										-
+									</c:when>
+									<c:otherwise>
+										<c:out value="${item.burningQuestion}" escapeXml="true"/>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+					</table>
+				</c:forEach>
+
+				<c:if test="${(mode != 'teacher') && isUserLeader}">
+					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="button">
+						<fmt:message key="label.edit" />
+					</html:button>
+				</c:if>
+			</div>
+		</c:if>
 
 		<c:if test="${sessionMap.reflectOn}">
 			<div class="small-space-top">
