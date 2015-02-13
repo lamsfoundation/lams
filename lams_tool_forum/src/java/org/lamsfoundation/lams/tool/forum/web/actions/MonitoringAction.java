@@ -264,16 +264,16 @@ public class MonitoringAction extends Action {
 	    sorting = ForumConstants.SORT_BY_USER_NAME_DESC;
 
 	} else if ((isSort2 != null) && isSort2.equals(0)) {
-	    sorting = ForumConstants.SORT_BY_LAST_POSTING_ASC;
-
-	} else if ((isSort2 != null) && isSort2.equals(1)) {
-	    sorting = ForumConstants.SORT_BY_LAST_POSTING_DESC;
-
-	} else if ((isSort3 != null) && isSort3.equals(0)) {
 	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC;
 
-	} else if ((isSort3 != null) && isSort3.equals(1)) {
+	} else if ((isSort2 != null) && isSort2.equals(1)) {
 	    sorting = ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC;
+
+	} else if ((isSort3 != null) && isSort3.equals(0)) {
+	    sorting = ForumConstants.SORT_BY_LAST_POSTING_ASC;
+
+	} else if ((isSort3 != null) && isSort3.equals(1)) {
+	    sorting = ForumConstants.SORT_BY_LAST_POSTING_DESC;
 	}
 
 	Set<SessionDTO> sessionDtos = (Set<SessionDTO>) sessionMap.get(ForumConstants.ATTR_SESSION_DTOS);
@@ -310,7 +310,7 @@ public class MonitoringAction extends Action {
 		MessageDTO lastMessage = messages.last();
 
 		// format lastEdited date
-		Date lastMessageDate = lastMessage.getMessage().getCreated();
+		Date lastMessageDate = lastMessage.getMessage().getUpdated();
 		lastMessageDate = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, lastMessageDate);
 		DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
 		responseRow.put("lastMessageDate", dateFormatter.format(lastMessageDate));
