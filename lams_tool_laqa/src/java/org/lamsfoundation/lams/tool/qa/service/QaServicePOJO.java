@@ -39,7 +39,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -894,24 +893,28 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	final String NEW_LINE_CHARACTER = "<br>";
 
 	HttpSession ss = SessionManager.getSession();
-	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userId = new Long(toolUser.getUserID().longValue());
+	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userId = new Long(userDto.getUserID().longValue());
 	QaQueUsr user = getUserByIdAndSession(userId, new Long(sessionId));
-
 	String fullName = user.getFullname();
 
-	String message = NEW_LINE_CHARACTER + NEW_LINE_CHARACTER
-		+ messageService.getMessage("label.user.has.answered.questions", new Object[] { fullName });
-
+	//add question-answer pairs to email message
 	List<QaUsrResp> responses = qaUsrRespDAO.getResponsesByUserUid(user.getUid());
+	Date attemptTime = new Date();
+	String message = new String();
 	for (QaUsrResp response : responses) {
 	    String question = response.getQaQuestion().getQuestion();
 	    String answer = response.getAnswer();
 
-	    message += NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + question + answer;
+	    message += NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + question + " " + answer;
+	    attemptTime = response.getAttemptTime();
 	}
-
-	message += NEW_LINE_CHARACTER + NEW_LINE_CHARACTER;
+	
+	message = NEW_LINE_CHARACTER
+		+ NEW_LINE_CHARACTER
+		+ messageService
+			.getMessage("label.user.has.answered.questions", new Object[] { fullName, attemptTime })
+		+ message + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER;
 
 	eventNotificationService.notifyLessonMonitors(sessionId, message, true);
     }
