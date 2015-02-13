@@ -31,5 +31,6 @@
 			<attribute name="javadoc_location" value="http://www.jboss.org/file-access/default/members/jbossweb/freezone/docs/latest/api/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
