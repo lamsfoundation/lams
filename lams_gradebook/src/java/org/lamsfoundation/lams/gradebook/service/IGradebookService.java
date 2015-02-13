@@ -157,6 +157,14 @@ public interface IGradebookService {
     GradebookUserLesson getGradebookUserLesson(Long lessonID, Integer userID);
     
     /**
+     * Gets a gradebook lesson mark/feedback for all users in a given lesson
+     * 
+     * @param lessonID
+     * @return
+     */
+    List<GradebookUserLesson> getGradebookUserLesson(Long lessonID);
+    
+    /**
      * Gets a gradebook activity mark/feedback for a given activity and user
      * 
      * @param activityID

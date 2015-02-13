@@ -61,8 +61,6 @@ public class CentralConstants {
     
     public static final String PARAM_SVG_FORMAT = "svgFormat";
 
-    public static final String PARAM_PROGRESS_USER = "progressUser";
-
     public static final String PARAM_MODE = "mode";
 
     public static final String PARAM_FILEPATH = "filePath";
