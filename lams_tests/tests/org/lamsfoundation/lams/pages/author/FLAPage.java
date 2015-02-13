@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.author.util.AuthorConstants;
 import org.lamsfoundation.lams.pages.AbstractPage;
+import org.lamsfoundation.lams.pages.tool.forum.AuthorPage;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
@@ -1023,6 +1024,58 @@ public class FLAPage extends AbstractPage {
 		}
 		return txt;
 	}
+	
+	
+	/*	Open specific tool authoring windows*/
+	
+	
+	/**
+	 * Opens Forum Authoring
+	 * 
+	 * @param activityName	the name of the activity to open
+	 * @return				abstractPage factory so it can be manipulated.
+	 * 
+	 */
+	public AuthorPage openForumAuthoring(String activityName) {
+
+		WebElement act = getActivityElement(activityName);
+
+		Actions openAct = new Actions(driver);
+		openAct.doubleClick(act).build().perform();;
+
+		String popUpWindow = getPopUpWindowId(driver);
+
+		driver.switchTo().window(popUpWindow);
+
+		return PageFactory.initElements(driver, AuthorPage.class);
+
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Returns the correct popup id
