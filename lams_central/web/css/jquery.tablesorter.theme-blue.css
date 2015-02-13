@@ -71,6 +71,7 @@
 }
 .tablesorter-blue thead .sorter-false {
 	background-image: none;
+	cursor: default;
 	padding: 4px;
 }
 
@@ -118,10 +119,10 @@
 }
 
 /* Zebra Widget - row alternating colors */
-.tablesorter-blue tbody tr.odd td {
+.tablesorter-blue tbody tr.odd > td {
 	background-color: #ebf2fa;
 }
-.tablesorter-blue tbody tr.even td {
+.tablesorter-blue tbody tr.even > td {
 	background-color: #fff;
 }
 
@@ -146,6 +147,11 @@
 }
 .tablesorter-blue tr.even td.tertiary {
 	background-color: #ebf0fa;
+}
+
+/* caption */
+caption {
+	background: #fff;
 }
 
 /* filter widget */
@@ -175,7 +181,7 @@
 	line-height: 0;
 	cursor: pointer;
 }
-.tablesorter-blue .tablesorter-filter-row.hideme .tablesorter-filter {
+.tablesorter-blue .tablesorter-filter-row.hideme * {
 	height: 1px;
 	min-height: 0;
 	border: 0;
@@ -186,9 +192,10 @@
 	filter: alpha(opacity=0);
 }
 /* filters */
-.tablesorter-blue .tablesorter-filter {
+.tablesorter-blue input.tablesorter-filter,
+.tablesorter-blue select.tablesorter-filter {
 	width: 98%;
-	height: inherit;
+	height: auto;
 	margin: 0;
 	padding: 4px;
 	background-color: #fff;
@@ -201,4 +208,15 @@
 	-moz-transition: height 0.1s ease;
 	-o-transition: height 0.1s ease;
 	transition: height 0.1s ease;
+}
+/* rows hidden by filtering (needed for child rows) */
+.tablesorter .filtered {
+	display: none;
+}
+
+/* ajax error row */
+.tablesorter .tablesorter-errorRow td {
+	text-align: center;
+	cursor: pointer;
+	background-color: #e6bf99;
 }
