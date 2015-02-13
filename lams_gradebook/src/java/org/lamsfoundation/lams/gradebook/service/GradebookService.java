@@ -401,6 +401,7 @@ public class GradebookService implements IGradebookService {
 		    .toString();
 
 	    gradebookUserActivity.setMark(mark);
+	    gradebookUserActivity.setUpdateDate(new Date());
 	    gradebookUserActivity.setMarkedInGradebook(markedInGradebook);
 	    gradebookDAO.insertOrUpdate(gradebookUserActivity);
 
@@ -451,6 +452,7 @@ public class GradebookService implements IGradebookService {
 	}
 
 	gradebookUserActivity.setFeedback(feedback);
+	gradebookUserActivity.setUpdateDate(new Date());
 	gradebookDAO.insertOrUpdate(gradebookUserActivity);
     }
     
