@@ -20,7 +20,7 @@
  * ****************************************************************
  */ 
 
-package org.lamsfoundation.org.lams.tool.forum;
+package org.lamsfoundation.lams.tool.forum;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
