@@ -66,12 +66,13 @@
 			</div>
 
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="getElementById('topicFormId').submit();"
-					class="button-add-item"> <fmt:message key="button.add" /> </a>
-					
 				<a href="#" onclick="javascript:window.parent.hideMessage()"
 					class="button space-left"> <fmt:message key="button.cancel" />
 				</a>
+				&nbsp;
+				<a href="#" onclick="getElementById('topicFormId').submit();"
+					class="button-add-item"> <fmt:message key="button.add" /> </a>
+					
 			</lams:ImgButtonWrapper>
 		</html:form>
 	</body>

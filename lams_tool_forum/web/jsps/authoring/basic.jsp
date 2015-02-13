@@ -141,7 +141,7 @@
 
 <p class="small-space-bottom">
 	<a
-		href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');"
+		href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" id="addTopic" 
 		class="button-add-item"> <fmt:message
 			key="label.authoring.create.new.topic" /> 
 	</a>
