@@ -115,6 +115,7 @@ public class GradebookService implements IGradebookService {
     private MessageService messageService;
     private IAuditService auditService;
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Lesson lesson, User learner) {
 
@@ -138,7 +139,7 @@ public class GradebookService implements IGradebookService {
 	    GBActivityGridRowDTO activityDTO = new GBActivityGridRowDTO(activity, groupName, groupId);
 
 	    // Set the possible marks if applicable
-	    activityDTO.setMarksAvailable(this.getTotalMarksAvailable(activity));
+	    activityDTO.setMarksAvailable(toolService.getActivityMaxPossibleMark(activity));
 
 	    GradebookUserActivity gradebookActivity = gradebookDAO.getGradebookUserDataForActivity(
 		    activity.getActivityId(), learner.getUserId());
@@ -178,6 +179,7 @@ public class GradebookService implements IGradebookService {
 	return gradebookActivityDTOs;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Lesson lesson) {
 
@@ -210,6 +212,7 @@ public class GradebookService implements IGradebookService {
 	return gradebookActivityDTOs;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId) {
 
@@ -230,12 +233,12 @@ public class GradebookService implements IGradebookService {
 	if (learners != null) {
 	    Map<Integer, LearnerProgress> userToLearnerProgressMap = getUserToLearnerProgressMap(lesson);
 	    Map<Integer, GradebookUserActivity> userToGradebookUserLessonMap = getUserToGradebookUserActivityMap(activity);
-	    Long totalMarksAvailable = getTotalMarksAvailable(activity);
+	    Long maxPossibleMark = toolService.getActivityMaxPossibleMark(activity);
 
 	    for (User learner : learners) {
 		GBUserGridRowDTO gUserDTO = new GBUserGridRowDTO(learner);
 
-		gUserDTO.setMarksAvailable(totalMarksAvailable);
+		gUserDTO.setMarksAvailable(maxPossibleMark);
 
 		// Set the progress
 		LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
@@ -272,6 +275,7 @@ public class GradebookService implements IGradebookService {
 	return gradebookUserDTOs;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public ArrayList<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson) {
 
@@ -320,6 +324,7 @@ public class GradebookService implements IGradebookService {
 	return gradebookUserDTOs;
     }
 
+    @Override
     public ArrayList<GBUserGridRowDTO> getGBUserRowsForOrganisation(Organisation organisation) {
 
 	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
@@ -341,14 +346,22 @@ public class GradebookService implements IGradebookService {
 
     }
 
+    @Override
     public GradebookUserLesson getGradebookUserLesson(Long lessonID, Integer userID) {
 	return gradebookDAO.getGradebookUserDataForLesson(lessonID, userID);
     }
+    
+    @Override
+    public List<GradebookUserLesson> getGradebookUserLesson(Long lessonID) {
+	return gradebookDAO.getGradebookUserDataForLesson(lessonID);
+    }
 
+    @Override
     public GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID) {
 	return gradebookDAO.getGradebookUserDataForActivity(activityID, userID);
     }
 
+    @Override
     public Double getAverageMarkForActivity(Long activityID, Long groupID) {
 	// return AverageMarkForActivity if groupId is null and AverageMarkForGroupedActivity if groupId is specified
 	Double averageMark;
@@ -360,10 +373,12 @@ public class GradebookService implements IGradebookService {
 	return averageMark;
     }
 
+    @Override
     public Double getAverageMarkForLesson(Long lessonID) {
 	return gradebookDAO.getAverageMarkForLesson(lessonID);
     }
 
+    @Override
     public void updateUserLessonGradebookMark(Lesson lesson, User learner, Double mark) {
 	if (lesson != null && learner != null) {
 	    GradebookUserLesson gradebookUserLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
@@ -386,6 +401,7 @@ public class GradebookService implements IGradebookService {
 	}
     }
 
+    @Override
     public void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook, boolean isAuditLogRequired) {
 	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
@@ -429,6 +445,7 @@ public class GradebookService implements IGradebookService {
 	}
     }
 
+    @Override
     public void updateUserLessonGradebookFeedback(Lesson lesson, User learner, String feedback) {
 
 	GradebookUserLesson gradebookUserLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
@@ -442,6 +459,7 @@ public class GradebookService implements IGradebookService {
 	gradebookDAO.insertOrUpdate(gradebookUserLesson);
     }
 
+    @Override
     public void updateUserActivityGradebookFeedback(Activity activity, User learner, String feedback) {
 
 	GradebookUserActivity gradebookUserActivity = gradebookDAO.getGradebookUserDataForActivity(
@@ -472,6 +490,7 @@ public class GradebookService implements IGradebookService {
 	auditService.log(monitor, GradebookConstants.MODULE_NAME, message);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view) {
 	List<GBLessonGridRowDTO> lessonRows = new ArrayList<GBLessonGridRowDTO>();
@@ -627,6 +646,7 @@ public class GradebookService implements IGradebookService {
 	return activityToUserDTOMap;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson) {
 
@@ -817,6 +837,7 @@ public class GradebookService implements IGradebookService {
 	return dataToExport;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId) {
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
@@ -1085,6 +1106,7 @@ public class GradebookService implements IGradebookService {
 	return dataToExport;
     }
 
+    @Override
     public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook) {
 	ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
@@ -1102,6 +1124,7 @@ public class GradebookService implements IGradebookService {
 	}
     }
 
+    @Override
     public Activity getActivityById(Long activityID) {
 	return activityDAO.getActivityByActivityId(activityID);
     }
@@ -1264,7 +1287,7 @@ public class GradebookService implements IGradebookService {
 	}
 
 	// Set the possible marks if applicable
-	activityDTO.setMarksAvailable(this.getTotalMarksAvailable(activity));
+	activityDTO.setMarksAvailable(toolService.getActivityMaxPossibleMark(activity));
 
 	String monitorUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + activity.getTool().getMonitorUrl() + "?"
 		+ AttributeNames.PARAM_CONTENT_FOLDER_ID + "=" + lesson.getLearningDesign().getContentFolderID() + "&"
@@ -1427,48 +1450,6 @@ public class GradebookService implements IGradebookService {
     }
 
     /**
-     * Gets the
-     * 
-     * @param activity
-     * @return
-     */
-    private Long getTotalMarksAvailable(ToolActivity activity) {
-	SortedMap<String, ToolOutputDefinition> map = toolService.getOutputDefinitionsFromTool(
-		activity.getToolContentId(), ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
-
-	Set<ActivityEvaluation> actEvals = activity.getActivityEvaluations();
-
-	if (map != null) {
-	    for (String key : map.keySet()) {
-		ToolOutputDefinition definition = map.get(key);
-		if (actEvals != null && actEvals.size() > 0) {
-
-		    // get first evaluation
-		    ActivityEvaluation actEval = actEvals.iterator().next();
-
-		    if (actEval.getToolOutputDefinition().equals(key)) {
-
-			Object upperLimit = definition.getEndValue();
-			if (upperLimit != null && upperLimit instanceof Long) {
-			    return (Long) upperLimit;
-			}
-			break;
-		    }
-		} else {
-		    if (definition.isDefaultGradebookMark() != null && definition.isDefaultGradebookMark()) {
-			Object upperLimit = definition.getEndValue();
-			if (upperLimit != null && upperLimit instanceof Long) {
-			    return (Long) upperLimit;
-			}
-			break;
-		    }
-		}
-	    }
-	}
-	return null;
-    }
-
-    /**
      * Returns map containing (userId -> LearnerProgressMap) pairs. It serves merely for optimizing amount of db
      * queries.
      */
@@ -1520,7 +1501,7 @@ public class GradebookService implements IGradebookService {
 
 	Map<Long, Long> map = new HashMap<Long, Long>();
 	for (ToolActivity activity : activities) {
-	    map.put(activity.getActivityId(), getTotalMarksAvailable(activity));
+	    map.put(activity.getActivityId(), toolService.getActivityMaxPossibleMark(activity));
 	}
 
 	return map;
@@ -1593,11 +1574,12 @@ public class GradebookService implements IGradebookService {
 	return new HashMap<Long, GradebookUserLesson>();
     }
 
+    @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
 
-    public String getMessage(String key, Object[] args) {
+    private String getMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
 
