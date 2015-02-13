@@ -9,7 +9,7 @@
 		</tr>
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		<c:forEach items="${sessionMap.topicList}" var="topic" varStatus="status">
-			<tr>
+			<tr id="row${status.index}">
 				<td>
 					<c:set var="viewtopic">
 						<html:rewrite page="/authoring/viewTopic.do?sessionMapID=${sessionMapID}&topicIndex=${status.index}&create=${topic.message.updated.time}" />
@@ -49,13 +49,13 @@
 				
 				<td width="20px">
 					<img src="${tool}images/edit.gif"
-						title="<fmt:message key="label.edit" />"
+						title="<fmt:message key="label.edit" />" id="edit${status.index}" 
 						onclick="editTopic(${status.index},'${sessionMapID}')" />
                 </td>
                 
 				<td width="20px">
 					<img src="${tool}images/delete.gif"
-						title="<fmt:message key="label.delete" />"
+						title="<fmt:message key="label.delete" />" id="delete${status.index}" 
 						onclick="deleteTopic(${status.index},'${sessionMapID}')" />
 				</td>				
 			</tr>
