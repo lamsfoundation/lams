@@ -24,13 +24,14 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -70,6 +71,7 @@ import org.lamsfoundation.lams.tool.qa.util.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -993,6 +995,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	initializeQAService();
 	
+	// teacher timezone
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	TimeZone userTimeZone = userDto.getTimeZone();
+	
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long qaSessionId = WebUtil.readLongParam(request, "qaSessionId");
 	
@@ -1035,7 +1042,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response.getAnswer()));
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
-	    responseRow.put("attemptTime", response.getAttemptTime());
+	    
+	    // format attemptTime
+	    Date attemptTime = response.getAttemptTime();
+	    attemptTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone, attemptTime);
+	    DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
+	    responseRow.put("attemptTime", dateFormatter.format(attemptTime));
 	    
 	    AverageRatingDTO averageRatingDto = qaService.getAverageRatingDTOByResponse(response.getResponseId());
 	    String averageRating =  (averageRatingDto == null) ? "0" : averageRatingDto.getRating();
