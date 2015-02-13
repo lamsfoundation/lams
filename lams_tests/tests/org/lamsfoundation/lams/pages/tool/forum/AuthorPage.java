@@ -66,6 +66,9 @@ public class AuthorPage extends AbstractPage {
 	@FindBy(className="editForm")
 	private WebElement reEdit;
 	
+	@FindBy(className="warning")
+	private WebElement warning;
+	
 	public AuthorPage(WebDriver driver) {
 		super(driver);
 		// TODO Auto-generated constructor stub
@@ -149,6 +152,12 @@ public class AuthorPage extends AbstractPage {
         }
 
         return authorToolWindow;
-}
+    }
 
+    public String getWarningMsg(){
+    	
+    	return warning.getText();
+    }
+    
+    
 }

@@ -45,25 +45,11 @@ import org.testng.annotations.AfterClass;
 
 /**
  * 
- * Add lesson tests
+ * Authoring Forum tests
  * 
  * @author Ernie Ghiglione (ernieg@lamsfoundation.org)
  *
- *
- * Tests to add:
- *  - Check default settings
- *  - Change title, instructions
- *  - Check title, instructions after save 
- *  - Add new threads
- *  - Change d
- *
- *
- *
- *
- *
- *
  */
-
 
 public class AuthorTests {
 	
@@ -113,7 +99,7 @@ public class AuthorTests {
 	@Test(dependsOnMethods={"openFLA"})
 	public void dragForumToCanvas() {
 		
-		String forumTitle  = ForumConstants.FORUM_TITLE + "Basic " + RANDOM_INT;
+		String forumTitle  = "Basic " + RANDOM_INT;
 		
 		// Drop activities in canvas
 		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE, 100, 100)
@@ -136,7 +122,7 @@ public class AuthorTests {
 	public void openForumAuthoring() {
 		
 		// open forum author
-		AuthorPage forumAuthorPage = fla.openForumAuthoring(ForumConstants.FORUM_TITLE);
+		AuthorPage forumAuthorPage = fla.openForumAuthoring("Basic " + RANDOM_INT);
 
 		String forumWindowTitle = forumAuthorPage.getWindowTitle();
 		
@@ -148,7 +134,7 @@ public class AuthorTests {
 	/**
 	 * Check forum default values basic tab
 	 */
-	@Test(dependsOnMethods={"openForumAuthoring"})
+	@Test(description="Check default values basic tab", dependsOnMethods={"openForumAuthoring"})
 	public void checkBasicTabDefaultValues() {
 		
 		BasicTab basicTab = forumAuthorPage.openBasicTab();
@@ -167,7 +153,8 @@ public class AuthorTests {
 	/**
 	 * Check forum default values advanced tab
 	 */
-	@Test(dependsOnMethods={"checkBasicTabDefaultValues"})
+	@Test(description="Check default values for advanced tab",
+			dependsOnMethods={"checkBasicTabDefaultValues"})
 	public void checkAdvancedTabDefaultValues() {
 		
 		AdvancedTab advancedTab = forumAuthorPage.openAdvancedTab();
@@ -184,7 +171,7 @@ public class AuthorTests {
 		Boolean isNotifyTeachersOnForumPosting = advancedTab.isNotifyTeachersOnForumPosting();
 		Boolean isNotifyLearnersOnMarkRelease = advancedTab.isNotifyLearnersOnMarkRelease();
 		Boolean isReflectOnActivity = advancedTab.isReflectOnActivity();
-		Boolean isAllowNewTopic = advancedTab.isAllowNewTopic();
+		Boolean isLimitedReplies = advancedTab.isLimitReplies();
 		
 		Assert.assertFalse(isLockWhenFinished, "Locked when finish should be false by default");
 		Assert.assertTrue(isAllowEdit, "Allow learners to change their posting should be true by default");
@@ -197,15 +184,41 @@ public class AuthorTests {
 		Assert.assertFalse(isNotifyTeachersOnForumPosting, "Option to notify teacher should be false by default");
 		Assert.assertFalse(isNotifyLearnersOnMarkRelease, "Notify learners on mark release should be false by default");
 		Assert.assertFalse(isReflectOnActivity, "Reflection should false by default");
-		Assert.assertTrue(isAllowNewTopic, "Allow new topics should be true by default");
+		Assert.assertFalse(isLimitedReplies, "Limited replies should be false by default");
 		
 	}
-	
+
+	/**
+	 * Add message
+	 */
+	@Test(description="Check forum author validation when no topic is listed and no new threads are allowed",
+			dependsOnMethods={"checkAdvancedTabDefaultValues"})
+	public void checkValidationErrors() {
+		
+		// Check validation when
+		forumAuthorPage.openBasicTab().deleteMesage(0);
+		forumAuthorPage.openAdvancedTab().setLimitReplies("1", "5");
+		forumAuthorPage.save();
+		
+		// Assert error message
+		
+		String warningMsg = forumAuthorPage.getWarningMsg();
+		
+		System.out.println("Warning: " + warningMsg);
+		Assert.assertTrue(warningMsg.contains(ForumConstants.FORUM_WARNING_REPLY_LIMITS_TXT));
+		
+		// Cancel the changes so we don't need to rebuild the original content
+		forumAuthorPage.cancel(flaHandler);
+		
+		// As cancel closes the pop-up, reopen the same activity again and set
+		// it ready for the next test
+		fla.openForumAuthoring("Basic " + RANDOM_INT);
+	}
 	
 	/**
-	 * Add topic
+	 * Add message
 	 */
-	@Test(dependsOnMethods={"checkAdvancedTabDefaultValues"})
+	@Test(description="Add message/topic", dependsOnMethods={"checkValidationErrors"})
 	public void addTopic() {
 		
 		String msgTitle = "Topic# " + RANDOM_INT;
@@ -230,9 +243,9 @@ public class AuthorTests {
 	}
 	
 	/**
-	 * Delete topic
+	 * Delete message
 	 */
-	@Test(dependsOnMethods={"addTopic"})
+	@Test(description="Delete message/topic", dependsOnMethods={"addTopic"})
 	public void deleteTopic() {
 		
 		// Delete the first default message
@@ -256,7 +269,7 @@ public class AuthorTests {
 	/**
 	 * Add forum with Locked when finished
 	 */
-	@Test(dependsOnMethods={"deleteTopic"})
+	@Test(description="Add forum with Locked when finished", dependsOnMethods={"deleteTopic"})
 	public void addForumLockedWhenFinished() {
 
 		String forumTitle = "Locked " + RANDOM_INT;
@@ -295,7 +308,7 @@ public class AuthorTests {
 	/**
 	 * Add forum with no re-edits allowed
 	 */
-	@Test(dependsOnMethods={"addForumLockedWhenFinished"})
+	@Test(description="Add forum with no re-edits allowed", dependsOnMethods={"addForumLockedWhenFinished"})
 	public void addForumEditNotAllowed() {
 
 		String forumTitle = "NoEdit " + RANDOM_INT;
@@ -333,7 +346,7 @@ public class AuthorTests {
 	/**
 	 * Add forum with ratings
 	 */
-	@Test(dependsOnMethods={"addForumEditNotAllowed"})
+	@Test(description="Add forum with ratings", dependsOnMethods={"addForumEditNotAllowed"})
 	public void addForumRatings() {
 
 		String forumTitle = "Ratings " + RANDOM_INT;
@@ -379,7 +392,7 @@ public class AuthorTests {
 	/**
 	 * Add forum with allow uploads on
 	 */
-	@Test(dependsOnMethods={"addForumRatings"})
+	@Test(description="Add forum with allow uploads on", dependsOnMethods={"addForumRatings"})
 	public void addForumUploads() {
 
 		String forumTitle = "Upload " + RANDOM_INT;
@@ -419,13 +432,13 @@ public class AuthorTests {
 	/**
 	 * Add forum with Rich Text editor
 	 */
-	@Test(dependsOnMethods={"addForumUploads"})
+	@Test(description="Add forum with Rich Text editor", dependsOnMethods={"addForumUploads"})
 	public void addForumRichText() {
 
 		String forumTitle = "RichText " + RANDOM_INT;
 
 		// Drop activities in canvas
-		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,900,250)
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,900,200)
 		.changeActivityTitle("Forum", forumTitle);
 
 		// Assert new forum activity title
@@ -458,7 +471,7 @@ public class AuthorTests {
 	/**
 	 * Add forum with limited character restrictions
 	 */
-	@Test(dependsOnMethods={"addForumRichText"})
+	@Test(description="Add forum with limited character restrictions", dependsOnMethods={"addForumRichText"})
 	public void addForumMinMaxCharacters() {
 
 		String forumTitle = "MinMax " + RANDOM_INT;
@@ -466,7 +479,7 @@ public class AuthorTests {
 		String maxChar = "100";
 		
 		// Drop activities in canvas
-		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,700,250)
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,700,200)
 		.changeActivityTitle("Forum", forumTitle);
 
 		// Assert new forum activity title
@@ -516,16 +529,15 @@ public class AuthorTests {
 	/**
 	 * Add forum with notifications on postings for learners and teachers and on mark release
 	 */
-	@Test(dependsOnMethods={"addForumMinMaxCharacters"})
+	@Test(description="Add forum with notifications on postings for learners and teachers and on mark release", 
+			dependsOnMethods={"addForumMinMaxCharacters"})
 	public void addForumNotifications() {
 
 		String forumTitle = "Notifications " + RANDOM_INT;
 		
 		// Drop activities in canvas
-		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,500,250)
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,500,200)
 		.changeActivityTitle("Forum", forumTitle);
-
-		fla.drawTransitionBtwActivities();
 
 		// Assert new forum activity title
 		// Now get all the activity titles
@@ -563,13 +575,125 @@ public class AuthorTests {
 	
 	
 	
+	/**
+	 * Add forum with reflection
+	 */
+	@Test(description="Add forum with reflection", dependsOnMethods={"addForumNotifications"})
+	public void addForumReflection() {
+
+		String forumTitle = "Reflection " + RANDOM_INT;
+		String reflectionTxt = "Reflect on...";
+		
+		// Drop activities in canvas
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,300,200)
+		.changeActivityTitle("Forum", forumTitle);
+
+		// Assert new forum activity title
+		// Now get all the activity titles
+		List<String> allActivityTitles = fla.getAllActivityNames();
+		
+		// Assert that all of them are in the design
+		
+		Assert.assertTrue(allActivityTitles.contains(forumTitle), 
+				"The title " + forumTitle + " was not found as an activity in the design");
+	
+		forumAuthorPage = fla.openForumAuthoring(forumTitle);
+		
+		// Set reflection
+		forumAuthorPage.openAdvancedTab().setRelectOnActivity(true);
+		forumAuthorPage.openAdvancedTab().setRelectionInstructions(reflectionTxt);
+
+		forumAuthorPage.save();
+		
+		// Assert Reflection
+		
+		forumAuthorPage.reEdit();
+		
+		// Assert reflection txt
+		boolean reflectionOption = forumAuthorPage.openAdvancedTab().isReflectOnActivity();
+		String reflectionInstructions = forumAuthorPage.openAdvancedTab().getReflectionInstructions();
+				
+		Assert.assertTrue(reflectionOption, "Option for reflection is not set");
+		Assert.assertEquals(reflectionInstructions, reflectionTxt, "Reflection instructions don't match");
+
+		
+		forumAuthorPage.cancel(flaHandler);
+	}	
+	
+	
+	/**
+	 * Add forum with replies limitation
+	 */
+	@Test(description="Add forum with replies limitation",
+			dependsOnMethods={"addForumReflection"})
+	public void addForumLimitReplies() {
+
+		String forumTitle = "LimReply " + RANDOM_INT;
+		String minReply = "2";
+		String maxReply = "5";
+		
+		// Drop activities in canvas
+		fla.dragActivityToCanvasPosition(AuthorConstants.FORUM_TITLE,100,200)
+		.changeActivityTitle("Forum", forumTitle);
+
+		// Assert new forum activity title
+		// Now get all the activity titles
+		List<String> allActivityTitles = fla.getAllActivityNames();
+		
+		// Assert that all of them are in the design
+		
+		Assert.assertTrue(allActivityTitles.contains(forumTitle), 
+				"The title " + forumTitle + " was not found as an activity in the design");
+	
+		forumAuthorPage = fla.openForumAuthoring(forumTitle);
+		
+		// Set limitation replies
+		forumAuthorPage.openAdvancedTab().setLimitReplies(minReply, maxReply);
+
+		forumAuthorPage.save();
+		
+		// Assert limit replies
+		
+		forumAuthorPage.reEdit();
+		
+		// Assert limit replies
+		boolean limitReplies = forumAuthorPage.openAdvancedTab().isLimitReplies();
+		String minimumReplies = forumAuthorPage.openAdvancedTab().getMinReply();
+		String maximumReplies = forumAuthorPage.openAdvancedTab().getMaxReply();
+				
+		Assert.assertTrue(limitReplies, "Option for limit replies is not set");
+		Assert.assertEquals(minimumReplies, minReply, "Minimum replies don't match");
+		Assert.assertEquals(maximumReplies, maxReply, "Maximum replies don't match");
+		
+		forumAuthorPage.cancel(flaHandler);
+		
+		
+	}	
+	
+	
+	/**
+	 * Save design
+	 */
+	@Test(description="saves forum design",
+			dependsOnMethods={"addForumLimitReplies"})
+	public void saveForumTestsDesigns() {
+
+		String designName = ForumConstants.FORUM_TITLE + " tests " + RANDOM_INT;
+		
+		fla.drawTransitionBtwActivities();
+		String result = fla.saveAsDesign(designName);
+		
+		// Assert save
+		boolean saveResult = result.contains(AuthorConstants.SAVE_SEQUENCE_SUCCESS_MSG);
+		Assert.assertTrue(saveResult, "The designed was not saved or is incomplete");
+		
+	}
+
 	
 	
 	@AfterClass
 	public void afterClass() {
 		//driver.quit();
 	}
-
-	
 	
 }

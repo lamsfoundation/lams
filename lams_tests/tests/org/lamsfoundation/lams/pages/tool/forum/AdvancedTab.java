@@ -22,7 +22,10 @@
 
 package org.lamsfoundation.lams.pages.tool.forum;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.pages.AbstractPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -81,10 +84,7 @@ public class AdvancedTab  extends AbstractPage {
 	
 	@FindBy(name="forum.reflectInstructions")
 	private WebElement reflectInstructions;	
-	
-	@FindBy(name="forum.allowNewTopic")
-	private WebElement allowNewTopic;
-	
+
 	@FindBy(name="forum.minimumReply")
 	private WebElement minimumReply;	
 	
@@ -356,14 +356,68 @@ public class AdvancedTab  extends AbstractPage {
 		return notifyLearnersOnMarkRelease.isSelected();
 	}
 	
+	public void setRelectOnActivity(Boolean value) {
+		
+		if(value && !reflectOnActivity.isSelected()) {
+
+			reflectOnActivity.click();
+			
+		} else if(reflectOnActivity.isSelected() && !value) {
+		
+			reflectOnActivity.click();
+			
+		}
+		
+	}
+	
 	public boolean isReflectOnActivity() {
 		
 		return reflectOnActivity.isSelected();
 	}
 	
-	
-	public boolean isAllowNewTopic() {
+	public void setRelectionInstructions(String instructions) {
 		
-		return allowNewTopic.isSelected();
+		reflectInstructions.clear();
+		reflectInstructions.sendKeys(instructions);
+		
 	}
+	
+	public String getReflectionInstructions() {
+		
+		return reflectInstructions.getAttribute("value").trim();
+		
+	}
+
+	public boolean isLimitReplies() {
+		
+		List<WebElement> options = driver.findElements(By.name("forum.allowNewTopic"));
+	
+		if(options.get(1).isSelected()) {
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+	
+	public void setLimitReplies(String min, String max) {
+		
+		List<WebElement> options = driver.findElements(By.name("forum.allowNewTopic"));
+		
+		options.get(1).click();
+		minimumReply.sendKeys(min);
+		maximumReply.sendKeys(max);
+		
+	}
+	
+	public String getMinReply() {
+		
+		return minimumReply.getAttribute("value").trim();
+	}
+	
+	public String getMaxReply() {
+		
+		return maximumReply.getAttribute("value").trim();
+	}
+	
 }
