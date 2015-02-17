@@ -221,9 +221,6 @@
 		} else {
 			maxCharacters.disabled = true;
 		}
-		
-		// html:textarea tag does not accept maxlength attribute, so set it here
-		document.getElementById('reflectInstructions').setAttribute('maxlength', '255');
 	}
 
 	initAdvanced();
