@@ -574,18 +574,27 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException, ServletException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	// if this method throws an Exception, there will be no removeLesson=true in the JSON reply
-	monitoringService.removeLesson(lessonId, getUserId());
+	.getServletContext());
 
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	JSONObject jsonObject = new JSONObject();
-	jsonObject.put("removeLesson", true);
+
+	try {
+	        // if this method throws an Exception, there will be no removeLesson=true in the JSON reply
+	        monitoringService.removeLesson(lessonId, getUserId());
+	        jsonObject.put("removeLesson", true);
+
+	} catch (Exception e) {
+	    String[] msg = new String[1];
+	    msg[0] = e.getMessage();
+	 	 jsonObject.put("removeLesson", monitoringService.getMessageService().getMessage("error.system.error",msg));
+	}
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(jsonObject);
 	return null;
     }
-
+	 	
     /**
      * <P>
      * This action need a lession ID, Learner ID and Activity ID as input. Activity ID is optional, if it is null, all
