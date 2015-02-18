@@ -531,7 +531,7 @@ function removeLesson(lessonID) {
 				data : "method=removeLesson&lessonID=" + lessonID,
 				type : "post",
 				success : function(json) {
-					if (json.removeLesson == "true") {
+					if (json.removeLesson == true) {
 						loadOrgTab(null, true);
 					} else {
 						alert(json.removeLesson);
