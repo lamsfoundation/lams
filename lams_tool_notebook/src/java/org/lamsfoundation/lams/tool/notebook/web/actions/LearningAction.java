@@ -145,19 +145,21 @@ public class LearningAction extends LamsDispatchAction {
 	    learningForm.setEntryText(nbEntry.getEntry());
 	}
 	
-	// get teacher's comment if available
-	request.setAttribute("teachersComment", notebookUser.getTeachersComment());
-
 	// set readOnly flag.
 	if (mode.equals(ToolAccessMode.TEACHER) || (notebook.isLockOnFinished() && notebookUser.isFinishedActivity())) {
 	    request.setAttribute("contentEditable", false);
 	} else {
 	    request.setAttribute("contentEditable", true);
 	}
-	request.setAttribute("finishedActivity", notebookUser.isFinishedActivity());
-
-	request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
-		notebookService.getLearnerContentFolder(toolSessionID, notebookUser.getUserId()));
+	
+	if (notebookUser != null) {
+		// get teacher's comment if available
+	    request.setAttribute("teachersComment", notebookUser.getTeachersComment());
+		
+	    request.setAttribute("finishedActivity", notebookUser.isFinishedActivity());
+	    request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		    notebookService.getLearnerContentFolder(toolSessionID, notebookUser.getUserId()));
+	}
 
 	// date and time restriction
 	Date submissionDeadline = notebook.getSubmissionDeadline();
