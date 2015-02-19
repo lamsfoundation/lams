@@ -71,20 +71,11 @@ public class ForumOutputFactory extends OutputFactory {
 		ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
 			ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, topicDatesToAnswersClass);
 		Forum forum = (Forum) toolContentObject;
-		
+
 		// adding all existing conditions
 		chosenTopicAnswersDefinition
 			.setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
-		
-		// if no conditions were created in the tool instance, a default condition is added;
-		if (chosenTopicAnswersDefinition.getDefaultConditions().isEmpty() && !forum.getMessages().isEmpty()) {
-		    
-		    ForumCondition defaultCondition = createDefaultTopicDateToAnswersCondition(forum);
-		    if (defaultCondition != null) {
-			forum.getConditions().add(defaultCondition);
-			chosenTopicAnswersDefinition.getDefaultConditions().add(defaultCondition);
-		    }
-		}
+
 		chosenTopicAnswersDefinition.setShowConditionNameOnly(true);
 		definitionMap.put(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, chosenTopicAnswersDefinition);
 	    }
@@ -143,8 +134,8 @@ public class ForumOutputFactory extends OutputFactory {
 	}
 
 	if (names == null || names.contains(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME)) {
-	    outputs.put(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, getNumPosts(forumService, learnerId,
-		    toolSessionId));
+	    outputs.put(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME,
+		    getNumPosts(forumService, learnerId, toolSessionId));
 	}
 	return outputs;
 
@@ -226,11 +217,11 @@ public class ForumOutputFactory extends OutputFactory {
      * Creates a default condition so teachers know how to use complex conditions for this tool.
      * 
      * @param forum
-     *                content of the tool
+     *            content of the tool
      * @return default Forum condition
      */
     protected ForumCondition createDefaultTopicDateToAnswersCondition(Forum forum) {
-	
+
 	Set<Message> messages = new HashSet<Message>();
 	for (Message message : (Set<Message>) forum.getMessages()) {
 	    if (message.getIsAuthored() && message.getToolSession() == null) {
@@ -238,7 +229,7 @@ public class ForumOutputFactory extends OutputFactory {
 		break;
 	    }
 	}
-	
+
 	if (messages.isEmpty()) {
 	    return null;
 	}

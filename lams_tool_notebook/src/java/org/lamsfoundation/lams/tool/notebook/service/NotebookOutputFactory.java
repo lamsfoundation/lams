@@ -62,12 +62,6 @@ public class NotebookOutputFactory extends OutputFactory {
 		Notebook notebook = (Notebook) toolContentObject;
 		// adding all existing conditions
 		notebookEntryDefinition.setDefaultConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
-		// if no conditions were created in the tool instance, a default condition is added;
-		if (notebookEntryDefinition.getDefaultConditions().isEmpty()) {
-		    NotebookCondition defaultCondition = createDefaultUserEntryCondition(notebook);
-		    notebook.getConditions().add(defaultCondition);
-		    notebookEntryDefinition.getDefaultConditions().add(defaultCondition);
-		}
 		notebookEntryDefinition.setShowConditionNameOnly(true);
 		definitionMap.put(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebookEntryDefinition);
 	    }

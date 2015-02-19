@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.service; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -39,31 +39,29 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.ExcelCell;
- 
+
 public interface IGradebookService {
-    
+
     /**
-     * Gets all the activity rows for a lesson, with the mark for each activity
-     * being the average for all users in the lesson
+     * Gets all the activity rows for a lesson, with the mark for each activity being the average for all users in the
+     * lesson
      * 
-     * @param lesson 
+     * @param lesson
      * @return
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Lesson lesson);
-    
+    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId);
+
     /**
-     * Gets all the activity rows for a user, with the mark for the activity 
-     * being the user's individual mark
+     * Gets all the activity rows for a user, with the mark for the activity being the user's individual mark
      * 
-     * @param 
-     * @param learner 
+     * @param
+     * @param learner
      * @return
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Lesson lesson, User learner);
-    
+    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId);
+
     /**
-     * Gets the GBActivityDTO list for an activity, which provides the marks
-     * for all users in an activity
+     * Gets the GBActivityDTO list for an activity, which provides the marks for all users in an activity
      * 
      * @param lesson
      * @param activity
@@ -71,15 +69,15 @@ public interface IGradebookService {
      * @return
      */
     List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId);
-    
+
     /**
-     * Gets the user rows and the user's entire lesson mark for all users 
-     * in a lesson
+     * Gets the user rows and the user's entire lesson mark for all users in a lesson
+     * 
      * @param lesson
      * @return
      */
     List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson);
-    
+
     /**
      * Gets the user rows for specified organisation
      * 
@@ -96,7 +94,7 @@ public interface IGradebookService {
      * @param mark
      */
     void updateUserLessonGradebookMark(Lesson lesson, User learner, Double mark);
-    
+
     /**
      * Updates a user's activity mark, this will automatically add up all the user's activity marks for a lesson and set
      * the lesson mark too
@@ -106,7 +104,8 @@ public interface IGradebookService {
      * @param activity
      * @param mark
      * @param markedInGradebook
-     * @param isAuditLogRequired should this event be logged with audit service
+     * @param isAuditLogRequired
+     *            should this event be logged with audit service
      */
     void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook, boolean isAuditLogRequired);
@@ -119,7 +118,7 @@ public interface IGradebookService {
      * @param feedback
      */
     void updateUserActivityGradebookFeedback(Activity activity, User learner, String feedback);
-    
+
     /**
      * Updates the user's feedback for a lesson
      * 
@@ -128,25 +127,27 @@ public interface IGradebookService {
      * @param feedback
      */
     void updateUserLessonGradebookFeedback(Lesson lesson, User learner, String feedback);
-    
+
     /**
      * Toggle on/off marks released option
      * 
      * @param lessonId
      */
     void toggleMarksReleased(Long lessonId);
-    
+
     /**
      * Gets the lesson row dtos for a given organisation
      * 
      * @param organisation
-     * @param user user which results is requested
-     * @param viewer user who view gradebook. We display list of lessons based on his rights.
+     * @param user
+     *            user which results is requested
+     * @param viewer
+     *            user who view gradebook. We display list of lessons based on his rights.
      * @param view
      * @return
      */
     List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view);
-    
+
     /**
      * Gets a gradebook lesson mark/feedback for a given user and lesson
      * 
@@ -155,7 +156,7 @@ public interface IGradebookService {
      * @return
      */
     GradebookUserLesson getGradebookUserLesson(Long lessonID, Integer userID);
-    
+
     /**
      * Gets a gradebook lesson mark/feedback for all users in a given lesson
      * 
@@ -163,7 +164,7 @@ public interface IGradebookService {
      * @return
      */
     List<GradebookUserLesson> getGradebookUserLesson(Long lessonID);
-    
+
     /**
      * Gets a gradebook activity mark/feedback for a given activity and user
      * 
@@ -172,17 +173,19 @@ public interface IGradebookService {
      * @return
      */
     GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
-    
+
     /**
      * Returns the average mark for a given activity. Activity can be grouped - then supply according groupId to receive
      * AverageMarkForGroupedActivity.
      * 
      * @param activityID
-     * @param groupID return AverageMarkForActivity if groupId is null and AverageMarkForGroupedActivity if groupId is specified
+     * @param groupID
+     *            return AverageMarkForActivity if groupId is null and AverageMarkForGroupedActivity if groupId is
+     *            specified
      * @return
      */
     Double getAverageMarkForActivity(Long activityID, Long groupID);
-    
+
     /**
      * Returns the average mark for a lesson
      * 
@@ -190,7 +193,7 @@ public interface IGradebookService {
      * @return
      */
     Double getAverageMarkForLesson(Long lessonID);
-    
+
     /**
      * Method for updating an activity mark that tools can call
      * 
@@ -200,7 +203,7 @@ public interface IGradebookService {
      * @param toolSessionID
      */
     void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID, Boolean markedInGradebook);
-    
+
     /**
      * Get an activity from the db by id
      * 
@@ -208,21 +211,23 @@ public interface IGradebookService {
      * @return
      */
     Activity getActivityById(Long activityID);
-    
+
     /**
      * Get a language label
+     * 
      * @param key
      * @return
      */
     String getMessage(String key);
-    
+
     /**
      * Get the summary data in a 2s array for an excel export
+     * 
      * @param lesson
      * @return
      */
     LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson);
-    
+
     /**
      * Get the summary data for course in order to create excel export
      * 
@@ -231,7 +236,6 @@ public interface IGradebookService {
      * @return
      */
     LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId);
-    
 
     /**
      * Get the summary data for selected lessons in order to create excel export
@@ -240,7 +244,6 @@ public interface IGradebookService {
      * @param organisationId
      * @return
      */
-    LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId, String[]  lessonIds);
-    
+    LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
+	    String[] lessonIds);
 }
- 

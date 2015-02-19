@@ -74,14 +74,6 @@ public class QaOutputFactory extends OutputFactory {
 
 		// adding all existing conditions
 		userAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
-		// if no conditions were created in the tool instance, a default condition is added;
-		if (userAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQueContents().isEmpty()) {
-
-		    QaCondition defaultCondition = createDefaultComplexUserAnswersCondition(qaContent);
-		    qaContent.getConditions().add(defaultCondition);
-
-		    userAnswersDefinition.getDefaultConditions().add(defaultCondition);
-		}
 		userAnswersDefinition.setShowConditionNameOnly(true);
 		definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
 	    }
