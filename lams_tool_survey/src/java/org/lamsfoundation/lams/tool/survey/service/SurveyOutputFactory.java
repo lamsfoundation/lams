@@ -66,16 +66,7 @@ public class SurveyOutputFactory extends OutputFactory {
 	    
 	    // adding all existing conditions
 	    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(survey.getConditions()));
-	    
-	    // if no conditions were created in the tool instance, a default condition is added;
-	    if (allAnswersDefinition.getDefaultConditions().isEmpty() && !survey.getQuestions().isEmpty()) {
-		
-		SurveyCondition defaultCondition = createDefaultComplexCondition(survey);
-		if (defaultCondition != null) {
-		    survey.getConditions().add(defaultCondition);
-		    allAnswersDefinition.getDefaultConditions().add(defaultCondition);
-		}
-	    }
+
 	    allAnswersDefinition.setShowConditionNameOnly(true);
 	    definitionMap.put(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, allAnswersDefinition);
 	}

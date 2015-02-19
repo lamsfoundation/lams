@@ -227,7 +227,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	}
 
-	Activity activity = (Activity) getUserService().findById(Activity.class, activityID);
+	Activity activity = getGradebookService().getActivityById(activityID);
 	if ((activity == null) || !activity.isToolActivity()) {
 	    GradebookMonitoringAction.log.error("Activity with ID " + activityID
 		    + " could not be found or it is not a Tool Activity");

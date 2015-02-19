@@ -63,12 +63,6 @@ public class ChatOutputFactory extends OutputFactory {
 		Chat chat = (Chat) toolContentObject;
 		// adding all existing conditions
 		chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
-		// if no conditions were created in the tool instance, a default condition is added;
-		if (chatMessagesDefinition.getDefaultConditions().isEmpty()) {
-		    ChatCondition defaultCondition = createDefaultUserMessagesCondition(chat);
-		    chat.getConditions().add(defaultCondition);
-		    chatMessagesDefinition.getDefaultConditions().add(defaultCondition);
-		}
 		chatMessagesDefinition.setShowConditionNameOnly(true);
 		definitionMap.put(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chatMessagesDefinition);
 	    }
