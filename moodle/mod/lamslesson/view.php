@@ -115,7 +115,7 @@ echo $OUTPUT->box_end();
 
 // Once we have progress info ready
 
-$progress = lamslesson_get_student_progress($USER->username,$lamslesson->lesson_id, $course->id);
+$progress = lamslesson_get_student_progress($USER->username,$lamslesson->lesson_id, $course->id,$USER->firstname,$USER->lastname,$USER->email,$locale['country'],$locale['lang']);
 
 // Progress details
 

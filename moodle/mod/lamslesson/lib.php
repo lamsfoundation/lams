@@ -702,7 +702,7 @@ function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
  * Return URL to join a LAMS lesson as a learner or staff depending on method.
  * URL redirects LAMS to learner or monitor interface depending on method.
  */
-function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $country, $lessonid, $courseid, $coursename, $coursecreatedate, $method, $customcsv='') {
+function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $country, $lessonid, $courseid, $coursename, $coursecreatedate, $method, $extraparam='', $customcsv='') {
     global $CFG;
 
     // append month/year to course name
@@ -744,6 +744,9 @@ function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $co
 		'&'. LAMSLESSON_PARAM_COUNTRY .'='.trim($country).
 		'&'. LAMSLESSON_PARAM_LANG .'='.substr(trim($lang),0,2);
 
+    if ($extraparam != '') {
+      $url .= '&'.$extraparam;
+    }
     if ($customcsv != '') {
       $url .= '&'. LAMSLESSON_PARAM_CUSTOM_CSV .'='.urlencode($customcsv);
     }
@@ -787,7 +790,7 @@ function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
  * Gets all the student progress for a lesson in one go
  * 
  */
-function lamslesson_get_student_progress($username,$ldid,$courseid) {
+function lamslesson_get_student_progress($username,$ldid,$courseid,$firstname,$lastname,$email,$country,$lang) {
   global $CFG;
   if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
     print_error(get_string('notsetup', 'lamslesson'));
@@ -808,7 +811,12 @@ function lamslesson_get_student_progress($username,$ldid,$courseid) {
 		'lsId'		=>	$ldid,
 		'courseId'	=>	$courseid,
 		'progressUser'	=>	$username,
-		'username'	=>	$username);
+		'username'	=>	$username,
+		'firstName'	=> 	$firstname,
+		'lastName'	=> 	$lastname,
+		'email'		=> 	$email,
+		'country'	=> 	$country,
+		'lang'		=>	$lang);
 
   // GET call to LAMS
   
