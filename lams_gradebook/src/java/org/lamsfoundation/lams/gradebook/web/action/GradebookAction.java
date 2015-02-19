@@ -134,23 +134,14 @@ public class GradebookAction extends LamsDispatchAction {
 	    }
 	}
 
-	Lesson lesson = getLessonService().getLesson(lessonID);
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
 	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {
-	    // Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
-	    User learner = (User) getUserService().findById(User.class, userID);
-	    if (learner != null) {
-		gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lesson, learner);
-	    } else {
-		// return null and the grid will report the error
-		GradebookAction.logger.error("No learner found for: " + userID);
-		return null;
-	    }
+	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lessonID, userID);
 	} else if (view == GBGridView.MON_ACTIVITY) {
-	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lesson);
+	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID);
 	}
 
 	if ((sortBy == null) || sortBy.equals("")) {
@@ -382,8 +373,10 @@ public class GradebookAction extends LamsDispatchAction {
 
 	if ((lesson != null) && (learner != null)) {
 	    GradebookUserLesson lessonMark = getGradebookService().getGradebookUserLesson(lessonID, userID);
-	    writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-		    GradebookUtil.niceFormatting(lessonMark.getMark()));
+	    if (lessonMark.getMark() != null) {
+		writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
+			GradebookUtil.niceFormatting(lessonMark.getMark()));
+	    }
 	} else {
 	    // Grid will handle error, just log and return null
 	    GradebookAction.logger
