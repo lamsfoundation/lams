@@ -30,7 +30,8 @@
 
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
-	<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
+	<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.contentFolderID}"
+				   resizeParentFrameName="questionInputArea"></lams:CKEditor>
 	<div class="space-bottom-top"><a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()"><fmt:message
 		key="label.authoring.basic.additionaloptions.show" /> </a><br />
 	</div>
