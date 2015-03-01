@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.pages.monitor.addlesson;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.pages.AbstractPage;
 import org.lamsfoundation.lams.pages.IndexPage;
 import org.openqa.selenium.WebDriver;
@@ -108,4 +110,34 @@ public class AddLessonPage extends AbstractPage {
 		return PageFactory.initElements(driver, AdvancedTab.class);
 		
 	}
+	
+	public void createLessonByDesignName(String designName) {
+		
+		List<WebElement> designs = openLessontab().getFolderNodes("user");
+		
+		WebElement selectedDesign = null;
+		
+		// now find the learning design for the forum
+		
+		for (WebElement design : designs) {
+			
+			//System.out.println(design.getTagName());
+			if (design.getText().equals(designName)) {
+				selectedDesign = design;
+				
+			}
+			
+		}
+		
+		// Select design
+		openLessontab()
+		.clickDesign(selectedDesign)
+		.setLessonName(designName);
+		
+		// create the lesson
+		
+		addLessonNow();
+		
+	}
+	
 }

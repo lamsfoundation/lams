@@ -20,26 +20,30 @@
  * ****************************************************************
  */ 
 
-package org.lamsfoundation.lams.pages.tool.forum.util;
+package org.lamsfoundation.lams.learner.util;
 
-public class ForumConstants {
+public class LearnerConstants {
 	
 	// Constants
 	
-	// Default values (English AU)
+	public static final String LEARNER_TITLE = "LAMS Learner";
 	
-	public static final String FORUM_TITLE = "Forum";
-	public static final String FORUM_INSTRUCTIONS = "<div>Instructions</div>";
 	
-	public static final String FORUM_DEFAULT_TOPIC = "Topic Heading";
-
-	// Warning messages
+	// SVG details
 	
-	public static final String FORUM_WARNING_REPLY_LIMITS_TXT = "Please add at least 1 topic when"; // When no topic and reply limits are set
+	/*	
+	 * In order to determine which activities we have completed/attempted/current/etc, 
+	 * we use the fill color of the icons.  
+	 */
 	
-	// Learner's textarea id for CkEditor
-	public static final String FORUM_LEARNER_CKEDITOR_ID = "message.body";
-	public static final CharSequence FORUM_FORM_INFO_MIN_CHAR = "The minimum number of characters for your response is";
-	public static final String FORUM_LEARNER_MIN_CHAR_WARNING = "characters more to proceed";;
+	public static final String LEARNER_SVG_COMPLETED_PATH_FILLCOLOR = "#000099";
+	public static final String LEARNER_SVG_CURRENT_PATH_FILLCOLOR = "#bb0000";
+	public static final String LEARNER_SVG_TODO_PATH_FILLCOLOR = "#bb0000";
+	public static final String LEARNER_SVG_ATTEMPTED_PATH_FILLCOLOR = "#bb0000";
+	
+	public static final String LEARNER_DEFAULT_TOPIC_SUBJECT = "Topic Heading";
+	
+	
+	public static final String LEARNER_NEXT_ACTIVITY_ID = "finishButton";
 	
 }

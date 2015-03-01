@@ -20,26 +20,39 @@
  * ****************************************************************
  */ 
 
-package org.lamsfoundation.lams.pages.tool.forum.util;
+package org.lamsfoundation.lams.pages.tool.forum.learner;
 
-public class ForumConstants {
-	
-	// Constants
-	
-	// Default values (English AU)
-	
-	public static final String FORUM_TITLE = "Forum";
-	public static final String FORUM_INSTRUCTIONS = "<div>Instructions</div>";
-	
-	public static final String FORUM_DEFAULT_TOPIC = "Topic Heading";
+import org.lamsfoundation.lams.pages.AbstractPage;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
-	// Warning messages
+public class ReflectionPage extends AbstractPage {
+
+	@FindBy(name = "entryText")
+	private WebElement entryText;
 	
-	public static final String FORUM_WARNING_REPLY_LIMITS_TXT = "Please add at least 1 topic when"; // When no topic and reply limits are set
+	@FindBy(className = "nextActivity")
+	private WebElement nextActivity;
 	
-	// Learner's textarea id for CkEditor
-	public static final String FORUM_LEARNER_CKEDITOR_ID = "message.body";
-	public static final CharSequence FORUM_FORM_INFO_MIN_CHAR = "The minimum number of characters for your response is";
-	public static final String FORUM_LEARNER_MIN_CHAR_WARNING = "characters more to proceed";;
+	public ReflectionPage(WebDriver driver) {
+		super(driver);
+		
+	}
+
+	public void postReflection(String reflectionTxt) {
 	
+		entryText.click();
+		entryText.clear();
+		entryText.sendKeys(reflectionTxt);
+		
+	}
+
+	public void nextActivity(String learnerHandler) {
+
+		nextActivity.click();
+		driver.switchTo().window(learnerHandler);		
+		
+	}
+
 }
