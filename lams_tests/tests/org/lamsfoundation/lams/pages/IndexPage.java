@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.lamsfoundation.lams.pages.admin.CourseManagementPage;
 import org.lamsfoundation.lams.pages.author.FLAPage;
+import org.lamsfoundation.lams.pages.learner.LearnerPage;
 import org.lamsfoundation.lams.pages.monitor.MonitorPage;
 import org.lamsfoundation.lams.pages.monitor.addlesson.AddLessonPage;
 import org.openqa.selenium.By;
@@ -255,7 +256,17 @@ public class IndexPage extends AbstractPage {
 	}
 	
 	
-	public void openLessonAsLearner() {
+	public LearnerPage openLessonAsLearner(String lessonName) {
+		
+		WebElement lesson = getLessonRowByName(lessonName);
+		
+		WebElement lessonLink = lesson.findElement(By.tagName("a"));
+		
+		lessonLink.click();
+		
+		driver.switchTo().window("lWindow");
+		return PageFactory.initElements(driver, LearnerPage.class);
+
 		
 	}
 	

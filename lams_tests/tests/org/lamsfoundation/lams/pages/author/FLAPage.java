@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.author.util.AuthorConstants;
 import org.lamsfoundation.lams.pages.AbstractPage;
-import org.lamsfoundation.lams.pages.tool.forum.AuthorPage;
+import org.lamsfoundation.lams.pages.tool.forum.author.AuthorPage;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
@@ -1026,6 +1026,24 @@ public class FLAPage extends AbstractPage {
 	}
 	
 	
+	/**
+	 *  Close FLA window
+	 *  
+	 *  Eventually we need to have a button to exit and then just press it from here
+	 *  
+	 *  Now we just switchTo 
+	 *  
+	 * @param indexHandler
+	 */
+	
+	public void close(String indexHandler) {
+		driver.switchTo().window(indexHandler);
+		
+	}
+	
+	
+	
+	
 	/*	Open specific tool authoring windows*/
 	
 	
@@ -1053,7 +1071,8 @@ public class FLAPage extends AbstractPage {
 	}
 	
 	
-	
+
+
 	
 	
 	
@@ -1322,5 +1341,4 @@ public class FLAPage extends AbstractPage {
 		
 	}
 
-	
 }
