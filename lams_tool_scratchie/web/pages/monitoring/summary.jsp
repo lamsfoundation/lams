@@ -314,6 +314,11 @@
 					<table id="burningQuestions${burningQuestionDto.item.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 				</div>
 			</c:forEach>
+			
+			<!-- General burning question's table -->
+			<div class="burning-question-dto">
+				<table id="burningQuestions0" class="scroll" cellpadding="0" cellspacing="0"></table>
+			</div>
 		</c:if>
 		
 		<!-- Display reflection entries -->

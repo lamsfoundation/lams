@@ -139,6 +139,24 @@
 						</tr>
 					</table>
 				</c:forEach>
+				
+				<table>
+					<tr>
+						<td width="30%">
+							<fmt:message key="label.general.burning.question" />
+						</td>						
+						<td>
+							<c:choose>
+								<c:when test="${empty sessionMap.generalBurningQuestion}">
+									-
+								</c:when>
+								<c:otherwise>
+									<c:out value="${sessionMap.generalBurningQuestion}" escapeXml="true"/>
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+				</table>
 
 				<c:if test="${(mode != 'teacher') && isUserLeader}">
 					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="button">

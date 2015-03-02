@@ -40,6 +40,7 @@ public class ScratchieBurningQuestion {
     private Date accessDate;
     private Long sessionId;
     private String question;
+    private boolean generalQuestion;
 
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
@@ -99,6 +100,18 @@ public class ScratchieBurningQuestion {
 
     public void setQuestion(String question) {
 	this.question = question;
+    }
+    
+    /**
+     * @hibernate.property column="general_question"
+     * @return
+     */
+    public boolean isGeneralQuestion() {
+	return generalQuestion;
+    }
+
+    public void setGeneralQuestion(boolean isGeneralQuestion) {
+	this.generalQuestion = isGeneralQuestion;
     }
 
 }
