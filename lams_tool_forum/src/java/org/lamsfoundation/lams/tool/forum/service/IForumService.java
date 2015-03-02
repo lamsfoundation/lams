@@ -172,12 +172,23 @@ public interface IForumService {
     // *********************Get topic methods **********************
     // ************************************************************************************
     /**
-     * Get topic and its children list by given root topic ID. Note that the return type is DTO.
+     * Get a complete topic and its children list by given root topic ID. Note that the return type is DTO.
      * 
      * @param rootTopicId
      * @return List of MessageDTO
      */
     List getTopicThread(Long rootTopicId);
+    
+    /**
+     * Get topic and its children list by given root topic ID, starting from after the sequence number specified. 
+     * Return the number of entries indicated by the paging number. Note that the return type is DTO.
+     * 
+     * @param rootTopicId
+     * @param afterSequenceId
+     * @param pagingSize
+     * @return List of MessageDTO
+     */
+    public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize );
 
     /**
      * Get root topics by a given sessionID value. Simultanousely, it gets back topics, which author posted in authoring

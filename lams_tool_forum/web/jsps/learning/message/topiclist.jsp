@@ -1,7 +1,8 @@
+<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
-
+<c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
 <table cellpadding="0" class="alternative-color" cellspacing="0">
 	<tbody>
 		<tr>
@@ -30,7 +31,7 @@
 			<tr>
 				<td>
 					<c:set var="viewtopic">
-						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
+						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}" />
 					</c:set>
 					<html:link href="${viewtopic}">
 						<c:choose>
