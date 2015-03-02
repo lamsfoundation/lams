@@ -33,12 +33,20 @@ public class ScratchieBurningQuestionDAOHibernate extends BaseDAOHibernate imple
     private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieBurningQuestion.class.getName()
 	    + " as r where r.sessionId=? and r.scratchieItem.uid = ?";
     
+    private static final String FIND_GENERAL_QUESTION_BY_SESSION = "from " + ScratchieBurningQuestion.class.getName()
+	    + " as r where r.sessionId=? and r.generalQuestion = 1";
+    
     private static final String FIND_BY_SESSION = "from " + ScratchieBurningQuestion.class.getName()
-	    + " as r where r.sessionId=? order by r.scratchieItem.orderId asc";
+	    + " as r where r.sessionId=?";
 
     private static final String FIND_BY_ITEM_UID = "from " + ScratchieBurningQuestion.class.getName()
 	    + " as r where r.scratchieItem.uid=? order by r.sessionId asc";
 
+//    @Override
+//    public List<ScratchieBurningQuestion> getBurningQuestionsByContentId(Long contentId) {
+//	return getHibernateTemplate().find(FIND_BY_CONTENT_ID, new Object[] { contentId});
+//    }
+    
     @Override
     public List<ScratchieBurningQuestion> getBurningQuestionsByItemUid(Long itemUid) {
 	return getHibernateTemplate().find(FIND_BY_ITEM_UID, new Object[] { itemUid});
@@ -46,7 +54,15 @@ public class ScratchieBurningQuestionDAOHibernate extends BaseDAOHibernate imple
     
     @Override
     public ScratchieBurningQuestion getBurningQuestionBySessionAndItem(Long sessionId, Long itemUid) {
-	List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_ITEM, new Object[] {  sessionId, itemUid });
+	List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
+	if (list == null || list.size() == 0)
+	    return null;
+	return (ScratchieBurningQuestion) list.get(0);
+    }
+    
+    @Override
+    public ScratchieBurningQuestion getGeneralBurningQuestionBySession(Long sessionId) {
+	List list = getHibernateTemplate().find(FIND_GENERAL_QUESTION_BY_SESSION, new Object[] { sessionId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ScratchieBurningQuestion) list.get(0);
