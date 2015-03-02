@@ -4,7 +4,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 ----------------------Put all sql statements below here-------------------------
 
 -- LDEV-3432 Do not limit reflect instructions length
-ALTER TABLE tl_latask10_taskList MODIFY COLUMN reflect_instructions text;
+ALTER TABLE tl_latask10_tasklist MODIFY COLUMN reflect_instructions text;
 
 ----------------------Put all sql statements above here-------------------------
 -- If there were no errors, commit and restore autocommit to on
