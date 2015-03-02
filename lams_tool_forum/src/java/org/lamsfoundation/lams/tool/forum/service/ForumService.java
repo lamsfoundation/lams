@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.forum.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -353,6 +354,18 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	msgSeq.setMessage(replyMessage);
 	msgSeq.setMessageLevel((short) (parentSeq.getMessageLevel() + 1));
 	msgSeq.setRootMessage(root);
+	
+	// look back up through the parents to find the thread top - will be level 1
+	if ( msgSeq.getMessageLevel() == 1 ) {
+	    msgSeq.setThreadMessage(replyMessage);
+	} else {
+	    MessageSeq threadSeq = parentSeq;
+	    while ( threadSeq.getMessageLevel() > 1 ) {
+		threadSeq = messageSeqDao.getByTopicId(threadSeq.getMessage().getParent().getUid());
+	    }
+	    msgSeq.setThreadMessage(threadSeq.getMessage());
+	}
+	
 	messageSeqDao.save(msgSeq);
 
 	// update last reply date for root message
@@ -381,15 +394,49 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     @Override
     public List getTopicThread(Long rootTopicId) {
+	return getTopicThread(rootTopicId, null, null);
+    }
+    
+    @Override
+    public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize ) {
 
-	List unsortedThread = messageSeqDao.getTopicThread(rootTopicId);
-	Iterator iter = unsortedThread.iterator();
-	MessageSeq msgSeq;
+	long lastThreadMessageUid = afterSequenceId != null ? afterSequenceId.longValue() : 0L;
+	long usePagingSize = pagingSize != null ? pagingSize.longValue() : ForumConstants.DEFAULT_PAGE_SIZE;
+	
 	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
-	while (iter.hasNext()) {
-	    msgSeq = (MessageSeq) iter.next();
+
+	// first time through we need to include the top topic message (level 0)
+	if ( lastThreadMessageUid == 0 ) {
+	    MessageSeq msgSeq = messageSeqDao.getByTopicId(rootTopicId);
 	    map.put(msgSeq, msgSeq.getMessage());
 	}
+
+	long count = 0;
+	boolean foundEnough = false;	
+	
+	do { 
+	    
+	    List msgSeqs =  messageSeqDao.getThreadByThreadId(rootTopicId, lastThreadMessageUid);
+	    if ( msgSeqs.size() == 0 ) {
+		// no more to come from db
+		foundEnough = true;
+	    } else {
+	    
+		Iterator iter = msgSeqs.iterator();
+        	while ( iter.hasNext() ) {
+        	    MessageSeq msgSeq = ( MessageSeq) iter.next();
+        	    if ( msgSeq.getMessageLevel() == 1 ) {
+        	    	lastThreadMessageUid = msgSeq.getMessage().getUid().longValue();
+        	    }
+        	    map.put(msgSeq, msgSeq.getMessage());
+                    count++;
+                }
+        	if ( usePagingSize >= 0 && count >= usePagingSize ) {
+        	    foundEnough = true;
+        	}
+            } 
+	} while ( ! foundEnough);
+        		
 	return getSortedMessageDTO(map);
     }
 
@@ -630,6 +677,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 	return msgDtoList;
     }
+
 
     /**
      * Process an uploaded file.
@@ -1005,8 +1053,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// also clone author created topic from this forum tool content!!!
 	// this can avoid topic record information conflict when multiple sessions are against same tool content
 	// for example, the reply number maybe various for different sessions.
-	ForumService.log.debug("Clone tool content [" + forum.getContentId() + "] topics for session ["
+	if ( log.isDebugEnabled() ) {
+	    log.debug("Clone tool content [" + forum.getContentId() + "] topics for session ["
 		+ session.getSessionId() + "]");
+	}
 	Set<Message> contentTopics = forum.getMessages();
 	if (contentTopics != null && contentTopics.size() > 0) {
 	    for (Message msg : contentTopics) {
@@ -1020,7 +1070,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	session.setStatus(ForumConstants.STATUS_CONTENT_COPYED);
 
 	forumToolSessionDao.saveOrUpdate(session);
-	ForumService.log.debug("tool session [" + session.getSessionId() + "] created.");
+	if ( log.isDebugEnabled() ) {
+	    ForumService.log.debug("tool session [" + session.getSessionId() + "] created.");
+	}
     }
 
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {

@@ -201,4 +201,9 @@ public interface ForumConstants {
 
     public static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
 	    | Pattern.MULTILINE;
+    
+    // for paging long topics
+    public static final String PAGE_LAST_ID = "pageLastId";
+    public static final String PAGE_SIZE = "size";
+    public static final int DEFAULT_PAGE_SIZE = 50;
 }

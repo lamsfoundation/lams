@@ -177,6 +177,11 @@
 			parameter="viewTopic" scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>
+		<action path="/learning/viewTopicNext"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="viewTopicNext" scope="request">
+			<forward name="success" path="tiles:/learning/forum/viewTopicNext" />
+		</action>
 		<action path="/learning/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="messageForm" 

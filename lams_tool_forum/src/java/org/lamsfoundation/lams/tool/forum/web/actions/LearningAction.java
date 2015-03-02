@@ -109,7 +109,7 @@ public class LearningAction extends Action {
 	}
 
 	// --------------Topic Level ------------------
-	if (param.equals("viewTopic")) {
+	if (param.equals("viewTopic") || param.equals("viewTopicNext")) {
 	    return viewTopic(mapping, form, request, response);
 	}
 	if (param.equals("newTopic")) {
@@ -491,14 +491,21 @@ public class LearningAction extends Action {
 	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
 	Forum forum = forumUser.getSession().getForum();
 
+	Long lastMsgSeqId = WebUtil.readLongParam(request, ForumConstants.PAGE_LAST_ID, true);
+	Long pageSize = WebUtil.readLongParam(request, ForumConstants.PAGE_SIZE, true);
+	
 	// get root topic list
-	List<MessageDTO> msgDtoList = forumService.getTopicThread(rootTopicId);
+	log.debug("viewTopic: Getting topic messages "+System.currentTimeMillis());
+	List<MessageDTO> msgDtoList = forumService.getTopicThread(rootTopicId, lastMsgSeqId, pageSize);
+	log.debug("viewTopic: updateMesssageFlag "+System.currentTimeMillis());
 	updateMesssageFlag(msgDtoList);
+	log.debug("viewTopic: doneMesssageFlag "+System.currentTimeMillis());
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic
-	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), msgDtoList.get(0).getMessage()
-		.getUid());
+	// check if we can still make posts in this topic - TODO fix this code. It currently depends on the first message being the topic
+//	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), msgDtoList.get(0).getMessage()
+//		.getUid());
+	int numOfPosts = 1;
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
 	request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
@@ -520,6 +527,7 @@ public class LearningAction extends Action {
 
 	return mapping.findForward("success");
     }
+
 
     /**
      * Display empty page for a new topic in forum
