@@ -394,7 +394,16 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     @Override
     public List getTopicThread(Long rootTopicId) {
-	return getTopicThread(rootTopicId, null, null);
+	List unsortedThread = messageSeqDao.getCompleteTopic(rootTopicId);
+	Iterator iter = unsortedThread.iterator();
+	MessageSeq msgSeq;
+	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
+	while (iter.hasNext()) {
+	    msgSeq = (MessageSeq) iter.next();
+	    map.put(msgSeq, msgSeq.getMessage());
+	}
+	return getSortedMessageDTO(map);
+
     }
     
     @Override

@@ -495,17 +495,12 @@ public class LearningAction extends Action {
 	Long pageSize = WebUtil.readLongParam(request, ForumConstants.PAGE_SIZE, true);
 	
 	// get root topic list
-	log.debug("viewTopic: Getting topic messages "+System.currentTimeMillis());
 	List<MessageDTO> msgDtoList = forumService.getTopicThread(rootTopicId, lastMsgSeqId, pageSize);
-	log.debug("viewTopic: updateMesssageFlag "+System.currentTimeMillis());
 	updateMesssageFlag(msgDtoList);
-	log.debug("viewTopic: doneMesssageFlag "+System.currentTimeMillis());
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic - TODO fix this code. It currently depends on the first message being the topic
-//	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), msgDtoList.get(0).getMessage()
-//		.getUid());
-	int numOfPosts = 1;
+	// check if we can still make posts in this topic 
+	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
 	request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
