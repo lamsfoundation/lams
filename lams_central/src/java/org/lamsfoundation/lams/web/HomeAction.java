@@ -220,7 +220,7 @@ public class HomeAction extends DispatchAction {
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
 		    String.valueOf(lesson.getLearnerPresenceAvailable()));
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, String.valueOf(lesson.getLearnerImAvailable()));
-	    req.setAttribute(AttributeNames.PARAM_TITLE, URLEncoder.encode(lesson.getLessonName(), "UTF8"));
+	    req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
 
 	    /* Date Format for Chat room append */
 	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
