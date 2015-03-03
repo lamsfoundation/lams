@@ -1,4 +1,4 @@
-CREATE PROCEDURE `TL_LAFRUM11_SET_ALL_THREAD_MESSAGE_UIDS_TMP`()
+CREATE PROCEDURE `tl_lafrum11_set_all_thread_message_uids_tmp`()
 BEGIN
 
 declare v_finished int default 0; 
@@ -6,7 +6,7 @@ declare v_thread_uid bigint(20);
 declare v_seq_uid bigint(20);
         
 DECLARE thread_cursor CURSOR FOR
-	SELECT thread_uid, seq_uid FROM tl_lafrum11_thread_message_uid_temp;
+	SELECT thread_uid, seq_uid FROM tl_lafrum11_thread_message_uid_tmp;
 
 DECLARE CONTINUE HANDLER
     FOR NOT FOUND SET v_finished = 1;

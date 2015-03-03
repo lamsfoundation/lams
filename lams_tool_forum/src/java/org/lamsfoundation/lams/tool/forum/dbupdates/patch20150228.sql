@@ -3,15 +3,15 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- --------------------Put all sql statements below here-------------------------
 
-call TL_LAFRUM11_GET_ALL_THREAD_MESSAGE_UIDS_TMP();
-call TL_LAFRUM11_SET_ALL_THREAD_MESSAGE_UIDS_TMP();
+call tl_lafrum11_get_all_thread_message_uids_tmp();
+call tl_lafrum11_set_all_thread_message_uids_tmp();
 
-drop procedure if exists WITH_EMULATOR;
-drop procedure if exists TL_LAFRUM11_SET_ALL_THREAD_MESSAGE_UIDS_TMP;
-drop procedure if exists TL_LAFRUM11_GET_ALL_THREAD_MESSAGE_UIDS_TMP;
+drop procedure if exists with_emulator;
+drop procedure if exists tl_lafrum11_set_all_thread_message_uids_tmp;
+drop procedure if exists tl_lafrum11_get_all_thread_message_uids_tmp;
 
-drop temporary table if exists tl_lafrum11_thread_message_uid_temp;
-drop temporary table if exists TL_LAFRUM11_ALL_THREAD_MEMBERS_TMP;
+drop temporary table if exists tl_lafrum11_thread_message_uid_tmp;
+drop temporary table if exists tl_lafrum11_recursive_tmp;
 
 -- End of thread id addition patches.
 

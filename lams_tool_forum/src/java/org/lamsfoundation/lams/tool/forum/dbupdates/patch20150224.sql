@@ -7,9 +7,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 ALTER TABLE `tl_lafrum11_message_seq` 
 ADD COLUMN `thread_message_uid` BIGINT(20) DEFAULT NULL,
-ADD INDEX `FKFRUM11MSEQTHREAD` (`thread_message_uid` ASC);
+ADD INDEX `fkfrum11mseqthread` (`thread_message_uid` ASC);
 ALTER TABLE `tl_lafrum11_message_seq` 
-ADD CONSTRAINT `FKFRUM11MSEQTHREAD`
+ADD CONSTRAINT `fkfrum11mseqthread`
   FOREIGN KEY (`thread_message_uid`)
   REFERENCES `tl_lafrum11_message` (`uid`)
   ON DELETE RESTRICT
