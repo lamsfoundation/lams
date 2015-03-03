@@ -2,7 +2,7 @@
 -- the WITH RECURSIVE feature not found in MySQL.
 -- From http://guilhembichot.blogspot.co.uk/2013/11/with-recursive-and-mysql.html
 
-CREATE PROCEDURE `WITH_EMULATOR`(
+CREATE PROCEDURE `with_emulator`(
 recursive_table varchar(100),
 initial_SELECT varchar(21845), 
 recursive_SELECT varchar(21845),
