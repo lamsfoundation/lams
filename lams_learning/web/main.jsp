@@ -131,7 +131,7 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 					<img id="logoImage" src="<lams:LAMSURL />images/css/lams_logo.gif" />
 				</td>
 				<td id="exitButtonCell">
-					<input onClick="javascript:closeWindow()" type="button" class="button progressButton" value='<fmt:message key="button.exit" />' />
+					<input name="exitButton" onClick="javascript:closeWindow()" type="button" class="button progressButton" value='<fmt:message key="button.exit" />' />
 				</td>
 			</tr>
 			<tr>
