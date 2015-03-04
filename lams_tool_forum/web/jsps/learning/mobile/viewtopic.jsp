@@ -12,12 +12,13 @@
 </c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="backToForum"><html:rewrite page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" /></c:set>
-<c:set var="refresh"><html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" /></c:set>
+<c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
+<c:set var="refresh"><html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}" /></c:set>
 
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
-		
+				
 		<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 		<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
@@ -35,6 +36,8 @@
 		<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 		<script src="${lams}includes/javascript/jquery.mobile.js" type="text/javascript"></script>	
 		<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/jquery.jscroll.js"></script>
+		
 		<script type="text/javascript">
 			$(document).bind('pageinit', function(){
 				$(".rating-stars").jRating({
@@ -79,6 +82,7 @@
 	</div>
 
 	<div data-role="content">
+
 		<div>
 			<div class="right-buttons">
 
@@ -154,8 +158,16 @@
 				</c:if>
 		</c:if>
 		<br>
-		
+
+		<div class="scroll" >
 		<%@ include file="message/topicview.jsp"%>
+		</div>
+		</div>
+		<script>
+			<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
+			<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
+			$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true});
+		</script>
 	
 		<div style="padding-top: 7px; padding-left: 5px;" data-role="controlgroup" >
 			<a href="${refresh}" id="refresh" data-theme="c" data-icon="refresh" data-role="button"  onclick="this.href += '&reqID=' + (new Date()).getTime();">
