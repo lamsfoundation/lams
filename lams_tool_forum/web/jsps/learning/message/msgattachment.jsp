@@ -15,7 +15,7 @@
 					<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
 				</td>
 				<td>		
-					<a href="#" onclick="removeAtt('${sessionMapID}')" class="button"> <fmt:message key="label.delete" /> </a>
+					<a id="removeAttachmentButton" href="#" onclick="removeAtt('${sessionMapID}')" class="button"> <fmt:message key="label.delete" /> </a>
 				</td>
 				<td>		
 					<img src="${ctxPath}/images/indicator.gif" style="display:none" id="itemAttachmentArea_Busy" />

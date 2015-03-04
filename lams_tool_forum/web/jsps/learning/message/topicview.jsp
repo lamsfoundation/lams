@@ -5,10 +5,10 @@
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="indentSize" value="${msgDto.level}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
-	<div style="margin-left:<c:out value="${indentSize}"/>em;">
+	<div id="message" name="msg${msgDto.message.uid}" style="margin-left:<c:out value="${indentSize}"/>em;">
 		<table cellspacing="0" class="forum">
 			<tr>
-				<th>
+				<th id="subject">
 					<c:choose>
 						<c:when test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 							<c:out value="${msgDto.message.subject}" />
@@ -29,14 +29,15 @@
 								<fmt:message key="label.default.user.name" />
 							</c:set>
 						</c:if>
-						<c:out value="${author}" escapeXml="true"/>						
+						<span id="author"><c:out value="${author}" escapeXml="true"/></span>
 								-
-						<lams:Date value="${msgDto.message.updated}" />
+						<span id="date"><lams:Date value="${msgDto.message.updated}" /></span>
 					</c:if>
 				</td>
 			</tr>
 			<tr>
 				<td>
+					<span id="msgBody">
 					<c:if
 						test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 						<c:out value="${msgDto.message.body}" escapeXml="false" />
@@ -44,12 +45,15 @@
 					<c:if test='${hidden}'>
 						<i><fmt:message key="topic.message.body.hidden" /> </i>
 					</c:if>
+					</span>
 				</td>
 			</tr>
 
 			<c:if test="${not empty msgDto.message.attachments}">
 				<tr>
-					<td><img src="<html:rewrite page="/images/paperclip.gif"/>" class="space-left float-left">
+					<td>
+						<div id="attachments">
+						<img src="<html:rewrite page="/images/paperclip.gif"/>" class="space-left float-left">
 						<c:if
 							test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'> 
 							<c:forEach var="file" items="${msgDto.message.attachments}">
@@ -64,6 +68,7 @@
 						<c:if test='${hidden}'>
 							<fmt:message key="topic.message.attachment.hidden" />
 						</c:if>
+						</div>
 					</td>
 				</tr>
 			</c:if>
@@ -144,7 +149,7 @@
 									<html:rewrite
 										page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 								</c:set>
-								<html:link href="${edittopic}" styleClass="button">
+								<html:link href="${edittopic}" styleClass="button" styleId="editButton">
 									<fmt:message key="label.edit" />
 								</html:link>
 							</c:if>
@@ -156,7 +161,7 @@
 									<html:rewrite
 										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />
 								</c:set>
-								<html:link href="${replytopic}" styleClass="button">
+								<html:link href="${replytopic}" styleClass="button" styleId="replyButton">
 									<fmt:message key="label.reply" />
 								</html:link>
 							</c:if>
