@@ -184,7 +184,7 @@
 					</html:button>
 				</div>
 		
-				<a href="javascript:refreshTopic();" class="button"> <fmt:message
+				<a href="javascript:refreshTopic();" class="button" id="refresh"> <fmt:message
 						key="label.refresh" /> </a>
 		
 			</div>

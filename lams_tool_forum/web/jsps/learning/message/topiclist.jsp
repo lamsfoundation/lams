@@ -2,7 +2,7 @@
 
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
 
-<table cellpadding="0" class="alternative-color" cellspacing="0">
+<table id="topicTable" cellpadding="0" class="alternative-color" cellspacing="0">
 	<tbody>
 		<tr>
 			<th width="">
@@ -32,7 +32,7 @@
 					<c:set var="viewtopic">
 						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 					</c:set>
-					<html:link href="${viewtopic}">
+					<html:link href="${viewtopic}" styleId="topicTitle">
 						<c:choose>
 							<c:when test="${topic.newPostingsNum > 0}">
 								<b><c:out value="${topic.message.subject}" /></b>
