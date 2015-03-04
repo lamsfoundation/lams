@@ -90,7 +90,7 @@
 				
 					<c:set var="refreshTopicURL">
 					</c:set>
-					<html:button property="backToForum"
+					<html:button property="refresh"
 						onclick="javascript:refreshTopic();"
 						styleClass="button">
 						<fmt:message key="label.refresh" />
