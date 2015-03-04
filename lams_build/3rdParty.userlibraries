@@ -6,8 +6,8 @@
         <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
         <archive path="/lams_build/lib/apache-poi/xmlbeans-2.3.0.jar"/>
         <archive javadoc="http://www.jarvana.com/jarvana/inspect/org/masukomi/aspirin/0.10.01/aspirin-0.10.01-javadoc.jar/" path="/lams_build/lib/aspirin/aspirin.jar" source="/3rdParty_sources/aspirin"/>
-        <archive path="/lams_build/lib/autopatch/autopatch-1.4.2.jar"/>
-        <archive path="/lams_build/lib/autopatch/discovery-1.0.5.jar"/>
+        <archive path="/lams_build/lib/autopatch/tk-autopatch-1.2.6.jar"/>
+        <archive path="/lams_build/lib/autopatch/tk-discovery-1.0.0.jar"/>
         <archive javadoc="http://ws.apache.org/axis/java/apiDocs/" path="/lams_build/lib/axis/axis.jar"/>
         <archive path="/lams_build/lib/axis/jaxrpc.jar"/>
         <archive path="/lams_build/lib/batik/batik-1.7.jar" source="/3rdParty_sources/batik"/>
