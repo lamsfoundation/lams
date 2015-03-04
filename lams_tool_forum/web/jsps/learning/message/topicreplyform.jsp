@@ -35,12 +35,12 @@
 			<html:rewrite
 				page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 		</c:set>
-		<html:button property="goback"
+		<html:button property="goback" styleId="cancelButton" 
 			onclick="javascript:location.href='${backToTopic}';"
 			styleClass="button">
 			<fmt:message key="button.cancel" />
 		</html:button>
-		<html:submit styleClass="button">
+		<html:submit styleClass="button" styleId="submitButton" >
 			<fmt:message key="button.submit" />
 		</html:submit>
 	</div>

@@ -22,11 +22,11 @@
 
 <div id="content">
 
-	<h1>
+	<h1 id="forumTitle">
 		<c:out value="${sessionMap.title}" escapeXml="true" />
 	</h1>
 
-	<div class="small-space-top">
+	<div class="small-space-top" id="forumInstructions">
 		<c:out value="${sessionMap.instruction}" escapeXml="false" />
 	</div>
 
@@ -140,7 +140,7 @@
 			<p>
 				<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
 			</p>
-
+			<div id="reflection">
 			<c:choose>
 				<c:when test="${empty sessionMap.reflectEntry}">
 					<p>
@@ -153,18 +153,18 @@
 					</p>
 				</c:otherwise>
 			</c:choose>
-
+			</div>
 			<c:if test='${sessionMap.mode != "teacher"}'>
 				<html:button property="continue"
 					onclick="javascript:location.href='${continue}';"
-					styleClass="button">
+					styleClass="button" styleId="editReflection">
 					<fmt:message key="label.edit" />
 				</html:button>
 			</c:if>
 		</div>
 	</c:if>
 
-	<div align="right" class="space-bottom-top">
+	<div align="right" class="space-bottom-top" id="rightButtons">
 		<c:if test='${(sessionMap.mode != "teacher") && sessionMap.isMinRatingsCompleted}'>
 			<c:choose>
 				<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
