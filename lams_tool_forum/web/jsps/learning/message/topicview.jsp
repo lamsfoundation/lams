@@ -2,14 +2,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
-
-<c:set var="maxSequenceUid" value="0"/>
+<c:set var="maxThreadUid" value="0"/>
 
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="indentSize" value="${msgDto.level}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
 
-	<c:if test='${(indentSize == 1)}'>
+	<c:if test='${(indentSize <= 1)}'>
 		<c:set var="maxThreadUid" value="${msgDto.message.uid}"/>
 	</c:if>
 	

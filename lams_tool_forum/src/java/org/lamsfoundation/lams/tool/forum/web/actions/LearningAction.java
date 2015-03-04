@@ -494,6 +494,21 @@ public class LearningAction extends Action {
 	Long lastMsgSeqId = WebUtil.readLongParam(request, ForumConstants.PAGE_LAST_ID, true);
 	Long pageSize = WebUtil.readLongParam(request, ForumConstants.PAGE_SIZE, true);
 	
+	setupViewTopicPagedDTOList(request, rootTopicId, sessionMapID, forumUser, forum, lastMsgSeqId, pageSize);
+
+	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
+	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
+	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
+	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
+	// as it has a link from the view topic screen back to View Forum screen.
+	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
+	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
+
+	return mapping.findForward("success");
+    }
+
+    private void setupViewTopicPagedDTOList(HttpServletRequest request, Long rootTopicId, String sessionMapID,
+	    ForumUser forumUser, Forum forum, Long lastMsgSeqId, Long pageSize) {
 	// get root topic list
 	List<MessageDTO> msgDtoList = forumService.getTopicThread(rootTopicId, lastMsgSeqId, pageSize);
 	updateMesssageFlag(msgDtoList);
@@ -509,18 +524,8 @@ public class LearningAction extends Action {
 	// transfer SessionMapID as well
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
-	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
-	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
-	// as it has a link from the view topic screen back to View Forum screen.
-	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
-	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
 	// Saving or updating user timestamp
 	forumService.saveTimestamp(rootTopicId, forumUser);
-
-	return mapping.findForward("success");
     }
 
 
@@ -693,33 +698,20 @@ public class LearningAction extends Action {
 
 	// echo back this topic thread into page
 	Long rootTopicId = forumService.getRootTopicId(parentId);
-	List msgDtoList = forumService.getTopicThread(rootTopicId);
-	updateMesssageFlag(msgDtoList);
-
-	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	// check whether allow more posts for this user
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 	Forum forum = session.getForum();
-	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO) msgDtoList.get(0))
-		.getMessage().getUid());
-	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
-		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
-	request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
-	request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 
-	sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
-
-	// Saving or updating user timestamp
-	forumService.saveTimestamp(rootTopicId, forumUser);
-
+	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null); 
+	
 	// notify learners and teachers
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
-
+	sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
 	return mapping.findForward("success");
     }
+
 
     /**
      * Display a editable form for a special topic in order to update it.
@@ -834,25 +826,10 @@ public class LearningAction extends Action {
 
 	// echo back this topic thread into page
 	Long rootTopicId = forumService.getRootTopicId(topicId);
-	List msgDtoList = forumService.getTopicThread(rootTopicId);
-	updateMesssageFlag(msgDtoList);
-
-	// check if we can still make posts in this topic
 	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
 	Forum forum = forumUser.getSession().getForum();
-	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), ((MessageDTO) msgDtoList.get(0))
-		.getMessage().getUid());
-	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
-		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
-	request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
-	request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
-
-	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
-
-	// Saving or updating user timestamp
-	forumService.saveTimestamp(rootTopicId, forumUser);
-
+	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
+		    
 	return mapping.findForward("success");
     }
 
