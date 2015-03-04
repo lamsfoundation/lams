@@ -11,8 +11,8 @@ aspirin           aspirin.jar                           0.8.03                 A
                   commons-pool-1.5.1.jar				1.5.1				   Apache License 2.0			 Apache
                   dnsjava-2.0.6.jar						2.0.6				   BSD							 Brian Wellington				  implementation of DNS in Java
 
-autopatch		  autopatch-1.4.2.jar					1.4.2				   Apache License				 Tacit Knowledge				  automated Java patching system
-				  discovery-1.0.5.jar					1.0.5				  
+autopatch		  tk-autopatch-1.2.6-cvs.jar			1.2.6				   Apache License				 Tacit Knowledge				  automated Java patching system
+				  discovery-1.0.0.jar					1.0.0				  
 
 axis              axis-ant.jar							1.4                    Apache License 2.0      	     Apache							  XML based Web service framework                                                                                          
                   axis.jar								1.4																					                                                                                                               
