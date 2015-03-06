@@ -3,16 +3,42 @@
 
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
 <c:set var="maxThreadUid" value="0"/>
+<c:set var="messageTablename" value=""/>
+<c:set var="indent" value="30"/>
+<c:set var="tableCommand">expandable:true,expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;Show/Hide Replies</a><',stringCollapse:'Hide Replies',stringExpand:'Show Replies',clickableNodeNames:true,indent:${indent}</c:set>
 
 <c:forEach var="msgDto" items="${topicThread}">
-	<c:set var="indentSize" value="${msgDto.level}" />
+	<c:set var="msgLevel" value="${msgDto.level}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
 	
-	<c:if test='${(indentSize <= 1)}'>
+	<c:if test='${(msgLevel <= 1)}'>
 		<c:set var="maxThreadUid" value="${msgDto.message.uid}"/>
 	</c:if>
+
+	<c:choose>
+	<c:when test='${(msgLevel == 0)}'>
+		<c:set var="indentSize" value="0" />
+	</c:when>
+	<c:when test='${(msgLevel <= 1)}'>
+		<%-- same test & command appears at bottom of script --%>
+		<c:if test='${messageTablename != ""}'>
+			</table>
+			<script> 
+				$("#${messageTablename}").treetable({${tableCommand}});
+			</script>	
+		</c:if>
+		<c:set var="messageTablename" value="tree${msgDto.message.uid}"/>
+		<c:set var="indentSize" value="0" />
+		<table id="${messageTablename}">
+		<tr data-tt-id="${msgDto.message.uid}"><td>	
+	</c:when>
+	<c:otherwise>
+	<c:set var="indentSize" value="${(msgDto.level-1)*indent}" />
+		<tr data-tt-id="${msgDto.message.uid}" data-tt-parent-id="${msgDto.message.parent.uid}"><td>	
+	</c:otherwise>
+	</c:choose>
 	
-	<div id="message" name="msg${msgDto.message.uid}"  style="margin-left:<c:out value="${indentSize}"/>em;">
+	<div id="message" name="msg${msgDto.message.uid}"  style="margin-left:<c:out value="${indentSize}"/>px;">
 		<table cellspacing="0" class="forum">
 			<tr>
 				<th id="subject">
@@ -178,8 +204,20 @@
 			</tr>
 		</table>
 	</div>
+
+	<c:if test='${(msgLevel >= 1)}'>
+		</td></tr>	
+	</c:if>
+
 </c:forEach>
 
+	<c:if test='${messageTablename != ""}'>
+		</table>
+		<script>
+			$("#${messageTablename}").treetable({${tableCommand}});
+		</script>	
+	</c:if>
+	
 <c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
 <c:if test='${maxThreadUid > 0}'>
 	<div class="float-right">
