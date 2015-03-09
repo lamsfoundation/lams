@@ -7,6 +7,14 @@
 <c:set var="indent" value="30"/>
 <c:set var="tableCommand">expandable:true,expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;Show/Hide Replies</a><',stringCollapse:'Hide Replies',stringExpand:'Show Replies',clickableNodeNames:true,indent:${indent}</c:set>
 
+<script type="text/javascript">
+	// The treetable code uses the clicks to expand and collapse the replies but then 
+	// the buttons will not work. So stop the event propogating up the event chain. 
+	$(".button").click(function (e) {
+    	e.stopPropagation();
+	});
+</script>
+
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="msgLevel" value="${msgDto.level}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
