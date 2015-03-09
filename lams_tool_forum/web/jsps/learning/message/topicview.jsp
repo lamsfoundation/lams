@@ -5,7 +5,11 @@
 <c:set var="maxThreadUid" value="0"/>
 <c:set var="messageTablename" value=""/>
 <c:set var="indent" value="30"/>
-<c:set var="tableCommand">expandable:true,expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;Show/Hide Replies</a><',stringCollapse:'Hide Replies',stringExpand:'Show Replies',clickableNodeNames:true,indent:${indent}</c:set>
+
+<c:set var="show"><fmt:message key="label.show.replies" /></c:set>
+<c:set var="hide"><fmt:message key="label.hide.replies" /></c:set>
+<c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
+<c:set var="tableCommand">expandable:true,expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a><',stringCollapse:'${hide}',stringExpand:'${show}',clickableNodeNames:true,indent:${indent}</c:set>
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
