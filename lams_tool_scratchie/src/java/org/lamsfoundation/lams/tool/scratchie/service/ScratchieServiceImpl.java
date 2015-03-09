@@ -815,6 +815,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	    ScratchieBurningQuestion burningQuestion = scratchieBurningQuestionDao
 		    .getGeneralBurningQuestionBySession(session.getSessionId());
+	    if (burningQuestion == null) {
+		continue;
+	    }
 
 	    String groupName = StringEscapeUtils.escapeJavaScript(session.getSessionName());
 	    String burningQuestionText = StringEscapeUtils.escapeJavaScript(burningQuestion.getQuestion());
