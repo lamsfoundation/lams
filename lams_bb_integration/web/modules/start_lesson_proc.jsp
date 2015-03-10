@@ -30,6 +30,7 @@
 <%@ page import="blackboard.platform.*"%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
+<%@ page import="blackboard.platform.context.Context"%>
 <%@ page import="blackboard.data.gradebook.Lineitem" %>
 <%@ page import="blackboard.persist.gradebook.LineitemDbPersister" %>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
@@ -131,7 +132,7 @@
         bbContent.setBody(description);
 
         // Start the Lesson in LAMS (via Webservices) and capture the lesson ID
-        long LamsLessonIdLong = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);
+        final long LamsLessonIdLong = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);
         //error checking
         if (LamsLessonIdLong == -1) {
         	response.sendRedirect("lamsServerDown.jsp");
@@ -174,6 +175,17 @@
 		}
 		
         String strReturnUrl = PlugInUtil.getEditableContentReturnURL(bbContent.getParentId(), courseId);
+        
+		// create a new thread to pre-add students and monitors to a lesson (in order to do this task in parallel not to slow down later work)
+		final Context ctxFinal = ctx;
+		Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+				LamsSecurityUtil.preaddLearnersMonitorsToLesson(ctxFinal, LamsLessonIdLong);
+		    }
+		}, "LAMS_preaddLearnersMonitors_thread");
+		preaddLearnersMonitorsThread.start();
+        
 	%>
 
     <%-- Breadcrumbs --%>
