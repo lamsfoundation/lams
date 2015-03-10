@@ -9,7 +9,16 @@
 <c:set var="show"><fmt:message key="label.show.replies" /></c:set>
 <c:set var="hide"><fmt:message key="label.hide.replies" /></c:set>
 <c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
-<c:set var="tableCommand">expandable:true,expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a><',stringCollapse:'${hide}',stringExpand:'${show}',clickableNodeNames:true,indent:${indent}</c:set>
+<c:set var="tableCommand">expandable:true,initialState:'expanded',
+	expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a><',
+	stringCollapse:'${hide}',stringExpand:'${show}',
+	clickableNodeNames:true,indent:${indent},
+	onNodeInitialized:function() {
+		if (this.level() >= 2) {
+			this.collapse();
+		}
+ 	}</c:set>
+
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
