@@ -41,7 +41,6 @@ import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -49,9 +48,14 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
-import org.xml.sax.SAXException;
 
+import blackboard.base.BbList;
+import blackboard.data.course.CourseMembership;
+import blackboard.persist.BbPersistenceManager;
+import blackboard.persist.Id;
 import blackboard.persist.PersistenceException;
+import blackboard.persist.course.CourseMembershipDbLoader;
+import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.portal.data.ExtraInfo;
 import blackboard.portal.data.PortalExtraInfo;
@@ -342,6 +346,143 @@ public class LamsSecurityUtil {
 			    + " Please contact your system administrator.", e);
 	} catch (Exception e) {
 	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
+	}
+
+    }
+    
+    /**
+     * Pre-adding students and monitors to a lesson
+     * 
+     * @param ctx
+     *            the blackboard contect, contains session data
+     * @param lessonId
+     *            the lesoon id that was just started
+     */
+    public static void preaddLearnersMonitorsToLesson(Context ctx, long lessonId) {
+	String serverId = getServerID();
+	String serverAddr = getServerAddress();
+	String serverKey = getServerKey();
+	String courseIdStr = ctx.getCourse().getCourseId();
+	String username = ctx.getUser().getUserName();
+	String locale = ctx.getUser().getLocale();
+	String country = getCountry(locale);
+	String lang = getLanguage(locale);
+
+	if (serverId == null || serverAddr == null || serverKey == null) {
+	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
+	}
+
+	try {
+	    
+	    /*
+	     * Returns a list of learners and monitors in the given course or group.
+	     */
+
+	    String learnerIds = "";
+	    String firstNames = "";
+	    String lastNames = "";
+	    String emails = "";
+	    String monitorIds = "";
+	    final String DUMMY_NAME = "unknown";
+
+	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    Id courseId = ctx.getCourse().getId();
+
+	    CourseMembershipDbLoader courseMemLoader = (CourseMembershipDbLoader) bbPm
+		    .getLoader(CourseMembershipDbLoader.TYPE);
+	    BbList<CourseMembership> studentCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+		    CourseMembership.Role.STUDENT, null, true);
+	    for (CourseMembership courseMembership : studentCourseMemberships) {
+		learnerIds += URLEncoder.encode(courseMembership.getUser().getUserName(), "utf8") + ",";
+		
+		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_NAME : courseMembership
+			.getUser().getGivenName();
+		firstNames += URLEncoder.encode(firstName, "utf8") + ",";
+		
+		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_NAME : courseMembership
+			.getUser().getFamilyName();
+		lastNames += URLEncoder.encode(lastName, "utf8") + ",";
+		
+		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_NAME : courseMembership
+			.getUser().getEmailAddress();
+		emails += URLEncoder.encode(email, "utf8") + ",";
+	    }
+
+	    BbList<CourseMembership> monitorCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+		    CourseMembership.Role.INSTRUCTOR, null, true);
+	    BbList<CourseMembership> teachingAssistantCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+		    CourseMembership.Role.TEACHING_ASSISTANT, null, true);
+	    monitorCourseMemberships.addAll(teachingAssistantCourseMemberships);
+	    for (CourseMembership courseMembership : monitorCourseMemberships) {
+		monitorIds += URLEncoder.encode(courseMembership.getUser().getUserName(), "utf8") + ",";
+
+		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_NAME : courseMembership
+			.getUser().getGivenName();
+		firstNames += URLEncoder.encode(firstName, "utf8") + ",";
+
+		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_NAME : courseMembership
+			.getUser().getFamilyName();
+		lastNames += URLEncoder.encode(lastName, "utf8") + ",";
+
+		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_NAME : courseMembership
+			.getUser().getEmailAddress();
+		emails += URLEncoder.encode(email, "utf8") + ",";
+	    }
+
+	    //no learners & no monitors - do nothing
+	    if (learnerIds.isEmpty() && monitorIds.isEmpty()) {
+		return;
+	    }
+
+	    // remove trailing comma
+	    learnerIds = learnerIds.isEmpty() ? "" : learnerIds.substring(0, learnerIds.length() - 1);
+	    firstNames = firstNames.isEmpty() ? "" : firstNames.substring(0, firstNames.length() - 1);
+	    lastNames = lastNames.isEmpty() ? "" : lastNames.substring(0, lastNames.length() - 1);
+	    emails = emails.isEmpty() ? "" : emails.substring(0, emails.length() - 1);
+	    monitorIds = monitorIds.isEmpty() ? "" : monitorIds.substring(0, monitorIds.length() - 1);
+
+	    String timestamp = new Long(System.currentTimeMillis()).toString();
+	    String hash = generateAuthenticationHash(timestamp, username, serverId);
+
+	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "&serverId="
+		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
+		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
+		    + URLEncoder.encode(courseIdStr, "utf8") + "&lsId=" + lessonId + "&country=" + country + "&lang="
+		    + lang + "&method=join" + "&firstNames="
+		    + firstNames + "&lastNames=" + lastNames + "&emails=" + emails;
+	    if (!monitorIds.isEmpty()) {
+		serviceURL += "&monitorIds=" + monitorIds;
+	    }
+	    if (!learnerIds.isEmpty()) {
+		serviceURL += "&learnerIds=" + learnerIds;
+	    }
+
+	    logger.info("LAMS Preadd users Req: " + serviceURL);
+	    System.out.println("LAMS Preadd users Req: " + serviceURL);
+
+	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+	    
+	} catch (MalformedURLException e) {
+	    throw new RuntimeException("Unable to preadd users to the lesson, bad URL: '" + serverAddr
+		    + "', please check lams.properties", e);
+	} catch (IllegalStateException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (RemoteException e) {
+	    throw new RuntimeException("Unable to preadd users to the lesson, RMI Remote Exception", e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new RuntimeException("Unable to preadd users to the lesson, Unsupported Encoding Exception", e);
+	} catch (ConnectException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (IOException e) {
+	    throw new RuntimeException("Unable to preadd users to the lesson. " + e.getMessage()
+		    + " Please contact your system administrator.", e);
+	} catch (Exception e) {
+	    throw new RuntimeException(
+		    "Unable to preadd users to the lesson. Please contact your system administrator.", e);
 	}
 
     }
