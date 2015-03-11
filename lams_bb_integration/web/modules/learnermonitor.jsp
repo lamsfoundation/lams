@@ -171,11 +171,6 @@
 	LearnerProgressDTO learnerProgressDto = LamsSecurityUtil.getLearnerProgress(ctx, lessonId);
 %>
 
-    <%-- Breadcrumbs --%>
-    <bbNG:breadcrumbBar environment="CTRL_PANEL" isContent="true">
-        <bbNG:breadcrumb title="LAMS Options" />
-    </bbNG:breadcrumbBar>
-
     <%-- Page Header --%>
     <bbNG:pageHeader>    	
         <bbNG:pageTitleBar title="<%=title%>"/>
