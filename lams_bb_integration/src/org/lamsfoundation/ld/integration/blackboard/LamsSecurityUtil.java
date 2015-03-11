@@ -383,7 +383,7 @@ public class LamsSecurityUtil {
 	    String lastNames = "";
 	    String emails = "";
 	    String monitorIds = "";
-	    final String DUMMY_NAME = "unknown";
+	    final String DUMMY_VALUE = "-";
 
 	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
 	    Id courseId = ctx.getCourse().getId();
@@ -395,15 +395,15 @@ public class LamsSecurityUtil {
 	    for (CourseMembership courseMembership : studentCourseMemberships) {
 		learnerIds += URLEncoder.encode(courseMembership.getUser().getUserName(), "utf8") + ",";
 		
-		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_NAME : courseMembership
+		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_VALUE : courseMembership
 			.getUser().getGivenName();
 		firstNames += URLEncoder.encode(firstName, "utf8") + ",";
 		
-		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_NAME : courseMembership
+		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_VALUE : courseMembership
 			.getUser().getFamilyName();
 		lastNames += URLEncoder.encode(lastName, "utf8") + ",";
 		
-		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_NAME : courseMembership
+		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_VALUE : courseMembership
 			.getUser().getEmailAddress();
 		emails += URLEncoder.encode(email, "utf8") + ",";
 	    }
@@ -416,15 +416,15 @@ public class LamsSecurityUtil {
 	    for (CourseMembership courseMembership : monitorCourseMemberships) {
 		monitorIds += URLEncoder.encode(courseMembership.getUser().getUserName(), "utf8") + ",";
 
-		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_NAME : courseMembership
+		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_VALUE : courseMembership
 			.getUser().getGivenName();
 		firstNames += URLEncoder.encode(firstName, "utf8") + ",";
 
-		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_NAME : courseMembership
+		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_VALUE : courseMembership
 			.getUser().getFamilyName();
 		lastNames += URLEncoder.encode(lastName, "utf8") + ",";
 
-		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_NAME : courseMembership
+		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_VALUE : courseMembership
 			.getUser().getEmailAddress();
 		emails += URLEncoder.encode(email, "utf8") + ",";
 	    }
