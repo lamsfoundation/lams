@@ -73,5 +73,8 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 ===================
 * LDEV-3423: Fixed Exception on getting mark from LAMS server after lesson is completed
 * LDEV-3424: Add new feature to integrations to be able to sync all marks in the lesson
+
+1.2.9 Release Fixes
+===================
 * LDEV-3446: Join users to the lesson after it was created on a BB side
 
