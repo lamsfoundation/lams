@@ -1039,7 +1039,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("responseUid", response.getResponseId().toString());
-	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response.getAnswer()));
+	    responseRow.put("answer", response.getAnswer());
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
 	    
