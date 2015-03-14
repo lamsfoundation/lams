@@ -182,6 +182,11 @@
 			parameter="viewTopicNext" scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopicNext" />
 		</action>
+		<action path="/learning/viewTopicThread"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="viewTopicThread" scope="request">
+			<forward name="success" path="tiles:/learning/forum/viewTopicNext" />
+		</action>
 		<action path="/learning/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="messageForm" 
@@ -212,6 +217,15 @@
 			validate="true" 
 			input="tiles:/learning/forum/replyTopic" 
 			parameter="replyTopic" 
+			scope="request">
+			<forward name="success" path="tiles:/learning/forum/viewTopic" />
+		</action>
+		<action path="/learning/replyTopicInline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			name="messageForm" 
+			validate="true" 
+			input="tiles:/learning/forum/replyTopic" 
+			parameter="replyTopicInline" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>

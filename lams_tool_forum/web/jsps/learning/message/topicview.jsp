@@ -17,15 +17,86 @@
 		if (this.level() >= 2) {
 			this.collapse();
 		}
- 	}</c:set>
-
+	}
+ </c:set>
 
 <script type="text/javascript">
+function inspect(obj, maxLevels, level)
+{
+  var str = '', type, msg;
+
+    // Start Input Validations
+    // Don't touch, we start iterating at level zero
+    if(level == null)  level = 0;
+
+    // At least you want to show the first level
+    if(maxLevels == null) maxLevels = 1;
+    if(maxLevels < 1)     
+        return '<font color="red">Error: Levels number must be > 0</font>';
+
+    // We start with a non null object
+    if(obj == null)
+    return '<font color="red">Error: Object <b>NULL</b></font>';
+    // End Input Validations
+
+    // Each Iteration must be indented
+    str += '<ul>';
+
+    // Start iterations for all objects in obj
+    for(property in obj)
+    {
+      try
+      {
+          // Show "property" and "type property"
+          type =  typeof(obj[property]);
+          str += '<li>(' + type + ') ' + property + 
+                 ( (obj[property]==null)?(': <b>null</b>'):('')) + '</li>';
+
+          // We keep iterating if this property is an Object, non null
+          // and we are inside the required number of levels
+          if((type == 'object') && (obj[property] != null) && (level+1 < maxLevels))
+          str += inspect(obj[property], maxLevels, level+1);
+      }
+      catch(err)
+      {
+        // Is there some properties in obj we can't access? Print it red.
+        if(typeof(err) == 'string') msg = err;
+        else if(err.message)        msg = err.message;
+        else if(err.description)    msg = err.description;
+        else                        msg = 'Unknown';
+
+        str += '<li><font color="red">(Error) ' + property + ': ' + msg +'</font></li>';
+      }
+    }
+
+      // Close indent
+      str += '</ul>';
+
+    return str;
+}
 	// The treetable code uses the clicks to expand and collapse the replies but then 
 	// the buttons will not work. So stop the event propogating up the event chain. 
 	$(".button").click(function (e) {
     	e.stopPropagation();
 	});
+	
+	function createReply(messageUid, url) {
+		if ( document.getElementById('reply') ) {
+// I18N
+			alert("Please complete or cancel the current reply before starting a new reply.");
+		} else {
+			// set up the new reply area
+			var parentDiv = document.getElementById('msg'+messageUid);
+			var replyDiv = document.createElement("div");
+			replyDiv.id = 'reply';
+			$(replyDiv).addClass('replydiv');
+			parentDiv.appendChild(replyDiv);
+			$(replyDiv).load(url);
+		}
+	}
+
+
+
 </script>
 
 <c:forEach var="msgDto" items="${topicThread}">
@@ -47,9 +118,11 @@
 			<script> 
 				$("#${messageTablename}").treetable({${tableCommand}});
 			</script>	
+			</div>
 		</c:if>
 		<c:set var="messageTablename" value="tree${msgDto.message.uid}"/>
 		<c:set var="indentSize" value="0" />
+		<div id="thread${msgDto.message.uid}"/>
 		<table id="${messageTablename}">
 		<tr data-tt-id="${msgDto.message.uid}"><td>	
 	</c:when>
@@ -59,7 +132,14 @@
 	</c:otherwise>
 	</c:choose>
 	
-	<div id="message" name="msg${msgDto.message.uid}"  style="margin-left:<c:out value="${indentSize}"/>px;">
+	<c:choose>
+	<c:when test='${msgDto.message.uid == messageUid}'>
+	<div id="msg${msgDto.message.uid}" style="margin-left:<c:out value="${indentSize}"/>px;" class="highlight" >
+	</c:when>
+	<c:otherwise>	
+	<div id="msg${msgDto.message.uid}" style="margin-left:<c:out value="${indentSize}"/>px;" >
+	</c:otherwise>
+	</c:choose>
 		<table cellspacing="0" class="forum">
 			<tr>
 				<th id="subject">
@@ -215,9 +295,7 @@
 									<html:rewrite
 										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />
 								</c:set>
-								<html:link href="${replytopic}" styleClass="button" styleId="replyButton">
-									<fmt:message key="label.reply" />
-								</html:link>
+								<a href="#${msgDto.message.uid}" onClick="javascript:createReply(${msgDto.message.uid},'${replytopic}')" class="button replybutton"><fmt:message key="label.reply" /></a>
 							</c:if>
 						</c:if>
 					</div>
@@ -237,10 +315,11 @@
 		<script>
 			$("#${messageTablename}").treetable({${tableCommand}});
 		</script>	
+		</div>
 	</c:if>
 	
 <c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
-<c:if test='${maxThreadUid > 0}'>
+<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
 	<div class="float-right">
 	<c:set var="more"><html:rewrite page="/learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}" /></c:set>
 	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>

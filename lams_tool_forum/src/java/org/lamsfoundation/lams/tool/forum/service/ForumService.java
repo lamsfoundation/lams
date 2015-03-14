@@ -332,7 +332,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public Message replyTopic(Long parentId, Long sessionId, Message replyMessage) throws PersistenceException {
+    public MessageSeq replyTopic(Long parentId, Long sessionId, Message replyMessage) throws PersistenceException {
 	// set parent
 	Message parent = this.getMessage(parentId);
 	replyMessage.setParent(parent);
@@ -374,7 +374,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	root.setReplyNumber(root.getReplyNumber() + 1);
 	messageDao.saveOrUpdate(root);
 
-	return replyMessage;
+	return msgSeq;
     }
 
     @Override
@@ -425,7 +425,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	
 	do { 
 	    
-	    List msgSeqs =  messageSeqDao.getThreadByThreadId(rootTopicId, lastThreadMessageUid);
+	    List msgSeqs =  messageSeqDao.getNextThreadByThreadId(rootTopicId, lastThreadMessageUid);
 	    if ( msgSeqs.size() == 0 ) {
 		// no more to come from db
 		foundEnough = true;
@@ -448,6 +448,19 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
         		
 	return getSortedMessageDTO(map);
     }
+
+    @Override
+    public List getThread( Long threadId ) {	
+	List msgSeqs =  messageSeqDao.getThreadByThreadId(threadId);
+	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
+	Iterator iter = msgSeqs.iterator();
+       	while ( iter.hasNext() ) {
+       	    MessageSeq msgSeq = ( MessageSeq) iter.next();
+       	    map.put(msgSeq, msgSeq.getMessage());
+	};		
+	return getSortedMessageDTO(map);
+    }
+
 
     @Override
     public List<MessageDTO> getRootTopics(Long sessionId) {
