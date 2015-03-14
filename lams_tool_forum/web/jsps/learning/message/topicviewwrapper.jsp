@@ -11,6 +11,7 @@
 </c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<script type="text/javascript" src="${tool}includes/javascript/jquery.treetable.js"></script>
 
 <%@ include file="topicview.jsp"%>
 

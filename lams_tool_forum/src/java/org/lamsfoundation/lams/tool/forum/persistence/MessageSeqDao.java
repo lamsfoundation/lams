@@ -44,6 +44,8 @@ public class MessageSeqDao extends HibernateDaoSupport {
 	    + " where root_message_uid = ? and message.uid > ? and message_level = 1";
     private static final String SQL_QUERY_FIND_NEXT_THREAD_MESSAGES = "from " + MessageSeq.class.getName()
 	    + " where root_message_uid = ? and thread_message_uid = ? and message_level > 1";
+    private static final String SQL_QUERY_GET_COMPLETE_THREAD = "from " + MessageSeq.class.getName()
+	    + " where thread_message_uid = ?";
 
     private static final String SQL_QUERY_NUM_POSTS_BY_TOPIC = "select count(*) from " + MessageSeq.class.getName()
 	    + " ms where ms.message.createdBy.userId=? and ms.message.isAuthored = false and ms.rootMessage.uid=?";
@@ -59,7 +61,11 @@ public class MessageSeqDao extends HibernateDaoSupport {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_COMPLETE_TOPIC, rootTopicId);
     }
 
-    public List getThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId) {
+    public List getThreadByThreadId(final Long threadMessageId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_GET_COMPLETE_THREAD, new Object[] { threadMessageId });
+    }
+
+    public List getNextThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId) {
 	HibernateTemplate template = this.getHibernateTemplate();
 	template.setMaxResults(1);
 	List list = template.find(SQL_QUERY_FIND_NEXT_THREAD_TOP, new Object[] { rootTopicId, previousThreadMessageId });	

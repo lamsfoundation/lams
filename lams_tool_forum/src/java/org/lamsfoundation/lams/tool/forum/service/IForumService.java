@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -148,7 +149,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    Message replyTopic(Long parentId, Long sessionId, Message message) throws PersistenceException;
+    MessageSeq replyTopic(Long parentId, Long sessionId, Message message) throws PersistenceException;
 
     /**
      * Delete the topic by given topic ID. The function will delete all children topics under this topic.
@@ -189,6 +190,14 @@ public interface IForumService {
      * @return List of MessageDTO
      */
     public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize );
+
+    /**
+     * Get one complete thread within a topic Note that the return type is DTO.
+     * 
+     * @param threadId
+     * @return List of MessageDTO
+     */
+    public List getThread(Long threadId );
 
     /**
      * Get root topics by a given sessionID value. Simultanousely, it gets back topics, which author posted in authoring
