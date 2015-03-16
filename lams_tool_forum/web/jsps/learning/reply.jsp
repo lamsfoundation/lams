@@ -5,11 +5,8 @@
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
 	// the buttons will not work. So stop the event propogating up the event chain. 
-	$(".button").click(function (e) {
-    	e.stopPropagation();
-	});
-	$(":file").click(function (e) {
-    	e.stopPropagation();
+	$("#replyForm").click(function (e) {
+		e.stopPropagation();
 	});
 
 	$('#replyForm').submit(function() { // catch the form's submit event
