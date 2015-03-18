@@ -47,7 +47,11 @@
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$(".rating-stars").jRating({
+				setupJRating();
+			});
+	
+			function setupJRating() {
+				$(".rating-stars-new").filter($(".rating-stars")).jRating({
 				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}",
 				    rateMax : 5,
 				    decimalLength : 1,
@@ -67,17 +71,17 @@
 					    jError('Error : please retry');
 					}
 				});
-			    $(".rating-stars-disabled").jRating({
+			    $(".rating-stars-new").filter($(".rating-stars-disabled")).jRating({
 			    	rateMax : 5,
 			    	isDisabled : true
 				});
-			});
-	
+				$(".rating-stars-new").removeClass("rating-stars-new");
+			}
+			
 			function refreshTopic(){
 				var reqIDVar = new Date();
 				location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=" />"+reqIDVar.getTime();;
 			}
-		
 		</script>		
 		
 	</lams:head>
@@ -191,7 +195,7 @@
 			<script>
 				<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
 				<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
-				$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true});
+				$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true,callback:setupJRating});
 			</script>
 			
 			<c:set var="refreshTopicURL">

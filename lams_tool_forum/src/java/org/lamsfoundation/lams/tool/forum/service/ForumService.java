@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.forum.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -46,6 +45,8 @@ import java.util.Vector;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -270,6 +271,15 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	messageDao.saveOrUpdate(root);
 
 	return message;
+    }
+
+
+    public List<MessageDTO> getMessageAsDTO(Long messageUid) throws PersistenceException {
+
+	MessageSeq msgSeq = messageSeqDao.getByMessageId(messageUid);
+	List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
+	msgDtoList.add(makeDTOSetRating(msgSeq, msgSeq.getMessage()));
+	return msgDtoList;
     }
 
     public void updateContainedReport(Message message) {
@@ -685,19 +695,22 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    Map.Entry entry = (Entry) iter.next();
 	    msgSeq = (MessageSeq) entry.getKey();
 	    message = (Message) entry.getValue();
-	    MessageDTO dto = MessageDTO.getMessageDTO(message);
-	    dto.setLevel(msgSeq.getMessageLevel());
-	    
-	    //set averageRating 
-	    if (message.getForum().isAllowRateMessages()) {
-		AverageRatingDTO averageRating = getAverageRatingDTOByMessage(message.getUid());
-		dto.setAverageRating(averageRating.getRating());
-		dto.setNumberOfVotes(averageRating.getNumberOfVotes());
-	    }
-	    
-	    msgDtoList.add(dto);
+	    msgDtoList.add(makeDTOSetRating(msgSeq, message));
 	}
 	return msgDtoList;
+    }
+
+    private MessageDTO makeDTOSetRating(MessageSeq msgSeq, Message message) {
+	MessageDTO dto = MessageDTO.getMessageDTO(message);
+	dto.setLevel(msgSeq.getMessageLevel());
+	
+	//set averageRating 
+	if (message.getForum().isAllowRateMessages()) {
+	AverageRatingDTO averageRating = getAverageRatingDTOByMessage(message.getUid());
+	dto.setAverageRating(averageRating.getRating());
+	dto.setNumberOfVotes(averageRating.getNumberOfVotes());
+	}
+	return dto;
     }
 
 
@@ -1572,4 +1585,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getForumOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
+    
+    // ****************** REST methods *************************
+
 }

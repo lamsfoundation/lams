@@ -35,7 +35,6 @@
         			if ( rootUid ) {
 	        			if ( ! threadDiv) {
     	    				// must have replied to the top level, so show the posting at the top.
-        					// even if it was an actual error, the top is as good a place as any to show it!
 							var threadDiv = document.getElementById('reply');
 							threadDiv.id = 'thread'+messageUid;
         				} else {
@@ -45,8 +44,7 @@
 						}
         			
 	        			if ( ! threadDiv) {
-// I18N
-    	    				alert("Your reply is saved but we cannot redisplay it. Please select refresh to reload the forum messages.");
+	        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
         				} else {
 	        				var loadString = '<html:rewrite page="/learning/viewTopicThread.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
 							$(threadDiv).load(loadString, function() {
@@ -75,7 +73,7 @@
 	});
 
 	function cancelReply() {
-		$('.replydiv').remove();
+		$('#reply').remove();
 	}
 	
 </script>

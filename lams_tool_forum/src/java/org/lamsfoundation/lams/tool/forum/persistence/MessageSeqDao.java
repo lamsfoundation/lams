@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.Tool;
@@ -46,6 +47,8 @@ public class MessageSeqDao extends HibernateDaoSupport {
 	    + " where root_message_uid = ? and thread_message_uid = ? and message_level > 1";
     private static final String SQL_QUERY_GET_COMPLETE_THREAD = "from " + MessageSeq.class.getName()
 	    + " where thread_message_uid = ?";
+    private static final String SQL_QUERY_GET_SEQ_BY_MESSAGE = "from " + MessageSeq.class.getName()
+	    + " where message_uid = ?";
 
     private static final String SQL_QUERY_NUM_POSTS_BY_TOPIC = "select count(*) from " + MessageSeq.class.getName()
 	    + " ms where ms.message.createdBy.userId=? and ms.message.isAuthored = false and ms.rootMessage.uid=?";
@@ -53,8 +56,23 @@ public class MessageSeqDao extends HibernateDaoSupport {
     private static final String SQL_QUERY_NUM_POSTS_BY_ROOT_MESSAGE_AND_DATE = "SELECT count(*) FROM "
 	    + MessageSeq.class.getName() + " seq WHERE seq.rootMessage.uid = ? AND seq.message.updated > ?";
 
+    private static final Logger log = Logger.getLogger(MessageSeqDao.class);
+    
     public MessageSeq getById(Long messageSeqId) {
 	return (MessageSeq) getHibernateTemplate().get(MessageSeq.class, messageSeqId);
+    }
+
+    public MessageSeq getByMessageId(Long messageId) {
+	HibernateTemplate template = this.getHibernateTemplate();
+	List list = template.find(SQL_QUERY_GET_SEQ_BY_MESSAGE, messageId);	
+	if (list != null ) {
+	    if ( list.size() > 1) {
+		log.warn("Looking up message seq by message id="+messageId+". More than one message seq found!"+list.toString());
+	    }
+	    return (MessageSeq) list.get(0);
+	} else {
+	    return null;
+	}
     }
 
     public List getCompleteTopic(Long rootTopicId) {

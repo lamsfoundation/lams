@@ -187,6 +187,11 @@
 			parameter="viewTopicThread" scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopicNext" />
 		</action>
+		<action path="/learning/viewMessage"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="viewMessage" scope="request">
+			<forward name="success" path="tiles:/learning/forum/viewMessage" />
+		</action>
 		<action path="/learning/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="messageForm" 
@@ -227,7 +232,7 @@
 			input="tiles:/learning/forum/replyTopic" 
 			parameter="replyTopicInline" 
 			scope="request">
-			<forward name="success" path="tiles:/learning/forum/viewTopic" />
+			<!--  JSON response on success -->
 		</action>
 		<action path="/learning/editTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
@@ -245,6 +250,15 @@
 			parameter="updateTopic" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
+		</action>
+		<action path="/learning/updateTopicInline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			name="messageForm" 
+			validate="true" 
+			input="tiles:/learning/forum/editTopic"
+			parameter="updateTopicInline" 
+			scope="request">
+			<!--  JSON response on success -->
 		</action>
 		
 		<action path="/learning/deleteAttachment"
