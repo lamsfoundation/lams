@@ -116,6 +116,9 @@ public class LearningAction extends Action {
 	if (param.equals("viewTopicThread")) {
 	    return viewTopicThread(mapping, form, request, response);
 	}
+	if (param.equals("viewMessage")) {
+	    return viewMessage(mapping, form, request, response);
+	}
 	if (param.equals("newTopic")) {
 	    return newTopic(mapping, form, request, response);
 	}
@@ -136,6 +139,9 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("updateTopic")) {
 	    return updateTopic(mapping, form, request, response);
+	}
+	if (param.equals("updateTopicInline")) {
+	    return updateTopicInline(mapping, form, request, response);
 	}
 	if (param.equals("deleteAttachment")) {
 	    return deleteAttachment(mapping, form, request, response);
@@ -584,6 +590,52 @@ public class LearningAction extends Action {
     }
 
     /**
+     * Display a single message.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward viewMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	forumService = getForumManager();
+
+	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
+	Long messageUid = WebUtil.readLongParam(request, ForumConstants.ATTR_MESS_ID, true);
+
+	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+
+	// get forum user and forum
+	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
+	Forum forum = forumUser.getSession().getForum();
+
+	List<MessageDTO> msgDtoList = forumService.getMessageAsDTO(messageUid);
+	updateMesssageFlag(msgDtoList);
+	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
+
+	// check if we can still make posts in this topic 
+	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
+	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
+		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
+	request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
+	request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
+	request.setAttribute(ForumConstants.ATTR_NO_MORE_PAGES, true);
+	
+	if ( messageUid != null ) {
+	    request.setAttribute(ForumConstants.ATTR_MESS_ID, messageUid);
+	}
+	// transfer SessionMapID as well
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	return mapping.findForward("success");
+    }
+
+    /**
      * Display empty page for a new topic in forum
      * 
      * @param mapping
@@ -908,6 +960,19 @@ public class LearningAction extends Action {
 	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
 	Message message = messageForm.getMessage();
 
+	doUpdateTopic(request, messageForm, sessionMap, topicId, message);
+
+	// echo back this topic thread into page
+	Long rootTopicId = forumService.getRootTopicId(topicId);
+	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
+	Forum forum = forumUser.getSession().getForum();
+	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
+		    
+	return mapping.findForward("success");
+    }
+
+    private void doUpdateTopic(HttpServletRequest request, MessageForm messageForm, SessionMap sessionMap,
+	    Long topicId, Message message) {
 	boolean makeAuditEntry = ToolAccessMode.TEACHER.equals(sessionMap.get(AttributeNames.ATTR_MODE));
 	String oldMessageString = null;
 
@@ -936,14 +1001,40 @@ public class LearningAction extends Action {
 	// save message into database
 	// if we are in monitoring then we are probably editing some else's entry so log the change.
 	forumService.updateTopic(messagePO);
+    }
 
-	// echo back this topic thread into page
+    /**
+     * Update a topic.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws PersistenceException
+     * @throws JSONException 
+     * @throws IOException 
+     */
+    public ActionForward updateTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws PersistenceException, JSONException, IOException {
+
+	forumService = getForumManager();
+
+	MessageForm messageForm = (MessageForm) form;
+	SessionMap sessionMap = getSessionMap(request, messageForm);
+	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
+	Message message = messageForm.getMessage();
+
+	doUpdateTopic(request, messageForm, sessionMap, topicId, message);
+
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put(ForumConstants.ATTR_MESS_ID, topicId);
+	JSONObject.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 	Long rootTopicId = forumService.getRootTopicId(topicId);
-	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
-	Forum forum = forumUser.getSession().getForum();
-	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
-		    
-	return mapping.findForward("success");
+	JSONObject.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;
     }
 
     /**

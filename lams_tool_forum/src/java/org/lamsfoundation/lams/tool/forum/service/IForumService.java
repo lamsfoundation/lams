@@ -237,6 +237,15 @@ public interface IForumService {
     Message getMessage(Long messageUid) throws PersistenceException;
 
     /**
+     * Get message by given message UID, wrapped up in the usual DTO list that is used for the view code in learner.
+     * 
+     * @param messageUid
+     * @return Message
+     * @throws PersistenceException
+     */
+    List<MessageDTO> getMessageAsDTO(Long messageUid) throws PersistenceException;
+    
+    /**
      * Get message list posted by given user. Note that the return type is DTO.
      * 
      * @param userId
