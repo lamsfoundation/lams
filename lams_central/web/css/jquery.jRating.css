@@ -40,11 +40,17 @@ p.jRatingInfos {
 	text-align:center;
 	padding-top:5px;
 }
-	p.jRatingInfos span.maxRate {
-		color:#c9c9c9;
-		font-size:14px;
-	}
+
+p.jRatingInfos span.maxRate {
+	color:#c9c9c9;
+	font-size:14px;
+}
 
 /** Please, note this is a LAMS customization. In case of library upgrade copy these lines manually.  **/
+.rating-stars-holder {width: 150px; text-align: center;}
+.rating-stars-caption {padding-top: 6px;}
+.rating-stars, .rating-stars-disabled {margin: 0px auto;}
+
+/** Remove the following once we move all tools to use Rating.tag.  **/
 .rating-stars-div {float:right; padding-right: 10px; margin-top: -8px; min-height: 45px;}
-.rating-stars-caption {text-align: center; padding-top: 6px;}
+.rating-stars-caption {text-align: center}

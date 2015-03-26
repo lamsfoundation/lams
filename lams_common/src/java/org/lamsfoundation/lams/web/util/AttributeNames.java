@@ -84,6 +84,8 @@ public class AttributeNames {
     public static final String ATTR_SESSION_STATUS = "sessionStatus";
     public static final String ATTR_ACTIVITY_POSITION = "activityPosition";
     public static final String ATTR_LEARNER_CONTENT_FOLDER = "learnerContentFolder";
+    public static final String ATTR_RATING_CRITERIAS = "ratingCriterias";
+    public static final String ATTR_RATINGS = "ratings";
 
     // for Pedagogical Planner
     public static final String PARAM_COMMAND = "command";
