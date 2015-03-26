@@ -23,24 +23,17 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
  * ImageGallery
- * 
- * @hibernate.class table="tl_laimag10_imagegallery"
  * 
  */
 public class ImageGallery implements Cloneable {
@@ -56,13 +49,13 @@ public class ImageGallery implements Cloneable {
     private String title;
 
     private String instructions;
-    
+
     private Long nextImageTitle;
 
     // advance
 
     private boolean allowVote;
-    
+
     private boolean allowCommentImages;
 
     private boolean allowShareImages;
@@ -74,6 +67,8 @@ public class ImageGallery implements Cloneable {
     private boolean contentInUse;
 
     private boolean allowRank;
+
+    private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     // general infomation
     private Date created;
@@ -88,7 +83,7 @@ public class ImageGallery implements Cloneable {
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
-    
+
     private boolean notifyTeachersOnImageSumbit;
 
     /**
@@ -116,6 +111,15 @@ public class ImageGallery implements Cloneable {
 		item.setCreateBy(toContent.getCreatedBy());
 	    }
 	}
+
+	// reset contentId
+	if (toContent.getRatingCriterias() != null) {
+	    Set<LearnerItemRatingCriteria> criterias = toContent.getRatingCriterias();
+	    for (LearnerItemRatingCriteria criteria : criterias) {
+		criteria.setToolContentId(contentId);
+	    }
+	}
+
 	return toContent;
     }
 
@@ -126,21 +130,34 @@ public class ImageGallery implements Cloneable {
 	try {
 	    imageGallery = (ImageGallery) super.clone();
 	    imageGallery.setUid(null);
+
+	    // clone imageGalleryItems as well
 	    if (imageGalleryItems != null) {
-		Iterator iter = imageGalleryItems.iterator();
-		Set set = new HashSet();
-		while (iter.hasNext()) {
-		    ImageGalleryItem item = (ImageGalleryItem) iter.next();
+		Set<ImageGalleryItem> newItems = new HashSet<ImageGalleryItem>();
+		for (ImageGalleryItem item : (Set<ImageGalleryItem>) imageGalleryItems) {
 		    ImageGalleryItem newItem = (ImageGalleryItem) item.clone();
 		    // just clone old file without duplicate it in repository
-		    set.add(newItem);
+		    newItems.add(newItem);
 		}
-		imageGallery.imageGalleryItems = set;
+		imageGallery.imageGalleryItems = newItems;
 	    }
-	    // clone ReourceUser as well
+
+	    // clone ImageGalleryUser as well
 	    if (createdBy != null) {
 		imageGallery.setCreatedBy((ImageGalleryUser) createdBy.clone());
 	    }
+
+	    // clone ratingCriterias as well
+	    if (ratingCriterias != null) {
+		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<LearnerItemRatingCriteria>();
+		for (LearnerItemRatingCriteria criteria : (Set<LearnerItemRatingCriteria>) ratingCriterias) {
+		    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
+		    // just clone old file without duplicate it in repository
+		    newCriterias.add(newCriteria);
+		}
+		imageGallery.ratingCriterias = newCriterias;
+	    }
+
 	} catch (CloneNotSupportedException e) {
 	    ImageGallery.log.error("When clone " + ImageGallery.class + " failed");
 	}
@@ -159,14 +176,15 @@ public class ImageGallery implements Cloneable {
 
 	final ImageGallery genericEntity = (ImageGallery) o;
 
-	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(
-		instructions, genericEntity.instructions).append(created, genericEntity.created)
+	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title)
+		.append(instructions, genericEntity.instructions).append(created, genericEntity.created)
 		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
+		.append(createdBy).toHashCode();
     }
 
     /**
@@ -188,7 +206,6 @@ public class ImageGallery implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
      */
     public Date getCreated() {
 	return created;
@@ -207,7 +224,6 @@ public class ImageGallery implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
      */
     public Date getUpdated() {
 	return updated;
@@ -225,8 +241,6 @@ public class ImageGallery implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Share imageGallery.
      * 
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
-     * 
      */
     public ImageGalleryUser getCreatedBy() {
 	return createdBy;
@@ -234,14 +248,13 @@ public class ImageGallery implements Cloneable {
 
     /**
      * @param createdBy
-     *                The userid of the user who created this Share imageGallery.
+     *            The userid of the user who created this Share imageGallery.
      */
     public void setCreatedBy(ImageGalleryUser createdBy) {
 	this.createdBy = createdBy;
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
      */
     public Long getUid() {
 	return uid;
@@ -254,8 +267,6 @@ public class ImageGallery implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
-     * 
      */
     public String getTitle() {
 	return title;
@@ -263,7 +274,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -272,8 +283,6 @@ public class ImageGallery implements Cloneable {
     /**
      * @return Returns the lockWhenFinish.
      * 
-     * @hibernate.property column="lock_on_finished"
-     * 
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -281,7 +290,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * @param lockWhenFinished
-     *                Set to true to lock the imageGallery for finished users.
+     *            Set to true to lock the imageGallery for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -289,8 +298,6 @@ public class ImageGallery implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
-     * @hibernate.property column="instructions" type="text"
      */
     public String getInstructions() {
 	return instructions;
@@ -299,11 +306,9 @@ public class ImageGallery implements Cloneable {
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
     }
-    
+
     /**
      * @return Returns the next condecutive integer for constructing image title.
-     * 
-     * @hibernate.property column="next_image_title"
      */
     public Long getNextImageTitle() {
 	return nextImageTitle;
@@ -314,11 +319,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * 
-     * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="imageGallery_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem"
      * 
      * @return
      */
@@ -331,7 +331,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use"
      * @return
      */
     public boolean isContentInUse() {
@@ -343,7 +342,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
      * @return
      */
     public boolean isDefineLater() {
@@ -355,7 +353,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
      * @return
      */
     public Long getContentId() {
@@ -367,7 +364,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_comment_images"
      * @return
      */
     public boolean isAllowCommentImages() {
@@ -379,7 +375,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_share_images"
      * @return
      */
     public boolean isAllowShareImages() {
@@ -391,7 +386,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_vote"
      * @return
      */
     public boolean isAllowVote() {
@@ -403,7 +397,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
      * @return
      */
     public String getReflectInstructions() {
@@ -415,7 +408,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
      * @return
      */
     public boolean isReflectOnActivity() {
@@ -427,7 +419,6 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_rank"
      * @return
      */
     public boolean isAllowRank() {
@@ -439,7 +430,18 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="image_submit_notify"
+     * 
+     * @return
+     */
+    public Set<LearnerItemRatingCriteria> getRatingCriterias() {
+	return ratingCriterias;
+    }
+
+    public void setRatingCriterias(Set<LearnerItemRatingCriteria> ratingCriterias) {
+	this.ratingCriterias = ratingCriterias;
+    }
+
+    /**
      * @return
      */
     public boolean isNotifyTeachersOnImageSumbit() {

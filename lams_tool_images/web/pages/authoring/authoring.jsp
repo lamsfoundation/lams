@@ -9,7 +9,7 @@
 	<title><fmt:message key="label.author.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 
 	<script>
         function init(){

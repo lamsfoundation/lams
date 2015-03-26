@@ -45,8 +45,7 @@
 	}
 	//The panel of imageGallery list panel
 	var imageGalleryListTargetDiv = "imageGalleryListArea";
-	
-	function deleteItem(idx,sessionMapID){
+	function deleteItem(idx, sessionMapID) {
 
 		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 		
@@ -54,17 +53,36 @@
 			var url = "<c:url value="/authoring/removeImage.do"/>";
 			var param = "imageIndex=" + idx +"&sessionMapID="+sessionMapID;;
 			deleteItemLoading();
-		    var myAjax = new Ajax.Updater(
-			    	imageGalleryListTargetDiv,
-			    	url,
-			    	{
-			    		method:'get',
-			    		parameters:param,
-			    		onComplete:deleteItemComplete,
-			    		evalScripts:false
-			    	}
-		    );
+			$("#" + imageGalleryListTargetDiv).load(
+				url,
+				{
+					itemIndex: idx,
+					reqID: reqIDVar.getTime(), 
+					sessionMapID: sessionMapID
+				},
+				function() {
+					deleteItemComplete();
+				}
+			);
 		}
+	}
+	
+	function deleteItem(idx,sessionMapID){
+		var url = "<c:url value="/authoring/removeItem.do"/>";
+	    var reqIDVar = new Date();
+		deleteItemLoading();
+	    
+		$("#" + resourceListTargetDiv).load(
+			url,
+			{
+				itemIndex: idx,
+				reqID: reqIDVar.getTime(), 
+				sessionMapID: sessionMapID
+			},
+			function() {
+				deleteItemComplete();
+			}
+		);
 	}
 	
 	function deleteItemLoading(){
@@ -78,41 +96,40 @@
 	function upImage(idx, sessionMapID){
 		var url = "<c:url value="/authoring/upImage.do"/>";
 	    var reqIDVar = new Date();
-		var param = "imageIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	imageGalleryListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:false
-		    	}
-	    );
+		$("#" + imageGalleryListTargetDiv).load(
+			url,
+			{
+				itemIndex: idx,
+				reqID: reqIDVar.getTime(), 
+				sessionMapID: sessionMapID
+			},
+			function() {
+				deleteItemComplete();
+			}
+		);
 	}
 	function downImage(idx, sessionMapID){
 		var url = "<c:url value="/authoring/downImage.do"/>";
 	    var reqIDVar = new Date();
-		var param = "imageIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	imageGalleryListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:false
-		    	}
-			);
+		$("#" + imageGalleryListTargetDiv).load(
+			url,
+			{
+				itemIndex: idx,
+				reqID: reqIDVar.getTime(), 
+				sessionMapID: sessionMapID
+			},
+			function() {
+				deleteItemComplete();
+			}
+		);
 	}
 	
 	function resizeOnMessageFrameLoad(){
 		var messageAreaFrame = document.getElementById("reourceInputArea");
 		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
 	}
-	    
 
 </script>
 <!-- Basic Tab Content -->
@@ -132,8 +149,8 @@
 			</div>
 			<lams:CKEditor id="imageGallery.instructions"
 				value="${formBean.imageGallery.instructions}"
-				contentFolderID="${formBean.contentFolderID}">
-				width="100%"
+				contentFolderID="${formBean.contentFolderID}"
+				width="100%">
 			</lams:CKEditor>
 		</td>
 	</tr>
