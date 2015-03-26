@@ -1685,3 +1685,36 @@ div.growlUI h1 {
 	color: #222222 !important;
 	background-color: #D0E5F5;"
 }
+
+.rating-criteria-tag {
+	width: 60%;
+	padding-bottom: 25px;
+}
+.rating-criteria-tag input[type="text"] {
+	width: 100%;
+}
+#criterias-table td {
+	vertical-align:middle;
+}
+img.up-arrow, img.up-arrow-disabled, img.down-arrow, img.down-arrow-disabled, img.delete-arrow {
+	width:0px; 
+	height:0px; 
+	padding: 4px 8px; 
+	border:0;
+	background-repeat: no-repeat;
+}
+img.up-arrow {
+	background-image: url('../images/uparrow.gif');
+}
+img.up-arrow-disabled {
+	background-image: url('../images/uparrow_disabled.gif');
+}
+img.down-arrow {
+	background-image: url('../images/downarrow.gif');
+}
+img.down-arrow-disabled {
+	background-image: url('../images/downarrow_disabled.gif');
+}
+img.delete-arrow {
+	background-image: url('../images/disposal.gif');
+}
