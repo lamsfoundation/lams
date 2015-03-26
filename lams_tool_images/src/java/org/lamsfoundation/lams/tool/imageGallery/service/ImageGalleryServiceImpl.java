@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,10 +53,12 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -152,6 +155,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
+    
+    private IRatingService ratingService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -228,16 +233,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageList.remove(image);
 	imageGallery.setImageGalleryItems(imageList);
 	saveOrUpdateImageGallery(imageGallery);
-    }
-
-    @Override
-    public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId) {
-	return imageRatingDao.getImageRatingByImageAndUser(imageUid, userId);
-    }
-
-    @Override
-    public void saveOrUpdateImageRating(ImageRating rating) {
-	imageRatingDao.saveObject(rating);
     }
 
     public ImageVote getImageVoteByImageAndUser(Long imageUid, Long userId) {
@@ -376,6 +371,22 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
+    }
+    
+    @Override
+    public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
+	List<RatingCriteria> ratingCriterias = ratingService.getCriteriasByToolContentId(toolContentId);
+	return ratingCriterias;
+    }
+    
+    @Override
+    public void saveOrUpdateRatingCriteria(RatingCriteria criteria) {
+	ratingService.saveOrUpdateRatingCriteria(criteria);
+    }
+    
+    @Override
+    public void deleteRatingCriteria(Long ratingCriteriaId) {
+	ratingService.deleteRatingCriteria(ratingCriteriaId);
     }
 
     @Override
@@ -1092,6 +1103,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
+    
+    public void setRatingService(IRatingService ratingService) {
+	this.ratingService = ratingService;
+    }
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
@@ -1134,9 +1149,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return images;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Deprecated
     public Object[] getRatingForGroup(Long imageUid, Long sessionId) {
 	List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
 	Long numberRatings = new Long(0);
@@ -1156,6 +1169,20 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 
 	return new Object[] { numberRatings, averageRating };
+    }
+    
+    @Override
+    public List<RatingDTO> getRatingDtos(ImageGallery imageGallery, Long imageUid, Long userId) {
+	List<RatingDTO> ratingDtos = new LinkedList<RatingDTO>();
+	
+	for (RatingCriteria criteria : imageGallery.getRatingCriterias()) {
+	    RatingDTO ratingDto = ratingService.getRatingDTOByUser(criteria.getRatingCriteriaId(), imageUid, userId.intValue());
+	    ratingDto.setRatingCriteria(criteria);
+	    
+	    ratingDtos.add(ratingDto);
+	}
+	
+	return ratingDtos;	
     }
 
     // *****************************************************************************

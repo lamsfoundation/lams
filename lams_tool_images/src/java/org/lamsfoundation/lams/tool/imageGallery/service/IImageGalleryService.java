@@ -28,21 +28,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
@@ -151,14 +149,13 @@ public interface IImageGalleryService {
      */
     void deleteImage(Long toolSessionId, Long imageUid);
     
-    /**
-     * Save/update ImageRating.
-     * 
-     * @param rating
-     *            ImageRating
-     * @return
-     */
-    void saveOrUpdateImageRating(ImageRating rating);
+    List<RatingCriteria> getRatingCriterias(Long toolContentId);
+    
+    void saveOrUpdateRatingCriteria(RatingCriteria criteria);
+    
+    void deleteRatingCriteria(Long ratingCriteriaId);
+    
+    List<RatingDTO> getRatingDtos(ImageGallery imageGallery, Long imageUid, Long userId);
 
     /**
      * Save/update ImageVote.
@@ -214,15 +211,6 @@ public interface IImageGalleryService {
      * @return
      */
     ImageGallery getImageGalleryByContentId(Long contentId);
-    
-    /**
-     * Returns imageRating by the given imageUid and userId
-     * 
-     * @param imageUid
-     * @param userId
-     * @return
-     */
-    ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId);
     
     /**
      * Returns imageVote by the given imageUid and userId

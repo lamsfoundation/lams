@@ -426,6 +426,14 @@
    	<tag-file>
        <name>AuthoringButton</name>
        <path>/WEB-INF/tags/AuthoringButton.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>AuthoringRatingCriteria</name>
+       <path>/WEB-INF/tags/AuthoringRatingCriteria.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>Rating</name>
+       <path>/WEB-INF/tags/Rating.tag</path>
    	</tag-file>   	
    	<tag-file>
        <name>headItems</name>

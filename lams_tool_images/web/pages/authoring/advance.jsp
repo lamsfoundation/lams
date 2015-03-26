@@ -1,6 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script lang="javascript">
+	$(document).ready(function() {
+	    $('#allowRank').click(function() {
+	        $("#criterias-holder").show("slow");
+	    });
+	    $('#allowVote').click(function() {
+	    	$("#criterias-holder").hide("slow");
+	    });//if(!$(this).is(":checked")) {
+	})
+
 	/**
 	 * Processes mouse click event on allowRatingsOrVote ckeckbox
 	 */
@@ -12,7 +21,8 @@
 		} else {
 			document.imageGalleryForm.allowVote.checked = false;
 			document.imageGalleryForm.allowRank.checked = false;
-		}		
+			$("#criterias-holder").hide("slow");
+		}
 	}
 
 	function uncheckNotifyTeachersOnImageSumbit() {
@@ -21,8 +31,8 @@
 	}
 </script>
 	
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="sessionMap"	value="${sessionScope[formBean.sessionMapID]}" />
 
 <!-- Advance Tab Content -->
 
@@ -44,8 +54,7 @@
 	</label>
 </p>
 
-<p>
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p style="margin-left:40px;">
 	<html:checkbox property="imageGallery.notifyTeachersOnImageSumbit" styleClass="noBorder" styleId="notifyTeachersOnImageSumbit"
 			disabled="${not formBean.imageGallery.allowShareImages}" >
 	</html:checkbox>
@@ -70,26 +79,30 @@
 	<label for="allowRatingsOrVote">
 		<fmt:message key="label.authoring.advance.allow.learner.ratings.or.vote" />
 	</label>
-	<br><br>
 	
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<input type="radio" name="imageGallery.allowVote" value="${true}" id="allowVote"
-		<c:if test="${formBean.imageGallery.allowVote}">checked="checked"</c:if>
-		<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if> 
-	/>
-	<label for="allowVote">
-		<fmt:message key="label.authoring.advance.allow.learner.vote" />
-	</label>
-	<br><br>
-
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<input type="radio" name="imageGallery.allowVote" value="${false}" id="allowRank"
-		<c:if test="${formBean.imageGallery.allowRank}">checked="checked"</c:if> 
-		<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>		
-	/>
-	<label for="allowRank">
-		<fmt:message key="label.authoring.advance.allow.learner.rank" />
-	</label>
+	<div style="margin-left:40px;">
+		<input type="radio" name="imageGallery.allowVote" value="${true}" id="allowVote"
+			<c:if test="${formBean.imageGallery.allowVote}">checked="checked"</c:if>
+			<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if> 
+		/>
+		<label for="allowVote">
+			<fmt:message key="label.authoring.advance.allow.learner.vote" />
+		</label>
+		<br><br>
+	
+		<input type="radio" name="imageGallery.allowVote" value="${false}" id="allowRank"
+			<c:if test="${formBean.imageGallery.allowRank}">checked="checked"</c:if> 
+			<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>		
+		/>
+		<label for="allowRank">
+			<fmt:message key="label.authoring.advance.allow.learner.rank" />
+		</label>
+		
+		<div id="criterias-holder" <c:if test="${!formBean.imageGallery.allowRank}"> style="display:none;"</c:if> >
+			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" 
+				upLabel="label.authoring.up" downLabel="label.authoring.down"/>
+		</div>
+	</div>
 </p>
 
 <p>

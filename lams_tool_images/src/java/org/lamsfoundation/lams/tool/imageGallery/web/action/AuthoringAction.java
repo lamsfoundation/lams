@@ -26,10 +26,11 @@ package org.lamsfoundation.lams.tool.imageGallery.web.action;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -52,11 +53,11 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
@@ -223,6 +224,10 @@ public class AuthoringAction extends Action {
 	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
 	imageGalleryItemList.clear();
 	imageGalleryItemList.addAll(items);
+	
+	// get rating criterias from DB
+	List<RatingCriteria> ratingCriterias = service.getRatingCriterias(contentId);
+	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
 
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY_FORM, imageGalleryForm);
 	sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, imageGallery.getNextImageTitle());
@@ -293,10 +298,10 @@ public class AuthoringAction extends Action {
 
 	ImageGallery imageGallery = imageGalleryForm.getImageGallery();
 	IImageGalleryService service = getImageGalleryService();
+	Long contentId = imageGalleryForm.getImageGallery().getContentId();
 
 	// **********************************Get ImageGallery PO*********************
-	ImageGallery imageGalleryPO = service.getImageGalleryByContentId(imageGalleryForm.getImageGallery()
-		.getContentId());
+	ImageGallery imageGalleryPO = service.getImageGalleryByContentId(contentId);
 	if (imageGalleryPO == null) {
 	    // new ImageGallery, create it.
 	    imageGalleryPO = imageGallery;
@@ -327,7 +332,7 @@ public class AuthoringAction extends Action {
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	ImageGalleryUser imageGalleryUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
-		imageGalleryForm.getImageGallery().getContentId());
+		contentId);
 	if (imageGalleryUser == null) {
 	    imageGalleryUser = new ImageGalleryUser(user, imageGalleryPO);
 	}
@@ -367,6 +372,41 @@ public class AuthoringAction extends Action {
 	while (iter.hasNext()) {
 	    ImageGalleryItem delAtt = (ImageGalleryItem) iter.next();
 	    iter.remove();
+	}
+	
+	// ************************* Handle rating criterias *******************
+	List<RatingCriteria> ratingCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
+	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<Integer, RatingCriteria>();
+	for (RatingCriteria ratingCriteriaIter : ratingCriterias) {
+	    mapOrderIdToRatingCriteria.put(ratingCriteriaIter.getOrderId(), ratingCriteriaIter);
+	}
+	
+	int criteriaMaxOrderId = WebUtil.readIntParam(request, "criteriaMaxOrderId");
+	//i is equal to an old orderId
+	for (int i=1; i<=criteriaMaxOrderId; i++) {
+	    
+	    String criteriaTitle = WebUtil.readStrParam(request, "criteriaTitle" + i, true);
+	    
+	    RatingCriteria ratingCriteria = mapOrderIdToRatingCriteria.get(i);
+	    if (StringUtils.isNotBlank(criteriaTitle)) {
+		int newCriteriaOrderId = WebUtil.readIntParam(request, "criteriaOrderId" + i);
+
+		// modify existing one if it exists. add otherwise
+		if (ratingCriteria == null) {
+		    ratingCriteria = new LearnerItemRatingCriteria();
+		    ratingCriteria.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+		    ((LearnerItemRatingCriteria) ratingCriteria).setToolContentId(contentId);
+		}
+
+		ratingCriteria.setOrderId(newCriteriaOrderId);
+		ratingCriteria.setTitle(criteriaTitle);
+		service.saveOrUpdateRatingCriteria(ratingCriteria);
+	    
+	    //delete
+	    } else if (ratingCriteria != null) {
+		service.deleteRatingCriteria(ratingCriteria.getRatingCriteriaId());
+	    }
+	    
 	}
 
 	// **********************************************
