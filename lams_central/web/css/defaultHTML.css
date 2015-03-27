@@ -1696,25 +1696,23 @@ div.growlUI h1 {
 #criterias-table td {
 	vertical-align:middle;
 }
-img.up-arrow, img.up-arrow-disabled, img.down-arrow, img.down-arrow-disabled, img.delete-arrow {
-	width:0px; 
-	height:0px; 
-	padding: 4px 8px; 
-	border:0;
-	background-repeat: no-repeat;
+div.up-arrow, div.up-arrow-disabled, div.down-arrow, div.down-arrow-disabled, div.delete-arrow {
+	width:16px; 
+	height:16px;
+	display: table-cell;
 }
-img.up-arrow {
+div.up-arrow {
 	background-image: url('../images/uparrow.gif');
 }
-img.up-arrow-disabled {
+div.up-arrow-disabled {
 	background-image: url('../images/uparrow_disabled.gif');
 }
-img.down-arrow {
+div.down-arrow {
 	background-image: url('../images/downarrow.gif');
 }
-img.down-arrow-disabled {
+div.down-arrow-disabled {
 	background-image: url('../images/downarrow_disabled.gif');
 }
-img.delete-arrow {
+div.delete-arrow {
 	background-image: url('../images/disposal.gif');
 }

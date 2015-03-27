@@ -55,7 +55,7 @@
 		}
 		#comments-area {
 			display: table-cell;
-			min-width: 68%;
+			width: 68%;
 		}
 		#comment-textarea {
 			margin-right:10px; 
