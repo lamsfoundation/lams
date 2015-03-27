@@ -64,12 +64,12 @@ $(document).ready(function() {
 		    		
 		})).append(jQuery('<td/>', {
 			width: '40px',
-			html: '<img class="up-arrow" title="<fmt:message key="${upLabel}"/>">' + 
-		    		'<img class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>">'
+			html: '<div class="up-arrow" title="<fmt:message key="${upLabel}"/>" />' + 
+		    		'<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>" />'
 		    		
 		})).append(jQuery('<td/>', {
 			width: '20px',
-			html: '<img class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" />'
+			html: '<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" />'
 		})).appendTo('#criterias-table');
 		
 		reactivateArrows();
@@ -180,23 +180,23 @@ $(document).ready(function() {
 				
 				<td width="40px">
 					<c:if test="${not status.first}">
-						<img class="up-arrow" title="<fmt:message key="${upLabel}"/>">
+						<div class="up-arrow" title="<fmt:message key="${upLabel}"/>"></div>
 						<c:if test="${status.last}">
-							<img class="up-arrow-disabled" title="<fmt:message key="${downLabel}"/>">
+							<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>"></div>
 						</c:if>
 					</c:if>
 
 					<c:if test="${not status.last}">
 						<c:if test="${status.first}">
-							<img class="down-arrow-disabled" title="<fmt:message key="${upLabel}"/>">
+							<div class="up-arrow-disabled" title="<fmt:message key="${upLabel}"/>"></div>
 						</c:if>
 
-						<img class="down-arrow" title="<fmt:message key="${downLabel}"/>">
+						<div class="down-arrow" title="<fmt:message key="${downLabel}"/>"></div>
 					</c:if>
 				</td>
                 
 				<td width="20px">
-					<img class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" />
+					<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" ></div>
 				</td>
 			</tr>
 		</c:forEach>
