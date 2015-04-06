@@ -392,8 +392,14 @@ public class MonitoringAction extends LamsDispatchAction {
 		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
 	    } catch (SecurityException e) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN,
-			"User is not a monitor in the organisation or lesson");
+		try {
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN,
+			    "User is not a monitor in the organisation or lesson");
+		} catch (IllegalStateException e1) {
+		    LamsDispatchAction.log
+			    .warn("Tried to tell user that \"User is not a monitor in the organisation or lesson\","
+				    + "but the HTTP response was already written, probably by some other error");
+		}
 		return null;
 	    }
 
@@ -411,7 +417,12 @@ public class MonitoringAction extends LamsDispatchAction {
 			monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
 		    }
 		} catch (SecurityException e) {
-		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+		    try {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+		    } catch (IllegalStateException e1) {
+			LamsDispatchAction.log.warn("Tried to tell user that \"User is not a monitor in the lesson\","
+				+ "but the HTTP response was already written, probably by some other error");
+		    }
 		    return null;
 		}
 	    }
@@ -574,27 +585,27 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException, ServletException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-	.getServletContext());
+		.getServletContext());
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	JSONObject jsonObject = new JSONObject();
 
 	try {
-	        // if this method throws an Exception, there will be no removeLesson=true in the JSON reply
-	        monitoringService.removeLesson(lessonId, getUserId());
-	        jsonObject.put("removeLesson", true);
+	    // if this method throws an Exception, there will be no removeLesson=true in the JSON reply
+	    monitoringService.removeLesson(lessonId, getUserId());
+	    jsonObject.put("removeLesson", true);
 
 	} catch (Exception e) {
 	    String[] msg = new String[1];
 	    msg[0] = e.getMessage();
-	 	 jsonObject.put("removeLesson", monitoringService.getMessageService().getMessage("error.system.error",msg));
+	    jsonObject.put("removeLesson", monitoringService.getMessageService().getMessage("error.system.error", msg));
 	}
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(jsonObject);
 	return null;
     }
-	 	
+
     /**
      * <P>
      * This action need a lession ID, Learner ID and Activity ID as input. Activity ID is optional, if it is null, all
@@ -910,7 +921,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
 	}
-	//prepare encoded lessonId for shortened learner URL
+	// prepare encoded lessonId for shortened learner URL
 	lessonDTO.setEncodedLessonID(WebUtil.encodeLessonId(lessonId));
 
 	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "monitor lesson", false)) {
@@ -1364,6 +1375,7 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward viewTimeChart(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	try {
+
 	    long lessonID = WebUtil.readLongParam(request, "lessonID");
 
 	    // check monitor privledges
@@ -1374,6 +1386,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    request.setAttribute("lessonID", lessonID);
 	    request.setAttribute("learnerID", WebUtil.readLongParam(request, "learnerID", true));
+
 	} catch (Exception e) {
 	    request.setAttribute("errorName", "MonitoringAction");
 	    request.setAttribute("errorMessage", e.getMessage());
