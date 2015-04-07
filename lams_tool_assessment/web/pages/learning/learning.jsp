@@ -35,6 +35,8 @@
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
 	<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}"/>
 	<c:set var="isEditingDisabled" value="${finishedLock || !hasEditRight}"/>
+		
+	<!-- hasEditRight=${hasEditRight} -->
 	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
