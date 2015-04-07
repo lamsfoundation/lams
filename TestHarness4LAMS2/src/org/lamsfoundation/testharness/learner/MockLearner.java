@@ -95,8 +95,12 @@ public class MockLearner extends MockUser implements Runnable {
 
     private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
 
+    private static final String ASSESSMENT_TOOL_SUBSTRING = "laasse10";
     private static final Pattern ASSESSMENT_FINISH_PATTERN = Pattern
 	    .compile("'(/lams/tool/laasse10/learning/finish\\.do\\?.*)'");
+    private static final String ASSESSMENT_HAS_EDIT_RIGHT_SUBSTRING = "hasEditRight=true";
+    private static final Pattern ASSESSMENT_TOOL_SESSION_ID_PATTERN = Pattern.compile("data: 'toolSessionID=(\\d+)',");
+    private static final String ASSESSMENT_FINISH_BUTTON_SUBSTRING = "return finishSession()";
 
     private static final Pattern IMAGE_GALLERY_FINISH_PATTERN = Pattern
 	    .compile("'(/lams/tool/laimag10/learning/finish\\.do\\?.*)'");
@@ -160,6 +164,10 @@ public class MockLearner extends MockUser implements Runnable {
 	int length = 1 + TestUtil.generateRandomNumber(MockLearner.ARBITRARY_TEXT_ALPHABET.length());
 	StringBuilder text = new StringBuilder(length);
 	for (int i = 0; i < length; i++) {
+	    // make the text split into words to comply with Assessment Tool validation
+	    if ((i % 3) == 0) {
+		text.append(" ");
+	    }
 	    text.append(MockLearner.ARBITRARY_TEXT_ALPHABET.charAt(TestUtil
 		    .generateRandomNumber(MockLearner.ARBITRARY_TEXT_ALPHABET.length())));
 	}
@@ -376,6 +384,7 @@ public class MockLearner extends MockUser implements Runnable {
 	WebForm form = null;
 	String action = null;
 	String asText = resp.getText();
+
 	do {
 	    index++;
 	    if (index >= forms.length) {
@@ -414,21 +423,16 @@ public class MockLearner extends MockUser implements Runnable {
 	    form.setAttribute("action", action + "&dispatch=viewAllResults");
 	} else if (asText.contains(MockLearner.WIKI_EDIT_BUTTON_STRING)) {
 	    form = handleToolWiki(form, action);
+	} else if (asText.contains(MockLearner.ASSESSMENT_TOOL_SUBSTRING)) {
+	    return handleToolAssessment(resp, form);
 	}
 
 	nextResp = (WebResponse) new Call(wc, test, username + " submits tool form", fillFormArbitrarily(form))
 		.execute();
 
-	// check if it is assessment activity
-	asText = nextResp.getText();
-	Matcher m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
+	Matcher m = MockLearner.SUBMIT_FILES_FINISH_PATTERN.matcher(asText);
 	if (m.find()) {
-	    nextResp = (WebResponse) new Call(wc, test, username + " finishes Assessment", m.group(1)).execute();
-	} else {
-	    m = MockLearner.SUBMIT_FILES_FINISH_PATTERN.matcher(asText);
-	    if (m.find()) {
-		nextResp = (WebResponse) new Call(wc, test, username + " finishes Submit Files", m.group()).execute();
-	    }
+	    nextResp = (WebResponse) new Call(wc, test, username + " finishes Submit Files", m.group()).execute();
 	}
 
 	return nextResp;
@@ -436,6 +440,10 @@ public class MockLearner extends MockUser implements Runnable {
 
     private WebResponse handlePageWithoutForms(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
+
+	if (asText.contains("submitAll")) {
+	    MockLearner.log.debug(asText);
+	}
 
 	if (asText.contains(MockLearner.LOAD_TOOL_ACTIVITY_FLAG)) {
 	    return handleLoadToolActivity(asText);
@@ -691,6 +699,63 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 
 	throw new TestHarnessException("Unable to finish the scratchie, no finish link found. " + asText);
+    }
+
+    private WebResponse handleToolAssessment(WebResponse resp, WebForm form) throws SAXException, IOException {
+	String asText = resp.getText();
+	// check if current user is the leader
+	boolean hasEditRights = asText.contains(MockLearner.ASSESSMENT_HAS_EDIT_RIGHT_SUBSTRING);
+	String finishURL = null;
+	Matcher m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
+	if (m.find()) {
+	    finishURL = m.group(1);
+	} else {
+	    MockLearner.log.debug(asText);
+	    throw new TestHarnessException("Finish URL was not found in Assessment Tool");
+	}
+
+	boolean canFinish = asText.contains(MockLearner.ASSESSMENT_FINISH_BUTTON_SUBSTRING);
+	if (hasEditRights) {
+	    // this is a Leader or it is a non-Leader Assessmnt
+	    while (!canFinish) {
+		WebResponse nextResp = (WebResponse) new Call(wc, test, username + " submits Assessment form",
+			fillFormArbitrarily(form)).execute();
+		asText = nextResp.getText();
+		// iterate through pages
+		canFinish = asText.contains(MockLearner.ASSESSMENT_FINISH_BUTTON_SUBSTRING);
+	    }
+	} else {
+	    String toolSessionID = null;
+	    String checkLeaderProgressURL = null;
+	    // read session map ID for the current user
+	    m = MockLearner.ASSESSMENT_TOOL_SESSION_ID_PATTERN.matcher(asText);
+	    if (m.find()) {
+		// prepare URLs
+		toolSessionID = m.group(1);
+		checkLeaderProgressURL = "/lams/tool/laasse10/learning/checkLeaderProgress.do?toolSessionID="
+			+ toolSessionID;
+	    } else {
+		MockLearner.log.debug(asText);
+		throw new TestHarnessException("Tool Session ID was not found in Assessment Tool");
+	    }
+
+	    while (!canFinish) {
+		MockLearner.log.debug("Waiting for leader to finish Assessment");
+		try {
+		    // in normal browser flow learners wait 15 seconds too
+		    Thread.sleep(15000);
+		} catch (InterruptedException e) {
+		    MockLearner.log.error("Interrupted waiting between check Leader progress in Assessment");
+		}
+		// the reply is JSON
+		WebResponse nextResp = (WebResponse) new Call(wc, test, username
+			+ " checks Assessment if leader finished", checkLeaderProgressURL).execute();
+		asText = nextResp.getText();
+		canFinish = asText.contains("true");
+	    }
+	}
+
+	return (WebResponse) new Call(wc, test, username + " finishes Assessment", finishURL).execute();
     }
 
     private WebResponse handleToolShareResources(WebResponse resp, String initialRedirectLink) throws IOException,
