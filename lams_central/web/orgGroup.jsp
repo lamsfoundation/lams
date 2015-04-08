@@ -30,11 +30,16 @@
 		
 		var LAMS_URL = '<lams:LAMSURL/>';
 		var LABELS = {
-			GROUP_PREFIX_LABEL : '<fmt:message key="label.course.groups.prefix" />',
-			GROUP_REMOVE_LABEL : '<fmt:message key="label.course.groups.remove.confirm" />',
-			EMPTY_GROUP_SAVE_LABEL : '<fmt:message key="label.course.groups.remove.empty.confirm" />',
-			GROUP_LOCK_LABEL : '<fmt:message key="label.course.groups.locked" />',
-			TRANSFER_LOCKED_LABEL : '<fmt:message key="label.course.groups.locked.transfer" />'
+			<fmt:message key="label.course.groups.prefix" var="GROUP_PREFIX_LABEL_VAR"/>
+			GROUP_PREFIX_LABEL : '<c:out value="GROUP_PREFIX_LABEL_VAR" />',
+			<fmt:message key="label.course.groups.remove.confirm" var="GROUP_REMOVE_LABEL_VAR"/>
+			GROUP_REMOVE_LABEL : '<c:out value="GROUP_REMOVE_LABEL_VAR" />',
+			<fmt:message key="label.course.groups.remove.empty.confirm" var="EMPTY_GROUP_SAVE_LABEL_VAR"/>
+			EMPTY_GROUP_SAVE_LABEL : '<c:out value="EMPTY_GROUP_SAVE_LABEL_VAR" />',
+			<fmt:message key="label.course.groups.locked" var="GROUP_LOCK_LABEL_VAR"/>
+			GROUP_LOCK_LABEL : '<c:out value="GROUP_LOCK_LABEL_VAR" />',
+			<fmt:message key="label.course.groups.locked.transfer" var="TRANSFER_LOCKED_LABEL_VAR"/>
+			TRANSFER_LOCKED_LABEL : '<c:out value="TRANSFER_LOCKED_LABEL_VAR" />'
 		};
 	</script>
 </lams:head>
