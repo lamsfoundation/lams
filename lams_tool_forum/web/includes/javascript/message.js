@@ -41,7 +41,7 @@
 	
 	function highlightMessage() {
 		$('.highlight').filter($('table')).css('background','none');
-		$('.highlight').filter($('div')).effect('highlight', {}, 6000);
+		$('.highlight').filter($('div')).effect('highlight', {color: "#f4c239"}, 6000);
 		$('.highlight').removeClass('highlight');
 	}
 
