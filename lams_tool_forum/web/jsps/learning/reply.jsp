@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
@@ -54,6 +55,7 @@
 									$('#tree' + threadUid).treetable("reveal",messageUid);
 									$('#msg'+messageUid).focus();
 								}
+								highlightMessage();
 							});
 						}
 

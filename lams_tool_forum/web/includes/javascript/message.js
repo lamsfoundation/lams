@@ -38,4 +38,10 @@
 			Element.hide(targetDiv+"_Busy");
 		}				
 	}
+	
+	function highlightMessage() {
+		$('.highlight').filter($('table')).css('background','none');
+		$('.highlight').filter($('div')).effect('highlight', {}, 6000);
+		$('.highlight').removeClass('highlight');
+	}
 

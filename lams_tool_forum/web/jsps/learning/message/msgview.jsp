@@ -13,16 +13,18 @@
 		<c:set var="indentSize" value="${(msgDto.level-1)*indent}" />
 	</c:otherwise>
 	</c:choose>
-	
+
 	<c:choose>
 	<c:when test='${msgDto.message.uid == messageUid}'>
-	<div id="msg${msgDto.message.uid}" style="margin-left:<c:out value="${indentSize}"/>px;" class="highlight" >
+		<c:set var="highlightClass">highlight</c:set>
 	</c:when>
 	<c:otherwise>	
-	<div id="msg${msgDto.message.uid}" style="margin-left:<c:out value="${indentSize}"/>px;" >
-	</c:otherwise>
+		<c:set var="highlightClass"></c:set>
+	</c:otherwise> 
 	</c:choose>
-		<table cellspacing="0" class="forum">
+	
+	<div id="msg${msgDto.message.uid}" class="${highlightClass}" style="margin-left:<c:out value="${indentSize}"/>px;">
+		<table id="table${msgDto.message.uid}" cellspacing="0" class="forum ${highlightClass}" >
 			<tr>
 				<th id="subject">
 					<c:choose>
