@@ -10,7 +10,7 @@
 <c:set var="hide"><fmt:message key="label.hide.replies" /></c:set>
 <c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a><',
+	expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
 	clickableNodeNames:true,indent:${indent},
 	onNodeInitialized:function() {
