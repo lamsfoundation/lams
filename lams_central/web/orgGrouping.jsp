@@ -24,8 +24,10 @@
 		
 			LAMS_URL = '<lams:LAMSURL/>',
 			LABELS = {
-				REMOVE_GROUPING_CONFIRM_LABEL : '<fmt:message key="label.course.groups.grouping.remove.confirm" />',
-				USE_GROUPING_CONFIRM_LABEL : '<fmt:message key="label.course.groups.grouping.use.confirm" />'
+				<fmt:message key="label.course.groups.grouping.remove.confirm" var="REMOVE_GROUPING_CONFIRM_LABEL_VAR"/>
+				REMOVE_GROUPING_CONFIRM_LABEL : '<c:out value="REMOVE_GROUPING_CONFIRM_LABEL_VAR" />',
+				<fmt:message key="label.course.groups.grouping.use.confirm" var="USE_GROUPING_CONFIRM_LABEL_VAR"/>
+				USE_GROUPING_CONFIRM_LABEL : '<c:out value="USE_GROUPING_CONFIRM_LABEL_VAR" />'
 			};
 	</script>
 </lams:head>

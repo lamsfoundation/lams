@@ -52,11 +52,16 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			APP_URL = LAMS_URL + 'learning/',
 			
 			LABELS = {
-				CURRENT_ACTIVITY : '<fmt:message key="label.learner.progress.activity.current.tooltip"/>',
-				COMPLETED_ACTIVITY : '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>',
-				ATTEMPTED_ACTIVITY : '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>',
-				TOSTART_ACTIVITY : '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>',
-				SUPPORT_ACTIVITY : '<fmt:message key="label.learner.progress.activity.support.tooltip"/>'
+				<fmt:message key="label.learner.progress.activity.current.tooltip" var="CURRENT_ACTIVITY_VAR"/>
+				CURRENT_ACTIVITY : '<c:out value="CURRENT_ACTIVITY_VAR" />',
+				<fmt:message key="label.learner.progress.activity.completed.tooltip" var="COMPLETED_ACTIVITY_VAR"/>
+				COMPLETED_ACTIVITY : '<c:out value="COMPLETED_ACTIVITY_VAR" />',
+				<fmt:message key="label.learner.progress.activity.attempted.tooltip" var="ATTEMPTED_ACTIVITY_VAR"/>
+				ATTEMPTED_ACTIVITY : '<c:out value="ATTEMPTED_ACTIVITY_VAR" />',
+				<fmt:message key="label.learner.progress.activity.tostart.tooltip" var="TOSTART_ACTIVITY_VAR"/>
+				TOSTART_ACTIVITY : '<c:out value="TOSTART_ACTIVITY_VAR" />',
+				<fmt:message key="label.learner.progress.activity.support.tooltip" var="SUPPORT_ACTIVITY_VAR"/>
+				SUPPORT_ACTIVITY : '<c:out value="SUPPORT_ACTIVITY_VAR" />'
 			},
 			
 			parentURL = "${notifyCloseURL}",
@@ -90,12 +95,16 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 						size : 160,
 						spacing_open : 10,
 						spacing_closed : 10,
-						togglerContent_open : '<fmt:message key="label.learner.progress.open"/>',
-						togglerContent_closed : '<fmt:message key="label.learner.progress.closed"/>',
+						<fmt:message key="label.learner.progress.open" var="togglerContent_open_VAR"/>
+						togglerContent_open : '<c:out value="togglerContent_open_VAR" />',
+						<fmt:message key="label.learner.progress.closed" var="togglerContent_closed_VAR"/>
+						togglerContent_closed : '<c:out value="togglerContent_closed_VAR" />',
 						togglerLength_open : 80,
 						togglerLength_closed : 130,
-						togglerTip_open : '<fmt:message key="label.learner.progress.open.tooltip"/>',
-						togglerTip_closed : '<fmt:message key="label.learner.progress.closed.tooltip"/>',
+						<fmt:message key="label.learner.progress.open.tooltip" var="togglerTip_open_VAR"/>
+						togglerTip_open : '<c:out value="togglerTip_open_VAR" />',
+						<fmt:message key="label.learner.progress.closed.tooltip" var="togglerTip_closed_VAR"/>
+						togglerTip_closed : '<c:out value="togglerTip_closed_VAR" />',
 						onopen_start : function() {$('#controlFrame').css('visibility','visible');},
 						onopen_end : function() {
 										//expand contentFrame width altogether with content-frame-container
