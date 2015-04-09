@@ -100,3 +100,17 @@
 		org.lamsfoundation.lams.web.OrganisationGroupServlet
 	</servlet-class>
 </servlet>
+
+<servlet>
+	<servlet-name>LearningDesignRestServlet</servlet-name>
+	<servlet-class>
+		org.lamsfoundation.lams.rest.LearningDesignRestServlet
+	</servlet-class>
+</servlet>
+
+<servlet>
+	<servlet-name>ToolContentRestServlet</servlet-name>
+	<servlet-class>
+		org.lamsfoundation.lams.rest.ToolContentRestServlet
+	</servlet-class>
+</servlet>
