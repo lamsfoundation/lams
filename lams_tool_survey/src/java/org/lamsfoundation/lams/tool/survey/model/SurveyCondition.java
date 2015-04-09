@@ -126,7 +126,7 @@ public class SurveyCondition extends TextSearchCondition {
     /**
      * Notice that questions are copied with very little information and then they are assigned to the cloned object.
      * This method is used when assigning BranchActivityEntry needs, so only basic information (in fact, only order ID)
-     * is needed. Also, there should be no link to Q&A content.
+     * is needed. Also, there should be no link to Survey content.
      */
     @Override
     public SurveyCondition clone(int uiidOffset) {
