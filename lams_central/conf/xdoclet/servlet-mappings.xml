@@ -54,3 +54,13 @@
 	<servlet-name>CourseGroupManager</servlet-name>
 	<url-pattern>/services/CourseGroupManager</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>LearningDesignRestServlet</servlet-name>
+	<url-pattern>/rest/LearningDesign</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>ToolContentRestServlet</servlet-name>
+	<url-pattern>/rest/ToolContent</url-pattern>
+</servlet-mapping>
