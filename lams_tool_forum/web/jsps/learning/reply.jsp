@@ -9,6 +9,10 @@
 	$("#replyForm").click(function (e) {
 		e.stopPropagation();
 	});
+	$("#replyForm").keydown(function (e) {
+    	e.stopPropagation();
+	});
+	
 
 	$('#replyForm').submit(function() { // catch the form's submit event
 
