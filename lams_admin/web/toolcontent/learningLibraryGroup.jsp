@@ -19,13 +19,13 @@
 			LAMS_URL = '<lams:LAMSURL/>',
 			LABELS = {
 					<fmt:message key="tool.groups.group.default.name" var="GROUP_DEFAULT_NAME_VAR"/>
-					GROUP_DEFAULT_NAME : '<c:out value="GROUP_DEFAULT_NAME_VAR" />',
+					GROUP_DEFAULT_NAME : '<c:out value="${GROUP_DEFAULT_NAME_VAR}" />',
 					<fmt:message key="tool.groups.remove.confirm" var="GROUP_REMOVE_CONFIRM_VAR"/>
-					GROUP_REMOVE_CONFIRM : '<c:out value="GROUP_REMOVE_CONFIRM_VAR" />',
+					GROUP_REMOVE_CONFIRM : '<c:out value="${GROUP_REMOVE_CONFIRM_VAR}" />',
 					<fmt:message key="tool.groups.group.name.error" var="GROUP_NAME_VALIDATION_ERROR_VAR"/>
-					GROUP_NAME_VALIDATION_ERROR : '<c:out value="GROUP_NAME_VALIDATION_ERROR_VAR" />',
+					GROUP_NAME_VALIDATION_ERROR : '<c:out value="${GROUP_NAME_VALIDATION_ERROR_VAR}" />',
 					<fmt:message key="tool.groups.save.error" var="SAVE_ERROR_VAR"/>
-					SAVE_ERROR : '<c:out value="SAVE_ERROR_VAR" />'
+					SAVE_ERROR : '<c:out value="${SAVE_ERROR_VAR}" />'
 			};
 	</script>
 </lams:head>
