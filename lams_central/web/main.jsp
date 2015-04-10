@@ -43,29 +43,29 @@
 			var LAMS_URL = '<lams:LAMSURL/>';
 			var LABELS = {
 					<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
-					EMAIL_NOTIFICATIONS_TITLE : '<c:out value="EMAIL_NOTIFICATIONS_TITLE_VAR" />',
+					EMAIL_NOTIFICATIONS_TITLE : '<c:out value="${EMAIL_NOTIFICATIONS_TITLE_VAR}" />',
 					<fmt:message key="index.remove.lesson.confirm1" var="REMOVE_LESSON_CONFIRM1_VAR"/>
-					REMOVE_LESSON_CONFIRM1 : '<c:out value="REMOVE_LESSON_CONFIRM1_VAR" />',
+					REMOVE_LESSON_CONFIRM1 : '<c:out value="${REMOVE_LESSON_CONFIRM1_VAR}" />',
 					<fmt:message key="index.remove.lesson.confirm2" var="REMOVE_LESSON_CONFIRM2_VAR"/>
-					REMOVE_LESSON_CONFIRM2 : '<c:out value="REMOVE_LESSON_CONFIRM2_VAR" />',
+					REMOVE_LESSON_CONFIRM2 : '<c:out value="${REMOVE_LESSON_CONFIRM2_VAR}" />',
 					<fmt:message key="label.enable.lesson.sorting" var="SORTING_ENABLE_VAR"/>
-					SORTING_ENABLE : '<c:out value="SORTING_ENABLE_VAR" />',
+					SORTING_ENABLE : '<c:out value="${SORTING_ENABLE_VAR}" />',
 					<fmt:message key="label.disable.lesson.sorting" var="SORTING_DISABLE_VAR"/>
-					SORTING_DISABLE : '<c:out value="SORTING_DISABLE_VAR" />',
+					SORTING_DISABLE : '<c:out value="${SORTING_DISABLE_VAR}" />',
 					<fmt:message key="index.single.activity.lesson.title" var="SINGLE_ACTIVITY_LESSON_TITLE_VAR"/>
-					SINGLE_ACTIVITY_LESSON_TITLE : '<c:out value="SINGLE_ACTIVITY_LESSON_TITLE_VAR" />',
+					SINGLE_ACTIVITY_LESSON_TITLE : '<c:out value="${SINGLE_ACTIVITY_LESSON_TITLE_VAR}" />',
 					<fmt:message key="index.gradebook.course.title" var="GRADEBOOK_COURSE_TITLE_VAR"/>
-					GRADEBOOK_COURSE_TITLE : '<c:out value="GRADEBOOK_COURSE_TITLE_VAR" />',
+					GRADEBOOK_COURSE_TITLE : '<c:out value="${GRADEBOOK_COURSE_TITLE_VAR}" />',
 					<fmt:message key="index.gradebook.lesson.title" var="GRADEBOOK_LESSON_TITLE_VAR"/>
-					GRADEBOOK_LESSON_TITLE : '<c:out value="GRADEBOOK_LESSON_TITLE_VAR" />',
+					GRADEBOOK_LESSON_TITLE : '<c:out value="${GRADEBOOK_LESSON_TITLE_VAR}" />',
 					<fmt:message key="index.gradebook.learner.title" var="GRADEBOOK_LEARNER_TITLE_VAR"/>
-					GRADEBOOK_LEARNER_TITLE : '<c:out value="GRADEBOOK_LEARNER_TITLE_VAR" />',
+					GRADEBOOK_LEARNER_TITLE : '<c:out value="${GRADEBOOK_LEARNER_TITLE_VAR}" />',
 					<fmt:message key="index.conditions.title" var="CONDITIONS_TITLE_VAR"/>
-					CONDITIONS_TITLE : '<c:out value="CONDITIONS_TITLE_VAR" />',
+					CONDITIONS_TITLE : '<c:out value="${CONDITIONS_TITLE_VAR}" />',
 					<fmt:message key="index.search.lesson.title" var="SEARCH_LESSON_TITLE_VAR"/>
-					SEARCH_LESSON_TITLE : '<c:out value="SEARCH_LESSON_TITLE_VAR" />',
+					SEARCH_LESSON_TITLE : '<c:out value="${SEARCH_LESSON_TITLE_VAR}" />',
 					<fmt:message key="index.course.groups.title" var="COURSE_GROUPS_TITLE_VAR"/>
-					COURSE_GROUPS_TITLE : '<c:out value="COURSE_GROUPS_TITLE_VAR" />'
+					COURSE_GROUPS_TITLE : '<c:out value="${COURSE_GROUPS_TITLE_VAR}" />'
 			}
 			
 			var tabName = '${tab}';
