@@ -62,7 +62,8 @@
 			$(this).height(starHeight);
 
 			var average = parseFloat($(this).attr('data-average')), // get the average of all rates
-			idBox = parseInt($(this).attr('data-id')), // get the id of the box
+			//**LAMS** customized. originally it looked like idBox = parseInt($(this).attr('data-id')), 
+			idBox = $(this).attr('data-id'), // get the id of the box 
 			widthRatingContainer = starWidth*opts.length, // Width of the Container
 			widthColor = average/opts.rateMax*widthRatingContainer, // Width of the color Container
 

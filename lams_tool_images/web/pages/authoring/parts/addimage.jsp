@@ -75,13 +75,14 @@
 			</c:if>		
 
 		</html:form>
-		
 
 		<lams:ImgButtonWrapper>
-			<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button-add-item"><fmt:message
-					key="label.authoring.basic.add.image" /> </a>
-			<a href="javascript:;" onclick="cancelImageGalleryItem()" class="button space-left"><fmt:message
-					key="label.cancel" /> </a>
+			<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button-add-item" style="padding-bottom: 40px;">
+				<fmt:message key="label.authoring.basic.add.image" /> 
+			</a>
+			<a href="javascript:;" onclick="cancelImageGalleryItem()" class="button space-left">
+				<fmt:message key="label.cancel" /> 
+			</a>
 		</lams:ImgButtonWrapper>
 	</body>
 </lams:html>

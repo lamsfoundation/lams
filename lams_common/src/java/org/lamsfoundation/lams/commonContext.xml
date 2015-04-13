@@ -222,6 +222,31 @@
 			</props>
 		</property>
 	</bean>
+
+	<!--  Rating Service -->
+
+	<bean id="ratingService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.rating.service.RatingService">
+				<property name="messageService"><ref bean="commonMessageService"/></property>
+				<property name="ratingDAO"><ref bean="ratingDAO" /></property>
+				<property name="ratingCriteriaDAO"><ref bean="ratingCriteriaDAO" /></property>
+				<property name="userManagementService"><ref bean="userManagementService"/></property>
+			</bean>
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+
+	</bean>
 	
 	<!-- Event notification Service -->
 
@@ -415,6 +440,14 @@
 	
 	<!-- Core Notebook related beans -->
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+
+	<!-- Rating related beans -->
+	<bean id="ratingDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="ratingCriteriaDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingCriteriaDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	
