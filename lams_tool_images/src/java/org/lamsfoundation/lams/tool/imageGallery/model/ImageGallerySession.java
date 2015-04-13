@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 /**
  * ImageGallery
  * 
- * @author Dapeng Ni
+ * @author Andrey Balan
  * 
  * @hibernate.class table="tl_laimag10_session"
  * 

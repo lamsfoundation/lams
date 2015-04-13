@@ -1685,3 +1685,34 @@ div.growlUI h1 {
 	color: #222222 !important;
 	background-color: #D0E5F5;"
 }
+
+.rating-criteria-tag {
+	width: 60%;
+	padding-bottom: 25px;
+}
+.rating-criteria-tag input[type="text"] {
+	width: 100%;
+}
+#criterias-table td {
+	vertical-align:middle;
+}
+div.up-arrow, div.up-arrow-disabled, div.down-arrow, div.down-arrow-disabled, div.delete-arrow {
+	width:16px; 
+	height:16px;
+	display: table-cell;
+}
+div.up-arrow {
+	background-image: url('../images/uparrow.gif');
+}
+div.up-arrow-disabled {
+	background-image: url('../images/uparrow_disabled.gif');
+}
+div.down-arrow {
+	background-image: url('../images/downarrow.gif');
+}
+div.down-arrow-disabled {
+	background-image: url('../images/downarrow_disabled.gif');
+}
+div.delete-arrow {
+	background-image: url('../images/disposal.gif');
+}

@@ -44,11 +44,8 @@ public class ImageGalleryConstants {
     public static final String PARAM_TITLE = "title";
     public static final String PARAM_COMMENTS = "comments";
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
-    public static final String PARAM_CURRENT_RATING = "currentRating";
     public static final String PARAM_IS_VOTED = "isVoted";
     public static final String PARAM_IS_AUTHOR = "isAuthor";
-    public static final String PARAM_NUMBER_RATINGS = "numberRatings";
-    public static final String PARAM_AVERAGE_RATING = "averageRating";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
@@ -79,6 +76,7 @@ public class ImageGalleryConstants {
     public static final String ATTR_MEDIUM_IMAGE_DIMENSIONS = "mediumImageDimensions";
     public static final String ATTR_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+    public static final String ATTR_RATING_DTOS = "ratingDtos";
     
     // error message keys
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";

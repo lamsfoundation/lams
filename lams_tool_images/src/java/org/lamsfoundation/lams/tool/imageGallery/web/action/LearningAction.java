@@ -37,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
@@ -49,12 +48,11 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.config.ForwardConfig;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.rating.dto.RatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
@@ -63,7 +61,6 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
@@ -74,7 +71,6 @@ import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -126,9 +122,6 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("addNewComment")) {
 	    return addNewComment(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateRating")) {
-	    return saveOrUpdateRating(mapping, form, request, response);
 	}
 	if (param.equals("vote")) {
 	    return vote(mapping, form, request, response);
@@ -203,6 +196,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
 	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED,
 		imageGalleryUser != null && imageGalleryUser.isSessionFinished());
+	sessionMap.put(AttributeNames.PARAM_USER_ID, imageGalleryUser.getUserId());
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -467,9 +461,7 @@ public class LearningAction extends Action {
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	IImageGalleryService service = getImageGalleryService();
 	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),
-		sessionId);
+	Long userId = (Long) sessionMap.get(AttributeNames.PARAM_USER_ID);
 
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
@@ -487,7 +479,7 @@ public class LearningAction extends Action {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	boolean isTeacher = mode != null && mode.isTeacher();
 	boolean isAuthor = !isTeacher && !image.isCreateByAuthor() && (createdBy != null)
-		&& (createdBy.getUserId().equals(imageGalleryUser.getUserId()));
+		&& (createdBy.getUserId().equals(userId));
 
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
@@ -504,18 +496,13 @@ public class LearningAction extends Action {
 	}
 
 	if (!isTeacher && imageGallery.isAllowRank()) {
-	    ImageRating imageRating = service.getImageRatingByImageAndUser(imageUid, imageGalleryUser.getUserId());
-	    int rating = imageRating == null ? 0 : imageRating.getRating();
-
-	    Object[] ratingForGroup = service.getRatingForGroup(imageUid, sessionId);
-	    sessionMap.put(ImageGalleryConstants.PARAM_NUMBER_RATINGS, ((Long) ratingForGroup[0]).toString());
-	    sessionMap.put(ImageGalleryConstants.PARAM_AVERAGE_RATING, ((Float) ratingForGroup[1]).toString());
-	    sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_RATING, rating);
+	    List<RatingDTO> ratingDtos = service.getRatingDtos(imageGallery, imageUid, userId);
+	    sessionMap.put(ImageGalleryConstants.ATTR_RATING_DTOS, ratingDtos);
 	}
 
 	if (!isTeacher && imageGallery.isAllowVote()) {
 	    boolean isVotedForThisImage = false;
-	    ImageVote imageVote = service.getImageVoteByImageAndUser(image.getUid(), imageGalleryUser.getUserId());
+	    ImageVote imageVote = service.getImageVoteByImageAndUser(image.getUid(), userId);
 	    if (imageVote != null && imageVote.isVoted()) {
 		isVotedForThisImage = true;
 	    }
@@ -581,47 +568,6 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 
 	form.reset(mapping, request);
-
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
-
-    /**
-     * Move down current item.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward saveOrUpdateRating(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-	IImageGalleryService service = getImageGalleryService();
-
-	int rating = NumberUtils.stringToInt(((ImageRatingForm) form).getRating());
-	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),
-		sessionId);
-	ImageRating imageRating = service.getImageRatingByImageAndUser(imageUid, imageGalleryUser.getUserId());
-
-	// persist ImageGalleryItem changes in DB
-	ImageGalleryItem dbImage = service.getImageGalleryItemByUid(imageUid);
-	if (imageRating == null) { // add
-	    imageRating = new ImageRating();
-	    imageRating.setCreateBy(imageGalleryUser);
-	    imageRating.setImageGalleryItem(dbImage);
-	}
-	imageRating.setRating(rating);
-	service.saveOrUpdateImageRating(imageRating);
-
-	// to make available new changes be visible in jsp page
-	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, dbImage);
-	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_RATING, rating);
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);

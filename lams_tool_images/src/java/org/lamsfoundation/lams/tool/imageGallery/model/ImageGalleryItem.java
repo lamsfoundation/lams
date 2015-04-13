@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
  * @hibernate.class table="tl_laimag10_imagegallery_item"
  * 
  * @author Andrey Balan
- * 
  */
 public class ImageGalleryItem implements Cloneable {
 
@@ -108,6 +107,7 @@ public class ImageGalleryItem implements Cloneable {
 	try {
 	    image = (ImageGalleryItem) super.clone();
 	    image.setUid(null);
+	    
 	    // clone ImageGalleryUser as well
 	    if (this.createBy != null) {
 		image.setCreateBy((ImageGalleryUser) this.createBy.clone());
