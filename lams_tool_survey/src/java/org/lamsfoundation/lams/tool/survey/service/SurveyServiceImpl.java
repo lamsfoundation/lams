@@ -174,7 +174,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public SurveyUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return surveyUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
-    
+
     @Override
     public int getCountFinishedUsers(Long sessionId) {
 	return surveyUserDao.getCountFinishedUsers(sessionId);
@@ -224,7 +224,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 	return nextUrl;
     }
-    
+
     @Override
     public void setResponseFinalized(Long userUid) {
 	SurveyUser user = (SurveyUser) surveyUserDao.getObject(SurveyUser.class, userUid);
@@ -406,8 +406,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     @Override
     public List<String> getOpenResponsesForTablesorter(final Long qaSessionId, final Long questionId, int page,
 	    int size, int sorting) {
-	return surveyAnswerDao.getOpenResponsesForTablesorter(qaSessionId, questionId, page, size,
-		sorting);
+	return surveyAnswerDao.getOpenResponsesForTablesorter(qaSessionId, questionId, page, size, sorting);
     }
 
     @Override
@@ -461,69 +460,123 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByContentId(Long toolContentID) {
+    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportClassPortfolio(Long toolContentID) {
 
-	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
-		new SurveySessionComparator());
-
-	// get all tool sessions in this content
+	//construct sessionToUsers Map
+	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
 	List<SurveySession> sessions = surveySessionDao.getByContentId(toolContentID);
 	if (sessions != null) {
 	    for (SurveySession session : sessions) {
 		// get all users under this session
 		List<SurveyUser> users = surveyUserDao.getBySessionID(session.getSessionId());
-
-		// container for this user's answers
-		List<List<AnswerDTO>> learnerAnswers = new ArrayList<List<AnswerDTO>>();
-		if (users != null) {
-		    // for every user, get answers of all questions.
-		    for (SurveyUser user : users) {
-			List<AnswerDTO> answers = getQuestionAnswers(user.getSession().getSessionId(), user.getUid());
-			learnerAnswers.add(answers);
-		    }
-		}
-		toQuestionMap(summary, session, learnerAnswers);
+		sessionToUsersMap.put(session, users);
 	    }
 	}
 
-	return summary;
+	return getExportSummary(sessionToUsersMap);
     }
 
     @Override
     public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID) {
 
-	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
-		new SurveySessionComparator());
-
-	// get tool sessions
 	SurveySession session = surveySessionDao.getSessionBySessionId(toolSessionID);
-	List<SurveyUser> users = surveyUserDao.getBySessionID(session.getSessionId());
+	List<SurveyUser> users = surveyUserDao.getBySessionID(toolSessionID);
 
-	// container for this user's answers
-	List<List<AnswerDTO>> learnerAnswers = new ArrayList<List<AnswerDTO>>();
-	if (users != null) {
-	    // for every user, get answers of all questions.
-	    for (SurveyUser user : users) {
-		List<AnswerDTO> answers = getQuestionAnswers(user.getSession().getSessionId(), user.getUid());
-		learnerAnswers.add(answers);
-	    }
-	}
-	toQuestionMap(summary, session, learnerAnswers);
+	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
+	sessionToUsersMap.put(session, users);
 
-	return summary;
+	return getExportSummary(sessionToUsersMap);
     }
 
     @Override
-    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByLearner(SurveyUser learner) {
+    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportLearnerPortfolio(SurveyUser learner) {
+
+	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
+	SurveySession session = learner.getSession();
+	sessionToUsersMap.put(session, Arrays.asList(learner));
+	
+	return getExportSummary(sessionToUsersMap);
+    }
+
+    /**
+     * Creates data for export methods. Suitable both for single/multiple users  
+     * 
+     * @param sessionToUsersMap map containing all session to users pairs that require data to be exported
+     * @return
+     */
+    private SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> getExportSummary(
+	    Map<SurveySession, List<SurveyUser>> sessionToUsersMap) {
+
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
 		new SurveySessionComparator());
 
-	SurveySession session = learner.getSession();
-	List<AnswerDTO> answers = getQuestionAnswers(session.getSessionId(), learner.getUid());
-	List<List<AnswerDTO>> learnerAnswers = new ArrayList<List<AnswerDTO>>();
-	learnerAnswers.add(answers);
+	// all questions
+	List<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
+	if (!sessionToUsersMap.isEmpty()) {
+	    SurveySession session = sessionToUsersMap.keySet().iterator().next();
+	    Survey survey = session.getSurvey();
+	    questions.addAll(survey.getQuestions());
+	}
 
-	toQuestionMap(summary, session, learnerAnswers);
+	// traverse all sessions
+	for (SurveySession session : sessionToUsersMap.keySet()) {
+
+	    SortedMap<SurveyQuestion, List<AnswerDTO>> questionMap = new TreeMap<SurveyQuestion, List<AnswerDTO>>(
+		    new QuestionsComparator());
+
+	    // traverse all questions
+	    for (SurveyQuestion question : questions) {
+
+		List<SurveyUser> users = sessionToUsersMap.get(session);
+		List<AnswerDTO> answerDtos = new ArrayList<AnswerDTO>();
+
+		// if it's for a single user - query DB for only one answer for this current user
+		if (users.size() == 1) {
+		    SurveyUser user = users.get(0);
+
+		    AnswerDTO answerDTO = new AnswerDTO(question);
+		    SurveyAnswer answer = surveyAnswerDao.getAnswer(question.getUid(), user.getUid());
+		    if (answer != null) {
+			answer.setChoices(SurveyWebUtils.getChoiceList(answer.getAnswerChoices()));
+		    }
+		    answerDTO.setAnswer(answer);
+		    answerDTO.setReplier(user);
+		    answerDtos.add(answerDTO);
+
+		    // if it's for more than one user - query DB for all answers for this session to this question
+		} else {
+
+		    // get all question answers for this session
+		    List<SurveyAnswer> answers = surveyAnswerDao.getSessionAnswer(session.getSessionId(),
+			    question.getUid());
+		    // traverse all users
+		    for (SurveyUser user : users) {
+
+			// find user's answer
+			SurveyAnswer learnerAnswer = null;
+			for (SurveyAnswer answer : answers) {
+			    if (answer.getUser().getUid().equals(user.getUid())) {
+				learnerAnswer = answer;
+				break;
+			    }
+			}
+
+			AnswerDTO answerDTO = new AnswerDTO(question);
+			if (learnerAnswer != null) {
+			    learnerAnswer.setChoices(SurveyWebUtils.getChoiceList(learnerAnswer.getAnswerChoices()));
+			}
+			answerDTO.setAnswer(learnerAnswer);
+			answerDTO.setReplier(user);
+			answerDtos.add(answerDTO);
+		    }
+
+		}
+
+		questionMap.put(question, answerDtos);
+	    }
+
+	    summary.put(session, questionMap);
+	}
 
 	return summary;
     }
@@ -573,35 +626,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     // *****************************************************************************
     // private methods
     // *****************************************************************************
-    /**
-     * Convert all user's answers to another map sorted by SurveyQuestion, rather than old sorted by user.
-     */
-    private void toQuestionMap(SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary,
-	    SurveySession session, List<List<AnswerDTO>> learnerAnswers) {
-	// after get all users' all answers, then sort them by SurveyQuestion
-	SortedMap<SurveyQuestion, List<AnswerDTO>> questionMap = new TreeMap<SurveyQuestion, List<AnswerDTO>>(
-		new QuestionsComparator());
-	Survey survey = getSurveyBySessionId(session.getSessionId());
-	Set<SurveyQuestion> questionList = survey.getQuestions();
-	if (questionList != null) {
-	    for (SurveyQuestion question : questionList) {
-		List<AnswerDTO> queAnsList = new ArrayList<AnswerDTO>();
-		questionMap.put(question, queAnsList);
-		for (List<AnswerDTO> listAns : learnerAnswers) {
-		    for (AnswerDTO answerDTO : listAns) {
-			// get a user's answer for this question
-			if (answerDTO.getUid().equals(question.getUid())) {
-			    queAnsList.add(answerDTO);
-			    break;
-			}
-		    }
-		    // find another user's answer
-		}
-	    }// for this question, get all users answer, the continue next
-	}
-
-	summary.put(session, questionMap);
-    }
 
     private Survey getDefaultSurvey() throws SurveyApplicationException {
 	Long defaultSurveyId = getToolDefaultContentIdBySignature(SurveyConstants.TOOL_SIGNATURE);

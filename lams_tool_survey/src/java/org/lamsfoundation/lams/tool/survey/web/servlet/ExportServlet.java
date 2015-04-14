@@ -148,7 +148,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, map);
 		}
         
-		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByLearner(learner);
+		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportLearnerPortfolio(learner);
 		sessionMap.put(SurveyConstants.ATTR_TITLE, content.getTitle());
 		sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, groupList);
 	}
@@ -170,7 +170,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new SurveyApplicationException(error);
 		}
-		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportByContentId(toolContentID);
+		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>  groupList = service.exportClassPortfolio(toolContentID);
 
 		// Add flag to indicate whether to render user notebook entries
 		sessionMap.put(SurveyConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());

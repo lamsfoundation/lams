@@ -24,7 +24,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.survey.web.action;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
@@ -37,16 +36,18 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -76,8 +77,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class MonitoringAction extends Action {
-	
-	public ISurveyService surveyService;
+
+    public ISurveyService surveyService;
     private static final String MSG_LABEL_QUESTION = "label.question";
     private static final String MSG_LABEL_OPEN_RESPONSE = "label.open.response";
     private static final String MSG_LABEL_SESSION_NAME = "label.session.name";
@@ -106,7 +107,7 @@ public class MonitoringAction extends Action {
 	if (param.equals("exportSurvey")) {
 	    return exportSurvey(mapping, form, request, response);
 	}
-	
+
 	if (param.equals("setSubmissionDeadline")) {
 	    return setSubmissionDeadline(mapping, form, request, response);
 	}
@@ -126,17 +127,17 @@ public class MonitoringAction extends Action {
 
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-    	
-    // get session from shared session.
-    HttpSession ss = SessionManager.getSession();
-    	
+
+	// get session from shared session.
+	HttpSession ss = SessionManager.getSession();
+
 	// initial Session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
-	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
-		AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 
@@ -163,20 +164,20 @@ public class MonitoringAction extends Action {
 	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, relectList);
 	sessionMap.put(SurveyConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
-	
+
 	// check if there is submission deadline
 	Date submissionDeadline = survey.getSubmissionDeadline();
-	
+
 	if (submissionDeadline != null) {
-		
-		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    MonitoringAction.log.info("Time:" + tzSubmissionDeadline.getTime());
-	    //store submission deadline to sessionMap
+	    // store submission deadline to sessionMap
 	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 
-	}	
+	}
 
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
@@ -255,11 +256,11 @@ public class MonitoringAction extends Action {
 	MessageService resource = getMessageService();
 	try {
 	    // create an empty excel file
-	    HSSFWorkbook wb = new HSSFWorkbook();
-	    HSSFSheet sheet = wb.createSheet("Survey");
+	    Workbook workbook = new SXSSFWorkbook();
+	    Sheet sheet = workbook.createSheet("Survey");
 	    sheet.setColumnWidth(0, 5000);
-	    HSSFRow row;
-	    HSSFCell cell;
+	    Row row;
+	    Cell cell;
 	    int idx = 0;
 	    Set<Entry<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>> entries = groupList.entrySet();
 	    for (Entry<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> entry : entries) {
@@ -391,19 +392,16 @@ public class MonitoringAction extends Action {
 
 		    }
 		}
-	    }
-	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	    wb.write(bos);
-	    // construct download file response header
-	    String fileName = "lams_survey_" + toolSessionID + ".xls";
-	    String mineType = "application/vnd.ms-excel";
-	    String header = "attachment; filename=\"" + fileName + "\";";
-	    response.setContentType(mineType);
-	    response.setHeader("Content-Disposition", header);
+	    } 
 
-	    byte[] data = bos.toByteArray();
-	    response.getOutputStream().write(data, 0, data.length);
-	    response.getOutputStream().flush();
+	    String fileName = "lams_survey_" + toolSessionID + ".xlsx";
+	    response.setContentType("application/x-download");
+	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+	    
+	    ServletOutputStream out = response.getOutputStream();
+	    workbook.write(out);
+	    out.close();
+	    
 	} catch (Exception e) {
 	    MonitoringAction.log.error(e);
 	    errors = new ActionMessage("error.monitoring.export.excel", e.toString()).toString();
@@ -419,7 +417,7 @@ public class MonitoringAction extends Action {
 	}
 	return null;
     }
-    
+
     /**
      * Set Submission Deadline
      * 
@@ -432,10 +430,10 @@ public class MonitoringAction extends Action {
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	surveyService = getSurveyService();
-		
+
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Survey survey = surveyService.getSurveyByContentId(contentID);
-	
+
 	Long dateParameter = WebUtil.readLongParam(request, SurveyConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
 	if (dateParameter != null) {
@@ -450,9 +448,10 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
-    
+
     /**
      * Removes all the html tags from a string
+     * 
      * @param string
      * @return
      */
