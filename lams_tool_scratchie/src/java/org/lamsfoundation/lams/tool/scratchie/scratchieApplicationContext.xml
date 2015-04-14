@@ -73,7 +73,7 @@
             <ref bean="scratchieAnswerVisitDao"/>
         </property>
         <property name="scratchieBurningQuestionDao">
-            <ref local="scratchieBurningQuestionDao"/>
+            <ref bean="scratchieBurningQuestionDao"/>
         </property>
         <property name="scratchieUserDao">
             <ref bean="scratchieUserDao"/>
