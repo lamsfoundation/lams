@@ -595,17 +595,6 @@ public class AuthoringAction extends Action {
 	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
 	    MessageDTO topic = rList.get(topicIdx);	    
 	    if (topic != null) {
-		// check whehter the edit topic and the current user are same person, if not, forbidden to edit topic
-		if (topic.getMessage() != null && topic.getMessage().getCreatedBy() != null) {
-		    // get login user (author)
-		    HttpSession ss = SessionManager.getSession();
-		    // get back login user DTO
-		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		    Long topicAuthorId = topic.getMessage().getCreatedBy().getUserId();
-		    if (!new Long(user.getUserID().intValue()).equals(topicAuthorId)) {
-			return mapping.findForward("forbiden");
-		    }
-		}
 		// update message to HTML Form to echo back to web page: for subject, body display
 		msgForm.setMessage(topic.getMessage());
 	    }
