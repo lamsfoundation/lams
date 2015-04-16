@@ -1470,6 +1470,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void parseAnnotations(JSONArray annotationList) throws ObjectExtractorException, JSONException {
+	if (annotationList == null) {
+	    return;
+	}
 
 	Set<LearningDesignAnnotation> existingAnnotations = learningDesign.getAnnotations();
 	if (existingAnnotations == null) {
@@ -1811,7 +1814,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setLibraryActivityUiImage((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.LIBRARY_IMAGE));
 	activity.setGroupingSupportType((Integer) JsonUtil
 		.opt(activityDetails, AuthoringJsonTags.GROUPING_SUPPORT_TYPE));
-	activity.setStopAfterActivity((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.STOP_AFTER_ACTIVITY));
+	activity.setStopAfterActivity((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.STOP_AFTER_ACTIVITY, false));
 
 	return activity;
     }
@@ -2733,7 +2736,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 	    group.getBranchActivities().add(entry);
 	}
-	
+
 	entry.setCondition(condition);
 
 	if (branchingActivity.isConditionGate()) {
@@ -2884,7 +2887,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 	    group.getBranchActivities().add(entry);
 	}
-	
+
 	entry.setCondition(condition);
 
 	if (branchingActivity.isConditionGate()) {

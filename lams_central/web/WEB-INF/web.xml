@@ -434,6 +434,29 @@
 		</servlet-class>
 	</servlet>
 
+	<servlet>
+		<servlet-name>LearningDesignRestServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.rest.LearningDesignRestServlet
+		</servlet-class>
+	</servlet>
+ 	
+	<servlet>
+		<servlet-name>ToolContentRestServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.rest.ToolContentRestServlet
+		</servlet-class>
+	</servlet>
+ 	
+ 	<servlet-mapping>
+ 		<servlet-name>LearningDesignRestServlet</servlet-name>
+ 		<url-pattern>/rest/LearningDesign</url-pattern>
+ 	</servlet-mapping>
+ 	
+ 	<servlet-mapping>
+ 		<servlet-name>ToolContentRestServlet</servlet-name>
+ 		<url-pattern>/rest/ToolContent</url-pattern>
+ 	</servlet-mapping>
 	<!-- Optional Module Placeholder - do not remove -->
 
 	<servlet-mapping>
@@ -711,6 +734,7 @@
 			<url-pattern>/services/Register/*</url-pattern>
 			<url-pattern>/ForgotPasswordRequest</url-pattern>
 			<url-pattern>/signup/*</url-pattern>
+			<url-pattern>/rest/*</url-pattern> 
 			<!-- Static resources -->
 			<url-pattern>/css/*</url-pattern>
 			<url-pattern>/errorpages/*</url-pattern>
