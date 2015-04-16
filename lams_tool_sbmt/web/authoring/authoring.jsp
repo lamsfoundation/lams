@@ -15,8 +15,6 @@
 	
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
-	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">	
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	

@@ -8,8 +8,6 @@
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	<lams:headItems />
-	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
 	<script type="text/javascript">
 		 function init(){
             var tag = document.getElementById("currentTab");

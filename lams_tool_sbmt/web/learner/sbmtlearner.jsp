@@ -13,9 +13,6 @@
 	<html:base />
 	<%@ include file="/common/header.jsp"%>
 
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>"
-		rel="stylesheet" type="text/css">
-
 	<script type="text/javascript">
 		function submitCount(tUrl){
 			var lockOnFinished = <c:out value="${sessionMap.lockOnFinish}"/>;

@@ -3,7 +3,7 @@
 <div id="itemList">
 	<h2 class="spacer-left">
 		<fmt:message key="label.vote.nominations" />
-		<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="resourceListArea_Busy" />
+		<img src="${ctxPath}/images/indicator.gif" style="display:none" id="resourceListArea_Busy" />
 	</h2>
 
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
