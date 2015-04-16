@@ -10,7 +10,7 @@
 <div>
 	<div class="field-name">
 		<fmt:message key="label.video.list" />
-		<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="referencesArea_Busy" />
+		<img src="${ctxPath}/images/indicator.gif"	style="display:none" id="referencesArea_Busy" />
 	</div>
 
 	<table class="alternative-color" id="videoTable" cellspacing="0">

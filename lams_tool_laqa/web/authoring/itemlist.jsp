@@ -4,7 +4,7 @@
 <div id="itemList">
 	<h2 class="spacer-left">
 		<fmt:message key="label.questions" />
-		<img src="${ctxPath}/includes/images/indicator.gif"
+		<img src="${ctxPath}/images/indicator.gif"
 			style="display:none" id="resourceListArea_Busy" />
 	</h2>
 

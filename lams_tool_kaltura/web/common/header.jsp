@@ -11,7 +11,6 @@
 	<title>
 		<fmt:message key="activity.title" />
 	</title>
-	<link href="${tool}pages/learning/kaltura_style.css" rel="stylesheet" type="text/css">
 	<lams:headItems />
 	<tiles:insert attribute="headItems" />
 </lams:head>

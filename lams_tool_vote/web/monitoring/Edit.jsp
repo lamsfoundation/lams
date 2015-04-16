@@ -27,7 +27,7 @@
 			<div id="resourceListArea">
 			<div id="itemList">
 				<h2><fmt:message key="label.vote.nominations" />
-				<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="resourceListArea_Busy" /></h2>
+				<img src="${ctxPath}/images/indicator.gif" style="display:none" id="resourceListArea_Busy" /></h2>
 			
 				<table id="itemTable" style="align:left;width:650px" >
 				    <c:set var="queIndex" scope="request" value="0"/>
