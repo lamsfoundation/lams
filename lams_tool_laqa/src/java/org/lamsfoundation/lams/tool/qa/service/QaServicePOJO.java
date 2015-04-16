@@ -42,6 +42,9 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -51,6 +54,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -92,6 +96,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -107,7 +112,7 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
+public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager,
 	QaAppConstants {
     private static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 
@@ -1495,5 +1500,61 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getQaOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    // ****************** REST methods *************************
+
+    /** Rest call to create a new Q&A content. Required fields in toolContentJSON: title, instructions, questions.
+     * The questions entry should be JSONArray containing JSON objects, which in turn must contain a question entry and may also contain feedback and required (boolean)
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+
+	QaContent qa = new QaContent();
+	Date updateDate = new Date();
+
+	qa.setCreationDate(updateDate);
+	qa.setUpdateDate(updateDate);
+	qa.setCreatedBy(userID.longValue());
+
+	qa.setQaContentId(toolContentID);
+	qa.setTitle(toolContentJSON.getString("title"));
+	qa.setInstructions(toolContentJSON.getString("instructions"));
+	
+	qa.setDefineLater(false);
+
+	qa.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockOnFinished", Boolean.FALSE));
+	qa.setAllowRichEditor(JsonUtil.opt(toolContentJSON, "allowRichTextEditor", Boolean.FALSE));
+	qa.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
+	qa.setShowOtherAnswers(JsonUtil.opt(toolContentJSON, "showOtherAnswers", Boolean.TRUE));
+	qa.setUsernameVisible(JsonUtil.opt(toolContentJSON, "usernameVisible", Boolean.FALSE));
+	qa.setAllowRateAnswers(JsonUtil.opt(toolContentJSON, "allowRateAnswers", Boolean.FALSE));
+	qa.setNotifyTeachersOnResponseSubmit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnResponseSubmit", Boolean.FALSE));
+	qa.setReflect(JsonUtil.opt(toolContentJSON, "reflect", Boolean.FALSE));
+	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, "reflectionSubject",(String)null));
+	qa.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
+
+	qa.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, "submissionDeadline",(Date)null));
+
+	// qa.setMonitoringReportTitle(); Can't find this field in the database - assuming unused.
+	// qa.setReportTitle(); Can't find this field in the database - assuming unused.
+	// qa.setContent(content);  Can't find this field in the database - assuming unused.
+
+	saveOrUpdateQaContent(qa);
+	// Questions
+	JSONArray questions = toolContentJSON.getJSONArray("questions");
+	for (int i=0; i<questions.length(); i++) {
+	    JSONObject questionData = (JSONObject) questions.get(i);
+	    QaQueContent question = new QaQueContent(questionData.getString("question"), i + 1, 
+		    JsonUtil.opt(questionData,"feedback",(String)null), 
+		    JsonUtil.opt(questionData, "required", Boolean.FALSE), qa );
+	    saveOrUpdateQuestion(question);
+	}
+
+	// TODO
+//	qa.setQaQueContents(qaQueContents);
+//	qa.setConditions(conditions);
+
+
     }
 }
