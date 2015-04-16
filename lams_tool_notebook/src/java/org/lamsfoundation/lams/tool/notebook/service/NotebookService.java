@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -41,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -61,6 +64,7 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -72,7 +76,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  */
 
 public class NotebookService implements ToolSessionManager, ToolContentManager, INotebookService,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
 
     static Logger logger = Logger.getLogger(NotebookService.class.getName());
 
@@ -601,4 +605,32 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getNotebookOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
+    
+    // ****************** REST methods *************************
+
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+	Date updateDate = new Date();
+
+	Notebook nb = new Notebook();
+	nb.setToolContentId(toolContentID);
+	nb.setTitle(toolContentJSON.getString("title"));
+	nb.setInstructions(toolContentJSON.getString("instructions"));
+	nb.setCreateBy(userID.longValue());
+	nb.setCreateDate(updateDate);
+	nb.setUpdateDate(updateDate);
+
+	nb.setLockOnFinished(JsonUtil.opt(toolContentJSON, "lockOnFinished", Boolean.FALSE));
+	nb.setAllowRichEditor(JsonUtil.opt(toolContentJSON, "allowRichTextEditor", Boolean.FALSE));
+	nb.setSubmissionDeadline((Date)JsonUtil.opt(toolContentJSON, "submissionDeadline", null));
+
+	nb.setContentInUse(false);
+	nb.setDefineLater(false);
+	this.saveOrUpdateNotebook(nb);
+	
+	// TODO
+	// nb.setConditions(conditions);
+	
+    }
+    
 }
