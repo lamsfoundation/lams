@@ -843,6 +843,10 @@ hr {
 	border: 1px solid #E82A28;
 }
 
+input.error{
+	color: #cc0000;
+	border: 1px solid #E82A28;
+}
 b.error {
 	color: #cc0000;
 }
