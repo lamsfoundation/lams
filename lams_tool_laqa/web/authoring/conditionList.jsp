@@ -9,7 +9,7 @@
 <div id="conditionList">
 	<h2 class="spacer-left">
 		<fmt:message key="label.authoring.conditions.list.title" />
-		<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="conditionListArea_Busy" />
+		<img src="${ctxPath}/images/indicator.gif"	style="display:none" id="conditionListArea_Busy" />
 	</h2>
 	
 	<table class="alternative-color" id="conditionTable" cellspacing="0">
