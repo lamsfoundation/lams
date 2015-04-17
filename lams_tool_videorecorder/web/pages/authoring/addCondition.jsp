@@ -16,9 +16,11 @@
 		<lams:css style="tabbed" />
 		<script type="text/javascript"> 
 			function callHideConditionMessage() {
-				if (window.parent && window.parent.hideConditionMessage) {
-					window.parent.hideConditionMessage();
+				if (window.hideConditionMessage) {
+					window.hideConditionMessage();
 				} else if (window.parent && window.parent.hideConditionMessage) {
+					window.parent.hideConditionMessage();
+				} else if (window.top && window.top.hideConditionMessage) {
 					window.top.hideConditionMessage();
 				}
 			}

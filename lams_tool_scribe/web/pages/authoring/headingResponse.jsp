@@ -8,7 +8,9 @@
 
 	<script type="text/javascript">
 		var win = null;
-		if (window.parent && window.parent.hideMessage) {
+		if (window.hideMessage) {
+			win = window;
+		} else if (window.parent && window.parent.hideMessage) {
 			win = window.parent;
 		} else if (window.top && window.top.hideMessage) {
 			win = window.top;
