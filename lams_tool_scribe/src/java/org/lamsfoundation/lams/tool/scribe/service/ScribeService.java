@@ -37,15 +37,9 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -56,6 +50,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -79,6 +74,7 @@ import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -90,7 +86,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class ScribeService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager,
+public class ScribeService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, ToolRestManager, 
 	IScribeService {
 
     static Logger logger = Logger.getLogger(ScribeService.class.getName());
@@ -631,5 +627,53 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
+    }
+    
+    // ****************** REST methods *************************
+    
+    /** Used by the Rest calls to create content. 
+     * Mandatory fields in toolContentJSON: title, instructions, topics.
+     * Topics must contain a JSONArray of JSONObject objects, which have the following mandatory fields: subject, body
+     * There should be at least one topic object in the Topics array.
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+
+	Date updateDate = new Date();
+
+	Scribe scribe = new Scribe();
+	scribe.setCreateBy(userID.longValue());
+	scribe.setCreateDate(updateDate);
+	scribe.setUpdateDate(updateDate);
+
+	scribe.setToolContentId(toolContentID);
+	scribe.setContentInUse(false);
+	scribe.setDefineLater(false);
+
+	scribe.setTitle(toolContentJSON.getString("title"));
+	scribe.setInstructions(toolContentJSON.getString("instructions"));
+
+	scribe.setAutoSelectScribe(JsonUtil.opt(toolContentJSON, "autoSelectScribe", Boolean.FALSE));
+	scribe.setLockOnFinished(JsonUtil.opt(toolContentJSON, "lockOnFinished", Boolean.FALSE));
+	scribe.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, "reflectInstructions", null));
+	scribe.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
+	scribe.setShowAggregatedReports(JsonUtil.opt(toolContentJSON, "showAggregatedReports", Boolean.FALSE));
+
+	Set headings = scribe.getScribeHeadings();
+	if ( headings == null ) {
+	    headings = new HashSet();
+	    scribe.setScribeHeadings(headings);
+	}
+	JSONArray headingData = toolContentJSON.getJSONArray("headings");
+	for ( int i=0; i<headingData.length(); i++) {
+	    ScribeHeading heading = new ScribeHeading();
+	    heading.setDisplayOrder(i);
+	    heading.setHeadingText(headingData.getString(i));
+	    heading.setScribe(scribe);
+	    headings.add(heading);
+	}
+
+	saveOrUpdateScribe(scribe);
+
     }
 }
