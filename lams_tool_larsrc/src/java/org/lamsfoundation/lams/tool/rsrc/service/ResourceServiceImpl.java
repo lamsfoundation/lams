@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,9 @@ import java.util.Vector;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -67,6 +71,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -102,6 +107,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -114,7 +120,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * @author Dapeng.Ni
  */
 public class ResourceServiceImpl implements IResourceService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
     private static Logger log = Logger.getLogger(ResourceServiceImpl.class.getName());
 
     private ResourceDAO resourceDao;
@@ -1341,5 +1347,98 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     public void setResourceOutputFactory(ResourceOutputFactory resourceOutputFactory) {
 	this.resourceOutputFactory = resourceOutputFactory;
+    }
+    
+    // ****************** REST methods *************************
+
+    /** Used by the Rest calls to create content. 
+     * Mandatory fields in toolContentJSON: title, instructions, resources, user fields firstName, lastName and loginName
+     * Resources must contain a JSONArray of JSONObject objects, which have the following mandatory fields: title, description, type.
+     * If there are instructions for a resource, the instructions are a JSONArray of Strings.
+     * There should be at least one resource object in the resources array.
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+
+	Date updateDate = new Date();
+
+	Resource resource = new Resource();
+	resource.setContentId(toolContentID);
+	resource.setTitle(toolContentJSON.getString("title"));
+	resource.setInstructions(toolContentJSON.getString("instructions"));
+	resource.setCreated(updateDate);
+
+	resource.setAllowAddFiles(JsonUtil.opt(toolContentJSON, "allowAddFiles", Boolean.FALSE));
+	resource.setAllowAddUrls(JsonUtil.opt(toolContentJSON, "allowAddUrls", Boolean.FALSE));
+	resource.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
+	resource.setMiniViewResourceNumber(JsonUtil.opt(toolContentJSON, "minViewResourceNumber", 0));
+	resource.setNotifyTeachersOnAssigmentSumbit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnAssigmentSumbit", Boolean.FALSE));
+	resource.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
+	resource.setReflectInstructions(JsonUtil.opt(toolContentJSON, "reflectInstructions", (String)null));
+	resource.setRunAuto(JsonUtil.opt(toolContentJSON, "runAuto", Boolean.FALSE));
+
+	resource.setContentInUse(false);
+	resource.setDefineLater(false);
+
+	ResourceUser resourceUser = getUserByIDAndContent(userID.longValue(), toolContentID);
+	if (resourceUser == null) {
+	    resourceUser = new ResourceUser();
+	    resourceUser.setFirstName(toolContentJSON.getString("firstName"));
+	    resourceUser.setLastName(toolContentJSON.getString("lastName"));
+	    resourceUser.setLoginName(toolContentJSON.getString("loginName"));
+	 //   resourceUser.setResource(content);
+	}
+
+	resource.setCreatedBy(resourceUser);
+
+
+	// **************************** Handle topic *********************
+	JSONArray resources = toolContentJSON.getJSONArray("resources");
+	Set itemList = new LinkedHashSet();
+	for (int i=0; i<resources.length(); i++) {
+	    JSONObject itemData = (JSONObject) resources.get(i);
+	    ResourceItem item = new ResourceItem();
+	    item.setTitle(itemData.getString("title"));
+	    item.setType((short)itemData.getInt("type"));
+	    item.setCreateBy(resourceUser);
+	    item.setCreateDate(updateDate);
+	    item.setComplete(false);
+	    item.setCreateByAuthor(true);
+	    item.setHide(false);
+	    item.setOrderId(i+1);
+
+	    item.setDescription(JsonUtil.opt(itemData, "description", (String)null));
+	    item.setFileName(JsonUtil.opt(itemData, "name", (String)null));
+	    item.setFileType(JsonUtil.opt(itemData, "fileType", (String)null));
+	    item.setFileUuid(JsonUtil.optLong(itemData, "crUuid"));
+	    item.setFileVersionId(JsonUtil.optLong(itemData, "crVersionId"));
+	    item.setImsSchema(JsonUtil.opt(itemData, "imsSchema", (String)null));
+	    item.setOrganizationXml(JsonUtil.opt(itemData, "organizationXml", (String)null));
+	    item.setOpenUrlNewWindow(JsonUtil.opt(itemData, "openUrlNewWindow", Boolean.FALSE));
+	    item.setUrl(JsonUtil.opt(itemData, "url", (String)null));
+
+	    JSONArray instructionStrings = itemData.getJSONArray("instructions");
+	    if ( instructionStrings != null && instructionStrings.length() > 0) {
+		Set instructions = new LinkedHashSet();
+		for ( int j=0; j<instructionStrings.length(); j++) {
+		    ResourceItemInstruction rii = new ResourceItemInstruction();
+		    rii.setDescription(instructionStrings.getString(j));
+		    rii.setSequenceId(j);
+		    instructions.add(rii);
+		}
+		item.setItemInstructions(instructions);
+	    }
+
+	    // TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
+	    itemList.add(item);
+	}
+	
+	resource.setResourceItems(itemList);
+	
+	saveOrUpdateResource(resource);
+
+	// *******************************
+	// TODO - investigate
+	// file attachments
     }
 }
