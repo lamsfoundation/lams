@@ -33,6 +33,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -43,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -62,6 +65,7 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.dao.DataAccessException;
 
@@ -74,7 +78,7 @@ import org.springframework.dao.DataAccessException;
  * 
  */
 public class NoticeboardServicePOJO implements INoticeboardService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
     private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
     private ILearnerService learnerService;
@@ -660,5 +664,26 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
+    }
+
+    // ****************** REST methods *************************
+
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+	Date updateDate = new Date();
+
+	NoticeboardContent noticeboard = new NoticeboardContent();
+	noticeboard.setNbContentId(toolContentID);
+	noticeboard.setTitle(toolContentJSON.getString("title"));
+	noticeboard.setContent(toolContentJSON.getString("content"));
+	noticeboard.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
+	noticeboard.setReflectInstructions((String)JsonUtil.opt(toolContentJSON, "reflectInstructions", null));
+
+	noticeboard.setCreatorUserId(userID.longValue());
+	noticeboard.setDateCreated(updateDate);
+	noticeboard.setDateUpdated(updateDate);
+	noticeboard.setContentInUse(false);
+
+	saveNoticeboard(noticeboard);
     }
 }
