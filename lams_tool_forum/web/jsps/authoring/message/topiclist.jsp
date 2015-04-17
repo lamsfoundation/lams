@@ -9,7 +9,7 @@
 		</tr>
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		<c:forEach items="${sessionMap.topicList}" var="topic" varStatus="status">
-			<tr id="row${status.index}>
+			<tr id="row${status.index}">
 				<td>
 					<c:set var="viewtopic">
 						<html:rewrite page="/authoring/viewTopic.do?sessionMapID=${sessionMapID}&topicIndex=${status.index}&create=${topic.message.updated.time}" />
@@ -65,7 +65,9 @@
 <%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
 	var win = null;
-	if (window.parent && window.parent.hideMessage) {
+	if (window.hideMessage) {
+		win = window;
+	} else if (window.parent && window.parent.hideMessage) {
 		win = window.parent;
 	} else if (window.top && window.top.hideMessage) {
 		win = window.top;

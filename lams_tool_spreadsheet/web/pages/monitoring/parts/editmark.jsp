@@ -9,9 +9,11 @@
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 		<script type="text/javascript"> 
 			function callHideMessage() {
-				if (window.parent && window.parent.hideMessage) {
-					window.parent.hideMessage();
+				if (window.hideMessage) {
+					window.hideMessage();
 				} else if (window.parent && window.parent.hideMessage) {
+					window.parent.hideMessage();
+				} else if (window.top && window.top.hideMessage) {
 					window.top.hideMessage();
 				}
 			}

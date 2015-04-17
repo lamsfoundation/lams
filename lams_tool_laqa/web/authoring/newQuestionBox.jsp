@@ -91,7 +91,9 @@
                                 heightOffSet = document.getElementById('wizardDiv').offsetHeight;
                             }
                             
-            				if (window.parent && window.parent.resizeIframe) {
+                            if (window.resizeIframe) {
+            					window.resizeIframe(heightOffSet);
+            				} else if (window.parent && window.parent.resizeIframe) {
             					window.parent.resizeIframe(heightOffSet);
             				} else if (window.top && window.top.resizeIframe) {
             					window.top.resizeIframe(heightOffSet);
