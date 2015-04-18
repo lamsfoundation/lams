@@ -156,6 +156,15 @@ public interface IImageGalleryService {
     void deleteRatingCriteria(Long ratingCriteriaId);
     
     List<RatingDTO> getRatingDtos(ImageGallery imageGallery, Long imageUid, Long userId);
+    
+    /**
+     * Returns number of images rated by specified user in a current activity.
+     * 
+     * @param toolContentId
+     * @param userId
+     * @return
+     */
+    int getCountImagesRatedByActivityAndUser(Long toolContentId, Integer userId);
 
     /**
      * Save/update ImageVote.

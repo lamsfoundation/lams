@@ -16,13 +16,22 @@
 <%@ attribute name="criterias" required="true" rtexprvalue="true" type="java.util.Collection" %>
 
 <%-- Optional attribute --%>
+<%@ attribute name="isRatesLimitOn" required="false" rtexprvalue="true" %>
 <%@ attribute name="headerLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="addLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="deleteLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="upLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="downLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="minimumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="maximumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="noMinimumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="noMaximumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="jsWarningLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
+<c:if test="${empty isRatesLimitOn}">
+	<c:set var="isRatesLimitOn" value="false" scope="request"/>
+</c:if>
 <c:if test="${empty headerLabel}">
 	<c:set var="headerLabel" value="label.rating.criterias" scope="request"/>
 </c:if>
@@ -37,6 +46,21 @@
 </c:if>
 <c:if test="${empty downLabel}">
 	<c:set var="downLabel" value="label.move.down" scope="request"/>
+</c:if>
+<c:if test="${empty minimumLabel}">
+	<c:set var="minimumLabel" value="label.minimum" scope="request"/>
+</c:if>
+<c:if test="${empty maximumLabel}">
+	<c:set var="maximumLabel" value="label.maximum" scope="request"/>
+</c:if>
+<c:if test="${empty noMinimumLabel}">
+	<c:set var="noMinimumLabel" value="label.no.minimum" scope="request"/>
+</c:if>
+<c:if test="${empty noMaximumLabel}">
+	<c:set var="noMaximumLabel" value="label.no.maximum" scope="request"/>
+</c:if>
+<c:if test="${empty jsWarningLabel}">
+	<c:set var="jsWarningLabel" value="js.warning.max.min.limit" scope="request"/>
 </c:if>
 
 <!-- begin tab content -->
@@ -160,10 +184,28 @@ $(document).ready(function() {
 	});	 
 	 
 })
+
+	//check minimum is not bigger than maximum
+	function validateRatingLimits(isMinimum) {
+		var minRateDropDown = document.getElementById("minimum-rates");
+		var minLimit = parseInt(minRateDropDown.options[minRateDropDown.selectedIndex].value);
+		var maxRateDropDown = document.getElementById("maximum-rates");
+		var maxLimit = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
+
+		if ((minLimit > maxLimit) && !(maxLimit == 0)) {
+			if (isMinimum) {
+				minRateDropDown.selectedIndex = maxRateDropDown.selectedIndex;
+			} else {
+				maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
+			}
+
+			alert('<fmt:message key="js.warning.max.min.limit"/>');
+		}
+	}
 </script>
 
 <div class="rating-criteria-tag">
-	<h2 class="spacer-left">
+	<h2>
 		<fmt:message key="${headerLabel}" />
 	</h2>
 	<input type="hidden" name="criteriaMaxOrderId" id="criteria-max-order-id" value="${maxOrderId}">
@@ -202,11 +244,49 @@ $(document).ready(function() {
 		</c:forEach>
 	</table>
 	
-	<div>
+	<div style="height: 30px;">
 		<a href="#nogo" class="button-add-item float-right" id="add-criteria">
 			<fmt:message key="${addLabel}" /> 
 		</a>
 	</div>
+	
+	<c:if test="${isRatesLimitOn}">
+		<div>
+			<fmt:message key="${minimumLabel}" />
+			<html:select property="imageGallery.minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);">
+				<html:option value="0">
+					<fmt:message key="${noMinimumLabel}" />
+				</html:option>
+				<html:option value="1">1</html:option>
+				<html:option value="2">2</html:option>
+				<html:option value="3">3</html:option>
+				<html:option value="4">4</html:option>
+				<html:option value="5">5</html:option>
+				<html:option value="6">6</html:option>
+				<html:option value="7">7</html:option>
+				<html:option value="8">8</html:option>
+				<html:option value="9">9</html:option>
+				<html:option value="10">10</html:option>
+			</html:select>
+		
+			<fmt:message key="${maximumLabel}" />
+			<html:select property="imageGallery.maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);">
+				<html:option value="0">
+					<fmt:message key="${noMaximumLabel}" />
+				</html:option>
+				<html:option value="1">1</html:option>
+				<html:option value="2">2</html:option>
+				<html:option value="3">3</html:option>
+				<html:option value="4">4</html:option>
+				<html:option value="5">5</html:option>
+				<html:option value="6">6</html:option>
+				<html:option value="7">7</html:option>
+				<html:option value="8">8</html:option>
+				<html:option value="9">9</html:option>
+				<html:option value="10">10</html:option>
+			</html:select>
+		</div>
+	</c:if>
 	
 </div>
 <!-- end tab content -->

@@ -196,6 +196,22 @@
             />
 
         </set>
+        
+		<property
+            name="maximumRates"
+            type="int"
+            update="true"
+            insert="true"
+            column="maximum_rates"
+        />
+
+        <property
+            name="minimumRates"
+            type="int"
+            update="true"
+            insert="true"
+            column="minimum_rates"
+        />
 
         <property
             name="notifyTeachersOnImageSumbit"

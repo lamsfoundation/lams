@@ -11,13 +11,13 @@
 	$(document).ready(function(){
 		$('#voting-form-checkbox').click(function() {
 			$('#voting-form').ajaxSubmit( {
-				success: afterRatingSubmit  // post-submit callback
+				success: afterVotingSubmit  // post-submit callback
 			});
 		});
 	});
 
 	// post-submit callback 
-	function afterRatingSubmit(responseText, statusText)  {
+	function afterVotingSubmit(responseText, statusText)  {
 		var votingFormLabel;
 		if ($('#voting-form-checkbox').is(':checked')) {
 			votingFormLabel = "<fmt:message key='label.learning.unvote'/>";					
@@ -94,7 +94,9 @@
 	
 		<c:if test="${imageGallery.allowRank}">
 			<div class="extra-controls-inner">
-				<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}"/>
+				<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}"
+						maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
+						countRatedImages="${sessionMap.countRatedImages}"/>
 			</div>
 			<br><br>
 		</c:if>

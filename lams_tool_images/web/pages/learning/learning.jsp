@@ -217,6 +217,39 @@
 			</div>
 		</c:if>
 		
+		<!-- Rating limits info -->
+		<c:if test="${imageGallery.allowRank && (imageGallery.minimumRates ne 0 || imageGallery.maximumRates ne 0)}">
+		
+			<div class="info">
+				<c:choose>
+					<c:when test="${imageGallery.minimumRates ne 0 and imageGallery.maximumRates ne 0}">
+						<fmt:message key="label.rate.limits.reminder">
+							<fmt:param value="${imageGallery.minimumRates}"/>
+							<fmt:param value="${imageGallery.maximumRates}"/>
+						</fmt:message>
+					</c:when>
+					
+					<c:when test="${imageGallery.minimumRates ne 0 and imageGallery.maximumRates eq 0}">
+						<fmt:message key="label.rate.limits.reminder.min">
+							<fmt:param value="${imageGallery.minimumRates}"/>
+						</fmt:message>
+					</c:when>
+					
+					<c:when test="${imageGallery.minimumRates eq 0 and imageGallery.maximumRates ne 0}">
+						<fmt:message key="label.rate.limits.reminder.max">
+							<fmt:param value="${imageGallery.maximumRates}"/>
+						</fmt:message>
+					</c:when>
+				</c:choose>
+				<br>
+						
+				<fmt:message key="label.rate.limits.topic.reminder">
+					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedImages}</span>"/>
+				</fmt:message>
+			</div>
+			
+		</c:if>	
+		
 		<%@ include file="/common/messages.jsp"%>
 		
 		<%--Main image---------------------------------------------------%>
@@ -268,7 +301,7 @@
 		<%--Bottom buttons-------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right" >
+			<div class="space-bottom-top align-right" id="learner-submit">
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button" >

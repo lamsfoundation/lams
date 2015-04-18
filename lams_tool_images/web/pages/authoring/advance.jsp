@@ -29,6 +29,7 @@
 		document.imageGalleryForm.notifyTeachersOnImageSumbit.checked = false;
 		document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled = ! eval(document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled);
 	}
+
 </script>
 	
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
@@ -99,16 +100,14 @@
 		</label>
 		
 		<div id="criterias-holder" <c:if test="${!formBean.imageGallery.allowRank}"> style="display:none;"</c:if> >
-			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" 
+			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" isRatesLimitOn="true"
 				upLabel="label.authoring.up" downLabel="label.authoring.down"/>
 		</div>
 	</div>
 </p>
 
 <p>
-	<html:checkbox property="imageGallery.reflectOnActivity"
-		styleClass="noBorder" styleId="reflectOn">
-	</html:checkbox>
+	<html:checkbox property="imageGallery.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
 	<label for="reflectOn">
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>

@@ -35,6 +35,8 @@ public interface IRatingCriteriaDAO {
     
     List<RatingCriteria> getByToolContentId(Long toolContentId);
 
-    RatingCriteria getByUid(Long ratingCriteriaId);
+    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId);
+    
+    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId, Class clasz);
 
 }

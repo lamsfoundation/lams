@@ -341,6 +341,10 @@ public class AuthoringAction extends Action {
 
 	// ************************* Handle imageGallery allowRank item *******************
 	imageGalleryPO.setAllowRank(imageGalleryForm.isAllowRatingsOrVote() && !imageGalleryPO.isAllowVote());
+	if (!imageGalleryPO.isAllowRank()) {
+	    imageGalleryPO.setMaximumRates(0);
+	    imageGalleryPO.setMinimumRates(0);
+	}
 
 	// ************************* Handle imageGallery items *******************
 	// Handle imageGallery items
@@ -375,6 +379,7 @@ public class AuthoringAction extends Action {
 	}
 	
 	// ************************* Handle rating criterias *******************
+	Set<RatingCriteria> updatedCriterias = new LinkedHashSet<RatingCriteria>();
 	List<RatingCriteria> ratingCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
 	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<Integer, RatingCriteria>();
 	for (RatingCriteria ratingCriteriaIter : ratingCriterias) {
@@ -401,6 +406,7 @@ public class AuthoringAction extends Action {
 		ratingCriteria.setOrderId(newCriteriaOrderId);
 		ratingCriteria.setTitle(criteriaTitle);
 		service.saveOrUpdateRatingCriteria(ratingCriteria);
+		//!!updatedCriterias.add(ratingCriteria);
 	    
 	    //delete
 	    } else if (ratingCriteria != null) {
@@ -408,6 +414,7 @@ public class AuthoringAction extends Action {
 	    }
 	    
 	}
+	//!!imageGalleryPO.setRatingCriterias(new LinkedHashSet<LearnerItemRatingCriteria> (updatedCriterias));
 
 	// **********************************************
 	// finally persist imageGalleryPO again
