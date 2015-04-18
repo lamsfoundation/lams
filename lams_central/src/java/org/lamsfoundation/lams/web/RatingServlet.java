@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.service.RatingService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -61,6 +62,7 @@ public class RatingServlet extends HttpServlet {
 
 	float rating = Float.parseFloat((String) request.getParameter("rate"));
 	String objectId = WebUtil.readStrParam(request, "idBox");
+	boolean isCountRatedItemsRequested = WebUtil.readBooleanParam(request, "isCountRatedItemsRequested", false);
 	Long ratingCriteriaId = Long.parseLong(objectId.split("-")[0]);
 	Long itemId = Long.parseLong(objectId.split("-")[1]);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -68,18 +70,25 @@ public class RatingServlet extends HttpServlet {
 
 	RatingDTO averageRatingDTO = ratingService.rateItem(ratingCriteriaId, userId, itemId, rating);
 
-	// refresh numOfRatings
-	// int numOfRatings = ratingService.getNumOfRatingsByUserAndForum(userUid, forumUid);
-
 	JSONObject JSONObject = new JSONObject();
 	try {
 	    JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
 	    JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
 	    
+	    // refresh countRatedItems in case there is max rates limit
+	    if (isCountRatedItemsRequested) {
+		//as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
+		LearnerItemRatingCriteria criteria = (LearnerItemRatingCriteria) ratingService.getCriteriaByCriteriaId(ratingCriteriaId, LearnerItemRatingCriteria.class);
+		Long toolContentId = criteria.getToolContentId();
+		
+		int countRatedItems = ratingService.getCountItemsRatedByActivityAndUser(toolContentId, userId);
+		JSONObject.put("countRatedItems", countRatedItems);
+	    }
+	    
 	} catch (JSONException e) {
 	    throw new ServletException(e);
 	}
-	// JSONObject.put("numOfRatings", numOfRatings);
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(JSONObject);
     }

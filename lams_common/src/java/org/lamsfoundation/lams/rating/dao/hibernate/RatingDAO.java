@@ -33,17 +33,28 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
 import org.lamsfoundation.lams.rating.dto.RatingDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 
 public class RatingDAO extends BaseDAO implements IRatingDAO {
 
     private static final String FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
+
     private static final String FIND_RATING_VALUE = "SELECT r.rating FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
+
     private static final String FIND_RATING_BY_CRITERIA_AND_USER = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=?";
+
     private static final String FIND_RATING_AVERAGE_BY_ITEM = "SELECT AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
+
+    private static final String COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER = "SELECT COUNT(DISTINCT r.itemId) FROM  "
+	    + Rating.class.getName()
+	    + " AS r, "
+	    + ToolActivityRatingCriteria.class.getName()
+	    + " AS cr "
+	    + " WHERE r.ratingCriteria.ratingCriteriaId = cr.ratingCriteriaId AND cr.toolContentId = ? AND r.learner.userId =?";
 
     @Override
     public void saveOrUpdate(Rating rating) {
@@ -72,44 +83,57 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	    return null;
 	}
     }
-    
+
     @Override
     public RatingDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId) {
-	List<Object[]> list = getHibernateTemplate().find(FIND_RATING_AVERAGE_BY_ITEM, new Object[] { ratingCriteriaId, itemId });
+	List<Object[]> list = getHibernateTemplate().find(FIND_RATING_AVERAGE_BY_ITEM,
+		new Object[] { ratingCriteriaId, itemId });
 	Object[] results = list.get(0);
-	
+
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];
 	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 	numberFormat.setMaximumFractionDigits(1);
 	String averageRating = numberFormat.format(averageRatingObj);
-	
+
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
 	return new RatingDTO(averageRating, numberOfVotes);
     }
-    
+
     @Override
     public RatingDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId) {
-	
+
 	RatingDTO ratingDTO = getRatingAverageDTOByItem(ratingCriteriaId, itemId);
-	
+
 	Float userRating = 0F;
-	List list = getHibernateTemplate().find(FIND_RATING_VALUE,
-		new Object[] { ratingCriteriaId, userId, itemId });
+	List list = getHibernateTemplate().find(FIND_RATING_VALUE, new Object[] { ratingCriteriaId, userId, itemId });
 	if (list.size() > 0) {
 	    userRating = (Float) list.get(0);
 	}
 	ratingDTO.setUserRating(userRating.toString());
 	ratingDTO.setItemId(itemId);
-	
+
 	return ratingDTO;
     }
 
+    @Override
     public Rating get(Long uid) {
 	if (uid != null) {
 	    Object o = getHibernateTemplate().get(Rating.class, uid);
 	    return (Rating) o;
 	} else {
 	    return null;
+	}
+    }
+
+    @Override
+    public int getCountItemsRatedByActivityAndUser(Long toolContentId, Integer userId) {
+
+	List list = getHibernateTemplate().find(COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER,
+		new Object[] { toolContentId, userId });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	} else {
+	    return ((Number) list.get(0)).intValue();
 	}
     }
 }

@@ -40,4 +40,12 @@ public class ImageGalleryImportContentVersionFilter extends ToolContentVersionFi
 	this.removeField(ImageGallery.class, "offlineInstructions");
 	this.removeField(ImageGallery.class, "attachments");
     }
+    
+    /**
+     * Import 20150217 version content to 20150416 version tool server.
+     */
+    public void up20150217To20150416() {
+	this.addField(ImageGallery.class, "minimumRates", 0);
+	this.addField(ImageGallery.class, "maximumRates", 0);
+    }
 }

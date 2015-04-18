@@ -104,9 +104,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * 
- * @author Dapeng.Ni
- * 
+ * @author Andrey Balan
  */
 public class ImageGalleryServiceImpl implements IImageGalleryService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
@@ -1183,6 +1181,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 	
 	return ratingDtos;	
+    }
+    
+    @Override
+    public int getCountImagesRatedByActivityAndUser(Long toolContentId, Integer userId) {
+	return ratingService.getCountItemsRatedByActivityAndUser(toolContentId, userId);
     }
 
     // *****************************************************************************

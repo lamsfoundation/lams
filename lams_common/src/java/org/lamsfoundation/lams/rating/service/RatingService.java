@@ -128,6 +128,11 @@ public class RatingService implements IRatingService {
     }
     
     @Override
+    public int getCountItemsRatedByActivityAndUser(Long toolContentId, Integer userId) {
+	return ratingDAO.getCountItemsRatedByActivityAndUser(toolContentId, userId);
+    }
+    
+    @Override
     public void saveOrUpdateRating(Rating rating) {
 	ratingDAO.saveOrUpdate(rating);
     }
@@ -163,6 +168,11 @@ public class RatingService implements IRatingService {
     public List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId) {
 	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
 	return criterias;
+    }
+    
+    @Override
+    public RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz) {
+	return ratingCriteriaDAO.getByRatingCriteriaId(ratingCriteriaId, clasz);
     }
     
     @Override

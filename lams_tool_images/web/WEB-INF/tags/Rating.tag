@@ -13,27 +13,40 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
-<%@ attribute name="ratingDtos" required="false" rtexprvalue="true" type="java.util.Collection" %>
+<%@ attribute name="ratingDtos" required="true" rtexprvalue="true" type="java.util.Collection" %>
 
 <%-- Optional attribute --%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true" %>
+<%@ attribute name="maxRates" required="false" rtexprvalue="true" %>
+<%@ attribute name="minRates" required="false" rtexprvalue="true" %>
 <%@ attribute name="numberVotesLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="countRatedImages" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
+<c:if test="${empty disabled}">
+	<c:set var="disabled" value="false" scope="request"/>
+</c:if>
+<c:if test="${empty maxRates}">
+	<c:set var="maxRates" value="0" scope="request"/>
+</c:if>
+<c:if test="${empty minRates}">
+	<c:set var="minRates" value="0" scope="request"/>
+</c:if>
+<c:if test="${empty countRatedImages}">
+	<c:set var="countRatedImages" value="0" scope="request"/>
+</c:if>
+<c:if test="${empty numberVotesLabel}">
+	<c:set var="numberVotesLabel" value="label.number.of.votes" scope="request"/>
+</c:if>
+
 <c:choose>
-	<c:when test='${empty disabled || disabled}'>
+	<c:when test='${disabled || maxRates > 0 && countRatedImages >= maxRates}'>
 		<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
 	</c:when>
 	<c:otherwise>
 		<c:set var="ratingStarsClass" value="rating-stars"/>
 	</c:otherwise>
 </c:choose>
-<c:if test="${empty disabled}">
-	<c:set var="disabled" value="false" scope="request"/>
-</c:if>
-<c:if test="${empty numberVotesLabel}">
-	<c:set var="numberVotesLabel" value="label.number.of.votes" scope="request"/>
-</c:if>
 
 <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 <script type="text/javascript">
@@ -46,11 +59,17 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		setupJRating();
+		
+		if (${minRates} != 0) {
+			checkMinimumRatesLimit(${countRatedImages});
+		}
 	});
 	
 	function setupJRating() {
+		var isCountRatedItemsRequested = ${maxRates!=0 || minRates!=0};
+		
 		$(".rating-stars-new").filter($(".rating-stars")).jRating({
-		    phpPath : "${lams}servlet/rateItem",
+		    phpPath : "${lams}servlet/rateItem?isCountRatedItemsRequested=" + isCountRatedItemsRequested,
 		    rateMax : 5,
 		    decimalLength : 1,
 			canRateAgain : true,
@@ -60,18 +79,34 @@
 			    $("#average-rating-" + itemId).html(data.averageRating);
 			    $("#number-of-votes-" + itemId).html(data.numberOfVotes);
 			    
-			    //callback function
-			    if (typeof onRatingSuccessCallback === "function") { 
-			        // safe to use the function
-			    	onRatingSuccessCallback(data.numOfRatings);
+			    if (isCountRatedItemsRequested) {
+
+			    	//update info box
+			    	$("#count-rated-items").html(data.countRatedItems);
+			    	
+				    //callback function
+				    if (typeof onRatingSuccessCallback === "function") { 
+				        // safe to use the function
+				    	onRatingSuccessCallback(data.countRatedItems);
+				    }
+				    
+				    //handle max rates limit
+				    if (${maxRates} != 0) {
+				    	
+				    	//disable rating feature in case maxRates limit reached
+				    	if (data.countRatedItems >= ${maxRates}) {
+					    	$(".rating-stars").each(function() {
+					    		$(this).unbind().css('cursor','default').addClass('jDisabled');
+					    	});			    		
+				    	}
+				    }
+				    
+				    //handle min rates limit
+				    if (${minRates} != 0) {
+				    	checkMinimumRatesLimit(data.countRatedItems)
+				    }
 			    }
-			    
-			    //disable rating feature in case maxRate limit reached
-			    //if (data.noMoreRatings) {
-			    	//$(".rating-stars").each(function() {
-			    		//$(this).jRating('readOnly');
-			    	//});
-			    //}
+
 			},
 			onError : function(){
 			    jError('Error. Please, retry');
@@ -84,6 +119,13 @@
 		});
 		
 		$(".rating-stars-new").removeClass("rating-stars-new");
+	}
+	
+	function checkMinimumRatesLimit(countRatedItems) {
+			//$('#yourID').css('display') == 'none'
+
+		$( "#learner-submit" ).toggle( countRatedItems >= ${minRates} );
+
 	}
 </script>
 

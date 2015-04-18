@@ -30,7 +30,6 @@ import java.util.List;
 import org.lamsfoundation.lams.rating.dto.RatingDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
-import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 
 public interface IRatingService {
 
@@ -49,12 +48,6 @@ public interface IRatingService {
 //    List<Rating> getEntry(Integer userID, Integer idType);
 //
 //    List<Rating> getEntry(Integer userID, Long lessonID);
-//
-//    Rating getEntry(Long uid);
-//
-//    void updateEntry(Long uid, String title, String entry);
-//
-//    void updateEntry(Rating rating);
 
     void saveOrUpdateRating(Rating rating);
     
@@ -63,6 +56,8 @@ public interface IRatingService {
     void deleteRatingCriteria(Long ratingCriteriaId);
     
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
+    
+    RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz);
     
     /**
      * Return Rating by the given itemId and userId.
@@ -84,8 +79,14 @@ public interface IRatingService {
     RatingDTO rateItem(Long ratingCriteriaId, Integer userId, Long itemId, float ratingFloat);
     
     RatingDTO getRatingDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
+    
+    /**
+     * Returns number of images rated by specified user in a current activity. Applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
+     * 
+     * @param toolContentId
+     * @param userId
+     * @return
+     */
+    int getCountItemsRatedByActivityAndUser(Long toolContentId, Integer userId);
 
-//    IUserManagementService getUserManagementService();
-//
-//    MessageService getMessageService();
 }

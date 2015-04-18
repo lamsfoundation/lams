@@ -1692,10 +1692,13 @@ div.growlUI h1 {
 
 .rating-criteria-tag {
 	width: 60%;
-	padding-bottom: 25px;
+	padding-left: 20px;
 }
 .rating-criteria-tag input[type="text"] {
 	width: 100%;
+}
+#criterias-table {
+	margin-left: 0;
 }
 #criterias-table td {
 	vertical-align:middle;

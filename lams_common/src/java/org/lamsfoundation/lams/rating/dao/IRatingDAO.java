@@ -47,5 +47,14 @@ public interface IRatingDAO {
     RatingDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
 
     Rating get(Long uid);
+    
+    /**
+     * Returns number of images rated by specified user in a current activity. Applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
+     * 
+     * @param toolContentId
+     * @param userId
+     * @return
+     */
+    int getCountItemsRatedByActivityAndUser(Long toolContentId, Integer userId);
 
 }

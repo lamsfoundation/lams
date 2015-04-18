@@ -148,7 +148,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	Long sessionId = new Long(request.getParameter(ImageGalleryConstants.PARAM_TOOL_SESSION_ID));
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
@@ -170,23 +170,21 @@ public class LearningAction extends Action {
 	} else {
 	    imageGalleryUser = getCurrentUser(service, sessionId);
 	}
+	Integer userId = imageGalleryUser.getUserId().intValue();
 
 	// Get contentFolderID and save to form.
 	// String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	// sessionMap.put(ImageGalleryConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 
 	// check whehter finish lock is on/off
-	boolean lock = imageGallery.getLockWhenFinished() && imageGalleryUser != null
-		&& imageGalleryUser.isSessionFinished();
+	boolean lock = imageGallery.getLockWhenFinished() && imageGalleryUser.isSessionFinished();
 
 	// get notebook entry
 	String entryText = new String();
-	if (imageGalleryUser != null) {
-	    NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ImageGalleryConstants.TOOL_SIGNATURE, imageGalleryUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
+	NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		ImageGalleryConstants.TOOL_SIGNATURE, userId);
+	if (notebookEntry != null) {
+	    entryText = notebookEntry.getEntry();
 	}
 
 	// basic information
@@ -194,9 +192,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, imageGallery.getInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
-	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED,
-		imageGalleryUser != null && imageGalleryUser.isSessionFinished());
-	sessionMap.put(AttributeNames.PARAM_USER_ID, imageGalleryUser.getUserId());
+	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED, imageGalleryUser.isSessionFinished());
+	sessionMap.put(AttributeNames.PARAM_USER_ID, userId);
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -224,6 +221,12 @@ public class LearningAction extends Action {
 	imageGallery.setDefineLater(false);
 	service.saveOrUpdateImageGallery(imageGallery);
 
+	// store how many items are rated
+	if (imageGallery.isAllowRank()) {
+	    int countRatedImages = service.getCountImagesRatedByActivityAndUser(imageGallery.getContentId(), userId);
+	    sessionMap.put(ImageGalleryConstants.ATTR_COUNT_RATED_IMAGES, countRatedImages);
+	}
+
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
@@ -233,21 +236,21 @@ public class LearningAction extends Action {
 	if (mode.isLearner()) {
 	    Set<ImageGalleryItem> groupImages = service.getImagesForGroup(imageGallery, sessionId);
 	    for (ImageGalleryItem image : groupImages) {
-		
+
 		// initialize login name to avoid session close error in proxy object
 		if (image.getCreateBy() != null) {
 		    image.getCreateBy().getLoginName();
 		}
-		
+
 		// remove hidden items
 		if (!image.isHide()) {
 		    images.add(image);
-		}	
+		}
 	    }
 	} else {
 	    images.addAll(imageGallery.getImageGalleryItems());
 	}
-	
+
 	// escape characters
 	for (ImageGalleryItem image : images) {
 	    String titleEscaped = StringEscapeUtils.escapeJavaScript(image.getTitle());
@@ -457,11 +460,11 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	IImageGalleryService service = getImageGalleryService();
 	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);
-	Long userId = (Long) sessionMap.get(AttributeNames.PARAM_USER_ID);
+	Long userId = ((Integer) sessionMap.get(AttributeNames.PARAM_USER_ID)).longValue();
 
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
@@ -474,8 +477,8 @@ public class LearningAction extends Action {
 	ImageGalleryUser createdBy = image.getCreateBy();
 	if (createdBy != null) {
 	    image.getCreateBy().getLoginName();
-	}	
-	
+	}
+
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	boolean isTeacher = mode != null && mode.isTeacher();
 	boolean isAuthor = !isTeacher && !image.isCreateByAuthor() && (createdBy != null)
@@ -498,6 +501,10 @@ public class LearningAction extends Action {
 	if (!isTeacher && imageGallery.isAllowRank()) {
 	    List<RatingDTO> ratingDtos = service.getRatingDtos(imageGallery, imageUid, userId);
 	    sessionMap.put(ImageGalleryConstants.ATTR_RATING_DTOS, ratingDtos);
+	    
+	    // store how many items are rated
+	    int countRatedImages = service.getCountImagesRatedByActivityAndUser(imageGallery.getContentId(), userId.intValue());
+	    sessionMap.put(ImageGalleryConstants.ATTR_COUNT_RATED_IMAGES, countRatedImages);
 	}
 
 	if (!isTeacher && imageGallery.isAllowVote()) {
@@ -899,7 +906,7 @@ public class LearningAction extends Action {
 	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType)
 		|| !(contentType.equals("image/gif") || contentType.equals("image/png")
 			|| contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			.equals("image/pjpeg"));
+			    .equals("image/pjpeg"));
 
 	return isContentTypeForbidden;
     }

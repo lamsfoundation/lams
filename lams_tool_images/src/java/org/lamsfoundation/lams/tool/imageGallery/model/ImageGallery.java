@@ -68,6 +68,10 @@ public class ImageGallery implements Cloneable {
 
     private boolean allowRank;
 
+    private int maximumRates;
+
+    private int minimumRates;
+
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     // general infomation
@@ -427,6 +431,28 @@ public class ImageGallery implements Cloneable {
 
     public void setAllowRank(boolean allowRank) {
 	this.allowRank = allowRank;
+    }
+
+    /**
+     * @return
+     */
+    public int getMaximumRates() {
+	return maximumRates;
+    }
+
+    public void setMaximumRates(int maximumRate) {
+	this.maximumRates = maximumRate;
+    }
+
+    /**
+     * @return
+     */
+    public int getMinimumRates() {
+	return minimumRates;
+    }
+
+    public void setMinimumRates(int minimumRates) {
+	this.minimumRates = minimumRates;
     }
 
     /**
