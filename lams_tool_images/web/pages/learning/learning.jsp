@@ -260,11 +260,9 @@
 			
 		<%--Comments & Ranking/Voting area----------------------------------------------%>	
 	 	
-	 	<c:if test="${not empty sessionMap.imageGalleryList}">
-			<div id="image-info">
-				<%@ include file="/pages/learning/parts/commentsarea.jsp"%> 
-			</div>
-		</c:if>	
+		<div id="image-info">
+			<%@ include file="/pages/learning/parts/commentsarea.jsp"%> 
+		</div>
  
 		<%--Reflection--------------------------------------------------%>
 
