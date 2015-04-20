@@ -1,10 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
-	
-<c:set var="sessionMapID" value="${param.sessionMapID}" />
+
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="imageGallery" value="${sessionMap.imageGallery}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+<c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>	
 <script type="text/javascript">
@@ -31,7 +34,7 @@
 
 <%--Comments area---------------------------------------%>
 <div id="comments-area">
-	<c:if test="${imageGallery.allowCommentImages}">
+	<c:if test="${imageGallery.allowCommentImages && isImageSelected}">
 
 		<%@ include file="/common/messages.jsp"%>
 	
@@ -92,7 +95,7 @@
 				
 		<%--Ranking area---------------------------------------%>
 	
-		<c:if test="${imageGallery.allowRank}">
+		<c:if test="${imageGallery.allowRank && isImageSelected}">
 			<div class="extra-controls-inner">
 				<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}"
 						maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
@@ -105,7 +108,7 @@
 				
 			<%--Voting area--------------%>
 		
-			<c:if test="${imageGallery.allowVote}">
+			<c:if test="${imageGallery.allowVote && isImageSelected}">
 				<html:form action="learning/vote" method="post" styleId="voting-form">
 					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 					<input type="hidden" name="imageUid" value="${sessionMap.currentImage.uid}"/>
