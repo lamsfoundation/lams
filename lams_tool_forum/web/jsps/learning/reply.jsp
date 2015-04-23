@@ -1,55 +1,100 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
 
-<html:form action="/learning/replyTopic.do" onsubmit="return validateForm();" 
-		focus="message.subject" enctype="multipart/form-data">
+<script type="text/javascript">
+	// The treetable code uses the clicks to expand and collapse the replies but then 
+	// the buttons will not work. So stop the event propogating up the event chain. 
+	$("#replyForm").click(function (e) {
+		e.stopPropagation();
+	});
+	$("#replyForm").keydown(function (e) {
+    	e.stopPropagation();
+	});
+	
+
+	$('#replyForm').submit(function() { // catch the form's submit event
+
+		if ( validateForm() ) {
+
+			if ( typeof CKEDITOR !== 'undefined' ) {
+				for ( instance in CKEDITOR.instances )
+    				CKEDITOR.instances[instance].updateElement();
+    		}
+    		
+			var formData = new FormData(this);
+			
+		    $.ajax({ // create an AJAX call...
+		        data: formData, 
+		        processData: false, // tell jQuery not to process the data
+		        contentType: false, // tell jQuery not to set contentType
+		        type: $(this).attr('method'), // GET or POST
+		        url: $(this).attr('action'), // the file to call
+		        success: function (response) {
+        			var threadDiv = document.getElementById('thread'+response.threadUid);
+        			var threadUid = response.threadUid;
+        			var messageUid = response.messageUid;
+        			var rootUid = response.rootUid;
+					
+        			if ( rootUid ) {
+	        			if ( ! threadDiv) {
+    	    				// must have replied to the top level, so show the posting at the top.
+							var threadDiv = document.getElementById('reply');
+							threadDiv.id = 'thread'+messageUid;
+        				} else {
+        					// make sure the old reply form is gone, so if something goes wrong 
+        					// the user won't try to submit it again
+							$('#reply').remove();
+						}
+        			
+	        			if ( ! threadDiv) {
+	        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+        				} else {
+	        				var loadString = '<html:rewrite page="/learning/viewTopicThread.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
+							$(threadDiv).load(loadString, function() {
+								// expand up to the reply - in case it is buried down in a lot of replies
+								// don't need to do this if we have started a new thread.
+								if ( threadUid != messageUid ) {
+									$('#tree' + threadUid).treetable("reveal",messageUid);
+									$('#msg'+messageUid).focus();
+								}
+								highlightMessage();
+							});
+						}
+
+    		     		if ( response.noMorePosts ) {
+	        				$('.replybutton').hide();
+	        			}
+		    		
+						 
+		    		} else {
+		    			// No new id? Validation failed! 
+						$('#reply').html(response);
+		    		}
+		    	}
+		    });
+		} // end validateForm()
+		return false;
+	});
+
+	function cancelReply() {
+		$('#reply').remove();
+	}
+	
+</script>
+
+<html:form action="/learning/replyTopicInline.do"
+		focus="message.subject" enctype="multipart/form-data" styleId="replyForm" >
 		
-	<html:hidden property="sessionMapID"/>
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 	<c:set var="originalMessage" value="${sessionMap.originalMessage}"/>
+
+	<html:hidden property="sessionMapID"/>
 	
 	<div id="content">
-	
-		<h1>
-			<c:out value="${sessionMap.title}" escapeXml="true"/>
-		</h1>
-	
-		<h2>
-			<fmt:message key="title.original.message.reply" />
-	    </h2>
-
-		<p><!--  Begins Original Message  -->
-		
-			<div>
-				<table cellspacing="0" class="forum">
-					<tr>
-						<th>
-							<c:out value='${originalMessage.message.subject}' escapeXml='true' />
-						</th>
-					</tr>
-					<tr>
-						<td class="posted-by">
-							<fmt:message key="lable.topic.subject.by" />
-							<c:if test="${empty originalMessage.author}">
-								<fmt:message key="label.default.user.name" />
-							</c:if> 
-							<c:out value='${originalMessage.author}' /> - <lams:Date
-								value="${originalMessage.message.updated}" />
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<c:out value="${originalMessage.message.body}" escapeXml="false" />
-						</td>
-					</tr>
-			
-				</table>
-			</div>
-		<!-- Ends Original Message -->
-		</p>
 	
 		<h2>
 			<fmt:message key="title.message.reply" />

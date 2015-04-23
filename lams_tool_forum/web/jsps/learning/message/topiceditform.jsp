@@ -30,13 +30,7 @@
 
 <div class="space-bottom-top">
 	<div class="right-buttons">
-		<c:set var="backToTopic">
-			<html:rewrite
-				page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
-		</c:set>
-		<html:button property="goback" styleId="cancelButton" 
-			onclick="javascript:location.href='${backToTopic}';"
-			styleClass="button">
+		<html:button property="goback" styleId="cancelButton" onclick="javascript:cancelEdit();"	styleClass="button">
 			<fmt:message key="button.cancel" />
 		</html:button>
 		<html:submit styleClass="button" styleId="submitButton">

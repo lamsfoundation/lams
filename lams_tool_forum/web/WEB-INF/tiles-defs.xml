@@ -79,6 +79,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</definition>
 	
 	<definition name="tiles:/learning/forum/viewTopic" path="/jsps/learning/viewtopic.jsp" />
+	<definition name="tiles:/learning/forum/viewTopicNext" path="/jsps/learning/message/topicviewwrapper.jsp" />
+	<definition name="tiles:/learning/forum/viewMessage" path="/jsps/learning/message/msgviewwrapper.jsp" />
 	
     <definition name="tiles:/learning/forum/newTopic" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.message.add"/>

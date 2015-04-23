@@ -1,6 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
+<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
+
 <%@ include file="/common/taglibs.jsp"%>
+
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -9,6 +12,7 @@
 </c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
 
 <lams:html>
 	<lams:head>
@@ -24,6 +28,8 @@
 			</c:otherwise>
 		</c:choose>
 		<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+		<link type="text/css" href="${tool}css/jquery.treetable.css" rel="stylesheet"/>
+		<link type="text/css" href="${tool}css/jquery.treetable.forum.css" rel="stylesheet"/>
 		
 		<!-- ********************  javascript ********************** -->
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
@@ -36,10 +42,16 @@
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/jquery.jscroll.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/jquery.treetable.js"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$(".rating-stars").jRating({
+				setupJRating();
+			});
+	
+			function setupJRating() {
+				$(".rating-stars-new").filter($(".rating-stars")).jRating({
 				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}",
 				    rateMax : 5,
 				    decimalLength : 1,
@@ -59,17 +71,17 @@
 					    jError('Error : please retry');
 					}
 				});
-			    $(".rating-stars-disabled").jRating({
+			    $(".rating-stars-new").filter($(".rating-stars-disabled")).jRating({
 			    	rateMax : 5,
 			    	isDisabled : true
 				});
-			});
-	
+				$(".rating-stars-new").removeClass("rating-stars-new");
+			}
+			
 			function refreshTopic(){
 				var reqIDVar = new Date();
-				location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&reqUid=" />"+reqIDVar.getTime();;
+				location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=" />"+reqIDVar.getTime();;
 			}
-		
 		</script>		
 		
 	</lams:head>
@@ -82,6 +94,15 @@
 		
 			<div>
 				<div class="right-buttons">
+				
+					<c:set var="refreshTopicURL">
+					</c:set>
+					<html:button property="refresh"
+						onclick="javascript:refreshTopic();"
+						styleClass="button">
+						<fmt:message key="label.refresh" />
+					</html:button>
+					
 					<c:set var="backToForum">
 						<html:rewrite
 							page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
@@ -166,12 +187,21 @@
 			</c:if>
 			<br>
 			
+			<div class="space-bottom">
+			<div class="scroll" >
 			<%@ include file="message/topicview.jsp"%>
+			</div>
+			</div>
+			<script>
+				<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
+				<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
+				$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true,callback:setupJRating});
+			</script>
+			
 			<c:set var="refreshTopicURL">
 			</c:set>
-		
-			<div class="space-bottom-top">
-		
+			
+			<div>
 				<div class="right-buttons">
 					<c:set var="backToForum">
 						<html:rewrite
@@ -184,10 +214,11 @@
 					</html:button>
 				</div>
 		
-				<a href="javascript:refreshTopic();" class="button" id="refresh"> <fmt:message
+				<a href="javascript:refreshTopic();" class="button"> <fmt:message
 						key="label.refresh" /> </a>
-		
 			</div>
+		</div>
+					
 		</div>
 
 	</body>

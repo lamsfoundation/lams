@@ -37,6 +37,7 @@ public class MessageSeq {
 	private Long uid;
 	private Message rootMessage;
 	private Message message;
+	private Message threadMessage;
 	private short messageLevel;
 	
     /**
@@ -67,6 +68,16 @@ public class MessageSeq {
 	}
 	public void setMessage(Message topicUid) {
 		this.message = topicUid;
+	}
+	/**
+	 * @hibernate.many-to-one column="thread_message_uid" outer-join="true" 
+	 * 	cascade="none"
+	 */
+	public Message getThreadMessage() {
+		return threadMessage;
+	}
+	public void setThreadMessage(Message threadTopMessageUid) {
+		this.threadMessage = threadTopMessageUid;
 	}
 	/**
 	 * @hibernate.property column="message_level"

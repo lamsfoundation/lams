@@ -8,9 +8,17 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 public interface IMessageSeqDAO extends IBaseDAO {
 
 
-	List getTopicThread(Long rootTopicId);
-
-	MessageSeq getByTopicId(Long messageId);
+    	MessageSeq getById(Long messageSeqId);
+    
+    	MessageSeq getByMessageId(Long messageId);
+    
+    	List getThreadByThreadId(final Long threadMessageId);
+    
+    	List getNextThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId);
+    
+    	List getCompleteTopic(Long rootTopicId);
+    
+    	MessageSeq getByTopicId(Long messageId);
 
 	void save(MessageSeq msgSeq);
 
