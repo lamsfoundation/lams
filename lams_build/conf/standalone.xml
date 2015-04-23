@@ -201,8 +201,17 @@
                 </handlers>
             </logger>
 
-            <logger category="org.hibernate" use-parent-handlers="false">
+            <logger category="org.hibernate"
+            	use-parent-handlers="false">
                 <level name="INFO" />
+                <handlers>
+                    <handler name="HIBERNATEFILE" />
+                </handlers>
+            </logger>
+            
+            <logger category="org.hibernate.engine.StatefulPersistenceContext"
+            	use-parent-handlers="false">
+                <level name="ERROR" />
                 <handlers>
                     <handler name="HIBERNATEFILE" />
                 </handlers>
