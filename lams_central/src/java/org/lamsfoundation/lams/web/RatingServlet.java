@@ -24,17 +24,21 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.RatingService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -58,33 +62,49 @@ public class RatingServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+	JSONObject JSONObject = new JSONObject();
 	getRatingService();
 
-	float rating = Float.parseFloat((String) request.getParameter("rate"));
 	String objectId = WebUtil.readStrParam(request, "idBox");
-	boolean isCountRatedItemsRequested = WebUtil.readBooleanParam(request, "isCountRatedItemsRequested", false);
 	Long ratingCriteriaId = Long.parseLong(objectId.split("-")[0]);
 	Long itemId = Long.parseLong(objectId.split("-")[1]);
+	RatingCriteria criteria = ratingService.getCriteriaByCriteriaId(ratingCriteriaId);
+
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Integer userId = user.getUserID();
 
-	RatingDTO averageRatingDTO = ratingService.rateItem(ratingCriteriaId, userId, itemId, rating);
-
-	JSONObject JSONObject = new JSONObject();
+	// get rating value as either float or comment String
 	try {
-	    JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
-	    JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
-	    
-	    // refresh countRatedItems in case there is max rates limit
-	    if (isCountRatedItemsRequested) {
-		//as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
-		LearnerItemRatingCriteria criteria = (LearnerItemRatingCriteria) ratingService.getCriteriaByCriteriaId(ratingCriteriaId, LearnerItemRatingCriteria.class);
-		Long toolContentId = criteria.getToolContentId();
-		
-		int countRatedItems = ratingService.getCountItemsRatedByActivityAndUser(toolContentId, userId);
-		JSONObject.put("countRatedItems", countRatedItems);
+	    if (criteria.isCommentsEnabled()) {
+		String comment = WebUtil.readStrParam(request, "comment");
+		ratingService.commentItem(criteria, userId, itemId, comment);
+		JSONObject.put("comment", StringEscapeUtils.escapeJavaScript(comment));
+		JSONObject.put("userName", user.getFirstName() + " " + user.getLastName());
+
+	    } else {
+		float rating = Float.parseFloat((String) request.getParameter("rate"));
+
+		boolean hasRatingLimists = WebUtil.readBooleanParam(request, "hasRatingLimists", false);
+
+		RatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
+
+		NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+		numberFormat.setMaximumFractionDigits(1);
+		JSONObject.put("userRating", numberFormat.format(rating));
+		JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
+		JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
+
+		// refresh countRatedItems in case there is rating limit set
+		if (hasRatingLimists) {
+		    // as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
+		    LearnerItemRatingCriteria learnerItemRatingCriteria = (LearnerItemRatingCriteria) criteria;
+		    Long toolContentId = learnerItemRatingCriteria.getToolContentId();
+
+		    int countRatedItems = ratingService.getCountItemsRatedByActivityAndUser(toolContentId, userId);
+		    JSONObject.put("countRatedItems", countRatedItems);
+		}
+
 	    }
-	    
 	} catch (JSONException e) {
 	    throw new ServletException(e);
 	}

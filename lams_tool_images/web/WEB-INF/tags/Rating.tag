@@ -19,8 +19,10 @@
 <%@ attribute name="disabled" required="false" rtexprvalue="true" %>
 <%@ attribute name="maxRates" required="false" rtexprvalue="true" %>
 <%@ attribute name="minRates" required="false" rtexprvalue="true" %>
-<%@ attribute name="numberVotesLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="countRatedImages" required="false" rtexprvalue="true" %>
+<%@ attribute name="numberVotesLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="byLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="instructorLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
@@ -38,15 +40,20 @@
 <c:if test="${empty numberVotesLabel}">
 	<c:set var="numberVotesLabel" value="label.number.of.votes" scope="request"/>
 </c:if>
+<c:if test="${empty byLabel}">
+	<c:set var="byLabel" value="label.learning.by" scope="request"/>
+</c:if>
+<c:if test="${empty instructorLabel}">
+	<c:set var="instructorLabel" value="label.default.user.name" scope="request"/>
+</c:if>
 
-<c:choose>
-	<c:when test='${disabled || maxRates > 0 && countRatedImages >= maxRates}'>
-		<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
-	</c:when>
-	<c:otherwise>
-		<c:set var="ratingStarsClass" value="rating-stars"/>
-	</c:otherwise>
-</c:choose>
+<%--Find commentsRatingDto--%>
+<c:forEach var="ratingDto" items="${ratingDtos}" varStatus="status">
+	<c:if test="${ratingDto.ratingCriteria.commentsEnabled}">
+		<c:set var="commentsRatingDto" value="${ratingDto}"/>
+	</c:if>
+</c:forEach>
+<c:set var="isCommentsEnabled" value="${not empty commentsRatingDto}"/>
 
 <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 <script type="text/javascript">
@@ -63,23 +70,51 @@
 		if (${minRates} != 0) {
 			checkMinimumRatesLimit(${countRatedImages});
 		}
+
+    	//addNewComment button handler
+	    $('#add-comment-button').click(function() {
+			var comment = document.getElementById('comment-textarea').value;
+	    	
+	    	//add new comment
+	    	$.ajax({
+	    		type: "POST",
+	    		url: '${lams}servlet/rateItem',
+	    		data: 'idBox=${commentsRatingDto.ratingCriteria.ratingCriteriaId}-${commentsRatingDto.itemId}&comment=' + comment,
+	    		success: function(data, itemId) {
+	    				
+	    			//add comment to HTML
+	    			jQuery('<div/>').append(jQuery('<table/>', {
+	    				'cellspacing': '0',
+	    				'class': "forum",
+	    			    html: '<tr><th><fmt:message key="${byLabel}"/> ' + data.userName + '</th></tr>' 
+	    			    	+ '<tr><td class="posted-by"></td></tr>'
+	    			    	+ '<tr><td>' + data.comment + '</td></tr>'
+	    			})).appendTo('#comments-area');
+	    				
+	    			//hide comments textarea and button
+	    			$("#add-comment-area").hide();
+	    				
+	    		}
+	    	});
+	    });
+		
 	});
 	
 	function setupJRating() {
-		var isCountRatedItemsRequested = ${maxRates!=0 || minRates!=0};
+		var hasRatingLimists = ${maxRates!=0 || minRates!=0};
 		
 		$(".rating-stars-new").filter($(".rating-stars")).jRating({
-		    phpPath : "${lams}servlet/rateItem?isCountRatedItemsRequested=" + isCountRatedItemsRequested,
+		    phpPath : "${lams}servlet/rateItem?hasRatingLimists=" + hasRatingLimists,
 		    rateMax : 5,
 		    decimalLength : 1,
-			canRateAgain : true,
-			nbRates : 1000,
 			onSuccess : function(data, itemId){
 				
+				$("#user-rating-" + itemId).html(data.userRating);
 			    $("#average-rating-" + itemId).html(data.averageRating);
 			    $("#number-of-votes-" + itemId).html(data.numberOfVotes);
+			    $("#rating-stars-caption-" + itemId).css("visibility", "visible");
 			    
-			    if (isCountRatedItemsRequested) {
+			    if (hasRatingLimists) {
 
 			    	//update info box
 			    	$("#count-rated-items").html(data.countRatedItems);
@@ -122,38 +157,119 @@
 	}
 	
 	function checkMinimumRatesLimit(countRatedItems) {
-			//$('#yourID').css('display') == 'none'
-
 		$( "#learner-submit" ).toggle( countRatedItems >= ${minRates} );
-
 	}
+	
 </script>
 
+
+<%--Rating stars area---------------------------------------%>
+
+<div class="extra-controls-inner">
 <div class="rating-stars-holder">
 	<c:forEach var="ratingDto" items="${ratingDtos}" varStatus="status">
-		<c:set var="objectId" value="${ratingDto.ratingCriteria.ratingCriteriaId}-${ratingDto.itemId}"/>
-		
-		<h4>
-			${ratingDto.ratingCriteria.title}
-		</h4>
+		<c:if test="${!ratingDto.ratingCriteria.commentsEnabled}">
+			<c:set var="objectId" value="${ratingDto.ratingCriteria.ratingCriteriaId}-${ratingDto.itemId}"/>
+			<c:set var="isCriteriaNotRatedByUser" value='${ratingDto.userRating == ""}'/>
 	
-		<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDto.averageRating}" data-id="${objectId}">
-		</div>
+			<c:choose>
+				<c:when test='${disabled || (maxRates > 0) && (countRatedImages >= maxRates) || !isCriteriaNotRatedByUser}'>
+					<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="ratingStarsClass" value="rating-stars"/>
+				</c:otherwise>
+			</c:choose>
 			
-		<div class="rating-stars-caption">
-			<fmt:message key="${numberVotesLabel}" >
-				<fmt:param>
-					<span id="average-rating-${objectId}">
-						<fmt:formatNumber value="${ratingDto.averageRating}" type="number" maxFractionDigits="1" />
-					</span>
-				</fmt:param>
-				<fmt:param>
-					<span id="number-of-votes-${objectId}">${ratingDto.numberOfVotes}</span>
-				</fmt:param>
-			</fmt:message>
-		</div>
-	
+			<h4>
+				${ratingDto.ratingCriteria.title}
+			</h4>
+		
+			<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDto.averageRating}" data-id="${objectId}">
+			</div>
+				
+			<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
+				<c:if test="${isCriteriaNotRatedByUser}">style="visibility: hidden;"</c:if>
+			>
+				<fmt:message key="${numberVotesLabel}" >
+					<fmt:param>
+						<span id="user-rating-${objectId}">
+							<fmt:formatNumber value="${ratingDto.userRating}" type="number" maxFractionDigits="1" />
+						</span>
+					</fmt:param>			
+					<fmt:param>
+						<span id="average-rating-${objectId}">
+							<fmt:formatNumber value="${ratingDto.averageRating}" type="number" maxFractionDigits="1" />
+						</span>
+					</fmt:param>
+					<fmt:param>
+						<span id="number-of-votes-${objectId}">${ratingDto.numberOfVotes}</span>
+					</fmt:param>
+				</fmt:message>
+			</div>
+		</c:if>
 	</c:forEach>
 
 </div>
+
+</div>
+
+<%--Comments area---------------------------------------%>
+<div id="comments-area">
+	<c:if test="${isCommentsEnabled}">
+	
+		<c:set var="userId"><lams:user property="userID" /></c:set>
+		<c:set var="isCommentedByUser" value="false"/>
+		<c:forEach var="comment" items="${commentsRatingDto.ratingComments}">
+			<c:if test="${comment.learner.userId == userId}">
+				<c:set var="isCommentedByUser" value="true"/>
+			</c:if>
+		</c:forEach>
+		
+		<c:forEach var="comment" items="${commentsRatingDto.ratingComments}">
+		
+			<div>
+				<table cellspacing="0" class="forum">
+					<tr>
+						<th>
+							<c:set var="author" value="${comment.learner.firstName} ${comment.learner.lastName}" />
+							<c:if test="${empty author}">
+								<c:set var="author">
+									<fmt:message key="${instructorLabel}" />
+								</c:set>
+							</c:if>
+						
+							<fmt:message key="${byLabel}" />
+							<c:out value="${author}" escapeXml="true" />
+						</th>
+					</tr>
+
+					<tr>
+						<td class="posted-by">
+						</td>
+					</tr>
+
+					<tr>
+						<td>
+							<c:out value="${comment.comment}" escapeXml="false" />
+						</td>
+					</tr>
+
+				</table>
+			</div>
+
+		</c:forEach>
+
+		<c:if test="${not disabled && not isCommentedByUser}">
+			<div id="add-comment-area">
+				<textarea name="comment" rows="2" id="comment-textarea" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;">Please, provide some comment here...</textarea>
+			
+				<div class="button add-comment" id="add-comment-button">
+				</div>			
+			</div>
+		</c:if>
+				
+	</c:if>
+</div>
+
 <!-- end tab content -->

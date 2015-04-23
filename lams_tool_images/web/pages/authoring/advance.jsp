@@ -64,6 +64,7 @@
 	</label>
 </p>
 
+<!-- 
 <p>
 	<html:checkbox property="imageGallery.allowCommentImages" styleClass="noBorder" styleId="allowCommentImages">
 	</html:checkbox>
@@ -71,8 +72,9 @@
 		<fmt:message key="label.authoring.advance.allow.learner.comment.images" />
 	</label>
 </p>
+ -->
 
-<p class="small-space-top">
+<p>
 	<html:checkbox property="allowRatingsOrVote" styleClass="noBorder" styleId="allowRatingsOrVote"
 		onclick="allowRatingsOrVoteClicked();"
 	>
@@ -100,8 +102,9 @@
 		</label>
 		
 		<div id="criterias-holder" <c:if test="${!formBean.imageGallery.allowRank}"> style="display:none;"</c:if> >
-			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" isRatesLimitOn="true"
-				upLabel="label.authoring.up" downLabel="label.authoring.down"/>
+			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
+				upLabel="label.authoring.up" downLabel="label.authoring.down"
+				allowCommentsLabel="label.authoring.advance.allow.learner.comment.images"/>
 		</div>
 	</div>
 </p>

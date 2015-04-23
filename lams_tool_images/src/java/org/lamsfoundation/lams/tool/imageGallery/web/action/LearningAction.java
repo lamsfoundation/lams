@@ -52,7 +52,7 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
@@ -463,7 +463,7 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	IImageGalleryService service = getImageGalleryService();
-	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);
+	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY);
 	Long userId = ((Integer) sessionMap.get(AttributeNames.PARAM_USER_ID)).longValue();
 
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
@@ -473,7 +473,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
 
 	// becuase in webpage will use this login name. Here is just
-	// initial it to avoid session close error in proxy object.
+	// initialize it to avoid session close error in a proxy object
 	ImageGalleryUser createdBy = image.getCreateBy();
 	if (createdBy != null) {
 	    image.getCreateBy().getLoginName();
@@ -487,19 +487,19 @@ public class LearningAction extends Action {
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
 	    Set<ImageComment> dbComments = image.getComments();
-	    List<ImageGalleryUser> sessionUsers = service.getUserListBySessionId(sessionId);
+	    //List<ImageGalleryUser> sessionUsers = service.getUserListBySessionId(sessionId);
 	    for (ImageComment comment : dbComments) {
-		for (ImageGalleryUser sessionUser : sessionUsers) {
-		    if (comment.getCreateBy().getUserId().equals(sessionUser.getUserId())) {
+		//for (ImageGalleryUser sessionUser : sessionUsers) {
+		    if (comment.getCreateBy().getSession().getSessionId().equals(sessionId)) {
 			comments.add(comment);
 		    }
-		}
+		//}
 	    }
 	    sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	}
 
 	if (!isTeacher && imageGallery.isAllowRank()) {
-	    List<RatingDTO> ratingDtos = service.getRatingDtos(imageGallery, imageUid, userId);
+	    List<RatingCriteriaDTO> ratingDtos = service.getRatingCriteriaDtos(imageGallery.getContentId(), imageUid, userId);
 	    sessionMap.put(ImageGalleryConstants.ATTR_RATING_DTOS, ratingDtos);
 	    
 	    // store how many items are rated

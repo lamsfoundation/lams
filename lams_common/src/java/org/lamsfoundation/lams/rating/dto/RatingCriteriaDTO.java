@@ -23,19 +23,47 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.rating.dto;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
-public class RatingDTO {
+public class RatingCriteriaDTO {
 
-    private String userRating;
-    private String averageRating;
-    private String numberOfVotes;
+    //common properties
     private Long itemId;
     private RatingCriteria ratingCriteria;
 
-    public RatingDTO(String rating, String numberOfVotes) {
+    //rating properties
+    private String userRating;
+    private String averageRating;
+    private String numberOfVotes;
+    
+    //comments rating properties
+    private List<RatingComment> ratingComments;
+
+    public RatingCriteriaDTO() {
+    }
+    
+    public RatingCriteriaDTO(String rating, String numberOfVotes) {
 	this.averageRating = rating;
 	this.numberOfVotes = numberOfVotes;
+    }
+
+    public Long getItemId() {
+	return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+	this.itemId = itemId;
+    }
+    
+    public RatingCriteria getRatingCriteria() {
+	return ratingCriteria;
+    }
+
+    public void setRatingCriteria(RatingCriteria ratingCriteria) {
+	this.ratingCriteria = ratingCriteria;
     }
     
     public String getUserRating() {
@@ -61,21 +89,13 @@ public class RatingDTO {
     public void setNumberOfVotes(String numberOfVotes) {
 	this.numberOfVotes = numberOfVotes;
     }
-
-    public Long getItemId() {
-	return itemId;
-    }
-
-    public void setItemId(Long itemId) {
-	this.itemId = itemId;
-    }
     
-    public RatingCriteria getRatingCriteria() {
-	return ratingCriteria;
+    public List<RatingComment> getRatingComments() {
+	return ratingComments;
     }
 
-    public void setRatingCriteria(RatingCriteria ratingCriteria) {
-	this.ratingCriteria = ratingCriteria;
+    public void setRatingComments(List<RatingComment> ratingComments) {
+	this.ratingComments = ratingComments;
     }
   
 }

@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
@@ -155,7 +155,7 @@ public interface IImageGalleryService {
     
     void deleteRatingCriteria(Long ratingCriteriaId);
     
-    List<RatingDTO> getRatingDtos(ImageGallery imageGallery, Long imageUid, Long userId);
+    List<RatingCriteriaDTO> getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
     
     /**
      * Returns number of images rated by specified user in a current activity.

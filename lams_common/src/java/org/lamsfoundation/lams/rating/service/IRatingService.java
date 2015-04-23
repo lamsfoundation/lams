@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.rating.service;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
@@ -57,6 +57,8 @@ public interface IRatingService {
     
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
     
+    RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
+    
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz);
     
     /**
@@ -76,9 +78,11 @@ public interface IRatingService {
      */
     List<Rating> getRatingsByItem(Long itemId);
     
-    RatingDTO rateItem(Long ratingCriteriaId, Integer userId, Long itemId, float ratingFloat);
+    RatingCriteriaDTO rateItem(RatingCriteria criteria, Integer userId, Long itemId, float ratingFloat);
     
-    RatingDTO getRatingDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
+    void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
+    
+    RatingCriteriaDTO getCriteriaDTOByUser(RatingCriteria criteria, Long itemId, Integer userId);
     
     /**
      * Returns number of images rated by specified user in a current activity. Applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.

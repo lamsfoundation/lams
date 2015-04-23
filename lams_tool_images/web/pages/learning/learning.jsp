@@ -36,11 +36,7 @@
 		#check-for-new-button, #add-new-image-button, #delete-button {
 		}
 		.extra-controls-inner {
-			width: 60%;
-			margin: 0px auto;
-		}
-		.extra-controls-inner2 {
-			text-align: center;
+			float: right;
 		}
 		.caption{
 			color:#0087e5; 
@@ -51,19 +47,21 @@
 			font-size:11px;
 		}
 		#extra-controls {
-			display: table-cell;
+			text-align: center;
+			float: right;
+			clear: both;
 		}
 		#comments-area {
-			display: table-cell;
-			width: 68%;
+			width: 400px;
+			float: right;
+			clear: both;
+			padding: 10px 0 20px;
 		}
 		#comment-textarea {
-			margin-right:10px; 
-			width:99%;
+			width: 370px;
 		}
 		#comment-button {
 			margin-right: 2px;
-			float: right;
 			margin-top: 10px;
 		}
 		table.forum {
@@ -83,9 +81,14 @@
 			text-align: center;
 			padding-top: 10px;
 		}
-		#image-info {
-			display: table; 
-			width: 100%;
+		#image-info:after {
+   content: " ";
+   display: block; 
+   height: 0; 
+   clear: both;
+		}
+		#kkk{
+			float:right;
 		}
 		
 		.space-bottom-top {
@@ -166,22 +169,9 @@
 			return false;
 		}
 
-		var imageInfoTargetDiv = "#image-info";
-		function addNewComment(currentImageUid, comment) {
-			var url = "<c:url value="/learning/addNewComment.do"/>";
-			$(imageInfoTargetDiv).load(
-				url,
-				{
-					currentImageUid: currentImageUid, 
-					comment: comment,
-					sessionMapID: "${sessionMapID}"
-				}
-			);
-		}
-
 		function loadImageData(imageUid) {
 			
-			$(imageInfoTargetDiv).load(
+			$("#image-info").load(
 				"<c:url value="/learning/loadImageData.do"/>",
 				{
 					imageUid: imageUid, 
@@ -261,7 +251,7 @@
 		<%--Comments & Ranking/Voting area----------------------------------------------%>	
 	 	
 		<div id="image-info">
-			<%@ include file="/pages/learning/parts/commentsarea.jsp"%> 
+				<%@ include file="/pages/learning/parts/commentsarea.jsp"%>
 		</div>
  
 		<%--Reflection--------------------------------------------------%>

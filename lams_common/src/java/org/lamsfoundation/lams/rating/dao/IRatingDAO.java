@@ -25,27 +25,24 @@
 
 package org.lamsfoundation.lams.rating.dao;
 
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 
 public interface IRatingDAO {
 
-    void saveOrUpdate(Rating rating);
+    void saveOrUpdate(Object object);
     
     Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId);
     
-    Rating getRating(Long ratingCriteriaId, Integer userId);
-    
     /**
      * Returns rating statistics by particular item
-     * 
      * @param itemId
      * @return
      */
-    RatingDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
+    RatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
     
-    RatingDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
-
+    RatingCriteriaDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
+    
     Rating get(Long uid);
     
     /**
