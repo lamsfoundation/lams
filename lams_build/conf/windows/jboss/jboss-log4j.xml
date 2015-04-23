@@ -243,6 +243,11 @@
     <priority value="INFO"/>
     <appender-ref ref="HIBERNATEFILE"/>
   </category>
+    
+  <category name="org.hibernate.engine.StatefulPersistenceContext" additivity="false">
+    <priority value="ERROR"/>
+    <appender-ref ref="HIBERNATEFILE"/>
+  </category>
   
   <category name="org.jboss">
     <priority value="INFO"/>
