@@ -16,7 +16,7 @@
 <%@ attribute name="criterias" required="true" rtexprvalue="true" type="java.util.Collection" %>
 
 <%-- Optional attribute --%>
-<%@ attribute name="isRatesLimitOn" required="false" rtexprvalue="true" %>
+<%@ attribute name="hasRatingLimits" required="false" rtexprvalue="true" %>
 <%@ attribute name="headerLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="addLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="deleteLabel" required="false" rtexprvalue="true" %>
@@ -27,10 +27,11 @@
 <%@ attribute name="noMinimumLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="noMaximumLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="jsWarningLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="allowCommentsLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
-<c:if test="${empty isRatesLimitOn}">
-	<c:set var="isRatesLimitOn" value="false" scope="request"/>
+<c:if test="${empty hasRatingLimits}">
+	<c:set var="hasRatingLimits" value="false" scope="request"/>
 </c:if>
 <c:if test="${empty headerLabel}">
 	<c:set var="headerLabel" value="label.rating.criterias" scope="request"/>
@@ -61,6 +62,9 @@
 </c:if>
 <c:if test="${empty jsWarningLabel}">
 	<c:set var="jsWarningLabel" value="js.warning.max.min.limit" scope="request"/>
+</c:if>
+<c:if test="${empty allowCommentsLabel}">
+	<c:set var="noMaximumLabel" value="label.allow.comments" scope="request"/>
 </c:if>
 
 <!-- begin tab content -->
@@ -213,34 +217,36 @@ $(document).ready(function() {
 	<table class="alternative-color" cellspacing="0" id="criterias-table">
 
 		<c:forEach var="criteria" items="${criterias}" varStatus="status">
-			<tr>
-				
-				<td class="criteria-info">
-					<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
-					<input type="text" name="criteriaTitle${criteria.orderId}" value="${criteria.title}">
-				</td>
-				
-				<td width="40px">
-					<c:if test="${not status.first}">
-						<div class="up-arrow" title="<fmt:message key="${upLabel}"/>"></div>
-						<c:if test="${status.last}">
-							<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>"></div>
+			<c:if test="${!criteria.commentsEnabled}">
+				<tr>
+					
+					<td class="criteria-info">
+						<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
+						<input type="text" name="criteriaTitle${criteria.orderId}" value="${criteria.title}">
+					</td>
+					
+					<td width="40px">
+						<c:if test="${not status.first}">
+							<div class="up-arrow" title="<fmt:message key="${upLabel}"/>"></div>
+							<c:if test="${status.last}">
+								<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>"></div>
+							</c:if>
 						</c:if>
-					</c:if>
-
-					<c:if test="${not status.last}">
-						<c:if test="${status.first}">
-							<div class="up-arrow-disabled" title="<fmt:message key="${upLabel}"/>"></div>
+	
+						<c:if test="${not status.last}">
+							<c:if test="${status.first}">
+								<div class="up-arrow-disabled" title="<fmt:message key="${upLabel}"/>"></div>
+							</c:if>
+	
+							<div class="down-arrow" title="<fmt:message key="${downLabel}"/>"></div>
 						</c:if>
-
-						<div class="down-arrow" title="<fmt:message key="${downLabel}"/>"></div>
-					</c:if>
-				</td>
-                
-				<td width="20px">
-					<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" ></div>
-				</td>
-			</tr>
+					</td>
+	                
+					<td width="20px">
+						<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" ></div>
+					</td>
+				</tr>
+			</c:if>
 		</c:forEach>
 	</table>
 	
@@ -250,7 +256,7 @@ $(document).ready(function() {
 		</a>
 	</div>
 	
-	<c:if test="${isRatesLimitOn}">
+	<c:if test="${hasRatingLimits}">
 		<div>
 			<fmt:message key="${minimumLabel}" />
 			<html:select property="imageGallery.minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);">
@@ -287,6 +293,23 @@ $(document).ready(function() {
 			</html:select>
 		</div>
 	</c:if>
+
+	<!-- calculate whether isCommentsAllowed is true -->
+	<c:set var="isCommentsEnabled" value="false"/>
+	<c:forEach var="criteria" items="${criterias}" varStatus="status">
+		<c:if test="${criteria.commentsEnabled}">
+			<c:set var="isCommentsEnabled" value="true"/>
+		</c:if>
+	</c:forEach>
+	
+	<div class="space-top">
+		<input type="checkbox" name="isCommentsEnabled" value="true" class="noBorder" id="enable-comments"
+			<c:if test="${isCommentsEnabled}">checked="checked"</c:if>
+		/>
+		<label for="enable-comments">
+			<fmt:message key="${allowCommentsLabel}" />
+		</label>
+	</div>
 	
 </div>
 <!-- end tab content -->

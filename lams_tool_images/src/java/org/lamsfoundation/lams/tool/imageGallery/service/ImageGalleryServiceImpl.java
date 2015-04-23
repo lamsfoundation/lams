@@ -56,7 +56,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -1170,17 +1170,17 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
     
     @Override
-    public List<RatingDTO> getRatingDtos(ImageGallery imageGallery, Long imageUid, Long userId) {
-	List<RatingDTO> ratingDtos = new LinkedList<RatingDTO>();
-	
-	for (RatingCriteria criteria : imageGallery.getRatingCriterias()) {
-	    RatingDTO ratingDto = ratingService.getRatingDTOByUser(criteria.getRatingCriteriaId(), imageUid, userId.intValue());
-	    ratingDto.setRatingCriteria(criteria);
-	    
-	    ratingDtos.add(ratingDto);
+    public List<RatingCriteriaDTO> getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId) {
+	List<RatingCriteriaDTO> criteriaDtos = new LinkedList<RatingCriteriaDTO>();
+
+	List<RatingCriteria> criterias = ratingService.getCriteriasByToolContentId(contentId);
+	for (RatingCriteria criteria : criterias) {
+	    RatingCriteriaDTO criteriaDto = ratingService.getCriteriaDTOByUser(criteria, imageUid, userId.intValue());
+	    	    
+	    criteriaDtos.add(criteriaDto);
 	}
 	
-	return ratingDtos;	
+	return criteriaDtos;	
     }
     
     @Override

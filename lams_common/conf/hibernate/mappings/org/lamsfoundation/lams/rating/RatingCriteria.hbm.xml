@@ -33,6 +33,14 @@
     <property name="ratingCriteriaTypeId" type="java.lang.Integer" column="rating_criteria_type_id" length="11" not-null="true">
 		<meta attribute="field-description">@hibernate.property column="rating_criteria_type_id" length="11"</meta>    
    	</property>
+   	
+   	<property
+		name="commentsEnabled"
+		type="boolean"
+		update="true"
+		insert="true"
+		column="comments_enabled"
+    />
     
     <!-- Subclass definations for polymorphic persistence -->
 	<subclass name="org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria" discriminator-value="1">

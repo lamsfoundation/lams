@@ -145,7 +145,7 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("saveMultipleImages")) {
 	    return saveMultipleImages(mapping, form, request, response);
-	}	
+	}
 
 	return mapping.findForward(ImageGalleryConstants.ERROR);
     }
@@ -224,7 +224,7 @@ public class AuthoringAction extends Action {
 	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
 	imageGalleryItemList.clear();
 	imageGalleryItemList.addAll(items);
-	
+
 	// get rating criterias from DB
 	List<RatingCriteria> ratingCriterias = service.getRatingCriterias(contentId);
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
@@ -377,21 +377,23 @@ public class AuthoringAction extends Action {
 	    ImageGalleryItem delAtt = (ImageGalleryItem) iter.next();
 	    iter.remove();
 	}
-	
+
 	// ************************* Handle rating criterias *******************
-	Set<RatingCriteria> updatedCriterias = new LinkedHashSet<RatingCriteria>();
-	List<RatingCriteria> ratingCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
+	// Set<RatingCriteria> updatedCriterias = new LinkedHashSet<RatingCriteria>();
+	List<RatingCriteria> ratingCriterias = (List<RatingCriteria>) sessionMap
+		.get(AttributeNames.ATTR_RATING_CRITERIAS);
+	// create orderId to RatingCriteria map
 	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<Integer, RatingCriteria>();
 	for (RatingCriteria ratingCriteriaIter : ratingCriterias) {
 	    mapOrderIdToRatingCriteria.put(ratingCriteriaIter.getOrderId(), ratingCriteriaIter);
 	}
-	
+
 	int criteriaMaxOrderId = WebUtil.readIntParam(request, "criteriaMaxOrderId");
-	//i is equal to an old orderId
-	for (int i=1; i<=criteriaMaxOrderId; i++) {
-	    
+	// i is equal to an old orderId
+	for (int i = 1; i <= criteriaMaxOrderId; i++) {
+
 	    String criteriaTitle = WebUtil.readStrParam(request, "criteriaTitle" + i, true);
-	    
+
 	    RatingCriteria ratingCriteria = mapOrderIdToRatingCriteria.get(i);
 	    if (StringUtils.isNotBlank(criteriaTitle)) {
 		int newCriteriaOrderId = WebUtil.readIntParam(request, "criteriaOrderId" + i);
@@ -406,15 +408,43 @@ public class AuthoringAction extends Action {
 		ratingCriteria.setOrderId(newCriteriaOrderId);
 		ratingCriteria.setTitle(criteriaTitle);
 		service.saveOrUpdateRatingCriteria(ratingCriteria);
-		//!!updatedCriterias.add(ratingCriteria);
-	    
-	    //delete
+		// !!updatedCriterias.add(ratingCriteria);
+
+		// delete
 	    } else if (ratingCriteria != null) {
 		service.deleteRatingCriteria(ratingCriteria.getRatingCriteriaId());
 	    }
-	    
+
 	}
-	//!!imageGalleryPO.setRatingCriterias(new LinkedHashSet<LearnerItemRatingCriteria> (updatedCriterias));
+
+	boolean isCommentsEnabled = WebUtil.readBooleanParam(request, "isCommentsEnabled", false);
+	// find comments' responsible RatingCriteria
+	RatingCriteria commentsResponsibleCriteria = null;
+	for (RatingCriteria ratingCriteriaIter : ratingCriterias) {
+	    if (ratingCriteriaIter.isCommentsEnabled()) {
+		commentsResponsibleCriteria = ratingCriteriaIter;
+		break;
+	    }
+	}
+	// create commentsRatingCriteria if it's required
+	if (isCommentsEnabled) {
+	    if (commentsResponsibleCriteria == null) {
+		commentsResponsibleCriteria = new LearnerItemRatingCriteria();
+		commentsResponsibleCriteria.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+		((LearnerItemRatingCriteria) commentsResponsibleCriteria).setToolContentId(contentId);
+		commentsResponsibleCriteria.setOrderId(0);
+		commentsResponsibleCriteria.setCommentsEnabled(true);
+	    }
+	    service.saveOrUpdateRatingCriteria(commentsResponsibleCriteria);
+
+	    // delete commentsRatingCriteria if it's not required
+	} else {
+	    if (commentsResponsibleCriteria != null) {
+		service.deleteRatingCriteria(commentsResponsibleCriteria.getRatingCriteriaId());
+	    }
+	}
+
+	// !!imageGalleryPO.setRatingCriterias(new LinkedHashSet<LearnerItemRatingCriteria> (updatedCriterias));
 
 	// **********************************************
 	// finally persist imageGalleryPO again
@@ -594,7 +624,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
-    
+
     /**
      * Display empty page for muiltiple image upload.
      * 
@@ -611,7 +641,7 @@ public class AuthoringAction extends Action {
 
 	return mapping.findForward("images");
     }
-    
+
     /**
      * This method will get necessary information from imageGallery item form and save or update into
      * <code>HttpSession</code> ImageGalleryItemList. Notice, this save is not persist them into database, just save
@@ -652,7 +682,7 @@ public class AuthoringAction extends Action {
 	// return null to close this window
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
-    
+
     /**
      * Remove imageGallery item from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
@@ -858,7 +888,7 @@ public class AuthoringAction extends Action {
 	image.setCreateByAuthor(true);
 	image.setHide(false);
     }
-    
+
     /**
      * Extract web form content to imageGallery items.
      * 
@@ -907,7 +937,7 @@ public class AuthoringAction extends Action {
 	    image.setHide(false);
 	}
     }
-    
+
     /**
      * Validate imageGallery.
      * 
@@ -954,7 +984,7 @@ public class AuthoringAction extends Action {
 
 	return errors;
     }
-    
+
     /**
      * Validate imageGallery item.
      * 
@@ -965,7 +995,7 @@ public class AuthoringAction extends Action {
 	ActionErrors errors = new ActionErrors();
 
 	List<FormFile> fileList = createFileListFromMultipleForm(multipleForm);
-	
+
 	// validate files size
 	for (FormFile file : fileList) {
 	    FileValidatorUtil.validateFileSize(file, true, errors);
@@ -980,7 +1010,7 @@ public class AuthoringAction extends Action {
 
 	return errors;
     }
-    
+
     /**
      * Create file list from multiple form.
      * 
@@ -990,25 +1020,25 @@ public class AuthoringAction extends Action {
     private List<FormFile> createFileListFromMultipleForm(MultipleImagesForm multipleForm) {
 
 	List<FormFile> fileList = new ArrayList<FormFile>();
-	if (! StringUtils.isEmpty(multipleForm.getFile1().getFileName())) {
+	if (!StringUtils.isEmpty(multipleForm.getFile1().getFileName())) {
 	    fileList.add(multipleForm.getFile1());
 	}
-	if (! StringUtils.isEmpty(multipleForm.getFile2().getFileName())) {
+	if (!StringUtils.isEmpty(multipleForm.getFile2().getFileName())) {
 	    fileList.add(multipleForm.getFile2());
 	}
-	if (! StringUtils.isEmpty(multipleForm.getFile3().getFileName())) {
+	if (!StringUtils.isEmpty(multipleForm.getFile3().getFileName())) {
 	    fileList.add(multipleForm.getFile3());
 	}
-	if (! StringUtils.isEmpty(multipleForm.getFile4().getFileName())) {
+	if (!StringUtils.isEmpty(multipleForm.getFile4().getFileName())) {
 	    fileList.add(multipleForm.getFile4());
 	}
-	if (! StringUtils.isEmpty(multipleForm.getFile5().getFileName())) {
+	if (!StringUtils.isEmpty(multipleForm.getFile5().getFileName())) {
 	    fileList.add(multipleForm.getFile5());
 	}
 
 	return fileList;
     }
-    
+
     /**
      * Checks if the format is allowed.
      * 
@@ -1019,7 +1049,7 @@ public class AuthoringAction extends Action {
 	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType)
 		|| !(contentType.equals("image/gif") || contentType.equals("image/png")
 			|| contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			.equals("image/pjpeg"));
+			    .equals("image/pjpeg"));
 
 	return isContentTypeForbidden;
     }

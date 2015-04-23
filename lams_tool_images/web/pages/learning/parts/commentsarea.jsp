@@ -32,79 +32,19 @@
 	}
 </script>
 
-<%--Comments area---------------------------------------%>
-<div id="comments-area">
-	<c:if test="${imageGallery.allowCommentImages && isImageSelected}">
+<c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">
 
-		<%@ include file="/common/messages.jsp"%>
-	
-		<div class="field-name">
-			<fmt:message key="label.learning.comments" />
-		</div>
-		
-		<c:forEach var="comment" items="${sessionMap.comments}">
-		
-			<div>
-				<table cellspacing="0" class="forum">
-					<tr >
-						<th >
-							<fmt:message key="label.learning.by" />
-							<c:set var="author" value="${comment.createBy.firstName} ${comment.createBy.lastName}" />
-							<c:if test="${empty author}">
-								<c:set var="author">
-									<fmt:message key="label.default.user.name" />
-								</c:set>
-							</c:if>
-							<c:out value="${author}" escapeXml="true" /> - <lams:Date value="${comment.createDate}" />
-						</th>
-					</tr>
-						
-					<tr>
-						<td class="posted-by">
-						</td>
-					</tr>
-			
-					<tr>
-						<td>
-							<c:out value="${comment.comment}" escapeXml="false" />
-						</td>
-					</tr>
-						
-				</table>
-			</div>
-				
-		</c:forEach>
-	
-		<c:if test="${mode != 'teacher' && (not finishedLock)}">
-			<div >
-				<html:form action="learning/addNewComment" method="post">
-					<lams:STRUTS-textarea property="comment" rows="3" styleId="comment-textarea"/>		
-			
-					<html:button property="commentButton" onclick="javascript:addNewComment(${sessionMap.currentImage.uid}, document.getElementById('comment__lamshidden').value);" styleClass="button" styleId="comment-button">
-						<fmt:message key="label.learning.add.comment" />
-					</html:button>
-				</html:form>					
-			</div>
-		</c:if>
-				
-	</c:if>
-</div>
-
-<c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">	
-	<div id="extra-controls">
-				
 		<%--Ranking area---------------------------------------%>
 	
 		<c:if test="${imageGallery.allowRank && isImageSelected}">
-			<div class="extra-controls-inner">
+			
 				<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}"
 						maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
-						countRatedImages="${sessionMap.countRatedImages}"/>
-			</div>
+						countRatedImages="${sessionMap.countRatedImages}" />
 			<br><br>
 		</c:if>
-		
-		<div class="extra-controls-inner2">
+
+	<div id="extra-controls">
 				
 			<%--Voting area--------------%>
 		
@@ -155,6 +95,5 @@
 				</c:if>
 			</c:if>
 		
-		</div>
 	</div>
 </c:if>

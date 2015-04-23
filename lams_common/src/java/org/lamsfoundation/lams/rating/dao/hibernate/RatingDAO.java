@@ -31,7 +31,7 @@ import java.util.Locale;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 
@@ -40,7 +40,7 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
     private static final String FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
 
-    private static final String FIND_RATING_VALUE = "SELECT r.rating FROM " + Rating.class.getName()
+    private static final String FIND_USER_RATING_VALUE = "SELECT r.rating FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
 
     private static final String FIND_RATING_BY_CRITERIA_AND_USER = "FROM " + Rating.class.getName()
@@ -57,8 +57,8 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	    + " WHERE r.ratingCriteria.ratingCriteriaId = cr.ratingCriteriaId AND cr.toolContentId = ? AND r.learner.userId =?";
 
     @Override
-    public void saveOrUpdate(Rating rating) {
-	this.getHibernateTemplate().saveOrUpdate(rating);
+    public void saveOrUpdate(Object object) {
+	this.getHibernateTemplate().saveOrUpdate(object);
 	this.getHibernateTemplate().flush();
     }
 
@@ -73,8 +73,7 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	}
     }
 
-    @Override
-    public Rating getRating(Long ratingCriteriaId, Integer userId) {
+    private Rating getRating(Long ratingCriteriaId, Integer userId) {
 	List<Rating> list = getHibernateTemplate().find(FIND_RATING_BY_CRITERIA_AND_USER,
 		new Object[] { ratingCriteriaId, userId });
 	if (list.size() > 0) {
@@ -85,7 +84,7 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
     }
 
     @Override
-    public RatingDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId) {
+    public RatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId) {
 	List<Object[]> list = getHibernateTemplate().find(FIND_RATING_AVERAGE_BY_ITEM,
 		new Object[] { ratingCriteriaId, itemId });
 	Object[] results = list.get(0);
@@ -96,23 +95,29 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	String averageRating = numberFormat.format(averageRatingObj);
 
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
-	return new RatingDTO(averageRating, numberOfVotes);
+	return new RatingCriteriaDTO(averageRating, numberOfVotes);
     }
 
     @Override
-    public RatingDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId) {
+    public RatingCriteriaDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId) {
 
-	RatingDTO ratingDTO = getRatingAverageDTOByItem(ratingCriteriaId, itemId);
+	RatingCriteriaDTO criteriaDto = getRatingAverageDTOByItem(ratingCriteriaId, itemId);
 
-	Float userRating = 0F;
-	List list = getHibernateTemplate().find(FIND_RATING_VALUE, new Object[] { ratingCriteriaId, userId, itemId });
+	List list = getHibernateTemplate().find(FIND_USER_RATING_VALUE,
+		new Object[] { ratingCriteriaId, userId, itemId });
+	String userRating;
 	if (list.size() > 0) {
-	    userRating = (Float) list.get(0);
-	}
-	ratingDTO.setUserRating(userRating.toString());
-	ratingDTO.setItemId(itemId);
+	    userRating = ((Float) list.get(0)).toString();
 
-	return ratingDTO;
+	    // user didn't leave his rating yet
+	} else {
+	    userRating = "";
+
+	}
+	criteriaDto.setUserRating(userRating);
+	criteriaDto.setItemId(itemId);
+
+	return criteriaDto;
     }
 
     @Override
