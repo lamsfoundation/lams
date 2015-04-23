@@ -1,5 +1,7 @@
+<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
 
 <ul data-role="listview" data-inset="true">
 
@@ -33,7 +35,7 @@
 			<tr class="ui-btn-up-c">
 				<td>
 					<c:set var="viewtopic">
-						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
+						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}" />
 					</c:set>
 					<a href="${viewtopic}" data-ajax="false">
 						<c:choose>

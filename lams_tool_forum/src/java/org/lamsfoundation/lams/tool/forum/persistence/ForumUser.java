@@ -58,12 +58,23 @@ public class ForumUser implements Serializable, Cloneable {
     public ForumUser() {
     }
 
+    /** Create the user based on the DTO in the session */
     public ForumUser(UserDTO user, ForumToolSession session) {
 	this.userId = new Long(user.getUserID().intValue());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
 	this.session = session;
+	this.sessionFinished = false;
+    }
+    
+    /** Create the user based on the details in the JSON call - used for authoring so no session exists. */
+    public ForumUser(Long userId, String firstName, String lastName, String loginName) {
+	this.userId = userId;
+	this.firstName = firstName;
+	this.lastName = lastName;
+	this.loginName = loginName;
+	this.session = null;
 	this.sessionFinished = false;
     }
 

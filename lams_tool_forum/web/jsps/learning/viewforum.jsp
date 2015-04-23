@@ -140,7 +140,7 @@
 			<p>
 				<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
 			</p>
-
+			<div id="reflection">
 			<c:choose>
 				<c:when test="${empty sessionMap.reflectEntry}">
 					<p>
@@ -153,7 +153,7 @@
 					</p>
 				</c:otherwise>
 			</c:choose>
-
+			</div>
 			<c:if test='${sessionMap.mode != "teacher"}'>
 				<html:button property="continue"
 					onclick="javascript:location.href='${continue}';"

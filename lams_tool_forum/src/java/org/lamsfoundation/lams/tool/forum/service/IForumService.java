@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -148,7 +149,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    Message replyTopic(Long parentId, Long sessionId, Message message) throws PersistenceException;
+    MessageSeq replyTopic(Long parentId, Long sessionId, Message message) throws PersistenceException;
 
     /**
      * Delete the topic by given topic ID. The function will delete all children topics under this topic.
@@ -172,12 +173,31 @@ public interface IForumService {
     // *********************Get topic methods **********************
     // ************************************************************************************
     /**
-     * Get topic and its children list by given root topic ID. Note that the return type is DTO.
+     * Get a complete topic and its children list by given root topic ID. Note that the return type is DTO.
      * 
      * @param rootTopicId
      * @return List of MessageDTO
      */
     List getTopicThread(Long rootTopicId);
+    
+    /**
+     * Get topic and its children list by given root topic ID, starting from after the sequence number specified. 
+     * Return the number of entries indicated by the paging number. Note that the return type is DTO.
+     * 
+     * @param rootTopicId
+     * @param afterSequenceId
+     * @param pagingSize
+     * @return List of MessageDTO
+     */
+    public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize );
+
+    /**
+     * Get one complete thread within a topic Note that the return type is DTO.
+     * 
+     * @param threadId
+     * @return List of MessageDTO
+     */
+    public List getThread(Long threadId );
 
     /**
      * Get root topics by a given sessionID value. Simultanousely, it gets back topics, which author posted in authoring
@@ -216,6 +236,15 @@ public interface IForumService {
      */
     Message getMessage(Long messageUid) throws PersistenceException;
 
+    /**
+     * Get message by given message UID, wrapped up in the usual DTO list that is used for the view code in learner.
+     * 
+     * @param messageUid
+     * @return Message
+     * @throws PersistenceException
+     */
+    List<MessageDTO> getMessageAsDTO(Long messageUid) throws PersistenceException;
+    
     /**
      * Get message list posted by given user. Note that the return type is DTO.
      * 

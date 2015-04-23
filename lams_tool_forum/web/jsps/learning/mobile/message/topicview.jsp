@@ -1,4 +1,7 @@
+<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
+
+<c:set var="maxThreadUid" value="0"/>
 
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="indentSize" value="${msgDto.level}" />
@@ -9,6 +12,10 @@
 	<c:set var="replytopic">
 		<html:rewrite page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />
 	</c:set>
+	
+	<c:if test='${(indentSize <= 1)}'>
+		<c:set var="maxThreadUid" value="${msgDto.message.uid}"/>
+	</c:if>
 	
 	<div style="margin-left:<c:out value="${indentSize}"/>em;">
 		<table cellspacing="0" class="forum">
@@ -112,3 +119,11 @@
 		</table>
 	</div>
 </c:forEach>
+
+<c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
+<c:if test='${maxThreadUid > 0}'>
+	<div class="float-right">
+	<c:set var="more"><html:rewrite page="/learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}" /></c:set>
+	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>
+	</div>
+</c:if>
