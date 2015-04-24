@@ -91,13 +91,15 @@
                                 heightOffSet = document.getElementById('wizardDiv').offsetHeight;
                             }
                             
-                            if (window.resizeIframe) {
-            					window.resizeIframe(heightOffSet);
-            				} else if (window.parent && window.parent.resizeIframe) {
-            					window.parent.resizeIframe(heightOffSet);
-            				} else if (window.top && window.top.resizeIframe) {
-            					window.top.resizeIframe(heightOffSet);
-            				} 
+							try {
+								if (window.parent && window.parent.resizeIframe) {
+	            					window.parent.resizeIframe(heightOffSet);
+	            				} else if (window.top && window.top.resizeIframe) {
+	            					window.top.resizeIframe(heightOffSet);
+	            				}
+							} catch(err) {
+								// mute cross-domain iframe access errors
+							} 
                         	
                         	heightOffSet = heightOffSet * -1;
                         });
