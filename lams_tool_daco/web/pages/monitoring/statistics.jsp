@@ -21,25 +21,27 @@
 							<select id="userDropdown" style="margin-top: -2px; height: 30px">
 								<c:forEach var="userGroup" items="${monitoringSummary}">
 									<option value="-1" disabled="disabled">--- ${userGroup.sessionName} ---</option>
+									
 									<c:forEach var="nextUser" items="${userGroup.users}">
 										<option value="${nextUser.uid}" 
-										<c:if test="${userUid==nextUser.uid}">
-											selected="selected"
-											<c:set var="recordList" value="${nextUser.records}" />
-											<c:set var="userFullName" value="<c:out value='${nextUser.fullName}' escapeXml='true'/>" />
-										</c:if>
-										<c:out value="${userFullName}" escapeXml="false"/></option>
+											<c:if test="${userUid==nextUser.uid}">
+												selected="selected"
+												<c:set var="recordList" value="${nextUser.records}" />
+												<c:set var="userFullName" value="${nextUser.fullName}" />
+											</c:if>>
+											<c:out value="${nextUser.fullName}" escapeXml="false"/>
+										</option>
 									</c:forEach>
 								</c:forEach>
 							</select>
 						</div>
-					<a href="#" onclick="javascript:refreshPage('${refreshStatisticsUrl}')" class="button space-left">
-						<fmt:message key="label.monitoring.chooseuser" />
-					</a>
+						
+						<a href="#" onclick="javascript:refreshPage('${refreshStatisticsUrl}')" class="button space-left">
+							<fmt:message key="label.monitoring.chooseuser" />
+						</a>
 					</td>
 				</tr>
 			</table>
-			</p>
 			<%@ include file="/pages/learning/questionSummaries.jsp" %>
 		</c:otherwise>
 	</c:choose>
