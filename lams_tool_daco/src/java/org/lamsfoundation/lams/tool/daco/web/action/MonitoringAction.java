@@ -139,7 +139,7 @@ public class MonitoringAction extends Action {
 	    userUid = (Long) sessionMap.get(DacoConstants.USER_UID);
 	    request.setAttribute(DacoConstants.ATTR_MONITORING_CURRENT_TAB, 1);
 	} else {
-	    request.setAttribute(DacoConstants.ATTR_MONITORING_CURRENT_TAB, 4);
+	    request.setAttribute(DacoConstants.ATTR_MONITORING_CURRENT_TAB, 3);
 	}
 
 	if (userUid == null && !monitoringSummaryList.isEmpty() && !monitoringSummaryList.get(0).getUsers().isEmpty()) {
