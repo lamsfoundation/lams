@@ -14,7 +14,7 @@ CREATE TABLE lams_rating_criteria (
        rating_criteria_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , title VARCHAR(255)
      , rating_criteria_type_id INT(11) NOT NULL DEFAULT 0
-     , comments_enabled TINYINT(1) NOT NULL DEFAULT 0,
+     , comments_enabled TINYINT(1) NOT NULL DEFAULT 0
      , order_id INT(11) NOT NULL
      , tool_content_id BIGINT(20)
      , item_id BIGINT(20)
