@@ -37,10 +37,10 @@
 		<%--Ranking area---------------------------------------%>
 	
 		<c:if test="${imageGallery.allowRank && isImageSelected}">
-			
-				<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}"
-						maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
-						countRatedImages="${sessionMap.countRatedImages}" />
+		
+			<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
+					maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
+					countRatedImages="${sessionMap.countRatedImages}" />
 			<br><br>
 		</c:if>
 
