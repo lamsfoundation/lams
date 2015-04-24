@@ -13,12 +13,14 @@
 	});
 
 	function callHideMessage() {
-		if (window.hideMessage) {
-			window.hideMessage();
-		} else if (window.parent && window.parent.hideMessage) {
-			window.parent.hideMessage();
-		} else if (window.top && window.top.hideMessage) {
-			window.top.hideMessage();
+		try {
+			if (window.parent && window.parent.hideMessage) {
+				window.parent.hideMessage();
+			} else if (window.top && window.top.hideMessage) {
+				window.top.hideMessage();
+			}
+		} catch(err) {
+			// mute cross-domain iframe access errors
 		}
 	}
 </script>

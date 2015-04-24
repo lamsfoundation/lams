@@ -8,12 +8,14 @@
 		<lams:css style="tabbed" />
 		<script type="text/javascript"> 
 			function callHideConditionMessage() {
-				if (window.hideConditionMessage) {
-					window.hideConditionMessage();
-				} else if (window.parent && window.parent.hideConditionMessage) {
-					window.parent.hideConditionMessage();
-				} else if (window.top && window.top.hideConditionMessage) {
-					window.top.hideConditionMessage();
+				try {
+					if (window.parent && window.parent.hideConditionMessage) {
+						window.parent.hideConditionMessage();
+					} else if (window.top && window.top.hideConditionMessage) {
+						window.top.hideConditionMessage();
+					}
+				} catch(err) {
+					// mute cross-domain iframe access errors
 				}
 			}
 		</script>
