@@ -8,12 +8,14 @@
 
 	<script type="text/javascript">
 		var win = null;
-		if (window.hideMessage) {
-			win = window;
-		} else if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else if (window.top && window.top.hideMessage) {
-			win = window.top;
+		try {
+			if (window.parent && window.parent.hideMessage) {
+				win = window.parent;
+			} else if (window.top && window.top.hideMessage) {
+				win = window.top;
+			}
+		} catch(err) {
+			// mute cross-domain iframe access errors
 		}
 		if (win) {
 			win.hideMessage();
