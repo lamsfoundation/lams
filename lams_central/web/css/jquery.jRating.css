@@ -58,6 +58,11 @@ p.jRatingInfos span.maxRate {
 	float: right;
 	margin-top: 20px;
 }
+.rating-comment{
+	background: url("../images/css/greyfade_bg.jpg") repeat-x scroll 0px 0px transparent;
+	padding: 15px;
+	margin: 10px 0;
+}
 
 /** Remove the following once we move all tools to use Rating.tag.  **/
 .rating-stars-div {float:right; padding-right: 10px; margin-top: -8px; min-height: 45px;}
