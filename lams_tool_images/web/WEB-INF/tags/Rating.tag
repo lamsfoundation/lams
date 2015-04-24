@@ -17,16 +17,21 @@
 
 <%-- Optional attribute --%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true" %>
+<%@ attribute name="isItemAuthoredByUser" required="false" rtexprvalue="true" %>
 <%@ attribute name="maxRates" required="false" rtexprvalue="true" %>
 <%@ attribute name="minRates" required="false" rtexprvalue="true" %>
 <%@ attribute name="countRatedImages" required="false" rtexprvalue="true" %>
-<%@ attribute name="numberVotesLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="byLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="instructorLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
 	<c:set var="disabled" value="false" scope="request"/>
+</c:if>
+<c:if test="${empty isItemAuthoredByUser}">
+	<c:set var="isItemAuthoredByUser" value="false" scope="request"/>
 </c:if>
 <c:if test="${empty maxRates}">
 	<c:set var="maxRates" value="0" scope="request"/>
@@ -37,8 +42,11 @@
 <c:if test="${empty countRatedImages}">
 	<c:set var="countRatedImages" value="0" scope="request"/>
 </c:if>
-<c:if test="${empty numberVotesLabel}">
-	<c:set var="numberVotesLabel" value="label.number.of.votes" scope="request"/>
+<c:if test="${empty yourRatingLabel}">
+	<c:set var="yourRatingLabel" value="label.your.rating" scope="request"/>
+</c:if>
+<c:if test="${empty averageRatingLabel}">
+	<c:set var="averageRatingLabel" value="label.average.rating" scope="request"/>
 </c:if>
 <c:if test="${empty byLabel}">
 	<c:set var="byLabel" value="label.learning.by" scope="request"/>
@@ -61,6 +69,7 @@
 	var pathToImageFolder = "${lams}images/css/";
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/common.js"></script> 
 
 <!-- begin tab content -->
 <script type="text/javascript">
@@ -73,13 +82,20 @@
 
     	//addNewComment button handler
 	    $('#add-comment-button').click(function() {
-			var comment = document.getElementById('comment-textarea').value;
+	    	
+	    	//replace special characters with HTML tags
+	    	var tempTextarea = jQuery('<textarea/>');
+	    	filterData(document.getElementById('comment-textarea'), tempTextarea);
+			var comment = tempTextarea.value;
 	    	
 	    	//add new comment
 	    	$.ajax({
 	    		type: "POST",
 	    		url: '${lams}servlet/rateItem',
-	    		data: 'idBox=${commentsRatingDto.ratingCriteria.ratingCriteriaId}-${commentsRatingDto.itemId}&comment=' + comment,
+	    		data: {
+	    			idBox: '${commentsRatingDto.ratingCriteria.ratingCriteriaId}-${commentsRatingDto.itemId}', 
+	    			comment: comment
+	    		},
 	    		success: function(data, itemId) {
 	    				
 	    			//add comment to HTML
@@ -173,7 +189,7 @@
 			<c:set var="isCriteriaNotRatedByUser" value='${ratingDto.userRating == ""}'/>
 	
 			<c:choose>
-				<c:when test='${disabled || (maxRates > 0) && (countRatedImages >= maxRates) || !isCriteriaNotRatedByUser}'>
+				<c:when test='${disabled || isItemAuthoredByUser || (maxRates > 0) && (countRatedImages >= maxRates) || !isCriteriaNotRatedByUser}'>
 					<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
 				</c:when>
 				<c:otherwise>
@@ -191,7 +207,7 @@
 			<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
 				<c:if test="${isCriteriaNotRatedByUser}">style="visibility: hidden;"</c:if>
 			>
-				<fmt:message key="${numberVotesLabel}" >
+				<fmt:message key="${yourRatingLabel}" >
 					<fmt:param>
 						<span id="user-rating-${objectId}">
 							<fmt:formatNumber value="${ratingDto.userRating}" type="number" maxFractionDigits="1" />
@@ -207,6 +223,20 @@
 					</fmt:param>
 				</fmt:message>
 			</div>
+			
+			<c:if test="${isItemAuthoredByUser}">
+				<div class="rating-stars-caption">
+					<fmt:message key="${averageRatingLabel}" >
+						<fmt:param>
+							<fmt:formatNumber value="${ratingDto.averageRating}" type="number" maxFractionDigits="1" />
+						</fmt:param>
+						<fmt:param>
+							${ratingDto.numberOfVotes}
+						</fmt:param>
+					</fmt:message>
+				</div>
+			</c:if>
+			
 		</c:if>
 	</c:forEach>
 
@@ -260,7 +290,7 @@
 
 		</c:forEach>
 
-		<c:if test="${not disabled && not isCommentedByUser}">
+		<c:if test="${not disabled && not isCommentedByUser && not isItemAuthoredByUser}">
 			<div id="add-comment-area">
 				<textarea name="comment" rows="2" id="comment-textarea" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;">Please, provide some comment here...</textarea>
 			
