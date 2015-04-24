@@ -79,7 +79,6 @@ public class RatingServlet extends HttpServlet {
 		String comment = WebUtil.readStrParam(request, "comment");
 		ratingService.commentItem(criteria, userId, itemId, comment);
 		JSONObject.put("comment", StringEscapeUtils.escapeJavaScript(comment));
-		JSONObject.put("userName", user.getFirstName() + " " + user.getLastName());
 
 	    } else {
 		float rating = Float.parseFloat((String) request.getParameter("rate"));

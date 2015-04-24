@@ -23,8 +23,6 @@
 <%@ attribute name="countRatedImages" required="false" rtexprvalue="true" %>
 <%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
-<%@ attribute name="byLabel" required="false" rtexprvalue="true" %>
-<%@ attribute name="instructorLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
@@ -47,12 +45,6 @@
 </c:if>
 <c:if test="${empty averageRatingLabel}">
 	<c:set var="averageRatingLabel" value="label.average.rating" scope="request"/>
-</c:if>
-<c:if test="${empty byLabel}">
-	<c:set var="byLabel" value="label.learning.by" scope="request"/>
-</c:if>
-<c:if test="${empty instructorLabel}">
-	<c:set var="instructorLabel" value="label.default.user.name" scope="request"/>
 </c:if>
 
 <%--Find commentsRatingDto--%>
@@ -99,13 +91,10 @@
 	    		success: function(data, itemId) {
 	    				
 	    			//add comment to HTML
-	    			jQuery('<div/>').append(jQuery('<table/>', {
-	    				'cellspacing': '0',
-	    				'class': "forum",
-	    			    html: '<tr><th><fmt:message key="${byLabel}"/> ' + data.userName + '</th></tr>' 
-	    			    	+ '<tr><td class="posted-by"></td></tr>'
-	    			    	+ '<tr><td>' + data.comment + '</td></tr>'
-	    			})).appendTo('#comments-area');
+	    			jQuery('<div/>', {
+	    				'class': "rating-comment",
+	    			    html: data.comment
+	    			}).appendTo('#comments-area');
 	    				
 	    			//hide comments textarea and button
 	    			$("#add-comment-area").hide();
@@ -200,8 +189,17 @@
 			<h4>
 				${ratingDto.ratingCriteria.title}
 			</h4>
+			
+			<c:choose>
+				<c:when test='${isItemAuthoredByUser || not isCriteriaNotRatedByUser}'>
+					<c:set var="ratingDataAverage" value="${ratingDto.averageRating}"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="ratingDataAverage" value="0"/>
+				</c:otherwise>
+			</c:choose>
 		
-			<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDto.averageRating}" data-id="${objectId}">
+			<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}">
 			</div>
 				
 			<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
@@ -249,48 +247,29 @@
 	<c:if test="${isCommentsEnabled}">
 	
 		<c:set var="userId"><lams:user property="userID" /></c:set>
-		<c:set var="isCommentedByUser" value="false"/>
 		<c:forEach var="comment" items="${commentsRatingDto.ratingComments}">
 			<c:if test="${comment.learner.userId == userId}">
-				<c:set var="isCommentedByUser" value="true"/>
+				<c:set var="commentLeftByUser" value="${comment}"/>
 			</c:if>
 		</c:forEach>
 		
-		<c:forEach var="comment" items="${commentsRatingDto.ratingComments}">
-		
-			<div>
-				<table cellspacing="0" class="forum">
-					<tr>
-						<th>
-							<c:set var="author" value="${comment.learner.firstName} ${comment.learner.lastName}" />
-							<c:if test="${empty author}">
-								<c:set var="author">
-									<fmt:message key="${instructorLabel}" />
-								</c:set>
-							</c:if>
-						
-							<fmt:message key="${byLabel}" />
-							<c:out value="${author}" escapeXml="true" />
-						</th>
-					</tr>
+		<c:choose>
+			<c:when test='${isItemAuthoredByUser}'>
+				<c:forEach var="comment" items="${commentsRatingDto.ratingComments}">
+					<div class="rating-comment">
+						<c:out value="${comment.comment}" escapeXml="false" />
+					</div>
+				</c:forEach>
+			</c:when>
+			
+			<c:when test='${not empty commentLeftByUser}'>
+				<div class="rating-comment">
+					<c:out value="${commentLeftByUser.comment}" escapeXml="false" />
+				</div>
+			</c:when>
+		</c:choose>
 
-					<tr>
-						<td class="posted-by">
-						</td>
-					</tr>
-
-					<tr>
-						<td>
-							<c:out value="${comment.comment}" escapeXml="false" />
-						</td>
-					</tr>
-
-				</table>
-			</div>
-
-		</c:forEach>
-
-		<c:if test="${not disabled && not isCommentedByUser && not isItemAuthoredByUser}">
+		<c:if test="${not disabled && empty commentLeftByUser && not isItemAuthoredByUser}">
 			<div id="add-comment-area">
 				<textarea name="comment" rows="2" id="comment-textarea" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;">Please, provide some comment here...</textarea>
 			
