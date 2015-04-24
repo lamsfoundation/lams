@@ -84,12 +84,14 @@
 <%-- This script will works when a new resoruce Condition submit in order to refresh "TaskList List" panel. --%>
 <script lang="javascript"> 
 	var win = null;
-	if (window.hideConditionMessage) {
-		win = window;
-	} else if (window.parent && window.parent.hideConditionMessage) {
-		win = window.parent;
-	} else if (window.top && window.top.hideConditionMessage) {
-		win = window.top;
+	try {
+		if (window.parent && window.parent.hideConditionMessage) {
+			win = window.parent;
+		} else if (window.top && window.top.hideConditionMessage) {
+			win = window.top;
+		}
+	} catch(err) {
+		// mute cross-domain iframe access errors
 	}
 	if (win) {
 		win.hideConditionMessage();
