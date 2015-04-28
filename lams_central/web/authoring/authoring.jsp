@@ -38,6 +38,8 @@
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=',
+
+			decoderDiv = $('<div />'),
 			LABELS = {
 				// ActivityLib
 				<fmt:message key="authoring.fla.default.group.title" var="DEFAULT_GROUPING_TITLE_VAR"/>
@@ -59,15 +61,15 @@
 				<fmt:message key="authoring.fla.branching.end.suffix" var="BRANCHING_END_SUFFIX_VAR"/>
 				BRANCHING_END_SUFFIX : '<c:out value="${BRANCHING_END_SUFFIX_VAR}" />',
 				<fmt:message key="authoring.fla.remove.activity.confirm" var="REMOVE_ACTIVITY_CONFIRM_VAR"/>
-				REMOVE_ACTIVITY_CONFIRM : '<c:out value="${REMOVE_ACTIVITY_CONFIRM_VAR}" />',
+				REMOVE_ACTIVITY_CONFIRM : decoderDiv.html('<c:out value="${REMOVE_ACTIVITY_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.branching.create.confirm" var="BRANCHING_CREATE_CONFIRM_VAR"/>
-				BRANCHING_CREATE_CONFIRM : '<c:out value="${BRANCHING_CREATE_CONFIRM_VAR}" />',
+				BRANCHING_CREATE_CONFIRM : decoderDiv.html('<c:out value="${BRANCHING_CREATE_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.transition.to.exists.error" var="TRANSITION_TO_EXISTS_ERROR_VAR"/>
-				TRANSITION_TO_EXISTS_ERROR : '<c:out value="${TRANSITION_TO_EXISTS_ERROR_VAR}" />',
+				TRANSITION_TO_EXISTS_ERROR : decoderDiv.html('<c:out value="${TRANSITION_TO_EXISTS_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.circular.sequence.error" var="CIRCULAR_SEQUENCE_ERROR_VAR"/>
-				CIRCULAR_SEQUENCE_ERROR : '<c:out value="${CIRCULAR_SEQUENCE_ERROR_VAR}" />',
+				CIRCULAR_SEQUENCE_ERROR : decoderDiv.html('<c:out value="${CIRCULAR_SEQUENCE_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.activity.in.container.error" var="ACTIVITY_IN_CONTAINER_ERROR_VAR"/>
-				ACTIVITY_IN_CONTAINER_ERROR : '<c:out value="${ACTIVITY_IN_CONTAINER_ERROR_VAR}" />',
+				ACTIVITY_IN_CONTAINER_ERROR : decoderDiv.html('<c:out value="${ACTIVITY_IN_CONTAINER_ERROR_VAR}" />').text(),
 				
 				// DecorationLib
 				<fmt:message key="authoring.fla.default.annotation.label.title" var="DEFAULT_ANNOTATION_LABEL_TITLE_VAR"/>
@@ -101,39 +103,39 @@
 				<fmt:message key="authoring.fla.sequence.validation.issues" var="SEQUENCE_VALIDATION_ISSUES_VAR"/>
 				SEQUENCE_VALIDATION_ISSUES : '<c:out value="${SEQUENCE_VALIDATION_ISSUES_VAR}" />',
 				<fmt:message key="authoring.fla.save.successful" var="SAVE_SUCCESSFUL_VAR"/>
-				SAVE_SUCCESSFUL : '<c:out value="${SAVE_SUCCESSFUL_VAR}" />',
+				SAVE_SUCCESSFUL : decoderDiv.html('<c:out value="${SAVE_SUCCESSFUL_VAR}" />').text(),
 				<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
-				NAVIGATE_AWAY_CONFIRM : '<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />',
+				NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.delete.node.confirm" var="DELETE_NODE_CONFIRM_VAR"/>
-				DELETE_NODE_CONFIRM : '<c:out value="${DELETE_NODE_CONFIRM_VAR}" />',
+				DELETE_NODE_CONFIRM : decoderDiv.html('<c:out value="${DELETE_NODE_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.overwrite.confirm" var="SEQUENCE_OVERWRITE_CONFIRM_VAR"/>
-				SEQUENCE_OVERWRITE_CONFIRM : '<c:out value="${SEQUENCE_OVERWRITE_CONFIRM_VAR}" />',
+				SEQUENCE_OVERWRITE_CONFIRM : decoderDiv.html('<c:out value="${SEQUENCE_OVERWRITE_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.new.folder.title.prompt" var="NEW_FOLDER_TITLE_PROMPT_VAR"/>
-				NEW_FOLDER_TITLE_PROMPT : '<c:out value="${NEW_FOLDER_TITLE_PROMPT_VAR}" />',
+				NEW_FOLDER_TITLE_PROMPT : decoderDiv.html('<c:out value="${NEW_FOLDER_TITLE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.rename.title.prompt" var="RENAME_TITLE_PROMPT_VAR"/>
-				RENAME_TITLE_PROMPT : '<c:out value="${RENAME_TITLE_PROMPT_VAR}" />',
+				RENAME_TITLE_PROMPT : decoderDiv.html('<c:out value="${RENAME_TITLE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.save.sequence.title.prompt" var="SAVE_SEQUENCE_TITLE_PROMPT_VAR"/>
-				SAVE_SEQUENCE_TITLE_PROMPT : '<c:out value="${SAVE_SEQUENCE_TITLE_PROMPT_VAR}" />',
+				SAVE_SEQUENCE_TITLE_PROMPT : decoderDiv.html('<c:out value="${SAVE_SEQUENCE_TITLE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.import.part.choose.prompt" var="IMPORT_PART_CHOOSE_PROMPT_VAR"/>
-				IMPORT_PART_CHOOSE_PROMPT : '<c:out value="${IMPORT_PART_CHOOSE_PROMPT_VAR}" />',
+				IMPORT_PART_CHOOSE_PROMPT : decoderDiv.html('<c:out value="${IMPORT_PART_CHOOSE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.folder.not.selected.error" var="FOLDER_NOT_SELECTED_ERROR_VAR"/>
-				FOLDER_NOT_SELECTED_ERROR : '<c:out value="${FOLDER_NOT_SELECTED_ERROR_VAR}" />',
+				FOLDER_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${FOLDER_NOT_SELECTED_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.title.validation.error" var="TITLE_VALIDATION_ERROR_VAR"/>
-				TITLE_VALIDATION_ERROR : '<c:out value="${TITLE_VALIDATION_ERROR_VAR}" />',
+				TITLE_VALIDATION_ERROR : decoderDiv.html('<c:out value="${TITLE_VALIDATION_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.folder.exists.error" var="FOLDER_EXISTS_ERROR_VAR"/>
-				FOLDER_EXISTS_ERROR : '<c:out value="${FOLDER_EXISTS_ERROR_VAR}" />',
+				FOLDER_EXISTS_ERROR : decoderDiv.html('<c:out value="${FOLDER_EXISTS_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.exists.error" var="SEQUENCE_EXISTS_ERROR_VAR"/>
-				SEQUENCE_EXISTS_ERROR : '<c:out value="${SEQUENCE_EXISTS_ERROR_VAR}" />',
+				SEQUENCE_EXISTS_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_EXISTS_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.save.error" var="SEQUENCE_SAVE_ERROR_VAR"/>
-				SEQUENCE_SAVE_ERROR : '<c:out value="${SEQUENCE_SAVE_ERROR_VAR}" />',
+				SEQUENCE_SAVE_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_SAVE_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.not.selected.error" var="SEQUENCE_NOT_SELECTED_ERROR_VAR"/>
-				SEQUENCE_NOT_SELECTED_ERROR : '<c:out value="${SEQUENCE_NOT_SELECTED_ERROR_VAR}" />',
+				SEQUENCE_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_NOT_SELECTED_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.load.error" var="SEQUENCE_LOAD_ERROR_VAR"/>
-				SEQUENCE_LOAD_ERROR : '<c:out value="${SEQUENCE_LOAD_ERROR_VAR}" />',
+				SEQUENCE_LOAD_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_LOAD_ERROR_VAR}" />').text(),
 				
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>
-				TRANSITION_FROM_EXISTS_ERROR : '<c:out value="${TRANSITION_FROM_EXISTS_ERROR_VAR}" />',
+				TRANSITION_FROM_EXISTS_ERROR : decoderDiv.html('<c:out value="${TRANSITION_FROM_EXISTS_ERROR_VAR}" />').text(),
 				
 				// MenuLib
 				<fmt:message key="authoring.fla.export.image.dialog.title" var="EXPORT_IMAGE_DIALOG_TITLE_VAR"/>
@@ -153,31 +155,31 @@
 				<fmt:message key="label.tab.lesson.sequence.folder" var="RUN_SEQUENCES_FOLDER_VAR"/>
 				RUN_SEQUENCES_FOLDER : '<c:out value="${RUN_SEQUENCES_FOLDER_VAR}" />',
 				<fmt:message key="authoring.fla.arrange.confirm" var="ARRANGE_CONFIRM_VAR"/>
-				ARRANGE_CONFIRM : '<c:out value="${ARRANGE_CONFIRM_VAR}" />',
+				ARRANGE_CONFIRM : decoderDiv.html('<c:out value="${ARRANGE_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.clear.canvas.confirm" var="CLEAR_CANVAS_CONFIRM_VAR"/>
-				CLEAR_CANVAS_CONFIRM : '<c:out value="${CLEAR_CANVAS_CONFIRM_VAR}" />',
+				CLEAR_CANVAS_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_CANVAS_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.branching.start.place.prompt" var="BRANCHING_START_PLACE_PROMPT_VAR"/>
-				BRANCHING_START_PLACE_PROMPT : '<c:out value="${BRANCHING_START_PLACE_PROMPT_VAR}" />',
+				BRANCHING_START_PLACE_PROMPT : decoderDiv.html('<c:out value="${BRANCHING_START_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.branching.end.place.prompt" var="BRANCHING_END_PLACE_PROMPT_VAR"/>
-				BRANCHING_END_PLACE_PROMPT : '<c:out value="${BRANCHING_END_PLACE_PROMPT_VAR}" />',
+				BRANCHING_END_PLACE_PROMPT : decoderDiv.html('<c:out value="${BRANCHING_END_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.annotation.region.place.prompt" var="ANNOTATION_REGION_PLACE_PROMPT_VAR"/>
-				ANNOTATION_REGION_PLACE_PROMPT : '<c:out value="${ANNOTATION_REGION_PLACE_PROMPT_VAR}" />',
+				ANNOTATION_REGION_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_REGION_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.annotation.label.place.prompt" var="ANNOTATION_LABEL_PLACE_PROMPT_VAR"/>
-				ANNOTATION_LABEL_PLACE_PROMPT : '<c:out value="${ANNOTATION_LABEL_PLACE_PROMPT_VAR}" />',
+				ANNOTATION_LABEL_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_LABEL_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.optional.activity.place.prompt" var="OPTIONAL_ACTIVITY_PLACE_PROMPT_VAR"/>
-				OPTIONAL_ACTIVITY_PLACE_PROMPT : '<c:out value="${OPTIONAL_ACTIVITY_PLACE_PROMPT_VAR}" />',
+				OPTIONAL_ACTIVITY_PLACE_PROMPT : decoderDiv.html('<c:out value="${OPTIONAL_ACTIVITY_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.support.activity.place.prompt" var="SUPPORT_ACTIVITY_PLACE_PROMPT_VAR"/>
-				SUPPORT_ACTIVITY_PLACE_PROMPT : '<c:out value="${SUPPORT_ACTIVITY_PLACE_PROMPT_VAR}" />',
+				SUPPORT_ACTIVITY_PLACE_PROMPT : decoderDiv.html('<c:out value="${SUPPORT_ACTIVITY_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.transition.place.prompt" var="TRANSITION_PLACE_PROMPT_VAR"/>
-				TRANSITION_PLACE_PROMPT : '<c:out value="${TRANSITION_PLACE_PROMPT_VAR}" />',
+				TRANSITION_PLACE_PROMPT : decoderDiv.html('<c:out value="${TRANSITION_PLACE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.paste.error" var="PASTE_ERROR_VAR"/>
-				PASTE_ERROR : '<c:out value="${PASTE_ERROR_VAR}" />',
+				PASTE_ERROR : decoderDiv.html('<c:out value="${PASTE_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.preview.error" var="PREVIEW_ERROR_VAR"/>
-				PREVIEW_ERROR : '<c:out value="${PREVIEW_ERROR_VAR}" />',
+				PREVIEW_ERROR : decoderDiv.html('<c:out value="${PREVIEW_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.cross.branching.error" var="CROSS_BRANCHING_ERROR_VAR"/>
-				CROSS_BRANCHING_ERROR : '<c:out value="${CROSS_BRANCHING_ERROR_VAR}" />',
+				CROSS_BRANCHING_ERROR : decoderDiv.html('<c:out value="${CROSS_BRANCHING_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.end.match.error" var="END_MATCH_ERROR_VAR"/>
-				END_MATCH_ERROR : '<c:out value="${END_MATCH_ERROR_VAR}" />',
+				END_MATCH_ERROR : decoderDiv.html('<c:out value="${END_MATCH_ERROR_VAR}" />').text(),
 				
 				
 				// PropertyLib
@@ -238,23 +240,23 @@
 				<fmt:message key="authoring.fla.default.range.condition.title.prefix" var="DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR"/>
 				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : '<c:out value="${DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR}" />',
 				<fmt:message key="authoring.fla.clear.all.confirm" var="CLEAR_ALL_CONFIRM_VAR"/>
-				CLEAR_ALL_CONFIRM : '<c:out value="${CLEAR_ALL_CONFIRM_VAR}" />',
+				CLEAR_ALL_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_ALL_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.remove.condition.confirm" var="REMOVE_CONDITION_CONFIRM_VAR"/>
-				REMOVE_CONDITION_CONFIRM : '<c:out value="${REMOVE_CONDITION_CONFIRM_VAR}" />',
+				REMOVE_CONDITION_CONFIRM : decoderDiv.html('<c:out value="${REMOVE_CONDITION_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.refresh.conditions.confirm" var="REFRESH_CONDITIONS_CONFIRM_VAR"/>
-				REFRESH_CONDITIONS_CONFIRM : '<c:out value="${REFRESH_CONDITIONS_CONFIRM_VAR}" />',
+				REFRESH_CONDITIONS_CONFIRM : decoderDiv.html('<c:out value="${REFRESH_CONDITIONS_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.conditions.to.default.gate.state.confirm" var="CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR"/>
-				CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM : '<c:out value="${CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR}" />',
+				CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM : decoderDiv.html('<c:out value="${CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.conditions.to.default.branch.confirm" var="CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR"/>
-				CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM : '<c:out value="${CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />',
+				CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM : decoderDiv.html('<c:out value="${CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.groups.to.default.branch.confirm" var="GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR"/>
-				GROUPS_TO_DEFAULT_BRANCH_CONFIRM : '<c:out value="${GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />',
+				GROUPS_TO_DEFAULT_BRANCH_CONFIRM : decoderDiv.html('<c:out value="${GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.range.condition.add.start.error" var="RANGE_CONDITION_ADD_START_ERROR_VAR"/>
-				RANGE_CONDITION_ADD_START_ERROR : '<c:out value="${RANGE_CONDITION_ADD_START_ERROR_VAR}" />',
+				RANGE_CONDITION_ADD_START_ERROR : decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_START_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.range.condition.add.end.error" var="RANGE_CONDITION_ADD_END_ERROR_VAR"/>
-				RANGE_CONDITION_ADD_END_ERROR : '<c:out value="${RANGE_CONDITION_ADD_END_ERROR_VAR}" />',
+				RANGE_CONDITION_ADD_END_ERROR : decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_END_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.group.title.validation.erorr" var="GROUP_TITLE_VALIDATION_ERORR_VAR"/>
-				GROUP_TITLE_VALIDATION_ERORR : '<c:out value="${GROUP_TITLE_VALIDATION_ERORR_VAR}" />'
+				GROUP_TITLE_VALIDATION_ERORR : decoderDiv.html('<c:out value="${GROUP_TITLE_VALIDATION_ERORR_VAR}" />').text()
 			},
 			
 			isReadOnlyMode = false,

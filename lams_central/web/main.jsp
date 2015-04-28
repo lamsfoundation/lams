@@ -41,13 +41,14 @@
 
 	<script type="text/javascript">
 			var LAMS_URL = '<lams:LAMSURL/>';
+			var decoderDiv = $('<div />');
 			var LABELS = {
 					<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
 					EMAIL_NOTIFICATIONS_TITLE : '<c:out value="${EMAIL_NOTIFICATIONS_TITLE_VAR}" />',
 					<fmt:message key="index.remove.lesson.confirm1" var="REMOVE_LESSON_CONFIRM1_VAR"/>
-					REMOVE_LESSON_CONFIRM1 : '<c:out value="${REMOVE_LESSON_CONFIRM1_VAR}" />',
+					REMOVE_LESSON_CONFIRM1 : decoderDiv.html('<c:out value="${REMOVE_LESSON_CONFIRM1_VAR}" />').text(),
 					<fmt:message key="index.remove.lesson.confirm2" var="REMOVE_LESSON_CONFIRM2_VAR"/>
-					REMOVE_LESSON_CONFIRM2 : '<c:out value="${REMOVE_LESSON_CONFIRM2_VAR}" />',
+					REMOVE_LESSON_CONFIRM2 : decoderDiv.html('<c:out value="${REMOVE_LESSON_CONFIRM2_VAR}" />').text(),
 					<fmt:message key="label.enable.lesson.sorting" var="SORTING_ENABLE_VAR"/>
 					SORTING_ENABLE : '<c:out value="${SORTING_ENABLE_VAR}" />',
 					<fmt:message key="label.disable.lesson.sorting" var="SORTING_DISABLE_VAR"/>
