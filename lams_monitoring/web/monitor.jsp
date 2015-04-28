@@ -173,7 +173,7 @@
 </lams:head>
 <body data-enhance="false">
 <div id="tabs">
-	<a id="closeButton" href="#" onClick="javascript:window.parent.closeMonitorLessonDialog()">
+	<a id="closeButton" href="#" onClick="javascript:closeMonitorLessonDialog()">
 		<span class="ui-icon ui-icon-closethick"></span>
 	</a>
 	

@@ -151,35 +151,59 @@ function makeSortable(element) {
 
 
 function showMonitorLessonDialog(lessonID) {
-	var dialog = $('#dialogContainer').dialog({
+	var dialogName = "dialogMonitorLesson" + lessonID,
+		dialog = $('#' + dialogName);
+	if (dialog.length > 0) {
+		// is it open already?
+		dialog.dialog('moveToTop');
+		return;
+	}
+	
+	// create a new dialog by cloning a template
+	dialog = $('#dialogContainer').clone();
+	dialog.attr('id', dialogName);
+	$('iframe', dialog).attr('id', null);
+	
+	dialog.dialog({
 		'lessonID' : lessonID,
 		'autoOpen' : false,
 		'height' : 600,
 		'width' : 1024,
-		'modal' : true,
-		'resizable' : false,
+		'modal' : false,
+		'draggable' : false,
+		'resizable' : true,
 		'hide' : 'fold',
 		'open' : function() {
 			// load contents after opening the dialog
-			$('#dialogFrame').attr('src', LAMS_URL
+			$('iframe', this).attr('src', LAMS_URL
 				+ 'home.do?method=monitorLesson&lessonID='
 				+ $(this).dialog('option', 'lessonID'));
 		},
 		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
+			$('iframe', this).attr('src', null);
 		},
 		'close' : function() {
-			// refresh if lesson was added
-			if ($(this).dialog('option', 'refresh')) {
-				loadOrgTab(null, true);
-			}
-			$(this).dialog('destroy');
+			// completely delete the dialog
+			$(this).remove();
 		}
+	});
+	// tell the dialog contents that it was resized
+	dialog.closest('.ui-dialog').on('resizestop', function(event, ui){
+		var frame = $('iframe', dialog)[0],
+			win = frame.contentWindow || frame.contentDocument;
+		win.resizeSequenceCanvas(ui.size.width, ui.size.height);
 	});
 	// tabs are the title bar, so remove dialog's one
 	dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
 	dialog.dialog('open');
 }
+
+
+function moveDialogToTop(dialogName) {
+	// called from withing dialog's iframe
+	$('#' + dialogName).dialog('moveToTop');
+}
+
 
 function showAddLessonDialog(orgID) {
 	var dialog = $('#dialogContainer').dialog({
@@ -483,10 +507,10 @@ function closeAddSingleActivityLessonDialog(action) {
 	dialog.dialog('option', 'refresh', save).dialog('close');
 }
 
-function closeMonitorLessonDialog(refresh) {
-	// was the dialog just closed or a new lesson really added?
+function closeMonitorLessonDialog(dialogName, refresh) {
+	// was the dialog just closed or 
 	// if latter, refresh the list
-	$("#dialogContainer").dialog('option', 'refresh', refresh ? true : false)
+	$("#" + dialogName).dialog('option', 'refresh', refresh ? true : false)
 			.dialog('close');
 }
 

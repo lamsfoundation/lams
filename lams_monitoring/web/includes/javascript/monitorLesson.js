@@ -55,6 +55,45 @@ function initTabs(){
 				sequenceInfoDialog.dialog('close');
 			}
 		}
+	}).draggable({
+		// scroll plugin has to be disabled here as it throws errors
+		// when dragging helper appended to parent document
+		'scroll' : false,
+		'handle' : $('#tabs>ul'),
+		'helper' : function(){
+			// since this code is inside an iframe, the helper is
+			// a transparent div with black borders attached to parent document
+			var dialogName = "dialogMonitorLesson" + lessonId,
+				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog'),
+				helper = dialog.clone().empty();
+			helper.css({
+				'border': 'thin black solid',
+				'width' : dialog.width(),
+				'height' : dialog.height(),
+				'background' : 'transparent'
+			});
+			return helper;
+		},
+		'appendTo' : window.parent.document.body,
+		'drag' : function(event, ui) {
+			// adjust position to be relative to parent document, not iframe contents
+			var dialogName = "dialogMonitorLesson" + lessonId,
+				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog');
+			ui.position.top += dialog.position().top;
+			ui.position.left += dialog.position().left;
+		},
+		'stop' : function(event, ui) {
+			var dialogName = "dialogMonitorLesson" + lessonId,
+				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog');
+			dialog.offset({
+				'top' : ui.offset.top,
+				'left' : ui.offset.left
+			});
+		}
+	}).mousedown(function(){
+		// bring clicked Monitor window to front
+		var dialogName = "dialogMonitorLesson" + lessonId;
+		window.parent.moveDialogToTop(dialogName);
 	});
 }
 
@@ -313,7 +352,7 @@ function changeLessonState(){
 			success : function() {
 				if (state == 7) {
 					// user chose to finish the lesson, close monitoring and refresh the lesson list
-					window.parent.closeMonitorLessonDialog(true);
+					closeMonitorLessonDialog(true);
 				} else {
 					refreshMonitor('lesson');
 				}
@@ -746,18 +785,7 @@ function updateSequenceTab() {
 					// if it was faded out by showBranchingSequence()
 					.fadeIn();
 				
-				var canvasHeight = sequenceCanvas.height(),
-					canvasWidth = Math.min('1010', sequenceCanvas.width()),
-					svg = $('svg', sequenceCanvas),
-					canvasPaddingTop = Math.max(0, canvasHeight/2 - svg.attr('height')/2),
-					canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2);
-
-				sequenceCanvas.css({
-					'padding-top'  : canvasPaddingTop,
-					'padding-left' : canvasPaddingLeft,
-					'width'        : canvasWidth - canvasPaddingLeft,
-					'height'       : canvasHeight - canvasPaddingTop
-				});
+				resizeSequenceCanvas();
 			}
 		});
 	}
@@ -1398,7 +1426,7 @@ function openLiveEdit(){
 				} else {
 					openPopUp(LAMS_URL + 'home.do?method=author&layout=editonfly&learningDesignID=' + ldId,
 							'LiveEdit', 600, 800, false);
-					window.parent.closeMonitorLessonDialog();
+					closeMonitorLessonDialog();
 				}
 			}
 		});	
@@ -1426,6 +1454,33 @@ function showBranchingSequence(branchingActivityId){
 function closeBranchingSequence(){
 	showBranchingSequence(null);
 	$('#closeBranchingButton').hide();
+}
+
+/**
+ * Adjusts sequence canvas (SVG) based on space available in the dialog.
+ */
+function resizeSequenceCanvas(width, height){
+	// Initial resize sends no parameters.
+	// When resizing the dialog, parameters are sent.
+	// Taking body's dimensions when resizing yields erroneous results.
+	width = width || $('body').width();
+	height = height || $('body').height();
+	var sequenceCanvas = $('#sequenceCanvas'),
+		// can it be done nicer?
+		canvasHeight = height - $('#tabs>ul').height() - $('#sequenceTopButtonsContainer').height()
+	  				   - Math.min(20, $('#completedLearnersContainer').height()) - 45,
+		canvasWidth = width - 15,
+		svg = $('svg', sequenceCanvas),
+		// center a small SVG inside large DIV
+		canvasPaddingTop = Math.max(0, canvasHeight/2 - svg.attr('height')/2),
+		canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2);
+		
+		sequenceCanvas.css({
+			'padding-top'  : canvasPaddingTop,
+			'padding-left' : canvasPaddingLeft,
+			'width'        : canvasWidth - canvasPaddingLeft,
+			'height'       : canvasHeight - canvasPaddingTop
+		});
 }
 
 //********** LEARNERS TAB FUNCTIONS **********
@@ -1690,6 +1745,14 @@ function refreshMonitor(tabName, isAuto){
 	}
 }
 
+
+/**
+ * Tells parent document to close this Monitor dialog.
+ */
+function closeMonitorLessonDialog(refresh) {
+	var dialogName = "dialogMonitorLesson" + lessonId;
+	window.parent.closeMonitorLessonDialog(dialogName, refresh);
+}
 
 /**
  * Show a dialog with user list and optional Force Complete and View Learner buttons.
