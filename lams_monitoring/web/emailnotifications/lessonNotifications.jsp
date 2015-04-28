@@ -35,7 +35,7 @@
 		}
 		#nowDiv{padding-left: 10px;}
 		.ui-jqgrid-hbox {padding-left: 0;}
-		#accordion {width: 314px;}
+		#accordion {width: 325px;}
 		#accordion h3 a {border-bottom: 0;}
 		#accordion p {text-align: center; padding-bottom: 0px; margin-bottom: 0xp;}
 		#listEmailsHref {border-bottom: 1px dotted #47BC23;color: #47BC23;text-decoration: none;}
