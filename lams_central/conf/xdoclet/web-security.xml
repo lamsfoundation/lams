@@ -32,7 +32,9 @@
 			<url-pattern>/ForgotPasswordRequest</url-pattern>
 			<url-pattern>/signup/*</url-pattern>
 			
-			<url-pattern>/rest/*</url-pattern>		
+			<url-pattern>/rest/*</url-pattern>
+			
+			<url-pattern>/runtimeStats</url-pattern>
 			
 	    	<!-- Static resources -->
     		<url-pattern>/css/*</url-pattern>

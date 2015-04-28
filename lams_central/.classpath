@@ -32,5 +32,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/jboss-jca.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-j2se.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
