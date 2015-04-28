@@ -23,11 +23,13 @@
 			lessonId = '${param.lessonID}',
 		
 			LAMS_URL = '<lams:LAMSURL/>',
+			
+			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="label.course.groups.grouping.remove.confirm" var="REMOVE_GROUPING_CONFIRM_LABEL_VAR"/>
-				REMOVE_GROUPING_CONFIRM_LABEL : '<c:out value="${REMOVE_GROUPING_CONFIRM_LABEL_VAR}" />',
+				REMOVE_GROUPING_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_GROUPING_CONFIRM_LABEL_VAR}" />').text(),
 				<fmt:message key="label.course.groups.grouping.use.confirm" var="USE_GROUPING_CONFIRM_LABEL_VAR"/>
-				USE_GROUPING_CONFIRM_LABEL : '<c:out value="${USE_GROUPING_CONFIRM_LABEL_VAR}" />'
+				USE_GROUPING_CONFIRM_LABEL : decoderDiv.html('<c:out value="${USE_GROUPING_CONFIRM_LABEL_VAR}" />').text()
 			};
 	</script>
 </lams:head>

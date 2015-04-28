@@ -44,15 +44,16 @@
 			
 			LAMS_URL = '<lams:LAMSURL/>',
 			
+			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="force.complete.click" var="FORCE_COMPLETE_CLICK_VAR"/>
-				FORCE_COMPLETE_CLICK : '<c:out value="${FORCE_COMPLETE_CLICK_VAR}" />',
+				FORCE_COMPLETE_CLICK : decoderDiv.html('<c:out value="${FORCE_COMPLETE_CLICK_VAR}" />').text(),
 				<fmt:message key="button.force.complete" var="FORCE_COMPLETE_BUTTON_VAR"/>
 				FORCE_COMPLETE_BUTTON : '<c:out value="${FORCE_COMPLETE_BUTTON_VAR}" />',
 				<fmt:message key="force.complete.end.lesson.confirm" var="FORCE_COMPLETE_END_LESSON_CONFIRM_VAR"/>
-				FORCE_COMPLETE_END_LESSON_CONFIRM : '<c:out value="${FORCE_COMPLETE_END_LESSON_CONFIRM_VAR}" />',
+				FORCE_COMPLETE_END_LESSON_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_END_LESSON_CONFIRM_VAR}" />').text(),
 				<fmt:message key="force.complete.activity.confirm" var="FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR"/>
-				FORCE_COMPLETE_ACTIVITY_CONFIRM : '<c:out value="${FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR}" />',
+				FORCE_COMPLETE_ACTIVITY_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR}" />').text(),
 				<fmt:message key="force.complete.remove.content" var="FORCE_COMPLETE_REMOVE_CONTENT_VAR"/>
 				FORCE_COMPLETE_REMOVE_CONTENT : '<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_VAR}" />',
 				<fmt:message key="force.complete.remove.content.yes" var="FORCE_COMPLETE_REMOVE_CONTENT_YES_VAR"/>
@@ -66,7 +67,7 @@
 				<fmt:message key="learner.group.show" var="LEARNER_GROUP_SHOW_VAR"/>
 				LEARNER_GROUP_SHOW : '<c:out value="${LEARNER_GROUP_SHOW_VAR}" />',
 				<fmt:message key="learner.group.remove.progress" var="LEARNER_GROUP_REMOVE_PROGRESS_VAR"/>
-				LEARNER_GROUP_REMOVE_PROGRESS : '<c:out value="${LEARNER_GROUP_REMOVE_PROGRESS_VAR}" />',
+				LEARNER_GROUP_REMOVE_PROGRESS : decoderDiv.html('<c:out value="${LEARNER_GROUP_REMOVE_PROGRESS_VAR}" />').text(),
 				<fmt:message key="learner.group.list.title" var="LEARNER_GROUP_LIST_TITLE_VAR"/>
 				LEARNER_GROUP_LIST_TITLE : '<c:out value="${LEARNER_GROUP_LIST_TITLE_VAR}" />',
 				<fmt:message key="button.view.learner" var="VIEW_LEARNER_BUTTON_VAR"/>
@@ -86,17 +87,17 @@
 				<fmt:message key="learner.finished.dialog.title" var="LEARNER_FINISHED_DIALOG_TITLE_VAR"/>
 				LEARNER_FINISHED_DIALOG_TITLE : '<c:out value="${LEARNER_FINISHED_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="lesson.enable.presence.alert" var="LESSON_PRESENCE_ENABLE_ALERT_VAR"/>
-				LESSON_PRESENCE_ENABLE_ALERT : '<c:out value="${LESSON_PRESENCE_ENABLE_ALERT_VAR}" />',
+				LESSON_PRESENCE_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_PRESENCE_ENABLE_ALERT_VAR}" />').text(),
 				<fmt:message key="lesson.disable.presence.alert" var="LESSON_PRESENCE_DISABLE_ALERT_VAR"/>
-				LESSON_PRESENCE_DISABLE_ALERT : '<c:out value="${LESSON_PRESENCE_DISABLE_ALERT_VAR}" />',
+				LESSON_PRESENCE_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_PRESENCE_DISABLE_ALERT_VAR}" />').text(),
 				<fmt:message key="lesson.enable.im.alert" var="LESSON_IM_ENABLE_ALERT_VAR"/>
-				LESSON_IM_ENABLE_ALERT : '<c:out value="${LESSON_IM_ENABLE_ALERT_VAR}" />',
+				LESSON_IM_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_IM_ENABLE_ALERT_VAR}" />').text(),
 				<fmt:message key="lesson.disable.im.alert" var="LESSON_IM_DISABLE_ALERT_VAR"/>
-				LESSON_IM_DISABLE_ALERT : '<c:out value="${LESSON_IM_DISABLE_ALERT_VAR}" />',
+				LESSON_IM_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_IM_DISABLE_ALERT_VAR}" />').text(),
 				<fmt:message key="lesson.remove.alert" var="LESSON_REMOVE_ALERT_VAR"/>
-				LESSON_REMOVE_ALERT : '<c:out value="${LESSON_REMOVE_ALERT_VAR}" />',
+				LESSON_REMOVE_ALERT : decoderDiv.html('<c:out value="${LESSON_REMOVE_ALERT_VAR}" />').text(),
 				<fmt:message key="lesson.remove.doublecheck.alert" var="LESSON_REMOVE_DOUBLECHECK_ALERT_VAR"/>
-				LESSON_REMOVE_DOUBLECHECK_ALERT : '<c:out value="${LESSON_REMOVE_DOUBLECHECK_ALERT_VAR}" />',
+				LESSON_REMOVE_DOUBLECHECK_ALERT : decoderDiv.html('<c:out value="${LESSON_REMOVE_DOUBLECHECK_ALERT_VAR}" />').text(),
 				<fmt:message key="lesson.state.created" var="LESSON_STATE_CREATED_VAR"/>
 				LESSON_STATE_CREATED : '<c:out value="${LESSON_STATE_CREATED_VAR}" />',
 				<fmt:message key="lesson.state.scheduled" var="LESSON_STATE_SCHEDULED_VAR"/>
@@ -120,7 +121,7 @@
 				<fmt:message key="lesson.state.action.archive" var="LESSON_STATE_ACTION_ARCHIVE_VAR"/>
 				LESSON_STATE_ACTION_ARCHIVE : '<c:out value="${LESSON_STATE_ACTION_ARCHIVE_VAR}" />',
 				<fmt:message key="error.lesson.schedule.date" var="LESSON_ERROR_SCHEDULE_DATE_VAR"/>
-				LESSON_ERROR_SCHEDULE_DATE : '<c:out value="${LESSON_ERROR_SCHEDULE_DATE_VAR}" />',
+				LESSON_ERROR_SCHEDULE_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_SCHEDULE_DATE_VAR}" />').text(),
 				<fmt:message key="button.edit.class" var="LESSON_EDIT_CLASS_VAR"/>
 				LESSON_EDIT_CLASS : '<c:out value="${LESSON_EDIT_CLASS_VAR}" />',
 				<fmt:message key="lesson.group.dialog.class" var="LESSON_GROUP_DIALOG_CLASS_VAR"/>
@@ -144,7 +145,7 @@
 			    <fmt:message key="button.timechart.tooltip" var="TIME_CHART_TOOLTIP_VAR"/>
 			    TIME_CHART_TOOLTIP : '<c:out value="${TIME_CHART_TOOLTIP_VAR}" />',
 				<fmt:message key="button.live.edit.confirm" var="LIVE_EDIT_CONFIRM_VAR"/>
-				LIVE_EDIT_CONFIRM : '<c:out value="${LIVE_EDIT_CONFIRM_VAR}" />',
+				LIVE_EDIT_CONFIRM : decoderDiv.html('<c:out value="${LIVE_EDIT_CONFIRM_VAR}" />').text(),
 				<fmt:message key="lesson.task.gate" var="CONTRIBUTE_GATE_VAR"/>
 				CONTRIBUTE_GATE : '<c:out value="${CONTRIBUTE_GATE_VAR}" />',
 				<fmt:message key="lesson.task.grouping" var="CONTRIBUTE_GROUPING_VAR"/>
