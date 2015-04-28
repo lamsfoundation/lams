@@ -1,7 +1,6 @@
 /********** GENERAL/DIALOG STYLES **********/
 div#tabs {
 	width: 99%;
-	height: 574px;
 	overflow: hidden;
 	border: none;
 }
@@ -88,7 +87,7 @@ div.dialogListItemDisabled {
 
 /********** LESSON TAB STYLES **********/
 div#tabLesson {
-	height: 540px;
+/*	height: 540px;*/
 	overflow: auto;
 }
 
@@ -179,7 +178,6 @@ td.contributeEntryCell a {
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {
 	text-align: center;
-	height: 478px;
 	width: 1024px;
 	overflow: auto;
 }
@@ -243,7 +241,6 @@ td.selectedLearnersHeaderPageCell {
 }
 
 div#tabLearnersContainer {
-	height: 500px;
 	overflow: auto;
 }
 
