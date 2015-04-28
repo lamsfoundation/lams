@@ -114,3 +114,10 @@
 		org.lamsfoundation.lams.rest.ToolContentRestServlet
 	</servlet-class>
 </servlet>
+
+<servlet>
+	<servlet-name>RuntimeStatsServlet</servlet-name>
+	<servlet-class>
+		org.lamsfoundation.lams.web.RuntimeStatsServlet
+	</servlet-class>
+</servlet>

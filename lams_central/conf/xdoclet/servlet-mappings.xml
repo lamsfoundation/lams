@@ -64,3 +64,8 @@
 	<servlet-name>ToolContentRestServlet</servlet-name>
 	<url-pattern>/rest/ToolContent</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>RuntimeStatsServlet</servlet-name>
+	<url-pattern>/runtimeStats</url-pattern>
+</servlet-mapping>
