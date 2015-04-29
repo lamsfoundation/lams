@@ -70,6 +70,7 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -1605,14 +1606,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setUpdated(updateDate);
 
 	forum.setContentId(toolContentID);
-	forum.setTitle(toolContentJSON.getString("title"));
-	forum.setInstructions(toolContentJSON.getString("instructions"));
+	forum.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	forum.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	
 	forum.setAllowAnonym(JsonUtil.opt(toolContentJSON, "allowAnonym", Boolean.FALSE));
 	forum.setAllowEdit(JsonUtil.opt(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default entry in the db
 	forum.setAllowNewTopic(JsonUtil.opt(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the default entry in the db
 	forum.setAllowRateMessages(JsonUtil.opt(toolContentJSON, "allowRateMessages", Boolean.FALSE));
-	forum.setAllowRichEditor(JsonUtil.opt(toolContentJSON, "allowRichEditor", Boolean.FALSE));
+	forum.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 	forum.setAllowUpload(JsonUtil.opt(toolContentJSON, "allowUpload", Boolean.FALSE));
 	forum.setContentInUse(false);
 	forum.setDefineLater(false);
@@ -1628,9 +1629,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setNotifyLearnersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyLearnersOnForumPosting", Boolean.FALSE));
 	forum.setNotifyLearnersOnMarkRelease(JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
 	forum.setNotifyTeachersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
-	forum.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, "reflectInstructions", null));
-	forum.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
-	forum.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, "submissionDeadline", null));
+	forum.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	forum.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	forum.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
 	
 	// *******************************Handle user*******************
 	// Code taken from AuthoringAction TODO 
