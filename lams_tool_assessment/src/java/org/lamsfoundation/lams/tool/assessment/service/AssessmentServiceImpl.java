@@ -44,6 +44,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -58,6 +61,8 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -101,6 +106,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -108,7 +114,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * @author Andrey Balan
  */
 public class AssessmentServiceImpl implements IAssessmentService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager{
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -1845,5 +1851,186 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     
     public void setUserService(IUserManagementService userService) {
 	this.userService = userService;
+    }
+    
+    // ****************** REST methods *************************
+
+    /**
+     * Rest call to create a new Assessment content. Required fields in toolContentJSON: "title", "instructions",
+     * "questions", "firstName", "lastName", "lastName", "questions" and "references".
+     * 
+     * The questions entry should be a JSONArray containing JSON objects, which in turn must contain "questionTitle",
+     * "questionText", "displayOrder" (Integer), "type" (Integer). If the type is Multiple Choice, Numerical or Matching
+     * Pairs then a JSONArray "answers" is required.
+     * 
+     * The answers entry should be JSONArray containing JSON objects, which in turn must contain "answerText" or
+     * "answerFloat", "displayOrder" (Integer), "grade" (Integer).
+     * 
+     * The references entry should be a JSONArray containing JSON objects, which in turn must contain "displayOrder" (Integer), 
+     * "questionDisplayOrder" (Integer - to match to the question). It may also have "defaultGrade" (Integer) and "randomQuestion" (Boolean)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
+
+	Date updateDate = new Date();
+
+	Assessment assessment = new Assessment();
+	assessment.setContentId(toolContentID);
+	assessment.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	assessment.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	assessment.setCreated(updateDate);
+
+	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	assessment.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
+	assessment.setAllowGradesAfterAttempt(JsonUtil.opt(toolContentJSON, "allowGradesAfterAttempt", Boolean.FALSE));
+	assessment.setAllowHistoryResponses(JsonUtil.opt(toolContentJSON, "allowHistoryResponses", Boolean.FALSE));
+	assessment.setAllowOverallFeedbackAfterQuestion(JsonUtil.opt(toolContentJSON,
+		"allowOverallFeedbackAfterQuestion", Boolean.FALSE));
+	assessment.setAllowQuestionFeedback(JsonUtil.opt(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
+	assessment.setAllowRightAnswersAfterQuestion(JsonUtil.opt(toolContentJSON, "allowRightAnswersAfterQuestion",
+		Boolean.FALSE));
+	assessment.setAllowWrongAnswersAfterQuestion(JsonUtil.opt(toolContentJSON, "allowWrongAnswersAfterQuestion",
+		Boolean.FALSE));
+	assessment.setAttemptsAllowed(JsonUtil.opt(toolContentJSON, "attemptsAllows", 1));
+	assessment.setDefineLater(false);
+	assessment.setDisplaySummary(JsonUtil.opt(toolContentJSON, "displaySummary", Boolean.FALSE));
+	assessment.setNotifyTeachersOnAttemptCompletion(JsonUtil.opt(toolContentJSON,
+		"notifyTeachersOnAttemptCompletion", Boolean.FALSE));
+	assessment.setNumbered(JsonUtil.opt(toolContentJSON, "numbered", Boolean.TRUE));
+	assessment.setPassingMark(JsonUtil.opt(toolContentJSON, "passingMark", 0));
+	assessment.setQuestionsPerPage(JsonUtil.opt(toolContentJSON, "questionsPerPage", 0));
+	assessment.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
+	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	assessment.setShuffled(JsonUtil.opt(toolContentJSON, "shuffled", Boolean.FALSE));
+	assessment.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, "submissionDeadline", (Date) null));
+	assessment.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
+	assessment
+		.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
+
+	if (toolContentJSON.has("overallFeedback")) {
+	    throw new JSONException("Assessment Tool does not support Overall Feedback for REST Authoring. "
+		    + toolContentJSON);
+	}
+
+	AssessmentUser assessmentUser = getUserByIDAndContent(userID.longValue(), toolContentID);
+	if (assessmentUser == null) {
+	    assessmentUser = new AssessmentUser();
+	    assessmentUser.setFirstName(toolContentJSON.getString("firstName"));
+	    assessmentUser.setLastName(toolContentJSON.getString("lastName"));
+	    assessmentUser.setLoginName(toolContentJSON.getString("loginName"));
+	    assessmentUser.setAssessment(assessment);
+	}
+	assessment.setCreatedBy(assessmentUser);
+
+	// **************************** Set the question bank *********************
+	JSONArray questions = toolContentJSON.getJSONArray("questions");
+	Set newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
+	for (int i = 0; i < questions.length(); i++) {
+	    JSONObject questionJSONData = (JSONObject) questions.get(i);
+	    AssessmentQuestion question = new AssessmentQuestion();
+	    short type = (short) questionJSONData.getInt("type");
+	    question.setType(type);
+	    question.setTitle(questionJSONData.getString(RestTags.QUESTION_TITLE));
+	    question.setQuestion(questionJSONData.getString(RestTags.QUESTION_TEXT));
+	    question.setCreateBy(assessmentUser);
+	    question.setCreateDate(updateDate);
+	    question.setSequenceId(questionJSONData.getInt(RestTags.DISPLAY_ORDER));
+
+	    question.setAllowRichEditor(JsonUtil.opt(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	    question.setAnswerRequired(JsonUtil.opt(questionJSONData, "answerRequired", Boolean.FALSE));
+	    question.setCaseSensitive(JsonUtil.opt(questionJSONData, "caseSensitive", Boolean.FALSE));
+	    question.setCorrectAnswer(JsonUtil.opt(questionJSONData, "correctAnswer", Boolean.FALSE));
+	    question.setDefaultGrade(JsonUtil.opt(questionJSONData, "defaultGrade", 1));
+	    question.setFeedback(JsonUtil.opt(questionJSONData, "feedback", (String) null));
+	    question.setFeedbackOnCorrect(JsonUtil.opt(questionJSONData, "feedbackOnCorrect", (String) null));
+	    question.setFeedbackOnIncorrect(JsonUtil.opt(questionJSONData, "feedbackOnIncorrect", (String) null));
+	    question.setFeedbackOnPartiallyCorrect(JsonUtil.opt(questionJSONData, "feedbackOnPartiallyCorrect",
+		    (String) null));
+	    question.setGeneralFeedback(JsonUtil.opt(questionJSONData, "generalFeedback", ""));
+	    question.setMaxWordsLimit(JsonUtil.opt(questionJSONData, "maxWordsLimit", 0));
+	    question.setMinWordsLimit(JsonUtil.opt(questionJSONData, "minWordsLimit", 0));
+	    question.setMultipleAnswersAllowed(JsonUtil.opt(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
+	    question.setPenaltyFactor(Float.parseFloat(JsonUtil.opt(questionJSONData, "penaltyFactor", "0.0")));
+	    // question.setUnits(units); Needed for numerical type question
+
+	    if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS
+		    || type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
+		    || type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+
+		if (!questionJSONData.has(RestTags.ANSWERS))
+		    throw new JSONException("REST Authoring is missing answers for a question of type " + type
+			    + ". Data:" + toolContentJSON);
+
+		Set<AssessmentQuestionOption> optionList = new LinkedHashSet<AssessmentQuestionOption>();
+		JSONArray optionsData = (JSONArray) questionJSONData.getJSONArray(RestTags.ANSWERS);
+		for (int j = 0; j < optionsData.length(); j++) {
+		    JSONObject answerData = (JSONObject) optionsData.get(j);
+		    AssessmentQuestionOption option = new AssessmentQuestionOption();
+		    option.setSequenceId(answerData.getInt(RestTags.DISPLAY_ORDER));
+		    option.setGrade(Float.parseFloat(answerData.getString("grade")));
+		    option.setAcceptedError(Float.parseFloat(JsonUtil.opt(answerData, "acceptedError", "0.0")));
+		    option.setFeedback(JsonUtil.opt(answerData, "feedback", (String) null));
+		    option.setOptionString(JsonUtil.opt(answerData, RestTags.ANSWER_TEXT, (String) null));
+		    option.setOptionFloat(Float.parseFloat(JsonUtil.opt(answerData, "answerFloat", "0.0")));
+		    // option.setQuestion(question); can't find the use for this field yet!
+		    optionList.add(option);
+		}
+		question.setOptions(optionList);
+	    }
+
+	    checkType(question.getType());
+	    newQuestionSet.add(question);
+	}
+
+	// **************************** Now set up the references to the questions in the bank *********************
+	JSONArray references = toolContentJSON.getJSONArray("references");
+	Set newReferenceSet = assessment.getQuestionReferences(); // the Assessment constructor will set up the
+								  // collection
+	for (int i = 0; i < references.length(); i++) {
+	    JSONObject referenceJSONData = (JSONObject) references.get(i);
+	    QuestionReference reference = new QuestionReference();
+	    reference.setType((short) 0);
+	    reference.setDefaultGrade(JsonUtil.opt(referenceJSONData, "defaultGrade", 1));
+	    reference.setSequenceId(referenceJSONData.getInt(RestTags.DISPLAY_ORDER));
+	    AssessmentQuestion matchingQuestion = matchQuestion(newQuestionSet,
+		    referenceJSONData.getInt("questionDisplayOrder"));
+	    if (matchingQuestion == null) {
+		throw new JSONException("Unable to find matching question for displayOrder "
+			+ referenceJSONData.get("questionDisplayOrder") + ". Data:" + toolContentJSON);
+	    }
+	    reference.setQuestion(matchingQuestion);
+	    reference.setRandomQuestion(JsonUtil.opt(referenceJSONData, "randomQuestion", Boolean.FALSE));
+	    reference.setTitle(null);
+	    newReferenceSet.add(reference);
+	}
+
+	saveOrUpdateAssessment(assessment);
+
+    }
+
+    // find the question that matches this sequence id - used by the REST calls only.
+    AssessmentQuestion matchQuestion(Set<AssessmentQuestion> newReferenceSet, Integer displayOrder) {
+	if ( displayOrder != null ) {
+	    for ( AssessmentQuestion question : newReferenceSet ) {
+		if ( displayOrder.equals(question.getSequenceId()) )
+			return question;
+	    }
+	}
+	return null;
+    }
+    // TODO Implement REST support for all types and then remove checkType method
+    void checkType(short type) throws JSONException {
+	if (type != AssessmentConstants.QUESTION_TYPE_ESSAY) {
+	    throw new JSONException(
+		    "Assessment Tool does not support REST Authoring for anything but Essay Type. Found type " + type);
+	}
+	// public static final short QUESTION_TYPE_MULTIPLE_CHOICE = 1;
+	// public static final short QUESTION_TYPE_MATCHING_PAIRS = 2;
+	// public static final short QUESTION_TYPE_SHORT_ANSWER = 3;
+	// public static final short QUESTION_TYPE_NUMERICAL = 4;
+	// public static final short QUESTION_TYPE_TRUE_FALSE = 5;
+	// public static final short QUESTION_TYPE_ORDERING = 7;
     }
 }
