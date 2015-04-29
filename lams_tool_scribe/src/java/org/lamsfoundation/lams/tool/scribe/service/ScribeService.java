@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -625,9 +626,9 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     // ****************** REST methods *************************
     
     /** Used by the Rest calls to create content. 
-     * Mandatory fields in toolContentJSON: title, instructions, topics.
-     * Topics must contain a JSONArray of JSONObject objects, which have the following mandatory fields: subject, body
-     * There should be at least one topic object in the Topics array.
+     * Mandatory fields in toolContentJSON: "title", "instructions", "questions".
+     * Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields: "displayOrder", "questionText"
+     * There should be at least one topic object in the "questions" array.
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
@@ -643,13 +644,13 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribe.setContentInUse(false);
 	scribe.setDefineLater(false);
 
-	scribe.setTitle(toolContentJSON.getString("title"));
-	scribe.setInstructions(toolContentJSON.getString("instructions"));
+	scribe.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	scribe.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 
 	scribe.setAutoSelectScribe(JsonUtil.opt(toolContentJSON, "autoSelectScribe", Boolean.FALSE));
-	scribe.setLockOnFinished(JsonUtil.opt(toolContentJSON, "lockOnFinished", Boolean.FALSE));
-	scribe.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, "reflectInstructions", null));
-	scribe.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
+	scribe.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	scribe.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	scribe.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scribe.setShowAggregatedReports(JsonUtil.opt(toolContentJSON, "showAggregatedReports", Boolean.FALSE));
 
 	Set headings = scribe.getScribeHeadings();
@@ -657,11 +658,12 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    headings = new HashSet();
 	    scribe.setScribeHeadings(headings);
 	}
-	JSONArray headingData = toolContentJSON.getJSONArray("headings");
-	for ( int i=0; i<headingData.length(); i++) {
+	JSONArray topics = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
+	for ( int i=0; i<topics.length(); i++) {
+	    JSONObject topic = topics.getJSONObject(i);
 	    ScribeHeading heading = new ScribeHeading();
-	    heading.setDisplayOrder(i);
-	    heading.setHeadingText(headingData.getString(i));
+	    heading.setDisplayOrder(topic.getInt(RestTags.DISPLAY_ORDER));
+	    heading.setHeadingText(topic.getString(RestTags.QUESTION_TEXT));
 	    heading.setScribe(scribe);
 	    headings.add(heading);
 	}

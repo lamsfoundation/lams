@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -608,21 +609,23 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     
     // ****************** REST methods *************************
 
+    /** Rest call to create a new Notebook content. Required fields in toolContentJSON: "title", "instructions".
+     */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
 	Date updateDate = new Date();
 
 	Notebook nb = new Notebook();
 	nb.setToolContentId(toolContentID);
-	nb.setTitle(toolContentJSON.getString("title"));
-	nb.setInstructions(toolContentJSON.getString("instructions"));
+	nb.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	nb.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	nb.setCreateBy(userID.longValue());
 	nb.setCreateDate(updateDate);
 	nb.setUpdateDate(updateDate);
 
-	nb.setLockOnFinished(JsonUtil.opt(toolContentJSON, "lockOnFinished", Boolean.FALSE));
-	nb.setAllowRichEditor(JsonUtil.opt(toolContentJSON, "allowRichTextEditor", Boolean.FALSE));
-	nb.setSubmissionDeadline((Date)JsonUtil.opt(toolContentJSON, "submissionDeadline", null));
+	nb.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	nb.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	nb.setSubmissionDeadline((Date)JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
 
 	nb.setContentInUse(false);
 	nb.setDefineLater(false);

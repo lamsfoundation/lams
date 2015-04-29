@@ -40,7 +40,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
@@ -52,8 +51,9 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -63,6 +63,8 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -75,8 +77,8 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McStringComparator;
@@ -99,6 +101,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -115,7 +118,7 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class McServicePOJO implements IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
+public class McServicePOJO implements IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager,
 	McAppConstants {
     private static Logger logger = Logger.getLogger(McServicePOJO.class.getName());
 
@@ -2000,4 +2003,66 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	return getMcOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
+    // ****************** REST methods *************************
+
+    /** Rest call to create a new Multiple Choice content. Required fields in toolContentJSON: "title", "instructions", "questions".
+     * The questions entry should be JSONArray containing JSON objects, which in turn must contain "questionText", "displayOrder" (Integer) and a JSONArray "answers".
+     * The answers entry should be JSONArray containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
+     * 
+     * Retries are controlled by lockWhenFinished, which defaults to true (no retries).
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+
+	McContent mcq = new McContent();
+	Date updateDate = new Date();
+
+	mcq.setCreationDate(updateDate);
+	mcq.setUpdateDate(updateDate);
+	mcq.setCreatedBy(userID.longValue());
+	mcq.setDefineLater(false);
+
+	mcq.setMcContentId(toolContentID);
+	mcq.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	mcq.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	
+	mcq.setRetries(JsonUtil.opt(toolContentJSON, "allowRetries", Boolean.FALSE));
+	mcq.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	mcq.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	mcq.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS,""));
+	mcq.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
+	mcq.setRandomize(JsonUtil.opt(toolContentJSON, "randomize", Boolean.FALSE));
+	mcq.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, (Date)null));
+	mcq.setShowReport(JsonUtil.opt(toolContentJSON, "showReport", Boolean.FALSE));
+	mcq.setDisplayAnswers(JsonUtil.opt(toolContentJSON, "displayAnswers", Boolean.FALSE));
+	mcq.setShowMarks(JsonUtil.opt(toolContentJSON, "showMarks", Boolean.FALSE));
+	mcq.setPrefixAnswersWithLetters(JsonUtil.opt(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
+	mcq.setPassMark(JsonUtil.opt(toolContentJSON, "passMark", 0));
+	
+	createMc(mcq);
+	
+	// Questions
+	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
+	for (int i=0; i<questions.length(); i++) {
+	    JSONObject questionData = (JSONObject) questions.get(i);
+	    McQueContent question = new McQueContent(questionData.getString(RestTags.QUESTION_TEXT), questionData.getInt(RestTags.DISPLAY_ORDER), 1, "", 
+		    mcq, null, new HashSet<McOptsContent>());
+
+	    JSONArray optionsData = (JSONArray) questionData.getJSONArray(RestTags.ANSWERS);
+	    for (int j=0; j<optionsData.length(); j++) {
+		JSONObject optionData = (JSONObject) optionsData.get(j);
+		question.getMcOptionsContents().add(new McOptsContent(optionData.getInt(RestTags.DISPLAY_ORDER), 
+			optionData.getBoolean(RestTags.CORRECT), 
+			optionData.getString(RestTags.ANSWER_TEXT), 
+			question));
+	    }
+	    saveOrUpdateMcQueContent(question);
+	}
+
+	// TODO    
+	// mcq.setContent(content) - can't find in database
+	// mcq.setConditions(conditions);
+
+    }
 }
