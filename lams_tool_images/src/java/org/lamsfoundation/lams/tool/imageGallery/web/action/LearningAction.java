@@ -223,7 +223,7 @@ public class LearningAction extends Action {
 
 	// store how many items are rated
 	if (imageGallery.isAllowRank()) {
-	    int countRatedImages = service.getCountImagesRatedByActivityAndUser(imageGallery.getContentId(), userId);
+	    int countRatedImages = service.getCountImagesRatedByUser(imageGallery.getContentId(), userId.intValue());
 	    sessionMap.put(ImageGalleryConstants.ATTR_COUNT_RATED_IMAGES, countRatedImages);
 	}
 
@@ -503,13 +503,13 @@ public class LearningAction extends Action {
 	    sessionMap.put(ImageGalleryConstants.ATTR_RATING_DTOS, ratingDtos);
 	    
 	    // store how many items are rated
-	    int countRatedImages = service.getCountImagesRatedByActivityAndUser(imageGallery.getContentId(), userId.intValue());
+	    int countRatedImages = service.getCountImagesRatedByUser(imageGallery.getContentId(), userId.intValue());
 	    sessionMap.put(ImageGalleryConstants.ATTR_COUNT_RATED_IMAGES, countRatedImages);
 	}
 
 	if (!isTeacher && imageGallery.isAllowVote()) {
 	    boolean isVotedForThisImage = false;
-	    ImageVote imageVote = service.getImageVoteByImageAndUser(image.getUid(), userId);
+	    ImageVote imageVote = service.getImageVoteByImageAndUser(imageUid, userId);
 	    if (imageVote != null && imageVote.isVoted()) {
 		isVotedForThisImage = true;
 	    }

@@ -26,14 +26,21 @@
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
 import java.text.NumberFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
 import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
+import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class RatingDAO extends BaseDAO implements IRatingDAO {
 
@@ -49,12 +56,13 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
     private static final String FIND_RATING_AVERAGE_BY_ITEM = "SELECT AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
 
-    private static final String COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER = "SELECT COUNT(DISTINCT r.itemId) FROM  "
-	    + Rating.class.getName()
-	    + " AS r, "
-	    + ToolActivityRatingCriteria.class.getName()
-	    + " AS cr "
-	    + " WHERE r.ratingCriteria.ratingCriteriaId = cr.ratingCriteriaId AND cr.toolContentId = ? AND r.learner.userId =?";
+    private static final String COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER = "SELECT COUNT(DISTINCT r.itemId)+(SELECT COUNT(comment) FROM "
+	    + RatingComment.class.getName()
+	    + " AS comment "
+	    + " WHERE comment.ratingCriteria.toolContentId = :toolContentId AND comment.learner.userId =:userId AND comment.itemId =:itemId AND cr.commentsEnabled IS TRUE ) FROM  "
+	    + Rating.class.getName() 
+	    + " AS r " 
+	    + " WHERE r.ratingCriteria.toolContentId = :toolContentId AND r.learner.userId =:userId";
 
     @Override
     public void saveOrUpdate(Object object) {
@@ -131,14 +139,26 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
     }
 
     @Override
-    public int getCountItemsRatedByActivityAndUser(Long toolContentId, Integer userId) {
+    public int getCountItemsRatedByUser(final Long toolContentId, final Integer userId) {
+	
+	//unions don't work in HQL so doing 2 separate DB queries (http://stackoverflow.com/a/3940445)
+	String FIND_ITEM_IDS_RATED_BY_USER = "SELECT DISTINCT r.itemId FROM  " + Rating.class.getName() + " AS r "
+		+ " WHERE r.ratingCriteria.toolContentId = :toolContentId AND r.learner.userId =:userId";
 
-	List list = getHibernateTemplate().find(COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER,
-		new Object[] { toolContentId, userId });
-	if (list == null || list.size() == 0) {
-	    return 0;
-	} else {
-	    return ((Number) list.get(0)).intValue();
-	}
+	String FIND_ITEM_IDS_COMMENTED_BY_USER = "SELECT DISTINCT comment.itemId FROM "
+		+ RatingComment.class.getName()
+		+ " AS comment "
+		+ " WHERE comment.ratingCriteria.toolContentId = :toolContentId AND comment.learner.userId =:userId AND comment.ratingCriteria.commentsEnabled IS TRUE";
+
+	List<Long> ratedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_RATED_BY_USER)
+		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
+	
+	List<Long> commentedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_COMMENTED_BY_USER)
+		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
+	
+	Set<Long> unionItemIds = new HashSet<Long>(ratedItemIds);
+	unionItemIds.addAll(commentedItemIds);
+	
+	return unionItemIds.size();
     }
 }

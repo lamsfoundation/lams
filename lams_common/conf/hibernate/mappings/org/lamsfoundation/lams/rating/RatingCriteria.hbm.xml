@@ -42,6 +42,14 @@
 		column="comments_enabled"
     />
     
+	<property
+		name="commentsMinWordsLimit"
+		type="int"
+		update="true"
+		insert="true"
+		column="comments_min_words_limit"
+	/>    
+    
     <!-- Subclass definations for polymorphic persistence -->
 	<subclass name="org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria" discriminator-value="1">
 		<meta attribute="class-description" inherit="false">@hibernate.class </meta>

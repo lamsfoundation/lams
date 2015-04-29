@@ -83,7 +83,6 @@ public class RatingServlet extends HttpServlet {
 	    } else {
 		float rating = Float.parseFloat((String) request.getParameter("rate"));
 
-		boolean hasRatingLimists = WebUtil.readBooleanParam(request, "hasRatingLimists", false);
 
 		RatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
 
@@ -92,18 +91,21 @@ public class RatingServlet extends HttpServlet {
 		JSONObject.put("userRating", numberFormat.format(rating));
 		JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
 		JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
-
-		// refresh countRatedItems in case there is rating limit set
-		if (hasRatingLimists) {
-		    // as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
-		    LearnerItemRatingCriteria learnerItemRatingCriteria = (LearnerItemRatingCriteria) criteria;
-		    Long toolContentId = learnerItemRatingCriteria.getToolContentId();
-
-		    int countRatedItems = ratingService.getCountItemsRatedByActivityAndUser(toolContentId, userId);
-		    JSONObject.put("countRatedItems", countRatedItems);
-		}
-
 	    }
+	    
+
+	    boolean hasRatingLimits = WebUtil.readBooleanParam(request, "hasRatingLimits", false);
+
+	    // refresh countRatedItems in case there is rating limit set
+	    if (hasRatingLimits) {
+		// as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
+		LearnerItemRatingCriteria learnerItemRatingCriteria = (LearnerItemRatingCriteria) criteria;
+		Long toolContentId = learnerItemRatingCriteria.getToolContentId();
+
+		int countRatedItems = ratingService.getCountItemsRatedByUser(toolContentId, userId);
+		JSONObject.put("countRatedItems", countRatedItems);
+	    }
+	    
 	} catch (JSONException e) {
 	    throw new ServletException(e);
 	}

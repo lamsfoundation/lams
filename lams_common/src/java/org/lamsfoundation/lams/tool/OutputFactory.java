@@ -201,7 +201,7 @@ public abstract class OutputFactory {
 	    Object endValue, Object complexValue, Boolean showConditionNameOnly, Class valueClass) {
 	ToolOutputDefinition definition = new ToolOutputDefinition();
 	definition.setName(definitionName);
-	definition.setDescription(getI18NText(definitionName, true));
+	definition.setDescription(definitionName);
 	definition.setType(type);
 	definition.setStartValue(startValue);
 	definition.setEndValue(endValue);

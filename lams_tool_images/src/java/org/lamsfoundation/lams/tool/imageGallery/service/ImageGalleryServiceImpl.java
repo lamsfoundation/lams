@@ -1184,8 +1184,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
     
     @Override
-    public int getCountImagesRatedByActivityAndUser(Long toolContentId, Integer userId) {
-	return ratingService.getCountItemsRatedByActivityAndUser(toolContentId, userId);
+    public int getCountImagesRatedByUser(Long toolContentId, Integer userId) {
+	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
     }
 
     // *****************************************************************************

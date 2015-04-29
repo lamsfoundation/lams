@@ -64,8 +64,8 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public int getCountItemsRatedByActivityAndUser(Long toolContentId, Integer userId) {
-	return ratingDAO.getCountItemsRatedByActivityAndUser(toolContentId, userId);
+    public int getCountItemsRatedByUser(final Long toolContentId, final Integer userId) {
+	return ratingDAO.getCountItemsRatedByUser(toolContentId, userId);
     }
 
     @Override
@@ -123,6 +123,7 @@ public class RatingService implements IRatingService {
 	RatingCriteriaDTO criteriaDto;
 	if (criteria.isCommentsEnabled()) {
 	    criteriaDto = ratingCommentDAO.getCommentsRatingDTO(criteriaId, itemId, userId);
+	    criteriaDto.setCommentsMinWordsLimit(criteria.getCommentsMinWordsLimit());
 
 	} else {
 	    criteriaDto = ratingDAO.getRatingAverageDTOByUser(criteriaId, itemId, userId);

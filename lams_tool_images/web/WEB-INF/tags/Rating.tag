@@ -20,9 +20,12 @@
 <%@ attribute name="isItemAuthoredByUser" required="false" rtexprvalue="true" %>
 <%@ attribute name="maxRates" required="false" rtexprvalue="true" %>
 <%@ attribute name="minRates" required="false" rtexprvalue="true" %>
-<%@ attribute name="countRatedImages" required="false" rtexprvalue="true" %>
+<%@ attribute name="countRatedItems" required="false" rtexprvalue="true" %>
 <%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="warnCommentIsBlankLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="warnMinNumberWordsLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
@@ -37,14 +40,23 @@
 <c:if test="${empty minRates}">
 	<c:set var="minRates" value="0" scope="request"/>
 </c:if>
-<c:if test="${empty countRatedImages}">
-	<c:set var="countRatedImages" value="0" scope="request"/>
+<c:if test="${empty countRatedItems}">
+	<c:set var="countRatedItems" value="0" scope="request"/>
 </c:if>
 <c:if test="${empty yourRatingLabel}">
 	<c:set var="yourRatingLabel" value="label.your.rating" scope="request"/>
 </c:if>
 <c:if test="${empty averageRatingLabel}">
 	<c:set var="averageRatingLabel" value="label.average.rating" scope="request"/>
+</c:if>
+<c:if test="${empty warnCommentIsBlankLabel}">
+	<c:set var="warnCommentIsBlankLabel" value="warn.comment.blank" scope="request"/>
+</c:if>
+<c:if test="${empty minNumberWordsLabel}">
+	<c:set var="minNumberWordsLabel" value="label.minimum.number.words" scope="request"/>
+</c:if>
+<c:if test="${empty warnMinNumberWordsLabel}">
+	<c:set var="warnMinNumberWordsLabel" value="warning.minimum.number.words" scope="request"/>
 </c:if>
 
 <%--Find commentsRatingDto--%>
@@ -65,11 +77,15 @@
 
 <!-- begin tab content -->
 <script type="text/javascript">
+
+	//constant indicating there is rting limits set up
+	var hasRatingLimits = ${maxRates!=0 || minRates!=0};
+
 	$(document).ready(function(){
 		setupJRating();
 		
 		if (${minRates} != 0) {
-			checkMinimumRatesLimit(${countRatedImages});
+			checkMinimumRatesLimit(${countRatedItems});
 		}
 
     	//addNewComment button handler
@@ -79,6 +95,25 @@
 	    	var tempTextarea = jQuery('<textarea/>');
 	    	filterData(document.getElementById('comment-textarea'), tempTextarea);
 			var comment = tempTextarea.value;
+			
+			//comment can't be blank
+			if (comment == "") {
+				alert("${warnCommentIsBlankLabel}");
+				return false;
+			}
+	    	
+			//word count limit
+			if (${isCommentsEnabled && commentsRatingDto.commentsMinWordsLimit ne 0}) {
+				var value =  $("#comment-textarea").val();
+				value = value.trim();
+				
+			    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
+			    
+			    if(wordCount < ${commentsRatingDto.commentsMinWordsLimit}){
+					alert('<fmt:message key="${warnMinNumberWordsLabel}"><fmt:param value="${commentsRatingDto.commentsMinWordsLimit}"/><fmt:param value="' + wordCount + '"/></fmt:message>');
+					return false;
+				}
+			}
 	    	
 	    	//add new comment
 	    	$.ajax({
@@ -86,7 +121,8 @@
 	    		url: '${lams}servlet/rateItem',
 	    		data: {
 	    			idBox: '${commentsRatingDto.ratingCriteria.ratingCriteriaId}-${commentsRatingDto.itemId}', 
-	    			comment: comment
+	    			comment: comment,
+	    			hasRatingLimits: hasRatingLimits
 	    		},
 	    		success: function(data, itemId) {
 	    				
@@ -98,6 +134,11 @@
 	    				
 	    			//hide comments textarea and button
 	    			$("#add-comment-area").hide();
+	    			
+	    			//handle rating limits if available
+	    			if (hasRatingLimits) {
+	    				handleRatingLimits(data.countRatedItems);
+	    			}
 	    				
 	    		}
 	    	});
@@ -105,11 +146,11 @@
 		
 	});
 	
+	//initialize jRating
 	function setupJRating() {
-		var hasRatingLimists = ${maxRates!=0 || minRates!=0};
 		
 		$(".rating-stars-new").filter($(".rating-stars")).jRating({
-		    phpPath : "${lams}servlet/rateItem?hasRatingLimists=" + hasRatingLimists,
+		    phpPath : "${lams}servlet/rateItem?hasRatingLimits=" + hasRatingLimits,
 		    rateMax : 5,
 		    decimalLength : 1,
 			onSuccess : function(data, itemId){
@@ -119,33 +160,8 @@
 			    $("#number-of-votes-" + itemId).html(data.numberOfVotes);
 			    $("#rating-stars-caption-" + itemId).css("visibility", "visible");
 			    
-			    if (hasRatingLimists) {
-
-			    	//update info box
-			    	$("#count-rated-items").html(data.countRatedItems);
-			    	
-				    //callback function
-				    if (typeof onRatingSuccessCallback === "function") { 
-				        // safe to use the function
-				    	onRatingSuccessCallback(data.countRatedItems);
-				    }
-				    
-				    //handle max rates limit
-				    if (${maxRates} != 0) {
-				    	
-				    	//disable rating feature in case maxRates limit reached
-				    	if (data.countRatedItems >= ${maxRates}) {
-					    	$(".rating-stars").each(function() {
-					    		$(this).unbind().css('cursor','default').addClass('jDisabled');
-					    	});			    		
-				    	}
-				    }
-				    
-				    //handle min rates limit
-				    if (${minRates} != 0) {
-				    	checkMinimumRatesLimit(data.countRatedItems)
-				    }
-			    }
+			    //handle rating limits if available
+			    handleRatingLimits(data.countRatedItems);
 
 			},
 			onError : function(){
@@ -159,6 +175,37 @@
 		});
 		
 		$(".rating-stars-new").removeClass("rating-stars-new");
+	}
+	
+	function handleRatingLimits(countRatedItems) {
+		
+	    if (hasRatingLimits) {
+
+	    	//update info box
+	    	$("#count-rated-items").html(countRatedItems);
+	    	
+		    //callback function
+		    if (typeof onRatingSuccessCallback === "function") { 
+		        // safe to use the function
+		    	onRatingSuccessCallback(countRatedItems);
+		    }
+		    
+		    //handle max rates limit
+		    if (${maxRates} != 0) {
+		    	
+		    	//disable rating feature in case maxRates limit reached
+		    	if (countRatedItems >= ${maxRates}) {
+			    	$(".rating-stars").each(function() {
+			    		$(this).unbind().css('cursor','default').addClass('jDisabled');
+			    	});			    		
+		    	}
+		    }
+		    
+		    //handle min rates limit
+		    if (${minRates} != 0) {
+		    	checkMinimumRatesLimit(countRatedItems)
+		    }
+	    }
 	}
 	
 	function checkMinimumRatesLimit(countRatedItems) {
@@ -178,7 +225,7 @@
 			<c:set var="isCriteriaNotRatedByUser" value='${ratingDto.userRating == ""}'/>
 	
 			<c:choose>
-				<c:when test='${disabled || isItemAuthoredByUser || (maxRates > 0) && (countRatedImages >= maxRates) || !isCriteriaNotRatedByUser}'>
+				<c:when test='${disabled || isItemAuthoredByUser || (maxRates > 0) && (countRatedItems >= maxRates) || !isCriteriaNotRatedByUser}'>
 					<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
 				</c:when>
 				<c:otherwise>
@@ -201,39 +248,44 @@
 		
 			<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}">
 			</div>
-				
-			<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
-				<c:if test="${isCriteriaNotRatedByUser}">style="visibility: hidden;"</c:if>
-			>
-				<fmt:message key="${yourRatingLabel}" >
-					<fmt:param>
-						<span id="user-rating-${objectId}">
-							<fmt:formatNumber value="${ratingDto.userRating}" type="number" maxFractionDigits="1" />
-						</span>
-					</fmt:param>			
-					<fmt:param>
-						<span id="average-rating-${objectId}">
-							<fmt:formatNumber value="${ratingDto.averageRating}" type="number" maxFractionDigits="1" />
-						</span>
-					</fmt:param>
-					<fmt:param>
-						<span id="number-of-votes-${objectId}">${ratingDto.numberOfVotes}</span>
-					</fmt:param>
-				</fmt:message>
-			</div>
 			
-			<c:if test="${isItemAuthoredByUser}">
-				<div class="rating-stars-caption">
-					<fmt:message key="${averageRatingLabel}" >
-						<fmt:param>
-							<fmt:formatNumber value="${ratingDto.averageRating}" type="number" maxFractionDigits="1" />
-						</fmt:param>
-						<fmt:param>
-							${ratingDto.numberOfVotes}
-						</fmt:param>
-					</fmt:message>
-				</div>
-			</c:if>
+			<c:choose>
+				<c:when test="${isItemAuthoredByUser}">
+					<div class="rating-stars-caption">
+						<fmt:message key="${averageRatingLabel}" >
+							<fmt:param>
+								<fmt:formatNumber value="${ratingDto.averageRating}" type="number" maxFractionDigits="1" />
+							</fmt:param>
+							<fmt:param>
+								${ratingDto.numberOfVotes}
+							</fmt:param>
+						</fmt:message>
+					</div>
+				</c:when>
+				
+				<c:otherwise>
+					<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
+						<c:if test="${isItemAuthoredByUser || isCriteriaNotRatedByUser}">style="visibility: hidden;"</c:if>
+					>
+						<fmt:message key="${yourRatingLabel}" >
+							<fmt:param>
+								<span id="user-rating-${objectId}">
+									<fmt:formatNumber value="${ratingDto.userRating}" type="number" maxFractionDigits="1" />
+								</span>
+							</fmt:param>			
+							<fmt:param>
+								<span id="average-rating-${objectId}">
+									<fmt:formatNumber value="${ratingDto.averageRating}" type="number" maxFractionDigits="1" />
+								</span>
+							</fmt:param>
+							<fmt:param>
+								<span id="number-of-votes-${objectId}">${ratingDto.numberOfVotes}</span>
+							</fmt:param>
+						</fmt:message>
+					</div>
+				
+				</c:otherwise>
+			</c:choose>
 			
 		</c:if>
 	</c:forEach>
@@ -269,8 +321,20 @@
 			</c:when>
 		</c:choose>
 
-		<c:if test="${not disabled && empty commentLeftByUser && not isItemAuthoredByUser}">
+		<c:if test="${not disabled && empty commentLeftByUser && not isItemAuthoredByUser}">	
+		
 			<div id="add-comment-area">
+		
+				<!-- Rating limits info -->
+				<c:if test="${commentsRatingDto.commentsMinWordsLimit ne 0}">
+				
+					<div class="info rating-info">
+						<fmt:message key="${minNumberWordsLabel}">
+							<fmt:param value="${commentsRatingDto.commentsMinWordsLimit}"/>
+						</fmt:message>
+					</div>
+				</c:if>		
+			
 				<textarea name="comment" rows="2" id="comment-textarea" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;">Please, provide some comment here...</textarea>
 			
 				<div class="button add-comment" id="add-comment-button">

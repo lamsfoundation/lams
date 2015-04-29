@@ -50,6 +50,7 @@
 			text-align: center;
 			float: right;
 			clear: both;
+			padding-top: 20px;
 		}
 		#comments-area {
 			width: 400px;
@@ -238,7 +239,7 @@
 				</fmt:message>
 			</div>
 			
-		</c:if>	
+		</c:if>
 		
 		<%@ include file="/common/messages.jsp"%>
 		
@@ -289,7 +290,9 @@
 		<%--Bottom buttons-------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right" id="learner-submit">
+			<div class="space-bottom-top align-right" id="learner-submit"
+				<c:if test="${imageGallery.minimumRates ne 0 && empty sessionMap.currentImage}">style="display:none;"</c:if>
+			>
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button" >

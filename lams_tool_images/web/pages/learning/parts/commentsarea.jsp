@@ -40,7 +40,8 @@
 		
 			<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
 					maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
-					countRatedImages="${sessionMap.countRatedImages}" />
+					countRatedItems="${sessionMap.countRatedImages}" 
+					warnCommentIsBlankLabel="error.resource.image.comment.blank"/>
 			<br><br>
 		</c:if>
 

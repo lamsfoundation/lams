@@ -31,27 +31,29 @@ import org.lamsfoundation.lams.rating.model.Rating;
 public interface IRatingDAO {
 
     void saveOrUpdate(Object object);
-    
+
     Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId);
-    
+
     /**
      * Returns rating statistics by particular item
+     * 
      * @param itemId
      * @return
      */
     RatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
-    
+
     RatingCriteriaDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
-    
+
     Rating get(Long uid);
-    
+
     /**
-     * Returns number of images rated by specified user in a current activity. Applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
+     * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This method
+     * is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
      * 
      * @param toolContentId
      * @param userId
      * @return
      */
-    int getCountItemsRatedByActivityAndUser(Long toolContentId, Integer userId);
+    int getCountItemsRatedByUser(final Long toolContentId, final Integer userId);
 
 }

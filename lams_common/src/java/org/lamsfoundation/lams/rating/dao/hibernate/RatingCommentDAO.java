@@ -28,7 +28,9 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingCommentDAO;
 import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 
 public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
     private static final String FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM = "FROM " + RatingComment.class.getName()
@@ -36,6 +38,11 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
 
     private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEM = "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
+
+//    private static final String COUNT_COMMENTS_BY_ITEM_AND_USER = "SELECT COUNT(r) FROM  "
+//	    + RatingComment.class.getName()
+//	    + " AS r "
+//	    + " WHERE r.ratingCriteria.toolContentId = ? AND r.ratingCriteria.commentsEnabled IS TRUE AND r.itemId =? AND r.learner.userId =?";
 
     private List<RatingComment> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long itemId) {
 	return (List<RatingComment>) (getHibernateTemplate().find(FIND_COMMENTS_BY_CRITERIA_AND_ITEM, new Object[] {
@@ -63,4 +70,15 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
 	criteriaDto.setRatingComments(ratingComments);
 	return criteriaDto;
     }
+
+//    @Override
+//    public boolean isUserCommentedItem(Long toolContentId, Long itemId, Integer userId) {
+//	List list = getHibernateTemplate().find(COUNT_COMMENTS_BY_ITEM_AND_USER,
+//		new Object[] { toolContentId, itemId, userId });
+//	if (list == null || list.size() == 0) {
+//	    return false;
+//	} else {
+//	    return ((Number) list.get(0)).intValue() > 0;
+//	}
+//    }
 }
