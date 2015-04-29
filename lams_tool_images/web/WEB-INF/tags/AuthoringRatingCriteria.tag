@@ -28,6 +28,7 @@
 <%@ attribute name="noMaximumLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="jsWarningLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="allowCommentsLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty hasRatingLimits}">
@@ -66,6 +67,19 @@
 <c:if test="${empty allowCommentsLabel}">
 	<c:set var="noMaximumLabel" value="label.allow.comments" scope="request"/>
 </c:if>
+<c:if test="${empty minNumberWordsLabel}">
+	<c:set var="minNumberWordsLabel" value="label.minimum.number.words" scope="request"/>
+</c:if>
+
+<!-- calculate whether isCommentsAllowed is true -->
+<c:set var="isCommentsEnabled" value="false"/>
+<c:set var="commentsMinWordsLimit" value="0"/>
+<c:forEach var="criteria" items="${criterias}" varStatus="status">
+	<c:if test="${criteria.commentsEnabled}">
+		<c:set var="isCommentsEnabled" value="true"/>
+		<c:set var="commentsMinWordsLimit" value="${criteria.commentsMinWordsLimit}"/>
+	</c:if>
+</c:forEach>
 
 <!-- begin tab content -->
 <script type="text/javascript">
@@ -185,7 +199,22 @@ $(document).ready(function() {
 	 //addCriteria
 	 $( "body" ).on( "click", "#add-criteria", function() {
 		 addCriteria();
-	});	 
+	});
+	 
+ 	//spinner
+ 	var minimumWordsSpinner = $("#comments-min-words-limit").spinner({ 
+ 		min: 0,
+ 		disabled: ${!isCommentsEnabled}
+ 	});
+ 	$("#enable-comments").click(function() {
+ 		if ( minimumWordsSpinner.spinner( "option", "disabled" ) ) {
+ 			minimumWordsSpinner.spinner( "enable" );
+ 			$("#comments-min-words-limit-label").removeClass("gray-color");
+ 		} else {
+ 			minimumWordsSpinner.spinner( "disable" );
+ 			$("#comments-min-words-limit-label").addClass("gray-color");
+ 		}
+     });
 	 
 })
 
@@ -293,14 +322,6 @@ $(document).ready(function() {
 			</html:select>
 		</div>
 	</c:if>
-
-	<!-- calculate whether isCommentsAllowed is true -->
-	<c:set var="isCommentsEnabled" value="false"/>
-	<c:forEach var="criteria" items="${criterias}" varStatus="status">
-		<c:if test="${criteria.commentsEnabled}">
-			<c:set var="isCommentsEnabled" value="true"/>
-		</c:if>
-	</c:forEach>
 	
 	<div class="space-top">
 		<input type="checkbox" name="isCommentsEnabled" value="true" class="noBorder" id="enable-comments"
@@ -309,6 +330,18 @@ $(document).ready(function() {
 		<label for="enable-comments">
 			<fmt:message key="${allowCommentsLabel}" />
 		</label>
+		
+		<div class="small-space-top" >
+			<label for="comments-min-words-limit" id="comments-min-words-limit-label"
+				<c:if test="${!isCommentsEnabled}">class="gray-color"</c:if>
+			>
+				<fmt:message key="${minNumberWordsLabel}" >
+					<fmt:param> </fmt:param>
+				</fmt:message>
+			</label>
+			<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
+		</div>
+		
 	</div>
 	
 </div>

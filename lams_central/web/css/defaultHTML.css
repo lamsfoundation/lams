@@ -1723,3 +1723,6 @@ div.down-arrow-disabled {
 div.delete-arrow {
 	background-image: url('../images/disposal.gif');
 }
+.gray-color{
+	color: gray;
+}

@@ -435,6 +435,10 @@ public class AuthoringAction extends Action {
 		commentsResponsibleCriteria.setOrderId(0);
 		commentsResponsibleCriteria.setCommentsEnabled(true);
 	    }
+	    
+	    int commentsMinWordsLimit = WebUtil.readIntParam(request, "commentsMinWordsLimit");
+	    commentsResponsibleCriteria.setCommentsMinWordsLimit(commentsMinWordsLimit);
+	    
 	    service.saveOrUpdateRatingCriteria(commentsResponsibleCriteria);
 
 	    // delete commentsRatingCriteria if it's not required

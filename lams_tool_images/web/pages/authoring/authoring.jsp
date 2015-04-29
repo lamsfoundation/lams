@@ -9,7 +9,10 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	
+	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
         function init(){
             var tag = document.getElementById("currentTab");

@@ -41,6 +41,7 @@ public class RatingCriteriaDTO {
     
     //comments rating properties
     private List<RatingComment> ratingComments;
+    private int commentsMinWordsLimit;
 
     public RatingCriteriaDTO() {
     }
@@ -96,6 +97,14 @@ public class RatingCriteriaDTO {
 
     public void setRatingComments(List<RatingComment> ratingComments) {
 	this.ratingComments = ratingComments;
+    }
+    
+    public int getCommentsMinWordsLimit() {
+	return commentsMinWordsLimit;
+    }
+
+    public void setCommentsMinWordsLimit(int commentsMinWordsLimit) {
+	this.commentsMinWordsLimit = commentsMinWordsLimit;
     }
   
 }

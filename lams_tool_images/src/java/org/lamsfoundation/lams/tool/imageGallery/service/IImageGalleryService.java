@@ -45,7 +45,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 /**
  * @author Dapeng.Ni
  * 
- * Interface that defines the contract that all ShareImageGallery service provider must follow.
+ *         Interface that defines the contract that all ShareImageGallery service provider must follow.
  */
 public interface IImageGalleryService {
 
@@ -122,7 +122,7 @@ public interface IImageGalleryService {
      * @return
      */
     Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId);
-    
+
     /**
      * Calculates average rating and number of rating for the current group.
      * 
@@ -140,7 +140,7 @@ public interface IImageGalleryService {
      * @return
      */
     void saveOrUpdateImageGalleryItem(ImageGalleryItem item);
-    
+
     /**
      * Delete image with the given uid from imageGallery.
      * 
@@ -148,23 +148,23 @@ public interface IImageGalleryService {
      * @param imageUid
      */
     void deleteImage(Long toolSessionId, Long imageUid);
-    
+
     List<RatingCriteria> getRatingCriterias(Long toolContentId);
-    
+
     void saveOrUpdateRatingCriteria(RatingCriteria criteria);
-    
+
     void deleteRatingCriteria(Long ratingCriteriaId);
-    
+
     List<RatingCriteriaDTO> getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
-    
+
     /**
-     * Returns number of images rated by specified user in a current activity.
+     * Returns number of images rated by specified user in a current activity. It counts comments as ratings.
      * 
      * @param toolContentId
      * @param userId
      * @return
      */
-    int getCountImagesRatedByActivityAndUser(Long toolContentId, Integer userId);
+    int getCountImagesRatedByUser(Long toolContentId, Integer userId);
 
     /**
      * Save/update ImageVote.
@@ -182,7 +182,7 @@ public interface IImageGalleryService {
      * @return
      */
     ImageGallery getImageGalleryBySessionId(Long sessionId);
-    
+
     /**
      * Get imageComment by the given uid.
      * 
@@ -190,14 +190,14 @@ public interface IImageGalleryService {
      * @return
      */
     ImageComment getImageCommentByUid(Long commentUid);
-    
+
     /**
      * Updates imageComment by the given uid.
      * 
      * @param comment
      */
     void saveImageComment(ImageComment comment);
-    
+
     /**
      * Delete imageComment by the given uid.
      * 
@@ -212,7 +212,7 @@ public interface IImageGalleryService {
      * @return
      */
     ImageGallerySession getImageGallerySessionBySessionId(Long sessionId);
-    
+
     /**
      * Get <code>ImageGallery</code> by toolContentID.
      * 
@@ -220,7 +220,7 @@ public interface IImageGalleryService {
      * @return
      */
     ImageGallery getImageGalleryByContentId(Long contentId);
-    
+
     /**
      * Returns imageVote by the given imageUid and userId
      * 
@@ -229,7 +229,7 @@ public interface IImageGalleryService {
      * @return
      */
     ImageVote getImageVoteByImageAndUser(Long imageUid, Long userId);
-    
+
     /**
      * Return number of imageVotes made by user.
      * 
@@ -282,7 +282,7 @@ public interface IImageGalleryService {
      * 
      * @param itemUid
      * @param visible
-     *                true, item is visible. False, item is invisible.
+     *            true, item is visible. False, item is invisible.
      */
     void setItemVisible(Long itemUid, boolean visible);
 
@@ -291,8 +291,8 @@ public interface IImageGalleryService {
      * 
      * @param sessionId
      * @param skipHide
-     *                true, don't get imageGallery item if its <code>isHide</code> flag is true. Otherwise, get all
-     *                imageGallery item
+     *            true, don't get imageGallery item if its <code>isHide</code> flag is true. Otherwise, get all
+     *            imageGallery item
      * @return
      */
     List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user, boolean skipHide);
@@ -347,9 +347,9 @@ public interface IImageGalleryService {
      * Gets a message from imageGallery bundle. Same as <code><fmt:message></code> in JSP pages.
      * 
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
@@ -368,9 +368,9 @@ public interface IImageGalleryService {
      * @param item
      */
     void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);
-    
+
     void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
      * 
