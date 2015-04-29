@@ -39,5 +39,5 @@
 					<html:option value="-0.8">-80 %</html:option>
 					<html:option value="-0.83333">-83.333 %</html:option>
 					<html:option value="-0.9">-90 %</html:option>
-					<html:option value="-1">-100 %</html:option>
+					<html:option value="-1.0">-100 %</html:option>
 				</html:select>
