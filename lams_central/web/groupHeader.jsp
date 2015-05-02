@@ -14,14 +14,12 @@
 		</div>
 		<ul>
 			<c:forEach var="link" items="${org.moreLinks}">
-				<li>
-					<a class="${link.style}" href="${link.url}"
-						<c:if test="${not empty link.tooltip}">
-                			title="<fmt:message key='${link.tooltip}'/>"
-                		</c:if>
-                	>
-						<fmt:message key="${link.name}" />
-					</a>
+				<li class="${link.style}" onClick="${link.url}"
+					<c:if test="${not empty link.tooltip}">
+               			title="<fmt:message key='${link.tooltip}'/>"
+               		</c:if>
+                >
+					<fmt:message key="${link.name}" />
 				</li>
 			</c:forEach>
 		</ul>
@@ -45,10 +43,8 @@
 				<ul>
 					<span><fmt:message key="index.single.activity.lesson.desc" /></span>
 					<c:forEach var="tool" items="${tools}">
-						<li>
-							<a href="#" onClick="javascript:showAddSingleActivityLessonDialog(${org.id}, ${tool.toolId})">
-								<c:out value="${tool.toolDisplayName}" />
-							</a>
+						<li onClick="javascript:showAddSingleActivityLessonDialog(${org.id}, ${tool.toolId})">
+							<c:out value="${tool.toolDisplayName}" />
 						</li>
 					</c:forEach>
 				</ul>
