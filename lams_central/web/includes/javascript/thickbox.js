@@ -7,13 +7,6 @@
 
 /*This script has been modified by LAMS.*/
 
-// fixed according to: http://jamazon.co.uk/web/2008/03/14/jquerybrowserversion-doesnt-recognise-ie7/
-$.browser.msie6 =
-$.browser.msie
-&& /MSIE 6\.0/i.test(window.navigator.userAgent)
-&& !/MSIE 7\.0/i.test(window.navigator.userAgent)
-&& !/MSIE 8\.0/i.test(window.navigator.userAgent);
-
 /*!!!!!!!!!!!!!!!!! edit below this line at your own risk !!!!!!!!!!!!!!!!!!!!!!!*/
 
 //on page load call tb_init
@@ -292,12 +285,6 @@ function tb_remove() {
 
 function tb_position() {
     jQuery("#TB_window").css({marginLeft: '-' + parseInt((TB_WIDTH / 2),10) + 'px', width: TB_WIDTH + 'px'});
-    var version = jQuery.browser.version;
-    if (version instanceof Object)
-        version=version.number();
- 	if ( !(jQuery.browser.msie6)) { // take away IE6; fixed according to: http://jamazon.co.uk/web/2008/03/14/jquerybrowserversion-doesnt-recognise-ie7/
- 		$("#TB_window").css({marginTop: '-' + parseInt((TB_HEIGHT / 2),10) + 'px'}); 
- 	}
 }
 
 function tb_parseQuery ( query ) {
