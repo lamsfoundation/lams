@@ -1539,12 +1539,14 @@ div.growlUI h1 {
 	background: url('../images/icons/wrench.png') no-repeat 0 0;
 	padding-left: 25px;
 	padding-bottom: 2px;
+	margin: 3px 0 0 3px;
 }
 
 #content-main .my-grades-button {
 	background: url('../images/icons/book_edit.png') no-repeat 0 0;
 	padding-left: 25px;
 	padding-bottom: 2px;
+	margin: 3px 0 0 3px;
 }
 
 #content-main .more-actions-button {
@@ -1556,16 +1558,19 @@ div.growlUI h1 {
 #content-main .course-gradebook-button {
 	background: url('../images/icons/book_edit.png') no-repeat 0 3px;
 	padding-left: 25px;
+	margin: 3px 0 0 3px;
 }
 
 #content-main .search-lesson {
 	background: url('../images/icons/magnifier.png') no-repeat 0 3px;
 	padding-left: 25px;
+	margin: 3px 0 0 3px;
 }
 
 #content-main .course-notifications {
 	background: url('../images/icons/email_go.png') no-repeat 0 3px;
 	padding-left: 25px;
+	margin: 3px 0 0 3px;
 }
 
 * html .right-buttons {
@@ -1692,10 +1697,13 @@ div.growlUI h1 {
 
 .rating-criteria-tag {
 	width: 60%;
-	padding-bottom: 25px;
+	padding-left: 20px;
 }
 .rating-criteria-tag input[type="text"] {
 	width: 100%;
+}
+#criterias-table {
+	margin-left: 0;
 }
 #criterias-table td {
 	vertical-align:middle;
@@ -1719,4 +1727,7 @@ div.down-arrow-disabled {
 }
 div.delete-arrow {
 	background-image: url('../images/disposal.gif');
+}
+.gray-color{
+	color: gray;
 }
