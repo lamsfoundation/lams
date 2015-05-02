@@ -106,7 +106,14 @@ public class SessionManager {
 	return SessionManager.getInstance().sessionContainer.get(sessionId);
 
     }
-
+    
+    /**
+     * Returns number of sessions stored in the container.
+     */
+    public static int getSessionCount(){
+	return getInstance().sessionContainer.size();
+    }
+    
     static void createSession(String sessionId) {
 	// initialize a new one
 	HttpSession session = SessionManager.getInstance().new SessionImpl(sessionId);

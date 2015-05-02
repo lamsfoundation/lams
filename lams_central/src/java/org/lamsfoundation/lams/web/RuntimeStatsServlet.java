@@ -20,7 +20,7 @@
  * **************************************************************** 
  */
 
-/* $Id$ */
+/* RuntimeStatsServlet.java,v 1.1 2015/04/28 11:52:07 marcin Exp */
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 
 public class RuntimeStatsServlet extends HttpServlet {
 
@@ -84,8 +85,9 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    ObjectName engineName = new ObjectName("jboss.web:type=Engine");
 	    String jvmRoute = (String) server.getAttribute(engineName, "jvmRoute");
 
-	    ObjectName connectorName = RuntimeStatsServlet.getConnectorName();
-	    Integer busyThreads = (Integer) server.getAttribute(connectorName, "currentThreadsBusy");
+	    String bindAddress = System.getProperty(HttpUrlConnectionUtil.JBOSS_BIND_ADDRESS_KEY);
+	    ObjectName sessionManager = new ObjectName("jboss.web:type=Manager,path=/lams,host=" + bindAddress);
+	    Integer activeSessions = (Integer) server.getAttribute(sessionManager, "activeSessions");
 
 	    ObjectName dataSourceName = new ObjectName("jboss.jca:name=jdbc/lams-ds,service=ManagedConnectionPool");
 	    Integer pickedConnections = (Integer) server.invoke(dataSourceName, "getConnectionCount", null, null);
@@ -95,7 +97,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 		resp.append(" - DB connection established");
 	    }
 	    resp.append("\nServer : ").append(jvmRoute).append("\n");
-	    resp.append("Current Sessions : ").append(busyThreads).append("\n");
+	    resp.append("Current Sessions : ").append(SessionManager.getSessionCount()).append("\n");
 	    resp.append("Time of Request : ").append(date);
 	} catch (Exception e) {
 	    RuntimeStatsServlet.log.error("Error while getting short runtime stats", e);
@@ -138,6 +140,8 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    Integer busyThreads = (Integer) server.getAttribute(connectorName, "currentThreadsBusy");
 	    resp.append("Connector threads [busy/max]: ").append(busyThreads).append("/").append(maxThreads)
 		    .append("\n");
+
+	    resp.append("Active sessions : ").append(SessionManager.getSessionCount()).append("\n");
 
 	    ObjectName dataSourceName = new ObjectName("jboss.jca:name=jdbc/lams-ds,service=ManagedConnectionPool");
 	    Long availConnections = (Long) server.invoke(dataSourceName, "getAvailableConnectionCount", null, null);
