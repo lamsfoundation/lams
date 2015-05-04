@@ -3,7 +3,6 @@
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 <link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
 <style media="screen,projection" type="text/css">
     .ui-jqgrid tr.jqgrow td, .ui-jqgrid .user-entry {
@@ -63,8 +62,6 @@
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
