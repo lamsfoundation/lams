@@ -6,7 +6,7 @@
                 <http-only>true</http-only>
                 <secure>@secure.cookie@</secure>
             </cookie-config>
-            <session-timeout>120</session-timeout>
+            <session-timeout>30</session-timeout>
         </session-config>
     </shared-session-config>
 </jboss>

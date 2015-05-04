@@ -42,8 +42,7 @@ public class ConfigurationKeys {
     public static String LAMS_TEMP_DIR = "TempDir";
 
     /**
-     * Directory in which lams.ear is deployed. Usually
-     * {JBOSS}/server/default/deploy/lams.ear
+     * Directory in which lams.ear is deployed. Usually {JBOSS}/server/default/deploy/lams.ear
      */
     public static String LAMS_EAR_DIR = "EARDir";
 
@@ -54,8 +53,7 @@ public class ConfigurationKeys {
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
     /**
-     * Flash crash dump files (see FlashCrashDump servlet) are written to the
-     * Dump directory
+     * Flash crash dump files (see FlashCrashDump servlet) are written to the Dump directory
      */
     public static String LAMS_DUMP_DIR = "DumpDir";
 
@@ -78,15 +76,13 @@ public class ConfigurationKeys {
     public static String PREVIEW_CLEANUP_NUM_DAYS = "CleanupPreviewOlderThanDays";
 
     /**
-     * Number of milliseconds before a user is considered "inactive".
-     * "Anonymous" sessions are ended after this period (ie ones that haven't
-     * ever access one of the clients )
+     * Number of seconds before a user is considered "inactive" and gets logged out.
      */
     public static String INACTIVE_TIME = "UserInactiveTimeout";
 
     /**
-     * Allow more than one session to exist for one user. Needed for the test
-     * harness Do not set this parameter to true in production.
+     * Allow more than one session to exist for one user. Needed for the test harness Do not set this parameter to true
+     * in production.
      */
     public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
@@ -106,8 +102,7 @@ public class ConfigurationKeys {
     public static String SERVER_LANGUAGE = "ServerLanguage";
 
     /**
-     * Direction (left to right, right to left) for writing on HTML pages.
-     * Originally LTR
+     * Direction (left to right, right to left) for writing on HTML pages. Originally LTR
      */
     public static String SERVER_PAGE_DIRECTION = "ServerPageDirection";
 
@@ -215,8 +210,7 @@ public class ConfigurationKeys {
     public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
 
     /**
-     * Number of learners to be displayed on the learner progress screen in
-     * monitoring.
+     * Number of learners to be displayed on the learner progress screen in monitoring.
      */
     public static String LEARNER_PROGRESS_BATCH_SIZE = "LearnerProgressBatchSize";
 
@@ -226,8 +220,7 @@ public class ConfigurationKeys {
     public static String CUSTOM_TAB_TITLE = "CustomTabTitle";
 
     /**
-     * Configurable screen sizes for authoring, monitor, learner and admin
-     * (LDEV-1598)
+     * Configurable screen sizes for authoring, monitor, learner and admin (LDEV-1598)
      */
     public static String AUTHORING_SCREEN_SIZE = "AuthoringScreenSize";
 
