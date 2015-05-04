@@ -42,20 +42,18 @@ public class ConfigurationKeys {
     public static String LAMS_TEMP_DIR = "TempDir";
 
     /**
-     * Directory in which lams.ear is deployed. Usually
-     * {JBOSS}/server/default/deploy/lams.ear
+     * Directory in which lams.ear is deployed. Usually {JBOSS}/server/default/deploy/lams.ear
      */
     public static String LAMS_EAR_DIR = "EARDir";
 
     public static String SMTP_SERVER = "SMTPServer";
-    
+
     public static String USE_INTERNAL_SMTP_SERVER = "InternalSMTPServer";
 
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
     /**
-     * Flash crash dump files (see FlashCrashDump servlet) are written to the
-     * Dump directory
+     * Flash crash dump files (see FlashCrashDump servlet) are written to the Dump directory
      */
     public static String LAMS_DUMP_DIR = "DumpDir";
 
@@ -78,22 +76,19 @@ public class ConfigurationKeys {
     public static String PREVIEW_CLEANUP_NUM_DAYS = "CleanupPreviewOlderThanDays";
 
     /**
-     * Number of milliseconds before a user is considered "inactive".
-     * "Anonymous" sessions are ended after this period (ie ones that haven't
-     * ever access one of the clients )
+     * Number of seconds before a user is considered "inactive" and gets logged out.
      */
     public static String INACTIVE_TIME = "UserInactiveTimeout";
 
     /**
-     * Allow more than one session to exist for one user. Needed for the test
-     * harness Do not set this parameter to true in production.
+     * Allow more than one session to exist for one user. Needed for the test harness Do not set this parameter to true
+     * in production.
      */
     public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
     /**
-     * Turn on the cache debugging listener. Logs whenever an item is
-     * added/removed/evicted to/from the cache. Not on in production. Must be
-     * set to a boolean value
+     * Turn on the cache debugging listener. Logs whenever an item is added/removed/evicted to/from the cache. Not on in
+     * production. Must be set to a boolean value
      */
     public static String USE_CACHE_DEBUG_LISTENER = "UseCacheDebugListener";
 
@@ -113,8 +108,7 @@ public class ConfigurationKeys {
     public static String SERVER_LANGUAGE = "ServerLanguage";
 
     /**
-     * Direction (left to right, right to left) for writing on HTML pages.
-     * Originally LTR
+     * Direction (left to right, right to left) for writing on HTML pages. Originally LTR
      */
     public static String SERVER_PAGE_DIRECTION = "ServerPageDirection";
 
@@ -140,7 +134,7 @@ public class ConfigurationKeys {
     public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
 
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
-    
+
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
 
     public static String LDAP_PROVISIONING_ENABLED = "LDAPProvisioningEnabled";
@@ -152,9 +146,9 @@ public class ConfigurationKeys {
     public static String LDAP_SEARCH_FILTER = "LDAPSearchFilter";
 
     public static String LDAP_BASE_DN = "LDAPBaseDN";
-    
+
     public static String LDAP_BIND_USER_DN = "LDAPBindUserDN";
-    
+
     public static String LDAP_BIND_USER_PASSWORD = "LDAPBindUserPassword";
 
     public static String LDAP_SECURITY_PROTOCOL = "LDAPSecurityProtocol";
@@ -222,8 +216,7 @@ public class ConfigurationKeys {
     public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
 
     /**
-     * Number of learners to be displayed on the learner progress screen in
-     * monitoring.
+     * Number of learners to be displayed on the learner progress screen in monitoring.
      */
     public static String LEARNER_PROGRESS_BATCH_SIZE = "LearnerProgressBatchSize";
 
@@ -233,8 +226,7 @@ public class ConfigurationKeys {
     public static String CUSTOM_TAB_TITLE = "CustomTabTitle";
 
     /**
-     * Configurable screen sizes for authoring, monitor, learner and admin
-     * (LDEV-1598)
+     * Configurable screen sizes for authoring, monitor, learner and admin (LDEV-1598)
      */
     public static String AUTHORING_SCREEN_SIZE = "AuthoringScreenSize";
 
@@ -245,17 +237,17 @@ public class ConfigurationKeys {
     public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
 
     public static String GMAP_KEY = "GmapKey";
-        
+
     public static String RED5_SERVER_URL = "Red5ServerUrl";
-    
+
     public static String RED5_RECORDINGS_URL = "Red5RecordingsUrl";
-    
+
     public static String SMTP_AUTH_USER = "SMTPUser";
-    
+
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
-    
+
     public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
-    
+
     public static String PROFILE_PARTIAL_EDIT_ENABLE = "ProfilePartialEditEnable";
 
     public static String KALTURA_SERVER = "KalturaServer";
@@ -267,25 +259,25 @@ public class ConfigurationKeys {
     public static String KALTURA_USER_SECRET = "KalturaUserSecret";
 
     public static String KALTURA_KCW_UI_CONF_ID = "KalturaKCWUiConfId";
-    
+
     public static String KALTURA_KDP_UI_CONF_ID = "KalturaKDPUiConfId";
-    
+
     public static String USER_VALIDATION_REQUIRED_USERNAME = "UserValidationUsername";
-    
+
     public static String USER_VALIDATION_REQUIRED_FIRST_LAST_NAME = "UserValidationFirstLastName";
-    
+
     public static String USER_VALIDATION_REQUIRED_EMAIL = "UserValidationEmail";
 
     // LDEV-2747
     public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";
-    
+
     // LDEV-2889
     public static String LEARNER_COLLAPSIBLE_PROGRESS_PANEL = "LearnerCollapsProgressPanel";
-    
+
     // CNG-26 Add to lams_configuration and set to false
     // if you don't want imported LD to have _<timestamp>_<seq_number> appended
     public static String SUFFIX_IMPORTED_LD = "SuffixImportedLD";
-    
+
     // LDEV-3254
     public static String CONFIGURATION_CACHE_REFRESH_INTERVAL = "ConfigCacheRefresInterval";
 }
