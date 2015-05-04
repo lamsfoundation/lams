@@ -14,7 +14,6 @@
 	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="includes/javascript/blockexportbutton.js"></script>
 	
