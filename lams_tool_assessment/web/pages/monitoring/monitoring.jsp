@@ -10,7 +10,6 @@
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
 		<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
-		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
 		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
 		<style media="screen,projection" type="text/css">
@@ -24,8 +23,6 @@
  
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
