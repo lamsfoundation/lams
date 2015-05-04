@@ -9,7 +9,6 @@
 </c:set>
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"> 
 
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -25,8 +24,6 @@
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>

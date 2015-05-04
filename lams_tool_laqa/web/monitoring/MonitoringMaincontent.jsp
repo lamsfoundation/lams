@@ -36,7 +36,6 @@
 	</c:choose>
 
 	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
@@ -109,8 +108,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
