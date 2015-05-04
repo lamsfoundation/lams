@@ -724,7 +724,7 @@ GeneralInitLib = {
      			            		});
      			            		
      			            		if (addActivities.length == 0 && selectedAnnotations.length == 0) {
-     			            			alert('Click on activities to select them for import');
+     			            			alert(LABELS.IMPORT_PART_CHOOSE_PROMPT);
      			            			return;
      			            		}
      			            		
