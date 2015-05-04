@@ -30,6 +30,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
 	
 		function submitMethod(actionMethod) {
