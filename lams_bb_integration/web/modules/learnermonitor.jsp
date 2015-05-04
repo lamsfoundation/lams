@@ -67,6 +67,7 @@
 	</bbNG:cssBlock>
  
 <%
+
     // Authorise current user for Course Access (automatic redirect)
     try{
         if (!PlugInUtil.authorizeForCourse(request, response))
@@ -88,9 +89,9 @@
     boolean isActive = false;
     
     CourseMembershipDbLoader sessionCourseMembershipLoader = (CourseMembershipDbLoader) bbPm.getLoader(CourseMembershipDbLoader.TYPE);
-    try {  
+    try {
         courseMembership = sessionCourseMembershipLoader.loadByCourseAndUserId(course_id, sessionUserId);
-        courseRole = courseMembership.getRole();
+        courseRole = courseMembership.getRole();        
         isActive = courseMembership.getIsAvailable();
     } catch (KeyNotFoundException e) {
         // There is no membership record.
@@ -102,9 +103,9 @@
 
     // Is the User an Instructor of Teaching Assistant
     boolean instructorstr=false;
-    if (courseRole.equals(CourseMembership.Role.INSTRUCTOR)||courseRole.equals(CourseMembership.Role.TEACHING_ASSISTANT)) {
+    if (CourseMembership.Role.INSTRUCTOR.equals(courseRole)||CourseMembership.Role.TEACHING_ASSISTANT.equals(courseRole)) {
         instructorstr=true;
-    } else if (!courseRole.equals(CourseMembership.Role.STUDENT)) {
+    } else if (!CourseMembership.Role.STUDENT.equals(courseRole)) {
         // The user is not an Instructor, Teaching Assistant or Student - Access Denied 
         response.sendRedirect("notAllowed.jsp");
     }
