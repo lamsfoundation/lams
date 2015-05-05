@@ -413,6 +413,9 @@ public class LamsSecurityUtil {
 	    BbList<CourseMembership> teachingAssistantCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.TEACHING_ASSISTANT, null, true);
 	    monitorCourseMemberships.addAll(teachingAssistantCourseMemberships);
+	    BbList<CourseMembership> courseBuilderCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+		    CourseMembership.Role.COURSE_BUILDER, null, true);
+	    monitorCourseMemberships.addAll(courseBuilderCourseMemberships);
 	    for (CourseMembership courseMembership : monitorCourseMemberships) {
 		monitorIds += URLEncoder.encode(courseMembership.getUser().getUserName(), "utf8") + ",";
 
