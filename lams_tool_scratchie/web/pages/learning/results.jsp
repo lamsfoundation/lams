@@ -21,7 +21,10 @@
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
 		#reflections-div {
-			padding: 80px 0 20px;
+			padding: 10px 0 20px;
+		}
+		.burning-question-dto {
+			padding-bottom: 5px; 
 		}
 		.ui-jqgrid tr.jqgrow td {
 		    white-space: normal !important;
@@ -35,6 +38,36 @@
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
+			
+			<!-- Display burningQuestionDtos -->
+			<c:forEach var="burningQuestionDto" items="${burningQuestionDtos}" varStatus="i">
+				jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid({
+					datatype: "local",
+					height: 'auto',
+					autowidth: true,
+					shrinkToFit: false,
+				   	colNames:['#',
+							"<fmt:message key='label.monitoring.summary.user.name' />",
+						    "<fmt:message key='label.burning.questions' />"
+					],
+				   	colModel:[
+				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
+				   		{name:'groupName', index:'groupName', width:200},
+				   		{name:'feedback', index:'feedback', width:522}
+				   	],
+				   	caption: "${burningQuestionDto.item.title}"
+				});
+			    <c:forEach var="entry" items="${burningQuestionDto.groupNameToBurningQuestion}" varStatus="i">
+			    	<c:set var="groupName" value="${entry.key}"/>
+			    	<c:set var="burningQuestion" value="${entry.value}"/>
+			    
+			    	jQuery("#burningQuestions${burningQuestionDto.item.uid}").addRowData(${i.index + 1}, {
+			   			id:"${i.index + 1}",
+			   	     	groupName:"${groupName}",
+				   	    feedback:"<lams:out value='${burningQuestion}' escapeHtml='true' />"
+			   	   	});
+		        </c:forEach>
+	        </c:forEach>
 			
 			<!-- Display reflection entries -->
 			jQuery("#reflections").jqGrid({
@@ -116,48 +149,23 @@
 			</fmt:message>
 		</h3>
 		
+		<!-- Display burningQuestionDtos -->
+
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
 			<div class="small-space-top">
-				<h3><fmt:message key="label.burning.questions" />:</h3>
+				<h3><fmt:message key="label.burning.questions" /></h3>
 				
-				<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
-					<table>
-						<tr>
-							<td width="30%">
-								<c:out value="${item.title}" escapeXml="true"/>
-							</td>						
-							<td>
-								<c:choose>
-									<c:when test="${empty item.burningQuestion}">
-										-
-									</c:when>
-									<c:otherwise>
-										<c:out value="${item.burningQuestion}" escapeXml="true"/>
-									</c:otherwise>
-								</c:choose>
-							</td>
-						</tr>
-					</table>
+				<c:forEach var="burningQuestionDto" items="${burningQuestionDtos}" varStatus="i">
+					<div class="burning-question-dto">
+						<table id="burningQuestions${burningQuestionDto.item.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
+					</div>
 				</c:forEach>
 				
-				<table>
-					<tr>
-						<td width="30%">
-							<fmt:message key="label.general.burning.question" />
-						</td>						
-						<td>
-							<c:choose>
-								<c:when test="${empty sessionMap.generalBurningQuestion}">
-									-
-								</c:when>
-								<c:otherwise>
-									<c:out value="${sessionMap.generalBurningQuestion}" escapeXml="true"/>
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-				</table>
-
+				<!-- General burning question's table -->
+				<div class="burning-question-dto">
+					<table id="burningQuestions0" class="scroll" cellpadding="0" cellspacing="0"></table>
+				</div>
+				
 				<c:if test="${(mode != 'teacher') && isUserLeader}">
 					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="button">
 						<fmt:message key="label.edit" />
@@ -168,7 +176,7 @@
 
 		<c:if test="${sessionMap.reflectOn}">
 			<div class="small-space-top">
-				<h3><fmt:message key="monitor.summary.td.notebookInstructions" />:</h3>
+				<h3><fmt:message key="monitor.summary.td.notebookInstructions" /></h3>
 				<p>
 					<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
 				</p>
