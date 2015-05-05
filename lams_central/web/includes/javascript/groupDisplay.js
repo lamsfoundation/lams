@@ -108,51 +108,53 @@ function makeOrgUnsortable(orgId) {
 }
 
 function makeSortable(element) {
-	$(element).sortable(
-			{
-				axis : "y",
-				delay : 100,
-				tolerance : 'pointer',
-				cursor : 'n-resize',
-				helper : function(e, tr) {
-					var $originals = tr.children();
-					var $helper = tr.clone();
-					$helper.children().each(function(index) {
-						// Set helper cell sizes to match the original
-						// sizes
-						$(this).width($originals.eq(index).width())
-					});
-					return $helper;
-				},
-				forceHelperSize : true,
-				forcePlaceholderSize : true,
-				containment : 'parent',
-				stop : function() {
-					var ids = $(this).sortable('toArray');
-					
-					var jLessonsId = $(this).attr("id");
-					var dashIndex = jLessonsId.indexOf("-");
-					var orgId = (dashIndex > 0 ? jLessonsId.substring(0,
-							dashIndex) : jLessonsId);
+	$(element).sortable({
+		axis : "y",
+		delay : 100,
+		tolerance : 'pointer',
+		cursor : 'n-resize',
+		helper : function(e, tr) {
+			var $originals = tr.children();
+			var $helper = tr.clone();
+			$helper.children().each(function(index) {
+				// Set helper cell sizes to match the original
+				// sizes
+				$(this).width($originals.eq(index).width())
+			});
+			return $helper;
+		},
+		forceHelperSize : true,
+		forcePlaceholderSize : true,
+		containment : 'parent',
+		stop : function() {
+			var ids = $(this).sortable('toArray');
+			
+			var jLessonsId = $(this).attr("id");
+			var dashIndex = jLessonsId.indexOf("-");
+			var orgId = (dashIndex > 0 ? jLessonsId.substring(0,
+					dashIndex) : jLessonsId);
 
-					$.ajax({
-						url : "servlet/saveLessonOrder",
-						data : {
-							orgId : orgId,
-							ids : ids.join(",")
-						},
-						error : function() {
-							loadOrgTab(null, true);
-						}
-					});
+			$.ajax({
+				url : "servlet/saveLessonOrder",
+				data : {
+					orgId : orgId,
+					ids : ids.join(",")
+				},
+				error : function() {
+					loadOrgTab(null, true);
 				}
-			}).disableSelection();
+			});
+		}
+	}).disableSelection();
 }
 
 
-function showMonitorLessonDialog(lessonID) {
-	var dialogName = "dialogMonitorLesson" + lessonID,
-		dialog = $('#' + dialogName);
+/**
+ * Checks if the dialog is already opened.
+ * If not, creates a new dialog with the given ID and init parameters.
+ */
+function showDialog(id, initParams) {
+	var dialog = $('#' + id);
 	if (dialog.length > 0) {
 		// is it open already?
 		dialog.dialog('moveToTop');
@@ -161,24 +163,15 @@ function showMonitorLessonDialog(lessonID) {
 	
 	// create a new dialog by cloning a template
 	dialog = $('#dialogContainer').clone();
-	dialog.attr('id', dialogName);
-	$('iframe', dialog).attr('id', null);
+	dialog.attr('id', id);
 	
-	dialog.dialog({
-		'lessonID' : lessonID,
-		'autoOpen' : false,
-		'height' : 600,
-		'width' : 1024,
+	// use initParams to overwrite default behaviour of the newly created dialog
+	return dialog.dialog($.extend({
+		'autoOpen' : true,
 		'modal' : false,
-		'draggable' : false,
-		'resizable' : true,
+		'draggable' : true,
+		'resizable' : false,
 		'hide' : 'fold',
-		'open' : function() {
-			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL
-				+ 'home.do?method=monitorLesson&lessonID='
-				+ $(this).dialog('option', 'lessonID'));
-		},
 		'beforeClose' : function(){
 			$('iframe', this).attr('src', null);
 		},
@@ -186,97 +179,105 @@ function showMonitorLessonDialog(lessonID) {
 			// completely delete the dialog
 			$(this).remove();
 		}
-	});
-	// tell the dialog contents that it was resized
-	dialog.closest('.ui-dialog').on('resizestop', function(event, ui){
-		var frame = $('iframe', dialog)[0],
-			win = frame.contentWindow || frame.contentDocument;
-		win.resizeSequenceCanvas(ui.size.width, ui.size.height);
-	});
-	// tabs are the title bar, so remove dialog's one
-	dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
-	dialog.dialog('open');
+	}, initParams));
 }
 
 
-function moveDialogToTop(dialogName) {
-	// called from withing dialog's iframe
-	$('#' + dialogName).dialog('moveToTop');
+/**
+ * Focuses on the dialog. Called from within the contained iframe.
+ */
+function moveDialogToTop(id) {
+	$('#' + id).dialog('moveToTop');
+}
+
+
+function showMonitorLessonDialog(lessonID) {
+	var id = "dialogMonitorLesson" + lessonID,
+		dialog = showDialog(id, {
+			'lessonID' : lessonID,
+			'autoOpen' : false,
+			'height' : 600,
+			'width' : 1024,
+			'draggable' : false,
+			'resizable' : true,
+			'open' : function() {
+				// load contents after opening the dialog
+				$('iframe', this).attr('src', LAMS_URL
+					+ 'home.do?method=monitorLesson&lessonID='
+					+ $(this).dialog('option', 'lessonID'));
+			},
+
+		});
+	
+	// if it was just created
+	if (dialog) {
+		// tell the dialog contents that it was resized
+		dialog.closest('.ui-dialog').on('resizestop', function(event, ui){
+			var frame = $('iframe', dialog)[0],
+				win = frame.contentWindow || frame.contentDocument;
+			win.resizeSequenceCanvas(ui.size.width, ui.size.height);
+		});
+		// tabs are the title bar, so remove dialog's one
+		dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+		dialog.dialog('open');
+	}
 }
 
 
 function showAddLessonDialog(orgID) {
-	var dialog = $('#dialogContainer').dialog({
-		'orgID' : orgID,
-		'autoOpen' : false,
-		'height' : 600,
-		'width' : 800,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
-		'open' : function() {
-			// load contents after opening the dialog
-			$('#dialogFrame')
-					.attr('src', LAMS_URL
-						+ 'home.do?method=addLesson&organisationID='
-						+ $(this).dialog('option', 'orgID'));
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			// refresh if lesson was added
-			if ($(this).dialog('option', 'refresh')) {
-				loadOrgTab(null, true);
+	var dialog = showDialog("dialogAddLesson", {
+			'orgID' : orgID,
+			'autoOpen' : false,
+			'modal' : true,
+			'draggable' : false,
+			'height' : 600,
+			'width' : 800,
+			'open' : function() {
+				// load contents after opening the dialog
+				$('iframe', this)
+						.attr('src', LAMS_URL
+							+ 'home.do?method=addLesson&organisationID='
+							+ $(this).dialog('option', 'orgID'));
 			}
-			$(this).dialog('destroy');
-		}
-	});
-	// tabs are the title bar, so remove dialog's one
-	dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
-	dialog.dialog('open');
+		});
+	
+	// if it was just created
+	if (dialog) {
+		// tabs are the title bar, so remove dialog's one
+		dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+		dialog.dialog('open');
+	}
 }
 
+
 function showOrgGroupDialog(orgID) {
-	var dialog = $('#dialogContainer').dialog({
+	showDialog("dialogOrgGroup", {
 		'orgID' : orgID,
-		'autoOpen' : false,
+		'modal' : true,
 		'height' : 460,
 		'width' : 460,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
-			$('#dialogFrame')
+			$('iframe', this)
 					.attr('src', LAMS_URL
 						+ 'OrganisationGroup.do?method=viewGroupings&organisationID='
 						+ $(this).dialog('option', 'orgID'));
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
 function showAddSingleActivityLessonDialog(orgID, toolID) {
-	$('#dialogContainer').dialog({
+	showDialog("dialogAddSingleActivityLesson", {
 		'orgID' : orgID,
 		'toolID' : toolID,
-		'autoOpen' : false,
 		'height' : 600,
 		'width' : 850,
 		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
 		'open' : function() {
-			var dialog = $(this);
-			var toolID = dialog.dialog('option', 'toolID');
+			var dialog = $(this),
+				toolID = dialog.dialog('option', 'toolID');
 			$.ajax({
 				async : false,
 				cache : false,
@@ -292,7 +293,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID) {
 						'contentFolderID' : response.contentFolderID
 					});
 
-					$('#dialogFrame').load(function(){
+					$('iframe', dialog).load(function(){
 						if ($(this).contents().find('span.editForm').length > 0){
 							closeAddSingleActivityLessonDialog('save');
 						}
@@ -302,192 +303,124 @@ function showAddSingleActivityLessonDialog(orgID, toolID) {
 						+ 'dialogCloser.jsp?function=closeAddSingleActivityLessonDialog&noopener=true'));
 				}
 			});
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').off('load').attr('src', null);
-		},
-		'close' : function() {
-			$('#dialogFrame').off('load').attr('src', null);
-			// refresh if lesson was added
-			if ($(this).dialog('option', 'refresh')) {
-				loadOrgTab(null, true);
-			}
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
+
 function showNotificationsDialog(orgID, lessonID) {
-	$('#notificationsDialogContainer').dialog({
+	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
+	showDialog(id, {
 		'orgID' : orgID,
 		'lessonID' : lessonID,
-		'autoOpen' : false,
 		'height' : 600,
 		'width' : 850,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
-			var lessonID = $(this).dialog('option', 'lessonID');
+			var dialog = $(this),
+				lessonID = dialog.dialog('option', 'lessonID');
 			// if lesson ID is given, use lesson view; otherwise
 			// use course view
 			if (lessonID) {
 				// load contents after opening the dialog
-				$('#notificationsDialogFrame').attr('src', LAMS_URL
+				$('iframe', dialog).attr('src', LAMS_URL
 					+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
 					+ lessonID);
 			} else {
-				var orgID = $(this).dialog('option', 'orgID');
-				$('#notificationsDialogFrame').attr('src', LAMS_URL
+				var orgID = dialog.dialog('option', 'orgID');
+				$('iframe', dialog).attr('src', LAMS_URL
 					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
 					+ orgID);
 			}
-		},
-		'beforeClose' : function(){
-			$('#notificationsDialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
 function showGradebookCourseDialog(orgID){
-	$('#dialogContainer').dialog({
+	var id = "dialoGradebookCourse" + orgID;
+	showDialog(id, {
 		'orgID' : orgID,
-		'autoOpen' : false,
 		'height' : 650,
 		'width' : 850,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
 			var orgID = $(this).dialog('option', 'orgID');
 			// load contents after opening the dialog
-			$('#dialogFrame').attr('src', LAMS_URL
+			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
 function showGradebookLessonDialog(lessonID){
-	$('#dialogContainer').dialog({
+	var id = "dialogGradebookLesson" + lessonID;
+	showDialog(id, {
 		'lessonID' : lessonID,
-		'autoOpen' : false,
 		'height' : 650,
 		'width' : 850,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
 			var lessonID = $(this).dialog('option', 'lessonID');
 			// load contents after opening the dialog
-			$('#dialogFrame').attr('src', LAMS_URL
+			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
 function showGradebookLearnerDialog(orgID){
-	$('#dialogContainer').dialog({
+	var id = "dialoGradebookLearner" + orgID;
+	showDialog(id, {
 		'orgID' : orgID,
-		'autoOpen' : false,
 		'height' : 400,
 		'width' : 750,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
 		'open' : function() {
 			var orgID = $(this).dialog('option', 'orgID');
 			// load contents after opening the dialog
-			$('#dialogFrame').attr('src', LAMS_URL
+			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
 function showConditionsDialog(lessonID){
-	$('#dialogContainer').dialog({
+	var id = "dialogConditions" + lessonID;
+	showDialog(id, {
 		'lessonID' : lessonID,
-		'autoOpen' : false,
 		'height' : 450,
 		'width' : 610,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
 			var lessonID = $(this).dialog('option', 'lessonID');
 			// load contents after opening the dialog
-			$('#dialogFrame').attr('src', LAMS_URL
+			$('iframe', this).attr('src', LAMS_URL
 				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
 function showSearchLessonDialog(orgID){
-	$('#dialogContainer').dialog({
+	var id = "dialoSearchLesson" + orgID;
+	showDialog(id, {
 		'orgID' : orgID,
-		'autoOpen' : false,
 		'height' : 400,
 		'width' : 600,
-		'modal' : true,
-		'resizable' : false,
-		'hide' : 'fold',
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
 			var orgID = $(this).dialog('option', 'orgID');
 			// load contents after opening the dialog
-			$('#dialogFrame').attr('src', LAMS_URL
+			$('iframe', this).attr('src', LAMS_URL
 				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
-		},
-		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
-		},
-		'close' : function() {
-			$(this).dialog('destroy');
 		}
-	}).dialog('open');
+	});
 }
 
-function closeAddLessonDialog(refresh) {
-	// was the dialog just closed or a new lesson really added?
-	// if latter, refresh the list
-	$("#dialogContainer").dialog('option', 'refresh', refresh ? true : false)
-			.dialog('close');
-}
 
 function closeAddSingleActivityLessonDialog(action) {
-	var dialog = $('#dialogContainer');
-	var save = action == 'save';
+	var id = 'dialogAddSingleActivityLesson',
+		dialog = $('#' + id),
+		save = action == 'save';
 	
 	if (save) {
 		$.ajax({
@@ -504,32 +437,35 @@ function closeAddSingleActivityLessonDialog(action) {
 			}
 		});
 	}
-	dialog.dialog('option', 'refresh', save).dialog('close');
+	closeDialog(id, save);
 }
 
-function closeMonitorLessonDialog(dialogName, refresh) {
-	// was the dialog just closed or 
+function closeDialog(id, refresh) {
+	// was the dialog just closed or a lesson removed
 	// if latter, refresh the list
-	$("#" + dialogName).dialog('option', 'refresh', refresh ? true : false)
-			.dialog('close');
+	if (refresh) {
+		loadOrgTab(null, true);
+	}
+	$("#" + id).dialog('close');
 }
 
 /**
- * Loads contents to already open dialog.
+ * Loads contents to already open organisation groups dialog.
  */
-function loadDialogContents(title, width, height, url) {
+function loadOrgGroupDialogContents(title, width, height, url) {
+	var dialog = $('#dialogOrgGroup');
 	if (title) {
-		$("#dialogContainer").dialog('option', 'title', title);
+		dialog.dialog('option', 'title', title);
 	}
 	if (width && height) {
-		$("#dialogContainer").dialog('option', {
+		dialog.dialog('option', {
 			'width'    : width,
 			'height'   : height,
 		}).dialog('option', 'position', 'center');
 	}
 	if (url) {
-		$('#dialogFrame').contents().find("body").html('');
-		$('#dialogFrame').attr('src', url);
+		$('iframe', dialog).contents().find("body").html('');
+		$('iframe', dialog).attr('src', url);
 		$('div.ui-dialog-titlebar .customDialogButton').remove();
 	}
 }
@@ -538,11 +474,11 @@ function loadDialogContents(title, width, height, url) {
  * Called from within Course Groups dialog, it saves groups and loads grouping page.
  */
 function saveOrgGroups() {
-	var groupsSaved = document.getElementById('dialogFrame').contentWindow.saveGroups();
+	var groupsSaved = $('#dialogOrgGroup iframe')[0].contentWindow.saveGroups();
 	if (groupsSaved) {
-		loadDialogContents(null, 460, 460,
+		loadOrgGroupDialogContents(null, 460, 460,
 			LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&organisationID='
-			         + $('#dialogContainer').dialog('option', 'orgID'));
+			         + $('#dialogOrgGroup').dialog('option', 'orgID'));
 	}
 }
 
