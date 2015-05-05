@@ -304,10 +304,19 @@ public class LearningAction extends Action {
 	
 	boolean isScratchingFinished = toolSession.isScratchingFinished();
 	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
-	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook) && !mode.isTeacher();
+	boolean isWaitingForLeaderToSubmitBurningQuestions = scratchie.isBurningQuestionsEnabled()
+		&& (burningQuestions == null || burningQuestions.isEmpty());
+	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook && !isWaitingForLeaderToSubmitBurningQuestions)
+		&& !mode.isTeacher();
+
+	//show leader showBurningQuestions page 
+	if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitBurningQuestions) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showBurningQuestions"));
+	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    return redirect;
 	
 	//show leader notebook page 
-	if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
+	} else if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
@@ -325,8 +334,7 @@ public class LearningAction extends Action {
 	} else {
 	    
 	    //make non leaders also wait for burning questions submit
-	    isWaitingForLeaderToSubmitNotebook |= scratchie.isBurningQuestionsEnabled()
-		    && (burningQuestions == null || burningQuestions.isEmpty());
+	    isWaitingForLeaderToSubmitNotebook |= isWaitingForLeaderToSubmitBurningQuestions;
 	    
 	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, (Boolean) isScratchingFinished);
 	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
