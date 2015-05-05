@@ -162,6 +162,7 @@
 			<forward name="success" path="/pages/learning/start.jsp" />
 			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
 			<forward name="newReflection" path="/learning/newReflection.do" />
+			<forward name="showBurningQuestions" path="/learning/showBurningQuestions.do" />
 			<forward name="showResults" path="/learning/showResults.do" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />			
