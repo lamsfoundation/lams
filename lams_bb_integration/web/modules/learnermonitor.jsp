@@ -103,8 +103,10 @@
 
     // Is the User an Instructor of Teaching Assistant
     boolean instructorstr=false;
-    if (CourseMembership.Role.INSTRUCTOR.equals(courseRole)||CourseMembership.Role.TEACHING_ASSISTANT.equals(courseRole)) {
+    if (CourseMembership.Role.INSTRUCTOR.equals(courseRole) || CourseMembership.Role.TEACHING_ASSISTANT.equals(courseRole)
+	    	|| CourseMembership.Role.COURSE_BUILDER.equals(courseRole)) {
         instructorstr=true;
+        
     } else if (!CourseMembership.Role.STUDENT.equals(courseRole)) {
         // The user is not an Instructor, Teaching Assistant or Student - Access Denied 
         response.sendRedirect("notAllowed.jsp");

@@ -55,7 +55,7 @@
 	
 	// if the user is not an Instructor, Teaching Assistant or Student - Access Denied 
 	if (!(courseRole.equals(CourseMembership.Role.INSTRUCTOR) || courseRole.equals(CourseMembership.Role.TEACHING_ASSISTANT) 
-		|| courseRole.equals(CourseMembership.Role.STUDENT))) {
+		||courseRole.equals(CourseMembership.Role.COURSE_BUILDER) || courseRole.equals(CourseMembership.Role.STUDENT))) {
 	    response.sendRedirect("notAllowed.jsp");
 	}
 
