@@ -1750,8 +1750,7 @@ function refreshMonitor(tabName, isAuto){
  * Tells parent document to close this Monitor dialog.
  */
 function closeMonitorLessonDialog(refresh) {
-	var dialogName = "dialogMonitorLesson" + lessonId;
-	window.parent.closeMonitorLessonDialog(dialogName, refresh);
+	window.parent.closeDialog('dialogMonitorLesson' + lessonId, refresh);
 }
 
 /**

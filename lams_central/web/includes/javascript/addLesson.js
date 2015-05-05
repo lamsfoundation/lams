@@ -312,7 +312,7 @@ function addLesson(){
 	submitInProgress = true;
 	$('#lessonForm').ajaxSubmit({
 		'success' : function(){
-			window.parent.closeAddLessonDialog(true);
+			window.parent.closeDialog('dialogAddLesson', true);
 	}});
 }
 
