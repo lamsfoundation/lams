@@ -54,7 +54,7 @@
 </lams:head>
 <body>
 <div id="tabs">
-	<a id="closeButton" href="#" onClick="javascript:window.parent.closeAddLessonDialog()">
+	<a id="closeButton" href="#" onClick="javascript:window.parent.closeDialog('dialogAddLesson')">
 		<span class="ui-icon ui-icon-closethick"></span>
 	</a>
 	

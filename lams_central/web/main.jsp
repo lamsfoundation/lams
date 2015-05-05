@@ -40,9 +40,10 @@
 	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 
 	<script type="text/javascript">
-			var LAMS_URL = '<lams:LAMSURL/>';
-			var decoderDiv = $('<div />');
-			var LABELS = {
+			var LAMS_URL = '<lams:LAMSURL/>',
+			
+				decoderDiv = $('<div />'),
+				LABELS = {
 					<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
 					EMAIL_NOTIFICATIONS_TITLE : '<c:out value="${EMAIL_NOTIFICATIONS_TITLE_VAR}" />',
 					<fmt:message key="index.remove.lesson.confirm1" var="REMOVE_LESSON_CONFIRM1_VAR"/>
@@ -67,10 +68,10 @@
 					SEARCH_LESSON_TITLE : '<c:out value="${SEARCH_LESSON_TITLE_VAR}" />',
 					<fmt:message key="index.course.groups.title" var="COURSE_GROUPS_TITLE_VAR"/>
 					COURSE_GROUPS_TITLE : '<c:out value="${COURSE_GROUPS_TITLE_VAR}" />'
-			}
-			
-			var tabName = '${tab}';
-			var stateId = tabName == 'profile' ? 3 : 1;
+				},
+				
+				tabName = '${tab}',
+				stateId = tabName == 'profile' ? 3 : 1;
 
 			$(document).ready(function(){
 				initMainPage();
@@ -270,13 +271,7 @@
 </div>
 
 <div id="dialogContainer" class="dialogContainer">
-	<iframe id="dialogFrame"></iframe>
-</div>
-
-<!-- There has to be a separate dialog for notifications
-	 as it can be opened from within monitor lesson dialog -->
-<div id="notificationsDialogContainer" class="dialogContainer">
-	<iframe id="notificationsDialogFrame"></iframe>
+	<iframe></iframe>
 </div>
 
 </body>
