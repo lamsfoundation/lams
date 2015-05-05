@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
@@ -489,6 +490,7 @@ public class LearningAction extends Action {
 		sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
+	boolean isBurningQuestionsEnabled = (Boolean) sessionMap.get(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED);
 
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
@@ -510,6 +512,13 @@ public class LearningAction extends Action {
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
 	double percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
 	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);
+	
+	// display other groups' BurningQuestions
+	if (isBurningQuestionsEnabled) {
+	    Scratchie scratchie = toolSession.getScratchie();
+	    List<BurningQuestionDTO> burningQuestionDtos = service.getBurningQuestionDtos(scratchie);
+	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTIONS_DTOS, burningQuestionDtos);
+	}
 
 	// display other groups' notebooks
 	if (isReflectOnActivity) {
