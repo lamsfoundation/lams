@@ -30,8 +30,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript">
-		var userId = '<lams:user property="userID"/>',
-			lessonId = ${lesson.lessonID},
+		var lessonId = ${lesson.lessonID},
+			userId = '<lams:user property="userID"/>',
 			ldId = ${lesson.learningDesignID},
 			lessonStateId = ${lesson.lessonStateID},
 			createDateTimeStr = '${lesson.createDateTimeStr}',

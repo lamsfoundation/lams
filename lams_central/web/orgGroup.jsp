@@ -63,7 +63,7 @@
 				</a>
 			</c:if>
 			<a class="customDialogButton" href="#"
-			   onClick="javascript:loadDialogContents(null, 460, 460,'<lams:LAMSURL/>OrganisationGroup.do?method=viewGroupings&organisationID=' + $('#dialogContainer').dialog('option', 'orgID'))"
+			   onClick="javascript:loadOrgGroupDialogContents(null, 460, 460,'<lams:LAMSURL/>OrganisationGroup.do?method=viewGroupings&organisationID=' + $('#dialogOrgGroup').dialog('option', 'orgID'))"
 			   style="right: 140px;">
 				<fmt:message key="label.course.groups.back" />
 			</a>
