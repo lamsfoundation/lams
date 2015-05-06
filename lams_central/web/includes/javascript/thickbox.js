@@ -285,6 +285,7 @@ function tb_remove() {
 
 function tb_position() {
     jQuery("#TB_window").css({marginLeft: '-' + parseInt((TB_WIDTH / 2),10) + 'px', width: TB_WIDTH + 'px'});
+ 	$("#TB_window").css({marginTop: '-' + parseInt((TB_HEIGHT / 2),10) + 'px'}); 
 }
 
 function tb_parseQuery ( query ) {
