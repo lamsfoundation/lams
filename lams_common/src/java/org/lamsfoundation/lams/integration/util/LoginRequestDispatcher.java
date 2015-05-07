@@ -109,13 +109,21 @@ public class LoginRequestDispatcher {
 
     /**
      * This method is called within LoginRequestValve and LoginRequestServlet.
-     * It simply fetch the method parameter from HttpServletRequest and build
-     * the url to redirect user to.
+     * If there is a redirectURL parameter then this becomes the redirect, otherwise it
+     * fetches the method parameter from HttpServletRequest and builds the redirect url.
+     * If the method parameter is used and a lessonId is supplied, then the user is added
+     * to the LessonClass.
      * 
      * @param request
      * @return
      */
+    
     public static String getRequestURL(HttpServletRequest request) throws ServletException {
+
+	// get the location from an explicit parameter if it exists
+	String redirect = request.getParameter("redirectURL");
+	if ( redirect != null )
+	    return request.getContextPath() + "/" + redirect;
 
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
