@@ -94,14 +94,8 @@ public class LoginRequestValve extends ValveBase {
 		LoginRequestValve.log.debug("Session Id - " + hses.getId());
 		String userid = hreq.getParameter(LoginRequestValve.PARAM_USERID);
 
-		// get the location from an explicit parameter
-		String redirect = hreq.getParameter("redirectURL");
-		if (redirect == null) {
-		    // get the redirect url from RequestDispatcher
-		    // The RequestDispatcher also setup any session variable
-		    // required to carryout the method
-		    redirect = LoginRequestDispatcher.getRequestURL(hreq);
-		}
+		// get the location from either redirectURL or from the method setting
+		String redirect = LoginRequestDispatcher.getRequestURL(hreq);
 
 		// check required parameters
 		if ((userid != null) && (redirect != null) && (hses != null)) {
