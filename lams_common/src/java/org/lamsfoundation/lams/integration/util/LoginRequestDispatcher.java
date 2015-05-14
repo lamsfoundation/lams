@@ -91,7 +91,9 @@ public class LoginRequestDispatcher {
     // with lesson id parameter
    public static final String METHOD_LEARNER_STRICT_AUTHENTICATION = "learnerStrictAuth";
 
-    public static final String PARAM_LESSON_ID = "lsid";
+   public static final String PARAM_LEARNING_DESIGN_ID = "ldId";
+
+   public static final String PARAM_LESSON_ID = "lsid";
 
     private static final String URL_DEFAULT = "/index.jsp";
 
@@ -147,6 +149,7 @@ public class LoginRequestDispatcher {
 	    String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
 	    String notifyCloseURL = request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
 	    String isPostMessageToParent = request.getParameter(PARAM_IS_POST_MESSAGE_TO_PARENT);
+	    String ldID = request.getParameter(PARAM_LEARNING_DESIGN_ID);
 
 	    // Custom CSV string to be used for tool adapters
 	    String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
@@ -156,6 +159,7 @@ public class LoginRequestDispatcher {
 
 	    // append the extra parameters if they are present in the request
 	    try {
+		parameters = ldID != null ? parameters + "&learningDesignID" + "=" + ldID : parameters;
 		parameters = customCSV != null ? parameters + "&" + PARAM_CUSTOM_CSV + "=" + customCSV : parameters;
 		parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
 		parameters = requestSrc != null ? parameters + "&" + PARAM_REQUEST_SRC + "="
