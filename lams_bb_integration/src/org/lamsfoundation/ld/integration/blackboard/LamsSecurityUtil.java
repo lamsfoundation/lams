@@ -100,10 +100,12 @@ public class LamsSecurityUtil {
 	String firstName = ctx.getUser().getGivenName();
 	String lastName  = ctx.getUser().getFamilyName();
 	String email = ctx.getUser().getEmailAddress();
-	String courseId = ctx.getCourse().getCourseId();
 	String locale = ctx.getUser().getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
+
+	// For template authoring calls we don't need the course. We probably don't need it for authoring in general
+	String courseId = ctx.getCourse()!=null ? ctx.getCourse().getCourseId() : null;
 
 	String secretkey = LamsPluginUtil.getSecretKey();
 
@@ -120,9 +122,10 @@ public class LamsSecurityUtil {
 
 	String url;
 	try {
+	    String course = courseId != null ? "&courseid=" + URLEncoder.encode(courseId, "UTF8") : "";
 	    url = serverAddr + "/LoginRequest?" + "&uid=" + URLEncoder.encode(username, "UTF8") + "&method=" + method
-		    + "&ts=" + timestamp + "&sid=" + serverId + "&hash=" + hash + "&courseid="
-		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&requestSrc="
+		    + "&ts=" + timestamp + "&sid=" + serverId + "&hash=" + hash + course
+		    + "&country=" + country + "&lang=" + lang + "&requestSrc="
 		    + URLEncoder.encode(reqSrc, "UTF8") + "&firstName=" + URLEncoder.encode(firstName, "UTF-8")
 		    + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
 		    + "&email=" + URLEncoder.encode(email, "UTF-8");
@@ -281,17 +284,25 @@ public class LamsSecurityUtil {
      * @return the learning session id
      */
     public static Long startLesson(Context ctx, long ldId, String title, String desc, boolean isPreview) {
+
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
-	String courseId = ctx.getCourse().getCourseId();
 	String username = ctx.getUser().getUserName();
 	String locale = ctx.getUser().getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 	String method = (isPreview) ? "preview" : "start";
 
+	// courseId not needed for preview but pass it through if we have it.
+	String courseId = null;
+	if ( isPreview ) 
+	    courseId = ctx.getCourse() != null ? ctx.getCourse().getCourseId() : null;
+	else 
+	    courseId = ctx.getCourse().getCourseId();
+	
 	if (serverId == null || serverAddr == null || serverKey == null) {
+	    logger.info("Unable to start lesson, one or more lams configuration properties is null");
 	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
 	}
 
@@ -299,11 +310,12 @@ public class LamsSecurityUtil {
 
 	    String timestamp = new Long(System.currentTimeMillis()).toString();
 	    String hash = generateAuthenticationHash(timestamp, username, serverId);
+	    String course = courseId != null ? "&courseId=" + URLEncoder.encode(courseId, "UTF8") : "";
 
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
-		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "utf8") + "&ldId=" + new Long(ldId).toString() + "&country="
+		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + course
+		    + "&ldId=" + new Long(ldId).toString() + "&country="
 		    + country + "&lang=" + lang + "&method=" + method + "&title="
 		    + URLEncoder.encode(title, "utf8").trim() + "&desc=" + URLEncoder.encode(desc, "utf8").trim();
 
