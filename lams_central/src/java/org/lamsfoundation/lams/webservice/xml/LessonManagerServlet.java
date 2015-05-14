@@ -172,7 +172,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    } else if (method.equals(CentralConstants.METHOD_PREVIEW)) {
 		ldId = new Long(ldIdStr);
-		Long lessonId = startPreview(serverId, datetime, hashValue, username, ldId, title, desc,
+		Long lessonId = startPreview(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
 			country, lang, customCSV, presenceEnable, imEnable);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
@@ -528,7 +528,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     public Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
-	    String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
+	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
 	    boolean presenceEnable, boolean imEnable) throws RemoteException {
 
 	try {
