@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -53,6 +57,8 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -89,6 +95,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -96,7 +103,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * @author Andrey Balan
  */
 public class ScratchieServiceImpl implements IScratchieService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
     private static Logger log = Logger.getLogger(ScratchieServiceImpl.class.getName());
 
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
@@ -1927,4 +1934,76 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public void setScratchieOutputFactory(ScratchieOutputFactory scratchieOutputFactory) {
 	this.scratchieOutputFactory = scratchieOutputFactory;
     }
+    
+    // ****************** REST methods *************************
+
+    /**
+     * Rest call to create a new Scratchie content. Required fields in toolContentJSON: "title", "instructions",
+     * "questions". The questions entry should be JSONArray containing JSON objects, which in turn must contain
+     * "questionText", "displayOrder" (Integer) and a JSONArray "answers". The answers entry should be JSONArray
+     * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
+
+	Scratchie scratchie = new Scratchie();
+	Date updateDate = new Date();
+
+	scratchie.setCreated(updateDate);
+	scratchie.setUpdated(updateDate);
+	scratchie.setDefineLater(false);
+
+	scratchie.setContentId(toolContentID);
+	scratchie.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	scratchie.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+
+	scratchie.setBurningQuestionsEnabled(JsonUtil.opt(toolContentJSON, "burningQuestionsEnabled", false));
+	scratchie.setExtraPoint(JsonUtil.opt(toolContentJSON, "extraPoint", false));
+	scratchie.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	scratchie.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
+	scratchie.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, (Date) null));
+
+	// Scratchie Items
+	Set<ScratchieItem> newItems = new LinkedHashSet<ScratchieItem>();
+
+	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
+	for (int i = 0; i < questions.length(); i++) {
+	    JSONObject questionData = (JSONObject) questions.get(i);
+
+	    ScratchieItem item = new ScratchieItem();
+	    item.setCreateDate(updateDate);
+	    item.setCreateByAuthor(true);
+	    item.setOrderId(questionData.getInt(RestTags.DISPLAY_ORDER));
+	    item.setTitle(questionData.getString(RestTags.QUESTION_TITLE));
+	    item.setDescription(questionData.getString(RestTags.QUESTION_TEXT));
+	    newItems.add(item);
+
+	    // set options
+	    Set<ScratchieAnswer> newAnswers = new LinkedHashSet<ScratchieAnswer>();
+
+	    JSONArray answersData = (JSONArray) questionData.getJSONArray(RestTags.ANSWERS);
+	    for (int j = 0; j < answersData.length(); j++) {
+		JSONObject answerData = (JSONObject) answersData.get(j);
+		ScratchieAnswer answer = new ScratchieAnswer();
+		// Removes redundant new line characters from options left by CKEditor (otherwise it will break
+		// Javascript in monitor). Copied from AuthoringAction.
+		String answerDescription = answerData.getString(RestTags.ANSWER_TEXT);
+		answer.setDescription(answerDescription != null ? answerDescription.replaceAll("[\n\r\f]", "") : "");
+		answer.setCorrect(answerData.getBoolean(RestTags.CORRECT));
+		answer.setOrderId(answerData.getInt(RestTags.DISPLAY_ORDER));
+		answer.setScratchieItem(item);
+		newAnswers.add(answer);
+	    }
+
+	    item.setAnswers(newAnswers);
+
+	}
+
+	scratchie.setScratchieItems(newItems);
+	saveOrUpdateScratchie(scratchie);
+
+    }
+    
 }

@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -1364,17 +1365,17 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	Resource resource = new Resource();
 	resource.setContentId(toolContentID);
-	resource.setTitle(toolContentJSON.getString("title"));
-	resource.setInstructions(toolContentJSON.getString("instructions"));
+	resource.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	resource.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	resource.setCreated(updateDate);
 
 	resource.setAllowAddFiles(JsonUtil.opt(toolContentJSON, "allowAddFiles", Boolean.FALSE));
 	resource.setAllowAddUrls(JsonUtil.opt(toolContentJSON, "allowAddUrls", Boolean.FALSE));
-	resource.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
+	resource.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	resource.setMiniViewResourceNumber(JsonUtil.opt(toolContentJSON, "minViewResourceNumber", 0));
-	resource.setNotifyTeachersOnAssigmentSumbit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnAssigmentSumbit", Boolean.FALSE));
-	resource.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
-	resource.setReflectInstructions(JsonUtil.opt(toolContentJSON, "reflectInstructions", (String)null));
+	resource.setNotifyTeachersOnAssigmentSumbit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
+	resource.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	resource.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String)null));
 	resource.setRunAuto(JsonUtil.opt(toolContentJSON, "runAuto", Boolean.FALSE));
 
 	resource.setContentInUse(false);
@@ -1405,7 +1406,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setComplete(false);
 	    item.setCreateByAuthor(true);
 	    item.setHide(false);
-	    item.setOrderId(i+1);
+	    item.setOrderId(itemData.getInt(RestTags.DISPLAY_ORDER));
 
 	    item.setDescription(JsonUtil.opt(itemData, "description", (String)null));
 	    item.setFileName(JsonUtil.opt(itemData, "name", (String)null));
@@ -1430,6 +1431,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    }
 
 	    // TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
+	    if ( item.getFileName() != null || item.getFileUuid() != null ) 
+		throw new JSONException("Only URLS supported via REST interface currently - files and learning objects are not supported.");
+	    
 	    itemList.add(item);
 	}
 	
@@ -1437,8 +1441,5 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	
 	saveOrUpdateResource(resource);
 
-	// *******************************
-	// TODO - investigate
-	// file attachments
     }
 }

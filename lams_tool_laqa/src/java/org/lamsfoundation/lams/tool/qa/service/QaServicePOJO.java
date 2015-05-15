@@ -39,7 +39,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -55,6 +54,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -1506,7 +1506,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     // ****************** REST methods *************************
 
     /** Rest call to create a new Q&A content. Required fields in toolContentJSON: title, instructions, questions.
-     * The questions entry should be JSONArray containing JSON objects, which in turn must contain a question entry and may also contain feedback and required (boolean)
+     * The questions entry should be JSONArray containing JSON objects, which in turn must contain "questionText", "displayOrder"
+     * and may also contain feedback and required (boolean)
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
@@ -1519,23 +1520,23 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qa.setCreatedBy(userID.longValue());
 
 	qa.setQaContentId(toolContentID);
-	qa.setTitle(toolContentJSON.getString("title"));
-	qa.setInstructions(toolContentJSON.getString("instructions"));
+	qa.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	qa.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	
 	qa.setDefineLater(false);
 
-	qa.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockOnFinished", Boolean.FALSE));
-	qa.setAllowRichEditor(JsonUtil.opt(toolContentJSON, "allowRichTextEditor", Boolean.FALSE));
-	qa.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
+	qa.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	qa.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	qa.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	qa.setShowOtherAnswers(JsonUtil.opt(toolContentJSON, "showOtherAnswers", Boolean.TRUE));
 	qa.setUsernameVisible(JsonUtil.opt(toolContentJSON, "usernameVisible", Boolean.FALSE));
 	qa.setAllowRateAnswers(JsonUtil.opt(toolContentJSON, "allowRateAnswers", Boolean.FALSE));
 	qa.setNotifyTeachersOnResponseSubmit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnResponseSubmit", Boolean.FALSE));
-	qa.setReflect(JsonUtil.opt(toolContentJSON, "reflect", Boolean.FALSE));
-	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, "reflectionSubject",(String)null));
+	qa.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS,(String)null));
 	qa.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 
-	qa.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, "submissionDeadline",(Date)null));
+	qa.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE,(Date)null));
 
 	// qa.setMonitoringReportTitle(); Can't find this field in the database - assuming unused.
 	// qa.setReportTitle(); Can't find this field in the database - assuming unused.
@@ -1543,17 +1544,17 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	saveOrUpdateQaContent(qa);
 	// Questions
-	JSONArray questions = toolContentJSON.getJSONArray("questions");
+	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
 	for (int i=0; i<questions.length(); i++) {
 	    JSONObject questionData = (JSONObject) questions.get(i);
-	    QaQueContent question = new QaQueContent(questionData.getString("question"), i + 1, 
+	    QaQueContent question = new QaQueContent(questionData.getString(RestTags.QUESTION_TEXT), 
+		    questionData.getInt(RestTags.DISPLAY_ORDER), 
 		    JsonUtil.opt(questionData,"feedback",(String)null), 
 		    JsonUtil.opt(questionData, "required", Boolean.FALSE), qa );
 	    saveOrUpdateQuestion(question);
 	}
 
 	// TODO
-//	qa.setQaQueContents(qaQueContents);
 //	qa.setConditions(conditions);
 
 
