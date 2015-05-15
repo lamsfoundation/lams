@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -674,10 +675,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
 	NoticeboardContent noticeboard = new NoticeboardContent();
 	noticeboard.setNbContentId(toolContentID);
-	noticeboard.setTitle(toolContentJSON.getString("title"));
+	noticeboard.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	noticeboard.setContent(toolContentJSON.getString("content"));
-	noticeboard.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
-	noticeboard.setReflectInstructions((String)JsonUtil.opt(toolContentJSON, "reflectInstructions", null));
+	noticeboard.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	noticeboard.setReflectInstructions((String)JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 
 	noticeboard.setCreatorUserId(userID.longValue());
 	noticeboard.setDateCreated(updateDate);

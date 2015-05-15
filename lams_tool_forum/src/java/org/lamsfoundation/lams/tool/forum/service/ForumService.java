@@ -70,6 +70,7 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -1590,83 +1591,87 @@ return getForumOutputFactory().getSupportedDefinitionClasses(definitionType);
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
 
-Forum forum = new Forum();
-Date updateDate = new Date();
-forum.setCreated(updateDate);
-forum.setUpdated(updateDate);
+	Forum forum = new Forum();
+	Date updateDate = new Date();
+	forum.setCreated(updateDate);
+	forum.setUpdated(updateDate);
 
-forum.setContentId(toolContentID);
-forum.setTitle(toolContentJSON.getString("title"));
-forum.setInstructions(toolContentJSON.getString("instructions"));
-forum.setAllowAnonym(JsonUtil.opt(toolContentJSON, "allowAnonym", Boolean.FALSE));
-forum.setAllowEdit(JsonUtil.opt(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default entry in the db
-forum.setAllowNewTopic(JsonUtil.opt(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the default entry in the db
-forum.setAllowRateMessages(JsonUtil.opt(toolContentJSON, "allowRateMessages", Boolean.FALSE));
-forum.setAllowRichEditor(JsonUtil.opt(toolContentJSON, "allowRichEditor", Boolean.FALSE));
-forum.setAllowUpload(JsonUtil.opt(toolContentJSON, "allowUpload", Boolean.FALSE));
-forum.setContentInUse(false);
-forum.setDefineLater(false);
-forum.setLimitedMaxCharacters(JsonUtil.opt(toolContentJSON, "limitedMaxCharacters", Boolean.FALSE));
-forum.setLimitedMinCharacters(JsonUtil.opt(toolContentJSON, "limitedMinCharacters", Boolean.FALSE));
-forum.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
-forum.setMaxCharacters(JsonUtil.opt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the default entry in the db.
-forum.setMaximumRate(JsonUtil.opt(toolContentJSON, "maximumRate", 0));
-forum.setMaximumReply(JsonUtil.opt(toolContentJSON, "maximumReply", 0));
-forum.setMinCharacters(JsonUtil.opt(toolContentJSON, "minCharacters", 0));
-forum.setMinimumRate(JsonUtil.opt(toolContentJSON, "minimumRate", 0));
-forum.setMinimumReply(JsonUtil.opt(toolContentJSON, "minimumReply", 0));
-forum.setNotifyLearnersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyLearnersOnForumPosting", Boolean.FALSE));
-forum.setNotifyLearnersOnMarkRelease(JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
-forum.setNotifyTeachersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
-forum.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, "reflectInstructions", null));
-forum.setReflectOnActivity(JsonUtil.opt(toolContentJSON, "reflectOnActivity", Boolean.FALSE));
-forum.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, "submissionDeadline", null));
-// *******************************Handle user*******************
-// Code taken from AuthoringAction TODO 
+	forum.setContentId(toolContentID);
+	forum.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	forum.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	
+	forum.setAllowAnonym(JsonUtil.opt(toolContentJSON, "allowAnonym", Boolean.FALSE));
+	forum.setAllowEdit(JsonUtil.opt(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default entry in the db
+	forum.setAllowNewTopic(JsonUtil.opt(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the default entry in the db
+	forum.setAllowRateMessages(JsonUtil.opt(toolContentJSON, "allowRateMessages", Boolean.FALSE));
+	forum.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	forum.setAllowUpload(JsonUtil.opt(toolContentJSON, "allowUpload", Boolean.FALSE));
+	forum.setContentInUse(false);
+	forum.setDefineLater(false);
+	forum.setLimitedMaxCharacters(JsonUtil.opt(toolContentJSON, "limitedMaxCharacters", Boolean.FALSE));
+	forum.setLimitedMinCharacters(JsonUtil.opt(toolContentJSON, "limitedMinCharacters", Boolean.FALSE));
+	forum.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
+	forum.setMaxCharacters(JsonUtil.opt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the default entry in the db.
+	forum.setMaximumRate(JsonUtil.opt(toolContentJSON, "maximumRate", 0));
+	forum.setMaximumReply(JsonUtil.opt(toolContentJSON, "maximumReply", 0));
+	forum.setMinCharacters(JsonUtil.opt(toolContentJSON, "minCharacters", 0));
+	forum.setMinimumRate(JsonUtil.opt(toolContentJSON, "minimumRate", 0));
+	forum.setMinimumReply(JsonUtil.opt(toolContentJSON, "minimumReply", 0));
+	forum.setNotifyLearnersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyLearnersOnForumPosting", Boolean.FALSE));
+	forum.setNotifyLearnersOnMarkRelease(JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
+	forum.setNotifyTeachersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
+	forum.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	forum.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	forum.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
+	
+	// *******************************Handle user*******************
+	// Code taken from AuthoringAction TODO 
 //	    String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-// check whether it is sysadmin:LDEV-906
+	// check whether it is sysadmin:LDEV-906
 //	if (!StringUtils.equals(contentFolderID, "-1")) {
-// try to get form system session
-//	 HttpSession ss = SessionManager.getSession();
-// get back login user DTO
-//	 UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-ForumUser forumUser = getUserByID(userID.longValue());
-if (forumUser == null) {
-   forumUser = new ForumUser(userID.longValue(), toolContentJSON.getString("firstName"), toolContentJSON.getString("lastName"),toolContentJSON.getString("loginName"));
-   getForumUserDao().save(forumUser);	    
-}
-forum.setCreatedBy(forumUser);
-updateForum(forum);    
+		// try to get form system session
+//		HttpSession ss = SessionManager.getSession();
+		// get back login user DTO
+//		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	ForumUser forumUser = getUserByID(userID.longValue());
+	if (forumUser == null) {
+	    forumUser = new ForumUser(userID.longValue(), toolContentJSON.getString("firstName"), toolContentJSON.getString("lastName"),toolContentJSON.getString("loginName"));
+	    getForumUserDao().save(forumUser);	    
+	}
+	forum.setCreatedBy(forumUser);
+	
+	updateForum(forum);    
 
-// **************************** Handle topic *********************
-JSONArray topics = toolContentJSON.getJSONArray("topics");
-for (int i=0; i<topics.length(); i++) {
-   JSONObject msgData = (JSONObject) topics.get(i);
-   Message newMsg = new Message();
+	// **************************** Handle topic *********************
+	JSONArray topics = toolContentJSON.getJSONArray("topics");
+	for (int i=0; i<topics.length(); i++) {
+	    JSONObject msgData = (JSONObject) topics.get(i);
+	    Message newMsg = new Message();
 //	    newMsg.setAttachments(attachments); TODO
-   newMsg.setCreatedBy(forumUser);
-   newMsg.setCreated(updateDate);
-   newMsg.setModifiedBy(null);
-   newMsg.setUpdated(updateDate);
+	    newMsg.setCreatedBy(forumUser);
+	    newMsg.setCreated(updateDate);
+	    newMsg.setModifiedBy(null);
+	    newMsg.setUpdated(updateDate);
 
-   newMsg.setSubject(msgData.getString("subject"));
-   newMsg.setBody(msgData.getString("body"));
-   newMsg.setForum(forum);
-   newMsg.setHideFlag(false);
-   // newMsg.setIsAnonymous(false); Does not appear on authoring interface
-   newMsg.setIsAuthored(true);
-   newMsg.setLastReplyDate(updateDate);
-   newMsg.setParent(null);
-   newMsg.setReplyNumber(0);
-   newMsg.setReport(null);
-   newMsg.setSequenceId(1);
+	    newMsg.setSubject(msgData.getString("subject"));
+	    newMsg.setBody(msgData.getString("body"));
+	    newMsg.setForum(forum);
+	    newMsg.setHideFlag(false);
+	    // newMsg.setIsAnonymous(false); Does not appear on authoring interface
+	    newMsg.setIsAuthored(true);
+	    newMsg.setLastReplyDate(updateDate);
+	    newMsg.setParent(null);
+	    newMsg.setReplyNumber(0);
+	    newMsg.setReport(null);
+	    newMsg.setSequenceId(1);
 //	    newMsg.setSessionClones(sessionClones); Used for updating in monitoring
-   newMsg.setToolSession(null);
-   createRootTopic(forum.getUid(), (ForumToolSession)null, newMsg);
-}
-// *******************************
-// TODO - investigate
-//forum.setConditions(conditions);
-// message attachments
+	    newMsg.setToolSession(null);
+	    createRootTopic(forum.getUid(), (ForumToolSession)null, newMsg);
+	}
+	
+	// *******************************
+	// TODO - investigate
+	//forum.setConditions(conditions);
+	// message attachments
     }
 }

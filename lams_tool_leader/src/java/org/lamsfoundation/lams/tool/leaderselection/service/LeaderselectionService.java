@@ -24,12 +24,15 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -44,6 +47,8 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -72,7 +77,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 
 public class LeaderselectionService implements ToolSessionManager, ToolContentManager, ILeaderselectionService,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(LeaderselectionService.class.getName());
 
@@ -562,4 +567,25 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getLeaderselectionOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
+    
+    // ****************** REST methods *************************
+
+    /** Rest call to create a new Learner Selection content. Required fields in toolContentJSON: "title", "instructions".
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+	Date updateDate = new Date();
+
+	Leaderselection leaderselection = new Leaderselection();
+	leaderselection.setToolContentId(toolContentID);
+	leaderselection.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	leaderselection.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	leaderselection.setCreateBy(userID.longValue());
+	leaderselection.setCreateDate(updateDate);
+	leaderselection.setUpdateDate(updateDate);
+	leaderselection.setContentInUse(false);
+	leaderselection.setDefineLater(false);
+	saveOrUpdateLeaderselection(leaderselection);
+    }
+    
 }
