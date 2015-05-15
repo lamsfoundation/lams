@@ -91,7 +91,9 @@ public class LoginRequestDispatcher {
     // with lesson id parameter
    public static final String METHOD_LEARNER_STRICT_AUTHENTICATION = "learnerStrictAuth";
 
-    public static final String PARAM_LESSON_ID = "lsid";
+   public static final String PARAM_LEARNING_DESIGN_ID = "ldId";
+
+   public static final String PARAM_LESSON_ID = "lsid";
 
     private static final String URL_DEFAULT = "/index.jsp";
 
@@ -109,13 +111,21 @@ public class LoginRequestDispatcher {
 
     /**
      * This method is called within LoginRequestValve and LoginRequestServlet.
-     * It simply fetch the method parameter from HttpServletRequest and build
-     * the url to redirect user to.
+     * If there is a redirectURL parameter then this becomes the redirect, otherwise it
+     * fetches the method parameter from HttpServletRequest and builds the redirect url.
+     * If the method parameter is used and a lessonId is supplied, then the user is added
+     * to the LessonClass.
      * 
      * @param request
      * @return
      */
+    
     public static String getRequestURL(HttpServletRequest request) throws ServletException {
+
+	// get the location from an explicit parameter if it exists
+	String redirect = request.getParameter("redirectURL");
+	if ( redirect != null )
+	    return request.getContextPath() + "/" + redirect;
 
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
@@ -139,6 +149,7 @@ public class LoginRequestDispatcher {
 	    String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
 	    String notifyCloseURL = request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
 	    String isPostMessageToParent = request.getParameter(PARAM_IS_POST_MESSAGE_TO_PARENT);
+	    String ldID = request.getParameter(PARAM_LEARNING_DESIGN_ID);
 
 	    // Custom CSV string to be used for tool adapters
 	    String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
@@ -148,6 +159,7 @@ public class LoginRequestDispatcher {
 
 	    // append the extra parameters if they are present in the request
 	    try {
+		parameters = ldID != null ? parameters + "&learningDesignID" + "=" + ldID : parameters;
 		parameters = customCSV != null ? parameters + "&" + PARAM_CUSTOM_CSV + "=" + customCSV : parameters;
 		parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
 		parameters = requestSrc != null ? parameters + "&" + PARAM_REQUEST_SRC + "="

@@ -77,12 +77,6 @@ public class SsoHandler implements ServletExtension {
 			// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs 
 			HttpSession session = request.getSession();
 
-			// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
-			String redirectURL = request.getParameter("redirectURL");
-			if (!StringUtils.isBlank(redirectURL)) {
-			    SsoHandler.handleRedirectBack(context, redirectURL);
-			}
-
 			/* Fetch UserDTO before completing request so putting it later in session is done ASAP
 			 * Response is sent in another thread and if UserDTO is not present in session when browser completes redirect,
 			 * it results in error. Winning this race is the easiest option.
