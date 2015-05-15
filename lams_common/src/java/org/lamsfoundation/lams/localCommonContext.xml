@@ -11,10 +11,6 @@
 		<props>
 			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 			<prop key="hibernate.show_sql">false</prop>
-			<prop key="hibernate.c3p0.minPoolSize">5</prop>
-			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
-			<prop key="hibernate.c3p0.timeout">1800</prop>
-			<prop key="hibernate.c3p0.max_statement">50</prop>
 			<prop key="hibernate.cache.use_second_level_cache">false</prop>
 		</props>
 		</property>
