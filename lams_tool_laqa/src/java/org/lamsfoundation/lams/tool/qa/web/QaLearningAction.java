@@ -149,10 +149,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		if (dto.isRequired() && isEmpty(answer)) {
 		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexInteger));
 		    forwardName = QaAppConstants.LOAD_LEARNER;
+		} else {
+		    // store
+		    QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(
+			    questionIndex));
 		}
-
-		// store
-		QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(questionIndex));
 	    }
 	    saveErrors(request, errors);
 
