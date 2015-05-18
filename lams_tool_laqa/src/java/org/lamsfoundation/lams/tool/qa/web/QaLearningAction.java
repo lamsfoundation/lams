@@ -51,7 +51,6 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -150,10 +149,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		if (dto.isRequired() && isEmpty(answer)) {
 		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexInteger));
 		    forwardName = QaAppConstants.LOAD_LEARNER;
+		} else {
+		    // store
+		    QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(
+			    questionIndex));
 		}
-
-		// store
-		QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(questionIndex));
 	    }
 	    saveErrors(request, errors);
 
