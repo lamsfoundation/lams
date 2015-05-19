@@ -149,11 +149,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 
 	    // check if there is a redirect URL parameter already
-	    String redirectURL = request.getParameter("redirectURL");
-	    if (redirectURL == null) {
-		// if not, get the full URL based on other parameters
-		redirectURL = WebUtil.getBaseServerURL() + LoginRequestDispatcher.getRequestURL(request);
-	    }
+	    String redirectURL = WebUtil.getBaseServerURL() + LoginRequestDispatcher.getRequestURL(request);
 	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
 
 	    // login.jsp knows what to do with these
