@@ -67,7 +67,6 @@ public interface IRepositoryService {
 	/** Context files, using a local datasource. Use for junit testing */
 	public static final String[] REPOSITORY_LOCAL_CONTEXT_PATH = new String[] { 
 		"/org/lamsfoundation/lams/contentrepository/applicationContext.xml",
-		"/org/lamsfoundation/lams/localApplicationContext.xml",
 		"/org/lamsfoundation/lams/toolApplicationContext.xml"};
 
     /**
