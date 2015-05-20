@@ -1,7 +1,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<!--  msgDto, messageUid, msgLevel needs to be in the session elsewhere -->
+<%--  msgDto, messageUid, msgLevel needs to be in the session elsewhere --%>
 
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
 	

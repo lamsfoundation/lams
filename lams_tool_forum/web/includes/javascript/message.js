@@ -45,3 +45,30 @@
 		$('.highlight').removeClass('highlight');
 	}
 
+	function setupJRating(rateMessagePath) {
+		$(".rating-stars-new").filter($(".rating-stars")).jRating({
+			phpPath : rateMessagePath,
+			rateMax : 5,
+			decimalLength : 1,
+			onSuccess : function(data, messageId){
+				$("#averageRating" + messageId).html(data.averageRating);
+				$("#numberOfVotes" + messageId).html(data.numberOfVotes);
+				$("#numOfRatings").html(data.numOfRatings);
+
+				//disable rating feature in case maxRate limit reached
+				if (data.noMoreRatings) {
+					$(".rating-stars").each(function() {
+						$(this).jRating('readOnly');
+					});
+				}
+			},
+			onError : function(){
+				jError('Error : please retry');
+			}
+		});
+		$(".rating-stars-new").filter($(".rating-stars-disabled")).jRating({
+			rateMax : 5,
+			isDisabled : true
+		});
+		$(".rating-stars-new").removeClass("rating-stars-new");
+	}

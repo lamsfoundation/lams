@@ -1,7 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <%-- If you change this file, remember to update the copy made for CNG-28 --%>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/message.js"></script>
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
@@ -59,6 +62,7 @@
 									$('#tree' + threadUid).treetable("reveal",messageUid);
 									$('#msg'+messageUid).focus();
 								}
+								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
 								highlightMessage();
 							});
 						}
