@@ -32,6 +32,7 @@
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
+	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
 
 	<script type="text/javascript">
 			var LAMS_URL = '<lams:LAMSURL/>',
@@ -254,7 +255,7 @@
 	<div id="footer">
 		<p>
 			<a id="openFla" style="color: #999999; text-decoration: none; border: none;" href="#"
-			 onClick="javascript:window.open('authoring/author.do?method=openAuthoring', 'FlashlessAuthoring','resizable=yes,scrollbars=yes,left=10,top=10,width=1280,height=800');">
+			   onClick="javascript:showFlashlessAuthoringDialog()">
 				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
 			</a>
 			<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
