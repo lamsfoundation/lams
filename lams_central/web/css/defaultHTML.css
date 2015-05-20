@@ -1731,3 +1731,8 @@ div.delete-arrow {
 .gray-color{
 	color: gray;
 }
+
+/* For jQuery Dialogextend */
+.ui-dialog .ui-dialog-titlebar-buttonpane a {
+	margin-right: 3px;
+}
