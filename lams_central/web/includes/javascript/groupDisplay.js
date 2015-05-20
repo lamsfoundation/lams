@@ -153,7 +153,7 @@ function makeSortable(element) {
  * Checks if the dialog is already opened.
  * If not, creates a new dialog with the given ID and init parameters.
  */
-function showDialog(id, initParams) {
+function showDialog(id, initParams, extraButtons) {
 	var dialog = $('#' + id);
 	if (dialog.length > 0) {
 		// is it open already?
@@ -166,7 +166,7 @@ function showDialog(id, initParams) {
 	dialog.attr('id', id);
 	
 	// use initParams to overwrite default behaviour of the newly created dialog
-	return dialog.dialog($.extend({
+	dialog.dialog($.extend({
 		'autoOpen' : true,
 		'modal' : false,
 		'draggable' : true,
@@ -180,6 +180,26 @@ function showDialog(id, initParams) {
 			$(this).remove();
 		}
 	}, initParams));
+	
+	if (extraButtons) {
+		dialog.dialogExtend({
+	        "closable" : true,
+	        "maximizable" : true,
+	        "minimizable" : true,
+	        "collapsable" : true,
+	        "dblclick" : "collapse",
+	        "minimizeLocation" : "right",
+	        "icons" : {
+	          "close" : "ui-icon-close",
+	          "maximize" : "ui-icon-arrow-4-diag",
+	          "minimize" : "ui-icon-minus",
+	          "collapse" : "ui-icon-triangle-1-s",
+	          "restore" : "ui-icon-newwin"
+	        }
+	      });
+	}
+	
+	return dialog;
 }
 
 
@@ -414,6 +434,20 @@ function showSearchLessonDialog(orgID){
 				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
 		}
 	});
+}
+
+
+function showFlashlessAuthoringDialog(){
+	showDialog('dialogFlashlessAuthoring', {
+		'height' : 865,
+		'width' : 1280,
+		'title' : 'Authoring',
+		'open' : function() {
+			var orgID = $(this).dialog('option', 'orgID');
+			// load contents after opening the dialog
+			$('iframe', this).attr('src', LAMS_URL + 'authoring/author.do?method=openAuthoring');
+		}
+	}, true);
 }
 
 
