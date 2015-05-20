@@ -1,5 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.jRating.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/message.js"></script>
+
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
 	// the buttons will not work. So stop the event propogating up the event chain. 
@@ -41,7 +46,11 @@
         					// the user won't try to submit it again
 							$('#edit').remove();
 	        				var loadString = '<html:rewrite page="/learning/viewMessage.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&messageUid="+messageUid;
-							$(messDiv).load(loadString);
+							$(messDiv).load(loadString, function() {
+								$('#msg'+messageUid).focus();
+								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
+								highlightMessage();
+							});
 						}
 
 		    		} else {

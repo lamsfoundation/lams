@@ -47,35 +47,11 @@
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
-				setupJRating();
+				setupJRatingSetPath();
 			});
-	
-			function setupJRating() {
-				$(".rating-stars-new").filter($(".rating-stars")).jRating({
-				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}",
-				    rateMax : 5,
-				    decimalLength : 1,
-					onSuccess : function(data, messageId){
-					    $("#averageRating" + messageId).html(data.averageRating);
-					    $("#numberOfVotes" + messageId).html(data.numberOfVotes);
-					    $("#numOfRatings").html(data.numOfRatings);
-					    
-					    //disable rating feature in case maxRate limit reached
-					    if (data.noMoreRatings) {
-					    	$(".rating-stars").each(function() {
-					    		$(this).jRating('readOnly');
-					    	});
-					    }
-					},
-					onError : function(){
-					    jError('Error : please retry');
-					}
-				});
-			    $(".rating-stars-new").filter($(".rating-stars-disabled")).jRating({
-			    	rateMax : 5,
-			    	isDisabled : true
-				});
-				$(".rating-stars-new").removeClass("rating-stars-new");
+				
+			function setupJRatingSetPath() {
+				setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
 			}
 			
 			function refreshTopic(){
@@ -195,7 +171,7 @@
 			<script>
 				<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
 				<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
-				$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true,callback:setupJRating});
+				$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true,callback:setupJRatingSetPath});
 			</script>
 			
 			<c:set var="refreshTopicURL">
