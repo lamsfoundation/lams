@@ -50,7 +50,13 @@
 	   >
 	   </property>
 
-
+	    <property
+	        name="minWordsLimit"
+	        type="int"
+	        update="true"
+	        insert="true"
+	        column="min_words_limit"
+	    />
 
         <many-to-one
             name="qaContent"

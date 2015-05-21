@@ -63,4 +63,14 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(QaContent.class, "contentLocked");
 	this.removeField(QaContent.class, "synchInMonitor");
     }
+    
+    /**
+     * Import 20140822 version content to 20150511 version tool server.
+     */
+    public void up20140822To20150511() {
+	this.addField(QaContent.class, "minimumRates", 0);
+	this.addField(QaContent.class, "maximumRates", 0);
+	
+	this.addField(QaQueContent.class, "minWordsLimit", 0);
+    }
 }

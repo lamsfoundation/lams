@@ -32,22 +32,59 @@
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
+
+		var minWordsLimitLabel = '<fmt:message key="label.minimum.number.words" ><fmt:param>{0}</fmt:param></fmt:message>';
 	
 		function submitMethod(actionMethod) {
+			
+			//validate answers
 			var submit = true;
 			if (actionMethod != 'getPreviousQuestion') {
-				jQuery(".text-area").each(function() {
-					if (jQuery.trim($(this).val()) == "") {
-						if (confirm("<fmt:message key="warning.empty.answers" />")) {
-							doSubmit(actionMethod);
-							return false;
-						} else {
-							this.focus();
-							return submit = false;
-						}
+				
+				//check for min words limit 
+				jQuery(".min-words-limit-enabled").each(function() {
+					
+					var questionId = $(this).data("sequence-id");
+					var isCkeditor = $(this).data("is-ckeditor");
+					
+					var value;
+					var instance;
+					if (isCkeditor) {
+						instance = CKEDITOR.instances["answer" + questionId];
+					    value = CKEDITOR.instances["answer" + questionId].getData();
+					    
+					} else {
+						instance = $("#answer"+ questionId);
+						value =  $("#answer"+ questionId).val();
+					}
+					
+					var numberEnteredWords = getNumberOfWords(value); 
+					
+					var minWordsLimit = $(this).data("min-words-limit");
+					if (numberEnteredWords < minWordsLimit) {
+						var minWordsLimitLabelStr = minWordsLimitLabel.replace("{0}", ": " + minWordsLimit);
+						alert("<fmt:message key="label.question" /> "+ questionId +". " +  minWordsLimitLabelStr);
+						instance.focus();
+						return submit = false;
 					}
 				});
+
+				//check for blank answers
+				if (submit) {
+					jQuery(".text-area").each(function() {
+						if (jQuery.trim($(this).val()) == "") {
+							if (confirm("<fmt:message key="warning.empty.answers" />")) {
+								doSubmit(actionMethod);
+								return false;
+							} else {
+								this.focus();
+								return submit = false;
+							}
+						}
+					});
+				}
 			}
+			
 			if (submit) {
 				doSubmit(actionMethod);
 			}

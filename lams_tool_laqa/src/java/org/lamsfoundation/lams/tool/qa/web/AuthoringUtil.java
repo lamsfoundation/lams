@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -55,8 +56,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Ozgur Demirtas
  */
 public class AuthoringUtil implements QaAppConstants {
-
-
 
     protected static List<QaQuestionDTO> reorderUpdateQuestionDTOs(List<QaQuestionDTO> questionDTOs,
 	    QaQuestionDTO qaQuestionContentDTONew, String editableQuestionIndex) {
@@ -74,12 +73,14 @@ public class AuthoringUtil implements QaAppConstants {
 	    String displayOrder = qaQuestionDTO.getDisplayOrder();
 	    String feedback = qaQuestionDTO.getFeedback();
 	    boolean required = qaQuestionDTO.isRequired();
+	    int minWordsLimit = qaQuestionDTO.getMinWordsLimit();
 
 	    if (displayOrder.equals(editableQuestionIndex)) {
 		qaQuestionDTO.setQuestion(qaQuestionContentDTONew.getQuestion());
 		qaQuestionDTO.setDisplayOrder(qaQuestionContentDTONew.getDisplayOrder());
 		qaQuestionDTO.setFeedback(qaQuestionContentDTONew.getFeedback());
-		qaQuestionDTO.setRequired(required);
+		qaQuestionDTO.setRequired(qaQuestionContentDTONew.isRequired());
+		qaQuestionDTO.setMinWordsLimit(qaQuestionContentDTONew.getMinWordsLimit());
 
 		listFinalQuestionDTO.add(qaQuestionDTO);
 	    } else {
@@ -87,171 +88,13 @@ public class AuthoringUtil implements QaAppConstants {
 		qaQuestionDTO.setDisplayOrder(displayOrder);
 		qaQuestionDTO.setFeedback(feedback);
 		qaQuestionDTO.setRequired(required);
+		qaQuestionDTO.setMinWordsLimit(minWordsLimit);
 
 		listFinalQuestionDTO.add(qaQuestionDTO);
 
 	    }
 	}
 	return listFinalQuestionDTO;
-    }
-
-    public static QaContent saveOrUpdateQaContent(List<QaQuestionDTO> questionDTOs, IQaService qaService,
-	    HttpServletRequest request, QaContent qaContent, String strToolContentID, Set<QaCondition> conditions) {
-	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	String usernameVisible = request.getParameter(QaAppConstants.USERNAME_VISIBLE);
-	String allowRateQuestions = request.getParameter(QaAppConstants.ALLOW_RATE_ANSWERS);
-	String notifyTeachersOnResponseSubmit = request.getParameter(QaAppConstants.NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
-	String showOtherAnswers = request.getParameter("showOtherAnswers");
-	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
-	String lockWhenFinished = request.getParameter("lockWhenFinished");
-	String allowRichEditor = request.getParameter("allowRichEditor");
-	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
-	String reflect = request.getParameter(QaAppConstants.REFLECT);
-	String reflectionSubject = request.getParameter(QaAppConstants.REFLECTION_SUBJECT);
-
-	boolean questionsSequencedBoolean = false;
-	boolean lockWhenFinishedBoolean = false;
-	boolean usernameVisibleBoolean = false;
-	boolean allowRateQuestionsBoolean = false;
-	boolean notifyTeachersOnResponseSubmitBoolean = false;
-	boolean showOtherAnswersBoolean = false;
-	boolean reflectBoolean = false;
-	boolean allowRichEditorBoolean = false;
-	boolean useSelectLeaderToolOuputBoolean = false;
-
-	if (questionsSequenced != null && questionsSequenced.equalsIgnoreCase("1")) {
-	    questionsSequencedBoolean = true;
-	}
-
-	if (lockWhenFinished != null && lockWhenFinished.equalsIgnoreCase("1")) {
-	    lockWhenFinishedBoolean = true;
-	}
-
-	if (usernameVisible != null && usernameVisible.equalsIgnoreCase("1")) {
-	    usernameVisibleBoolean = true;
-	}
-
-	if (allowRateQuestions != null && allowRateQuestions.equalsIgnoreCase("1")) {
-	    allowRateQuestionsBoolean = true;
-	}
-
-	if (notifyTeachersOnResponseSubmit != null && notifyTeachersOnResponseSubmit.equalsIgnoreCase("1")) {
-	    notifyTeachersOnResponseSubmitBoolean = true;
-	}
-
-	if (showOtherAnswers != null && showOtherAnswers.equalsIgnoreCase("1")) {
-	    showOtherAnswersBoolean = true;
-	}
-
-	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("1")) {
-	    allowRichEditorBoolean = true;
-	}
-
-	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
-	    useSelectLeaderToolOuputBoolean = true;
-	}
-
-	if (reflect != null && reflect.equalsIgnoreCase("1")) {
-	    reflectBoolean = true;
-	}
-	long userId = 0;
-	if (toolUser != null) {
-	    userId = toolUser.getUserID().longValue();
-	} else {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if (user != null) {
-		userId = user.getUserID().longValue();
-	    } else {
-		userId = 0;
-	    }
-	}
-
-	boolean newContent = false;
-	if (qaContent == null) {
-	    qaContent = new QaContent();
-	    newContent = true;
-	}
-
-	qaContent.setQaContentId(new Long(strToolContentID));
-	qaContent.setTitle(richTextTitle);
-	qaContent.setInstructions(richTextInstructions);
-	qaContent.setUpdateDate(new Date(System.currentTimeMillis()));
-	/** keep updating this one */
-	qaContent.setCreatedBy(userId);
-	/** make sure we are setting the userId from the User object above */
-
-	qaContent.setUsernameVisible(usernameVisibleBoolean);
-	qaContent.setAllowRateAnswers(allowRateQuestionsBoolean);
-	qaContent.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmitBoolean);
-	qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
-	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
-	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
-	qaContent.setReflect(reflectBoolean);
-	qaContent.setReflectionSubject(reflectionSubject);
-	qaContent.setAllowRichEditor(allowRichEditorBoolean);
-	qaContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
-
-	qaContent.setConditions(new TreeSet<QaCondition>(new TextSearchConditionComparator()));
-	if (newContent) {
-	    qaService.createQaContent(qaContent);
-	} else {
-	    qaService.updateQaContent(qaContent);
-	}
-
-	qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
-
-	for (QaCondition condition : conditions) {
-	    condition.setQuestions(new TreeSet<QaQueContent>(new QaQueContentComparator()));
-	    for (QaQuestionDTO dto : condition.temporaryQuestionDTOSet) {
-		for (QaQueContent queContent : (Set<QaQueContent>) qaContent.getQaQueContents()) {
-		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
-			condition.getQuestions().add(queContent);
-		    }
-		}
-	    }
-	}
-	qaContent.setConditions(conditions);
-	qaService.updateQaContent(qaContent);
-
-	// persist questions
-	int displayOrder = 0;
-	for (QaQuestionDTO questionDTO : questionDTOs) {
-
-	    String questionText = questionDTO.getQuestion();
-
-	    // skip empty questions
-	    if (questionText.isEmpty()) {
-		continue;
-	    }
-
-	    ++displayOrder;
-
-	    QaQueContent question = qaService.getQuestionByUid(questionDTO.getUid());
-
-	    // in case question doesn't exist
-	    if (question == null) {
-		question = new QaQueContent(questionText, displayOrder, questionDTO.getFeedback(),
-			questionDTO.isRequired(), qaContent);
-		qaContent.getQaQueContents().add(question);
-		question.setQaContent(qaContent);
-
-		// in case question exists already
-	    } else {
-
-		question.setQuestion(questionText);
-		question.setFeedback(questionDTO.getFeedback());
-		question.setDisplayOrder(displayOrder);
-		question.setRequired(questionDTO.isRequired());
-	    }
-
-	    qaService.saveOrUpdateQuestion(question);
-	}
-
-	return qaContent;
     }
 
     public static boolean checkDuplicateQuestions(List<QaQuestionDTO> questionDTOs, String newQuestion) {

@@ -13,7 +13,9 @@
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="mode" value="${sessionMap.mode}" />
-<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
+<c:set var="qaContent" value="${sessionMap.content}" />
+<c:set var="isLeadershipEnabled" value="${qaContent.useSelectLeaderToolOuput}" />
+<c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 
 <lams:html>
@@ -26,32 +28,41 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
-	<style media="screen,projection" type="text/css">
-		.rating-stars-div {margin-top: 8px;}
-		.user-answer {padding: 7px 2px;}
-		tr.odd:hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-grey.png)!important;}
-		tr.even:hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-grey.png)!important;}
-		tr.odd .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-blue.png)!important;}
-		.tablesorter-blue {margin-bottom: 5px;}
-		.pager {padding-bottom: 20px; width: 150px;}
-	</style>
+	<link rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
 
 	<script type="text/javascript"> 
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
+		
+		//vars for rating.js
+		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		IS_DISABLED =  ${sessionMap.isDisabled},
+		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.commentsMinWordsLimit},
+		MAX_RATES = ${qaContent.maximumRates};
 	</script>
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript" ></script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/jquery.mobile.js" type="text/javascript" ></script>	>	
+	<script src="${lams}includes/javascript/jquery.mobile.js" type="text/javascript" ></script>
+	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 
 	<script type="text/javascript">
 	  	$(document).bind('pageinit', function(){
 	  		
 			$(".tablesorter").tablesorter({
 				theme: 'blue',
 			    widthFixed: true,
-			    widgets: ['zebra']
+			    widgets: ['zebra'],
+		        headers: { 
+		            1: { 
+		                sorter: false 
+		            }, 
+		            2: {
+		                sorter: false 
+		            } 
+		        } 
 			});
 			
 			$(".tablesorter").each(function() {
@@ -65,15 +76,18 @@
 				      // the filterList to the url into an "fcol" array.
 				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
 				      // and a filterList = [[2,Blue],[3,13]] becomes "&fcol[2]=Blue&fcol[3]=13" in the url
-					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
+					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isAllowRateAnswers=${qaContent.allowRateAnswers}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $("#toolSessionID").val() + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
 
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
-				            json = {};
+				            json = {},
+							countRatedItems = data.countRatedItems;
 				    		
 							for (i = 0; i < data.rows.length; i++){
 								var userData = data.rows[i];
+								var itemId = userData["responseUid"];
+								var isItemAuthoredByUser = userData["isItemAuthoredByUser"];
 								
 								rows += '<tr>';
 								rows += '<td>';
@@ -98,24 +112,87 @@
 								rows += '</td>';
 								
 								if (${generalLearnerFlowDTO.allowRateAnswers == 'true'}) {
-									rows += '<td style="width:50px;">';
+									rows += '<td style="width:150px;">';
 									
 									if (userData["visible"] == 'true') {
-										var responseUid = userData["responseUid"];
+										rows += '<div class="rating-stars-holder">';
 										
-										rows += '<div class="rating-stars-div">';
-										rows += 	'<div class="rating-stars" data-average="' + userData["averageRating"] +'" data-id="' + responseUid + '"></div>';
-										rows += 	'<div class="rating-stars-caption">';
-										rows += 		'<span id="averageRating' + responseUid + '">' + userData["averageRating"] +'</span> / ';
-										rows += 		'<span id="numberOfVotes' + responseUid + '">' + userData["numberOfVotes"] +'</span> ';
-										rows += 		'<fmt:message key="label.votes" />';
-										rows += 	'</div>';
+										for (j = 0; j < userData.criteriaDtos.length; j++){
+											var criteriaDto = userData.criteriaDtos[j];
+											var objectId = criteriaDto["ratingCriteriaId"] + "-" + itemId;
+											var averageRating = criteriaDto.averageRating;
+											var numberOfVotes = criteriaDto.numberOfVotes;
+											var userRating = criteriaDto.userRating;
+											var isCriteriaNotRatedByUser = userRating == "";
+											var averageRatingDisplayed = (isItemAuthoredByUser || !isCriteriaNotRatedByUser) ? averageRating : 0;
+											var ratingStarsClass = (IS_DISABLED ||isItemAuthoredByUser || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES) || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
+								
+											rows += '<h4>';
+											rows += 	 criteriaDto.title;
+											rows += '</h4>';
+											
+											rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
+											rows += '</div>';
+											
+											if (isItemAuthoredByUser) {
+												rows += '<div class="rating-stars-caption">';
+												rows += 	AVG_RATING_LABEL.replace("@1@", averageRating).replace("@2@", numberOfVotes);
+												rows += '</div>';
+												
+											} else {
+												rows += '<div class="rating-stars-caption" id="rating-stars-caption-'+ objectId +'"';
+												if (isCriteriaNotRatedByUser) {
+													rows += ' style="visibility: hidden;"';	
+												}
+												rows += '>';
+												var temp = YOUR_RATING_LABEL.replace("@1@", '<span id="user-rating-'+ objectId +'">'+ userRating + '</span>');
+												temp = temp.replace("@2@", '<span id="average-rating-'+ objectId +'">'+ averageRating + '</span>');
+												temp = temp.replace("@3@", '<span id="number-of-votes-'+ objectId +'">'+ numberOfVotes + '</span>');
+												rows += 	temp;
+												rows += '</div>';
+											}
+										}
+										
 										rows += '</div>';
-										rows += '<div style="clear: both;"></div>';
-									}									
+									}
 									
 									rows += '</td>';
-								}	
+								}
+								
+								if (${isCommentsEnabled}) {
+									rows += '<td style="width:30%; min-width: 250px;" id="comments-area-' + itemId + '">';
+									
+									if (userData["visible"] == 'true') {
+										var commentsCriteriaId = userData["commentsCriteriaId"];
+										var commentPostedByUser = userData["commentPostedByUser"];
+										
+										//show all comments needs to be shown
+										if (isItemAuthoredByUser) {
+											for (j = 0; i < userData.comments.length; j++){
+												var comment = userData.comments[j];
+												rows += '<div class="rating-comment">';
+												rows += 	comment;
+												rows += '</div>';
+											}
+											
+										} else if (commentPostedByUser != "") {
+											rows += '<div class="rating-comment">';
+											rows += 	commentPostedByUser;
+											rows += '</div>';
+											
+										//show comments textarea and a submit button
+										} else if (!IS_DISABLED) {
+											rows += '<div id="add-comment-area-' + itemId + '">';											
+											rows +=		'<textarea name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
+											
+											rows += 	'<div class="button add-comment add-comment-new" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'">';
+											rows += 	'</div>';
+											rows += '</div>';											
+										}
+									}
+									
+									rows += '</td>';
+								}
 								
 								rows += '</tr>';
 							}
@@ -123,8 +200,7 @@
 							json.total = data.total_rows; // only allow 100 rows in total
 							//json.filteredRows = 100; // no filtering
 							json.rows = $(rows);
-							return json;
-				            
+							return json;				            
 				    	}
 					},
 				    container: $(this).next(".pager"),
@@ -143,33 +219,9 @@
 				
 				// bind to pager events
 				.bind('pagerInitialized pagerComplete', function(event, options){
-				    $(".rating-stars").each(function() {
-				    	//make sure jRating gets applied only once
-				    	if ($(this)[0].innerHTML.indexOf("jRatingColor") > -1) {
-				    		return;
-				    	}
-				    	
-				    	$(this).jRating({
-					    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
-					    	rateMax : 5,
-					    	decimalLength : 1,
-						  	onSuccess : function(data, responseUid){
-						    	$("#averageRating" + responseUid).html(data.averageRating);
-						    	$("#numberOfVotes" + responseUid).html(data.numberOfVotes);
-						    	$("#averageRating" + responseUid).parents(".tablesorter").trigger("update");
-							},
-						  	onError : function(){
-						    	jError('Error : please retry');
-						  	}
-				    	})
-					});
+					initializeJRating();
 				});
 			});
-	  		
-		    $(".rating-stars-disabled").jRating({
-		    	rateMax : 5,
-		    	isDisabled : true
-		    });
 		 });
 	
 		function submitLearningMethod(actionMethod) {
@@ -205,6 +257,39 @@
 			</div>
 		</c:if>
 		
+		<!-- Rating limits info -->
+		<c:if test="${qaContent.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
+		
+			<div class="info">
+				<c:choose>
+					<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
+						<fmt:message key="label.rate.limits.reminder">
+							<fmt:param value="${qaContent.minimumRates}"/>
+							<fmt:param value="${qaContent.maximumRates}"/>
+						</fmt:message>
+					</c:when>
+					
+					<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates eq 0}">
+						<fmt:message key="label.rate.limits.reminder.min">
+							<fmt:param value="${qaContent.minimumRates}"/>
+						</fmt:message>
+					</c:when>
+					
+					<c:when test="${qaContent.minimumRates eq 0 and qaContent.maximumRates ne 0}">
+						<fmt:message key="label.rate.limits.reminder.max">
+							<fmt:param value="${qaContent.maximumRates}"/>
+						</fmt:message>
+					</c:when>
+				</c:choose>
+				<br>
+						
+				<fmt:message key="label.rate.limits.topic.reminder">
+					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>"/>
+				</fmt:message>
+			</div>
+			
+		</c:if>
+		
 		<c:if test="${isLeadershipEnabled}">
 			<h4>
 				<fmt:message key="label.group.leader" >
@@ -218,34 +303,30 @@
 		</h2>
 
 		<ul data-role="listview" data-theme="c" id="qaAnswers" >
-			<c:forEach var="currentDto" items="${generalLearnerFlowDTO.listMonitoredAnswersContainerDTO}" varStatus="status">
-				<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}" />
-
+			<c:forEach var="userResponse" items="${generalLearnerFlowDTO.userResponses}" varStatus="status">
 				<li>
+				
 					<p class="space-top">
 						<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
-						<c:out value="${currentDto.question}" escapeXml="false" />
+						<c:out value="${userResponse.qaQuestion.question}" escapeXml="false" />
 					</p>
 
-					<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-						<c:forEach var="sData" items="${questionAttemptData.value}">
-							<c:set var="userData" scope="request" value="${sData.value}" />
-							<c:set var="responseUid" scope="request" value="${userData.uid}" />
-
-							<c:if test="${generalLearnerFlowDTO.userUid == userData.queUsrId}">
-									<c:if test="${currentQuestionId == userData.questionUid}">
-										<p class="small-space-top">
-											<span class="field-name"> <c:out value="${userData.userName}" /> </span> -
-											<lams:Date value="${userData.attemptTime}" style="short"/>
-										</p>
-										<p class="space-bottom user-answer">
-											<c:out value="${userData.responsePresentable}" escapeXml="false" />
-										</p>
-										<jsp:include page="ratingStarsDisabled.jsp" />
-									</c:if>
-							</c:if>								
-						</c:forEach>
-					</c:forEach>
+					<p class="small-space-top">
+						<span class="field-name"> <c:out value="${userResponse.qaQueUser.fullname}" /> </span> -
+							<lams:Date value="${userResponse.attemptTime}" style="short"/>
+					</p>
+					<div class="small-space-bottom user-answer">
+						<c:out value="${userResponse.answer}" escapeXml="false" />
+					</div>
+					
+					<%--Rating area---------------------------------------%>
+					<c:if test="${qaContent.allowRateAnswers}">
+						<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
+								maxRates="${qaContent.maximumRates}" minRates="${qaContent.minimumRates}" 
+								countRatedItems="${sessionMap.countRatedItems}" />
+						<br>
+					</c:if>
+					
 				</li>
 			</c:forEach>
 		</ul>
@@ -275,6 +356,14 @@
 							<c:out value="${question.question}" escapeXml="false" />
 						</p>
 						
+						<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
+							<div class="info rating-info">
+								<fmt:message key="label.comment.minimum.number.words">
+									<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
+								</fmt:message>
+							</div>
+						</c:if>
+						
 						<table class="tablesorter" data-question-uid="${question.uid}">
 							<thead>
 								<tr>
@@ -284,6 +373,11 @@
 									<c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
 										<th title="<fmt:message key='label.sort.by.rating'/>">
 											<fmt:message key="label.learning.rating" />
+										</th>
+									</c:if>
+									<c:if test="${isCommentsEnabled}">
+										<th>
+											<fmt:message key="label.comment" />
 										</th>
 									</c:if>
 								</tr>

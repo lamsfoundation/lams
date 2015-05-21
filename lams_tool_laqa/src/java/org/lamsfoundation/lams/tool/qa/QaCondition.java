@@ -65,7 +65,7 @@ public class QaCondition extends TextSearchCondition {
 	super(conditionDTO);
 	for (QaQueContent question : conditionDTO.getQuestions()) {
 	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
-		    question.isRequired(), null);
+		    question.isRequired(), question.getMinWordsLimit(), null);
 	    getQuestions().add(questionCopy);
 	}
     }
@@ -136,7 +136,7 @@ public class QaCondition extends TextSearchCondition {
 
 	for (QaQueContent question : getQuestions()) {
 	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
-		    question.isRequired(), null);
+		    question.isRequired(), question.getMinWordsLimit(), null);
 	    questionsCopy.add(questionCopy);
 	}
 	return new QaCondition(null, newConditionUIID, orderId, name, displayName, allWords, phrase, anyWords,

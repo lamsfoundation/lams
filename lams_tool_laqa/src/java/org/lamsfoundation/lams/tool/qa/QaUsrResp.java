@@ -29,6 +29,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 
 /**
  * 
@@ -64,8 +65,7 @@ public class QaUsrResp implements Serializable, Comparable {
     private String timezone;
     
     //DTO fields
-    private String averageRating;
-    private String numberOfVotes;
+    private ItemRatingDTO itemRatingDto;
 
     /** full constructor */
     public QaUsrResp(Long responseId, String answer, Date attemptTime, String timezone,
@@ -237,20 +237,12 @@ public class QaUsrResp implements Serializable, Comparable {
 	this.visible = visible;
     }
 
-    public String getNumberOfVotes() {
-	return numberOfVotes;
+    public ItemRatingDTO getItemRatingDto() {
+	return itemRatingDto;
     }
 
-    public void setNumberOfVotes(String numberOfVotes) {
-	this.numberOfVotes = numberOfVotes;
-    }
-
-    public String getAverageRating() {
-	return averageRating;
-    }
-
-    public void setAverageRating(String averageRating) {
-	this.averageRating = averageRating;
+    public void setItemRatingDto(ItemRatingDTO itemRatingDto) {
+	this.itemRatingDto = itemRatingDto;
     }
 
 }

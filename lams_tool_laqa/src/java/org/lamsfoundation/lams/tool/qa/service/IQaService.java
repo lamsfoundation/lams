@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -41,7 +42,6 @@ import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
-import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * 
  * @author Ozgur Demirtas
  */
-public interface IQaService {
+public interface IQaService extends ToolRatingManager {
 
     /**
      * @param user
@@ -112,10 +112,6 @@ public interface IQaService {
 	    int page, int size, int sorting);
     
     int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId);
-
-    Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId);
-    
-    Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId);
     
     /**
      * Creates or updates response with answer submitted by user.
@@ -321,10 +317,6 @@ public interface IQaService {
      * @return
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
-
-    AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating);
-
-    AverageRatingDTO getAverageRatingDTOByResponse(Long responseId);
 
     /**
      * Return reflection data for all sessions.

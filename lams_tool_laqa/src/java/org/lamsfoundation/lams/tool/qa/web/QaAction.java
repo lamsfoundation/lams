@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.TreeSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -46,6 +48,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -56,19 +60,27 @@ import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
+ * Q&A Tool's authoring methods. Additionally, there is one more method that initializes authoring and it's located in
+ * QaStarterAction.java.
+ * 
  * @author Ozgur Demirtas
  */
 public class QaAction extends LamsDispatchAction implements QaAppConstants {
     private static Logger logger = Logger.getLogger(QaAction.class.getName());
+    
+    private static IQaService qaService;
 
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -82,7 +94,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    HttpServletResponse response) throws IOException, ServletException {
 
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+	qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
@@ -90,6 +102,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Long toolContentID = new Long(strToolContentID);
 
 	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
@@ -120,7 +133,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    QaAction.logger.debug("errors saved: " + errors);
 	}
 
-	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
+	QaContent qaContent = qaService.getQaContent(toolContentID);
 	if (errors.isEmpty()) {
 	    ToolAccessMode mode = getAccessMode(request);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
@@ -145,13 +158,16 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    qaService.removeQuestion(removeableQuestion);
 		}
 	    }
-
-	    SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
-		    .get(QaAppConstants.ATTR_CONDITION_SET);
+	    
+	    // ************************* Handle rating criterias *******************
+	    List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap
+		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
+	    qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
 
 	    // store content
-	    qaContent = AuthoringUtil.saveOrUpdateQaContent(questionDTOs, qaService, request, qaContent,
-		    strToolContentID, conditionSet);
+	    SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
+		    .get(QaAppConstants.ATTR_CONDITION_SET);
+	    qaContent = saveOrUpdateQaContent(questionDTOs, request, qaContent, toolContentID, conditionSet);
 
 	    //reOrganizeDisplayOrder
 	    List<QaQueContent> sortedQuestions = qaService.getAllQuestionEntriesSorted(qaContent.getUid().longValue());
@@ -197,6 +213,170 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }
 
+    private QaContent saveOrUpdateQaContent(List<QaQuestionDTO> questionDTOs, HttpServletRequest request,
+	    QaContent qaContent, Long toolContentId, Set<QaCondition> conditions) {
+	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
+	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
+	String usernameVisible = request.getParameter(QaAppConstants.USERNAME_VISIBLE);
+	String allowRateQuestions = request.getParameter(QaAppConstants.ALLOW_RATE_ANSWERS);
+	String notifyTeachersOnResponseSubmit = request.getParameter(QaAppConstants.NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
+	String showOtherAnswers = request.getParameter("showOtherAnswers");
+	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
+	String lockWhenFinished = request.getParameter("lockWhenFinished");
+	String allowRichEditor = request.getParameter("allowRichEditor");
+	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
+	String reflect = request.getParameter(QaAppConstants.REFLECT);
+	String reflectionSubject = request.getParameter(QaAppConstants.REFLECTION_SUBJECT);
+	int minimumRates = WebUtil.readIntParam(request, "minimumRates");
+	int maximumRates = WebUtil.readIntParam(request, "maximumRates");
+
+	boolean questionsSequencedBoolean = false;
+	boolean lockWhenFinishedBoolean = false;
+	boolean usernameVisibleBoolean = false;
+	boolean allowRateQuestionsBoolean = false;
+	boolean notifyTeachersOnResponseSubmitBoolean = false;
+	boolean showOtherAnswersBoolean = false;
+	boolean reflectBoolean = false;
+	boolean allowRichEditorBoolean = false;
+	boolean useSelectLeaderToolOuputBoolean = false;
+
+	if (questionsSequenced != null && questionsSequenced.equalsIgnoreCase("1")) {
+	    questionsSequencedBoolean = true;
+	}
+
+	if (lockWhenFinished != null && lockWhenFinished.equalsIgnoreCase("1")) {
+	    lockWhenFinishedBoolean = true;
+	}
+
+	if (usernameVisible != null && usernameVisible.equalsIgnoreCase("1")) {
+	    usernameVisibleBoolean = true;
+	}
+
+	if (showOtherAnswers != null && showOtherAnswers.equalsIgnoreCase("1")) {
+	    showOtherAnswersBoolean = true;
+	}
+
+	if (allowRateQuestions != null && allowRateQuestions.equalsIgnoreCase("1") && showOtherAnswersBoolean) {
+	    allowRateQuestionsBoolean = true;
+	}
+
+	if (notifyTeachersOnResponseSubmit != null && notifyTeachersOnResponseSubmit.equalsIgnoreCase("1")) {
+	    notifyTeachersOnResponseSubmitBoolean = true;
+	}
+
+	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("1")) {
+	    allowRichEditorBoolean = true;
+	}
+
+	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
+	    useSelectLeaderToolOuputBoolean = true;
+	}
+
+	if (reflect != null && reflect.equalsIgnoreCase("1")) {
+	    reflectBoolean = true;
+	}
+	long userId = 0;
+	if (toolUser != null) {
+	    userId = toolUser.getUserID().longValue();
+	} else {
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if (user != null) {
+		userId = user.getUserID().longValue();
+	    } else {
+		userId = 0;
+	    }
+	}
+
+	boolean newContent = false;
+	if (qaContent == null) {
+	    qaContent = new QaContent();
+	    newContent = true;
+	}
+
+	qaContent.setQaContentId(toolContentId);
+	qaContent.setTitle(richTextTitle);
+	qaContent.setInstructions(richTextInstructions);
+	qaContent.setUpdateDate(new Date(System.currentTimeMillis()));
+	/** keep updating this one */
+	qaContent.setCreatedBy(userId);
+	/** make sure we are setting the userId from the User object above */
+
+	qaContent.setUsernameVisible(usernameVisibleBoolean);
+	qaContent.setAllowRateAnswers(allowRateQuestionsBoolean);
+	qaContent.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmitBoolean);
+	qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
+	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
+	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
+	qaContent.setReflect(reflectBoolean);
+	qaContent.setReflectionSubject(reflectionSubject);
+	qaContent.setAllowRichEditor(allowRichEditorBoolean);
+	qaContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
+	qaContent.setMinimumRates(minimumRates);
+	qaContent.setMaximumRates(maximumRates);
+
+	qaContent.setConditions(new TreeSet<QaCondition>(new TextSearchConditionComparator()));
+	if (newContent) {
+	    qaService.createQaContent(qaContent);
+	} else {
+	    qaService.updateQaContent(qaContent);
+	}
+
+	qaContent = qaService.getQaContent(toolContentId);
+
+	for (QaCondition condition : conditions) {
+	    condition.setQuestions(new TreeSet<QaQueContent>(new QaQueContentComparator()));
+	    for (QaQuestionDTO dto : condition.temporaryQuestionDTOSet) {
+		for (QaQueContent queContent : (Set<QaQueContent>) qaContent.getQaQueContents()) {
+		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
+			condition.getQuestions().add(queContent);
+		    }
+		}
+	    }
+	}
+	qaContent.setConditions(conditions);
+	qaService.updateQaContent(qaContent);
+
+	// persist questions
+	int displayOrder = 0;
+	for (QaQuestionDTO questionDTO : questionDTOs) {
+
+	    String questionText = questionDTO.getQuestion();
+
+	    // skip empty questions
+	    if (questionText.isEmpty()) {
+		continue;
+	    }
+
+	    ++displayOrder;
+
+	    QaQueContent question = qaService.getQuestionByUid(questionDTO.getUid());
+
+	    // in case question doesn't exist
+	    if (question == null) {
+		question = new QaQueContent(questionText, displayOrder, questionDTO.getFeedback(),
+			questionDTO.isRequired(), questionDTO.getMinWordsLimit(), qaContent);
+		qaContent.getQaQueContents().add(question);
+		question.setQaContent(qaContent);
+
+		// in case question exists already
+	    } else {
+
+		question.setQuestion(questionText);
+		question.setFeedback(questionDTO.getFeedback());
+		question.setDisplayOrder(displayOrder);
+		question.setRequired(questionDTO.isRequired());
+		question.setMinWordsLimit(questionDTO.getMinWordsLimit());
+	    }
+
+	    qaService.saveOrUpdateQuestion(question);
+	}
+
+	return qaContent;
+    }
+
     /**
      * saveSingleQuestion
      */
@@ -233,6 +413,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	if (required != null && required.equalsIgnoreCase("1")) {
 	    requiredBoolean = true;
 	}
+	int minWordsLimit = WebUtil.readIntParam(request, "minWordsLimit");
 	
 	if (newQuestion != null && newQuestion.length() > 0) {
 	    if (editQuestionBoxRequest != null && editQuestionBoxRequest.equals("false")) {
@@ -258,6 +439,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    qaQuestionDTO.setFeedback(feedback);
 		    qaQuestionDTO.setDisplayOrder(editableQuestionIndex);
 		    qaQuestionDTO.setRequired(requiredBoolean);
+		    qaQuestionDTO.setMinWordsLimit(minWordsLimit);
 
 		    questionDTOs = AuthoringUtil.reorderUpdateQuestionDTOs(questionDTOs,
 			    qaQuestionDTO, editableQuestionIndex);
@@ -285,6 +467,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		qaQuestionDTO.setFeedback(feedback);
 		qaQuestionDTO.setDisplayOrder(editableQuestionIndex);
 		qaQuestionDTO.setRequired(requiredBoolean);
+		qaQuestionDTO.setMinWordsLimit(minWordsLimit);
 
 		questionDTOs = AuthoringUtil.reorderUpdateQuestionDTOs(questionDTOs,
 			qaQuestionDTO, editableQuestionIndex);
@@ -471,14 +654,15 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaAuthoringForm.setEditableQuestionIndex(questionIndex);
 
-	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
+	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
 	String editableQuestion = "";
 	String editableFeedback = "";
 	boolean requiredBoolean = false;
-	Iterator iter = questionDTOs.iterator();
+	int minWordsLimit = 0;
+	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = (QaQuestionDTO) iter.next();
+	    QaQuestionDTO qaQuestionDTO = iter.next();
 	    String displayOrder = qaQuestionDTO.getDisplayOrder();
 
 	    if (displayOrder != null && !displayOrder.equals("")) {
@@ -486,6 +670,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    editableFeedback = qaQuestionDTO.getFeedback();
 		    editableQuestion = qaQuestionDTO.getQuestion();
 		    requiredBoolean = qaQuestionDTO.isRequired();
+		    minWordsLimit = qaQuestionDTO.getMinWordsLimit();
 		    break;
 		}
 
@@ -514,7 +699,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaGeneralAuthoringDTO.setEditableQuestionText(editableQuestion);
 	qaGeneralAuthoringDTO.setEditableQuestionFeedback(editableFeedback);
 	qaAuthoringForm.setRequired(requiredBoolean);
-	qaAuthoringForm.setFeedback(editableFeedback);
+	qaAuthoringForm.setMinWordsLimit(minWordsLimit);
 
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
@@ -811,6 +996,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    String question = qaQuestionDTO.getQuestion();
 	    String feedback = qaQuestionDTO.getFeedback();
 	    boolean required = qaQuestionDTO.isRequired();
+	    int minWordsLimit = qaQuestionDTO.getMinWordsLimit();
 
 	    if (question != null && !question.equals("")) {
 		++queIndex;
@@ -819,6 +1005,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		qaQuestionDTO.setDisplayOrder(new Integer(queIndex).toString());
 		qaQuestionDTO.setFeedback(feedback);
 		qaQuestionDTO.setRequired(required);
+		qaQuestionDTO.setMinWordsLimit(minWordsLimit);
 
 		listFinalQuestionDTO.add(qaQuestionDTO);
 	    }

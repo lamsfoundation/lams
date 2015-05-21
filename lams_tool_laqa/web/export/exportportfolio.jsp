@@ -7,24 +7,11 @@
 	<title><fmt:message key="label.exportPortfolio" />
 	</title>
 	<lams:css localLinkPath="../" />
-	<link rel="stylesheet" href="./css/jquery.jRating.css"  type="text/css" />
-	<style media="screen,projection" type="text/css">
-		.rating-stars-div {padding-top: 24px; padding-bottom: 2px;}
-	</style>
 
 	<script type="text/javascript"> 
 		var pathToImageFolder = "./images/css/";
 	</script>
 	<script type="text/javascript" src="./javascript/jquery.js"></script>
-	<script type="text/javascript" src="./javascript/jquery.jRating.js"></script>
-	<script type="text/javascript">
-	  	$(document).ready(function(){
-		    $(".rating-stars-disabled").jRating({
-		    	rateMax : 5,
-		    	isDisabled : true
-			});		    
-		 });
-	</script>
 </lams:head>
 
 <body class="stripes">
@@ -98,7 +85,6 @@
 													<c:when
 														test="${generalLearnerFlowDTO.userUid == userData.queUsrId or userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}" escapeXml="true" />
-														<jsp:include page="../learning/atingStarsDisabled.jsp" />
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden" /> </i>
@@ -176,7 +162,6 @@
 													</c:if>
 													<c:out value="${userData.responsePresentable}"
 														escapeXml="false" />
-													<jsp:include page="../learning/ratingStarsDisabled.jsp" />
 												</td>
 											</tr>
 
