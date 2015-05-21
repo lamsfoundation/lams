@@ -17,6 +17,7 @@
 
 <%-- Optional attribute --%>
 <%@ attribute name="hasRatingLimits" required="false" rtexprvalue="true" %>
+<%@ attribute name="formContentPrefix" required="false" rtexprvalue="true" %>
 <%@ attribute name="headerLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="addLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="deleteLabel" required="false" rtexprvalue="true" %>
@@ -33,6 +34,9 @@
 <%-- Default value for message key --%>
 <c:if test="${empty hasRatingLimits}">
 	<c:set var="hasRatingLimits" value="false" scope="request"/>
+</c:if>
+<c:if test="${not empty formContentPrefix}">
+	<c:set var="formContentPrefix" scope="request">${formContentPrefix}.</c:set>
 </c:if>
 <c:if test="${empty headerLabel}">
 	<c:set var="headerLabel" value="label.rating.criterias" scope="request"/>
@@ -288,7 +292,7 @@ $(document).ready(function() {
 	<c:if test="${hasRatingLimits}">
 		<div>
 			<fmt:message key="${minimumLabel}" />
-			<html:select property="imageGallery.minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);">
+			<html:select property="${formContentPrefix}minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);">
 				<html:option value="0">
 					<fmt:message key="${noMinimumLabel}" />
 				</html:option>
@@ -305,7 +309,7 @@ $(document).ready(function() {
 			</html:select>
 		
 			<fmt:message key="${maximumLabel}" />
-			<html:select property="imageGallery.maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);">
+			<html:select property="${formContentPrefix}maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);">
 				<html:option value="0">
 					<fmt:message key="${noMaximumLabel}" />
 				</html:option>

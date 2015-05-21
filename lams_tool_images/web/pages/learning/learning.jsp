@@ -83,15 +83,14 @@
 			padding-top: 10px;
 		}
 		#image-info:after {
-   content: " ";
-   display: block; 
-   height: 0; 
-   clear: both;
+		   content: " ";
+		   display: block; 
+		   height: 0; 
+		   clear: both;
 		}
 		#kkk{
 			float:right;
 		}
-		
 		.space-bottom-top {
 			padding-top: 40px;
 		}

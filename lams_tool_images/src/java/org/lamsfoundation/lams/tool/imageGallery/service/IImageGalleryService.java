@@ -29,7 +29,9 @@ import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.ToolRatingManager;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
@@ -47,7 +49,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
  * 
  *         Interface that defines the contract that all ShareImageGallery service provider must follow.
  */
-public interface IImageGalleryService {
+public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get a cloned copy of tool default tool content (ImageGallery) and assign the toolContentId of that copy as the
@@ -131,6 +133,8 @@ public interface IImageGalleryService {
      * @return Object[] {numberRatings, averageRating}
      */
     Object[] getRatingForGroup(Long imageUid, Long sessionId);
+    
+    ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
 
     /**
      * Save/update current ImageGalleryItem.
@@ -148,23 +152,6 @@ public interface IImageGalleryService {
      * @param imageUid
      */
     void deleteImage(Long toolSessionId, Long imageUid);
-
-    List<RatingCriteria> getRatingCriterias(Long toolContentId);
-
-    void saveOrUpdateRatingCriteria(RatingCriteria criteria);
-
-    void deleteRatingCriteria(Long ratingCriteriaId);
-
-    List<RatingCriteriaDTO> getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
-
-    /**
-     * Returns number of images rated by specified user in a current activity. It counts comments as ratings.
-     * 
-     * @param toolContentId
-     * @param userId
-     * @return
-     */
-    int getCountImagesRatedByUser(Long toolContentId, Integer userId);
 
     /**
      * Save/update ImageVote.

@@ -104,7 +104,8 @@
 		<div id="criterias-holder" <c:if test="${!formBean.imageGallery.allowRank}"> style="display:none;"</c:if> >
 			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
 				upLabel="label.authoring.up" downLabel="label.authoring.down"
-				allowCommentsLabel="label.authoring.advance.allow.learner.comment.images"/>
+				allowCommentsLabel="label.authoring.advance.allow.learner.comment.images"
+				formContentPrefix="imageGallery"/>
 		</div>
 	</div>
 </p>
