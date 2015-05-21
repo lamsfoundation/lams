@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.imageGallery.web.action;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +53,8 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
@@ -223,7 +225,7 @@ public class LearningAction extends Action {
 
 	// store how many items are rated
 	if (imageGallery.isAllowRank()) {
-	    int countRatedImages = service.getCountImagesRatedByUser(imageGallery.getContentId(), userId.intValue());
+	    int countRatedImages = service.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
 	    sessionMap.put(ImageGalleryConstants.ATTR_COUNT_RATED_IMAGES, countRatedImages);
 	}
 
@@ -479,11 +481,6 @@ public class LearningAction extends Action {
 	    image.getCreateBy().getLoginName();
 	}
 
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	boolean isTeacher = mode != null && mode.isTeacher();
-	boolean isAuthor = !isTeacher && !image.isCreateByAuthor() && (createdBy != null)
-		&& (createdBy.getUserId().equals(userId));
-
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
 	    Set<ImageComment> dbComments = image.getComments();
@@ -498,13 +495,15 @@ public class LearningAction extends Action {
 	    sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	}
 
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	boolean isTeacher = mode != null && mode.isTeacher();
 	if (!isTeacher && imageGallery.isAllowRank()) {
-	    List<RatingCriteriaDTO> ratingDtos = service.getRatingCriteriaDtos(imageGallery.getContentId(), imageUid, userId);
-	    sessionMap.put(ImageGalleryConstants.ATTR_RATING_DTOS, ratingDtos);
+	    ItemRatingDTO itemRatingDto = service.getRatingCriteriaDtos(imageGallery.getContentId(), imageUid, userId);
+	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTO, itemRatingDto);
 	    
 	    // store how many items are rated
-	    int countRatedImages = service.getCountImagesRatedByUser(imageGallery.getContentId(), userId.intValue());
-	    sessionMap.put(ImageGalleryConstants.ATTR_COUNT_RATED_IMAGES, countRatedImages);
+	    int countRatedImages = service.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
+	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedImages);
 	}
 
 	if (!isTeacher && imageGallery.isAllowVote()) {
@@ -517,6 +516,7 @@ public class LearningAction extends Action {
 	}
 
 	// set visibility of "Delete image" button
+	boolean isAuthor = !image.isCreateByAuthor() && (createdBy != null) && (createdBy.getUserId().equals(userId));
 	sessionMap.put(ImageGalleryConstants.PARAM_IS_AUTHOR, isAuthor);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);

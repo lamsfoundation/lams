@@ -38,7 +38,7 @@
 	
 		<c:if test="${imageGallery.allowRank && isImageSelected}">
 		
-			<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
+			<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
 					maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
 					countRatedItems="${sessionMap.countRatedImages}" 
 					warnCommentIsBlankLabel="error.resource.image.comment.blank"/>

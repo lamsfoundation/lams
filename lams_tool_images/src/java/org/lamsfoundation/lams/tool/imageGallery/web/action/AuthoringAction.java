@@ -26,11 +26,9 @@ package org.lamsfoundation.lams.tool.imageGallery.web.action;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -53,7 +51,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
@@ -379,76 +376,8 @@ public class AuthoringAction extends Action {
 	}
 
 	// ************************* Handle rating criterias *******************
-	// Set<RatingCriteria> updatedCriterias = new LinkedHashSet<RatingCriteria>();
-	List<RatingCriteria> ratingCriterias = (List<RatingCriteria>) sessionMap
-		.get(AttributeNames.ATTR_RATING_CRITERIAS);
-	// create orderId to RatingCriteria map
-	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<Integer, RatingCriteria>();
-	for (RatingCriteria ratingCriteriaIter : ratingCriterias) {
-	    mapOrderIdToRatingCriteria.put(ratingCriteriaIter.getOrderId(), ratingCriteriaIter);
-	}
-
-	int criteriaMaxOrderId = WebUtil.readIntParam(request, "criteriaMaxOrderId");
-	// i is equal to an old orderId
-	for (int i = 1; i <= criteriaMaxOrderId; i++) {
-
-	    String criteriaTitle = WebUtil.readStrParam(request, "criteriaTitle" + i, true);
-
-	    RatingCriteria ratingCriteria = mapOrderIdToRatingCriteria.get(i);
-	    if (StringUtils.isNotBlank(criteriaTitle)) {
-		int newCriteriaOrderId = WebUtil.readIntParam(request, "criteriaOrderId" + i);
-
-		// modify existing one if it exists. add otherwise
-		if (ratingCriteria == null) {
-		    ratingCriteria = new LearnerItemRatingCriteria();
-		    ratingCriteria.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
-		    ((LearnerItemRatingCriteria) ratingCriteria).setToolContentId(contentId);
-		}
-
-		ratingCriteria.setOrderId(newCriteriaOrderId);
-		ratingCriteria.setTitle(criteriaTitle);
-		service.saveOrUpdateRatingCriteria(ratingCriteria);
-		// !!updatedCriterias.add(ratingCriteria);
-
-		// delete
-	    } else if (ratingCriteria != null) {
-		service.deleteRatingCriteria(ratingCriteria.getRatingCriteriaId());
-	    }
-
-	}
-
-	boolean isCommentsEnabled = WebUtil.readBooleanParam(request, "isCommentsEnabled", false);
-	// find comments' responsible RatingCriteria
-	RatingCriteria commentsResponsibleCriteria = null;
-	for (RatingCriteria ratingCriteriaIter : ratingCriterias) {
-	    if (ratingCriteriaIter.isCommentsEnabled()) {
-		commentsResponsibleCriteria = ratingCriteriaIter;
-		break;
-	    }
-	}
-	// create commentsRatingCriteria if it's required
-	if (isCommentsEnabled) {
-	    if (commentsResponsibleCriteria == null) {
-		commentsResponsibleCriteria = new LearnerItemRatingCriteria();
-		commentsResponsibleCriteria.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
-		((LearnerItemRatingCriteria) commentsResponsibleCriteria).setToolContentId(contentId);
-		commentsResponsibleCriteria.setOrderId(0);
-		commentsResponsibleCriteria.setCommentsEnabled(true);
-	    }
-	    
-	    int commentsMinWordsLimit = WebUtil.readIntParam(request, "commentsMinWordsLimit");
-	    commentsResponsibleCriteria.setCommentsMinWordsLimit(commentsMinWordsLimit);
-	    
-	    service.saveOrUpdateRatingCriteria(commentsResponsibleCriteria);
-
-	    // delete commentsRatingCriteria if it's not required
-	} else {
-	    if (commentsResponsibleCriteria != null) {
-		service.deleteRatingCriteria(commentsResponsibleCriteria.getRatingCriteriaId());
-	    }
-	}
-
-	// !!imageGalleryPO.setRatingCriterias(new LinkedHashSet<LearnerItemRatingCriteria> (updatedCriterias));
+	List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
+	service.saveRatingCriterias(request, oldCriterias, contentId);
 
 	// **********************************************
 	// finally persist imageGalleryPO again
