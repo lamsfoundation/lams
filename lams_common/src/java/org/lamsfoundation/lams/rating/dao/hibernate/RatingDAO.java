@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +36,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
@@ -53,16 +54,29 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
     private static final String FIND_RATING_BY_CRITERIA_AND_USER = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=?";
 
+    private static final String FIND_RATINGS_BY_USER = "FROM " + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? AND r.learner.userId=?";
+
     private static final String FIND_RATING_AVERAGE_BY_ITEM = "SELECT AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
+    
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEM = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName() + " AS r where r.ratingCriteria.toolContentId=? AND r.itemId=? GROUP BY r.ratingCriteria.ratingCriteriaId";
+    
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName() + " AS r where r.ratingCriteria.toolContentId=:contentId AND r.itemId IN (:itemIds) GROUP BY r.ratingCriteria.ratingCriteriaId";
 
-    private static final String COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER = "SELECT COUNT(DISTINCT r.itemId)+(SELECT COUNT(comment) FROM "
-	    + RatingComment.class.getName()
-	    + " AS comment "
-	    + " WHERE comment.ratingCriteria.toolContentId = :toolContentId AND comment.learner.userId =:userId AND comment.itemId =:itemId AND cr.commentsEnabled IS TRUE ) FROM  "
-	    + Rating.class.getName() 
-	    + " AS r " 
-	    + " WHERE r.ratingCriteria.toolContentId = :toolContentId AND r.learner.userId =:userId";
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_ID = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
+
+//    private static final String COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER = "SELECT COUNT(DISTINCT r.itemId)+(SELECT COUNT(comment) FROM "
+//	    + RatingComment.class.getName()
+//	    + " AS comment "
+//	    + " WHERE comment.ratingCriteria.toolContentId = :toolContentId AND comment.learner.userId =:userId AND comment.itemId =:itemId AND cr.commentsEnabled IS TRUE ) FROM  "
+//	    + Rating.class.getName()
+//	    + " AS r "
+//	    + " WHERE r.ratingCriteria.toolContentId = :toolContentId AND r.learner.userId =:userId";
 
     @Override
     public void saveOrUpdate(Object object) {
@@ -81,6 +95,7 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	}
     }
 
+    // method is not used at the moment
     private Rating getRating(Long ratingCriteriaId, Integer userId) {
 	List<Rating> list = getHibernateTemplate().find(FIND_RATING_BY_CRITERIA_AND_USER,
 		new Object[] { ratingCriteriaId, userId });
@@ -92,7 +107,12 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
     }
 
     @Override
-    public RatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId) {
+    public List<Rating> getRatingsByUser(Long contentId, Integer userId) {
+	return getHibernateTemplate().find(FIND_RATINGS_BY_USER, new Object[] { contentId, userId });
+    }
+
+    @Override
+    public ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId) {
 	List<Object[]> list = getHibernateTemplate().find(FIND_RATING_AVERAGE_BY_ITEM,
 		new Object[] { ratingCriteriaId, itemId });
 	Object[] results = list.get(0);
@@ -103,29 +123,24 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	String averageRating = numberFormat.format(averageRatingObj);
 
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
-	return new RatingCriteriaDTO(averageRating, numberOfVotes);
+	return new ItemRatingCriteriaDTO(averageRating, numberOfVotes);
     }
 
     @Override
-    public RatingCriteriaDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId) {
+    public List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long itemId) {
+	return getHibernateTemplate().find(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEM,
+		new Object[] { contentId, itemId });
+    }
+    
+    @Override
+    public List<Object[]> getRatingAverageByContentAndItems(Long contentId, Collection<Long> itemIds) {
+	return  getSession().createQuery(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS)
+	    .setLong("contentId", contentId).setParameterList("itemIds", itemIds).list();
+    }
 
-	RatingCriteriaDTO criteriaDto = getRatingAverageDTOByItem(ratingCriteriaId, itemId);
-
-	List list = getHibernateTemplate().find(FIND_USER_RATING_VALUE,
-		new Object[] { ratingCriteriaId, userId, itemId });
-	String userRating;
-	if (list.size() > 0) {
-	    userRating = ((Float) list.get(0)).toString();
-
-	    // user didn't leave his rating yet
-	} else {
-	    userRating = "";
-
-	}
-	criteriaDto.setUserRating(userRating);
-	criteriaDto.setItemId(itemId);
-
-	return criteriaDto;
+    @Override
+    public List<Object[]> getRatingAverageByContent(Long contentId) {
+	return getHibernateTemplate().find(FIND_RATING_AVERAGE_BY_CONTENT_ID, new Object[] { contentId });
     }
 
     @Override
@@ -140,8 +155,8 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 
     @Override
     public int getCountItemsRatedByUser(final Long toolContentId, final Integer userId) {
-	
-	//unions don't work in HQL so doing 2 separate DB queries (http://stackoverflow.com/a/3940445)
+
+	// unions don't work in HQL so doing 2 separate DB queries (http://stackoverflow.com/a/3940445)
 	String FIND_ITEM_IDS_RATED_BY_USER = "SELECT DISTINCT r.itemId FROM  " + Rating.class.getName() + " AS r "
 		+ " WHERE r.ratingCriteria.toolContentId = :toolContentId AND r.learner.userId =:userId";
 
@@ -152,13 +167,13 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 
 	List<Long> ratedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_RATED_BY_USER)
 		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
-	
+
 	List<Long> commentedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_COMMENTED_BY_USER)
 		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
-	
+
 	Set<Long> unionItemIds = new HashSet<Long>(ratedItemIds);
 	unionItemIds.addAll(commentedItemIds);
-	
+
 	return unionItemIds.size();
     }
 }

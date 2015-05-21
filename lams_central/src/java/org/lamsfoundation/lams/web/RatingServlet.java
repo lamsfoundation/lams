@@ -36,7 +36,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.RatingService;
@@ -84,7 +84,7 @@ public class RatingServlet extends HttpServlet {
 		float rating = Float.parseFloat((String) request.getParameter("rate"));
 
 
-		RatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
+		ItemRatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
 
 		NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 		numberFormat.setMaximumFractionDigits(1);

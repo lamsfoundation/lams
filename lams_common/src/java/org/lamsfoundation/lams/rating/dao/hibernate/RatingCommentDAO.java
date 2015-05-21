@@ -23,30 +23,85 @@
 /* $Id$ */
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingCommentDAO;
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
-import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 
 public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
     private static final String FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM = "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
 
-    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEM = "FROM " + RatingComment.class.getName()
+    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEM = "SELECT r.itemId, r.learner.userId, r.comment "
+	    + "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
+    
+    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS = "SELECT r.itemId, r.learner.userId, r.comment "
+	    + "FROM " + RatingComment.class.getName()
+	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId IN (:itemIds)";
+    
+    private static final String FIND_COMMENTS_BY_CRITERIA = "SELECT r.itemId, r.learner.userId, r.comment "
+	    + "FROM " + RatingComment.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=?";
+    
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_ID = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
 
 //    private static final String COUNT_COMMENTS_BY_ITEM_AND_USER = "SELECT COUNT(r) FROM  "
 //	    + RatingComment.class.getName()
 //	    + " AS r "
 //	    + " WHERE r.ratingCriteria.toolContentId = ? AND r.ratingCriteria.commentsEnabled IS TRUE AND r.itemId =? AND r.learner.userId =?";
 
-    private List<RatingComment> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long itemId) {
-	return (List<RatingComment>) (getHibernateTemplate().find(FIND_COMMENTS_BY_CRITERIA_AND_ITEM, new Object[] {
+    @Override
+    public List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long itemId) {
+	List<Object[]> results = (List<Object[]>) (getHibernateTemplate().find(FIND_COMMENTS_BY_CRITERIA_AND_ITEM, new Object[] {
 		ratingCriteriaId, itemId }));
+	
+	return convertIntoCommentDtos(results);
+    }
+    
+    @Override
+    public List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Collection<Long> itemIds) {
+	
+	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS)
+		    .setLong("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds).list();
+	
+	return convertIntoCommentDtos(results);
+    }
+    
+    @Override
+    public List<RatingCommentDTO> getCommentsByCriteria(Long ratingCriteriaId) {
+	List<Object[]> results = (List<Object[]>) (getHibernateTemplate().find(FIND_COMMENTS_BY_CRITERIA,
+		new Object[] { ratingCriteriaId }));
+	
+	return convertIntoCommentDtos(results);
+    }
+    
+    /*
+     * Converts DB results presentation into list of RatingCommentDTO.
+     * 
+     * @param results
+     * @return
+     */
+    private List<RatingCommentDTO> convertIntoCommentDtos(List<Object[]> results) {
+
+	//populate RatingCommentDTOs list
+	List<RatingCommentDTO> commentDtos = new LinkedList<RatingCommentDTO>();
+	for (Object[] result : results) {
+	    Long itemId = (Long) result[0];
+	    Long userId = ((Integer) result[1]).longValue();
+	    String comment = (String) result[2];
+	    
+	    RatingCommentDTO commentDto = new RatingCommentDTO(itemId, userId, comment);
+	    commentDtos.add(commentDto);
+	}
+	
+	return commentDtos;
     }
 
     @Override
@@ -58,17 +113,6 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
 	} else {
 	    return null;
 	}
-    }
-
-    @Override
-    public RatingCriteriaDTO getCommentsRatingDTO(Long ratingCriteriaId, Long itemId, Integer userId) {
-
-	List<RatingComment> ratingComments = getCommentsByCriteriaAndItem(ratingCriteriaId, itemId);
-
-	RatingCriteriaDTO criteriaDto = new RatingCriteriaDTO();
-	criteriaDto.setItemId(itemId);
-	criteriaDto.setRatingComments(ratingComments);
-	return criteriaDto;
     }
 
 //    @Override
