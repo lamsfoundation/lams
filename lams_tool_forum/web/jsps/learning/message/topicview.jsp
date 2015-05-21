@@ -1,7 +1,6 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-28 --%>
 <c:set var="maxThreadUid" value="0"/>
 <c:set var="messageTablename" value=""/>
 <c:set var="indent" value="30"/>

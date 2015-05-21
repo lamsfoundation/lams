@@ -1,7 +1,6 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-28 --%>
 <c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
 <table  id="topicTable" cellpadding="0" class="alternative-color" cellspacing="0">
 	<tbody>

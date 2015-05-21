@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-28 --%>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
