@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
+import org.lamsfoundation.lams.tool.forum.util.AttachmentComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
@@ -510,7 +511,7 @@ public class AuthoringAction extends Action {
 	    for (ForumToolSession toolSession : toolSessions) {
 		Message newMsg = Message.newInstance(message);
 		newMsg.setToolSession(toolSession);
-		newMsg.setAttachments(new TreeSet());
+		newMsg.setAttachments(new TreeSet<Attachment>(new AttachmentComparator()));
 		newMsg.setModifiedBy(null);
 		newMsg.setCreatedBy(null);		
 		message.getSessionClones().add(newMsg);

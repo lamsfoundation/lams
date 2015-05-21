@@ -34,7 +34,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
+import org.lamsfoundation.lams.tool.forum.util.AttachmentComparator;
 
 /**
  * @author conradb
@@ -70,7 +70,7 @@ public class Message implements Cloneable {
     private Set sessionClones;
 
     public Message() {
-	attachments = new TreeSet();
+	attachments = new TreeSet<Attachment>(new AttachmentComparator());
 	sessionClones = new HashSet();
     }
 
@@ -110,7 +110,7 @@ public class Message implements Cloneable {
 	    // clone attachment
 	    if (attachments != null) {
 		Iterator iter = attachments.iterator();
-		Set set = new TreeSet();
+		Set<Attachment> set = new TreeSet<Attachment>(new AttachmentComparator());
 		while (iter.hasNext()) {
 		    Attachment file = (Attachment) iter.next();
 		    Attachment newFile = (Attachment) file.clone();
