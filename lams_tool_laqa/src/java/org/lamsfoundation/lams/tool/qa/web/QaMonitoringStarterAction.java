@@ -49,12 +49,14 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
@@ -151,6 +153,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
+	
+	//rating stuff
+	boolean isCommentsEnabled = qaService.isCommentsEnabled(qaContent.getQaContentId());
+	request.setAttribute("isCommentsEnabled", isCommentsEnabled);
 
 	//buildQaStatsDTO
 	QaStatsDTO qaStatsDTO = new QaStatsDTO();

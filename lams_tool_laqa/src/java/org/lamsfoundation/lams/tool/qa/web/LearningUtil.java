@@ -97,7 +97,7 @@ public class LearningUtil implements QaAppConstants {
     
     /**
      */
-    public static void populateAnswers(Map sessionMap, QaContent qaContent, QaQueUsr qaQueUsr,
+    public static void populateAnswers(Map sessionMap, QaContent qaContent, QaQueUsr user,
 	    Map<Integer, QaQuestionDTO> mapQuestions, GeneralLearnerFlowDTO generalLearnerFlowDTO,
 	    IQaService qaService) {
 	
@@ -110,8 +110,8 @@ public class LearningUtil implements QaAppConstants {
 	    Map<String, String> mapAnswersFromDb = new TreeMap<String, String>();
 	    for (QaQueContent question : qaContent.getQaQueContents()) {
 		Long questionUid = question.getUid();
-		QaUsrResp dbResponse = qaService.getResponseByUserAndQuestion(qaQueUsr.getQueUsrId(), questionUid);
-		String answer = (dbResponse == null) ? null : dbResponse.getAnswer();
+		QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), questionUid);
+		String answer = (response == null) ? null : response.getAnswer();
 		mapAnswersFromDb.put(String.valueOf(question.getDisplayOrder()), answer);
 	    }	    
 	    

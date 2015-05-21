@@ -26,6 +26,11 @@
 					<c:if test="${questionEntry.value.required}">
 						<fmt:message key="label.required" />
 					</c:if>
+					<c:if test="${questionEntry.value.minWordsLimit != 0}">
+						<fmt:message key="label.minimum.number.words" >
+							<fmt:param>${questionEntry.value.minWordsLimit}</fmt:param>
+						</fmt:message>
+					</c:if>	
 					<c:out value="${questionEntry.value.question}" escapeXml="false" />
 				</p>
 								 
@@ -36,17 +41,22 @@
 				<c:choose>
 					<c:when test="${hasEditRight}">
 					
-						<c:choose>
-							<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
-								<lams:CKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
-									contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
-								</lams:CKEditor>
-							</c:when>
-					
-							<c:otherwise>
-								<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
-							</c:otherwise>
-						</c:choose>
+						<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
+							 data-min-words-limit="${questionEntry.value.minWordsLimit}"
+							<c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>
+						>
+							<c:choose>
+								<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
+									<lams:CKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
+										contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
+									</lams:CKEditor>
+								</c:when>
+						
+								<c:otherwise>
+									<lams:textarea name="answer${questionEntry.key}" id="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+								</c:otherwise>
+							</c:choose>
+						</div>
 						
 					</c:when>
 					

@@ -46,6 +46,12 @@
 							<fmt:message key="label.learning.rating" />
 						</th>
 					</c:if>
+					
+					<c:if test="${isCommentsEnabled}">
+						<th>
+							<fmt:message key="label.comment" />
+						</th>
+					</c:if>
 				</tr>
 			</thead>
 			

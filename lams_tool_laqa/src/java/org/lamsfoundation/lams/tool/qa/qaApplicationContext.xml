@@ -49,10 +49,6 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaResponseRatingDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.ResponseRatingDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
 	<bean id="qaConfigItemDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaConfigItemDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
@@ -78,7 +74,6 @@
 					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
 					<property name="qaQuestionDAO"><ref bean="qaQuestionDAO"/></property>
 					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>	
-					<property name="qaResponseRatingDAO"><ref bean="qaResponseRatingDAO"/></property>	
 					<property name="qaConfigItemDAO"><ref bean="qaConfigItemDAO"/></property>
 					<property name="qaWizardDAO"><ref bean="qaWizardDAO"/></property>								
 					<property name="toolService"><ref bean="lamsToolService"/></property>
@@ -88,6 +83,7 @@
 					<property name="qaToolContentHandler"><ref bean="qaToolContentHandler"/></property>								
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property>											
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+			   		<property name="ratingService"><ref bean="ratingService"/></property>   
 			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
 			   		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 			   		<property name="messageService"><ref bean="qaMessageService"/></property>
@@ -109,7 +105,6 @@
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="rateResponse">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

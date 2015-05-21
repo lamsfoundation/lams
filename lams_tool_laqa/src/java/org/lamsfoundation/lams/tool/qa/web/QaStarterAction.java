@@ -46,6 +46,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -148,6 +149,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	
 	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	
+	// get rating criterias from DB
+	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qaContent.getQaContentId());
+	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
 
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
@@ -174,6 +179,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setShowOtherAnswers(qaContent.isShowOtherAnswers() ? "1" : "0");
 	qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced() ? "1" : "0");
 	qaAuthoringForm.setLockWhenFinished(qaContent.isLockWhenFinished() ? "1" : "0");
+	qaAuthoringForm.setMaximumRates(qaContent.getMaximumRates());
+	qaAuthoringForm.setMinimumRates(qaContent.getMinimumRates());
 
 	qaGeneralAuthoringDTO.setReflect(qaContent.isReflect() ? "1" : "0");
 

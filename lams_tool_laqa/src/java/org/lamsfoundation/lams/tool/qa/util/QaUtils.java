@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -71,6 +72,16 @@ public abstract class QaUtils implements QaAppConstants {
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
 	qaAuthoringForm.setLockWhenFinished(lockWhenFinished);
 	qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
+	
+	int minimumRates = WebUtil.readIntParam(request, MINIMUM_RATES, true) == null ? 0 : WebUtil.readIntParam(
+		request, MINIMUM_RATES);
+	qaAuthoringForm.setMinimumRates(minimumRates);
+	qaGeneralAuthoringDTO.setMinimumRates(minimumRates);
+	
+	int maximumRates = WebUtil.readIntParam(request, MAXIMUM_RATES, true) == null ? 0 : WebUtil.readIntParam(
+		request, MAXIMUM_RATES);
+	qaAuthoringForm.setMaximumRates(maximumRates);
+	qaGeneralAuthoringDTO.setMaximumRates(maximumRates);
 
 	String reflect = request.getParameter(REFLECT);
 
