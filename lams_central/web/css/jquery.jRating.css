@@ -47,7 +47,13 @@ p.jRatingInfos span.maxRate {
 }
 
 /** Please, note this is a LAMS customization. In case of library upgrade copy these lines manually.  **/
-.rating-stars-holder {width: 150px; text-align: center;}
+.extra-controls-inner:after {
+	content: " ";
+	display: block; 
+	height: 0; 
+	clear: both;
+}
+.rating-stars-holder {width: 150px; text-align: center; float: right;}
 .rating-stars-caption {padding-top: 6px;}
 .rating-stars, .rating-stars-disabled {margin: 0px auto; min-height: 20px;}
 .add-comment {

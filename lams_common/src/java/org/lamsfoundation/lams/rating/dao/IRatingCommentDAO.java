@@ -23,21 +23,43 @@
 /* $Id$ */
 package org.lamsfoundation.lams.rating.dao;
 
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import java.util.Collection;
+import java.util.List;
+
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.model.RatingComment;
 
 public interface IRatingCommentDAO {
     
-    RatingComment getRatingComment(Long ratingCriteriaId, Integer userId, Long itemId);
-    
     /**
-     * Constructs RatingCriteriaDTO for rating criteria that allows comments.
+     * Returns list of RatingCommentDTO which hold only minimum information required for displaying in Rating.tag
+     * Created in order to lighten the data passed from DB.
+     * 
+     * @param ratingCriteriaId
+     * @return
+     */
+    List<RatingCommentDTO> getCommentsByCriteria(Long ratingCriteriaId);
+
+    /**
+     * Constructs ItemRatingCriteriaDTO for rating criteria that allows comments.
      * 
      * @param ratingCriteriaId
      * @param itemId
      * @param userId
      * @return
      */
-    RatingCriteriaDTO getCommentsRatingDTO(Long ratingCriteriaId, Long itemId, Integer userId);
+    List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long itemId);
+    
+    /**
+     * Constructs ItemRatingCriteriaDTO for rating criteria that allows comments. Returns comments only for itemIds supplied.
+     * 
+     * @param ratingCriteriaId
+     * @param itemIds
+     * @return
+     */
+    List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Collection<Long> itemIds);
+    
+    RatingComment getRatingComment(Long ratingCriteriaId, Integer userId, Long itemId);
 
 }

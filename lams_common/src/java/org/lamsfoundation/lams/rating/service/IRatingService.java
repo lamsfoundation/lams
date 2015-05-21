@@ -25,9 +25,13 @@
 
 package org.lamsfoundation.lams.rating.service;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import javax.servlet.http.HttpServletRequest;
+
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
@@ -35,15 +39,24 @@ public interface IRatingService {
 
     void saveOrUpdateRating(Rating rating);
 
-    void saveOrUpdateRatingCriteria(RatingCriteria criteria);
-
-    void deleteRatingCriteria(Long ratingCriteriaId);
+    /**
+     * Read modified rating criterias from request, then update existing ones/add new ones/delete removed ones. Used on
+     * saving content action in authoring.
+     * 
+     * @param request
+     * @param oldCriterias
+     *            criterias stored in the DB
+     * @param toolContentId
+     */
+    void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId);
 
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
 
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
 
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz);
+    
+    boolean isCommentsEnabled(Long toolContentId);
 
     /**
      * Return Rating by the given itemId and userId.
@@ -62,11 +75,24 @@ public interface IRatingService {
      */
     List<Rating> getRatingsByItem(Long itemId);
 
-    RatingCriteriaDTO rateItem(RatingCriteria criteria, Integer userId, Long itemId, float ratingFloat);
+    ItemRatingCriteriaDTO rateItem(RatingCriteria criteria, Integer userId, Long itemId, float ratingFloat);
 
     void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
 
-    RatingCriteriaDTO getCriteriaDTOByUser(RatingCriteria criteria, Long itemId, Integer userId);
+    /**
+     * Returns results for all items. If result is needed for only one item provide provide it as a single element in a
+     * itemIds list.
+     * 
+     * @param contentId
+     * @param itemIds
+     * @param isAllItemResultsRequested
+     *            is all item results requested. If so it will query DB without using itemIds and instead return all
+     *            available results.
+     * @param userId
+     * @return
+     */
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+	    boolean isAllItemResultsRequested, Long userId);
 
     /**
      * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This

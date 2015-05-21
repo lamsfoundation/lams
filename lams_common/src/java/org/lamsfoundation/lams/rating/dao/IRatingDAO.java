@@ -25,7 +25,10 @@
 
 package org.lamsfoundation.lams.rating.dao;
 
-import org.lamsfoundation.lams.rating.dto.RatingCriteriaDTO;
+import java.util.Collection;
+import java.util.List;
+
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 
 public interface IRatingDAO {
@@ -34,15 +37,34 @@ public interface IRatingDAO {
 
     Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId);
 
+    List<Rating> getRatingsByUser(Long contentId, Integer userId);
+
     /**
      * Returns rating statistics by particular item
      * 
      * @param itemId
      * @return
      */
-    RatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
+    ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
+    
+    List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long itemId);
+    
+    /**
+     * Returns rating statistics for specified itemIds.
+     * 
+     * @param contentId
+     * @param itemIds
+     * @return
+     */
+    List<Object[]> getRatingAverageByContentAndItems(Long contentId, Collection<Long> itemIds);
 
-    RatingCriteriaDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
+    /**
+     * Returns rating statistics for entire tool.
+     * 
+     * @param contentId
+     * @return
+     */
+    List<Object[]> getRatingAverageByContent(Long contentId);
 
     Rating get(Long uid);
 

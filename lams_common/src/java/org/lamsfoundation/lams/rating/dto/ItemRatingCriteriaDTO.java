@@ -23,40 +23,24 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.rating.dto;
 
-import java.util.List;
-
-import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
-public class RatingCriteriaDTO {
+public class ItemRatingCriteriaDTO {
 
     //common properties
-    private Long itemId;
     private RatingCriteria ratingCriteria;
 
     //rating properties
     private String userRating;
     private String averageRating;
     private String numberOfVotes;
-    
-    //comments rating properties
-    private List<RatingComment> ratingComments;
-    private int commentsMinWordsLimit;
 
-    public RatingCriteriaDTO() {
+    public ItemRatingCriteriaDTO() {
     }
     
-    public RatingCriteriaDTO(String rating, String numberOfVotes) {
+    public ItemRatingCriteriaDTO(String rating, String numberOfVotes) {
 	this.averageRating = rating;
 	this.numberOfVotes = numberOfVotes;
-    }
-
-    public Long getItemId() {
-	return itemId;
-    }
-
-    public void setItemId(Long itemId) {
-	this.itemId = itemId;
     }
     
     public RatingCriteria getRatingCriteria() {
@@ -89,22 +73,6 @@ public class RatingCriteriaDTO {
 
     public void setNumberOfVotes(String numberOfVotes) {
 	this.numberOfVotes = numberOfVotes;
-    }
-    
-    public List<RatingComment> getRatingComments() {
-	return ratingComments;
-    }
-
-    public void setRatingComments(List<RatingComment> ratingComments) {
-	this.ratingComments = ratingComments;
-    }
-    
-    public int getCommentsMinWordsLimit() {
-	return commentsMinWordsLimit;
-    }
-
-    public void setCommentsMinWordsLimit(int commentsMinWordsLimit) {
-	this.commentsMinWordsLimit = commentsMinWordsLimit;
     }
   
 }
