@@ -53,16 +53,6 @@ public interface ToolRatingManager {
      * @param toolContentId
      */
     void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId);
-    
-    /**
-     * Returns results for only one item.
-     * 
-     * @param contentId
-     * @param itemIds
-     * @param userId
-     * @return
-     */
-    ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long itemId, Long userId);
 
     /**
      * Returns results for all items. If result is needed for only one item provide provide it as a single element in a
@@ -70,13 +60,13 @@ public interface ToolRatingManager {
      * 
      * @param contentId
      * @param itemIds
-     * @param isAllItemResultsRequested
-     *            is all item results requested. If so it will query DB without using itemIds and instead return all available
+     * @param isCommentsByOtherUsersRequired
+     *            whether required just comment from the current user or by all users
      *            results.
      * @param userId
      * @return
      */
-    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isAllItemResultsRequested, Long userId);
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId);
 
     /**
      * Returns number of images rated by specified user in a current activity. It counts comments as ratings.

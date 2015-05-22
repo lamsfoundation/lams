@@ -32,16 +32,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
-import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class RatingDAO extends BaseDAO implements IRatingDAO {
 
@@ -64,7 +59,8 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	    + Rating.class.getName() + " AS r where r.ratingCriteria.toolContentId=? AND r.itemId=? GROUP BY r.ratingCriteria.ratingCriteriaId";
     
     private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
-	    + Rating.class.getName() + " AS r where r.ratingCriteria.toolContentId=:contentId AND r.itemId IN (:itemIds) GROUP BY r.ratingCriteria.ratingCriteriaId";
+		+ Rating.class.getName()
+		+ " AS r where r.ratingCriteria.toolContentId=:contentId AND r.itemId IN (:itemIds) GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
 
     private static final String FIND_RATING_AVERAGE_BY_CONTENT_ID = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName()
