@@ -60,6 +60,9 @@ public interface IRatingCommentDAO {
      */
     List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Collection<Long> itemIds);
     
-    RatingComment getRatingComment(Long ratingCriteriaId, Integer userId, Long itemId);
+    List<RatingCommentDTO> getCommentsByCriteriaAndItemsAndUser(Long ratingCriteriaId, Collection<Long> itemIds,
+	    Integer userId);
+    
+    RatingComment getComment(Long ratingCriteriaId, Integer userId, Long itemId);
 
 }

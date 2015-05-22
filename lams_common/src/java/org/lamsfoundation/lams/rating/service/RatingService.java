@@ -111,7 +111,7 @@ public class RatingService implements IRatingService {
 
     @Override
     public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment) {
-	RatingComment ratingComment = ratingCommentDAO.getRatingComment(ratingCriteria.getRatingCriteriaId(), userId,
+	RatingComment ratingComment = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(), userId,
 		itemId);
 
 	// persist MessageRating changes in DB
@@ -130,7 +130,7 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isAllItemResultsRequested, Long userId) {
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) {
 
 	//initial preparations
 	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
@@ -157,12 +157,13 @@ public class RatingService implements IRatingService {
 		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, singleItemId);
 		
 		//query DB using itemIds
-		} else if (!isAllItemResultsRequested) {
+		} else if (isCommentsByOtherUsersRequired) {
 		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, itemIds);
-		
-		//query DB without specifying itemIds
+		    
+		// get only comments for current user
 		} else {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteria(commentCriteriaId);
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItemsAndUser(commentCriteriaId, itemIds,
+			    userId.intValue());
 		}
 		
 		for (ItemRatingDTO itemDto: itemDtos) {
@@ -170,7 +171,7 @@ public class RatingService implements IRatingService {
 		    itemDto.setCommentsCriteriaId(commentCriteriaId);
 		    itemDto.setCommentsMinWordsLimit(criteria.getCommentsMinWordsLimit());
 		    
-		    //sort commentDtos by the item
+		    //assign commentDtos by the appropriate items
 		    List<RatingCommentDTO> commentDtosPerItem = new LinkedList<RatingCommentDTO>();
 		    for (RatingCommentDTO commentDto: commentDtos) {
 			if (commentDto.getItemId().equals(itemDto.getItemId())) {
@@ -197,12 +198,8 @@ public class RatingService implements IRatingService {
 	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItem(contentId, singleItemId);
 	    
 	// query DB using itemIds
-	} else if (!isAllItemResultsRequested) {
-	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItems(contentId, itemIds);
-	    
-	// query DB without specifying itemIds
 	} else {
-	    itemsStatistics = ratingDAO.getRatingAverageByContent(contentId);
+	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItems(contentId, itemIds);
 	}
 
 	//handle all criterias except for comments' one

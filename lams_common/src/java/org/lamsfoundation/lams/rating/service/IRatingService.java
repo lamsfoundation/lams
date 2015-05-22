@@ -85,14 +85,13 @@ public interface IRatingService {
      * 
      * @param contentId
      * @param itemIds
-     * @param isAllItemResultsRequested
-     *            is all item results requested. If so it will query DB without using itemIds and instead return all
-     *            available results.
+     * @param isCommentsByOtherUsersRequired
+     *            whether required just comment from the current user or by all users
      * @param userId
      * @return
      */
     List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
-	    boolean isAllItemResultsRequested, Long userId);
+	    boolean isCommentsByOtherUsersRequired, Long userId);
 
     /**
      * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This

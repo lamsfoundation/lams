@@ -45,12 +45,12 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
 	    + "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId IN (:itemIds)";
     
+    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS_AND_USER = "SELECT r.itemId, r.learner.userId, r.comment "
+	    + "FROM " + RatingComment.class.getName()
+	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId IN (:itemIds) AND r.learner.userId=:userId";
+    
     private static final String FIND_COMMENTS_BY_CRITERIA = "SELECT r.itemId, r.learner.userId, r.comment "
 	    + "FROM " + RatingComment.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=?";
-    
-    private static final String FIND_RATING_AVERAGE_BY_CONTENT_ID = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
-	    + Rating.class.getName()
-	    + " AS r where r.ratingCriteria.toolContentId=? GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
 
 //    private static final String COUNT_COMMENTS_BY_ITEM_AND_USER = "SELECT COUNT(r) FROM  "
 //	    + RatingComment.class.getName()
@@ -71,6 +71,17 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
 	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS)
 		    .setLong("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds).list();
 	
+	return convertIntoCommentDtos(results);
+    }
+    
+    @Override
+    public List<RatingCommentDTO> getCommentsByCriteriaAndItemsAndUser(Long ratingCriteriaId, Collection<Long> itemIds,
+	    Integer userId) {
+
+	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS_AND_USER)
+		.setLong("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds)
+		.setInteger("userId", userId).list();
+
 	return convertIntoCommentDtos(results);
     }
     
@@ -105,7 +116,7 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
     }
 
     @Override
-    public RatingComment getRatingComment(Long ratingCriteriaId, Integer userId, Long itemId) {
+    public RatingComment getComment(Long ratingCriteriaId, Integer userId, Long itemId) {
 	List<RatingComment> list = getHibernateTemplate().find(FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM,
 		new Object[] { ratingCriteriaId, userId, itemId });
 	if (list.size() > 0) {
