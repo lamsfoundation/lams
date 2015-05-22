@@ -36,7 +36,7 @@
 	<c:set var="hasRatingLimits" value="false" scope="request"/>
 </c:if>
 <c:if test="${not empty formContentPrefix}">
-	<c:set var="formContentPrefix" scope="request">${formContentPrefix}.</c:set>
+	<c:set var="formContentPrefix" value="${formContentPrefix}."/>
 </c:if>
 <c:if test="${empty headerLabel}">
 	<c:set var="headerLabel" value="label.rating.criterias" scope="request"/>

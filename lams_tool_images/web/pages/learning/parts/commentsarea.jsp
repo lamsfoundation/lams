@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -9,7 +10,27 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>	
+
+<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
+<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<c:if test="${isImageSelected}">
+	<script type="text/javascript">
+		//var for jquery.jRating.js
+		var pathToImageFolder = "${lams}images/css/";
+		
+		//vars for rating.js
+		var MAX_RATES = ${imageGallery.maximumRates},
+		MIN_RATES = ${imageGallery.minimumRates},
+		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.itemRatingDto.commentsMinWordsLimit},
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
+		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
+		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.itemRatingDto.commentsMinWordsLimit}"/></fmt:message>';
+	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+</c:if>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('#voting-form-checkbox').click(function() {
@@ -34,16 +55,14 @@
 
 <c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">
 
-		<%--Ranking area---------------------------------------%>
+	<%--Ranking area---------------------------------------%>
 	
-		<c:if test="${imageGallery.allowRank && isImageSelected}">
+	<c:if test="${imageGallery.allowRank && isImageSelected}">
 		
-			<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
-					maxRates="${imageGallery.maximumRates}" minRates="${imageGallery.minimumRates}" 
-					countRatedItems="${sessionMap.countRatedImages}" 
-					warnCommentIsBlankLabel="error.resource.image.comment.blank"/>
-			<br><br>
-		</c:if>
+		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
+				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}" />
+		<br><br>
+	</c:if>
 
 	<div id="extra-controls">
 				

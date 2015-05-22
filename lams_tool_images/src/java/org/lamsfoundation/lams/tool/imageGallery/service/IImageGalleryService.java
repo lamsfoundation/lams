@@ -45,9 +45,9 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 
 /**
- * @author Dapeng.Ni
+ * Interface that defines the contract that all ShareImageGallery service provider must follow.
  * 
- *         Interface that defines the contract that all ShareImageGallery service provider must follow.
+ * @author Andrey Balan        
  */
 public interface IImageGalleryService extends ToolRatingManager {
 

@@ -77,7 +77,6 @@ public class ImageGalleryConstants {
     public static final String ATTR_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
     public static final String ATTR_RATING_DTOS = "ratingDtos";
-    public static final String ATTR_COUNT_RATED_IMAGES = "countRatedImages";
     
     // error message keys
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";
