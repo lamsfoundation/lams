@@ -226,7 +226,7 @@ public class LearningAction extends Action {
 	// store how many items are rated
 	if (imageGallery.isAllowRank()) {
 	    int countRatedImages = service.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
-	    sessionMap.put(ImageGalleryConstants.ATTR_COUNT_RATED_IMAGES, countRatedImages);
+	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedImages);
 	}
 
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
@@ -495,9 +495,7 @@ public class LearningAction extends Action {
 	    sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	}
 
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	boolean isTeacher = mode != null && mode.isTeacher();
-	if (!isTeacher && imageGallery.isAllowRank()) {
+	if (imageGallery.isAllowRank()) {
 	    ItemRatingDTO itemRatingDto = service.getRatingCriteriaDtos(imageGallery.getContentId(), imageUid, userId);
 	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTO, itemRatingDto);
 	    
@@ -506,7 +504,7 @@ public class LearningAction extends Action {
 	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedImages);
 	}
 
-	if (!isTeacher && imageGallery.isAllowVote()) {
+	if (imageGallery.isAllowVote()) {
 	    boolean isVotedForThisImage = false;
 	    ImageVote imageVote = service.getImageVoteByImageAndUser(imageUid, userId);
 	    if (imageVote != null && imageVote.isVoted()) {

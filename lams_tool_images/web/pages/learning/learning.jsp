@@ -52,16 +52,16 @@
 			clear: both;
 			padding-top: 20px;
 		}
-		#comments-area {
+		[id^=comments-area] {
 			width: 400px;
 			float: right;
 			clear: both;
 			padding: 10px 0 20px;
 		}
-		#comment-textarea {
+		[id^=comment-textarea] {
 			width: 370px;
 		}
-		#comment-button {
+		.button.add-comment {
 			margin-right: 2px;
 			margin-top: 10px;
 		}
@@ -95,6 +95,9 @@
 			padding-top: 40px;
 		}
     </style>
+    <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
     
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
@@ -234,7 +237,7 @@
 				<br>
 						
 				<fmt:message key="label.rate.limits.topic.reminder">
-					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedImages}</span>"/>
+					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>"/>
 				</fmt:message>
 			</div>
 			
@@ -251,7 +254,7 @@
 		<%--Comments & Ranking/Voting area----------------------------------------------%>	
 	 	
 		<div id="image-info">
-				<%@ include file="/pages/learning/parts/commentsarea.jsp"%>
+			<%@ include file="/pages/learning/parts/commentsarea.jsp"%>
 		</div>
  
 		<%--Reflection--------------------------------------------------%>
