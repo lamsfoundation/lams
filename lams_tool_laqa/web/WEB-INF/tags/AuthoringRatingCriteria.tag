@@ -36,7 +36,7 @@
 	<c:set var="hasRatingLimits" value="false" scope="request"/>
 </c:if>
 <c:if test="${not empty formContentPrefix}">
-	<c:set var="formContentPrefix" scope="request">${formContentPrefix}.</c:set>
+	<c:set var="formContentPrefix" value="${formContentPrefix}."/>
 </c:if>
 <c:if test="${empty headerLabel}">
 	<c:set var="headerLabel" value="label.rating.criterias" scope="request"/>
@@ -72,7 +72,7 @@
 	<c:set var="allowCommentsLabel" value="label.allow.comments" scope="request"/>
 </c:if>
 <c:if test="${empty minNumberWordsLabel}">
-	<c:set var="minNumberWordsLabel" value="label.comment.minimum.number.words" scope="request"/>
+	<c:set var="minNumberWordsLabel" value="label.minimum.number.words" scope="request"/>
 </c:if>
 
 <!-- calculate whether isCommentsAllowed is true -->
