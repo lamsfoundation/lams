@@ -175,7 +175,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    qaService.getLearnerContentFolder(new Long(toolSessionID), user.getQueUsrId()));
 	}
 	String sessionMapId = sessionMap.getSessionID();
-	sessionMap.put(IS_DISABLED, qaContent.isLockWhenFinished() && user.isLearnerFinished());
+	sessionMap.put(IS_DISABLED, qaContent.isLockWhenFinished() && user.isLearnerFinished() || (mode != null)
+		&& mode.equals(ToolAccessMode.TEACHER.toString()));
 	
 	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
 	boolean isUserLeader = qaService.isUserGroupLeader(user, new Long(toolSessionID));

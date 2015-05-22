@@ -27,16 +27,19 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
 
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/"; 
+		var pathToImageFolder = "${lams}images/css/";
 		
-		//var for rating.js
-		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
-		IS_DISABLED =  ${sessionMap.isDisabled},
+		//vars for rating.js
+		var MAX_RATES = ${qaContent.maximumRates},
+		MIN_RATES = ${qaContent.minimumRates},
 		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.commentsMinWordsLimit},
-		MAX_RATES = ${qaContent.maximumRates};
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
+		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
+		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message>';
 	</script>
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
@@ -45,6 +48,10 @@
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 
 	<script type="text/javascript">
+	
+		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		IS_DISABLED =  ${sessionMap.isDisabled};
 	
 	  	$(document).ready(function(){
 	  		
@@ -318,8 +325,7 @@
 				<%--Rating area---------------------------------------%>
 				<c:if test="${qaContent.allowRateAnswers}">
 					<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
-							maxRates="${qaContent.maximumRates}" minRates="${qaContent.minimumRates}" 
-							countRatedItems="${sessionMap.countRatedItems}" />
+							maxRates="${qaContent.maximumRates}"/>
 					<br>
 				</c:if>
 				

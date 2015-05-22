@@ -1006,7 +1006,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		itemIds.add(response.getResponseId());
 	    }
 	    
-	    itemRatingDtos = qaService.getRatingCriteriaDtos(qaContentId, itemIds, false, userId);
+	    //all comments required only for monitoring
+	    boolean isCommentsByOtherUsersRequired = isMonitoring;
+	    itemRatingDtos = qaService.getRatingCriteriaDtos(qaContentId, itemIds, isCommentsByOtherUsersRequired, userId);
 	    
 	    // store how many items are rated
 	    int countRatedQuestions = qaService.getCountItemsRatedByUser(qaContentId, userId.intValue());

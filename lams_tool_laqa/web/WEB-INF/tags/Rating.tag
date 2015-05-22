@@ -19,13 +19,10 @@
 <%@ attribute name="disabled" required="false" rtexprvalue="true" %>
 <%@ attribute name="isItemAuthoredByUser" required="false" rtexprvalue="true" %>
 <%@ attribute name="maxRates" required="false" rtexprvalue="true" %>
-<%@ attribute name="minRates" required="false" rtexprvalue="true" %>
 <%@ attribute name="countRatedItems" required="false" rtexprvalue="true" %>
 <%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
-<%@ attribute name="warnCommentIsBlankLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
-<%@ attribute name="warnMinNumberWordsLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
@@ -37,9 +34,6 @@
 <c:if test="${empty maxRates}">
 	<c:set var="maxRates" value="0" scope="request"/>
 </c:if>
-<c:if test="${empty minRates}">
-	<c:set var="minRates" value="0" scope="request"/>
-</c:if>
 <c:if test="${empty countRatedItems}">
 	<c:set var="countRatedItems" value="0" scope="request"/>
 </c:if>
@@ -49,32 +43,10 @@
 <c:if test="${empty averageRatingLabel}">
 	<c:set var="averageRatingLabel" value="label.average.rating" scope="request"/>
 </c:if>
-<c:if test="${empty warnCommentIsBlankLabel}">
-	<c:set var="warnCommentIsBlankLabel" value="warning.comment.blank" scope="request"/>
-</c:if>
 <c:if test="${empty minNumberWordsLabel}">
 	<c:set var="minNumberWordsLabel" value="label.comment.minimum.number.words" scope="request"/>
 </c:if>
-<c:if test="${empty warnMinNumberWordsLabel}">
-	<c:set var="warnMinNumberWordsLabel" value="warning.minimum.number.words" scope="request"/>
-</c:if>
-
 <c:set var="isCommentsEnabled" value="${itemRatingDto.commentsEnabled}"/>
-
-<script type="text/javascript">
-	//var for jquery.jRating.js
-	var pathToImageFolder = "${lams}images/css/";
-	
-	//vars for rating.js
-	var MAX_RATES = ${maxRates};
-	var MIN_RATES = ${minRates};
-	var COMMENTS_MIN_WORDS_LIMIT = ${itemRatingDto.commentsMinWordsLimit};
-	var LAMS_URL = '${lams}';
-	var COUNT_RATED_ITEMS = ${countRatedItems};
-	var COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>';
-	var WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="${warnCommentIsBlankLabel}"/>';
-	var WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="${warnMinNumberWordsLabel}"><fmt:param value="${itemRatingDto.commentsMinWordsLimit}"/></fmt:message>';
-</script>
 
 <%--Rating stars area---------------------------------------%>
 
@@ -154,7 +126,7 @@
 </div>
 
 <%--Comments area---------------------------------------%>
-<c:if test="${isCommentsEnabled && not empty itemRatingDto.commentDtos}">
+<c:if test="${isCommentsEnabled}">
 	<div id="comments-area-${itemRatingDto.itemId}">
 	
 		<c:set var="userId"><lams:user property="userID" /></c:set>
@@ -192,9 +164,8 @@
 						</div>
 					</c:if>		
 				
-					<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;">
-						<fmt:message key="label.comment.textarea.tip"/>
-					</textarea>
+					<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" onfocus="if(this.value==this.defaultValue)this.value='';" 
+							onblur="if(this.value=='')this.value=this.defaultValue;" ><fmt:message key="label.comment.textarea.tip"/></textarea>
 				
 					<div class="button add-comment add-comment-new" data-item-id="${itemRatingDto.itemId}" data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}">
 					</div>			

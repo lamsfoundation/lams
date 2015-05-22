@@ -1049,20 +1049,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingService.isCommentsEnabled(toolContentId);
     }
-    
-    @Override
-    public ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long itemId, Long userId) {
-
-	LinkedList<Long> itemIds = new LinkedList<Long>();
-	itemIds.add(itemId);
-	ItemRatingDTO ratingCriteria = getRatingCriteriaDtos(contentId, itemIds, false, userId).get(0);
-	
-	return ratingCriteria;
-    }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isAllItemResultsRequested, Long userId) {
-	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isAllItemResultsRequested, userId);
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) {
+	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
     }
 
     @Override
