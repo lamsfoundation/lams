@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteQueContent implements Serializable, Comparable {
+public class VoteQueContent implements Serializable, Comparable<VoteQueContent> {
 
     /** identifier field */
     private Long uid;
@@ -106,8 +106,7 @@ public class VoteQueContent implements Serializable, Comparable {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
 
-    public int compareTo(Object o) {
-	VoteQueContent queContent = (VoteQueContent) o;
+    public int compareTo(VoteQueContent queContent) {
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
 	if (uid == null)
 	    return 1;

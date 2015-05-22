@@ -38,7 +38,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McQueContent implements Serializable, Comparable {
+public class McQueContent implements Serializable, Comparable<McQueContent> {
 
     /** identifier field */
     private Long uid;
@@ -207,8 +207,7 @@ public class McQueContent implements Serializable, Comparable {
 	this.feedback = feedback;
     }
 
-    public int compareTo(Object o) {
-	McQueContent queContent = (McQueContent) o;
+    public int compareTo(McQueContent queContent) {
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
 	if (mcQueContentId == null)
 	    return 1;

@@ -36,7 +36,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteSession implements Serializable {
+public class VoteSession implements Serializable, Comparable<VoteSession> {
 
     public final static String INCOMPLETE = "INCOMPLETE";
 
@@ -231,4 +231,14 @@ public class VoteSession implements Serializable {
     public void setGroupLeader(VoteQueUsr groupLeader) {
 	this.groupLeader = groupLeader;
     }
+    
+    public int compareTo(VoteSession other) {
+	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+	if (uid == null)
+	    return 1;
+	else
+	    return (int) (uid.longValue() - other.uid.longValue());
+    }
+
+
 }

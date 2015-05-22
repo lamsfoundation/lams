@@ -40,7 +40,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * Represents tool users.
  */
-public class QaQueUsr implements Serializable, Nullable {
+public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     private static final long serialVersionUID = -6768077344827699440L;
 
@@ -234,4 +234,13 @@ public class QaQueUsr implements Serializable, Nullable {
     public void setLearnerFinished(boolean learnerFinished) {
 	this.learnerFinished = learnerFinished;
     }
+    
+    public int compareTo(QaQueUsr user) {
+	if (user.getUid() != null && uid != null) {
+	    return user.getUid().compareTo(uid) * -1;
+	} else {
+	    return 1;
+	}
+    }
+
 }

@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteUsrAttempt implements Serializable {
+public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> {
 
     /** identifier field */
     private Long uid;
@@ -220,6 +220,14 @@ public class VoteUsrAttempt implements Serializable {
      */
     public void setVisible(boolean visible) {
 	this.visible = visible;
+    }
+
+    public int compareTo(VoteUsrAttempt other) {
+	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+	if (uid == null)
+	    return 1;
+	else
+	    return (int) (uid.longValue() - other.uid.longValue());
     }
 
 }

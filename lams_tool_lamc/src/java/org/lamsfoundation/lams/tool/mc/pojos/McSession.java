@@ -37,7 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McSession implements Serializable {
+public class McSession implements Serializable, Comparable<McSession> {
 
     public final static String INCOMPLETE = "INCOMPLETE";
 
@@ -237,4 +237,13 @@ public class McSession implements Serializable {
 	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
 	return isUserLeader;
     }
+    
+    public int compareTo(McSession other) {
+ 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+ 	if (uid == null)
+ 	    return 1;
+ 	else
+ 	    return (int) (uid.longValue() - other.uid.longValue());
+     }
+
 }

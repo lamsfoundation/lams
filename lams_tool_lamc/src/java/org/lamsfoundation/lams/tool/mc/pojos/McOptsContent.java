@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McOptsContent implements Serializable, Comparable {
+public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 
     /** identifier field */
     private Long uid;
@@ -124,8 +124,7 @@ public class McOptsContent implements Serializable, Comparable {
 	this.mcQueContentId = mcQueContentId;
     }
 
-    public int compareTo(Object o) {
-	McOptsContent optContent = (McOptsContent) o;
+    public int compareTo(McOptsContent optContent) {
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
 	if (uid == null)
 	    return 1;

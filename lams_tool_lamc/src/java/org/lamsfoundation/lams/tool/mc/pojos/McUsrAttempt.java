@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McUsrAttempt implements Serializable {
+public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 
     private static final long serialVersionUID = 4514268732673337338L;
 
@@ -239,5 +239,13 @@ public class McUsrAttempt implements Serializable {
 	
 	return getMark();
     }
+
+    public int compareTo(McUsrAttempt other) {
+ 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+ 	if (uid == null)
+ 	    return 1;
+ 	else
+ 	    return (int) (uid.longValue() - other.uid.longValue());
+     }
 
 }
