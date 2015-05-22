@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
  * 
  * @author Fiona Malikoff
  */
-public class SimpleVersionDetail implements IVersionDetail {
+public class SimpleVersionDetail implements IVersionDetail, Comparable {
 
 	private Long versionId;
 	private Date createdDateTime;
@@ -137,5 +137,6 @@ public class SimpleVersionDetail implements IVersionDetail {
     		}
     	}
     }
+    
     
 }

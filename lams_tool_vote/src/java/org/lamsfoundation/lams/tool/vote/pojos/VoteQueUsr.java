@@ -37,7 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteQueUsr implements Serializable {
+public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
 
     private static final long serialVersionUID = 7303944502340276133L;
 
@@ -193,4 +193,13 @@ public class VoteQueUsr implements Serializable {
     public void setFinalScreenRequested(boolean finalScreenRequested) {
         this.finalScreenRequested = finalScreenRequested;
     }
+    
+    public int compareTo(VoteQueUsr other) {
+	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+	if (uid == null)
+	    return 1;
+	else
+	    return (int) (uid.longValue() - other.uid.longValue());
+    }
+
 }

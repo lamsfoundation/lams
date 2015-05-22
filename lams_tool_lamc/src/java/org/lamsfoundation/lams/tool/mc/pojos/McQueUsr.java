@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McQueUsr implements Serializable {
+public class McQueUsr implements Serializable, Comparable<McQueUsr> {
 
     /** identifier field */
     private Long uid;
@@ -191,4 +191,13 @@ public class McQueUsr implements Serializable {
 	}
 	return false;
     }
+
+    public int compareTo(McQueUsr other) {
+ 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+ 	if (uid == null)
+ 	    return 1;
+ 	else
+ 	    return (int) (uid.longValue() - other.uid.longValue());
+     }
+
 }
