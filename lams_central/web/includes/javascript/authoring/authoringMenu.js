@@ -585,19 +585,33 @@ var MenuLib = {
 	 * Opens a pop up for importing LD. Loads the imported LD to canvas.
 	 */
 	importLearningDesign : function(){
-		var importWindow = window.open(LAMS_URL + 'authoring/importToolContent.do?method=import','Import',
-					'width=800,height=298,resize=yes,status=yes,scrollbar=no,menubar=no,toolbar=no'),
+		var dialog = showDialog("dialogImportLearningDesign", {
+						'height' : 315,
+						'width' : 850,
+						'title' : LABELS.IMPORT_DIALOG_TITLE,
+						'open' : function() {
+							var dialog = $(this);
+							// load contents after opening the dialog
+							$('iframe', dialog).attr('src', LAMS_URL + 'authoring/importToolContent.do?method=import').load(function(){
+								// override the close function so it works with the dialog, not window
+								this.contentWindow.closeWin = function(){
+									dialog.dialog('close');
+								}
+							});
+						},
+						'close' : function(){
+							// stop checking in LD was imported
+							clearInterval(loadCheckInterval);
+							// completely delete the dialog
+							$(this).remove();
+						}
+					}),
 			currentLearningDesignID = null,
 			regEx = /learningDesignID=(\d+)/g,
 			// since window.onload does not really work after submitting a form inside the window,
 			// this trick checks periodically for changes
 			loadCheckInterval = setInterval(function(){
-				if (!importWindow){
-					// window was closed
-					clearInterval(loadCheckInterval);
-					return;
-				}
-				var body = $('body', importWindow.document).html(),
+				var body = $('body', $('iframe', dialog).contents()).html(),
 					match = regEx.exec(body);
 				// check if ID was found and it's not the same as previously set
 				if (match && match[1] != currentLearningDesignID) {
@@ -816,7 +830,7 @@ var MenuLib = {
 	toggleDescriptionDiv: function() {
 		$('#ldDescriptionDetails').slideToggle(function(){
 			$('#ldDescriptionHideTip').text($(this).is(':visible') ? '▲' : '▼');
-			$('#templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
+			$('.templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
 		});
 	}
 	
