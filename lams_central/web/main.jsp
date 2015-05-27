@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
+<%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy"%>
+<%@ page import="org.lamsfoundation.lams.web.util.HttpSessionManager"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -7,6 +9,10 @@
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 
+<%-- If you change this file, remember to update the copy made for CNG-21 --%>
+
+<%JspRedirectStrategy.welcomePageStatusUpdate(request, response);%>
+<%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser());%>
 <!DOCTYPE HTML>
 <lams:html>
 <lams:head>
@@ -31,8 +37,9 @@
 	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
+	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 
 	<script type="text/javascript">
 			var LAMS_URL = '<lams:LAMSURL/>',
@@ -224,24 +231,6 @@
 							</table>
 						</c:if>
 					</td>
-					<%--
-					<td id="actionAccord">
-							<h3>New lessons</h3>
-							<div>New lessons content panel<br />
-							TEXT TEXT TEXT TEXT<br />
-							TEXT TEXT TEXT TEXT<br />
-							TEXT TEXT TEXT TEXT<br />
-							TEXT TEXT TEXT TEXT<br />
-							TEXT TEXT TEXT TEXT<br />
-							</div>
-							<h3>Recent activity</h3>
-							<div>Recent activity content panel</div>
-							<h3>Gradebooks</h3>
-							<div>Gradebooks content panel</div>
-							<h3>Announcements</h3>
-							<div>Announcements content panel</div>
-					</td>
-					--%>
 				</tr>
 			</table>
 		</c:if>
@@ -263,10 +252,6 @@
 			</a>
 		</p>
 	</div>
-</div>
-
-<div id="dialogContainer" class="dialogContainer">
-	<iframe></iframe>
 </div>
 
 </body>
