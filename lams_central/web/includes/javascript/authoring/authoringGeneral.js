@@ -1965,7 +1965,14 @@ GeneralLib = {
 		if (!paper) {
 			return;
 		}
-
+		
+		var windowHeight = $(window).height();
+		// height of window minus toolbar, padding...
+		$('.templateContainer').height(windowHeight - 81);
+		$('#canvas').height(windowHeight - 75)
+		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
+					.width(Math.max($('#toolbar').width() - 160, $(window).width() - 170));
+		
 		if (!width || !height) {
 			var width = 0,
 				height = 0;
@@ -1987,8 +1994,6 @@ GeneralLib = {
 		height = Math.max(height + (isReadOnlyMode ? 20 : 50), canvas.height()) - 20;
 		
 		paper.setSize(width, height);
-		$('#templateContainer').height($('#ldDescriptionDiv').height() 
-									 + $('#canvas').height() - 10);
 
 		if (!isReadOnlyMode){
 			if (layout.bin) {

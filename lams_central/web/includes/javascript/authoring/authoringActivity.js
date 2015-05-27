@@ -1166,9 +1166,23 @@ ActivityLib = {
 		}
 		
 		if (activity.authorURL) {
-			window.open(activity.authorURL, 'activityAuthoring' + activity.id,
-					"HEIGHT=800,WIDTH=1024,resizable=yes,scrollbars=yes,status=false," +
-					"menubar=no,toolbar=no");
+			showDialog("dialogActivity" + activity.toolContentID, {
+				'height' : 800,
+				'width' : 1024,
+				'resizable' : true,
+				'title' : activity.title + LABELS.ACTIVITY_DIALOG_TITLE_SUFFIX,
+				'open' : function() {
+					var dialog = $(this);
+					// load contents after opening the dialog
+					$('iframe', dialog).attr('src', activity.authorURL).load(function(){
+						// override the close function so it works with the dialog, not window
+						this.contentWindow.closeWindow = function(){
+							dialog.dialog('close');
+						}
+					});
+				}
+			}, true);
+			
 			GeneralLib.setModified(true);
 		}
 	},
