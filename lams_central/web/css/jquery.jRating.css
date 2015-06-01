@@ -73,6 +73,9 @@ p.jRatingInfos span.maxRate {
 	margin-top: 0;
 	margin-bottom: 12px;
 }
+textarea[id^=comment-textarea-] {
+	color: #d3d3d3;
+}
 
 /** Remove the following once we move all tools to use Rating.tag.  **/
 .rating-stars-div {float:right; padding-right: 10px; margin-top: -8px; min-height: 45px;}
