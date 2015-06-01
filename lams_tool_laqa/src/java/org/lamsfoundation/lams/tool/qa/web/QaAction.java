@@ -539,6 +539,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	if (required != null && required.equalsIgnoreCase("1")) {
 	    requiredBoolean = true;
 	}
+	int minWordsLimit = WebUtil.readIntParam(request, "minWordsLimit");
 
 	int listSize = questionDTOs.size();
 
@@ -547,7 +548,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	    if (!duplicates) {
 		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(newQuestion, new Long(listSize + 1).toString(), 
-			feedback, requiredBoolean);
+			feedback, requiredBoolean, minWordsLimit);
 		questionDTOs.add(qaQuestionDTO);
 	    } else {
 		//entry duplicate, not adding

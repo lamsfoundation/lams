@@ -47,7 +47,7 @@ public class QaQuestionDTO implements Comparable {
 	this.uid = que.getUid();
     }
 
-    public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required) {
+    public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required, int minWordsLimit) {
 	this.question = question;
 	this.displayOrder = displayOrder;
 	this.feedback = feedback;
