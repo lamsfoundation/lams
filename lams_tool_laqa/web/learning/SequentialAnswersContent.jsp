@@ -29,7 +29,7 @@
 				</c:if>
 				<c:if test="${questionEntry.value.minWordsLimit != 0}">
 					<fmt:message key="label.minimum.number.words" >
-						<fmt:param>${questionEntry.value.minWordsLimit}</fmt:param>
+						<fmt:param>&nbsp;${questionEntry.value.minWordsLimit}</fmt:param>
 					</fmt:message>
 				</c:if>
 			<br>
