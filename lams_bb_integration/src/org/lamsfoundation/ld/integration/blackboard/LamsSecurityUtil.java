@@ -69,7 +69,8 @@ import blackboard.portal.servlet.PortalUtil;
 public class LamsSecurityUtil {
 
     private static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
-
+    private static final String DUMMY_COURSE = "Previews"; 
+    
     /**
      * Generates login requests to LAMS for author, monitor and learner
      * 
@@ -104,8 +105,9 @@ public class LamsSecurityUtil {
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 
-	// For template authoring calls we don't need the course. We probably don't need it for authoring in general
-	String courseId = ctx.getCourse()!=null ? ctx.getCourse().getCourseId() : null;
+	// Even for authoring calls we still need a 'course' the user, role & organisation are all bound up together
+	// do to be authorised to use authoring you must be in an organisation.
+	String courseId = ctx.getCourse()!=null ? ctx.getCourse().getCourseId() : DUMMY_COURSE;
 
 	String secretkey = LamsPluginUtil.getSecretKey();
 
