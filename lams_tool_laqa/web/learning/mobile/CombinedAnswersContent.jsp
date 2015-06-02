@@ -24,6 +24,11 @@
 					<c:if test="${questionEntry.value.required}">
 						<fmt:message key="label.required" />
 					</c:if>
+					<c:if test="${questionEntry.value.minWordsLimit != 0}">
+						<fmt:message key="label.minimum.number.words" >
+							<fmt:param>&nbsp;${questionEntry.value.minWordsLimit}</fmt:param>
+						</fmt:message>
+					</c:if>
 					<c:out value="${questionEntry.value.question}" escapeXml="false" />
 				</p>
 					
@@ -31,10 +36,13 @@
 					<strong><fmt:message key="label.answer" /></strong>
 				</p>
 					
-				<div class="small-space-bottom">
+				<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
+						data-min-words-limit="${questionEntry.value.minWordsLimit}"
+						class="small-space-bottom <c:if test="${questionEntry.value.minWordsLimit != 0}">min-words-limit-enabled</c:if>"
+				>
 					<c:choose>
 						<c:when test="${hasEditRight}">
-							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" ><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+							<lams:textarea name="answer${questionEntry.key}" id="answer${questionEntry.key}" rows="5" cols="60" class="text-area" ><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
 						</c:when>
 						
 						<c:otherwise>
