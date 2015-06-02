@@ -94,7 +94,19 @@
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);
-				},	 
+				},
+				beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+					if (isNaN(val)) {
+  						return null;
+  					}
+					
+					// get maxGrade attribute which was set in masterDetailLoadUp.jsp
+					var maxGrade = jQuery("table#userSummary${summary.sessionId} tr#" + iRow 
+							              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
+					if (val > maxGrade) {
+						return maxGrade;
+					}
+				},
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
   					if (isNaN(val)) {
   						jQuery("#userSummary${summary.sessionId}").restoreCell(iRow,iCol); 
