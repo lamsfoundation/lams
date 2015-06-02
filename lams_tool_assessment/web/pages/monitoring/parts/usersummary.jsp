@@ -57,7 +57,18 @@
 	  				  	cellEdit: true,
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
   				  			previousCellValue = val;
-  				  		},	  				  	
+  				  		},
+	  					beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+	  						if (isNaN(val)) {
+	  	  						return null;
+	  	  					}
+	  						
+	  						var maxGrade = jQuery("table#user${question.uid} tr#" + iRow 
+	  								              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
+	  						if (val > maxGrade) {
+	  							return maxGrade;
+	  						}
+	  					},
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
 	  				  		//var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
 	  				  		if (isNaN(val)) { //|| (questionResultUid=="")) {
@@ -91,13 +102,17 @@
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
 	  	   	        	var responseStr = "";
 	  	   	       		<%@ include file="userresponse.jsp"%>
-	  	   	     		jQuery("#user${question.uid}").addRowData(${i.index + 1}, {
+	  	   	     		var table = jQuery("#user${question.uid}");
+	  	   	     		table.addRowData(${i.index + 1}, {
 	  	   	   	     		id:"${i.index + 1}",
 	  	   	   	   			questionResultUid:"${questionResult.uid}",
 	  	   	   	   			time:"${questionResult.finishDate}",
 	  	   	   	   			response:responseStr,
 	  	   	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
 	  	   	   	   	    });
+	  	   	     		
+	  	   	    		// set maxGrade attribute to cell DOM element
+	  	 	 	     	table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  ${questionResult.maxMark}});
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>
