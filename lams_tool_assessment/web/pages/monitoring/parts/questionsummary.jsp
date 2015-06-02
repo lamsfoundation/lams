@@ -57,6 +57,17 @@
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
 	  				  		previousCellValue = val;
 	  				  	},
+	  					beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+	  						if (isNaN(val)) {
+	  	  						return null;
+	  	  					}
+	  						
+	  						var maxGrade = jQuery("table#session${session.sessionId} tr#" + iRow 
+	  								              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
+	  						if (val > maxGrade) {
+	  							return maxGrade;
+	  						}
+	  					},
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
 	  				  		var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');
 	  				  		if (isNaN(val) || (questionResultUid=="")) {
@@ -102,12 +113,16 @@
 			   	   			</c:otherwise>
 		   	   			</c:choose>		  	   	        
 
-	  	   	     		jQuery("#session${session.sessionId}").addRowData(${i.index + 1}, {
+	  	   	     		var table = jQuery("#session${session.sessionId}");
+	  	   	     		table.addRowData(${i.index + 1}, {
 	  	   	     			questionResultUid:"${questionResult.uid}",
 	  	   	     			userName:"${questionResult.user.lastName}, ${questionResult.user.firstName}",
 	  	   	   	   			response:responseStr,
 	  	   	   	   			grade:grade
 	  	   	   	   	    });
+	  	   	     		
+	  	   	   			// set maxGrade attribute to cell DOM element
+	  	 	 	     	table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  ${questionResult.maxMark}});
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>

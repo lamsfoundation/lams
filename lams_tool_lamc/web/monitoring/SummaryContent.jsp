@@ -113,12 +113,25 @@
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);
 				},
+				beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+					var intRegex = /^\d+$/;
+					if (!intRegex.test(val)) {
+  						return null;
+  					}
+					
+					// get maxGrade attribute which was set in masterDetailLoadUp.jsp
+					var maxGrade = jQuery("table#userSummary${sessionMarkDto.sessionId} tr#" + iRow 
+							              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
+					if (val > maxGrade) {
+						return maxGrade;
+					}
+				},
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
   					var intRegex = /^\d+$/;
   					if (!intRegex.test(val)) {
   						jQuery("#userSummary${sessionMarkDto.sessionId}").restoreCell(iRow,iCol); 
   					} else {
-  						var parentSelectedRowId = jQuery("#group${sessionMarkDto.sessionId}").getGridParam("selrow");
+   						var parentSelectedRowId = jQuery("#group${sessionMarkDto.sessionId}").getGridParam("selrow");
   						var previousTotal =  eval(jQuery("#group${sessionMarkDto.sessionId}").getCell(parentSelectedRowId, 'total'));
   						jQuery("#group${sessionMarkDto.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
   					}
