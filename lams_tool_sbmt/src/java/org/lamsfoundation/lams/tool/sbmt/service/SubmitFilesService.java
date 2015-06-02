@@ -45,6 +45,8 @@ import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -68,6 +70,8 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -97,6 +101,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.dao.DataAccessException;
@@ -105,7 +110,7 @@ import org.springframework.dao.DataAccessException;
  * @author Manpreet Minhas
  */
 public class SubmitFilesService implements ToolContentManager, ToolSessionManager, ISubmitFilesService,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
 
     private static Logger log = Logger.getLogger(SubmitFilesService.class);
 
@@ -1003,6 +1008,24 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return submitUserDAO.getLearner(sessionID, userID);
     }
 
+    public SubmitUser createContentUser(Integer userId, String firstName, String lastName, String loginName, Long contentId) {
+	SubmitUser author = submitUserDAO.getContentUser(contentId, userId);
+	if (author != null) {
+	    return author;
+	}
+	author = new SubmitUser();
+	author.setUserID(userId);
+	author.setFirstName(firstName);
+	author.setLastName(lastName);
+	author.setLogin(loginName);
+	author.setContentID(contentId);
+	author.setFinished(false);
+
+	submitUserDAO.saveOrUpdateUser(author);
+	return author;
+
+    }
+
     public SubmitUser createContentUser(UserDTO userDto, Long contentId) {
 	SubmitUser learner = submitUserDAO.getContentUser(contentId, userDto.getUserID());
 	if (learner != null) {
@@ -1167,4 +1190,42 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     public void setSubmitFilesOutputFactory(SubmitFilesOutputFactory submitFilesOutputFactory) {
 	this.submitFilesOutputFactory = submitFilesOutputFactory;
     }
+    
+    // ****************** REST methods *************************
+
+    /** Used by the Rest calls to create content. 
+     * Mandatory fields in toolContentJSON: title, instructions
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+
+	SubmitFilesContent content = new SubmitFilesContent();
+	Date updateDate = new Date();
+	content.setCreated(updateDate);
+	content.setUpdated(updateDate);
+
+	content.setContentID(toolContentID);
+	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	content.setInstruction(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	
+	content.setContentInUse(false);
+	content.setDefineLater(false);
+	content.setNotifyTeachersOnFileSubmit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
+	content.setNotifyLearnersOnMarkRelease(JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
+	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
+	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	content.setLimitUpload(JsonUtil.opt(toolContentJSON, "limitUpload", Boolean.FALSE));
+	content.setLimitUploadNumber(JsonUtil.opt(toolContentJSON, "limitUploadNumber", 0));
+
+	SubmitUser user = getContentUser(toolContentID, userID);
+	if (user == null) {
+	    user = createContentUser(userID, toolContentJSON.getString("firstName"), toolContentJSON.getString("lastName"),toolContentJSON.getString("loginName"), toolContentID);
+	}
+	content.setCreatedBy(user);
+	saveOrUpdateContent(content);
+
+    }
+
 }
