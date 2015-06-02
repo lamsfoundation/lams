@@ -23,6 +23,11 @@
 					<c:if test="${questionEntry.value.required}">
 						<fmt:message key="label.required" />
 					</c:if>
+					<c:if test="${questionEntry.value.minWordsLimit != 0}">
+						<fmt:message key="label.minimum.number.words" >
+							<fmt:param>&nbsp;${questionEntry.value.minWordsLimit}</fmt:param>
+						</fmt:message>
+					</c:if>					
 					<br>
 					<c:out value="${questionEntry.value.question}" escapeXml="false" />
 				</p>
@@ -31,8 +36,11 @@
 					<strong><fmt:message key="label.answer" /> </strong>
 				</p>
 	
-				<div class="space-bottom">
-					<lams:textarea  name="answer" rows="5" cols="60" class="text-area" ><c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' /></lams:textarea>
+				<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
+					 data-min-words-limit="${questionEntry.value.minWordsLimit}"
+					class="space-bottom <c:if test="${questionEntry.value.minWordsLimit != 0}">min-words-limit-enabled</c:if>"
+				>
+					<lams:textarea  name="answer" id="answer${questionEntry.key}" rows="5" cols="60" class="text-area" ><c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' /></lams:textarea>
 				</div>
 				
 				<html:hidden property="currentQuestionIndex"value="${questionEntry.key}" />
