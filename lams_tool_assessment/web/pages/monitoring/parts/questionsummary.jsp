@@ -64,7 +64,7 @@
 	  						
 	  						var maxGrade = jQuery("table#session${session.sessionId} tr#" + iRow 
 	  								              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
-	  						if (val > maxGrade) {
+	  						if (+val > +maxGrade) {
 	  							return maxGrade;
 	  						}
 	  					},
