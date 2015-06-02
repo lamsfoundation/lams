@@ -103,7 +103,7 @@
 					// get maxGrade attribute which was set in masterDetailLoadUp.jsp
 					var maxGrade = jQuery("table#userSummary${summary.sessionId} tr#" + iRow 
 							              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
-					if (val > maxGrade) {
+					if (+val > +maxGrade) {
 						return maxGrade;
 					}
 				},
