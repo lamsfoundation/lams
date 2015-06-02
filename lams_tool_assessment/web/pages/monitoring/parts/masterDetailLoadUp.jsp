@@ -11,13 +11,19 @@
 	       		</c:set>	
  	        	var responseStr = "";
  	       		<%@ include file="userresponse.jsp"%>
- 	     		jQuery("#userSummary${assessmentResult.sessionId}").addRowData(${i.index + 1}, {
+ 	       		
+ 	       		var table = jQuery("#userSummary${assessmentResult.sessionId}");
+ 	     		table.addRowData(${i.index + 1}, {
  	   	     		id:"${i.index + 1}",
  	   	   			questionResultUid:"${questionResult.uid}",
  	   	   			title:"${fn:escapeXml(title)}",
  	   	   			response:responseStr,
  	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
  	   	   	    });	
+ 	     		
+
+ 	 	     	// set maxGrade attribute to cell DOM element
+ 	 	     	table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  ${questionResult.maxMark}});
 	        </c:forEach>
 	};	  	   	  
 	masterDetailLoadUp();
