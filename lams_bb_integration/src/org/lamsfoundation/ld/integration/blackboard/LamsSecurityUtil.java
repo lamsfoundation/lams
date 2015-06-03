@@ -296,16 +296,17 @@ public class LamsSecurityUtil {
 	String lang = getLanguage(locale);
 	String method = (isPreview) ? "preview" : "start";
 
-	// courseId not needed for preview but pass it through if we have it.
+	// courseId aways needed to check roles
+	// if it is preview, then can use the DUMMY_COURSE
 	String courseId = null;
 	if ( isPreview ) 
-	    courseId = ctx.getCourse() != null ? ctx.getCourse().getCourseId() : null;
+	    courseId = ctx.getCourse()!=null ? ctx.getCourse().getCourseId() : DUMMY_COURSE;
 	else 
 	    courseId = ctx.getCourse().getCourseId();
 	
-	if (serverId == null || serverAddr == null || serverKey == null) {
-	    logger.info("Unable to start lesson, one or more lams configuration properties is null");
-	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
+	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
+	    logger.info("Unable to start lesson, one or more lams configuration properties or the course id is null");
+	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties or the course id is null");
 	}
 
 	try {
