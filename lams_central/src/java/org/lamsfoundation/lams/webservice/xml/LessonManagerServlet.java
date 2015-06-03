@@ -114,6 +114,7 @@ public class LessonManagerServlet extends HttpServlet {
 	String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
+	String courseId = request.getParameter(CentralConstants.PARAM_COURSE_ID);
 	String ldIdStr = request.getParameter(CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	String lsIdStr = request.getParameter(CentralConstants.PARAM_LESSON_ID);
 	String country = request.getParameter(CentralConstants.PARAM_COUNTRY);
@@ -121,15 +122,11 @@ public class LessonManagerServlet extends HttpServlet {
 	String desc = request.getParameter(CentralConstants.PARAM_DESC);
 	String startDate = request.getParameter(CentralConstants.PARAM_STARTDATE);
 	String lang = request.getParameter(CentralConstants.PARAM_LANG);
+	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	String filePath = request.getParameter(CentralConstants.PARAM_FILEPATH);
 	String outputsUser = request.getParameter("outputsUser");
 	String learnerIds = request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 	String monitorIds = request.getParameter(CentralConstants.PARAM_MONITOR_IDS);
-
-	String method = request.getParameter(CentralConstants.PARAM_METHOD);
-
-	/** CourseId isn't needed for a preview, but it is needed for the other calls */
-	String courseId = WebUtil.readStrParam(request, CentralConstants.PARAM_COURSE_ID, method.equals(CentralConstants.METHOD_PREVIEW));
 
 	// Custom CSV string to be used for tool adapters
 	String customCSV = request.getParameter(CentralConstants.PARAM_CUSTOM_CSV);
