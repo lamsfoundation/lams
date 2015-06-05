@@ -448,7 +448,12 @@ public class LearningAction extends Action {
 	}
 	
 	//store results from sessionMap into DB
-	storeUserAnswersIntoDatabase(sessionMap, false);
+ 	boolean isResultsStored = storeUserAnswersIntoDatabase(sessionMap, false);
+	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
+	// using 2 browsers). Then show last stored results
+ 	if (!isResultsStored) {
+ 	    loadupLastAttempt(sessionMap);
+ 	}
 	
 	// populate info for displaying results page
 	prepareResultsPageData(sessionMap);
@@ -923,25 +928,27 @@ public class LearningAction extends Action {
     /**
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
      */
-    private void storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) {
+    private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) {
 	
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	service.storeUserAnswers(assessmentUid, userId, pagedQuestions, isAutosave);
+	boolean isResultsStored = service.storeUserAnswers(assessmentUid, userId, pagedQuestions, isAutosave);
 	
 	// notify teachers
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	if ((mode != null) && !mode.isTeacher() && !isAutosave && assessment.isNotifyTeachersOnAttemptCompletion()) {
+	if ((mode != null) && !mode.isTeacher() && !isAutosave && isResultsStored && assessment.isNotifyTeachersOnAttemptCompletion()) {
 
 	    Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    AssessmentUser assessmentUser = getCurrentUser(toolSessionId);
 	    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
 	    service.notifyTeachersOnAttemptCompletion(toolSessionId, fullName);
 	}
+	
+	return isResultsStored;
     }
     
     private IAssessmentService getAssessmentService() {
