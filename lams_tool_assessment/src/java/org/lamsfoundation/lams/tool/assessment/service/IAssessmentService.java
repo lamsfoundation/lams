@@ -197,8 +197,10 @@ public interface IAssessmentService {
      * @param userId
      * @param pagedQuestions
      * @param isAutosave indicates whether it's autosave request
+     * 
+     * @return whether storing results is allowed, false otherwise
      */
-    void storeUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions,
+    boolean storeUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions,
 	    boolean isAutosave);
     
     /**
