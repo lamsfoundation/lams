@@ -63,7 +63,9 @@
 					<fmt:message key="index.search.lesson.title" var="SEARCH_LESSON_TITLE_VAR"/>
 					SEARCH_LESSON_TITLE : '<c:out value="${SEARCH_LESSON_TITLE_VAR}" />',
 					<fmt:message key="index.course.groups.title" var="COURSE_GROUPS_TITLE_VAR"/>
-					COURSE_GROUPS_TITLE : '<c:out value="${COURSE_GROUPS_TITLE_VAR}" />'
+					COURSE_GROUPS_TITLE : '<c:out value="${COURSE_GROUPS_TITLE_VAR}" />',
+					<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
+					NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text()
 				},
 				
 				tabName = '${tab}',
