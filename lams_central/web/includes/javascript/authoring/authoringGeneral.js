@@ -1038,16 +1038,6 @@ GeneralInitLib = {
 				 win.focus();
 			}
 		});
-		
-		window.onbeforeunload = function(){
-			if (layout.modified &&
-				(layout.activities.length > 0
-				|| layout.regions.length > 0
-				|| layout.labels.length > 0
-				|| layout.floatingActivity)) {
-				return LABELS.NAVIGATE_AWAY_CONFIRM;
-			}
-		};
 	}
 },
 
@@ -1355,6 +1345,14 @@ GeneralLib = {
 		GeneralLib.setModified(true);
 	},
 	
+	
+	canClose : function(){
+		return !(layout.modified &&
+			(layout.activities.length > 0
+			|| layout.regions.length > 0
+			|| layout.labels.length > 0
+			|| layout.floatingActivity));
+	},
 	
 	/**
 	 * Escapes HTML tags to prevent XSS injection.

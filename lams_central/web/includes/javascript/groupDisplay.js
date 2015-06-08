@@ -233,6 +233,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID) {
 		'height' : 600,
 		'width' : 850,
 		'modal' : true,
+		'resizable' : true,
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this),
@@ -263,7 +264,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID) {
 				}
 			});
 		}
-	});
+	}, true);
 }
 
 
@@ -382,6 +383,15 @@ function showFlashlessAuthoringDialog(){
 		'width' : 1280,
 		'resizable' : true,
 		'title' : 'Authoring',
+		'beforeClose' : function(){
+			// if LD was modified, ask the user if he really wants to exit
+			var canClose = $('iframe', this)[0].contentWindow.GeneralLib.canClose();
+			if (canClose || confirm(LABELS.NAVIGATE_AWAY_CONFIRM)) {
+				$('iframe', this).attr('src', null);
+			} else {
+				return false;
+			}
+		},
 		'open' : function() {
 			var orgID = $(this).dialog('option', 'orgID');
 			// load contents after opening the dialog
