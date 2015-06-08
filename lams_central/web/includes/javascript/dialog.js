@@ -37,7 +37,7 @@ function showDialog(id, initParams, extraButtons) {
 	        "closable" : true,
 	        "maximizable" : true,
 	        "minimizable" : true,
-	        "collapsable" : true,
+	        "collapsable" : false,
 	        "dblclick" : "collapse",
 	        "minimizeLocation" : "right",
 	        "icons" : {

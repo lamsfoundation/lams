@@ -1170,7 +1170,19 @@ ActivityLib = {
 				'height' : 800,
 				'width' : 1024,
 				'resizable' : true,
-				'title' : activity.title + LABELS.ACTIVITY_DIALOG_TITLE_SUFFIX,
+				'title' : activity.title + ' ' + LABELS.ACTIVITY_DIALOG_TITLE_SUFFIX,
+				'beforeClose' : function(event){
+					// ask the user if he really wants to exit before saving his work
+					var iframe = $('iframe', this);
+					// if X button was clicked, currentTarget is set
+					// if it is not the last Re-Edit/Close page, doCancel() exists
+					if (event.currentTarget && iframe[0].contentWindow.doCancel) {
+						iframe[0].contentWindow.doCancel();
+						return false;
+					} else {
+						iframe.attr('src', null);
+					}
+				},
 				'open' : function() {
 					var dialog = $(this);
 					// load contents after opening the dialog
