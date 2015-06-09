@@ -9,20 +9,8 @@ div#tabs {
 	padding: 0px;
 }
 
-div#tabs ul li a,a#closeButton {
+div#tabs ul li a {
 	border-bottom: none;
-}
-
-a#closeButton {
-	position: absolute;
-	right: 10px;
-	top: 11px;
-	width: 19px;
-	height: 18px;
-}
-
-a#closeButton span {
-	background-color: #D0E5F5;
 }
 
 .errorMessage {

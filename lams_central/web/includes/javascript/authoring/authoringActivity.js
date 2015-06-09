@@ -1169,7 +1169,6 @@ ActivityLib = {
 			showDialog("dialogActivity" + activity.toolContentID, {
 				'height' : 800,
 				'width' : 1024,
-				'resizable' : true,
 				'title' : activity.title + ' ' + LABELS.ACTIVITY_DIALOG_TITLE_SUFFIX,
 				'beforeClose' : function(event){
 					// ask the user if he really wants to exit before saving his work
