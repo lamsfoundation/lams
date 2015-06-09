@@ -21,18 +21,6 @@ div#tabs ul li a, a.ygtvspacer, a#closeButton, a#addButton {
 	border-bottom: none;
 }
 
-a#closeButton {
-	position: absolute;
-	right: 10px;
-	top: 11px;
-	width: 19px;
-	height: 18px;
-}
-
-a#closeButton span {
-	background-color: #D0E5F5;
-}
-
 a#addButton {
 	position: absolute;
 	right: 60px;

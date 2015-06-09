@@ -28,7 +28,7 @@ td#messageCell {
 
 .dialogContainer iframe {
 	width: 100%;
-	height: 99.5%;
+	height: 99.4%;
 	border: none;
 }
 
@@ -117,7 +117,21 @@ td#messageCell {
 	padding: 3px;
 }
 
-td#actionAccord {
-	width: 15%;
-	padding-top: 1px;
+/* Style for Monitoring and Add Lesson dialogs.
+   Put the transparent dialog's titlebar over the tab bar. */
+body > .tabbedDialog .ui-dialog-titlebar {
+	background : transparent;
+	border : none;
+	z-index : 200;
+	position : absolute;
+	right : 40px;
+	top : 10px;
+}
+
+.tabbedDialog .ui-dialog-title {
+	margin-right: 70px;
+}
+
+body > .addLessonDialog .ui-dialog-titlebar {
+	right : 10px;
 }

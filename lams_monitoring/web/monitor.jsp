@@ -174,10 +174,6 @@
 </lams:head>
 <body data-enhance="false">
 <div id="tabs">
-	<a id="closeButton" href="#" onClick="javascript:closeMonitorLessonDialog()">
-		<span class="ui-icon ui-icon-closethick"></span>
-	</a>
-	
 	<!-- Tab names -->
 	<ul>
 		<li><a id="tabLessonLink" href="#tabLesson"><fmt:message key="tab.lesson"/></a></li>

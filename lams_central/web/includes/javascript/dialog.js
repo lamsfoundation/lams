@@ -21,7 +21,7 @@ function showDialog(id, initParams, extraButtons) {
 		'autoOpen' : true,
 		'modal' : false,
 		'draggable' : true,
-		'resizable' : false,
+		'resizable' : extraButtons == true,
 		'hide' : 'fold',
 		'beforeClose' : function(){
 			$('iframe', this).attr('src', null);
