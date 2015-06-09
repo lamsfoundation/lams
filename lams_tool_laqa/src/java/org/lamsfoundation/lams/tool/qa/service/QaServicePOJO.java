@@ -1454,8 +1454,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS,(String)null));
 	qa.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 
-	qa.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE,(Date)null));
-
+	// submissionDeadline is set in monitoring
 	// qa.setMonitoringReportTitle(); Can't find this field in the database - assuming unused.
 	// qa.setReportTitle(); Can't find this field in the database - assuming unused.
 	// qa.setContent(content);  Can't find this field in the database - assuming unused.

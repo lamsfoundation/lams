@@ -625,7 +625,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
 	nb.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	nb.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	nb.setSubmissionDeadline((Date)JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
+	// submissionDeadline is set in monitoring
 
 	nb.setContentInUse(false);
 	nb.setDefineLater(false);

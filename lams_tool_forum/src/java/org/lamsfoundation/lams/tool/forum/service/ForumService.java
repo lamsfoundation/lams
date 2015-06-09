@@ -1631,7 +1631,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setNotifyTeachersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
 	forum.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 	forum.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	forum.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
+	// submissionDeadline is set in monitoring
 	
 	// *******************************Handle user*******************
 	// Code taken from AuthoringAction TODO 
