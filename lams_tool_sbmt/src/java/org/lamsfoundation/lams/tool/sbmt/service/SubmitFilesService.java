@@ -1214,10 +1214,10 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	content.setNotifyLearnersOnMarkRelease(JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
 	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	content.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
 	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	content.setLimitUpload(JsonUtil.opt(toolContentJSON, "limitUpload", Boolean.FALSE));
 	content.setLimitUploadNumber(JsonUtil.opt(toolContentJSON, "limitUploadNumber", 0));
+	// submissionDeadline is set in monitoring
 
 	SubmitUser user = getContentUser(toolContentID, userID);
 	if (user == null) {

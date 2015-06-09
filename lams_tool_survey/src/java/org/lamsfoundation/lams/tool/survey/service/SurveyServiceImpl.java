@@ -1161,10 +1161,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	survey.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.TRUE));
 	survey.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 	survey.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	survey.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
 	survey.setNotifyTeachersOnAnswerSumbit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnAnswerSumbit", Boolean.FALSE));
 	survey.setShowOnePage(JsonUtil.opt(toolContentJSON, "showOnePage", Boolean.TRUE));
 	survey.setShowOtherUsersAnswers(JsonUtil.opt(toolContentJSON, "showOtherUsersAnswers", Boolean.FALSE));
+
+	// submissionDeadline is set in monitoring
 
 	SurveyUser surveyUser = new SurveyUser(userID.longValue(), toolContentJSON.getString("firstName"),
 		toolContentJSON.getString("lastName"), toolContentJSON.getString("loginName"), survey);
