@@ -65,14 +65,14 @@
 			   	multiselect: true,
 			    sortorder: "asc",
 			    loadonce: true,
-			    height:'auto',
+			    height:'100%',
 			    pagerpos:'left',
 			    ignoreCase: true
 			});
 			jQuery("#list3").jqGrid('navGrid','#pager3',{add:false,del:false,edit:false,position:'right'});
 			jQuery("#list3").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
 			$("#list3").parents('div.ui-jqgrid-bdiv').css("max-height","1000px");
-			
+
 			//initialize jStepper for additional parameters
 			$("#daysToDeadline").jStepper({minValue:0, maxValue:999, defaultValue:3, allowDecimals:false});
 			
@@ -84,9 +84,10 @@
     		
     		//initialize accordion
     		$( "#accordion" ).accordion({
-    			autoHeight: false,
     			create: function(event, ui) {
-    				
+    				// accordion probably sets its height based on empty grid
+    				// once it is loaded, it needs to be adjusted
+    				$('div.ui-accordion-content').css('height', '100%');
     			},
     			change: function(event, ui) {
     				if ($('#accordion').accordion('option', 'active') == 0) {

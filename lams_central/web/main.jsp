@@ -65,7 +65,9 @@
 					<fmt:message key="index.course.groups.title" var="COURSE_GROUPS_TITLE_VAR"/>
 					COURSE_GROUPS_TITLE : '<c:out value="${COURSE_GROUPS_TITLE_VAR}" />',
 					<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
-					NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text()
+					NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
+					<fmt:message key="index.monitoring.title" var="MONITORING_TITLE_VAR"/>
+					MONITORING_TITLE : '<c:out value="${MONITORING_TITLE_VAR}" />',
 				},
 				
 				tabName = '${tab}',

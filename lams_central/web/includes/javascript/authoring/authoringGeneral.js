@@ -578,7 +578,6 @@ GeneralInitLib = {
 			},
 			'resizable'     : false,
 			'width'			: 1240,
-			'height'		: 785,
 			'draggable'     : false,
 			'buttonsLoad' : sharedButtons.concat([
 			             {

@@ -158,7 +158,8 @@ function showMonitorLessonDialog(lessonID) {
 			'height' : 600,
 			'width' : 1024,
 			'draggable' : false,
-			'resizable' : true,
+			'dialogClass' : 'tabbedDialog',
+			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
 				// load contents after opening the dialog
 				$('iframe', this).attr('src', LAMS_URL
@@ -166,7 +167,7 @@ function showMonitorLessonDialog(lessonID) {
 					+ $(this).dialog('option', 'lessonID'));
 			},
 
-		});
+		}, true);
 	
 	// if it was just created
 	if (dialog) {
@@ -176,36 +177,28 @@ function showMonitorLessonDialog(lessonID) {
 				win = frame.contentWindow || frame.contentDocument;
 			win.resizeSequenceCanvas(ui.size.width, ui.size.height);
 		});
-		// tabs are the title bar, so remove dialog's one
-		dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
 		dialog.dialog('open');
 	}
 }
 
 
 function showAddLessonDialog(orgID) {
-	var dialog = showDialog("dialogAddLesson", {
-			'orgID' : orgID,
-			'autoOpen' : false,
-			'modal' : true,
-			'draggable' : false,
-			'height' : 600,
-			'width' : 800,
-			'open' : function() {
-				// load contents after opening the dialog
-				$('iframe', this)
-						.attr('src', LAMS_URL
-							+ 'home.do?method=addLesson&organisationID='
-							+ $(this).dialog('option', 'orgID'));
-			}
-		});
-	
-	// if it was just created
-	if (dialog) {
-		// tabs are the title bar, so remove dialog's one
-		dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
-		dialog.dialog('open');
-	}
+	showDialog("dialogAddLesson", {
+		'orgID' : orgID,
+		'autoOpen' : true,
+		'modal' : true,
+		'draggable' : false,
+		'dialogClass' : 'tabbedDialog addLessonDialog',
+		'height' : 600,
+		'width' : 800,
+		'open' : function() {
+			// load contents after opening the dialog
+			$('iframe', this)
+					.attr('src', LAMS_URL
+						+ 'home.do?method=addLesson&organisationID='
+						+ $(this).dialog('option', 'orgID'));
+		}
+	});
 }
 
 
@@ -223,7 +216,7 @@ function showOrgGroupDialog(orgID) {
 						+ 'OrganisationGroup.do?method=viewGroupings&organisationID='
 						+ $(this).dialog('option', 'orgID'));
 		}
-	});
+	}, true);
 }
 
 function showAddSingleActivityLessonDialog(orgID, toolID) {
@@ -233,7 +226,6 @@ function showAddSingleActivityLessonDialog(orgID, toolID) {
 		'height' : 600,
 		'width' : 850,
 		'modal' : true,
-		'resizable' : true,
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this),
@@ -293,7 +285,7 @@ function showNotificationsDialog(orgID, lessonID) {
 					+ orgID);
 			}
 		}
-	});
+	}, true);
 }
 
 function showGradebookCourseDialog(orgID){
@@ -309,7 +301,7 @@ function showGradebookCourseDialog(orgID){
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
 		}
-	});
+	}, true);
 }
 
 function showGradebookLessonDialog(lessonID){
@@ -325,7 +317,7 @@ function showGradebookLessonDialog(lessonID){
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
 		}
-	});
+	}, true);
 }
 
 function showGradebookLearnerDialog(orgID){
@@ -341,7 +333,7 @@ function showGradebookLearnerDialog(orgID){
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
 		}
-	});
+	}, true);
 }
 
 function showConditionsDialog(lessonID){
@@ -357,11 +349,11 @@ function showConditionsDialog(lessonID){
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
 		}
-	});
+	}, true);
 }
 
 function showSearchLessonDialog(orgID){
-	var id = "dialoSearchLesson" + orgID;
+	var id = "dialogSearchLesson" + orgID;
 	showDialog(id, {
 		'orgID' : orgID,
 		'height' : 400,
@@ -373,7 +365,7 @@ function showSearchLessonDialog(orgID){
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
 		}
-	});
+	}, true);
 }
 
 
@@ -381,7 +373,6 @@ function showFlashlessAuthoringDialog(){
 	showDialog('dialogFlashlessAuthoring', {
 		'height' : 865,
 		'width' : 1280,
-		'resizable' : true,
 		'title' : 'Authoring',
 		'beforeClose' : function(){
 			// if LD was modified, ask the user if he really wants to exit
@@ -424,6 +415,7 @@ function closeAddSingleActivityLessonDialog(action) {
 	closeDialog(id, save);
 }
 
+
 function closeDialog(id, refresh) {
 	// was the dialog just closed or a lesson removed
 	// if latter, refresh the list
@@ -432,6 +424,7 @@ function closeDialog(id, refresh) {
 	}
 	$("#" + id).dialog('close');
 }
+
 
 /**
  * Loads contents to already open organisation groups dialog.

@@ -48,7 +48,6 @@
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jstepper.min.js"></script>
 	<script language="JavaScript" type="text/javascript">
-	<!--
 		jQuery(document).ready(function() {
 
 			//initialize user list 
@@ -82,9 +81,10 @@
     		
     		//initialize accordion
     		$( "#accordion" ).accordion({
-    			autoHeight: false,
     			create: function(event, ui) {
-    				
+    				// accordion probably sets its height based on empty grid
+    				// once it is loaded, it needs to be adjusted
+    				$('div.ui-accordion-content').css('height', '100%');
     			},
     			change: function(event, ui) {
     				if ($('#accordion').accordion('option', 'active') == 0) {
@@ -212,7 +212,6 @@
 			//return search params
 			return "&organisationID=${org.organisationId}&searchType=" + searchType + lessonId + lessonIds;
 		}
-	//-->
 	</script>
 	
 </lams:head>
