@@ -28,13 +28,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -45,6 +47,8 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -72,6 +76,7 @@ import org.lamsfoundation.lams.tool.wiki.util.diff.Difference;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 
@@ -80,7 +85,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
-public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager {
+public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager, ToolRestManager {
 
     static Logger logger = Logger.getLogger(WikiService.class.getName());
 
@@ -1012,5 +1017,85 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getWikiOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    /* ****************** REST methods **************************************************************************/
+
+    /**
+     * Used by the Rest calls to create content.
+     * 
+     * Mandatory fields in toolContentJSON: title, instructions, pages. Optional fields reflectInstructions,
+     * reflectOnActivity, lockWhenFinished (default False), allowLearnerAttachImages (default True),
+     * allowLearnerCreatePages (default True), allowLearnerInsertLinks (default True) notifyUpdates (default False),
+     * minimumEdits and maximumEdits (default 0, no min/max)
+     * 
+     * Pages is a JSONArray of JSONObjects, where each object represents a Wiki page. The first entry in the array
+     * becomes the main page. Withing the wiki page object, mandatory fields are title and body. Optional field is
+     * readOnly, which defaults to false (ie the user can edit the page).
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
+
+	Wiki content = new Wiki();
+	Date updateDate = new Date();
+	content.setCreateDate(updateDate);
+	content.setUpdateDate(updateDate);
+	content.setCreateBy(userID.longValue());
+	content.setToolContentId(toolContentID);
+	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	// No instructions are available in the current wiki implementation
+	// content.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+
+	content.setContentInUse(false);
+	content.setDefineLater(false);
+	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+
+	content.setAllowLearnerAttachImages(JsonUtil.opt(toolContentJSON, "allowLearnerAttachImages", Boolean.TRUE));
+	content.setAllowLearnerCreatePages(JsonUtil.opt(toolContentJSON, "allowLearnerCreatePages", Boolean.TRUE));
+	content.setAllowLearnerInsertLinks(JsonUtil.opt(toolContentJSON, "allowLearnerInsertLinks", Boolean.TRUE));
+	content.setNotifyUpdates(JsonUtil.opt(toolContentJSON, "notifyUpdates", Boolean.FALSE));
+	content.setMinimumEdits(JsonUtil.opt(toolContentJSON, "minimumEdits", 0));
+	content.setMaximumEdits(JsonUtil.opt(toolContentJSON, "maximumEdits", 0));
+
+	/* ********************** Handle pages ***************************************************** */
+	/* The first page becomes the main page, all other pages saved in the order in the JSONArray */
+	boolean firstEntry = true;
+	content.setWikiPages(new HashSet<WikiPage>());
+	JSONArray pages = toolContentJSON.getJSONArray("pages");
+	for (int i = 0; i < pages.length(); i++) {
+	    JSONObject pageData = (JSONObject) pages.get(i);
+
+	    WikiPage wikiPage = new WikiPage();
+	    Boolean isReadOnly = JsonUtil.opt(pageData, RestTags.READ_ONLY, Boolean.FALSE);
+	    wikiPage.setEditable(!isReadOnly);
+	    wikiPage.setParentWiki(content);
+	    wikiPage.setTitle(pageData.getString(RestTags.TITLE));
+	    wikiPage.setAddedBy(null);
+	    wikiPage.setWikiContentVersions(new HashSet<WikiPageContent>());
+	    wikiPage.setWikiSession(null);
+
+	    // Create a new wiki page content using the wiki page form
+	    WikiPageContent wikiPageContent = new WikiPageContent();
+	    wikiPageContent.setBody(pageData.getString("body"));
+	    wikiPageContent.setEditDate(updateDate);
+	    wikiPageContent.setEditor(null);
+	    wikiPageContent.setVersion(new Long(1));
+	    wikiPageContent.setWikiPage(wikiPage);
+
+	    // Apply the content to the wiki page and save
+	    wikiPage.setCurrentWikiContent(wikiPageContent);
+	    wikiPage.getWikiContentVersions().add(wikiPageContent);
+	    if ( firstEntry ) {
+		content.setMainPage(wikiPage);
+		firstEntry=false;
+	    }
+	    content.getWikiPages().add(wikiPage);
+	}
+
+	insertUnsavedWikiContent(content);
+	// don't set WikiPages, as it is built from the database column wiki_uid in the wiki_page table
     }
 }
