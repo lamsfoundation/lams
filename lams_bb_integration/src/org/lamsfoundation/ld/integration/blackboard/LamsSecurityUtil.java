@@ -233,15 +233,23 @@ public class LamsSecurityUtil {
 	String learningDesigns = ""; // empty 
 	try {
 
-	    String serviceURL = serverAddr
+	    String serviceURLBase = serverAddr
 		    + "/services/xml/LearningDesignRepository?method=getLearningDesignsJSON" + "&datetime="
 		    + timestamp + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
 		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + MODE
 		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
 		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8");
-	    if (folderId != null) {
-		serviceURL += "&folderID=" + folderId;
+	    String serviceURL = serviceURLBase;
+	    
+	    boolean isHome = false;
+	    
+	    if (folderId != null ) {
+		if ( folderId.equalsIgnoreCase("home") ) {
+		    isHome = true;
+		} else {
+		    serviceURL += "&folderID=" + folderId;
+		}
 	    }
 
 	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
@@ -251,6 +259,22 @@ public class LamsSecurityUtil {
 	    IOUtils.copy(is, writer, "UTF-8");
 	    learningDesigns = writer.toString();
 
+	    if ( isHome ) {
+		// we are after the designs in the root of the user's personal folder
+		String newFolderId = findPersonalFolderId(learningDesigns);
+		if ( newFolderId != null ) {
+        		serviceURL = serviceURLBase + "&folderID=" + newFolderId;
+        		is = LamsSecurityUtil.callLamsServer(serviceURL);
+        		writer = new StringWriter();
+        		IOUtils.copy(is, writer, "UTF-8");
+        		learningDesigns = writer.toString();
+		} else {
+		    logger.error("Unable to find personal folder ID from learning design response "+learningDesigns);
+		    learningDesigns = "{}";
+		}
+	    }
+		
+	    
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to get LAMS learning designs, bad URL: '" + serverAddr
 		    + "', please check lams.properties", e);
@@ -271,6 +295,19 @@ public class LamsSecurityUtil {
 	return learningDesigns;
     }
 
+    private static String findPersonalFolderId(String response) {
+	// {"folders":[{"isRunSequencesFolder":false,"name":"Teacher Pontiff","folderID":47},{.........}]}
+	int indexStart = response.indexOf("folderID");
+	if ( indexStart > 0 ) {
+	    indexStart += 10;
+	    int indexEnd = response.indexOf("}",indexStart);
+	    if ( indexEnd > 0 ) {
+		return response.substring(indexStart, indexEnd);
+	    }
+	}
+	return null;	
+    }
+    
     /**
      * Starts lessons in lams through a LAMS webservice
      * 
