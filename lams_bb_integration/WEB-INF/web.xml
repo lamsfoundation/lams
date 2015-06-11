@@ -21,6 +21,10 @@
     <servlet-name>GradebookSyncServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookSyncServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>RenderDesignImageServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.RenderDesignImageServlet</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>LamsLearningDesignServlet</servlet-name>
@@ -38,5 +42,8 @@
     <servlet-name>GradebookSyncServlet</servlet-name>
     <url-pattern>/GradebookSync</url-pattern>
   </servlet-mapping>   
- 
+  <servlet-mapping>
+    <servlet-name>RenderDesignImageServlet</servlet-name>
+    <url-pattern>/RenderImage</url-pattern>
+  </servlet-mapping>   
 </web-app>

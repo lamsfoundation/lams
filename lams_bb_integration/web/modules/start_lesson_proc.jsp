@@ -86,35 +86,39 @@
         String strIsAvailable = request.getParameter("isAvailable");
         String strIsGradecenter = request.getParameter("isGradecenter");
         String strIsTracked = request.getParameter("isTracked");
-        boolean isAvailable = strIsAvailable.equals("true")?true:false;
-        boolean isGradecenter = strIsGradecenter.equals("true")?true:false;
-        boolean isTracked = strIsTracked.equals("true")?true:false;
+        boolean isAvailable = (strIsAvailable==null || strIsAvailable.equals("true"))?true:false; // default true
+        boolean isGradecenter = (strIsGradecenter!=null && strIsGradecenter.equals("true"))?true:false; // default false
+        boolean isTracked = (strIsTracked!=null && strIsTracked.equals("true"))?true:false; // default false
 
         String isDisplayDesignImage = request.getParameter("isDisplayDesignImage");
 
-        String strStartDate = request.getParameter("lessonAvailability_start_datetime");
-        String strEndDate = request.getParameter("lessonAvailability_end_datetime");
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Calendar startDate = Calendar.getInstance();
-		Calendar endDate = Calendar.getInstance();
-        startDate.setTime(formatter.parse(strStartDate));
-        endDate.setTime(formatter.parse(strEndDate));
-
-        String strStartDateCheckbox = request.getParameter("lessonAvailability_start_checkbox");
-        String strEndDateCheckbox = request.getParameter("lessonAvailability_end_checkbox");
-
 	    // Set Availability Dates
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 	    // Start Date
-	    if (strStartDateCheckbox != null){
-	        if (strStartDateCheckbox.equals("1")){
-	            bbContent.setStartDate(startDate);
-	        }
-	    }
+        String strStartDate = request.getParameter("lessonAvailability_start_datetime");
+        if ( strStartDate != null ) {
+	        Calendar startDate = Calendar.getInstance();
+	        startDate.setTime(formatter.parse(strStartDate));
+	        String strStartDateCheckbox = request.getParameter("lessonAvailability_start_checkbox");
+		    if (strStartDateCheckbox != null){
+		        if (strStartDateCheckbox.equals("1")){
+		            bbContent.setStartDate(startDate);
+		        }
+		    }
+        }
+	        
 	    // End Date
-	    if (strEndDateCheckbox != null){
-	        if (strEndDateCheckbox.equals("1")){
-	            bbContent.setEndDate(endDate);
-	        }
+        String strEndDate = request.getParameter("lessonAvailability_end_datetime");
+	    if ( strEndDate != null ) {
+	        Calendar endDate = Calendar.getInstance();
+    	    endDate.setTime(formatter.parse(strEndDate));
+	        String strEndDateCheckbox = request.getParameter("lessonAvailability_end_checkbox");
+		    if (strEndDateCheckbox != null){
+		        if (strEndDateCheckbox.equals("1")){
+	    	        bbContent.setEndDate(endDate);
+	        	}
+	    	}
 	    }
 
         // Set the New LAMS Lesson content data (in Blackboard)
@@ -203,6 +207,7 @@
         iconUrl="/images/ci/icons/receiptsuccess_u.gif"
         title="Start A LAMS Lesson"
         recallUrl="<%=strReturnUrl%>">
+        	<!-- LESSON START SUCCESS (DO NOT REMOVE: String is used to check for completion) --> 
             Content successfully added.
     </bbNG:receipt>
 
