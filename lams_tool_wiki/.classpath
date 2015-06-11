@@ -22,5 +22,6 @@
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-jboss-logging.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-logging-spi.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/lib/javassist.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jbossweb.sar/jbossweb.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
