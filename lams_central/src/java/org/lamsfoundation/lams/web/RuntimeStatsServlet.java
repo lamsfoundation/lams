@@ -85,8 +85,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    ObjectName engineName = new ObjectName("jboss.web:type=Engine");
 	    String jvmRoute = (String) server.getAttribute(engineName, "jvmRoute");
 
-	    String bindAddress = System.getProperty(HttpUrlConnectionUtil.JBOSS_BIND_ADDRESS_KEY);
-	    ObjectName sessionManager = new ObjectName("jboss.web:type=Manager,path=/lams,host=" + bindAddress);
+	    ObjectName sessionManager = new ObjectName("jboss.web:type=Manager,path=/lams,host=localhost");
 	    Integer activeSessions = (Integer) server.getAttribute(sessionManager, "activeSessions");
 
 	    ObjectName dataSourceName = new ObjectName("jboss.jca:name=jdbc/lams-ds,service=ManagedConnectionPool");
