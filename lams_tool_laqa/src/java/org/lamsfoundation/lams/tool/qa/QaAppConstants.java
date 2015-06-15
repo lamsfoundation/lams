@@ -32,8 +32,6 @@ public interface QaAppConstants {
     public static final int SORT_BY_NO = 0;
     public static final int SORT_BY_ANSWER_ASC = 1;
     public static final int SORT_BY_ANSWER_DESC = 2;
-    public static final int SORT_BY_AVG_RATING_ASC = 3;
-    public static final int SORT_BY_AVG_RATING_DESC = 4;
 
     public static final String MY_SIGNATURE = "laqa11";
     public static final String TOOL_CONTENT_ID = "toolContentID";
@@ -76,6 +74,8 @@ public interface QaAppConstants {
     public static final String ALLOW_RATE_ANSWERS = "allowRateAnswers";
     public static final String NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT = "notifyTeachersOnResponseSubmit";
     public static final String QUESTIONS_SEQUENCED = "questionsSequenced";
+    public static final String MAXIMUM_RATES = "maximumRates";
+    public static final String MINIMUM_RATES = "minimumRates";
 
     public static final String SOURCE_MC_STARTER = "sourceMcStarter";
     public static final Integer MAX_QUESTION_COUNT = new Integer(50);
@@ -199,6 +199,7 @@ public interface QaAppConstants {
     public static final String REQUEST_PREVIEW = "requestPreview";
     public static final String REQUEST_LEARNING_REPORT_VIEWONLY = "requestLearningReportViewOnly";
     public static final String REVISITED_LEARNER_REP = "revisitedLearnerRep";
+    public static final String IS_DISABLED = "isDisabled";
 
     /*
      * Monitoring Mode constants

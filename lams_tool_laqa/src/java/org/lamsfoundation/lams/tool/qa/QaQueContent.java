@@ -55,6 +55,8 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     private boolean required;
     
+    private int minWordsLimit;
+    
     /** nullable persistent field */
     private QaContent qaContent;
 
@@ -62,18 +64,19 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     public QaQueContent() {
     }
 
-    public QaQueContent(String question, int displayOrder, String feedback, boolean required,
+    public QaQueContent(String question, int displayOrder, String feedback, boolean required, int minWordsLimit,
 	    QaContent qaContent) {
 	this.question = question;
 	this.displayOrder = displayOrder;
 	this.feedback = feedback;
 	this.required = required;
+	this.minWordsLimit = minWordsLimit;
 	this.qaContent = qaContent;
     }
 
     public static QaQueContent newInstance(QaQueContent queContent, QaContent newQaContent) {
 	QaQueContent newQueContent = new QaQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
-		queContent.getFeedback(), queContent.isRequired(), newQaContent);
+		queContent.getFeedback(), queContent.isRequired(), queContent.minWordsLimit, newQaContent);
 	return newQueContent;
     }
 
@@ -117,6 +120,21 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
      */
     public boolean isRequired() {
 	return required;
+    }
+    
+    /**
+     * @param minWordsLimit
+     *            minWordsLimit
+     */
+    public void setMinWordsLimit(int minWordsLimit) {
+	this.minWordsLimit = minWordsLimit;
+    }
+
+    /**
+     * @return minWordsLimit
+     */
+    public int getMinWordsLimit() {
+	return minWordsLimit;
     }
 
     /**

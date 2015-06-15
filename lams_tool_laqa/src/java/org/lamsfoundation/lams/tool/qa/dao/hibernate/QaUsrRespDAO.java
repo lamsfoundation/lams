@@ -46,10 +46,6 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId order by ";
     
-    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_ORDER_BY_AVG_RATING = "SELECT resp FROM "
-	    + " ResponseRating as rating RIGHT JOIN rating.response as resp "
-	    + " WHERE resp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND resp.qaQuestion.uid=:questionId AND resp.qaQueUser.queUsrId!=:excludeUserId GROUP BY resp.responseId ORDER BY AVG(rating.rating) ";
-    
     private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
 
@@ -113,33 +109,13 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	case QaAppConstants.SORT_BY_ANSWER_DESC:
 	    sortingOrder = "answer DESC";
 	    break;
-	case QaAppConstants.SORT_BY_AVG_RATING_ASC:
-	    sortingOrder = "ASC";
-	    break;
-	case QaAppConstants.SORT_BY_AVG_RATING_DESC:
-	    sortingOrder = "DESC";
-	    break;
 	}
 	
-	if (sorting == QaAppConstants.SORT_BY_AVG_RATING_ASC || sorting == QaAppConstants.SORT_BY_AVG_RATING_DESC) {
-
-	    List list = getSessionFactory().getCurrentSession()
-		    .createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_ORDER_BY_AVG_RATING + sortingOrder)
-		    .setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue())
-		    .setLong("excludeUserId", excludeUserId.longValue()).setFirstResult(page * size)
-		    .setMaxResults(size).list();
-
-	    return list;
-
-	} else {
-	    return getSessionFactory().getCurrentSession()
-		    .createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder)
-		    .setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue())
-		    .setLong("excludeUserId", excludeUserId.longValue()).setFirstResult(page * size)
-		    .setMaxResults(size).list();
-	}
-
-
+	return getSessionFactory().getCurrentSession()
+		.createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder)
+		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue())
+		.setLong("excludeUserId", excludeUserId.longValue()).setFirstResult(page * size).setMaxResults(size)
+		.list();
     }
 
     @Override

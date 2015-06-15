@@ -6,6 +6,9 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.qa.QaAppConstants"%>
 
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="qaContent" value="${content}" />
+
     <% 
 		Set tabs = new LinkedHashSet();
 		tabs.add("label.summary");
@@ -40,10 +43,8 @@
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
 	<style media="screen,projection" type="text/css">
-		table.tablesorter, .question-title, div.pager {
-			
-		}
 		.tablesorter-blue {
 			margin: 5px 0 5px;
 		}
@@ -87,6 +88,14 @@
 		tr:nth-child(even):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-grey.png)!important;}
 		tr:nth-child(odd) .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-blue.png)!important;}
 		
+		h4 {
+			color:#0087e5; 
+			font-size:11px;
+			margin-top:10px;
+			margin-bottom:10px;
+			padding:0;
+		}
+		
 	</style>
 	
 	<!-- ********************  javascript ********************** -->
@@ -104,6 +113,20 @@
 	
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
+		
+		//vars for rating.js
+		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		IS_DISABLED =  true,
+		COMMENTS_MIN_WORDS_LIMIT = 0,
+		MAX_RATES = 0,
+		MIN_RATES = 0,
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = 0,
+		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="${warnCommentIsBlankLabel}"/>',
+		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="${warnMinNumberWordsLabel}"><fmt:param value="${itemRatingDto.commentsMinWordsLimit}"/></fmt:message>';
+
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
@@ -115,6 +138,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
@@ -123,7 +147,16 @@
 		    
 			$(".tablesorter").tablesorter({
 				theme: 'blue',
-			    widthFixed: true
+			    widthFixed: true,
+			    widgets: ['zebra'],
+		        headers: { 
+		            1: { 
+		                sorter: false 
+		            }, 
+		            2: {
+		                sorter: false 
+		            } 
+		        } 
 			});
 			
 			$(".tablesorter").each(function() {
@@ -136,24 +169,26 @@
 				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
 				      // the filterList to the url into an "fcol" array.
 				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
-					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isMonitoring=true&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
+					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
-				            json = {};
+				            json = {},
+							countRatedItems = data.countRatedItems;
 				    		
 							for (i = 0; i < data.rows.length; i++){
 								var userData = data.rows[i];
+								var itemId = userData["responseUid"];
 								
 								rows += '<tr>';
 								rows += '<td>';
 								
-								rows += 	'<div>';
-								rows += 		'<span class="field-name">';
-								rows += 			userData["userName"];
-								rows += 		'</span> ';
-								rows += 		userData["attemptTime"];
-								rows +=		'</div>';
+									rows += '<div>';
+									rows += 	'<span class="field-name">';
+									rows += 		userData["userName"];
+									rows += 	'</span> ';
+									rows += 	userData["attemptTime"];
+									rows += '</div>';
 								
 								rows += 	'<div class="user-answer">';
 								if (userData["visible"] == 'true') {
@@ -165,25 +200,53 @@
 								
 								rows += '</td>';
 								
-								if (${content.allowRateAnswers == 'true'}) {
-									rows += '<td style="width:50px;">';
+								if (${qaContent.allowRateAnswers}) {
+									rows += '<td style="width:150px;">';
 									
 									if (userData["visible"] == 'true') {
-										var responseUid = userData["responseUid"];
+										rows += '<div class="rating-stars-holder">';
 										
-										rows += '<div class="rating-stars-div">';
-										rows += 	'<div class="rating-stars-disabled" data-average="' + userData["averageRating"] +'" data-id="' + responseUid + '"></div>';
-										rows += 	'<div class="rating-stars-caption">';
-										rows += 		'<span id="averageRating' + responseUid + '">' + userData["averageRating"] +'</span> / ';
-										rows += 		'<span id="numberOfVotes' + responseUid + '">' + userData["numberOfVotes"] +'</span> ';
-										rows += 		'<fmt:message key="label.votes" />';
-										rows += 	'</div>';
+										for (j = 0; j < userData.criteriaDtos.length; j++){
+											var criteriaDto = userData.criteriaDtos[j];
+											var objectId = criteriaDto["ratingCriteriaId"] + "-" + itemId;
+											var averageRating = criteriaDto.averageRating;
+											var numberOfVotes = criteriaDto.numberOfVotes;
+											var userRating = criteriaDto.userRating;
+											var isCriteriaNotRatedByUser = userRating == "";
+											var averageRatingDisplayed = averageRating;
+											var ratingStarsClass = "rating-stars-disabled";
+								
+											rows += '<h4>';
+											rows += 	 criteriaDto.title;
+											rows += '</h4>';
+											
+											rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
+											rows += '</div>';
+											
+												rows += '<div class="rating-stars-caption">';
+												rows += 	AVG_RATING_LABEL.replace("@1@", averageRating).replace("@2@", numberOfVotes);
+												rows += '</div>';
+										}
+										
 										rows += '</div>';
-										rows += '<div style="clear: both;"></div>';
-									}									
+									}
 									
 									rows += '</td>';
-								}	
+								}
+								
+								if (${isCommentsEnabled}) {
+									rows += '<td style="width:30%; min-width: 250px;" id="comments-area-' + itemId + '">';
+										
+										//show all comments needs to be shown
+											for (j = 0; j < userData.comments.length; j++){
+												var comment = userData.comments[j];
+												rows += '<div class="rating-comment">';
+												rows += 	comment;
+												rows += '</div>';
+											}
+									
+									rows += '</td>';
+								}
 								
 								rows += '</tr>';
 							}
@@ -194,7 +257,7 @@
 							return json;
 				            
 				    	}
-					},					
+					},
 				    container: $(this).next(".pager"),
 				    output: '{startRow} to {endRow} ({totalRows})',
 				    // css class names of pager arrows
@@ -211,10 +274,7 @@
 				
 				// bind to pager events
 				.bind('pagerInitialized pagerComplete', function(event, options){
-				    $(".rating-stars-disabled").jRating({
-				    	rateMax : 5,
-				    	isDisabled : true
-					})
+					initializeJRating();
 				})
 			});
 			

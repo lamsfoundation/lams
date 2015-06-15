@@ -59,10 +59,6 @@ public class QaMonitoredUserDTO implements Comparable {
     private String questionUid;
 
     private String visible;
-    
-    private String averageRating;
-    
-    private String numberOfVotes;
 
     private Map usersAttempts;
 
@@ -229,36 +225,6 @@ public class QaMonitoredUserDTO implements Comparable {
      */
     public void setVisible(String visible) {
 	this.visible = visible;
-    }
-    
-    /**
-     * @return Returns the averageRating.
-     */
-    public String getAverageRating() {
-	return averageRating;
-    }
-
-    /**
-     * @param averageRating
-     *                The averageRating to set.
-     */
-    public void setAverageRating(String averageRating) {
-	this.averageRating = averageRating;
-    }
-    
-    /**
-     * @return Returns the numberOfVotes.
-     */
-    public String getNumberOfVotes() {
-	return numberOfVotes;
-    }
-
-    /**
-     * @param numberOfVotes
-     *                The numberOfVotes to set.
-     */
-    public void setNumberOfVotes(String numberOfVotes) {
-	this.numberOfVotes = numberOfVotes;
     }
 
     /**

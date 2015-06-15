@@ -1,42 +1,46 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script language="JavaScript" type="text/JavaScript">
-	/**
-	 * Processes mouse click event on showOtherAnswers ckeckbox
-	 */
-	function doShowOtherAnswers() {
-		document.QaAuthoringForm.usernameVisible.disabled = ! eval(document.QaAuthoringForm.showOtherAnswers.checked); 
-		document.QaAuthoringForm.allowRateAnswers.disabled = ! eval(document.QaAuthoringForm.showOtherAnswers.checked);
-		if (document.QaAuthoringForm.showOtherAnswers.checked) {
-			document.QaAuthoringForm.usernameVisible.checked = true;
-		} else {
-			document.QaAuthoringForm.usernameVisible.checked = false;
-			document.QaAuthoringForm.allowRateAnswers.checked = false;
-		}		
-	}
 	
-	function clickSelectLeaderToolOuputHandler() {
-		if (document.QaAuthoringForm.useSelectLeaderToolOuput.checked) {
-			//uncheck checkboxes
-			document.QaAuthoringForm.showOtherAnswers.checked = false;
-			document.QaAuthoringForm.usernameVisible.checked = false;
-			document.QaAuthoringForm.allowRateAnswers.checked = false;
-			//disable checkboxes
-			document.QaAuthoringForm.showOtherAnswers.disabled = true;
-			document.QaAuthoringForm.usernameVisible.disabled = true;
-			document.QaAuthoringForm.allowRateAnswers.disabled = true;
-		} else {
-			//enable checkboxes
-			document.QaAuthoringForm.showOtherAnswers.disabled = false;
-		}		
-	}
+	jQuery( document ).ready(function( $ ) {
+		
+		$("#useSelectLeaderToolOuput").click(function() {
+			if (document.QaAuthoringForm.useSelectLeaderToolOuput.checked) {
+				//uncheck checkboxes
+				document.QaAuthoringForm.showOtherAnswers.checked = false;
+				//disable checkboxes
+				document.QaAuthoringForm.showOtherAnswers.disabled = true;
+				
+				$("#show-other-answers-options").hide('slow');
+			} else {
+				//enable checkboxes
+				document.QaAuthoringForm.showOtherAnswers.disabled = false;
+			}	
+		});
+		
+		$("#showOtherAnswers").click(function() {
+			$("#show-other-answers-options").toggle('slow');
+			if ($(this).is(':checked')) {
+				$("#usernameVisible").prop('checked', true);
+			}
+		});
+		
+		//initial state
+		if (${formBean.showOtherAnswers == 0}) {
+			$("#show-other-answers-options").hide();
+		}
+		
+	    $('#allow-rate-answers').click(function() {
+	        $("#criterias-holder").toggle("slow");
+	    });
+		
+	});
 	
 </script>
 
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
 <p>
-	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"
+	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput"
 		styleClass="noBorder"/>
 	<label for="useSelectLeaderToolOuput">
 		<fmt:message key="label.use.select.leader.tool.output" />
@@ -44,30 +48,39 @@
 </p>
 
 <p class="small-space-top">
-	<html:checkbox property="showOtherAnswers" value="1" styleId="showOtherAnswers" onclick="doShowOtherAnswers();"
+	<html:checkbox property="showOtherAnswers" value="1" styleId="showOtherAnswers"
 		styleClass="noBorder" disabled="${formBean.useSelectLeaderToolOuput}"/>
 	<label for="showOtherAnswers">
 		<fmt:message key="label.learner.answer" />
 	</label>
 </p>
 
-<p>
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible" styleClass="noBorder" 
-			disabled="${formBean.showOtherAnswers == 0}"/>
-	<label for="usernameVisible">
-		<fmt:message key="label.show.names" />
-	</label>
-</p>
+<div style="padding-left: 20px;" id="show-other-answers-options">
 
-<p>
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<html:checkbox property="allowRateAnswers" value="1" styleId="allowRateAnswers" styleClass="noBorder" 
-			disabled="${formBean.showOtherAnswers == 0}"/>
-	<label for="allowRateAnswers">
-		<fmt:message key="label.authoring.allow.rate.answers" />
-	</label>
-</p>
+	<p>
+		<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible" styleClass="noBorder"/>
+		<label for="usernameVisible">
+			<fmt:message key="label.show.names" />
+		</label>
+	</p>
+
+	<p>
+		<html:checkbox property="allowRateAnswers" value="1" styleId="allow-rate-answers" styleClass="noBorder"/>
+		<label for="allow-rate-answers">
+			<fmt:message key="label.authoring.allow.rate.answers" />
+		</label>
+	</p>
+	
+	<div>
+		<div style="margin-left:20px;">
+			<div id="criterias-holder" <c:if test="${formBean.allowRateAnswers == 0}"> style="display:none;"</c:if>>
+				<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
+					upLabel="label.authoring.up" downLabel="label.authoring.down"/>
+			</div>
+		</div>
+	</div>
+	
+</div>
 
 <p class="small-space-top">
 	<html:checkbox property="notifyTeachersOnResponseSubmit" value="1" styleClass="noBorder" styleId="notifyTeachersOnResponseSubmit"/>
