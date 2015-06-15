@@ -16,13 +16,28 @@
 <%@ attribute name="criterias" required="true" rtexprvalue="true" type="java.util.Collection" %>
 
 <%-- Optional attribute --%>
+<%@ attribute name="hasRatingLimits" required="false" rtexprvalue="true" %>
+<%@ attribute name="formContentPrefix" required="false" rtexprvalue="true" %>
 <%@ attribute name="headerLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="addLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="deleteLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="upLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="downLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="minimumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="maximumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="noMinimumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="noMaximumLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="jsWarningLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="allowCommentsLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
+<c:if test="${empty hasRatingLimits}">
+	<c:set var="hasRatingLimits" value="false" scope="request"/>
+</c:if>
+<c:if test="${not empty formContentPrefix}">
+	<c:set var="formContentPrefix" value="${formContentPrefix}."/>
+</c:if>
 <c:if test="${empty headerLabel}">
 	<c:set var="headerLabel" value="label.rating.criterias" scope="request"/>
 </c:if>
@@ -38,6 +53,37 @@
 <c:if test="${empty downLabel}">
 	<c:set var="downLabel" value="label.move.down" scope="request"/>
 </c:if>
+<c:if test="${empty minimumLabel}">
+	<c:set var="minimumLabel" value="label.minimum" scope="request"/>
+</c:if>
+<c:if test="${empty maximumLabel}">
+	<c:set var="maximumLabel" value="label.maximum" scope="request"/>
+</c:if>
+<c:if test="${empty noMinimumLabel}">
+	<c:set var="noMinimumLabel" value="label.no.minimum" scope="request"/>
+</c:if>
+<c:if test="${empty noMaximumLabel}">
+	<c:set var="noMaximumLabel" value="label.no.maximum" scope="request"/>
+</c:if>
+<c:if test="${empty jsWarningLabel}">
+	<c:set var="jsWarningLabel" value="js.warning.max.min.limit" scope="request"/>
+</c:if>
+<c:if test="${empty allowCommentsLabel}">
+	<c:set var="noMaximumLabel" value="label.allow.comments" scope="request"/>
+</c:if>
+<c:if test="${empty minNumberWordsLabel}">
+	<c:set var="minNumberWordsLabel" value="label.minimum.number.words" scope="request"/>
+</c:if>
+
+<!-- calculate whether isCommentsAllowed is true -->
+<c:set var="isCommentsEnabled" value="false"/>
+<c:set var="commentsMinWordsLimit" value="0"/>
+<c:forEach var="criteria" items="${criterias}" varStatus="status">
+	<c:if test="${criteria.commentsEnabled}">
+		<c:set var="isCommentsEnabled" value="true"/>
+		<c:set var="commentsMinWordsLimit" value="${criteria.commentsMinWordsLimit}"/>
+	</c:if>
+</c:forEach>
 
 <!-- begin tab content -->
 <script type="text/javascript">
@@ -157,13 +203,46 @@ $(document).ready(function() {
 	 //addCriteria
 	 $( "body" ).on( "click", "#add-criteria", function() {
 		 addCriteria();
-	});	 
+	});
+	 
+ 	//spinner
+ 	var minimumWordsSpinner = $("#comments-min-words-limit").spinner({ 
+ 		min: 0,
+ 		disabled: ${!isCommentsEnabled}
+ 	});
+ 	$("#enable-comments").click(function() {
+ 		if ( minimumWordsSpinner.spinner( "option", "disabled" ) ) {
+ 			minimumWordsSpinner.spinner( "enable" );
+ 			$("#comments-min-words-limit-label").removeClass("gray-color");
+ 		} else {
+ 			minimumWordsSpinner.spinner( "disable" );
+ 			$("#comments-min-words-limit-label").addClass("gray-color");
+ 		}
+     });
 	 
 })
+
+	//check minimum is not bigger than maximum
+	function validateRatingLimits(isMinimum) {
+		var minRateDropDown = document.getElementById("minimum-rates");
+		var minLimit = parseInt(minRateDropDown.options[minRateDropDown.selectedIndex].value);
+		var maxRateDropDown = document.getElementById("maximum-rates");
+		var maxLimit = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
+
+		if ((minLimit > maxLimit) && !(maxLimit == 0)) {
+			if (isMinimum) {
+				minRateDropDown.selectedIndex = maxRateDropDown.selectedIndex;
+			} else {
+				maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
+			}
+
+			alert('<fmt:message key="js.warning.max.min.limit"/>');
+		}
+	}
 </script>
 
 <div class="rating-criteria-tag">
-	<h2 class="spacer-left">
+	<h2>
 		<fmt:message key="${headerLabel}" />
 	</h2>
 	<input type="hidden" name="criteriaMaxOrderId" id="criteria-max-order-id" value="${maxOrderId}">
@@ -171,41 +250,102 @@ $(document).ready(function() {
 	<table class="alternative-color" cellspacing="0" id="criterias-table">
 
 		<c:forEach var="criteria" items="${criterias}" varStatus="status">
-			<tr>
-				
-				<td class="criteria-info">
-					<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
-					<input type="text" name="criteriaTitle${criteria.orderId}" value="${criteria.title}">
-				</td>
-				
-				<td width="40px">
-					<c:if test="${not status.first}">
-						<div class="up-arrow" title="<fmt:message key="${upLabel}"/>"></div>
-						<c:if test="${status.last}">
-							<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>"></div>
+			<c:if test="${!criteria.commentsEnabled}">
+				<tr>
+					
+					<td class="criteria-info">
+						<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
+						<input type="text" name="criteriaTitle${criteria.orderId}" value="${criteria.title}">
+					</td>
+					
+					<td width="40px">
+						<c:if test="${not status.first}">
+							<div class="up-arrow" title="<fmt:message key="${upLabel}"/>"></div>
+							<c:if test="${status.last}">
+								<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>"></div>
+							</c:if>
 						</c:if>
-					</c:if>
-
-					<c:if test="${not status.last}">
-						<c:if test="${status.first}">
-							<div class="up-arrow-disabled" title="<fmt:message key="${upLabel}"/>"></div>
+	
+						<c:if test="${not status.last}">
+							<c:if test="${status.first}">
+								<div class="up-arrow-disabled" title="<fmt:message key="${upLabel}"/>"></div>
+							</c:if>
+	
+							<div class="down-arrow" title="<fmt:message key="${downLabel}"/>"></div>
 						</c:if>
-
-						<div class="down-arrow" title="<fmt:message key="${downLabel}"/>"></div>
-					</c:if>
-				</td>
-                
-				<td width="20px">
-					<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" ></div>
-				</td>
-			</tr>
+					</td>
+	                
+					<td width="20px">
+						<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" ></div>
+					</td>
+				</tr>
+			</c:if>
 		</c:forEach>
 	</table>
 	
-	<div>
+	<div style="height: 30px;">
 		<a href="#nogo" class="button-add-item float-right" id="add-criteria">
 			<fmt:message key="${addLabel}" /> 
 		</a>
+	</div>
+	
+	<c:if test="${hasRatingLimits}">
+		<div>
+			<fmt:message key="${minimumLabel}" />
+			<html:select property="${formContentPrefix}minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);">
+				<html:option value="0">
+					<fmt:message key="${noMinimumLabel}" />
+				</html:option>
+				<html:option value="1">1</html:option>
+				<html:option value="2">2</html:option>
+				<html:option value="3">3</html:option>
+				<html:option value="4">4</html:option>
+				<html:option value="5">5</html:option>
+				<html:option value="6">6</html:option>
+				<html:option value="7">7</html:option>
+				<html:option value="8">8</html:option>
+				<html:option value="9">9</html:option>
+				<html:option value="10">10</html:option>
+			</html:select>
+		
+			<fmt:message key="${maximumLabel}" />
+			<html:select property="${formContentPrefix}maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);">
+				<html:option value="0">
+					<fmt:message key="${noMaximumLabel}" />
+				</html:option>
+				<html:option value="1">1</html:option>
+				<html:option value="2">2</html:option>
+				<html:option value="3">3</html:option>
+				<html:option value="4">4</html:option>
+				<html:option value="5">5</html:option>
+				<html:option value="6">6</html:option>
+				<html:option value="7">7</html:option>
+				<html:option value="8">8</html:option>
+				<html:option value="9">9</html:option>
+				<html:option value="10">10</html:option>
+			</html:select>
+		</div>
+	</c:if>
+	
+	<div class="space-top">
+		<input type="checkbox" name="isCommentsEnabled" value="true" class="noBorder" id="enable-comments"
+			<c:if test="${isCommentsEnabled}">checked="checked"</c:if>
+		/>
+		<label for="enable-comments">
+			<fmt:message key="${allowCommentsLabel}" />
+		</label>
+		
+		<div class="small-space-top" >
+			<label for="comments-min-words-limit" id="comments-min-words-limit-label"
+				<c:if test="${!isCommentsEnabled}">class="gray-color"</c:if>
+			>
+				<fmt:message key="${minNumberWordsLabel}" >
+					<fmt:param> </fmt:param>
+				</fmt:message>
+			</label>
+			<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
+		</div>
+		
 	</div>
 	
 </div>

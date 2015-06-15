@@ -36,11 +36,7 @@
 		#check-for-new-button, #add-new-image-button, #delete-button {
 		}
 		.extra-controls-inner {
-			width: 60%;
-			margin: 0px auto;
-		}
-		.extra-controls-inner2 {
-			text-align: center;
+			float: right;
 		}
 		.caption{
 			color:#0087e5; 
@@ -51,19 +47,22 @@
 			font-size:11px;
 		}
 		#extra-controls {
-			display: table-cell;
-		}
-		#comments-area {
-			display: table-cell;
-			width: 68%;
-		}
-		#comment-textarea {
-			margin-right:10px; 
-			width:99%;
-		}
-		#comment-button {
-			margin-right: 2px;
+			text-align: center;
 			float: right;
+			clear: both;
+			padding-top: 20px;
+		}
+		[id^=comments-area] {
+			width: 400px;
+			float: right;
+			clear: both;
+			padding: 10px 0 20px;
+		}
+		[id^=comment-textarea] {
+			width: 370px;
+		}
+		.button.add-comment {
+			margin-right: 2px;
 			margin-top: 10px;
 		}
 		table.forum {
@@ -83,15 +82,22 @@
 			text-align: center;
 			padding-top: 10px;
 		}
-		#image-info {
-			display: table; 
-			width: 100%;
+		#image-info:after {
+		   content: " ";
+		   display: block; 
+		   height: 0; 
+		   clear: both;
 		}
-		
+		#kkk{
+			float:right;
+		}
 		.space-bottom-top {
 			padding-top: 40px;
 		}
     </style>
+    <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
     
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
@@ -166,22 +172,9 @@
 			return false;
 		}
 
-		var imageInfoTargetDiv = "#image-info";
-		function addNewComment(currentImageUid, comment) {
-			var url = "<c:url value="/learning/addNewComment.do"/>";
-			$(imageInfoTargetDiv).load(
-				url,
-				{
-					currentImageUid: currentImageUid, 
-					comment: comment,
-					sessionMapID: "${sessionMapID}"
-				}
-			);
-		}
-
 		function loadImageData(imageUid) {
 			
-			$(imageInfoTargetDiv).load(
+			$("#image-info").load(
 				"<c:url value="/learning/loadImageData.do"/>",
 				{
 					imageUid: imageUid, 
@@ -217,6 +210,39 @@
 			</div>
 		</c:if>
 		
+		<!-- Rating limits info -->
+		<c:if test="${imageGallery.allowRank && (imageGallery.minimumRates ne 0 || imageGallery.maximumRates ne 0)}">
+		
+			<div class="info">
+				<c:choose>
+					<c:when test="${imageGallery.minimumRates ne 0 and imageGallery.maximumRates ne 0}">
+						<fmt:message key="label.rate.limits.reminder">
+							<fmt:param value="${imageGallery.minimumRates}"/>
+							<fmt:param value="${imageGallery.maximumRates}"/>
+						</fmt:message>
+					</c:when>
+					
+					<c:when test="${imageGallery.minimumRates ne 0 and imageGallery.maximumRates eq 0}">
+						<fmt:message key="label.rate.limits.reminder.min">
+							<fmt:param value="${imageGallery.minimumRates}"/>
+						</fmt:message>
+					</c:when>
+					
+					<c:when test="${imageGallery.minimumRates eq 0 and imageGallery.maximumRates ne 0}">
+						<fmt:message key="label.rate.limits.reminder.max">
+							<fmt:param value="${imageGallery.maximumRates}"/>
+						</fmt:message>
+					</c:when>
+				</c:choose>
+				<br>
+						
+				<fmt:message key="label.rate.limits.topic.reminder">
+					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>"/>
+				</fmt:message>
+			</div>
+			
+		</c:if>
+		
 		<%@ include file="/common/messages.jsp"%>
 		
 		<%--Main image---------------------------------------------------%>
@@ -227,11 +253,9 @@
 			
 		<%--Comments & Ranking/Voting area----------------------------------------------%>	
 	 	
-	 	<c:if test="${not empty sessionMap.imageGalleryList}">
-			<div id="image-info">
-				<%@ include file="/pages/learning/parts/commentsarea.jsp"%> 
-			</div>
-		</c:if>	
+		<div id="image-info">
+			<%@ include file="/pages/learning/parts/commentsarea.jsp"%>
+		</div>
  
 		<%--Reflection--------------------------------------------------%>
 
@@ -268,7 +292,9 @@
 		<%--Bottom buttons-------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right" >
+			<div class="space-bottom-top align-right" id="learner-submit"
+				<c:if test="${imageGallery.minimumRates ne 0 && empty sessionMap.currentImage}">style="display:none;"</c:if>
+			>
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button" >

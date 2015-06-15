@@ -118,6 +118,40 @@
 		
 		<tr>
 			<td>
+				<fmt:message key="label.minimum" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.minimumRates == 0}">
+						<fmt:message key="label.no.minimum" />
+					</c:when>
+					<c:otherwise>
+						${sessionMap.imageGallery.minimumRates}
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<fmt:message key="label.maximum" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.maximumRates == 0}">
+						<fmt:message key="label.no.maximum" />
+					</c:when>
+					<c:otherwise>
+						${sessionMap.imageGallery.maximumRates}
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
 				<fmt:message key="monitor.summary.td.addNotebook" />
 			</td>
 			
