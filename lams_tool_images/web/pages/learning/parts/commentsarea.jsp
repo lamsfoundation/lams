@@ -1,23 +1,47 @@
 <%@ include file="/common/taglibs.jsp"%>
-	
-<c:set var="sessionMapID" value="${param.sessionMapID}" />
+<c:set var="lams"><lams:LAMSURL/></c:set>
+
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="imageGallery" value="${sessionMap.imageGallery}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+<c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>	
+
+<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
+<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<c:if test="${isImageSelected}">
+	<script type="text/javascript">
+		//var for jquery.jRating.js
+		var pathToImageFolder = "${lams}images/css/";
+		
+		//vars for rating.js
+		var MAX_RATES = ${imageGallery.maximumRates},
+		MIN_RATES = ${imageGallery.minimumRates},
+		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.itemRatingDto.commentsMinWordsLimit},
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
+		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
+		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.itemRatingDto.commentsMinWordsLimit}"/></fmt:message>';
+	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+</c:if>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('#voting-form-checkbox').click(function() {
 			$('#voting-form').ajaxSubmit( {
-				success: afterRatingSubmit  // post-submit callback
+				success: afterVotingSubmit  // post-submit callback
 			});
 		});
 	});
 
 	// post-submit callback 
-	function afterRatingSubmit(responseText, statusText)  {
+	function afterVotingSubmit(responseText, statusText)  {
 		var votingFormLabel;
 		if ($('#voting-form-checkbox').is(':checked')) {
 			votingFormLabel = "<fmt:message key='label.learning.unvote'/>";					
@@ -29,81 +53,22 @@
 	}
 </script>
 
-<%--Comments area---------------------------------------%>
-<div id="comments-area">
-	<c:if test="${imageGallery.allowCommentImages}">
+<c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">
 
-		<%@ include file="/common/messages.jsp"%>
+	<%--Ranking area---------------------------------------%>
 	
-		<div class="field-name">
-			<fmt:message key="label.learning.comments" />
-		</div>
+	<c:if test="${imageGallery.allowRank && isImageSelected}">
 		
-		<c:forEach var="comment" items="${sessionMap.comments}">
-		
-			<div>
-				<table cellspacing="0" class="forum">
-					<tr >
-						<th >
-							<fmt:message key="label.learning.by" />
-							<c:set var="author" value="${comment.createBy.firstName} ${comment.createBy.lastName}" />
-							<c:if test="${empty author}">
-								<c:set var="author">
-									<fmt:message key="label.default.user.name" />
-								</c:set>
-							</c:if>
-							<c:out value="${author}" escapeXml="true" /> - <lams:Date value="${comment.createDate}" />
-						</th>
-					</tr>
-						
-					<tr>
-						<td class="posted-by">
-						</td>
-					</tr>
-			
-					<tr>
-						<td>
-							<c:out value="${comment.comment}" escapeXml="false" />
-						</td>
-					</tr>
-						
-				</table>
-			</div>
-				
-		</c:forEach>
-	
-		<c:if test="${mode != 'teacher' && (not finishedLock)}">
-			<div >
-				<html:form action="learning/addNewComment" method="post">
-					<lams:STRUTS-textarea property="comment" rows="3" styleId="comment-textarea"/>		
-			
-					<html:button property="commentButton" onclick="javascript:addNewComment(${sessionMap.currentImage.uid}, document.getElementById('comment__lamshidden').value);" styleClass="button" styleId="comment-button">
-						<fmt:message key="label.learning.add.comment" />
-					</html:button>
-				</html:form>					
-			</div>
-		</c:if>
-				
+		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
+				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}" />
+		<br><br>
 	</c:if>
-</div>
 
-<c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">	
 	<div id="extra-controls">
-				
-		<%--Ranking area---------------------------------------%>
-	
-		<c:if test="${imageGallery.allowRank}">
-			<div class="extra-controls-inner">
-				<lams:Rating ratingDtos="${sessionMap.ratingDtos}" disabled="${finishedLock}"/>
-			</div>
-			<br><br>
-		</c:if>
-		
-		<div class="extra-controls-inner2">
 				
 			<%--Voting area--------------%>
 		
-			<c:if test="${imageGallery.allowVote}">
+			<c:if test="${imageGallery.allowVote && isImageSelected}">
 				<html:form action="learning/vote" method="post" styleId="voting-form">
 					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 					<input type="hidden" name="imageUid" value="${sessionMap.currentImage.uid}"/>
@@ -150,6 +115,5 @@
 				</c:if>
 			</c:if>
 		
-		</div>
 	</div>
 </c:if>

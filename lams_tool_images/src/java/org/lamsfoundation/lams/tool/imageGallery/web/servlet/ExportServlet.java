@@ -68,7 +68,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author Andrey Balan
  * 
- * @version $Revision$
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
     private static final long serialVersionUID = -4529093489007108143L;

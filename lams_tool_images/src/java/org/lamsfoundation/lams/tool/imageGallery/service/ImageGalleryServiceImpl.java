@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -41,6 +42,7 @@ import java.util.SortedMap;
 import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -56,7 +58,9 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.ToolRatingManager;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -104,9 +108,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * 
- * @author Dapeng.Ni
- * 
+ * @author Andrey Balan
  */
 public class ImageGalleryServiceImpl implements IImageGalleryService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
@@ -374,19 +376,40 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
     
     @Override
+    public ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId) {
+
+	LinkedList<Long> itemIds = new LinkedList<Long>();
+	itemIds.add(imageUid);
+	ItemRatingDTO ratingCriteria = getRatingCriteriaDtos(contentId, itemIds, true, userId).get(0);
+
+	return ratingCriteria;
+    }
+    
+    @Override
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+	    boolean isCommentsByOtherUsersRequired, Long userId) {
+	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
+    }
+    
+    @Override
+    public int getCountItemsRatedByUser(Long toolContentId, Integer userId) {
+	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
+    }
+    
+    @Override
     public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
 	List<RatingCriteria> ratingCriterias = ratingService.getCriteriasByToolContentId(toolContentId);
 	return ratingCriterias;
     }
     
     @Override
-    public void saveOrUpdateRatingCriteria(RatingCriteria criteria) {
-	ratingService.saveOrUpdateRatingCriteria(criteria);
+    public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId) {
+	ratingService.saveRatingCriterias(request, oldCriterias, toolContentId);
     }
     
     @Override
-    public void deleteRatingCriteria(Long ratingCriteriaId) {
-	ratingService.deleteRatingCriteria(ratingCriteriaId);
+    public boolean isCommentsEnabled(Long toolContentId) {
+	return ratingService.isCommentsEnabled(toolContentId);
     }
 
     @Override
@@ -1169,20 +1192,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 
 	return new Object[] { numberRatings, averageRating };
-    }
-    
-    @Override
-    public List<RatingDTO> getRatingDtos(ImageGallery imageGallery, Long imageUid, Long userId) {
-	List<RatingDTO> ratingDtos = new LinkedList<RatingDTO>();
-	
-	for (RatingCriteria criteria : imageGallery.getRatingCriterias()) {
-	    RatingDTO ratingDto = ratingService.getRatingDTOByUser(criteria.getRatingCriteriaId(), imageUid, userId.intValue());
-	    ratingDto.setRatingCriteria(criteria);
-	    
-	    ratingDtos.add(ratingDto);
-	}
-	
-	return ratingDtos;	
     }
 
     // *****************************************************************************

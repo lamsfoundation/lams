@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.imageGallery.web.action;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +53,8 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
@@ -148,7 +150,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	Long sessionId = new Long(request.getParameter(ImageGalleryConstants.PARAM_TOOL_SESSION_ID));
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
@@ -170,23 +172,21 @@ public class LearningAction extends Action {
 	} else {
 	    imageGalleryUser = getCurrentUser(service, sessionId);
 	}
+	Integer userId = imageGalleryUser.getUserId().intValue();
 
 	// Get contentFolderID and save to form.
 	// String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	// sessionMap.put(ImageGalleryConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 
 	// check whehter finish lock is on/off
-	boolean lock = imageGallery.getLockWhenFinished() && imageGalleryUser != null
-		&& imageGalleryUser.isSessionFinished();
+	boolean lock = imageGallery.getLockWhenFinished() && imageGalleryUser.isSessionFinished();
 
 	// get notebook entry
 	String entryText = new String();
-	if (imageGalleryUser != null) {
-	    NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ImageGalleryConstants.TOOL_SIGNATURE, imageGalleryUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
+	NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		ImageGalleryConstants.TOOL_SIGNATURE, userId);
+	if (notebookEntry != null) {
+	    entryText = notebookEntry.getEntry();
 	}
 
 	// basic information
@@ -194,9 +194,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, imageGallery.getInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
-	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED,
-		imageGalleryUser != null && imageGalleryUser.isSessionFinished());
-	sessionMap.put(AttributeNames.PARAM_USER_ID, imageGalleryUser.getUserId());
+	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED, imageGalleryUser.isSessionFinished());
+	sessionMap.put(AttributeNames.PARAM_USER_ID, userId);
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -224,6 +223,12 @@ public class LearningAction extends Action {
 	imageGallery.setDefineLater(false);
 	service.saveOrUpdateImageGallery(imageGallery);
 
+	// store how many items are rated
+	if (imageGallery.isAllowRank()) {
+	    int countRatedImages = service.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
+	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedImages);
+	}
+
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
@@ -233,21 +238,21 @@ public class LearningAction extends Action {
 	if (mode.isLearner()) {
 	    Set<ImageGalleryItem> groupImages = service.getImagesForGroup(imageGallery, sessionId);
 	    for (ImageGalleryItem image : groupImages) {
-		
+
 		// initialize login name to avoid session close error in proxy object
 		if (image.getCreateBy() != null) {
 		    image.getCreateBy().getLoginName();
 		}
-		
+
 		// remove hidden items
 		if (!image.isHide()) {
 		    images.add(image);
-		}	
+		}
 	    }
 	} else {
 	    images.addAll(imageGallery.getImageGalleryItems());
 	}
-	
+
 	// escape characters
 	for (ImageGalleryItem image : images) {
 	    String titleEscaped = StringEscapeUtils.escapeJavaScript(image.getTitle());
@@ -457,11 +462,11 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	IImageGalleryService service = getImageGalleryService();
-	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);
-	Long userId = (Long) sessionMap.get(AttributeNames.PARAM_USER_ID);
+	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY);
+	Long userId = ((Integer) sessionMap.get(AttributeNames.PARAM_USER_ID)).longValue();
 
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
@@ -470,39 +475,38 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
 
 	// becuase in webpage will use this login name. Here is just
-	// initial it to avoid session close error in proxy object.
+	// initialize it to avoid session close error in a proxy object
 	ImageGalleryUser createdBy = image.getCreateBy();
 	if (createdBy != null) {
 	    image.getCreateBy().getLoginName();
-	}	
-	
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	boolean isTeacher = mode != null && mode.isTeacher();
-	boolean isAuthor = !isTeacher && !image.isCreateByAuthor() && (createdBy != null)
-		&& (createdBy.getUserId().equals(userId));
+	}
 
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
 	    Set<ImageComment> dbComments = image.getComments();
-	    List<ImageGalleryUser> sessionUsers = service.getUserListBySessionId(sessionId);
+	    //List<ImageGalleryUser> sessionUsers = service.getUserListBySessionId(sessionId);
 	    for (ImageComment comment : dbComments) {
-		for (ImageGalleryUser sessionUser : sessionUsers) {
-		    if (comment.getCreateBy().getUserId().equals(sessionUser.getUserId())) {
+		//for (ImageGalleryUser sessionUser : sessionUsers) {
+		    if (comment.getCreateBy().getSession().getSessionId().equals(sessionId)) {
 			comments.add(comment);
 		    }
-		}
+		//}
 	    }
 	    sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	}
 
-	if (!isTeacher && imageGallery.isAllowRank()) {
-	    List<RatingDTO> ratingDtos = service.getRatingDtos(imageGallery, imageUid, userId);
-	    sessionMap.put(ImageGalleryConstants.ATTR_RATING_DTOS, ratingDtos);
+	if (imageGallery.isAllowRank()) {
+	    ItemRatingDTO itemRatingDto = service.getRatingCriteriaDtos(imageGallery.getContentId(), imageUid, userId);
+	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTO, itemRatingDto);
+	    
+	    // store how many items are rated
+	    int countRatedImages = service.getCountItemsRatedByUser(imageGallery.getContentId(), userId.intValue());
+	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedImages);
 	}
 
-	if (!isTeacher && imageGallery.isAllowVote()) {
+	if (imageGallery.isAllowVote()) {
 	    boolean isVotedForThisImage = false;
-	    ImageVote imageVote = service.getImageVoteByImageAndUser(image.getUid(), userId);
+	    ImageVote imageVote = service.getImageVoteByImageAndUser(imageUid, userId);
 	    if (imageVote != null && imageVote.isVoted()) {
 		isVotedForThisImage = true;
 	    }
@@ -510,6 +514,7 @@ public class LearningAction extends Action {
 	}
 
 	// set visibility of "Delete image" button
+	boolean isAuthor = !image.isCreateByAuthor() && (createdBy != null) && (createdBy.getUserId().equals(userId));
 	sessionMap.put(ImageGalleryConstants.PARAM_IS_AUTHOR, isAuthor);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -899,7 +904,7 @@ public class LearningAction extends Action {
 	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType)
 		|| !(contentType.equals("image/gif") || contentType.equals("image/png")
 			|| contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			.equals("image/pjpeg"));
+			    .equals("image/pjpeg"));
 
 	return isContentTypeForbidden;
     }

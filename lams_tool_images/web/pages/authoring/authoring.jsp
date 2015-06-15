@@ -3,14 +3,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
 
-
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
+	
+	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
         function init(){
             var tag = document.getElementById("currentTab");
@@ -18,8 +20,7 @@
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
-          
-        }     
+        }
         
         function doSelectTab(tabId) {
         	// start optional tab controller stuff
@@ -29,8 +30,6 @@
 	    	selectTab(tabId);
         }
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
-
  
 </lams:head>
 <body class="stripes" onLoad="init();">
