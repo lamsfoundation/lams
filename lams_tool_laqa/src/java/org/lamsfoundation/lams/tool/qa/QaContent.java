@@ -34,6 +34,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
  * QaContent Value Object The value object that maps to our model database table: tl_laqa11_content The relevant
@@ -103,6 +104,12 @@ public class QaContent implements Serializable {
     private Date updateDate;
 
     private Date submissionDeadline;
+    
+    private int maximumRates;
+
+    private int minimumRates;
+
+    private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     /** persistent field */
     private Set<QaQueContent> qaQueContents;
@@ -121,8 +128,9 @@ public class QaContent implements Serializable {
 	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
 	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished,
 	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
-	    Set qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
-	    boolean useSelectLeaderToolOuput) {
+	    Set<QaQueContent> qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
+	    boolean useSelectLeaderToolOuput, int maximumRates, int minimumRates,
+	    Set<LearnerItemRatingCriteria> ratingCriterias) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -145,6 +153,9 @@ public class QaContent implements Serializable {
 	this.conditions = conditions;
 	this.allowRichEditor = allowRichEditor;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.maximumRates = maximumRates;
+	this.minimumRates = minimumRates;
+	this.ratingCriterias = ratingCriterias;
     }
 
     /**
@@ -163,17 +174,32 @@ public class QaContent implements Serializable {
 		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(),
 		qa.isLockWhenFinished(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
 		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
-			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput());
+			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput(),
+		qa.maximumRates, qa.minimumRates, new TreeSet());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
+	
+	newContent.setRatingCriterias(qa.deepCopyRatingCriterias(newContent));
 
 	newContent.setConditions(qa.deepCopyConditions(newContent));
 	return newContent;
     }
+    
+    public Set<LearnerItemRatingCriteria> deepCopyRatingCriterias(QaContent newQaContent) {
 
-    public Set deepCopyQaQueContent(QaContent newQaContent) {
-	Set newQaQueContent = new TreeSet();
-	for (Iterator i = this.getQaQueContents().iterator(); i.hasNext();) {
+	Set<LearnerItemRatingCriteria> newCriterias = new TreeSet<LearnerItemRatingCriteria>();
+	for (Iterator<LearnerItemRatingCriteria> i = ratingCriterias.iterator(); i.hasNext();) {
+	    LearnerItemRatingCriteria criteria = i.next();
+	    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
+	    newCriteria.setToolContentId(newQaContent.qaContentId);
+	    newCriterias.add(newCriteria);
+	}
+	return newCriterias;
+    }
+
+    public Set<QaQueContent> deepCopyQaQueContent(QaContent newQaContent) {
+	Set<QaQueContent> newQaQueContent = new TreeSet<QaQueContent>();
+	for (Iterator<QaQueContent> i = this.getQaQueContents().iterator(); i.hasNext();) {
 	    QaQueContent queContent = (QaQueContent) i.next();
 	    newQaQueContent.add(QaQueContent.newInstance(queContent, newQaContent));
 	}
@@ -552,6 +578,40 @@ public class QaContent implements Serializable {
      */
     public void setShowOtherAnswers(boolean showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
+    }
+    
+    /**
+     * @return
+     */
+    public int getMaximumRates() {
+	return maximumRates;
+    }
+
+    public void setMaximumRates(int maximumRate) {
+	this.maximumRates = maximumRate;
+    }
+
+    /**
+     * @return
+     */
+    public int getMinimumRates() {
+	return minimumRates;
+    }
+
+    public void setMinimumRates(int minimumRates) {
+	this.minimumRates = minimumRates;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public Set<LearnerItemRatingCriteria> getRatingCriterias() {
+	return ratingCriterias;
+    }
+
+    public void setRatingCriterias(Set<LearnerItemRatingCriteria> ratingCriterias) {
+	this.ratingCriterias = ratingCriterias;
     }
 
     public Set<QaCondition> getConditions() {

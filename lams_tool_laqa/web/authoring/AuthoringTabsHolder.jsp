@@ -20,7 +20,9 @@
 	<title><fmt:message key="activity.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
@@ -59,7 +61,6 @@
 	</script>
 </lams:head>
 
-
 <body class="stripes" onLoad="init();">
 
 <div id="page">
@@ -89,7 +90,6 @@
 			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
 
 			<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
-			
 			
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
 				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 

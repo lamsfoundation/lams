@@ -5,8 +5,10 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
+		<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
 		
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 		<script language="JavaScript" type="text/JavaScript">
 
 			function submitMethod() {
@@ -26,6 +28,11 @@
 				    	iframe.style.height=eval(iframe.contentWindow.document.body.scrollHeight)+'px';
 				    });
 				});
+				
+			 	//spinner
+			 	$("#min-words-limit").spinner({ 
+			 		min: 0
+			 	});
 			});
 			
 		</script>
@@ -50,7 +57,8 @@
 
 			<lams:CKEditor id="newQuestion"
 				value="${qaGeneralAuthoringDTO.editableQuestionText}"
-				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}" width="99%"></lams:CKEditor>
+				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}" width="99%">
+			</lams:CKEditor>
 
 			<div class="field-name space-top">
 				<html:checkbox property="required" value="1" styleId="required" styleClass="noBorder"/>
@@ -58,6 +66,15 @@
 				<label for="required">
 					<fmt:message key="label.required.desc" />
 				</label>
+			</div>
+			
+			<div class="field-name space-top" >
+				<label for="min-words-limit">
+					<fmt:message key="label.minimum.number.words" >
+						<fmt:param> </fmt:param>
+					</fmt:message>
+				</label>
+				<html:text property="minWordsLimit" styleId="min-words-limit"/>
 			</div>
 
 			<div class="field-name space-top">

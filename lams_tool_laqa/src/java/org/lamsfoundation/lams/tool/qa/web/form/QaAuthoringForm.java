@@ -62,7 +62,9 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String questionsSequenced;
     protected String lockWhenFinished;
     protected String reflect;
-    protected String reflectionSubject;
+    protected String reflectionSubject;    
+    protected int maximumRates;
+    protected int minimumRates;
 
     /* proxy controllers for Monitoring tabs */
     protected String summaryMonitoring;
@@ -76,6 +78,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     private String editableQuestionIndex;
     private String feedback;
     private boolean required;
+    private int minWordsLimit;
     private String editQuestionBoxRequest;
 
     protected IQaService qaService;
@@ -415,6 +418,28 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     public void setQuestionsSequenced(String questionsSequenced) {
 	this.questionsSequenced = questionsSequenced;
     }
+    
+    /**
+     * @return
+     */
+    public int getMaximumRates() {
+	return maximumRates;
+    }
+
+    public void setMaximumRates(int maximumRates) {
+	this.maximumRates = maximumRates;
+    }
+
+    /**
+     * @return
+     */
+    public int getMinimumRates() {
+	return minimumRates;
+    }
+
+    public void setMinimumRates(int minimumRates) {
+	this.minimumRates = minimumRates;
+    }
 
     /**
      * @return Returns the endLearningMessage.
@@ -738,5 +763,13 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     public void setRequired(boolean required) {
         this.required = required;
+    }
+    
+    public void setMinWordsLimit(int minWordsLimit) {
+	this.minWordsLimit = minWordsLimit;
+    }
+
+    public int getMinWordsLimit() {
+	return minWordsLimit;
     }
 }

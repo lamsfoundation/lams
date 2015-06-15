@@ -36,29 +36,67 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	
+		var minWordsLimitLabel = '<fmt:message key="label.minimum.number.words" ><fmt:param>{0}</fmt:param></fmt:message>';
+		
 		function submitMethod(actionMethod) {
+			document.QaLearningForm.method.value=actionMethod;
+		}
+		
+		function validateForm() {
+			var actionMethod = document.QaLearningForm.method.value;
+			
+			//validate answers
 			var submit = true;
 			if (actionMethod != 'getPreviousQuestion') {
-				jQuery(".text-area").each(function() {
-					if (jQuery.trim($(this).val()) == "") {
-						if (confirm("<fmt:message key="warning.empty.answers" />")) {
-							doSubmit(actionMethod);
-							return false;
-						} else {
-							this.focus();
-							//return submit = false;
-							return false;
-						}
+				
+				//check for min words limit 
+				jQuery(".min-words-limit-enabled").each(function() {
+					
+					var questionId = $(this).data("sequence-id");
+					var isCkeditor = $(this).data("is-ckeditor");
+					
+					var value;
+					var instance;
+					if (isCkeditor) {
+						instance = CKEDITOR.instances["answer" + questionId];
+					    value = CKEDITOR.instances["answer" + questionId].getData();
+					    
+					} else {
+						instance = $("#answer"+ questionId);
+						value =  $("#answer"+ questionId).val();
+					}
+					
+					var numberEnteredWords = getNumberOfWords(value); 
+					
+					var minWordsLimit = $(this).data("min-words-limit");
+					if (numberEnteredWords < minWordsLimit) {
+						var minWordsLimitLabelStr = minWordsLimitLabel.replace("{0}", ": " + minWordsLimit);
+						alert("<fmt:message key="label.question" /> "+ questionId +". " +  minWordsLimitLabelStr);
+						instance.focus();
+						return submit = false;
 					}
 				});
+	
+				//check for blank answers
+				if (submit) {
+					jQuery(".text-area").each(function() {
+						if (jQuery.trim($(this).val()) == "") {
+							if (confirm("<fmt:message key="warning.empty.answers" />")) {
+								doSubmit(actionMethod);
+								return submit = false;
+							} else {
+								this.focus();
+								return submit = false;
+							}
+						}
+					});
+				}
 			}
-			if (submit) {
-				doSubmit(actionMethod);
-			}
+			
+			return submit;
 		}
 		
 		function doSubmit(actionMethod) {
-			document.QaLearningForm.method.value=actionMethod; 
 			document.QaLearningForm.submit();
 		}
 		
@@ -100,6 +138,26 @@
 		       	}, interval
 		   );
 		}
+		
+		//bind to pagebeforechange in order to prevent form submition (as per https://github.com/jquery/jquery-mobile/issues/729)
+		$(document).bind('pageinit', function(){
+			
+			$('#learningForm').submit(function (e) {
+
+			    //cache the form element for use in this function
+			    var $this = $(this);
+
+			    //prevent the default submission of the form
+			    e.preventDefault();
+
+			    if (validateForm()) {
+			    	//run an AJAX post request
+				    $.post($this.attr('action'), $this.serialize());
+			    } else {
+			    	return false;
+			    }
+			});
+		});
 		
 	</script>
 </lams:head>

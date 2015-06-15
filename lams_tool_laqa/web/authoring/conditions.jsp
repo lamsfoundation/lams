@@ -40,49 +40,41 @@
 		showConditionMessage(url);
 	}
 	//The panel of taskList list panel
-	var conditionListTargetDiv = "conditionsArea";
+	var conditionListTargetDiv = "#conditionsArea";
 	function deleteCondition(orderId,sessionMapID){
 		var url = "<c:url value="/authoring/removeCondition.do"/>";
 	    var reqIDVar = new Date();
-		var param = "orderId=" + orderId +"&sessionMapID="+sessionMapID;;
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		evalScripts:true
-		    	}
-	    );
+		$(conditionListTargetDiv).load(
+			url,
+			{
+				orderId: orderId,
+				sessionMapID: sessionMapID
+			}
+		);
 	}
 	
 	function upCondition(orderId,sessionMapID){
 		var url = "<c:url value="/authoring/upCondition.do"/>";
 	    var reqIDVar = new Date();
-		var param = "orderId=" + orderId + "&sessionMapID="+sessionMapID;;
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		evalScripts:true
-		    	}
-	    );
+	    $(conditionListTargetDiv).load(
+			url,
+			{
+				orderId: orderId,
+				sessionMapID: sessionMapID
+			}
+		);
 	}
 	function downCondition(orderId,sessionMapID){
 		var url = "<c:url value="/authoring/downCondition.do"/>";
 	    var reqIDVar = new Date();
 		var param = "orderId=" + orderId + "&sessionMapID="+sessionMapID;;
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		evalScripts:true
-		    	}
-	    );
+		$(conditionListTargetDiv).load(
+			url,
+			{
+				orderId: orderId,
+				sessionMapID: sessionMapID
+			}
+		);
 	}
 
 </script>

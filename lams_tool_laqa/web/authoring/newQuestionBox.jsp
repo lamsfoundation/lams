@@ -7,8 +7,11 @@
         <%@ include file="/common/header.jsp"%>
         <%@ include file="/includes/jsp/qaWizardCommon.jsp"%>
         
-        <lams:css style="tabbed" />
-        <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+        <lams:css style="tabbed" />		
+        <link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+		
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
         <script language="JavaScript" type="text/JavaScript">
 
             function submitMethod() {
@@ -28,6 +31,11 @@
 				    	iframe.style.height=eval(iframe.contentWindow.document.body.scrollHeight)+'px';
 				    });
 				});
+				
+			 	//spinner
+			 	$("#min-words-limit").spinner({ 
+			 		min: 0
+			 	});
 			});
             
             <c:choose>
@@ -199,7 +207,16 @@
 				<label for="required">
 					<fmt:message key="label.required.desc" />
 				</label>
-			</div>    
+			</div>
+			
+			<div class="field-name space-top" >
+				<label for="min-words-limit">
+					<fmt:message key="label.minimum.number.words" >
+						<fmt:param> </fmt:param>
+					</fmt:message>
+				</label>
+				<html:text property="minWordsLimit" styleId="min-words-limit"/>
+			</div>
 
             <div class="field-name space-top">
                 <fmt:message key="label.feedback"></fmt:message>

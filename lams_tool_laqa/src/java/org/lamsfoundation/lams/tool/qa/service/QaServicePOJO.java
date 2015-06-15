@@ -39,6 +39,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -54,6 +55,9 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
@@ -75,7 +79,6 @@ import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
-import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
@@ -83,8 +86,6 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
-import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
-import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredUserDTO;
@@ -113,8 +114,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager,
-	QaAppConstants {
+public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
+	ToolRestManager, QaAppConstants {
     private static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 
     private IQaContentDAO qaDAO;
@@ -123,7 +124,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private IQaSessionDAO qaSessionDAO;
     private IQaQueUsrDAO qaQueUsrDAO;
     private IQaUsrRespDAO qaUsrRespDAO;
-    private IResponseRatingDAO qaResponseRatingDAO;
 
     private IToolContentHandler qaToolContentHandler = null;
     private IUserManagementService userManagementService;
@@ -136,6 +136,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private IQaWizardDAO qaWizardDAO;
 
     private ICoreNotebookService coreNotebookService;
+    private IRatingService ratingService;
     private IEventNotificationService eventNotificationService;
     private MessageService messageService;
 
@@ -309,16 +310,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     @Override
     public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId) {
 	return qaUsrRespDAO.getCountResponsesBySessionAndQuestion(qaSessionId, questionId, excludeUserId);
-    }
-    
-    @Override
-    public Map<Long, AverageRatingDTO> getAverageRatingDTOByQuestionAndSession(Long questionUid, Long qaSessionId) {
-	return qaResponseRatingDAO.getAverageRatingDTOByQuestionAndSession(questionUid, qaSessionId);
-    }
-    
-    @Override
-    public Map<Long, AverageRatingDTO> getAverageRatingDTOByUserAndContentId(Long userUid, Long contentId) {
-	return qaResponseRatingDAO.getAverageRatingDTOByUserAndContentId(userUid, contentId);
     }
 
     @Override
@@ -601,11 +592,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    for (QaSession session : (Set<QaSession>) content.getQaSessions()) {
 		QaQueUsr user = qaQueUsrDAO.getQaUserBySession(userId.longValue(), session.getQaSessionId());
 		if (user != null) {
-		    List<ResponseRating> ratings = qaResponseRatingDAO.getRatingsByUser(user.getUid());
-		    for (ResponseRating rating : ratings) {
-			qaResponseRatingDAO.removeResponseRating(rating);
-		    }
-
 		    for (QaUsrResp response : (Set<QaUsrResp>) user.getQaUsrResps()) {
 			qaUsrRespDAO.removeUserResponse(response);
 		    }
@@ -620,30 +606,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		}
 	    }
 	}
-    }
-
-    @Override
-    public AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating) {
-	QaQueUsr imageGalleryUser = this.getUserByIdAndSession(userId, toolSessionID);
-	ResponseRating responseRating = qaResponseRatingDAO.getRatingByResponseAndUser(responseId, userId);
-	QaUsrResp response = qaUsrRespDAO.getResponseById(responseId);
-
-	// persist ResponseRating changes in DB
-	if (responseRating == null) { // add
-	    responseRating = new ResponseRating();
-	    responseRating.setUser(imageGalleryUser);
-	    responseRating.setResponse(response);
-	}
-	responseRating.setRating(rating);
-	qaResponseRatingDAO.saveObject(responseRating);
-
-	// to make available new changes be visible in jsp page
-	return qaResponseRatingDAO.getAverageRatingDTOByResponse(responseId);
-    }
-
-    @Override
-    public AverageRatingDTO getAverageRatingDTOByResponse(Long responseId) {
-	return qaResponseRatingDAO.getAverageRatingDTOByResponse(responseId);
     }
 
     @Override
@@ -786,9 +748,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    boolean isLearnerRequest, String sessionId, String userId) {
 	List<Map<String, QaMonitoredUserDTO>> listMonitoredAttemptsContainerDTO = new LinkedList<Map<String, QaMonitoredUserDTO>>();
 
-	Map<Long, AverageRatingDTO> mapResponseIdToAverageRating = getAverageRatingDTOByQuestionAndSession(new Long(
-		questionUid), new Long(sessionId));
-
 	List<QaUsrResp> responses = new ArrayList<QaUsrResp>();
 	if (!isLearnerRequest) {
 	    /* request is for monitoring summary */
@@ -851,22 +810,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 		qaMonitoredUserDTO.setQuestionUid(questionUid);
 		qaMonitoredUserDTO.setVisible(new Boolean(response.isVisible()).toString());
-
-		// set averageRating
-		if (qaContent.isAllowRateAnswers()) {
-
-		    AverageRatingDTO averageRating = mapResponseIdToAverageRating.get(response.getResponseId());
-		    // AverageRatingDTO averageRating =
-		    // qaService.getAverageRatingDTOByResponse(response.getResponseId());
-		    if (averageRating == null) {
-			qaMonitoredUserDTO.setAverageRating("0");
-			qaMonitoredUserDTO.setNumberOfVotes("0");
-		    } else {
-			qaMonitoredUserDTO.setAverageRating(averageRating.getRating());
-			qaMonitoredUserDTO.setNumberOfVotes(averageRating.getNumberOfVotes());
-		    }
-
-		}
 
 		qaMonitoredUserDTOs.add(qaMonitoredUserDTO);
 	    }
@@ -1090,6 +1033,32 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 
     }
+    
+
+    @Override
+    public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
+	return ratingService.getCriteriasByToolContentId(toolContentId);
+    }
+    
+    @Override
+    public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId) {
+	ratingService.saveRatingCriterias(request, oldCriterias, toolContentId);
+    }
+    
+    @Override
+    public boolean isCommentsEnabled(Long toolContentId) {
+	return ratingService.isCommentsEnabled(toolContentId);
+    }
+
+    @Override
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) {
+	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
+    }
+
+    @Override
+    public int getCountItemsRatedByUser(Long toolContentId, Integer userId) {
+	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
+    }
 
     /**
      * ToolSessionManager CONTRACT
@@ -1159,35 +1128,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * @return Returns the qaQuestionDAO.
-     */
-    public IQaQuestionDAO getQaQuestionDAO() {
-	return qaQuestionDAO;
-    }
-
-    /**
-     * @return Returns the qaQueUsrDAO.
-     */
-    public IQaQueUsrDAO getQaQueUsrDAO() {
-	return qaQueUsrDAO;
-    }
-
-    /**
-     * @return Returns the toolService.
-     */
-    public ILamsToolService getToolService() {
-	return toolService;
-    }
-
-    /**
      * @return Returns the userManagementService.
      */
     public IUserManagementService getUserManagementService() {
 	return userManagementService;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
     }
 
     public void setLearnerService(ILearnerService learnerService) {
@@ -1214,36 +1158,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	this.qaUsrRespDAO = qaUsrRespDAO;
     }
 
-    public void setQaResponseRatingDAO(IResponseRatingDAO responseRatingDAO) {
-	this.qaResponseRatingDAO = responseRatingDAO;
-    }
-
     /**
      * @return Returns the qaDAO.
      */
     public IQaContentDAO getQaDAO() {
 	return qaDAO;
-    }
-
-    /**
-     * @return Returns the qaSessionDAO.
-     */
-    public IQaSessionDAO getQaSessionDAO() {
-	return qaSessionDAO;
-    }
-
-    /**
-     * @return Returns the qaUsrRespDAO.
-     */
-    public IQaUsrRespDAO getQaUsrRespDAO() {
-	return qaUsrRespDAO;
-    }
-
-    /**
-     * @return Returns the IResponseRatingDAO.
-     */
-    public IResponseRatingDAO getQaResponseRatingDAO() {
-	return qaResponseRatingDAO;
     }
 
     public void setUserManagementService(IUserManagementService userManagementService) {
@@ -1252,13 +1171,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
-    }
-
-    /**
-     * @return Returns the qaToolContentHandler.
-     */
-    public IToolContentHandler getQaToolContentHandler() {
-	return qaToolContentHandler;
     }
 
     /**
@@ -1374,6 +1286,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      */
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public void setRatingService(IRatingService ratingService) {
+	this.ratingService = ratingService;
     }
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
@@ -1528,6 +1444,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qa.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	qa.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 	qa.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	qa.setMinimumRates(JsonUtil.opt(toolContentJSON, RestTags.MINIMUM_RATES, 0));
+	qa.setMaximumRates(JsonUtil.opt(toolContentJSON, RestTags.MAXIMUM_RATES, 0));
 	qa.setShowOtherAnswers(JsonUtil.opt(toolContentJSON, "showOtherAnswers", Boolean.TRUE));
 	qa.setUsernameVisible(JsonUtil.opt(toolContentJSON, "usernameVisible", Boolean.FALSE));
 	qa.setAllowRateAnswers(JsonUtil.opt(toolContentJSON, "allowRateAnswers", Boolean.FALSE));
@@ -1550,7 +1468,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    QaQueContent question = new QaQueContent(questionData.getString(RestTags.QUESTION_TEXT), 
 		    questionData.getInt(RestTags.DISPLAY_ORDER), 
 		    JsonUtil.opt(questionData,"feedback",(String)null), 
-		    JsonUtil.opt(questionData, "required", Boolean.FALSE), qa );
+		    JsonUtil.opt(questionData, "required", Boolean.FALSE),
+		    questionData.getInt("minWordsLimit"), qa );
 	    saveOrUpdateQuestion(question);
 	}
 

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -50,12 +51,15 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -71,7 +75,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
-/**
+/**d
  * This class is used to load the default content and initialize the presentation Map for Learner mode.
  * It is important that ALL the session attributes created in this action gets removed by: QaUtils.cleanupSession(request)
  * 
@@ -115,21 +119,21 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    throw new ServletException("No QA content found");
 	}
 	
-	QaQueUsr qaUser = null;
+	QaQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    // monitoring mode - user is specified in URL
 	    // assessmentUser may be null if the user was force completed.
-	    qaUser = getSpecifiedUser(toolSessionID,
+	    user = getSpecifiedUser(toolSessionID,
 		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    qaUser = getCurrentUser(toolSessionID);
+	    user = getCurrentUser(toolSessionID);
 	}
-	Long userId = qaUser.getQueUsrId();
-	qaLearningForm.setUserID(qaUser.getQueUsrId().toString());
+	Long userId = user.getQueUsrId();
+	qaLearningForm.setUserID(user.getQueUsrId().toString());
 	
 	QaQueUsr groupLeader = null;
 	if (qaContent.isUseSelectLeaderToolOuput()) {
-	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(qaUser, new Long(toolSessionID).longValue());
+	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionID).longValue());
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
@@ -147,14 +151,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 		// in case user joins the lesson after leader has answers some answers already - we need to make sure
 		// he has the same scratches as leader
-		qaService.copyAnswersFromLeader(qaUser, groupLeader);
+		qaService.copyAnswersFromLeader(user, groupLeader);
 
-		qaUser.setResponseFinalized(true);
-		qaService.updateUser(qaUser);
+		user.setResponseFinalized(true);
+		qaService.updateUser(user);
 	    }
 	}
 
-	/* holds the question contents for a given tool session and relevant content */
+	/* holds the question contents for a given tool session and relevant content s*/
 	Map mapQuestionStrings = new TreeMap(new QaComparator());
 	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<Integer, QaQuestionDTO>();
 
@@ -169,18 +173,22 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 	    
 	    sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
-		    qaService.getLearnerContentFolder(new Long(toolSessionID), qaUser.getQueUsrId()));
+		    qaService.getLearnerContentFolder(new Long(toolSessionID), user.getQueUsrId()));
 	}
+	String sessionMapId = sessionMap.getSessionID();
+	sessionMap.put(IS_DISABLED, qaContent.isLockWhenFinished() && user.isLearnerFinished() || (mode != null)
+		&& mode.equals(ToolAccessMode.TEACHER.toString()));
 	
 	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = qaService.isUserGroupLeader(qaUser, new Long(toolSessionID));
+	boolean isUserLeader = qaService.isUserGroupLeader(user, new Long(toolSessionID));
 	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ATTR_CONTENT, qaContent);
+	sessionMap.put(AttributeNames.USER, user);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	generalLearnerFlowDTO.setUserUid(qaUser.getQueUsrId().toString());
-	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+	generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
+	generalLearnerFlowDTO.setHttpSessionID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
 	generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
@@ -270,13 +278,13 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	    /* the report should have the all entries for the users in this tool session,
 	     * and display under the "my answers" section the answers for the user id in the url */
-	    Long learnerProgressUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
+//	    Long learnerProgressUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
 
-	    QaLearningAction.refreshSummaryData(request, qaContent, qaService, qaContent.isUsernameVisible(),
-		    toolSessionID, userId.toString(), generalLearnerFlowDTO);
+	    QaLearningAction.refreshSummaryData(request, qaContent, qaService, sessionMapId, user,
+		    generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	    return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
@@ -285,19 +293,19 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	//check if there is submission deadline
 	Date submissionDeadline = qaContent.getSubmissionDeadline();
 	if (submissionDeadline != null) {
-		//store submission deadline to sessionMap
-		sessionMap.put(QaAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
-		
-		HttpSession ss = SessionManager.getSession();
-		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		TimeZone learnerTimeZone = learnerDto.getTimeZone();
-		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-		Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-		
-		//calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
-		if (currentLearnerDate.after(tzSubmissionDeadline)) {
-			return mapping.findForward("submissionDeadline");
-		}
+	    // store submission deadline to sessionMap
+	    sessionMap.put(QaAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("submissionDeadline");
+	    }
 	}
 	
 	/*
@@ -311,8 +319,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	Long currentToolSessionID = new Long(qaLearningForm.getToolSessionID());
 
 	//if Response is Finalized
-	if (qaUser.isResponseFinalized()) {
-	    QaSession checkSession = qaUser.getQaSession();
+	if (user.isResponseFinalized()) {
+	    QaSession checkSession = user.getQaSession();
 
 	    if (checkSession != null) {
 		Long checkQaSessionId = checkSession.getQaSessionId();
@@ -328,11 +336,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		     */
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-		    boolean isUserNamesVisible = qaContent.isUsernameVisible();
-		    QaLearningAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible,
-			    currentToolSessionID.toString(), userId.toString(), generalLearnerFlowDTO);
+		    QaLearningAction.refreshSummaryData(request, qaContent, qaService, sessionMapId, user,
+			    generalLearnerFlowDTO);
 
-		    if (qaUser.isLearnerFinished()) {
+		    if (user.isLearnerFinished()) {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
 			return (mapping.findForward(REVISITED_LEARNER_REP));
 		    } else {
@@ -344,7 +351,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	}
 	
 	//**---- showing AnswersContent.jsp ----**
-	LearningUtil.populateAnswers(sessionMap, qaContent, qaUser, mapQuestions, generalLearnerFlowDTO, qaService);
+	LearningUtil.populateAnswers(sessionMap, qaContent, user, mapQuestions, generalLearnerFlowDTO, qaService);
 
 	return (mapping.findForward(LOAD_LEARNER));
     }
@@ -392,13 +399,13 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	qaLearningForm.setMode(mode);
     }
     
-    private QaQueUsr getCurrentUser(String toolSessionId) {
 
-	// get back login user DTO 
+    private QaQueUsr getCurrentUser(String toolSessionId) {
+	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Integer userId = toolUser.getUserID();
-	
+
 	QaQueUsr qaUser = qaService.getUserByIdAndSession(userId.longValue(), new Long(toolSessionId));
 	if (qaUser == null) {
 	    qaUser = qaService.createUser(new Long(toolSessionId), userId);

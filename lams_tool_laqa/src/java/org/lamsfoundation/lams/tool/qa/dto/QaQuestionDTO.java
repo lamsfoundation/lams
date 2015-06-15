@@ -36,20 +36,23 @@ public class QaQuestionDTO implements Comparable {
     private String displayOrder;
     private String feedback;
     private boolean required;
+    private int minWordsLimit;
 
     public QaQuestionDTO(QaQueContent que) {
 	this.question = que.getQuestion();
 	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
 	this.feedback = que.getFeedback() != null ? que.getFeedback() : " ";
 	this.required = que.isRequired();
+	this.minWordsLimit = que.getMinWordsLimit();
 	this.uid = que.getUid();
     }
 
-    public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required) {
+    public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required, int minWordsLimit) {
 	this.question = question;
 	this.displayOrder = displayOrder;
 	this.feedback = feedback;
 	this.required = required;
+	this.minWordsLimit = minWordsLimit;
     }
 
     public int compareTo(Object o) {
@@ -135,6 +138,21 @@ public class QaQuestionDTO implements Comparable {
      */
     public void setRequired(boolean required) {
 	this.required = required;
+    }
+    
+    /**
+     * @return minWordsLimit
+     */
+    public int getMinWordsLimit() {
+	return minWordsLimit;
+    }
+
+    /**
+     * @param minWordsLimit
+     * minWordsLimit
+     */
+    public void setMinWordsLimit(int minWordsLimit) {
+	this.minWordsLimit = minWordsLimit;
     }
 
 

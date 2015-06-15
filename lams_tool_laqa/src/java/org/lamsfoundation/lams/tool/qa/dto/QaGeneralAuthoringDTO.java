@@ -48,6 +48,8 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected String reflectionSubject;
     protected Boolean allowRichEditor;
     protected Boolean useSelectLeaderToolOuput;
+    protected int maximumRates;
+    protected int minimumRates;
 
     protected String httpSessionID;
 
@@ -335,6 +337,28 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     public void setUseSelectLeaderToolOuput(Boolean useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+    }
+    
+    /**
+     * @return
+     */
+    public int getMaximumRates() {
+	return maximumRates;
+    }
+
+    public void setMaximumRates(int maximumRates) {
+	this.maximumRates = maximumRates;
+    }
+
+    /**
+     * @return
+     */
+    public int getMinimumRates() {
+	return minimumRates;
+    }
+
+    public void setMinimumRates(int minimumRates) {
+	this.minimumRates = minimumRates;
     }
 
 }
