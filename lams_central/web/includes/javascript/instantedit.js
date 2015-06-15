@@ -66,13 +66,22 @@ datosServidor.prototype.enviar = function(urlget,datos) {
 var formVars = "";
 var changing = false;
 
+//**LAMS** added the following 3 lines 
+//Ajax call is required unless it was set to false in jsp
+if (typeof IS_AJAX_CALL_REQUIRED === 'undefined') {
+	var IS_AJAX_CALL_REQUIRED = true;
+}
 
 function fieldEnter(campo,evt,idfld) {
 	evt = (evt) ? evt : window.event;
 	if (evt.keyCode == 13 && campo.value!="") {
 		elem = document.getElementById( idfld );
-		remotos = new datosServidor;
-		nt = remotos.enviar(urlBase + "?fieldname=" +encodeURI(elem.id)+ "&content="+encodeURI(campo.value)+"&"+formVars,"");
+		
+		//**LAMS** added the following condition
+		if (IS_AJAX_CALL_REQUIRED) {
+			remotos = new datosServidor;
+			nt = remotos.enviar(urlBase + "?fieldname=" +encodeURI(elem.id)+ "&content="+encodeURI(campo.value)+"&"+formVars,"");
+		}
 		//remove glow
 		noLight(elem);
 		elem.innerHTML = campo.value;
@@ -88,8 +97,13 @@ function fieldEnter(campo,evt,idfld) {
 function fieldBlur(campo,idfld) {
 	if (campo.value!="") {
 		elem = document.getElementById( idfld );
-		remotos = new datosServidor;
-		nt = remotos.enviar(urlBase + "?fieldname=" +escape(elem.id)+ "&content="+escape(campo.value)+"&"+formVars,"");
+		
+		//**LAMS** added the following condition
+		if (IS_AJAX_CALL_REQUIRED) {
+			remotos = new datosServidor;
+			nt = remotos.enviar(urlBase + "?fieldname=" +escape(elem.id)+ "&content="+escape(campo.value)+"&"+formVars,"");
+		}
+		
 		elem.innerHTML = campo.value;
 		changing = false;
 		return false;
