@@ -1468,7 +1468,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		    questionData.getInt(RestTags.DISPLAY_ORDER), 
 		    JsonUtil.opt(questionData,"feedback",(String)null), 
 		    JsonUtil.opt(questionData, "required", Boolean.FALSE),
-		    questionData.getInt("minWordsLimit"), qa );
+		    JsonUtil.opt(questionData,"minWordsLimit",0), qa );
 	    saveOrUpdateQuestion(question);
 	}
 
