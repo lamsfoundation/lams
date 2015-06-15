@@ -39,6 +39,7 @@ public class EmailForm extends ActionForm {
     private Long userId;
 
     private String to;
+    private String ccEmail;
     private String subject;
     private String body;
 
@@ -56,6 +57,14 @@ public class EmailForm extends ActionForm {
 
     public void setTo(String name) {
 	this.to = name;
+    }
+    
+    public void setCcEmail(String ccEmail) {
+	this.ccEmail = ccEmail;
+    }
+    
+    public String getCcEmail() {
+	return ccEmail;
     }
 
     public String getSubject() {

@@ -68,12 +68,23 @@ public class ValidationUtil {
     }
 
     /**
-     * Checks whether supplied email address is valid.
+     * Checks whether supplied email address is valid. It validates email only if USER_VALIDATION_REQUIRED_EMAIL LAMS configuration is ON.
      */
     public static boolean isEmailValid(String email) {
+	return isEmailValid(email, true);
+    }
+    
+    /**
+     * Checks whether supplied email address is valid.
+     * 
+     * @param email supplied email
+     * @param checkConfiguration whether it should take into account LAMS server configuration setting USER_VALIDATION_REQUIRED_EMAIL
+     * @return
+     */
+    public static boolean isEmailValid(String email, boolean checkConfiguration) {
 	
 	boolean isValidationRequired = Configuration.getAsBoolean(ConfigurationKeys.USER_VALIDATION_REQUIRED_EMAIL);
-	if (isValidationRequired) {
+	if (!checkConfiguration || checkConfiguration && isValidationRequired) {
 	    return ValidationUtil.isRegexMatches(ValidationUtil.REGEX_EMAIL, email);
 	}
 	return true;
