@@ -25,97 +25,46 @@
 
 package org.lamsfoundation.lams.rating.service;
 
+import java.text.NumberFormat;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.rating.dao.IRatingCommentDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingCriteriaDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
+import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 
 public class RatingService implements IRatingService {
 
     private static Logger log = Logger.getLogger(RatingService.class);
 
     private IRatingDAO ratingDAO;
-    
+
+    private IRatingCommentDAO ratingCommentDAO;
+
     private IRatingCriteriaDAO ratingCriteriaDAO;
 
     protected IUserManagementService userManagementService;
 
     protected MessageService messageService;
-
-//    public TreeMap<Long, List<Rating>> getEntryByLesson(Integer userID, Integer idType) {
-//	TreeMap<Long, List<Rating>> entryMap = new TreeMap<Long, List<Rating>>();
-//	List<Rating> list = getEntry(userID, idType);
-//
-//	for (Rating entry : list) {
-//	    if (entryMap.containsKey(entry.getItemId())) {
-//		String lessonName = (String) entryMap.get(entry.getItemId()).get(0).getRating();
-//		entry.setRating(lessonName);
-//		entryMap.get(entry.getItemId()).add(entry);
-//	    } else {
-//		Lesson lesson = (Lesson) baseDAO.find(Lesson.class, entry.getItemId());
-//		List<Rating> newEntryList = new ArrayList<Rating>();
-//
-//		entry.setRating(lesson.getLessonName());
-//		newEntryList.add(entry);
-//
-//		entryMap.put(entry.getItemId(), newEntryList);
-//	    }
-//	}
-//
-//	return entryMap;
-//    }
-//
-//    public List<Rating> getEntry(Long id, Integer idType, String signature, Integer userID) {
-//	return ratingDAO.get(id, idType, signature, userID);
-//    }
-//
-//    public List<Rating> getEntry(Long id, Integer idType, String signature) {
-//	return ratingDAO.get(id, idType, signature);
-//    }
-//
-//    public List<Rating> getEntry(Long id, Integer idType, Integer userID) {
-//	return ratingDAO.get(id, idType, userID);
-//    }
-//
-//    public List<Rating> getEntry(Integer userID) {
-//	return ratingDAO.get(userID);
-//    }
-//
-//    public List<Rating> getEntry(Integer userID, Integer idType) {
-//	return ratingDAO.get(userID, idType);
-//    }
-//
-//    public List<Rating> getEntry(Integer userID, Long lessonID) {
-//	return ratingDAO.get(userID, lessonID);
-//    }
-//
-//    public Rating getEntry(Long uid) {
-//	return ratingDAO.get(uid);
-//    }
-//
-//    public void updateEntry(Long uid, String title, String entry) {
-//	Rating ne = getEntry(uid);
-//	if (ne != null) {
-//	    ne.setTitle(title);
-//	    ne.setEntry(entry);
-//	    ne.setLastModified(new Date());
-//	    saveOrUpdateRating(ne);
-//	} else {
-//	    log.debug("updateEntry: uid " + uid + "does not exist");
-//	}
-//    }
-//
-//    public void updateEntry(Rating rating) {
-//	rating.setLastModified(new Date());
-//	saveOrUpdateRating(rating);
-//    }
 
     @Override
     public Rating getRatingByItemAndUser(Long itemId, Integer userId) {
@@ -126,53 +75,286 @@ public class RatingService implements IRatingService {
     public List<Rating> getRatingsByItem(Long itemId) {
 	return null;
     }
-    
+
+    @Override
+    public int getCountItemsRatedByUser(final Long toolContentId, final Integer userId) {
+	return ratingDAO.getCountItemsRatedByUser(toolContentId, userId);
+    }
+
     @Override
     public void saveOrUpdateRating(Rating rating) {
 	ratingDAO.saveOrUpdate(rating);
     }
-    
+
     @Override
-    public RatingDTO rateItem(Long ratingCriteriaId, Integer userId, Long itemId, float ratingFloat) {
+    public ItemRatingCriteriaDTO rateItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, float ratingFloat) {
+	Long ratingCriteriaId = ratingCriteria.getRatingCriteriaId();
 	Rating rating = ratingDAO.getRating(ratingCriteriaId, userId, itemId);
 
-	//persist MessageRating changes in DB
+	// persist MessageRating changes in DB
 	if (rating == null) { // add
 	    rating = new Rating();
 	    rating.setItemId(itemId);
-	    
+
 	    User learner = (User) userManagementService.findById(User.class, userId);
 	    rating.setLearner(learner);
-	    
-	    RatingCriteria ratingCriteria = (RatingCriteria) userManagementService.findById(RatingCriteria.class, ratingCriteriaId);
+
 	    rating.setRatingCriteria(ratingCriteria);
 	}
+
 	rating.setRating(ratingFloat);
 	ratingDAO.saveOrUpdate(rating);
-	
-	//to make available new changes be visible on a jsp page
+
+	// to make available new changes be visible on a jsp page
 	return ratingDAO.getRatingAverageDTOByItem(ratingCriteriaId, itemId);
     }
-    
+
     @Override
-    public RatingDTO getRatingDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId) {
-	return ratingDAO.getRatingAverageDTOByUser(ratingCriteriaId, itemId, userId);
+    public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment) {
+	RatingComment ratingComment = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(), userId,
+		itemId);
+
+	// persist MessageRating changes in DB
+	if (ratingComment == null) { // add
+	    ratingComment = new RatingComment();
+	    ratingComment.setItemId(itemId);
+
+	    User learner = (User) userManagementService.findById(User.class, userId);
+	    ratingComment.setLearner(learner);
+
+	    ratingComment.setRatingCriteria(ratingCriteria);
+	}
+
+	ratingComment.setComment(comment);
+	ratingDAO.saveOrUpdate(ratingComment);
     }
-    
+
+    @Override
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) {
+
+	//initial preparations
+	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	numberFormat.setMaximumFractionDigits(1);
+	List<RatingCriteria> criterias = getCriteriasByToolContentId(contentId);
+	boolean isSingleItem = itemIds.size() == 1;
+	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
+	
+	//initialize itemDtos
+	List<ItemRatingDTO> itemDtos = new LinkedList<ItemRatingDTO>();
+	for (Long itemId : itemIds) {
+	    ItemRatingDTO itemDto = new ItemRatingDTO();
+	    itemDto.setItemId(itemId);
+	    itemDtos.add(itemDto);
+	}
+	
+	//handle comments criteria
+	for (RatingCriteria criteria : criterias) {
+	    if (criteria.isCommentsEnabled()) {
+		Long commentCriteriaId = criteria.getRatingCriteriaId();
+		
+		List<RatingCommentDTO> commentDtos;
+		if (isSingleItem) {
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, singleItemId);
+		
+		//query DB using itemIds
+		} else if (isCommentsByOtherUsersRequired) {
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, itemIds);
+		    
+		// get only comments for current user
+		} else {
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItemsAndUser(commentCriteriaId, itemIds,
+			    userId.intValue());
+		}
+		
+		for (ItemRatingDTO itemDto: itemDtos) {
+		    itemDto.setCommentsEnabled(true);
+		    itemDto.setCommentsCriteriaId(commentCriteriaId);
+		    itemDto.setCommentsMinWordsLimit(criteria.getCommentsMinWordsLimit());
+		    
+		    //assign commentDtos by the appropriate items
+		    List<RatingCommentDTO> commentDtosPerItem = new LinkedList<RatingCommentDTO>();
+		    for (RatingCommentDTO commentDto: commentDtos) {
+			if (commentDto.getItemId().equals(itemDto.getItemId())) {
+			    commentDtosPerItem.add(commentDto);
+			    
+			    //fill in commentPostedByUser field
+			    if (commentDto.getUserId().equals(userId)) {
+				itemDto.setCommentPostedByUser(commentDto);
+			    }
+			}
+		    }
+		    
+		    itemDto.setCommentDtos(commentDtosPerItem);
+		}
+		
+		break;
+	    }
+	}
+	
+	//get all data from DB
+	List<Rating> userRatings = ratingDAO.getRatingsByUser(contentId, userId.intValue());
+	List<Object[]> itemsStatistics;
+	if (isSingleItem) {
+	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItem(contentId, singleItemId);
+	    
+	// query DB using itemIds
+	} else {
+	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItems(contentId, itemIds);
+	}
+
+	//handle all criterias except for comments' one
+	for (ItemRatingDTO itemDto : itemDtos) {
+	    Long itemId = itemDto.getItemId();
+	    List<ItemRatingCriteriaDTO> criteriaDtos = new LinkedList<ItemRatingCriteriaDTO>();
+	    itemDto.setCriteriaDtos(criteriaDtos);
+
+	    for (RatingCriteria criteria : criterias) {
+		Long criteriaId = criteria.getRatingCriteriaId();
+		
+		//comments' criteria are handled earlier, at the beginning of this function
+		if (criteria.isCommentsEnabled()) {
+		    continue;
+		}
+		    
+		ItemRatingCriteriaDTO criteriaDto = new ItemRatingCriteriaDTO();
+		criteriaDto.setRatingCriteria(criteria);
+
+		// set user's rating
+		Rating userRating = null;
+		for (Rating userRatingIter : userRatings) {
+		    if (userRatingIter.getItemId().equals(itemId)
+			    && userRatingIter.getRatingCriteria().getRatingCriteriaId().equals(criteriaId)) {
+			userRating = userRatingIter;
+		    }
+		}
+		String userRatingStr = userRating == null ? "" : numberFormat.format(userRating.getRating());
+		criteriaDto.setUserRating(userRatingStr);
+
+		// check if there is any data returned from DB regarding this item and criteria
+		Object[] itemStatistics = null;
+		for (Object[] itemStatisticsIter : itemsStatistics) {
+		    Long itemIdIter = (Long) itemStatisticsIter[0];
+		    Long ratingCriteriaIdIter = (Long) itemStatisticsIter[1];
+
+		    if (itemIdIter.equals(itemId) && ratingCriteriaIdIter.equals(criteriaId)) {
+			itemStatistics = itemStatisticsIter;
+		    }
+		}
+
+		String averageRating = itemStatistics == null ? "0" : numberFormat.format(itemStatistics[2]);
+		String numberOfVotes = itemStatistics == null ? "0" : String.valueOf(itemStatistics[3]);
+		criteriaDto.setAverageRating(averageRating);
+		criteriaDto.setNumberOfVotes(numberOfVotes);
+
+		criteriaDtos.add(criteriaDto);
+
+	    }
+
+	}
+
+	return itemDtos;
+    }
+
     @Override
     public List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId) {
 	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
 	return criterias;
     }
-    
+
     @Override
-    public void saveOrUpdateRatingCriteria(RatingCriteria criteria) {
-	ratingCriteriaDAO.saveOrUpdate(criteria);
+    public RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId) {
+	return ratingCriteriaDAO.getByRatingCriteriaId(ratingCriteriaId);
+    }
+
+    @Override
+    public RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz) {
+	return ratingCriteriaDAO.getByRatingCriteriaId(ratingCriteriaId, clasz);
+    }
+
+    @Override
+    public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias,
+	    Long toolContentId) {
+	// create orderId to RatingCriteria map
+	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<Integer, RatingCriteria>();
+	for (RatingCriteria ratingCriteriaIter : oldCriterias) {
+	    mapOrderIdToRatingCriteria.put(ratingCriteriaIter.getOrderId(), ratingCriteriaIter);
+	}
+
+	int criteriaMaxOrderId = WebUtil.readIntParam(request, "criteriaMaxOrderId");
+	// i is equal to an old orderId
+	for (int i = 1; i <= criteriaMaxOrderId; i++) {
+
+	    String criteriaTitle = WebUtil.readStrParam(request, "criteriaTitle" + i, true);
+
+	    RatingCriteria ratingCriteria = mapOrderIdToRatingCriteria.get(i);
+	    if (StringUtils.isNotBlank(criteriaTitle)) {
+		int newCriteriaOrderId = WebUtil.readIntParam(request, "criteriaOrderId" + i);
+
+		// modify existing one if it exists. add otherwise
+		if (ratingCriteria == null) {
+		    ratingCriteria = new LearnerItemRatingCriteria();
+		    ratingCriteria.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+		    ((LearnerItemRatingCriteria) ratingCriteria).setToolContentId(toolContentId);
+		}
+
+		ratingCriteria.setOrderId(newCriteriaOrderId);
+		ratingCriteria.setTitle(criteriaTitle);
+		ratingCriteriaDAO.saveOrUpdate(ratingCriteria);
+		// !!updatedCriterias.add(ratingCriteria);
+
+		// delete
+	    } else if (ratingCriteria != null) {
+		ratingCriteriaDAO.deleteRatingCriteria(ratingCriteria.getRatingCriteriaId());
+	    }
+
+	}
+
+	// ==== handle comments criteria ====
+
+	boolean isCommentsEnabled = WebUtil.readBooleanParam(request, "isCommentsEnabled", false);
+	// find comments' responsible RatingCriteria
+	RatingCriteria commentsResponsibleCriteria = null;
+	for (RatingCriteria ratingCriteriaIter : oldCriterias) {
+	    if (ratingCriteriaIter.isCommentsEnabled()) {
+		commentsResponsibleCriteria = ratingCriteriaIter;
+		break;
+	    }
+	}
+	// create commentsRatingCriteria if it's required
+	if (isCommentsEnabled) {
+	    if (commentsResponsibleCriteria == null) {
+		commentsResponsibleCriteria = new LearnerItemRatingCriteria();
+		commentsResponsibleCriteria
+			.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+		((LearnerItemRatingCriteria) commentsResponsibleCriteria).setToolContentId(toolContentId);
+		commentsResponsibleCriteria.setOrderId(0);
+		commentsResponsibleCriteria.setCommentsEnabled(true);
+	    }
+
+	    int commentsMinWordsLimit = WebUtil.readIntParam(request, "commentsMinWordsLimit");
+	    commentsResponsibleCriteria.setCommentsMinWordsLimit(commentsMinWordsLimit);
+
+	    ratingCriteriaDAO.saveOrUpdate(commentsResponsibleCriteria);
+
+	    // delete commentsRatingCriteria if it's not required
+	} else {
+	    if (commentsResponsibleCriteria != null) {
+		ratingCriteriaDAO.deleteRatingCriteria(commentsResponsibleCriteria.getRatingCriteriaId());
+	    }
+	}
     }
     
     @Override
-    public void deleteRatingCriteria(Long ratingCriteriaId) {
-	ratingCriteriaDAO.deleteRatingCriteria(ratingCriteriaId);
+    public boolean isCommentsEnabled(Long toolContentId) {
+	//TODO implement as new DAO method without getting all criterias
+	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
+	
+	boolean isCommentsEnabled = false;
+	for (RatingCriteria criteria : criterias) {
+	    isCommentsEnabled |= criteria.isCommentsEnabled();
+	}
+	
+	return isCommentsEnabled;
     }
 
     /* ********** Used by Spring to "inject" the linked objects ************* */
@@ -180,7 +362,11 @@ public class RatingService implements IRatingService {
     public void setRatingDAO(IRatingDAO ratingDAO) {
 	this.ratingDAO = ratingDAO;
     }
-    
+
+    public void setRatingCommentDAO(IRatingCommentDAO ratingCommentDAO) {
+	this.ratingCommentDAO = ratingCommentDAO;
+    }
+
     public void setRatingCriteriaDAO(IRatingCriteriaDAO ratingCriteriaDAO) {
 	this.ratingCriteriaDAO = ratingCriteriaDAO;
     }

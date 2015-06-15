@@ -25,27 +25,57 @@
 
 package org.lamsfoundation.lams.rating.dao;
 
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import java.util.Collection;
+import java.util.List;
+
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 
 public interface IRatingDAO {
 
-    void saveOrUpdate(Rating rating);
-    
+    void saveOrUpdate(Object object);
+
     Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId);
-    
-    Rating getRating(Long ratingCriteriaId, Integer userId);
-    
+
+    List<Rating> getRatingsByUser(Long contentId, Integer userId);
+
     /**
      * Returns rating statistics by particular item
      * 
      * @param itemId
      * @return
      */
-    RatingDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
+    ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
     
-    RatingDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
+    List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long itemId);
+    
+    /**
+     * Returns rating statistics for specified itemIds.
+     * 
+     * @param contentId
+     * @param itemIds
+     * @return
+     */
+    List<Object[]> getRatingAverageByContentAndItems(Long contentId, Collection<Long> itemIds);
+
+    /**
+     * Returns rating statistics for entire tool.
+     * 
+     * @param contentId
+     * @return
+     */
+    List<Object[]> getRatingAverageByContent(Long contentId);
 
     Rating get(Long uid);
+
+    /**
+     * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This method
+     * is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
+     * 
+     * @param toolContentId
+     * @param userId
+     * @return
+     */
+    int getCountItemsRatedByUser(final Long toolContentId, final Integer userId);
 
 }

@@ -82,6 +82,10 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     /** The type of ratingCriteria */
     private Integer ratingCriteriaTypeId;
+    
+    private boolean commentsEnabled;
+    
+    private int commentsMinWordsLimit;
 
     // ---------------------------------------------------------------------
     // Object constructors
@@ -168,6 +172,22 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     public void setRatingCriteriaTypeId(Integer ratingCriteriaTypeId) {
 	this.ratingCriteriaTypeId = ratingCriteriaTypeId;
+    }
+    
+    public boolean isCommentsEnabled() {
+	return commentsEnabled;
+    }
+
+    public void setCommentsEnabled(boolean commentsEnabled) {
+	this.commentsEnabled = commentsEnabled;
+    }
+    
+    public int getCommentsMinWordsLimit() {
+	return commentsMinWordsLimit;
+    }
+
+    public void setCommentsMinWordsLimit(int commentsMinWordsLimit) {
+	this.commentsMinWordsLimit = commentsMinWordsLimit;
     }
 
     @Override

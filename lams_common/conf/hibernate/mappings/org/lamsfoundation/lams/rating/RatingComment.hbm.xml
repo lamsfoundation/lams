@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.rating.model.RatingComment"
+        table="lams_rating_comment"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-Rating.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="itemId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="item_id"
+        />
+
+        <many-to-one
+            name="ratingCriteria"
+            class="org.lamsfoundation.lams.rating.model.RatingCriteria"
+            cascade="all"
+            outer-join="auto"
+            update="true"
+            insert="true"
+        >
+            <column
+                name="rating_criteria_id" 
+            />
+        </many-to-one>
+
+        <many-to-one
+            name="learner"
+            class="org.lamsfoundation.lams.usermanagement.User"
+            not-null="true"
+        >
+            <column
+                name="user_id" 
+            />
+        </many-to-one>
+        
+        <property
+            name="comment"
+            type="text"
+            update="true"
+            insert="true"
+            column="comment"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-Rating.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>
