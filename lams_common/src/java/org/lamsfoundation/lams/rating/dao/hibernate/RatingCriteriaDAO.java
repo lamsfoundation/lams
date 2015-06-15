@@ -27,7 +27,12 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingCriteriaDAO;
+import org.lamsfoundation.lams.rating.model.AuthoredItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.LessonRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.springframework.dao.DataRetrievalFailureException;
 
 public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO {
 
@@ -47,15 +52,47 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
 
     @Override
     public List<RatingCriteria> getByToolContentId(Long toolContentId) {
-	return (List<RatingCriteria>) (doFind(FIND_BY_TOOL_CONTENT_ID, new Object[] { toolContentId }));
+	return (List<RatingCriteria>) (doFind(FIND_BY_TOOL_CONTENT_ID,
+		new Object[] { toolContentId }));
     }
 
-    public RatingCriteria getByUid(Long ratingCriteriaId) {
-	if (ratingCriteriaId != null) {
-	    Object o = super.find(RatingCriteria.class, ratingCriteriaId);
-	    return (RatingCriteria) o;
-	} else {
+    @Override
+    public RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId) {
+	if (ratingCriteriaId == null) {
 	    return null;
 	}
+
+	RatingCriteria criteria = (RatingCriteria) super.find(RatingCriteria.class, ratingCriteriaId);
+
+	/**
+	 * we must return the real activity, not a Hibernate proxy. So relook it up. This should be quick as it should
+	 * be in the cache.
+	 */
+	if (criteria != null) {
+	    Integer criteriaType = criteria.getRatingCriteriaTypeId();
+	    if (criteriaType != null) {
+		switch (criteriaType.intValue()) {
+		case RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE:
+		    return getByRatingCriteriaId(ratingCriteriaId, ToolActivityRatingCriteria.class);
+		case RatingCriteria.AUTHORED_ITEM_CRITERIA_TYPE:
+		    return getByRatingCriteriaId(ratingCriteriaId, AuthoredItemRatingCriteria.class);
+		case RatingCriteria.LEARNER_ITEM_CRITERIA_TYPE:
+		    return getByRatingCriteriaId(ratingCriteriaId, LearnerItemRatingCriteria.class);
+		case RatingCriteria.LESSON_CRITERIA_TYPE:
+		    return getByRatingCriteriaId(ratingCriteriaId, LessonRatingCriteria.class);
+		default:
+		    break;
+		}
+	    }
+	    throw new DataRetrievalFailureException(
+		    "Unable to get RatingCriteria as the RatingCriteria type is unknown or missing. RatingCriteria type is "
+			    + criteriaType);
+	}
+	return null;
+    }
+
+    @Override
+    public RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId, Class clasz) {
+	return (RatingCriteria) super.find(clasz, ratingCriteriaId);
     }
 }

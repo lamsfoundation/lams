@@ -21,22 +21,58 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.rating.dao;
-
-import java.util.List;
+package org.lamsfoundation.lams.rating.dto;
 
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
-public interface IRatingCriteriaDAO {
+public class ItemRatingCriteriaDTO {
 
-    void saveOrUpdate(RatingCriteria criteria);
-    
-    void deleteRatingCriteria(Long ratingCriteriaId);
-    
-    List<RatingCriteria> getByToolContentId(Long toolContentId);
+    //common properties
+    private RatingCriteria ratingCriteria;
 
-    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId);
-    
-    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId, Class clasz);
+    //rating properties
+    private String userRating;
+    private String averageRating;
+    private String numberOfVotes;
 
+    public ItemRatingCriteriaDTO() {
+    }
+    
+    public ItemRatingCriteriaDTO(String rating, String numberOfVotes) {
+	this.averageRating = rating;
+	this.numberOfVotes = numberOfVotes;
+    }
+    
+    public RatingCriteria getRatingCriteria() {
+	return ratingCriteria;
+    }
+
+    public void setRatingCriteria(RatingCriteria ratingCriteria) {
+	this.ratingCriteria = ratingCriteria;
+    }
+    
+    public String getUserRating() {
+	return userRating;
+    }
+
+    public void setUserRating(String userRating) {
+	this.userRating = userRating;
+    }
+
+    public String getAverageRating() {
+	return averageRating;
+    }
+
+    public void setAverageRating(String averageRating) {
+	this.averageRating = averageRating;
+    }
+
+    public String getNumberOfVotes() {
+	return numberOfVotes;
+    }
+
+    public void setNumberOfVotes(String numberOfVotes) {
+	this.numberOfVotes = numberOfVotes;
+    }
+  
 }

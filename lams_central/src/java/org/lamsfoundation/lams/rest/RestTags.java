@@ -52,6 +52,8 @@ public class RestTags {
     public static String SUBMISSION_DEADLINE = "submissionDeadline";
     public static String ALLOW_RICH_TEXT_EDITOR = "allowRichEditor";
     public static String USE_SELECT_LEADER_TOOL_OUTPUT = "useSelectLeaderToolOuput";
+    public static String MINIMUM_RATES = "minimumRates";
+    public static String MAXIMUM_RATES = "maximumRates";
 
     public static String QUESTIONS = "questions";
     public static String QUESTION_TEXT = "questionText";

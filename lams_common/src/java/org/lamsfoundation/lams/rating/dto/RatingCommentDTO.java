@@ -21,22 +21,56 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.rating.dao;
+package org.lamsfoundation.lams.rating.dto;
 
-import java.util.List;
 
-import org.lamsfoundation.lams.rating.model.RatingCriteria;
+/**
+ * Holds minimum information required for displaying in Rating.tag Created in order to lighten the data passed from DB.
+ * 
+ * @author Andrey Balan
+ */
+public class RatingCommentDTO {
 
-public interface IRatingCriteriaDAO {
+    private Long itemId;
 
-    void saveOrUpdate(RatingCriteria criteria);
+    private Long userId;
     
-    void deleteRatingCriteria(Long ratingCriteriaId);
-    
-    List<RatingCriteria> getByToolContentId(Long toolContentId);
+    private String comment;
 
-    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId);
-    
-    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId, Class clasz);
+    public RatingCommentDTO() {
+    }
 
+    public RatingCommentDTO(Long itemId, Long userId, String comment) {
+	this.itemId = itemId;
+	this.userId = userId;
+	this.comment = comment;
+    }
+
+    /**
+     */
+    public Long getItemId() {
+	return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+	this.itemId = itemId;
+    }
+
+    /**
+     */
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userId) {
+	this.userId = userId;
+    }
+    
+    public void setComment(String comment) {
+	this.comment = comment;
+    }
+
+    public String getComment() {
+	return this.comment;
+    }
 }

@@ -25,45 +25,39 @@
 
 package org.lamsfoundation.lams.rating.service;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import javax.servlet.http.HttpServletRequest;
+
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
-import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 
 public interface IRatingService {
 
-//    Long createRating(Long id, Integer idType, String signature, Integer userID, String title, String entry);
-//
-//    TreeMap<Long, List<Rating>> getEntryByLesson(Integer userID, Integer idType);
-//
-//    List<Rating> getEntry(Long id, Integer idType, String signature, Integer userID);
-//
-//    List<Rating> getEntry(Long id, Integer idType, String signature);
-//
-//    List<Rating> getEntry(Long id, Integer idType, Integer userID);
-//    
-//    List<Rating> getEntry(Integer userID);
-//
-//    List<Rating> getEntry(Integer userID, Integer idType);
-//
-//    List<Rating> getEntry(Integer userID, Long lessonID);
-//
-//    Rating getEntry(Long uid);
-//
-//    void updateEntry(Long uid, String title, String entry);
-//
-//    void updateEntry(Rating rating);
-
     void saveOrUpdateRating(Rating rating);
-    
-    void saveOrUpdateRatingCriteria(RatingCriteria criteria);
-    
-    void deleteRatingCriteria(Long ratingCriteriaId);
-    
+
+    /**
+     * Read modified rating criterias from request, then update existing ones/add new ones/delete removed ones. Used on
+     * saving content action in authoring.
+     * 
+     * @param request
+     * @param oldCriterias
+     *            criterias stored in the DB
+     * @param toolContentId
+     */
+    void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId);
+
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
+
+    RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
+
+    RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz);
     
+    boolean isCommentsEnabled(Long toolContentId);
+
     /**
      * Return Rating by the given itemId and userId.
      * 
@@ -80,12 +74,33 @@ public interface IRatingService {
      * @return
      */
     List<Rating> getRatingsByItem(Long itemId);
-    
-    RatingDTO rateItem(Long ratingCriteriaId, Integer userId, Long itemId, float ratingFloat);
-    
-    RatingDTO getRatingDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId);
 
-//    IUserManagementService getUserManagementService();
-//
-//    MessageService getMessageService();
+    ItemRatingCriteriaDTO rateItem(RatingCriteria criteria, Integer userId, Long itemId, float ratingFloat);
+
+    void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
+
+    /**
+     * Returns results for all items. If result is needed for only one item provide provide it as a single element in a
+     * itemIds list.
+     * 
+     * @param contentId
+     * @param itemIds
+     * @param isCommentsByOtherUsersRequired
+     *            whether required just comment from the current user or by all users
+     * @param userId
+     * @return
+     */
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+	    boolean isCommentsByOtherUsersRequired, Long userId);
+
+    /**
+     * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This
+     * method is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
+     * 
+     * @param toolContentId
+     * @param userId
+     * @return
+     */
+    int getCountItemsRatedByUser(final Long toolContentId, final Integer userId);
+
 }

@@ -26,35 +26,75 @@
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
 import java.text.NumberFormat;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
+import org.lamsfoundation.lams.rating.model.RatingComment;
 
 public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
     private static final String FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
-    private static final String FIND_RATING_VALUE = "SELECT r.rating FROM " + Rating.class.getName()
+
+    private static final String FIND_USER_RATING_VALUE = "SELECT r.rating FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
+
     private static final String FIND_RATING_BY_CRITERIA_AND_USER = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=?";
+
+    private static final String FIND_RATINGS_BY_USER = "FROM " + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? AND r.learner.userId=?";
+
     private static final String FIND_RATING_AVERAGE_BY_ITEM = "SELECT AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
+    
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEM = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName() + " AS r where r.ratingCriteria.toolContentId=? AND r.itemId=? GROUP BY r.ratingCriteria.ratingCriteriaId";
+    
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+		+ Rating.class.getName()
+		+ " AS r where r.ratingCriteria.toolContentId=:contentId AND r.itemId IN (:itemIds) GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
+
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_ID = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
+
+//    private static final String COUNT_ITEMS_RATED_BY_ACTIVITY_AND_USER = "SELECT COUNT(DISTINCT r.itemId)+(SELECT COUNT(comment) FROM "
+//	    + RatingComment.class.getName()
+//	    + " AS comment "
+//	    + " WHERE comment.ratingCriteria.toolContentId = :toolContentId AND comment.learner.userId =:userId AND comment.itemId =:itemId AND cr.commentsEnabled IS TRUE ) FROM  "
+//	    + Rating.class.getName()
+//	    + " AS r "
+//	    + " WHERE r.ratingCriteria.toolContentId = :toolContentId AND r.learner.userId =:userId";
 
     @Override
-    public void saveOrUpdate(Rating rating) {
-	getSession().saveOrUpdate(rating);
+    public void saveOrUpdate(Object object) {
+	getSession().saveOrUpdate(object);
 	getSession().flush();
     }
 
     @Override
     public Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId) {
-	List<Rating> list = (List<Rating>) doFind(FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM, new Object[] { ratingCriteriaId, userId,
-		itemId });
+	List<Rating> list = (List<Rating>) doFind(FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM,
+		new Object[] { ratingCriteriaId, userId, itemId });
+	if (list.size() > 0) {
+	    return (Rating) list.get(0);
+	} else {
+	    return null;
+	}
+    }
+
+    // method is not used at the moment
+    private Rating getRating(Long ratingCriteriaId, Integer userId) {
+	List<Rating> list = (List<Rating>) doFind(FIND_RATING_BY_CRITERIA_AND_USER,
+		new Object[] { ratingCriteriaId, userId });
 	if (list.size() > 0) {
 	    return (Rating) list.get(0);
 	} else {
@@ -63,18 +103,14 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
     }
 
     @Override
-    public Rating getRating(Long ratingCriteriaId, Integer userId) {
-	List<Rating> list = (List<Rating>) doFind(FIND_RATING_BY_CRITERIA_AND_USER, new Object[] { ratingCriteriaId, userId });
-	if (list.size() > 0) {
-	    return (Rating) list.get(0);
-	} else {
-	    return null;
-	}
+    public List<Rating> getRatingsByUser(Long contentId, Integer userId) {
+	return (List<Rating>) doFind(FIND_RATINGS_BY_USER, new Object[] { contentId, userId });
     }
 
     @Override
-    public RatingDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId) {
-	List<Object[]> list = (List<Object[]>) doFind(FIND_RATING_AVERAGE_BY_ITEM, new Object[] { ratingCriteriaId, itemId });
+    public ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId) {
+	List<Object[]> list = (List<Object[]>) doFind(FIND_RATING_AVERAGE_BY_ITEM,
+		new Object[] { ratingCriteriaId, itemId });
 	Object[] results = list.get(0);
 
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];
@@ -83,25 +119,27 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	String averageRating = numberFormat.format(averageRatingObj);
 
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
-	return new RatingDTO(averageRating, numberOfVotes);
+	return new ItemRatingCriteriaDTO(averageRating, numberOfVotes);
     }
 
     @Override
-    public RatingDTO getRatingAverageDTOByUser(Long ratingCriteriaId, Long itemId, Integer userId) {
-
-	RatingDTO ratingDTO = getRatingAverageDTOByItem(ratingCriteriaId, itemId);
-
-	Float userRating = 0F;
-	List list = doFind(FIND_RATING_VALUE, new Object[] { ratingCriteriaId, userId, itemId });
-	if (list.size() > 0) {
-	    userRating = (Float) list.get(0);
-	}
-	ratingDTO.setUserRating(userRating.toString());
-	ratingDTO.setItemId(itemId);
-
-	return ratingDTO;
+    public List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long itemId) {
+	return (List<Object[]>) doFind(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEM,
+		new Object[] { contentId, itemId });
+    }
+    
+    @Override
+    public List<Object[]> getRatingAverageByContentAndItems(Long contentId, Collection<Long> itemIds) {
+	return  getSession().createQuery(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS)
+	    .setLong("contentId", contentId).setParameterList("itemIds", itemIds).list();
     }
 
+    @Override
+    public List<Object[]> getRatingAverageByContent(Long contentId) {
+	return (List<Object[]>) doFind(FIND_RATING_AVERAGE_BY_CONTENT_ID, new Object[] { contentId });
+    }
+
+    @Override
     public Rating get(Long uid) {
 	if (uid != null) {
 	    Object o = super.find(Rating.class, uid);
@@ -109,5 +147,29 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	} else {
 	    return null;
 	}
+    }
+
+    @Override
+    public int getCountItemsRatedByUser(final Long toolContentId, final Integer userId) {
+
+	// unions don't work in HQL so doing 2 separate DB queries (http://stackoverflow.com/a/3940445)
+	String FIND_ITEM_IDS_RATED_BY_USER = "SELECT DISTINCT r.itemId FROM  " + Rating.class.getName() + " AS r "
+		+ " WHERE r.ratingCriteria.toolContentId = :toolContentId AND r.learner.userId =:userId";
+
+	String FIND_ITEM_IDS_COMMENTED_BY_USER = "SELECT DISTINCT comment.itemId FROM "
+		+ RatingComment.class.getName()
+		+ " AS comment "
+		+ " WHERE comment.ratingCriteria.toolContentId = :toolContentId AND comment.learner.userId =:userId AND comment.ratingCriteria.commentsEnabled IS TRUE";
+
+	List<Long> ratedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_RATED_BY_USER)
+		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
+
+	List<Long> commentedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_COMMENTED_BY_USER)
+		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
+
+	Set<Long> unionItemIds = new HashSet<Long>(ratedItemIds);
+	unionItemIds.addAll(commentedItemIds);
+
+	return unionItemIds.size();
     }
 }
