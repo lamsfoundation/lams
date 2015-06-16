@@ -64,17 +64,20 @@ function initTabs(){
 			// since this code is inside an iframe, the helper is
 			// a transparent div with black borders attached to parent document
 			var dialogName = "dialogMonitorLesson" + lessonId,
-				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog'),
-				helper = dialog.clone().empty();
-			helper.css({
-				'border': 'thin black solid',
-				'width' : dialog.width(),
-				'height' : dialog.height(),
-				'background' : 'transparent'
-			});
+				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog'),	
+				helper = $('<div />').attr('id', 'dragHelper').css({
+					'width'  : dialog.width(),
+					'height' : dialog.height()
+				});
 			return helper;
 		},
 		'appendTo' : window.parent.document.body,
+		'start' : function(){
+			$(window.parent.document.body).mouseup(function(){
+				// IE sometimes does not trigger drag stop, so we need to help it
+				$('#tabs').trigger('mouseup');
+			});
+		},
 		'drag' : function(event, ui) {
 			// adjust position to be relative to parent document, not iframe contents
 			var dialogName = "dialogMonitorLesson" + lessonId,
@@ -83,6 +86,7 @@ function initTabs(){
 			ui.position.left += dialog.position().left;
 		},
 		'stop' : function(event, ui) {
+			$(window.parent.document.body).off('mouseup');
 			var dialogName = "dialogMonitorLesson" + lessonId,
 				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog');
 			dialog.offset({
