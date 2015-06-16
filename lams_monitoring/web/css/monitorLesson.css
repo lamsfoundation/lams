@@ -9,6 +9,10 @@ div#tabs {
 	padding: 0px;
 }
 
+div#tabs ul {
+	cursor: move;
+}
+
 div#tabs ul li a {
 	border-bottom: none;
 }
