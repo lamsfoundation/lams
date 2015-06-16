@@ -117,6 +117,13 @@ td#messageCell {
 	padding: 3px;
 }
 
+#dragHelper {
+	border: thin black solid;
+	background : transparent;
+	/* z-index has to be less than the dialog otherwise the helper won't drag in Chrome and IE */
+	z-index: 50;
+}
+
 /* Style for Monitoring and Add Lesson dialogs.
    Put the transparent dialog's titlebar over the tab bar. */
 body > .tabbedDialog .ui-dialog-titlebar {
@@ -133,5 +140,6 @@ body > .tabbedDialog .ui-dialog-titlebar {
 }
 
 body > .addLessonDialog .ui-dialog-titlebar {
+	width: 25px;
 	right : 10px;
 }
