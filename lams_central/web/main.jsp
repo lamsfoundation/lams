@@ -241,7 +241,7 @@
 	</div>
 	<div id="footer">
 		<p>
-			<a id="openFla" style="color: #999999; text-decoration: none; border: none;" href="#"
+			<a id="openFla" style="color: #999999; text-decoration: none; border: none;"
 			   onClick="javascript:showFlashlessAuthoringDialog()">
 				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
 			</a>

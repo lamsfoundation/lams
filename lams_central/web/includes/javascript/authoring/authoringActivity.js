@@ -495,6 +495,10 @@ ActivityDraw = {
 							   layout.colors.optionalActivity);
 		}
 		
+		if (this.grouping) {
+			ActivityLib.addGroupingEffect(this);
+		}
+		
 		if (!isReadOnlyMode){
 			// allow transition drawing and other activity behaviour
 			this.items.shape.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
@@ -707,9 +711,9 @@ ActivityLib = {
 					activityBox.height)
 				.attr({
 					'fill' : shape.attr('fill')
-				});
+				})
+				.toBack();
 			
-			shape.toFront();
 			activity.items.push(activity.items.groupingEffect);
 			
 			// this is needed, for some reason, otherwise the activity can not be selected
