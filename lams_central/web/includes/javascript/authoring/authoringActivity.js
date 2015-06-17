@@ -587,6 +587,12 @@ ActivityDraw = {
 		this.items = paper.setFinish();
 
 		this.items.toBack();
+		
+		// region annotations could cover grouping effect
+		$.each(layout.regions, function(){
+			this.items.shape.toBack();
+		});
+		
 		this.items.data('parentObject', this);
 		
 		if (!isReadOnlyMode){
@@ -715,6 +721,11 @@ ActivityLib = {
 				.toBack();
 			
 			activity.items.push(activity.items.groupingEffect);
+			
+			// region annotations could cover grouping effect
+			$.each(layout.regions, function(){
+				this.items.shape.toBack();
+			});
 			
 			// this is needed, for some reason, otherwise the activity can not be selected
 			HandlerLib.resetCanvasMode(true);
