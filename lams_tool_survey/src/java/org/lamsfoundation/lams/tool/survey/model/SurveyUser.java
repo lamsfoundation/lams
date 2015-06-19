@@ -73,6 +73,17 @@ public class SurveyUser implements Cloneable {
 	this.survey = content;
 	this.responseFinalized = false;
     }
+    
+    public SurveyUser(Long userId, String firstName, String lastName, String login, Survey content) {
+	this.userId = userId;
+	this.firstName = firstName;
+	this.lastName = lastName;
+	this.loginName = login;
+	this.session = null;
+	this.survey = content;
+	this.responseFinalized = false;
+    }
+
 
     /**
      * Clone method from <code>java.lang.Object</code>

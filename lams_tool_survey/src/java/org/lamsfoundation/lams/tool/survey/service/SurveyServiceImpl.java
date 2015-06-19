@@ -42,6 +42,9 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -50,6 +53,8 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -83,6 +88,7 @@ import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -92,7 +98,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * @author Dapeng.Ni
  */
 public class SurveyServiceImpl implements ISurveyService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
     private static Logger log = Logger.getLogger(SurveyServiceImpl.class.getName());
 
     // DAO
@@ -672,13 +678,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    SurveyUser user = surveyUserDao
 		    .getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
 	    if (user == null) {
-		user = new SurveyUser();
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
-		user.setFirstName(sysUser.getFirstName());
-		user.setLastName(sysUser.getLastName());
-		user.setLoginName(sysUser.getLogin());
-		user.setUserId(new Long(newUserUid.longValue()));
-		user.setSurvey(toolContentObj);
+		user = new SurveyUser(sysUser, toolContentObj);
 	    }
 	    toolContentObj.setCreatedBy(user);
 
@@ -1099,5 +1100,83 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     public void setSurveyOutputFactory(SurveyOutputFactory surveyOutputFactory) {
 	this.surveyOutputFactory = surveyOutputFactory;
+    }
+    
+    // ****************** REST methods *************************
+
+    /**
+     * Used by the Rest calls to create content.
+     * 
+     * Mandatory fields in toolContentJSON: title, instructions, questions. Optional fields are lockWhenFinished
+     * (default true), showOnePage (default true), notifyTeachersOnAnswerSumbit (default false), showOtherUsersAnswers
+     * (default false), reflectOnActivity, reflectInstructions, submissionDeadline
+     * 
+     * Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields:
+     * questionText, type (1=one answer,2=multiple answers,3=free text entry) and answers. Answers is a JSONArray of
+     * strings, which are the answer text. A question may also have the optional fields: allowOtherTextEntry (default
+     * false), required (default true)
+     * 
+     * There should be at least one question object in the Questions array and at least one option in the Options array.
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
+
+	Survey survey = new Survey();
+	Date updateDate = new Date();
+	survey.setCreated(updateDate);
+	survey.setUpdated(updateDate);
+
+	survey.setContentId(toolContentID);
+	survey.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	survey.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+
+	survey.setContentInUse(false);
+	survey.setDefineLater(false);
+	survey.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.TRUE));
+	survey.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	survey.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	survey.setNotifyTeachersOnAnswerSumbit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnAnswerSumbit", Boolean.FALSE));
+	survey.setShowOnePage(JsonUtil.opt(toolContentJSON, "showOnePage", Boolean.TRUE));
+	survey.setShowOtherUsersAnswers(JsonUtil.opt(toolContentJSON, "showOtherUsersAnswers", Boolean.FALSE));
+
+	// submissionDeadline is set in monitoring
+
+	SurveyUser surveyUser = new SurveyUser(userID.longValue(), toolContentJSON.getString("firstName"),
+		toolContentJSON.getString("lastName"), toolContentJSON.getString("loginName"), survey);
+	survey.setCreatedBy(surveyUser);
+
+	// **************************** Handle Survey Questions *********************
+
+	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
+	for (int i = 0; i < questions.length(); i++) {
+	    JSONObject questionData = (JSONObject) questions.get(i);
+	    SurveyQuestion newQuestion = new SurveyQuestion();
+	    newQuestion.setCreateBy(surveyUser);
+	    newQuestion.setCreateDate(updateDate);
+	    newQuestion.setDescription(questionData.getString(RestTags.QUESTION_TEXT));
+	    newQuestion.setType((short) questionData.getInt("type"));
+	    newQuestion.setAppendText(JsonUtil.opt(questionData, "allowOtherTextEntry", Boolean.FALSE));
+	    Boolean required = JsonUtil.opt(questionData, "required", Boolean.TRUE);
+	    newQuestion.setOptional(!required);
+	    newQuestion.setSequenceId(i + 1); // sequence number starts at 1
+
+	    Set<SurveyOption> newOptions = new HashSet<SurveyOption>();
+	    JSONArray options = questionData.getJSONArray(RestTags.ANSWERS);
+	    for (int j = 0; j < options.length(); j++) {
+		SurveyOption newOption = new SurveyOption();
+		newOption.setDescription(options.getString(j));
+		newOption.setSequenceId(j); // sequence number starts at 0
+		newOptions.add(newOption);
+	    }
+	    newQuestion.setOptions(newOptions);
+
+	    survey.getQuestions().add(newQuestion);
+	}
+
+	saveOrUpdateSurvey(survey);
+	// *******************************
+	// TODO - investigate conditions
+	// survey.setConditions(conditions);
     }
 }
