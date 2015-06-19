@@ -661,6 +661,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Survey toolContentObj = surveyDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -683,6 +684,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
     }
 
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
@@ -719,14 +721,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Survey survey = surveyDao.getByContentId(toolContentId);
@@ -740,6 +735,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return getSurveyOutputFactory().getToolOutputDefinitions(survey, definitionType);
     }
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SharedSurveyFiles tool seession");
@@ -771,6 +767,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getSurveyByContentId(toolContentId).getTitle();
     }
@@ -840,6 +837,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	surveySessionDao.saveObject(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    SurveyServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -852,37 +850,35 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	surveySessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getSurveyOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getSurveyOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */

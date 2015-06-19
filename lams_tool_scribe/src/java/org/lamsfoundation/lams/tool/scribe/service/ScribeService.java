@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -83,7 +84,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 public class ScribeService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, ToolRestManager, 
 	IScribeService {
 
-    static Logger logger = Logger.getLogger(ScribeService.class.getName());
+    private static Logger logger = Logger.getLogger(ScribeService.class.getName());
 
     private IScribeDAO scribeDAO = null;
 
@@ -105,10 +106,11 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     public ScribeService() {
 	super();
-	// TODO Auto-generated constructor stub
     }
 
     /* ************ Methods from ToolSessionManager ************* */
+    
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ScribeService.logger.isDebugEnabled()) {
 	    ScribeService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
@@ -126,48 +128,46 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribeSessionDAO.saveOrUpdate(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	scribeSessionDAO.deleteBySessionID(toolSessionId);
 	// TODO check if cascade worked
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ************ Methods from ToolContentManager ************************* */
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (ScribeService.logger.isDebugEnabled()) {
@@ -202,11 +202,13 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribeDAO.saveOrUpdate(scribe);
     }
 
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	// TODO Auto-generated method stub
     }
     
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (logger.isDebugEnabled()) {
@@ -252,15 +254,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	}
     }
     
-    /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
-     * @throws ToolException
-     *                 if any other error occurs
-     */
-
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Scribe scribe = scribeDAO.getByContentId(toolContentId);
 	if (scribe == null) {
@@ -287,12 +281,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	}
     }
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *                 if any other error occurs
-     */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
@@ -317,23 +306,18 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
  
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getScribeByContentId(toolContentId).getTitle();
     }
     
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getScribeByContentId(toolContentId).isDefineLater();
     }

@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -121,40 +122,34 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
     }
 
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
     @SuppressWarnings("unchecked")
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	bbbSessionDAO.deleteByProperty(BbbSession.class, "sessionId", toolSessionId);
 	// TODO check if cascade worked
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util .List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* Methods from ToolContentManager */

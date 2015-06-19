@@ -949,15 +949,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return true;
     }
 
-    /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
-     * @throws ToolException
-     *             if any other error occurs
-     */
-
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Forum toolContentObj = forumDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -993,12 +985,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
     }
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *             if any other error occurs
-     */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
@@ -1053,14 +1040,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Forum forum = getForumByContentId(toolContentId);
@@ -1070,18 +1050,17 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return getForumOutputFactory().getToolOutputDefinitions(forum, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getForumByContentId(toolContentId).getTitle();
     }
     
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getForumByContentId(toolContentId).isDefineLater();
     }
     
-    /**
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String,
-     *      java.lang.Long)
-     */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ForumToolSession session = new ForumToolSession();
 	session.setSessionId(toolSessionId);
@@ -1114,6 +1093,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    ForumService.log.error("Fail to leave tool Session based on null tool session id.");
@@ -1136,46 +1116,40 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	forumToolSessionDao.delete(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 
 	return forumOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
 
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return forumOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getDefaultContent(java.lang.Long)
-     */
+    @Override
     public Forum getDefaultContent(Long contentID) {
 	if (contentID == null) {
 	    String error = "Could not retrieve default content id for Forum tool";

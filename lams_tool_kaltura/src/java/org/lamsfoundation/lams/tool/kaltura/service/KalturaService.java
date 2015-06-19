@@ -173,6 +173,11 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getKalturaOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
     /* ************ Methods from ToolContentManager ************************* */
 

@@ -1199,16 +1199,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	return data;
     }
 
-    /**
-     * implemented as part of the Tool Contract copyToolContent(Long fromContentId, Long toContentId) throws
-     * ToolException
-     * 
-     * @param fromContentId
-     * @param toContentId
-     * @return
-     * @throws ToolException
-     * 
-     */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) {
 
 	if (fromContentId == null) {
@@ -1239,15 +1230,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * implemented as part of the tool contract. Removes content and uploaded files from the content repository.
-     * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
-     * 
-     * @param toContentId
-     * @param removeSessionData
-     * @return
-     * @throws ToolException
-     */
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 
@@ -1291,6 +1274,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	mcContentDAO.saveMcContent(mcContent);
     }    
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (logger.isDebugEnabled()) {
@@ -1319,15 +1303,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
     
-    /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
-     * @throws ToolException
-     *             if any other error occurs
-     */
-
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	McContent toolContentObj = mcContentDAO.findMcContentById(toolContentId);
 	if (toolContentObj == null) {
@@ -1348,12 +1324,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *             if any other error occurs
-     */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
@@ -1377,14 +1348,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	McContent content = getMcContent(toolContentId);
@@ -1395,10 +1359,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	return getMcOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return  mcContentDAO.findMcContentById(toolContentId).getTitle();
     }
     
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return  mcContentDAO.findMcContentById(toolContentId).isDefineLater();
     }
@@ -1415,20 +1381,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	return mcSession != null;
     }
 
-    /**
-     * Implemented as part of the tool contract. Gets called only in the Learner mode. All the learners in the same
-     * group have the same toolSessionId.
-     * 
-     * @param toolSessionId
-     *            the generated tool session id.
-     * @param toolSessionName
-     *            the tool session name.
-     * @param toolContentId
-     *            the tool content id specified.
-     * @throws ToolException
-     *             if an error occurs e.g. defaultContent is missing.
-     * 
-     */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 
 	if (toolSessionId == null) {
@@ -1453,15 +1406,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * Implemented as part of the tool contract. removeToolSession(Long toolSessionId) throws DataMissingException,
-     * ToolException
-     * 
-     * @param toolSessionId
-     * @param toolContentId
-     *            return
-     * @throws ToolException
-     */
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    McServicePOJO.logger.error("toolSessionId is null");
@@ -1490,16 +1435,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * Implemtented as part of the tool contract. leaveToolSession(Long toolSessionId,Long learnerId) throws
-     * DataMissingException, ToolException
-     * 
-     * @param toolSessionId
-     * @param learnerId
-     *            return String
-     * @throws ToolException
-     * 
-     */
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 
 	if (learnerService == null) {
@@ -1535,49 +1471,62 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	return nextUrl;
     }
 
-    /**
-     * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
-     * 
-     * @param toolSessionId
-     *            return ToolSessionExportOutputData
-     * @throws ToolException
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
     }
 
-    /**
-     * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
-     * 
-     * @param toolSessionIds
-     *            return ToolSessionExportOutputData
-     * @throws ToolException
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	throw new ToolException("not yet implemented");
 
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-
 	return mcOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return mcOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	Long userId = user.getUserId().longValue();
+
+	McSession session = getMcSessionById(toolSessionId);
+	if ((session == null) || (session.getMcContent() == null)) {
+	    return;
+	}
+	McContent content = session.getMcContent();
+
+	// copy answers only in case leader aware feature is ON
+	if (content.isUseSelectLeaderToolOuput()) {
+
+	    McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
+	    // create user if he hasn't accessed this activity yet
+	    if (mcUser == null) {
+
+		String userName = user.getLogin();
+		String fullName = user.getFirstName() + " " + user.getLastName();
+		mcUser = new McQueUsr(userId, userName, fullName, session, new TreeSet());
+		mcUserDAO.saveMcUser(mcUser);
+	    }
+
+	    McQueUsr groupLeader = session.getGroupLeader();
+
+	    // check if leader has submitted answers
+	    if (groupLeader != null && groupLeader.isResponseFinalised()) {
+
+		// we need to make sure specified user has the same scratches as a leader
+		copyAnswersFromLeader(mcUser, groupLeader);
+	    }
+
+	}
+
     }
 
     public IToolVO getToolBySignature(String toolSignature) throws McApplicationException {
