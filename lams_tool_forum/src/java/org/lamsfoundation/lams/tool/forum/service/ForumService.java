@@ -1595,7 +1595,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     /** Used by the Rest calls to create content. 
      * Mandatory fields in toolContentJSON: title, instructions, topics.
      * Topics must contain a JSONArray of JSONObject objects, which have the following mandatory fields: subject, body
-     * There should be at least one topic object in the Topics array.
+     * There will usually be at least one topic object in the Topics array but the array may be of zero length.
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
@@ -1653,30 +1653,30 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	// **************************** Handle topic *********************
 	JSONArray topics = toolContentJSON.getJSONArray("topics");
-	for (int i=0; i<topics.length(); i++) {
-	    JSONObject msgData = (JSONObject) topics.get(i);
-	    Message newMsg = new Message();
-//	    newMsg.setAttachments(attachments); TODO
-	    newMsg.setCreatedBy(forumUser);
-	    newMsg.setCreated(updateDate);
-	    newMsg.setModifiedBy(null);
-	    newMsg.setUpdated(updateDate);
-
-	    newMsg.setSubject(msgData.getString("subject"));
-	    newMsg.setBody(msgData.getString("body"));
-	    newMsg.setForum(forum);
-	    newMsg.setHideFlag(false);
-	    // newMsg.setIsAnonymous(false); Does not appear on authoring interface
-	    newMsg.setIsAuthored(true);
-	    newMsg.setLastReplyDate(updateDate);
-	    newMsg.setParent(null);
-	    newMsg.setReplyNumber(0);
-	    newMsg.setReport(null);
-	    newMsg.setSequenceId(1);
-//	    newMsg.setSessionClones(sessionClones); Used for updating in monitoring
-	    newMsg.setToolSession(null);
-	    createRootTopic(forum.getUid(), (ForumToolSession)null, newMsg);
-	}
+    	for (int i=0; i<topics.length(); i++) {
+    	    JSONObject msgData = (JSONObject) topics.get(i);
+    	    Message newMsg = new Message();
+    //	    newMsg.setAttachments(attachments); TODO
+    	    newMsg.setCreatedBy(forumUser);
+    	    newMsg.setCreated(updateDate);
+    	    newMsg.setModifiedBy(null);
+    	    newMsg.setUpdated(updateDate);
+    
+    	    newMsg.setSubject(msgData.getString("subject"));
+    	    newMsg.setBody(msgData.getString("body"));
+    	    newMsg.setForum(forum);
+    	    newMsg.setHideFlag(false);
+    	    // newMsg.setIsAnonymous(false); Does not appear on authoring interface
+    	    newMsg.setIsAuthored(true);
+    	    newMsg.setLastReplyDate(updateDate);
+    	    newMsg.setParent(null);
+    	    newMsg.setReplyNumber(0);
+    	    newMsg.setReport(null);
+    	    newMsg.setSequenceId(1);
+    //	    newMsg.setSessionClones(sessionClones); Used for updating in monitoring
+    	    newMsg.setToolSession(null);
+    	    createRootTopic(forum.getUid(), (ForumToolSession)null, newMsg);
+    	}
 	
 	// *******************************
 	// TODO - investigate
