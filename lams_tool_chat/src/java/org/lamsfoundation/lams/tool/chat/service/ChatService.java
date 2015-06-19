@@ -37,6 +37,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -45,6 +47,8 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -68,6 +72,7 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -79,7 +84,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class ChatService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, IChatService {
+public class ChatService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, IChatService, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(ChatService.class.getName());
 
@@ -785,4 +790,37 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return getChatOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
     // =========================================================================================
+    
+    // ****************** REST methods *************************
+
+    /** Used by the Rest calls to create content. 
+     * Mandatory fields in toolContentJSON: title, instructions
+     * Optional fields reflectInstructions, lockWhenFinished, filterKeywords
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+
+	Chat content = new Chat();
+	Date updateDate = new Date();
+	content.setCreateDate(updateDate);
+	content.setUpdateDate(updateDate);
+	content.setToolContentId(toolContentID);
+	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	content.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	content.setCreateBy(userID.longValue());
+	
+	content.setContentInUse(false);
+	content.setDefineLater(false);
+	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	
+	String filterKeywords = JsonUtil.opt(toolContentJSON, "filterKeywords", null);
+	content.setFilteringEnabled(filterKeywords != null && filterKeywords.length()>0);
+	content.setFilterKeywords(filterKeywords);
+	// submissionDeadline is set in monitoring
+
+	saveOrUpdateChat(content);
+
+    }
 }
