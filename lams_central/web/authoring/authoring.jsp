@@ -103,7 +103,7 @@
 				<fmt:message key="authoring.fla.sequence" var="SEQUENCE_VAR"/>
 				SEQUENCE : '<c:out value="${SEQUENCE_VAR}" />',
 				<fmt:message key="authoring.fla.sequence.not.valid" var="SEQUENCE_NOT_VALID_VAR"/>
-				SEQUENCE_NOT_VALID : '<c:out value="${SEQUENCE_NOT_VALID_VAR}" />',
+				SEQUENCE_NOT_VALID : decoderDiv.html('<c:out value="${SEQUENCE_NOT_VALID_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.validation.issues" var="SEQUENCE_VALIDATION_ISSUES_VAR"/>
 				SEQUENCE_VALIDATION_ISSUES : '<c:out value="${SEQUENCE_VALIDATION_ISSUES_VAR}" />',
 				<fmt:message key="authoring.fla.save.successful" var="SAVE_SUCCESSFUL_VAR"/>
