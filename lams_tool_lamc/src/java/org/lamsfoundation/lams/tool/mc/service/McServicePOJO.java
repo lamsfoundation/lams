@@ -2034,12 +2034,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	mcq.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS,""));
 	mcq.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 	mcq.setRandomize(JsonUtil.opt(toolContentJSON, "randomize", Boolean.FALSE));
-	mcq.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, (Date)null));
 	mcq.setShowReport(JsonUtil.opt(toolContentJSON, "showReport", Boolean.FALSE));
 	mcq.setDisplayAnswers(JsonUtil.opt(toolContentJSON, "displayAnswers", Boolean.FALSE));
 	mcq.setShowMarks(JsonUtil.opt(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.opt(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.opt(toolContentJSON, "passMark", 0));
+	// submissionDeadline is set in monitoring
 	
 	createMc(mcq);
 	
