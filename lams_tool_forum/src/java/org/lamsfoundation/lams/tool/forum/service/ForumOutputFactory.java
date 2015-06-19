@@ -148,7 +148,7 @@ public class ForumOutputFactory extends OutputFactory {
 	    Map<Date, Set<String>> answers = new HashMap<Date, Set<String>>();
 
 	    ForumUser user = forumService.getUserByUserAndSession(learnerId, toolSessionId);
-	    List<MessageDTO> userMessages = forumService.getMessagesByUserUid(user.getUid(), toolSessionId);
+	    List<MessageDTO> userMessages = user == null ? null : forumService.getMessagesByUserUid(user.getUid(), toolSessionId);
 
 	    if (userMessages != null) {
 		for (MessageDTO messageDTO : userMessages) {
