@@ -63,7 +63,7 @@ var paper = null,
 			'arrangeHorizontalPadding'         : 35,
 			'arrangeVerticalPadding'           : 50,
 			
-			'dragStartThreshold'               : 300,
+			'dragStartThreshold'               : 100,
 			
 			'propertiesDialogDimOpacity'       : 0.3,
 			'propertiesDialogDimThreshold'     : 100,
