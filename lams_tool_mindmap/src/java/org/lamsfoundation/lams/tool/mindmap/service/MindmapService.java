@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -41,6 +43,8 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -66,6 +70,7 @@ import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -79,7 +84,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  * ToolContentManager and ToolSessionManager.
  */
 public class MindmapService implements ToolSessionManager, ToolContentManager, IMindmapService,
-	ToolContentImport102Manager {
+	ToolContentImport102Manager, ToolRestManager {
 
     static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
@@ -926,5 +931,46 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getMindmapOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    // ****************** REST methods *************************
+
+    /** Used by the Rest calls to create content.  Creates default nodes as seen when first opening authoring.
+     * Mandatory fields in toolContentJSON: title, instructions
+     * Optional fields: multiUserMode (default false), lockWhenFinished (default false), reflectOnActivity (default false), reflectInstructions
+     */
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+
+	Mindmap content = new Mindmap();
+	Date updateDate = new Date();
+	content.setToolContentId(toolContentID);
+	content.setCreateDate(updateDate);
+	content.setUpdateDate(updateDate);
+	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	content.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	content.setContentInUse(false);
+	content.setDefineLater(false);
+	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	content.setMultiUserMode(JsonUtil.opt(toolContentJSON, "multiUserMode", Boolean.FALSE));
+
+	// createdBy and submissionDeadline are null in the database using the standard authoring module
+	// submissionDeadline is set in monitoring
+	// content.setSubmissionDeadline((Date) JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, null));
+	// content.setCreatedBy(user);
+	// content.setMindmapExportContent(exportContent) only set by export, not by authoring
+	saveOrUpdateMindmap(content);
+
+	// creating default nodes for current mindmap
+	String rootNodeName = getMindmapMessageService().getMessage("node.root.defaultName");
+	String childNodeName1 = getMindmapMessageService().getMessage("node.child1.defaultName");
+	String childNodeName2 = getMindmapMessageService().getMessage("node.child2.defaultName");
+	    
+	MindmapNode rootMindmapNode = saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, content, null);
+	saveOrUpdateMindmapNode(rootMindmapNode);
+	saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, content, null);
+	saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, content, null);
     }
 }
