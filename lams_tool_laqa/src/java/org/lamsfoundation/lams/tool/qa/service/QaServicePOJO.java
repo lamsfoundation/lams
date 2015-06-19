@@ -114,8 +114,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
-	ToolRestManager, QaAppConstants {
+public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager,
+	QaAppConstants  {
     private static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 
     private IQaContentDAO qaDAO;
@@ -1454,8 +1454,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS,(String)null));
 	qa.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 
-	qa.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE,(Date)null));
-
+	// submissionDeadline is set in monitoring
 	// qa.setMonitoringReportTitle(); Can't find this field in the database - assuming unused.
 	// qa.setReportTitle(); Can't find this field in the database - assuming unused.
 	// qa.setContent(content);  Can't find this field in the database - assuming unused.
@@ -1469,7 +1468,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		    questionData.getInt(RestTags.DISPLAY_ORDER), 
 		    JsonUtil.opt(questionData,"feedback",(String)null), 
 		    JsonUtil.opt(questionData, "required", Boolean.FALSE),
-		    questionData.getInt("minWordsLimit"), qa );
+		    JsonUtil.opt(questionData,"minWordsLimit",0), qa );
 	    saveOrUpdateQuestion(question);
 	}
 
