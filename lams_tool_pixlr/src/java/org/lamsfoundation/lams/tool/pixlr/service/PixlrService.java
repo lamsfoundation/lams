@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrException;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -91,7 +92,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 
 public class PixlrService implements ToolSessionManager, ToolContentManager, IPixlrService, ToolContentImport102Manager {
 
-    static Logger logger = Logger.getLogger(PixlrService.class.getName());
+    private static Logger logger = Logger.getLogger(PixlrService.class.getName());
 
     public static final String EXPORT_IMAGE_FILE_NAME = "authorImage";
 
@@ -119,10 +120,11 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     public PixlrService() {
 	super();
-	// TODO Auto-generated constructor stub
     }
 
     /* ************ Methods from ToolSessionManager ************* */
+    
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (PixlrService.logger.isDebugEnabled()) {
 	    PixlrService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
@@ -139,49 +141,47 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	pixlrSessionDAO.saveOrUpdate(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public ToolSessionExportOutputData exportToolSession(List ToolSessionIds) throws DataMissingException,
 	    ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	pixlrSessionDAO.deleteBySessionID(toolSessionId);
 	// TODO check if cascade worked
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getPixlrOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getPixlrOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
     /* ************ Methods from ToolContentManager ************************* */
-
+    
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (PixlrService.logger.isDebugEnabled()) {

@@ -68,8 +68,8 @@ import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstant
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.JsonUtil;
 
 /**
  * An implementation of the ILeaderselectionService interface.
@@ -154,6 +154,11 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getLeaderselectionOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    } 
 
     /* ************ Methods from ToolContentManager ************************* */
     @Override

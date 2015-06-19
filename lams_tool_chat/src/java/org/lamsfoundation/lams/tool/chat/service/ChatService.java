@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -128,6 +129,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	chatSessionDAO.saveOrUpdate(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 
 	// TODO issues with session status/start date/ end date. Need to
@@ -167,44 +169,43 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	chatSessionDAO.deleteBySessionID(toolSessionId);
 	// TODO check if cascade worked
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getChatOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getChatOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* Methods from ToolContentManager */
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (ChatService.logger.isDebugEnabled()) {

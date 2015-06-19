@@ -755,6 +755,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	ImageGallery toolContentObj = imageGalleryDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -810,6 +811,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
     }
 
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
@@ -862,14 +864,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	ImageGallery imageGallery = getImageGalleryByContentId(toolContentId);
@@ -879,6 +874,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return getImageGalleryOutputFactory().getToolOutputDefinitions(imageGallery, definitionType);
     }
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SharedImageGalleryFiles tool seession");
@@ -916,6 +912,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGalleryDao.saveObject(toContent);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).getTitle();
     }
@@ -929,10 +926,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGallery.setDefineLater(false);
     }
 
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).isDefineLater();
     }
     
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
@@ -947,6 +946,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGalleryDao.delete(imageGallery);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
@@ -1014,6 +1014,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     }
     
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ImageGallerySession session = new ImageGallerySession();
 	session.setSessionId(toolSessionId);
@@ -1023,6 +1024,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGallerySessionDao.saveObject(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    ImageGalleryServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -1046,37 +1048,35 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	imageGallerySessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return imageGalleryOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return imageGalleryOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */

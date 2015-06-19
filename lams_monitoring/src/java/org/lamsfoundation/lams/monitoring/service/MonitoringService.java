@@ -1189,6 +1189,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			learnerService.createToolSessionsIfNecessary(toolActivity, progress);
 			toolSession = lamsCoreToolService.getToolSessionByActivity(learner, toolActivity);
 		    }
+
+		    // Let activity know that the user is force completed. Currently it's been utilized only by leader
+		    // aware tools, it copies results from leader to non-leader.
+		    lamsCoreToolService.forceCompleteActivity(toolSession, progress.getUser());
+		    
 		    learnerService.completeToolSession(toolSession.getToolSessionId(), new Long(learner.getUserId()
 			    .longValue()));
 		    learnerService.completeActivity(learner.getUserId(), activity, lessonId);

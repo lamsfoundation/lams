@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -79,7 +80,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 public class NotebookService implements ToolSessionManager, ToolContentManager, INotebookService,
 	ToolContentImport102Manager, ToolRestManager {
 
-    static Logger logger = Logger.getLogger(NotebookService.class.getName());
+    private static Logger logger = Logger.getLogger(NotebookService.class.getName());
 
     private INotebookDAO notebookDAO = null;
 
@@ -112,6 +113,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     /* ************ Methods from ToolSessionManager ************* */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (NotebookService.logger.isDebugEnabled()) {
 	    NotebookService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
@@ -128,47 +130,45 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	notebookSessionDAO.saveOrUpdate(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	notebookSessionDAO.deleteBySessionID(toolSessionId);
 	// TODO check if cascade worked
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getNotebookOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getNotebookOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
     /* ************ Methods from ToolContentManager ************************* */
-
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (NotebookService.logger.isDebugEnabled()) {

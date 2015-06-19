@@ -87,7 +87,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  */
 public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager, ToolRestManager {
 
-    static Logger logger = Logger.getLogger(WikiService.class.getName());
+    private static Logger logger = Logger.getLogger(WikiService.class.getName());
 
     private IWikiDAO wikiDAO = null;
 
@@ -123,12 +123,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     /* ************ Methods from ToolSessionManager ************* */
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String,
-     *      java.lang.Long)
-     */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (WikiService.logger.isDebugEnabled()) {
 	    WikiService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
@@ -183,27 +178,28 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wikiSessionDAO.saveOrUpdate(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	wikiSessionDAO.deleteBySessionID(toolSessionId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 
 	wikiOutputFactory = getWikiOutputFactory();
@@ -214,10 +210,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return wikiOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	wikiOutputFactory = getWikiOutputFactory();
 	WikiSession session = this.getSessionBySessionId(toolSessionId);
@@ -226,12 +219,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 	return wikiOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId.
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	wikiOutputFactory = getWikiOutputFactory();
@@ -242,6 +236,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return wikiOutputFactory.getToolOutputDefinitions(wiki, definitionType);
     }
     
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getWikiByContentId(toolContentId).getTitle();
     }
@@ -331,14 +326,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
     }
     
-    /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
-     * @throws ToolException
-     *                 if any other error occurs
-     */
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
 	if (wiki == null) {
@@ -378,12 +366,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
     }
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *                 if any other error occurs
-     */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {

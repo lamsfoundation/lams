@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
@@ -1462,6 +1461,42 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return voteOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	Long userId = user.getUserId().longValue();
+
+	VoteSession session = getSessionBySessionId(toolSessionId);
+	if ((session == null) || (session.getVoteContent() == null)) {
+	    return;
+	}
+	VoteContent content = session.getVoteContent();
+
+	// copy answers only in case leader aware feature is ON
+	if (content.isUseSelectLeaderToolOuput()) {
+
+	    VoteQueUsr voteUser = voteUserDAO.getVoteUserBySession(userId, toolSessionId);
+	    // create user if he hasn't accessed this activity yet
+	    if (voteUser == null) {
+		String userName = user.getLogin();
+		String fullName = user.getFirstName() + " " + user.getLastName();
+
+		voteUser = new VoteQueUsr(userId, userName, fullName, session, new TreeSet());
+		createVoteQueUsr(voteUser);
+	    }
+
+	    VoteQueUsr groupLeader = session.getGroupLeader();
+
+	    // check if leader has submitted answers
+	    if (groupLeader != null && groupLeader.isResponseFinalised()) {
+
+		// we need to make sure specified user has the same scratches as a leader
+		copyAnswersFromLeader(voteUser, groupLeader);
+	    }
+
+	}
+
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */

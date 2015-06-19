@@ -69,6 +69,7 @@ import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -85,7 +86,7 @@ import org.xml.sax.InputSource;
 
 public class GmapService implements ToolSessionManager, ToolContentManager, IGmapService, ToolContentImport102Manager {
 
-    static Logger logger = Logger.getLogger(GmapService.class.getName());
+    private static Logger logger = Logger.getLogger(GmapService.class.getName());
 
     private IGmapDAO gmapDAO = null;
 
@@ -113,6 +114,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     }
 
     /* ************ Methods from ToolSessionManager ************* */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (GmapService.logger.isDebugEnabled()) {
 	    GmapService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
@@ -140,44 +142,41 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	}
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
-	// TODO Auto-generated method stub
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	gmapSessionDAO.deleteBySessionID(toolSessionId);
 	// TODO check if cascade worked
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ************ Methods from ToolContentManager ************************* */

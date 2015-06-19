@@ -564,6 +564,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
     }
 
+    @Override
     public DacoSession getSessionBySessionId(Long sessionId) {
 	return dacoSessionDao.getSessionBySessionId(sessionId);
     }
@@ -579,34 +580,22 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return contentId;
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return dacoOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return dacoOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Daco daco = getDacoByContentId(toolContentId);
@@ -620,28 +609,29 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return getDacoOutputFactory().getToolOutputDefinitions(daco, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getDacoByContentId(toolContentId).getTitle();
     }
     
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getDacoByContentId(toolContentId).isDefineLater();
     }
     
+    @Override
     public DacoUser getUser(Long uid) {
 	return (DacoUser) dacoUserDao.getObject(DacoUser.class, uid);
     }
 
+    @Override
     public DacoUser getUserByUserIdAndContentId(Long userId, Long contentId) {
-
 	return dacoUserDao.getUserByUserIdAndContentId(userId, contentId);
-
     }
 
+    @Override
     public DacoUser getUserByUserIdAndSessionId(Long userId, Long sessionId) {
-
 	return dacoUserDao.getUserByUserIdAndSessionId(userId, sessionId);
-
     }
 
     /*

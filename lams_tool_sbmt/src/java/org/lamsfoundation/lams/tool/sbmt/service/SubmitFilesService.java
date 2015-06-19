@@ -347,21 +347,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return getSubmitFilesContent(toolContentId).isDefineLater();
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#updateSubmitFilesContent(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
-     */
+    @Override
     public void saveOrUpdateContent(SubmitFilesContent submitFilesContent) {
 	submitFilesContent.setUpdated(new Date());
 	submitFilesContentDAO.saveOrUpdate(submitFilesContent);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesContent(java.lang.Long)
-     */
+    @Override
     public SubmitFilesContent getSubmitFilesContent(Long contentID) {
 	SubmitFilesContent content = null;
 	try {
@@ -376,11 +368,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return content;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesReport(java.lang.Long)
-     */
+    @Override
     public SubmitFilesReport getSubmitFilesReport(Long reportID) {
 	return submitFilesReportDAO.getReportByID(reportID);
     }
@@ -410,16 +398,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
-    /**
-     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
-     * repository
-     * 
-     * @param uuid
-     *                The <code>uuid</code> of the node to be deleted
-     * @param versionID
-     *                The <code>version_id</code> of the node to be deleted.
-     * @throws SubmitFilesException
-     */
+    @Override
     public void deleteFromRepository(Long uuid, Long versionID) throws SubmitFilesException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
@@ -430,12 +409,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,java.lang.String,
-     *      java.lang.Long)
-     */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) {
 	// pre-condition validation
 	if (toolSessionId == null || toolContentId == null) {
@@ -466,12 +440,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long,
-     *      org.lamsfoundation.lams.usermanagement.User)
-     */
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    SubmitFilesService.log.error("Fail to leave tool Session based on null tool session id.");
@@ -495,31 +464,17 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.lang.Long)
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) {
-	// TODO Auto-generated method stub
 	return null;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.util.List)
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) {
-	// TODO Auto-generated method stub
 	return null;
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#removeToolSession(java.lang.Long)
-     */
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    SubmitFilesService.log.error("Fail to remove tool Session based on null tool session id.");
@@ -535,7 +490,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
-    /** Remove a tool session. The session parameter must not be null. */
     private void removeToolSession(SubmitFilesSession session) {
 	Set filesUploaded = session.getSubmissionDetails();
 	if (filesUploaded != null) {
@@ -549,31 +503,22 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	submitFilesSessionDAO.delete(session);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util .List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getSubmitFilesOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getSubmitFilesOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToSession(Long,FormFile,String,Long )
-     */
+    @Override
     public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
 

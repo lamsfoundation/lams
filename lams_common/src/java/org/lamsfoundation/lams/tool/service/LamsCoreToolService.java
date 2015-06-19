@@ -423,6 +423,39 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     }
 
     @Override
+    public void forceCompleteActivity(ToolSession toolSession, User learner) throws ToolException {
+
+	if (toolSession == null) {
+	    String error = "The toolSession is not valid. Unable to force complete activity.";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	Tool tool = toolSession.getToolActivity().getTool();
+	if (tool == null) {
+	    String error = "The tool for toolSession " + toolSession.getToolSessionId() + " is missing.";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	try {
+	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
+	    sessionManager.forceCompleteUser(toolSession.getToolSessionId(), learner);
+	} catch (NoSuchBeanDefinitionException e) {
+	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to force complete activity. toolSession "
+		    + toolSession.getToolSessionId();
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	} catch (java.lang.AbstractMethodError e) {
+	    String message = "Tool "
+		    + tool.getToolDisplayName()
+		    + " doesn't support the forceCompleteUser(ToolSession toolSession, User learner) method so can't force complete learner.";
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	}
+    }
+
+    @Override
     public SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, Long toolSessionId, Integer learnerId)
 	    throws ToolException {
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);

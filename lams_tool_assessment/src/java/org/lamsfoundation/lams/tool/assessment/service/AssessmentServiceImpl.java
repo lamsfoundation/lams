@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -1763,6 +1764,38 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
     
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	Long userId = user.getUserId().longValue();
+
+	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
+	if ((session == null) || (session.getAssessment() == null)) {
+	    return;
+	}
+	Assessment assessment = session.getAssessment();
+
+	// copy answers only in case leader aware feature is ON
+	if (assessment.isUseSelectLeaderToolOuput()) {
+
+	    AssessmentUser assessmentUser = getUserByIDAndSession(userId, toolSessionId);
+	    // create user if he hasn't accessed this activity yet
+	    if (assessmentUser == null) {
+		assessmentUser = new AssessmentUser(user.getUserDTO(), session);
+		createUser(assessmentUser);
+	    }
+
+	    AssessmentUser groupLeader = session.getGroupLeader();
+
+	    // check if leader has submitted answers
+	    if (groupLeader != null && groupLeader.isSessionFinished()) {
+
+		// we need to make sure specified user has the same scratches as a leader
+		copyAnswersFromLeader(assessmentUser, groupLeader);
+	    }
+
+	}
+
+    }   
 
     public boolean isContentEdited(Long toolContentId) {
 	return getAssessmentByContentId(toolContentId).isDefineLater();
