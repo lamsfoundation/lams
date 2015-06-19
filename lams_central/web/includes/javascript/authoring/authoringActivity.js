@@ -452,7 +452,7 @@ ActivityDraw = {
 		
 		if (!isReadOnlyMode){
 			// allow transition drawing and other activity behaviour
-			this.items.shape.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
+			this.items.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
 		}
 		
 		this.items.data('parentObject', this);
@@ -501,7 +501,7 @@ ActivityDraw = {
 		
 		if (!isReadOnlyMode){
 			// allow transition drawing and other activity behaviour
-			this.items.shape.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
+			this.items.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
 		}
 		
 		this.items.data('parentObject', this);

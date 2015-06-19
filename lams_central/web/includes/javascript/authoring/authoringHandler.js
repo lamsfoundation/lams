@@ -26,16 +26,19 @@ var HandlerLib = {
 	 * Start dragging an activity or a transition.
 	 */
 	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
-		// clear "clicked" flag, just in case
-		items.clicked = false;
-		
-		// if there is already a function waiting to be started, clear it
-		if (items.dragStarter) {
-			// prevent confusion when double clicking
-			clearTimeout(items.dragStarter);
-			items.dragStarter = null;
-			return;
+		// if user clicks or drags very shortly, do not take it into account 
+		var dragCancel = function(){
+			canvas.off('mouseup');
+			// if there is already a function waiting to be started, clear it
+			if (items.dragStarter) {
+				// prevent confusion when double clicking
+				clearTimeout(items.dragStarter);
+				items.dragStarter = null;
+				return;
+			}
 		}
+		dragCancel();
+		canvas.mouseup(dragCancel);
 		
 		if (layout.drawMode || (event.originalEvent ?
 				event.originalEvent.defaultPrevented : event.defaultPrevented)){
@@ -45,13 +48,8 @@ var HandlerLib = {
 		// run only if "click" event was not generated, i.e. user really wants to drag
 		items.dragStarter = setTimeout(function(){
 			items.dragStarter = null;
-			// "clicked" flag is set by mouseup event
-			// and it means that user does not want to drag, but to click
-			if (items.clicked) {
-				items.clicked = false;
-				return;
-			}
 			
+			// show that we are in the middle of something
 			HandlerLib.resetCanvasMode();
 			items.isDragged = true;
 			items.attr('cursor', 'move');
@@ -81,17 +79,19 @@ var HandlerLib = {
 				// finish dragging - restore various elements' default state
 				items.isDragged = false;
 				items.unmouseup();
+				HandlerLib.resetCanvasMode(true);
 				layout.bin.attr('fill', 'transparent');
 				
 				// do whetver needs to be done with the dragged elements
 				mouseupHandler(mouseupEvent);
-				HandlerLib.resetCanvasMode(true);
 			};
 			
-			// if user moves mouse very quickly, mouseup event can be triggered
-			// for canvas, not the dragged elements
+			/* The event is passed from items to canvas, so it is OK to assign it only to canvas.
+			   Ufortunately, this does not apply to the icon.
+			   Also, if mousedown was on items and mouseup on canvas (very quick move),
+			   items will not accept mouseup until click.
+			*/
 			canvas.mouseup(mouseup);
-			items.mouseup(mouseup);
 			
 			GeneralLib.setModified(true);
 		}, layout.conf.dragStartThreshold);
@@ -165,8 +165,6 @@ var HandlerLib = {
 		}
 		
 		var parentObject = this.data('parentObject');
-		// inform that user wants to select, not drag the activity
-		parentObject.items.clicked = true;
 		
 		// if it's "import part" allow multiple selection of activities
 		if (activitiesOnlySelectable) {
@@ -221,8 +219,6 @@ HandlerActivityLib = {
 	 */
 	activityDblclickHandler : function(event) {
 		var activity = this.data('parentObject');
-		// inform that user wants to open, not drag the activity
-		activity.items.clicked = true;
 		ActivityLib.openActivityAuthoring(activity);
 	},
 	
