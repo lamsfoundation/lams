@@ -24,8 +24,6 @@
 
 package org.lamsfoundation.lams.tool.scribe.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -35,14 +33,11 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -72,12 +67,10 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
-import org.lamsfoundation.lams.tool.scribe.util.ScribeToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
@@ -635,7 +628,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     /** Used by the Rest calls to create content. 
      * Mandatory fields in toolContentJSON: "title", "instructions", "questions".
      * Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields: "displayOrder", "questionText"
-     * There should be at least one topic object in the "questions" array.
+     * There must be at least one topic object in the "questions" array.
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
@@ -660,11 +653,10 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribe.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scribe.setShowAggregatedReports(JsonUtil.opt(toolContentJSON, "showAggregatedReports", Boolean.FALSE));
 
-	Set headings = scribe.getScribeHeadings();
-	if ( headings == null ) {
-	    headings = new HashSet();
-	    scribe.setScribeHeadings(headings);
+	if ( scribe.getScribeHeadings() == null ) {
+	    scribe.setScribeHeadings(new HashSet());
 	}
+
 	JSONArray topics = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
 	for ( int i=0; i<topics.length(); i++) {
 	    JSONObject topic = topics.getJSONObject(i);
@@ -672,9 +664,28 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    heading.setDisplayOrder(topic.getInt(RestTags.DISPLAY_ORDER));
 	    heading.setHeadingText(topic.getString(RestTags.QUESTION_TEXT));
 	    heading.setScribe(scribe);
-	    headings.add(heading);
+	    scribe.getScribeHeadings().add(heading);
 	}
 
+	// must have at least one heading - it should be supplied by the caller but have a backup just in case.
+	// if we don't, the scribe can't actually enter any text!
+	if ( scribe.getScribeHeadings().size() == 0 ) {
+	    ScribeHeading heading = new ScribeHeading();
+	    heading.setDisplayOrder(1);
+
+	    Scribe defaultContent = getDefaultContent();
+	    Set defaultHeadings = defaultContent.getScribeHeadings();
+	    if ( defaultHeadings != null && defaultHeadings.size() > 0 ) {
+		Iterator iter = defaultHeadings.iterator();
+		if ( iter.hasNext() )
+		    heading.setHeadingText(((ScribeHeading)iter.next()).getHeadingText());
+	    }
+	    if ( heading.getHeadingText() == null )
+		heading.setHeadingText("Heading");
+	    
+	    heading.setScribe(scribe);
+	    scribe.getScribeHeadings().add(heading);
+	}
 	saveOrUpdateScribe(scribe);
 
     }
