@@ -1963,7 +1963,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	scratchie.setExtraPoint(JsonUtil.opt(toolContentJSON, "extraPoint", false));
 	scratchie.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
-	scratchie.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, RestTags.SUBMISSION_DEADLINE, (Date) null));
 
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<ScratchieItem>();
