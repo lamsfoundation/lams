@@ -106,6 +106,8 @@ public class GeneralLearnerFlowDTO implements Comparable {
     protected String initialScreen;
 
     protected String lockWhenFinished;
+    
+    protected boolean noReeditAllowed;
 
     protected String userUid;
 
@@ -655,6 +657,21 @@ public class GeneralLearnerFlowDTO implements Comparable {
      */
     public void setLockWhenFinished(String lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
+    }
+    
+    /**
+     * @return Returns the noReeditAllowed.
+     */
+    public boolean getNoReeditAllowed() {
+	return noReeditAllowed;
+    }
+
+    /**
+     * @param noReeditAllowed
+     *            The noReeditAllowed to set.
+     */
+    public void setNoReeditAllowed(boolean noReeditAllowed) {
+	this.noReeditAllowed = noReeditAllowed;
     }
 
     /**
