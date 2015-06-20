@@ -65,7 +65,7 @@
 			</div>
 		</c:if>	
 
-		<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && (generalLearnerFlowDTO.showOtherAnswers == 'true') }">
+		<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && !generalLearnerFlowDTO.noReeditAllowed && (generalLearnerFlowDTO.showOtherAnswers == 'true') }">
 			<div class="info space-bottom">
 				<fmt:message key="label.responses.locked" />								
 			</div>
@@ -116,9 +116,11 @@
 			</div>
 
 			<div class="small-space-top button-inside" >
-				<button name="redoQuestions" class="button" onclick="submitMethod('redoQuestions');" data-icon="back">
-					<fmt:message key="label.redo" />
-				</button>				
+				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
+					<button name="redoQuestions" class="button" onclick="submitMethod('redoQuestions');" data-icon="back">
+						<fmt:message key="label.redo" />
+					</button>
+				</c:if>
 			</div>
 		</html:form>
 	</div>

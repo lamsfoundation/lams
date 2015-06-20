@@ -34,14 +34,20 @@
 	    $('#allow-rate-answers').click(function() {
 	        $("#criterias-holder").toggle("slow");
 	    });
+	    
+	    $('#no-reedit-allowed').click(function() {
+	    	if ($(this).is(':checked')) {
+	    		$("#lockWhenFinished").prop('checked', true);
+	    	}
+	        $("#lockWhenFinished").prop("disabled", $(this).is(':checked'));
+	    });
 		
 	});
 	
 </script>
 
 <p>
-	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput"
-		styleClass="noBorder"/>
+	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" styleClass="noBorder"/>
 	<label for="useSelectLeaderToolOuput">
 		<fmt:message key="label.use.select.leader.tool.output" />
 	</label>
@@ -119,24 +125,29 @@
 </script>
 
 <p>
-	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"
-		styleClass="noBorder"/>
+	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced" styleClass="noBorder"/>
 	<label for="questionsSequenced">
 		<fmt:message key="radiobox.questionsSequenced" />
 	</label>
 </p>
 
 <p>
-	<html:checkbox property="lockWhenFinished" value="1" styleId="lockWhenFinished"
-		styleClass="noBorder"/>
+	<html:checkbox property="noReeditAllowed" value="1" styleId="no-reedit-allowed" styleClass="noBorder"/>
+	<label for="no-reedit-allowed">
+		<fmt:message key="label.no.reedit.allowed" />
+	</label>
+</p>
+
+<p>
+	<html:checkbox property="lockWhenFinished" value="1" styleId="lockWhenFinished" styleClass="noBorder"
+		disabled="${formBean.noReeditAllowed == 1}"/>
 	<label for="lockWhenFinished">
 		<fmt:message key="label.lockWhenFinished" />
 	</label>
 </p>
 
 <p>
-	<html:checkbox property="allowRichEditor" value="1" styleId="allowRichEditor"
-		styleClass="noBorder"/>
+	<html:checkbox property="allowRichEditor" value="1" styleId="allowRichEditor" styleClass="noBorder"/>
 	<label for="allowRichEditor">
 		<fmt:message key="label.allowRichEditor" />
 	</label>

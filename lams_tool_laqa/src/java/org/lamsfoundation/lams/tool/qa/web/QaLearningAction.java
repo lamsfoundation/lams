@@ -176,6 +176,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		forwardName = QaAppConstants.LOAD_LEARNER;
 	    }
 	}
+	
+	//in case noReeditAllowed finalize response so user can't refresh the page and post answers again
+	if (errors.isEmpty() && qaContent.isNoReeditAllowed()) {
+	    QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
+	    qaQueUsr.setResponseFinalized(true);
+	    QaLearningAction.qaService.updateUser(qaQueUsr);
+	}
 
 	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
 	generalLearnerFlowDTO.setMapAnswersPresentable(mapAnswersPresentable);
@@ -193,6 +200,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
@@ -366,6 +374,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	    boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	    generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 
 	    boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	    generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
@@ -460,6 +469,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());

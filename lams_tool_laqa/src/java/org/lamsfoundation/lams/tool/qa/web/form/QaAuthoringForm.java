@@ -61,6 +61,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String showOtherAnswers;
     protected String questionsSequenced;
     protected String lockWhenFinished;
+    protected String noReeditAllowed;
     protected String reflect;
     protected String reflectionSubject;    
     protected int maximumRates;
@@ -124,6 +125,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.monitoringReportTitle = null;
 	this.questionsSequenced = null;
 	this.lockWhenFinished = null;
+	this.noReeditAllowed = null;
 	this.reflect = null;
 	this.allowRichEditor = false;
 	this.useSelectLeaderToolOuput = false;
@@ -143,6 +145,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.notifyTeachersOnResponseSubmit = OPTION_OFF;
 	this.questionsSequenced = OPTION_OFF;
 	this.lockWhenFinished = OPTION_OFF;
+	this.noReeditAllowed = OPTION_OFF;
 	this.reflect = OPTION_OFF;
 	this.allowRichEditor = false;
 	this.required = false;
@@ -724,6 +727,21 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setLockWhenFinished(String lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
+    }
+    
+    /**
+     * @return Returns the noReeditAllowed.
+     */
+    public String getNoReeditAllowed() {
+	return noReeditAllowed;
+    }
+
+    /**
+     * @param noReeditAllowed
+     *            The noReeditAllowed to set.
+     */
+    public void setNoReeditAllowed(String noReeditAllowed) {
+	this.noReeditAllowed = noReeditAllowed;
     }
 
     /**

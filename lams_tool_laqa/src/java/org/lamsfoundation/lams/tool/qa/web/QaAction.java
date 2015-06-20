@@ -225,6 +225,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String showOtherAnswers = request.getParameter("showOtherAnswers");
 	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
+	String noReeditAllowed = request.getParameter("noReeditAllowed");
 	String allowRichEditor = request.getParameter("allowRichEditor");
 	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
 	String reflect = request.getParameter(QaAppConstants.REFLECT);
@@ -234,6 +235,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	boolean questionsSequencedBoolean = false;
 	boolean lockWhenFinishedBoolean = false;
+	boolean noReeditAllowedBoolean = false;
 	boolean usernameVisibleBoolean = false;
 	boolean allowRateQuestionsBoolean = false;
 	boolean notifyTeachersOnResponseSubmitBoolean = false;
@@ -247,6 +249,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	}
 
 	if (lockWhenFinished != null && lockWhenFinished.equalsIgnoreCase("1")) {
+	    lockWhenFinishedBoolean = true;
+	}
+	
+	if (noReeditAllowed != null && noReeditAllowed.equalsIgnoreCase("1")) {
+	    noReeditAllowedBoolean = true;
 	    lockWhenFinishedBoolean = true;
 	}
 
@@ -310,6 +317,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
 	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
 	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
+	qaContent.setNoReeditAllowed(noReeditAllowedBoolean);
 	qaContent.setReflect(reflectBoolean);
 	qaContent.setReflectionSubject(reflectionSubject);
 	qaContent.setAllowRichEditor(allowRichEditorBoolean);

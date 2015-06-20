@@ -1254,6 +1254,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	toolContentObj.setMonitoringReportTitle(null);
 	// in LAMS 2.0
 	toolContentObj.setLockWhenFinished(true);
+	toolContentObj.setNoReeditAllowed(false);
 	toolContentObj.setShowOtherAnswers(true);
 	toolContentObj.setAllowRateAnswers(false);
 	toolContentObj.setNotifyTeachersOnResponseSubmit(false);
@@ -1473,6 +1474,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qa.setDefineLater(false);
 
 	qa.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	qa.setNoReeditAllowed(JsonUtil.opt(toolContentJSON, "noReeditAllowed", Boolean.FALSE));
 	qa.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 	qa.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	qa.setMinimumRates(JsonUtil.opt(toolContentJSON, RestTags.MINIMUM_RATES, 0));
