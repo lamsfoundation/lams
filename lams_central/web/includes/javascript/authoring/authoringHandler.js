@@ -159,8 +159,8 @@ var HandlerLib = {
 	 * Selects an activity/transition/annotation.
 	 */
 	itemClickHandler : function(event) {
-		if (layout.drawMode || (event.originalEvent ?
-				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+		if (event.ctrlKey || layout.drawMode ||
+			(event.originalEvent ? event.originalEvent.defaultPrevented : event.defaultPrevented)){
 			return;
 		}
 		
@@ -172,7 +172,7 @@ var HandlerLib = {
 				ActivityLib.removeSelectEffect(parentObject);
 			} else {
 				ActivityLib.addSelectEffect(parentObject);	
-			}
+			} 
 		} else if (parentObject != layout.selectedObject) {
 			HandlerLib.canvasClickHandler(event);
 			ActivityLib.addSelectEffect(parentObject, true);
@@ -244,8 +244,6 @@ HandlerActivityLib = {
 					ActivityLib.removeActivity(activity);
 				} else {
 					// finalise movement - rewrite coordinates, see if the activity was not added to a container
-					
-
 					var originalCoordinates = HandlerLib.dropObject(activity),
 						translatedEvent = GeneralLib.translateEventOnCanvas(event),
 						endX = translatedEvent[0],
