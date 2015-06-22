@@ -80,7 +80,10 @@ var HandlerLib = {
 				items.isDragged = false;
 				items.unmouseup();
 				HandlerLib.resetCanvasMode(true);
-				layout.bin.attr('fill', 'transparent');
+				if (layout.bin.glowEffect) {
+					layout.bin.glowEffect.remove();
+					layout.bin.glowEffect = null;
+				}
 				
 				// do whetver needs to be done with the dragged elements
 				mouseupHandler(mouseupEvent);
@@ -113,9 +116,17 @@ var HandlerLib = {
 		
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
-			layout.bin.attr('fill', layout.colors.binActive);
-		} else {
-			layout.bin.attr('fill', 'transparent');
+			if (!layout.bin.glowEffect) {
+				layout.bin.glowEffect = layout.bin.glow({
+					'width'   : layout.conf.binGlowWidth,
+					'opacity' : layout.conf.binGlowOpacity,
+					'color'   : layout.colors.binGlow,
+					'offsety' : 2
+				});
+			}
+		} else if (layout.bin.glowEffect){
+			layout.bin.glowEffect.remove();
+			layout.bin.glowEffect = null;
 		}
 	},
 	

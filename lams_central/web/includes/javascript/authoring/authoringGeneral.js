@@ -45,7 +45,9 @@ var paper = null,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
 		// stores precached tool images so they can be used in exported SVG
-		'iconLib' : {},
+		'iconLib' : {
+			'bin' : 'images/authoring_bin.svg'
+		},
 		// icons for special activities
 		'toolMetadata': {
 			'gate'     : {		
@@ -82,7 +84,11 @@ var paper = null,
 			'groupingEffectPadding'			   : 5,
 			'selectEffectPadding'			   : 7,
 			
-			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined'
+			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined',
+			
+			// when mouse hovers over rubbish bin
+			'binGlowWidth'        : 10,
+			'binGlowOpacity'      : 1
 		},
 		
 		'colors' : {
@@ -95,8 +101,10 @@ var paper = null,
 			'annotationPalette'	  : ['FFFF00', '00FFFF', '8A2BE2', '7FFF00', '6495ED',
 			                   	     'FFF8DC', 'FF8C00', '00BFFF', 'DCDCDC', 'ADD8E6', '20B2AA',
 			                   	     'B0C4DE', 'FFE4E1', 'FF4500', 'EE82EE'],
-			// when mouse hover rubbish bin
-			'binActive'    		  : 'red',
+
+			// when mouse hovers over rubbish bin
+			'binGlow' 		  : 'red',
+			
 			'branchingEdgeStart'  : 'green',
 			'branchingEdgeEnd'    : 'red',
 			// highlight branching edges on mouse hover
@@ -1998,7 +2006,7 @@ GeneralLib = {
 			}
 			
 			// draw rubbish bin on canvas
-			layout.bin = paper.path(Raphael.format('M {0} {1} h -50 l 10 50 h 30 z', width - 5, height - 50));
+			layout.bin = paper.image(LAMS_URL + layout.iconLib.bin, width - 55, height - 55, 48, 48);
 			// so it can be found when SVG code gets cloned
 			$(layout.bin.node).attr('id', 'rubbishBin');
 			
