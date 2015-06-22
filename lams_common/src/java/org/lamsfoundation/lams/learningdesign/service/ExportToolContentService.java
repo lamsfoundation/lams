@@ -1312,8 +1312,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		badFileType(ldErrorMsgs, filename, "Unexpected extension");
 	    }
 
-	} catch (Exception e) {
-	    throw new ImportToolContentException(e);
+	}  catch (Exception e) {
+	    throw new ImportToolContentException("Error while importing a sequence", e);
 	}
 
 	ldResults[0] = ldId;
