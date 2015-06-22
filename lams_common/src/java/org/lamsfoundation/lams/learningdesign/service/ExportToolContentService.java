@@ -1302,7 +1302,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 
 	} catch (Exception e) {
-	    throw new ImportToolContentException(e);
+	    throw new ImportToolContentException("Error while importing a sequence", e);
 	}
 
 	ldResults[0] = ldId;

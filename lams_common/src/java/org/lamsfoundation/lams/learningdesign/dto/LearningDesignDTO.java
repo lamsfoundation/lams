@@ -696,7 +696,7 @@ public class LearningDesignDTO extends BaseDTO {
      *                The firstActivityUIID to set.
      */
     public void setFirstActivityUIID(Integer firstActivityUIID) {
-	if (!firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+	if (firstActivityUIID != null && !firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 	    this.firstActivityUIID = firstActivityUIID;
     }
 
