@@ -463,10 +463,12 @@ ActivityDraw = {
 	 * Draws a Parallel (double) Activity container
 	 */
 	parallelActivity : function(x, y) {
-		if (x == undefined || y == undefined) {
-			// if no new coordinates are given, just redraw the activity
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+		// if no new coordinates are given, just redraw the activity or give default value
+		if (x == undefined) {
+			x = this.items ? this.items.shape.getBBox().x : 0;
+		}
+		if (y == undefined) {
+			y = this.items ? this.items.shape.getBBox().y : 0;
 		}
 		
 		if (this.childActivities && this.childActivities.length > 0) {
