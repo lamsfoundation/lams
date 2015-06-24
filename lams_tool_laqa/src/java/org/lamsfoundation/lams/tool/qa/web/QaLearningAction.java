@@ -924,6 +924,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	//handle rating criterias
 	int commentsMinWordsLimit = 0;
 	boolean isCommentsEnabled = false;
+	int countRatedQuestions = 0;
 	if (qaContent.isAllowRateAnswers()) {
 	    
 	    // create itemIds list
@@ -953,13 +954,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		
 		response.setItemRatingDto(itemRatingDto);
 	    }
-	    
+
 	    // store how many items are rated
-	    int countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
-	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
+	    countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	}
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
+	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	
 	generalLearnerFlowDTO.setUserResponses(userResponses);
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
@@ -1009,7 +1010,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	//handle rating criterias
 	List<ItemRatingDTO> itemRatingDtos = null;
-	if (isAllowRateAnswers) {
+	if (isAllowRateAnswers && !responses.isEmpty()) {
 	    //create itemIds list
 	    List<Long> itemIds = new LinkedList<Long>();
 	    for (QaUsrResp response : responses) {
