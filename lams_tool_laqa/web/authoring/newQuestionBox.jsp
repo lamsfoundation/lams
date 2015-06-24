@@ -209,7 +209,7 @@
 				</label>
 			</div>
 			
-			<div class="field-name space-top" >
+			<div class="field-name small-space-top" >
 				<label for="min-words-limit">
 					<fmt:message key="label.minimum.number.words" >
 						<fmt:param> </fmt:param>
@@ -218,7 +218,7 @@
 				<html:text property="minWordsLimit" styleId="min-words-limit"/>
 			</div>
 
-            <div class="field-name space-top">
+            <div class="field-name small-space-top">
                 <fmt:message key="label.feedback"></fmt:message>
             </div>
             <lams:STRUTS-textarea property="feedback" rows="3" cols="75"/>

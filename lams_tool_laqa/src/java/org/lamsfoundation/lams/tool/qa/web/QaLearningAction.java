@@ -49,6 +49,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
@@ -116,6 +117,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
+	
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
+	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (qaQueUsr.isResponseFinalized()) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStarter"));
+	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	    redirect.addParameter(MODE, "learner");
+	    return redirect;
+	}
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 
@@ -179,7 +189,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	//in case noReeditAllowed finalize response so user can't refresh the page and post answers again
 	if (errors.isEmpty() && qaContent.isNoReeditAllowed()) {
-	    QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	    qaQueUsr.setResponseFinalized(true);
 	    QaLearningAction.qaService.updateUser(qaQueUsr);
 	}
@@ -245,9 +254,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    HttpServletResponse response) throws IOException, ServletException {
 	initializeQAService();
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
+	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
+	//prohibit users from autosaving answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (qaQueUsr.isResponseFinalized()) {
+	    return null;
+	}
 
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 	int intTotalQuestionCount = qaContent.getQaQueContents().size();
@@ -320,6 +335,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO,
 		QaLearningAction.qaService);
+	
+	//in order to track whether redo button is pressed store this info
+	qaQueUsr.setResponseFinalized(false);
+	QaLearningAction.qaService.updateUser(qaQueUsr);
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	qaLearningForm.resetAll();
@@ -409,7 +428,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    }
 
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	    return (mapping.findForward(QaAppConstants.INDIVIDUAL_LEARNER_REPORT));
+	    return (mapping.findForward(QaAppConstants.LEARNER_REP));
 
 	} else if (qaContent.isReflect()) {
 	    return forwardtoReflection(mapping, request, qaContent, toolSessionID, userID, qaLearningForm);
@@ -496,7 +515,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	return (mapping.findForward(QaAppConstants.INDIVIDUAL_LEARNER_REPORT));
+	return (mapping.findForward(QaAppConstants.LEARNER_REP));
     }
 
     /**
@@ -525,6 +544,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
+	
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
+	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (qaQueUsr.isResponseFinalized()) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStarter"));
+	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	    redirect.addParameter(MODE, "learner");
+	    return redirect;
+	}
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 
@@ -663,6 +691,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.setToolSessionID(toolSessionID);
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
+	
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
+	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (qaQueUsr.isResponseFinalized()) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStarter"));
+	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	    redirect.addParameter(MODE, "learner");
+	    return redirect;
+	}
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 
