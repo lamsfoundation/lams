@@ -186,13 +186,6 @@
 	        path="/learning/LearnerRep.jsp"
 		    redirect="false"
 	      />
-	      
-	      <forward
-	        name="learningStarter"
-	        path="/learningIndex.jsp"
-		    redirect="false"
-	      />
-
 
 	     <forward
 	        name="revisitedLearnerRep"
@@ -247,8 +240,8 @@
 	      
 	    <forward
 	        name="learningStarter"
-	        path="/learningIndex.jsp"
-		    redirect="false"
+	        path="/learningStarter.do"
+		    redirect="true"
 	      />
       
 	      <forward

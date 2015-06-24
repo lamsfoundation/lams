@@ -286,7 +286,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	    return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
+	    return (mapping.findForward(LEARNER_REP));
 	}
 
 	//check if there is submission deadline
@@ -344,7 +344,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			return (mapping.findForward(REVISITED_LEARNER_REP));
 		    } else {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(false).toString());
-			return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
+			return (mapping.findForward(LEARNER_REP));
 		    }
 		}
 	    }
