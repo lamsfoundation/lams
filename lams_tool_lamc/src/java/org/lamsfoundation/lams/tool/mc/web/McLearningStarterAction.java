@@ -42,6 +42,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -247,29 +248,14 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	sessionMap.put(ATTR_CONTENT, mcContent);
 	request.setAttribute("sessionMapID", sessionMap.getSessionID());
 
-	if (mode.equals("teacher")) {
-
-	    /* LEARNER_PROGRESS for jsp */
-	    mcLearningForm.setLearnerProgress(new Boolean(true).toString());
-	    mcLearningForm.setLearnerProgressUserId(user.getQueUsrId().toString());
-
-	    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
-
-	    request.setAttribute(McAppConstants.REQUEST_BY_STARTER, new Boolean(true).toString());
+	/* user has already submitted response once OR it's a monitor - go to viewAnswers page. */
+	if (user.isResponseFinalised() || mode.equals("teacher")) {
 	    
-	    McLearningAction mcLearningAction = new McLearningAction();
-	    mcLearningAction.setServlet(servlet);
-	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
-	}
-
-	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
-
-	/* user has already submitted response once - go to viewAnswers page. */
-	if (user.getNumberOfAttempts() > 0) {
-	    McLearningAction mcLearningAction = new McLearningAction();
-	    request.setAttribute(McAppConstants.REQUEST_BY_STARTER, (Boolean.TRUE).toString());
-	    mcLearningAction.prepareViewAnswersData(mapping, mcLearningForm, request, getServlet().getServletContext());
-	    return mapping.findForward(McAppConstants.VIEW_ANSWERS);
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewAnswersRedirect"));
+	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	    redirect.addParameter(MODE, mode);
+	    redirect.addParameter("httpSessionID", sessionMap.getSessionID());
+	    return redirect;
 	}
 	
 	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
