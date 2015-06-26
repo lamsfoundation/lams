@@ -1931,7 +1931,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private Integer getCoord(JSONObject details, String tag) throws JSONException {
-	Integer coord = ((Number) JsonUtil.opt(details, tag)).intValue();
+	// the coordinate can be Integer or Double in JSON, need to be ready for any
+	Number number = (Number) JsonUtil.opt(details, tag);
+	Integer coord = number == null ? null : number.intValue();
 	return (coord == null) || (coord >= 0) ? coord : ObjectExtractor.DEFAULT_COORD;
     }
 
