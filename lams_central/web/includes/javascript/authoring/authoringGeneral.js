@@ -31,7 +31,7 @@ $(document).ready(function() {
  * A few publicly visible variables .
  */
 
-	// The Raphael Paper object
+	// The Snap Paper object
 var paper = null,
 	// container for the paper 
 	canvas = null,
@@ -65,7 +65,7 @@ var paper = null,
 			'arrangeHorizontalPadding'         : 35,
 			'arrangeVerticalPadding'           : 50,
 			
-			'dragStartThreshold'               : 100,
+			'dragStartThreshold'               : 300,
 			
 			'propertiesDialogDimOpacity'       : 0.3,
 			'propertiesDialogDimThreshold'     : 100,
@@ -84,14 +84,11 @@ var paper = null,
 			'groupingEffectPadding'			   : 5,
 			'selectEffectPadding'			   : 7,
 			
-			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined',
-			
-			// when mouse hovers over rubbish bin
-			'binGlowWidth'        : 10,
-			'binGlowOpacity'      : 1
+			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined'
 		},
 		
 		'colors' : {
+			'activityBorder'      : 'black',
 			// each activity type has its own colour
 			'activity'     		  : ['','#d0defd','#fffccb','#ece9f7','#fdf1d3','#FFFFFF','#e9f9c0'],
 			'activityText' 		  : 'black',
@@ -103,7 +100,7 @@ var paper = null,
 			                   	     'B0C4DE', 'FFE4E1', 'FF4500', 'EE82EE'],
 
 			// when mouse hovers over rubbish bin
-			'binGlow' 		  : 'red',
+			'binSelect' 		  : 'red',
 			
 			'branchingEdgeStart'  : 'green',
 			'branchingEdgeEnd'    : 'red',
@@ -119,8 +116,9 @@ var paper = null,
 		},
 	
 		'defaultTextAttributes' : {
-			'font-size' : 10,
-			'font' 		: 'sans-serif'
+			'text-anchor' : 'middle',
+			'font-size'   : 10,
+			'font-family' : 'sans-serif'
 		}
 },
 
@@ -1058,7 +1056,17 @@ GeneralLib = {
 	nameValidator   : /^[^<>^*@%$]*$/i,
 	numberValidator : /^[\d\.]+$/,
 
-
+	
+	/**
+	 * Runs the method with parameters on each item of the set.
+	 */
+	applyToSet : function(set, method, params) {
+		set.forEach(function(item){
+			item[method].apply(item, params);
+		});
+	},
+	
+	
 	/**
 	 * Sorts activities on canvas.
 	 */
@@ -1097,7 +1105,7 @@ GeneralLib = {
 			// for special cases when row needs to shifted more
 			forceRowY = null,
 			// check how many columns current paper can hold
-			maxColumns = Math.floor((paper.width - layout.conf.arrangeHorizontalPadding)
+			maxColumns = Math.floor((paper.attr('width') - layout.conf.arrangeHorizontalPadding)
 					                 / layout.conf.arrangeHorizontalSpace),
 			// the initial max length of subsequences is limited by paper space
 			subsequenceMaxLength = maxColumns,
@@ -1416,7 +1424,8 @@ GeneralLib = {
 				paper.clear();
 			} else {
 				// need to set size right away for Chrome
-				paper = Raphael('canvas', canvas.width() - 5, canvas.height() - 5);
+				paper = Snap(canvas.width() - 5, canvas.height() - 5);
+				canvas.append(paper.node);
 			}
 			
 			GeneralLib.resizePaper();
@@ -1998,7 +2007,10 @@ GeneralLib = {
 		width = Math.max(width, canvas.width()) - 20;
 		height = Math.max(height + (isReadOnlyMode ? 20 : 50), canvas.height()) - 20;
 		
-		paper.setSize(width, height);
+		paper.attr({
+			'width'  : width, 
+			'height' : height
+		});
 
 		if (!isReadOnlyMode){
 			if (layout.bin) {
@@ -2677,6 +2689,32 @@ GeneralLib = {
 				access.removeClass('selected');
 			}
 		});
+	},
+	
+	/**
+	 * Puts given object (set or shape) to back of parent.
+	 */
+	toBack : function(object) {
+		if (object.type == 'set') {
+			object.forEach(function(item) {
+				GeneralLib.toBack(item);
+			});
+		} else {
+			$(object.node).parent().prepend(object.node);
+		}
+	},
+	
+	/**
+	 * Puts given object (set or shape) to front of parent.
+	 */
+	toFront : function(object) {
+		if (object.type == 'set') {
+			object.forEach(function(item) {
+				GeneralLib.toFront(item);
+			});
+		} else {
+			$(object.node).parent().append(object.node);
+		}
 	},
 	
 	

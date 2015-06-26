@@ -76,15 +76,16 @@ var DecorationDefs = {
 				}
 				
 				// the label
-				this.items = paper.set();
+				this.items = Snap.set();
 				if (this.title) {
-					var label = paper.text(x + 7, y + 10, this.title)
+					var label = paper.text(x + 7, y + 14, this.title)
 									 .attr(layout.defaultTextAttributes)
-					 				 .attr('text-anchor', 'start')
-					 				 .toBack();
+					 				 .attr('text-anchor', 'start');
 					if (!isReadOnlyMode){
 						label.attr('cursor', 'pointer');
 					}
+					
+					GeneralLib.toBack(label);
 					this.items.push(label);
 					
 					// make sure title fits
@@ -92,20 +93,29 @@ var DecorationDefs = {
 				}
 				
 				// the rectangle
-				this.items.shape = paper.path('M {0} {1} H {2} V {3} H {0} z', x, y, x2, y2)
-						 				.attr('fill', color)
-										.toBack();
+				this.items.shape = paper.path(Snap.format('M {x} {y} H {x2} V {y2} H {x} z',
+														  {
+														   'x'  : x,
+														   'y'  : y,
+														   'x2' : x2,
+														   'y2' : y2
+														  }))
+						 			    .attr({
+						 			    	'stroke' : layout.colors.activityBorder,
+						 			    	'fill'   : color
+						 			    });
+				GeneralLib.toBack(this.items.shape);
 				this.items.push(this.items.shape);
 				
 				if (isReadOnlyMode){
 					if (activitiesOnlySelectable) {
 						this.items.shape.attr('cursor', 'pointer');
-						this.items.click(HandlerLib.itemClickHandler);
+						GeneralLib.applyToSet(this.items, 'click',[HandlerLib.itemClickHandler]);
 					}
 				} else {
 					this.items.shape.attr('cursor', 'pointer');
-					this.items.mousedown(HandlerDecorationLib.containerMousedownHandler)
-							  .click(HandlerLib.itemClickHandler);
+					GeneralLib.applyToSet(this.items, 'mousedown',[HandlerDecorationLib.containerMousedownHandler]);
+					GeneralLib.applyToSet(this.items, 'click',[HandlerLib.itemClickHandler]);
 				}
 			},	
 	
@@ -121,7 +131,7 @@ var DecorationDefs = {
 	
 				ActivityLib.removeSelectEffect(this);
 				
-				var allElements = paper.set();
+				var allElements = Snap.set();
 				$.each(childActivities, function(){
 					allElements.push(this.items.shape);
 				});
@@ -142,28 +152,26 @@ var DecorationDefs = {
 		 */
 		label : {
 			draw : function(x, y) {
-				var x = x ? x : this.items.shape.getBBox().x,
-					// the Y coordinate has to be adjusted;
-					// it is not perfect and not really cross-browser compliant...
-					y = y ? y : this.items.shape.getBBox().y + 6;
+				var x = x ? x : this.items.shape.attr('x'),
+					y = y ? y : this.items.shape.attr('y');
 				
 				if (this.items) {
 					this.items.remove();
 				}
 				
-				this.items = paper.set();
+				this.items = Snap.set();
 				this.items.shape = paper.text(x, y, this.title)
 										.attr(layout.defaultTextAttributes)
 										.attr('text-anchor', 'start');
 				this.items.push(this.items.shape);
 				
 				this.items.shape.attr('cursor', 'pointer');
-				this.items.click(HandlerLib.itemClickHandler);
+				GeneralLib.applyToSet(this.items, 'click',[HandlerLib.itemClickHandler]);
 				if (!isReadOnlyMode){
 					this.items.shape.mousedown(HandlerDecorationLib.labelMousedownHandler);
 				}
 				
-				this.items.data('parentObject', this);
+				GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
 			}
 		},
 		
@@ -180,35 +188,41 @@ var DecorationDefs = {
 				if (!isReadOnlyMode){
 					this.items.fitButton = paper.circle(box.x2 - 10, box.y + 10, 5)
 										 .attr({
-											'stroke' : null,
-											'fill'   : 'blue',
-											'cursor' : 'pointer',
-											'title'  : LABELS.REGION_FIT_BUTTON_TOOLTIP
+											'stroke'  : null,
+											'fill'    : 'blue',
+											// hide it for now
+											'display' : 'none',
+											'cursor'  : 'pointer',
+											'title'   : LABELS.REGION_FIT_BUTTON_TOOLTIP
 										 })
 										 .click(function(event){
 											event.stopImmediatePropagation();
 											var region = this.data('parentObject');
 											region.fit();
 											ActivityLib.addSelectEffect(region, true);
-										 })
-										 .hide();
+										 });
 					this.items.push(this.items.fitButton);
 					
-					this.items.resizeButton = paper.path(Raphael.format('M {0} {1} v {2} h -{2} z',
-																 box.x2, box.y2 - 15, 15))
+					this.items.resizeButton = paper.path(Snap.format('M {x} {y} v {side} h -{side} z',
+																	 {
+																 	  'x' : box.x2,
+																 	  'y' : box.y2 - 15,
+																 	  'side' : 15
+																	 })
+														)
 												   .attr({
 													 'stroke' : null,
 													 'fill'   : 'blue',
+													 // hide it for now
+													 'display' : 'none',
 													 'cursor' : 'se-resize'
 												   });
 					
-					this.items.resizeButton.mousedown(HandlerDecorationLib.resizeRegionStartHandler)
-											   .hide();
-											
+					this.items.resizeButton.mousedown(HandlerDecorationLib.resizeRegionStartHandler);
 					this.items.push(this.items.resizeButton);
 				}
 				
-				this.items.data('parentObject', this);
+				GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
 			}
 		}
 	}
@@ -254,8 +268,8 @@ DecorationLib = {
 				var activityBox = this.items.shape.getBBox(),
 					shapeBox = shape.getBBox();
 				
-				if (Raphael.isPointInsideBBox(shapeBox,activityBox.x, activityBox.y)
-					&& Raphael.isPointInsideBBox(shapeBox, activityBox.x2, activityBox.y2)) {
+				if (Snap.path.isPointInsideBBox(shapeBox,activityBox.x, activityBox.y)
+					&& Snap.path.isPointInsideBBox(shapeBox, activityBox.x2, activityBox.y2)) {
 					result.push(this);
 				}
 			}
