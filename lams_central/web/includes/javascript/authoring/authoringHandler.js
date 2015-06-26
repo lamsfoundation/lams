@@ -26,6 +26,11 @@ var HandlerLib = {
 	 * Start dragging an activity or a transition.
 	 */
 	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
+		if (layout.drawMode || (event.originalEvent ?
+				event.originalEvent.defaultPrevented : event.defaultPrevented)){
+			return;
+		}
+		
 		// if user clicks or drags very shortly, do not take it into account 
 		var dragCancel = function(){
 			canvas.off('mouseup');
@@ -40,11 +45,6 @@ var HandlerLib = {
 		dragCancel();
 		canvas.mouseup(dragCancel);
 		
-		if (layout.drawMode || (event.originalEvent ?
-				event.originalEvent.defaultPrevented : event.defaultPrevented)){
-			return;
-		}
-		
 		// run only if "click" event was not generated, i.e. user really wants to drag
 		items.dragStarter = setTimeout(function(){
 			items.dragStarter = null;
@@ -52,7 +52,7 @@ var HandlerLib = {
 			// show that we are in the middle of something
 			HandlerLib.resetCanvasMode();
 			items.isDragged = true;
-			items.attr('cursor', 'move');
+			GeneralLib.applyToSet(items, 'attr', ['cursor', 'move']);
 			
 			var parentObject = draggedElement.data('parentObject');
 				sticky = parentObject && (parentObject instanceof ActivityDefs.ParallelActivity
@@ -60,12 +60,17 @@ var HandlerLib = {
 										  || parentObject instanceof ActivityDefs.FloatingActivity);
 				
 			// hide child activities while moving the parent around
+			// they will be redrawn when the parent is dropped
 			if (sticky) {
 				$.each(parentObject.childActivities, function(){
-					this.items.hide();
+					this.items.forEach(function(item){
+						item.attr('display', 'none');
+					});
 					if (this.childActivities) {
 						$.each(this.childActivities, function() {
-							this.items.hide();
+							this.items.forEach(function(item){
+								item.attr('display', 'none');
+							});
 						});
 					}
 				});
@@ -78,7 +83,7 @@ var HandlerLib = {
 			var mouseup = function(mouseupEvent){
 				// finish dragging - restore various elements' default state
 				items.isDragged = false;
-				items.unmouseup();
+				GeneralLib.applyToSet(items, 'unmouseup');
 				HandlerLib.resetCanvasMode(true);
 				if (layout.bin.glowEffect) {
 					layout.bin.glowEffect.remove();
@@ -108,21 +113,27 @@ var HandlerLib = {
 		var dx = event.pageX - startX,
 			dy = event.pageY - startY;
 		
-		items.transform('t' + dx + ' ' + dy);
+		GeneralLib.applyToSet(items, 'transform', ['t' + dx + ' ' + dy]);
 		
 		if (items.groupingEffect) {
-			items.groupingEffect.toBack();
+			GeneralLib.toBack(items.groupingEffect);
 		}
 		
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
 			if (!layout.bin.glowEffect) {
-				layout.bin.glowEffect = layout.bin.glow({
-					'width'   : layout.conf.binGlowWidth,
-					'opacity' : layout.conf.binGlowOpacity,
-					'color'   : layout.colors.binGlow,
-					'offsety' : 2
-				});
+				layout.bin.glowEffect = paper.path(Snap.format('M {x} {y} h {side} v {side} h -{side} z',
+												   {
+													'x'     : layout.bin.attr('x'),
+													'y'     : layout.bin.attr('y'),
+													'side'  : layout.bin.attr('width')
+												   }))
+								   			.attr({
+												   'stroke'           : layout.colors.binSelect,
+												   'stroke-width'     : 2,
+												   'stroke-dasharray' : '5,3',
+												   'fill' : 'none'
+												  });
 			}
 		} else if (layout.bin.glowEffect){
 			layout.bin.glowEffect.remove();
@@ -136,8 +147,8 @@ var HandlerLib = {
 	 */
 	dropObject : function(object) {
 		// finally transform the dragged elements
-		var transformation = object.items.shape.attr('transform');
-		object.items.transform('');
+		var transformation = Snap.parseTransformString(object.items.shape.transform().string);
+		GeneralLib.applyToSet(object.items, 'transform', ['']);
 		
 		var box = object.items.shape.getBBox(),
 			originalCoordinates = {
@@ -146,7 +157,7 @@ var HandlerLib = {
 				y : box.y + (object instanceof DecorationDefs.Label ? 6 : 0)
 			};
 		
-		if (transformation.length > 0) {
+		if (transformation && transformation.length > 0) {
 			object.draw(originalCoordinates.x + transformation[0][1],
 						originalCoordinates.y + transformation[0][2]);
 		}
@@ -162,7 +173,7 @@ var HandlerLib = {
 	 */
 	isElemenentBinned : function(event) {
 		var translatedEvent = GeneralLib.translateEventOnCanvas(event);
-		return Raphael.isPointInsideBBox(layout.bin.getBBox(), translatedEvent[0], translatedEvent[1]); 
+		return Snap.path.isPointInsideBBox(layout.bin.getBBox(), translatedEvent[0], translatedEvent[1]); 
 	},
 	
 	
@@ -176,7 +187,6 @@ var HandlerLib = {
 		}
 		
 		var parentObject = this.data('parentObject');
-		
 		// if it's "import part" allow multiple selection of activities
 		if (activitiesOnlySelectable) {
 			if (parentObject.items.selectEffect) {
@@ -376,11 +386,14 @@ HandlerDecorationLib = {
 			data.shape.remove();
 		}
 		
-		data.shape = paper.path(Raphael.format('M {0} {1} h {2} v {3} h -{2} z',
-								x < data.startX ? x : data.startX,
-								y < data.startY ? y : data.startY,
-								Math.abs(x - data.startX),
-								Math.abs(y - data.startY)))
+		data.shape = paper.path(Snap.format('M {x} {y} h {width} v {height} h -{width} z',
+											{
+											 'x' : x < data.startX ? x : data.startX,
+											 'y' : y < data.startY ? y : data.startY,
+											 'width' : Math.abs(x - data.startX),
+											 'height' : Math.abs(y - data.startY)
+											})
+							   )
 						  .attr({
 							'fill'    : layout.colors.annotation,
 							'opacity' : 0.3
@@ -559,16 +572,24 @@ HandlerTransitionLib = {
 		var translatedEvent = GeneralLib.translateEventOnCanvas(event),
 			endX = translatedEvent[0],
 			endY = translatedEvent[1];
-		
 		// draw a temporary transition so user sees what he is doing
-		activity.tempTransition = paper.set();
-		activity.tempTransition.push(paper.circle(startX, startY, 3));
-		activity.tempTransition.push(paper.path(Raphael.format('M {0} {1} L {2} {3}',
-														startX, startY, endX, endY))
-					.attr({
-						'arrow-end' : 'open-wide-long',
-						'stroke-dasharray' : '- '
-					}));
+		activity.tempTransition = Snap.set();
+		activity.tempTransition.push(paper.circle(startX, startY, 3).attr({
+			'stroke' : layout.colors.transition
+		}));
+		activity.tempTransition.push(paper.path(Snap.format('M {startX} {startY} L {endX} {endY}',
+															{
+															 'startX' : startX,
+															 'startY' : startY,
+															 'endX'   : endX,
+															 'endY'   : endY
+															}))
+										  .attr({
+											  	 'stroke' : layout.colors.transition,
+									        	 'stroke-width' : 2,
+												 'stroke-dasharray' : '5,3'
+											    })
+									);
 	},
 	
 	
@@ -587,7 +608,7 @@ HandlerTransitionLib = {
 		}
 		
 		var endActivity = null,
-			targetElement = paper.getElementByPoint(event.pageX, event.pageY);
+			targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 		if (targetElement) {
 			endActivity = targetElement.data('parentObject');
 		}

@@ -137,13 +137,13 @@ var MenuLib = {
 			dialog.text('');
 			dialog.dialog('close');
 			
-			var	targetElement = paper.getElementByPoint(event.pageX, event.pageY);
+			var	targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 			
-			if (targetElement) {
-				// cancel
-				HandlerLib.resetCanvasMode(true);
-			} else {
+			if (targetElement.type == 'svg') {
 				HandlerDecorationLib.drawRegionStartHandler(event);
+			} else {
+				// cancel if clicked on some existing element, not canvas
+				HandlerLib.resetCanvasMode(true);
 			}
 		});
 	},
@@ -303,7 +303,7 @@ var MenuLib = {
 			dialog.dialog('close');
 			
 			var startActivity = null,
-				targetElement = paper.getElementByPoint(event.pageX, event.pageY);
+				targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 			if (targetElement) {
 				startActivity = targetElement.data('parentObject');
 				if (startActivity) {
@@ -450,6 +450,9 @@ var MenuLib = {
 			// need to set attributes using pure JS as jQuery sets them with lower case, which is unacceptable in SVG
 			svg.setAttribute('viewBox', crop.x + ' ' + crop.y + ' ' + width + ' ' + height);
 			svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
+			svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+			svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+			
 			
 			// reset any cursor=pointer styles
 			$('*[style*="cursor"]', svg).css('cursor', 'default');
@@ -457,10 +460,8 @@ var MenuLib = {
 			
 			imageCode = crop.canvasClone.html();
 			// otherwise there will be syntax erros in IE11
-			imageCode = imageCode.replace(/xmlns=\"http:\/\/www\.w3\.org\/2000\/svg\"/, '');
 			imageCode = imageCode.replace(/xmlns:NS1=\"\"/, '');
-			imageCode = imageCode.replace(/NS1:xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"/, 'xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"');
-			imageCode = imageCode.replace(/xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\" xlink:href/g, 'xlink:href');
+			imageCode = imageCode.replace(/NS1:xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"/, '');
 		}
 		
 		if (download) {
@@ -488,7 +489,7 @@ var MenuLib = {
 	 */
 	getCanvasCrop : function(){
 		var canvasClone = canvas.clone();
-		// Raphael does not add this and it's needed by Firefox
+		// Snap does not add this and it's needed by Firefox
 		$('svg', canvasClone).attr('xmlns:xlink', 'http://www.w3.org/1999/xlink');
 		// remove the rubbish bin icon
 		canvasClone.find('#rubbishBin').remove();
