@@ -277,19 +277,24 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		paper.setStart();
-		var shape = paper.path(Raphael.format('M {0} {1} a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0', x, y + 8))
+		this.items = Snap.set();
+		var shape = paper.path(Snap.format('M {x} {y} a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
+										   {
+											'x' : x,
+											'y' : y + 8
+										   })
+							  )
 						 .attr({
+							 'stroke' : layout.colors.activityBorder,
 							 'fill' : this.isStart ? layout.colors.branchingEdgeStart
 						                           : layout.colors.branchingEdgeEnd
-						 });
+						 }),
+			title = this.branchingActivity.title,
+			label = paper.text(x + 8, y + 27,  title + ' ' + (this.isStart ? LABELS.BRANCHING_START_SUFFIX
+	                                        		 	 				   : LABELS.BRANCHING_END_SUFFIX))
+	                     .attr(layout.defaultTextAttributes);
 		
-		var title = this.branchingActivity.title;
-		paper.text(x + 8, y + 27,  title + ' ' + (this.isStart ? LABELS.BRANCHING_START_SUFFIX
-	                                        		 	 		: LABELS.BRANCHING_END_SUFFIX))
-		     .attr(layout.defaultTextAttributes);
-		
-		this.items = paper.setFinish();
+		this.items.push(shape).push(label);
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -314,7 +319,7 @@ ActivityDraw = {
 		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, horizontally
 			var activityX = x + layout.conf.containerActivityPadding,
-				allElements = paper.set(),
+				allElements = Snap.set(),
 				floatingActivity = this,
 				box = this.items.shape.getBBox();
 			$.each(this.childActivities, function(orderID){
@@ -340,7 +345,7 @@ ActivityDraw = {
 							   layout.colors.optionalActivity);
 		}
 		
-		this.items.data('parentObject', this);
+		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
 	},
 	
 	
@@ -358,17 +363,22 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		paper.setStart();
-		var shape = paper.path(Raphael.format('M {0} {1} l-9 9 v16 l9 9 h16 l9 -9 v-16 l-9 -9 z', x + 9, y))
+		this.items = Snap.set();
+		var shape = paper.path(Snap.format('M {x} {y} l-9 9 v16 l9 9 h16 l9 -9 v-16 l-9 -9 z',
+										   {
+											'x' : x + 9,
+											'y' : y
+										   })
+							  )
 						 .attr({
-							 'fill' : layout.colors.gate
-						 });
+							 'stroke' : layout.colors.activityBorder,
+							 'fill'   : layout.colors.gate
+						 }),
+			label = paper.text(x + 17, y + 20, LABELS.GATE_ACTIVITY_LABEL)
+						 .attr(layout.defaultTextAttributes)
+						 .attr('stroke', layout.colors.gateText);
 		
-		paper.text(x + 17, y + 16, LABELS.GATE_ACTIVITY_LABEL)
-			 .attr(layout.defaultTextAttributes)
-		     .attr('stroke', layout.colors.gateText);
-		
-		this.items = paper.setFinish();
+		this.items.push(shape).push(label);
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -390,16 +400,22 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		paper.setStart();
-		var shape = paper.path(Raphael.format('M {0} {1} h 125 v 50 h -125 z', x, y))
+		this.items = Snap.set();
+		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
+										   {
+											'x' : x,
+											'y' : y
+										   })
+							  )
 						 .attr({
+							    'stroke' : layout.colors.activityBorder,
 								'fill' : layout.colors.grouping
-							 });
+							 }),
+			icon = paper.image('../images/grouping.gif', x + 47, y + 2, 30, 30),
+			label = paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
+						 .attr(layout.defaultTextAttributes);
 		
-		paper.image('../images/grouping.gif', x + 47, y + 2, 30, 30);
-		paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title));
-		
-		this.items = paper.setFinish();
+		this.items.push(shape).push(icon).push(label);
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -424,14 +440,15 @@ ActivityDraw = {
 		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
 			var activityY = y + layout.conf.containerActivityPadding + 10,
-				allElements = paper.set(),
+				allElements = Snap.set(),
 				optionalActivity = this,
-				box = this.items.shape.getBBox();
+				box = this.items.shape.getBBox(),
+				boxWidth = box.width;
 			$.each(this.childActivities, function(orderID){
 				this.parentActivity = optionalActivity;
 				this.orderID = orderID + 1;
 				var childBox = this.items.shape.getBBox();
-				this.draw(x + Math.max(layout.conf.containerActivityPadding, (box.width - childBox.width)/2), activityY);
+				this.draw(x + Math.max(layout.conf.containerActivityPadding, (boxWidth - childBox.width)/2), activityY);
 				childBox = this.items.shape.getBBox();
 				activityY = childBox.y2 + layout.conf.containerActivityChildrenPadding;
 				allElements.push(this.items.shape);
@@ -452,10 +469,11 @@ ActivityDraw = {
 		
 		if (!isReadOnlyMode){
 			// allow transition drawing and other activity behaviour
-			this.items.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
+			GeneralLib.applyToSet(this.items, 'unmousedown');
+			GeneralLib.applyToSet(this.items, 'mousedown', [HandlerActivityLib.activityMousedownHandler]);
 		}
 		
-		this.items.data('parentObject', this);
+		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
 	},
 	
 	
@@ -474,7 +492,7 @@ ActivityDraw = {
 		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
 			var activityY = y + layout.conf.containerActivityPadding + 10,
-				allElements = paper.set(),
+				allElements = Snap.set(),
 				optionalActivity = this;
 			$.each(this.childActivities, function(orderID){
 				this.parentActivity = optionalActivity;
@@ -503,10 +521,11 @@ ActivityDraw = {
 		
 		if (!isReadOnlyMode){
 			// allow transition drawing and other activity behaviour
-			this.items.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
+			GeneralLib.applyToSet(this.items, 'unmousedown');
+			GeneralLib.applyToSet(this.items, 'mousedown', [HandlerActivityLib.activityMousedownHandler]);
 		}
 		
-		this.items.data('parentObject', this);
+		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
 	},
 	
 	
@@ -525,24 +544,29 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		this.items = paper.set();
-		var shape = paper.path(Raphael.format('M {0} {1} h 125 v 50 h -125 z', x, y))
+		this.items = Snap.set();
+		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
+										   {
+											'x' : x,
+											'y' : y
+										   }))
 						 // activity colour depends on its category ID
 						 .attr({
+							'stroke' : layout.colors.activityBorder,
 							'fill' : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
-						 });
+						 }),
+			// check for icon in the library
+			icon =  paper.image(layout.toolMetadata[this.learningLibraryID].iconPath, x + 47, y + 3, 30, 30),
+			label = paper.text(x + 62, y + 43, ActivityLib.shortenActivityTitle(this.title))
+			 			 .attr(layout.defaultTextAttributes)
+			 			 .attr('fill', layout.colors.activityText);
+			 			 
+		this.items.push(shape).push(icon).push(label);
 		this.items.shape = shape;
-		this.items.push(shape);
 		
 		if (this.grouping) {
 			ActivityLib.addGroupingEffect(this);
 		}
-		
-		// check for icon in the library
-		this.items.push(paper.image(layout.toolMetadata[this.learningLibraryID].iconPath, x + 47, y + 2, 30, 30));
-		this.items.push(paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
-							 .attr(layout.defaultTextAttributes)
-							 .attr('fill', layout.colors.activityText));
 		
 		ActivityLib.activityHandlersInit(this);
 	},
@@ -561,46 +585,51 @@ ActivityDraw = {
 		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity);
 		
 		// create transition SVG elements
-		paper.setStart();
-		paper.path(Raphael.format('M {0} {1} L {2} {3}', points.startX, points.startY, points.endX, points.endY))
-		                  .attr({
-		                 	'stroke'       : layout.colors.transition,
-		                	'stroke-width' : 2
-		                  });
-
-		// draw the arrow and turn it in the same direction as the line
-		var angle = 90 + Math.atan2(points.endY - points.startY, points.endX - points.startX) * 180 / Math.PI,
-			arrowPath = Raphael.transformPath(Raphael.format('M {0} {1} l 10 15 a 25 25 0 0 0 -20 0 z',
-															 points.middleX, points.middleY), 
-				                              Raphael.format('R {0} {1} {2}', angle, points.middleX, points.middleY));
-		paper.path(arrowPath)
-						 .attr({
-							'stroke' : layout.colors.transition,
-							'fill'   : layout.colors.transition
-						 });
+		this.items = Snap.set();
+		var arrowShaft = paper.path(Snap.format('M {startX} {startY} L {endX} {endY}', points))
+				              .attr({
+						          	 'stroke'       : layout.colors.transition,
+						        	 'stroke-width' : 2
+				              	  }),
+			// draw the arrow and turn it in the same direction as the line
+			angle = 90 + Math.atan2(points.endY - points.startY, points.endX - points.startX) * 180 / Math.PI,
+			arrowPath = paper.path(Snap.format('M {middleX} {middleY} l 10 15 a 25 25 0 0 0 -20 0 z', points))
+						     .transform(Snap.format('R {angle} {points.middleX} {points.middleY}',
+						    		                {
+						    	 					 'angle' : angle,
+						    	 					 'points' : points
+						    	 					})
+						    	 	   )
+						     .attr({
+								'stroke' : layout.colors.transition,
+								'fill'   : layout.colors.transition
+							 });
+		this.items.push(arrowShaft).push(arrowPath);
 		if (this.title) {
 			// adjust X & Y depending on the angle, so the label does not overlap with the transition;
 			// angle in Javascript is -90 <= a <= 270
-			paper.text(points.middleX + ((angle > -45 && angle < 45) || (angle > 135 && angle < 225) ? 20 : 0),
-					   points.middleY + ((angle > 45 && angle < 135) || angle > 225 || angle < 45 ? -20 : 0),
-					   this.title)
-				 .attr('text-anchor', 'start');
+			var label = paper.text(points.middleX + ((angle > -45 && angle < 45) || (angle > 135 && angle < 225) ? 20 : 0),
+					   			   points.middleY + ((angle > 45 && angle < 135) || angle > 225 || angle < 45 ? -20 : 0),
+					   			   this.title)
+					   	     .attr(layout.defaultTextAttributes)
+					   	     .attr('text-anchor', 'start');
+			
+			this.items.push(label);
 		}
-		this.items = paper.setFinish();
 
-		this.items.toBack();
+		GeneralLib.toBack(this.items);
 		
 		// region annotations could cover grouping effect
 		$.each(layout.regions, function(){
-			this.items.shape.toBack();
+			GeneralLib.toBack(this.items.shape);
 		});
 		
-		this.items.data('parentObject', this);
+		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
 		
 		if (!isReadOnlyMode){
-			this.items.attr('cursor', 'pointer');
-			this.items.mousedown(HandlerTransitionLib.transitionMousedownHandler);
-			this.items.click(HandlerLib.itemClickHandler);
+			GeneralLib.applyToSet(this.items, 'attr', ['cursor', 'pointer']);
+			GeneralLib.applyToSet(this.items, 'mousedown', [HandlerTransitionLib.transitionMousedownHandler]);
+			GeneralLib.applyToSet(this.items, 'click', [HandlerLib.itemClickHandler]);
 		}
 	}
 },
@@ -616,33 +645,32 @@ ActivityLib = {
 	 * Make a new activity fully functional on canvas.
 	 */
 	activityHandlersInit : function(activity) {
-		activity.items.data('parentObject', activity);
+		GeneralLib.applyToSet(activity.items, 'data', ['parentObject', activity]);
 		
 		if (isReadOnlyMode) {
 			if (activitiesOnlySelectable) {
-				activity.items.click(HandlerLib.itemClickHandler)
-							  .attr({
-								  'cursor' : 'pointer'
-							  });
+				GeneralLib.applyToSet(activity.items, 'click', [HandlerLib.itemClickHandler]);
+				GeneralLib.applyToSet(activity.items, 'attr', [{'cursor' : 'pointer'}]);
 			}
 		} else {
 			// set all the handlers
-			activity.items.mousedown(HandlerActivityLib.activityMousedownHandler)
-						  .click(HandlerLib.itemClickHandler)
-						  .dblclick(HandlerActivityLib.activityDblclickHandler)
-						  .attr({
-							  'cursor' : 'pointer'
-						  });
+			GeneralLib.applyToSet(activity.items, 'mousedown', [HandlerActivityLib.activityMousedownHandler]);
+			GeneralLib.applyToSet(activity.items, 'click', [HandlerLib.itemClickHandler]);
+			GeneralLib.applyToSet(activity.items, 'dblclick', [HandlerActivityLib.activityDblclickHandler]);
+			GeneralLib.applyToSet(activity.items, 'attr', [{'cursor' : 'pointer'}]);
 			
 			if (activity instanceof ActivityDefs.BranchingEdgeActivity
 					&& activity.branchingActivity.end) {
 				// highligh branching edges on hover
-				activity.branchingActivity.start.items.hover(HandlerActivityLib.branchingEdgeMouseoverHandler,
-						HandlerActivityLib.branchingEdgeMouseoutHandler);
-				activity.branchingActivity.end.items.hover(HandlerActivityLib.branchingEdgeMouseoverHandler,
-						HandlerActivityLib.branchingEdgeMouseoutHandler);
+				GeneralLib.applyToSet(activity.branchingActivity.start.items, 'hover',
+						[HandlerActivityLib.branchingEdgeMouseoverHandler,
+						HandlerActivityLib.branchingEdgeMouseoutHandler]);
+				GeneralLib.applyToSet(activity.branchingActivity.end.items, 'hover',
+						[HandlerActivityLib.branchingEdgeMouseoverHandler,
+						HandlerActivityLib.branchingEdgeMouseoutHandler]);
 			}
 		}
+
 	},
 
 	
@@ -718,19 +746,17 @@ ActivityLib = {
 					activityBox.width,
 					activityBox.height)
 				.attr({
+					'stroke' : layout.colors.activityBorder,
 					'fill' : shape.attr('fill')
-				})
-				.toBack();
+				});
 			
+			GeneralLib.toBack(activity.items.groupingEffect);
 			activity.items.push(activity.items.groupingEffect);
 			
 			// region annotations could cover grouping effect
 			$.each(layout.regions, function(){
-				this.items.shape.toBack();
+				GeneralLib.toBack(this.items.shape);
 			});
-			
-			// this is needed, for some reason, otherwise the activity can not be selected
-			HandlerLib.resetCanvasMode(true);
 		}
 	},
 	
@@ -745,17 +771,17 @@ ActivityLib = {
 			if (object instanceof DecorationDefs.Region) {
 				object.items.shape.attr({
 					'stroke'           : layout.colors.selectEffect,
-					'stroke-dasharray' : '-'
+					'stroke-dasharray' : '5,3'
 				});
 				object.items.selectEffect = true;
 				
 				if (!isReadOnlyMode) {
-					object.items.resizeButton.show();
-					object.items.resizeButton.toFront();
+					object.items.resizeButton.attr('display', null);
+					GeneralLib.toFront(object.items.resizeButton);
 					// also select encapsulated activities
 					var childActivities = DecorationLib.getChildActivities(object.items.shape);
 					if (childActivities.length > 0) {
-						object.items.fitButton.show();
+						object.items.fitButton.attr('display', null);
 						
 						$.each(childActivities, function(){
 							if (!this.parentActivity || !(this.parentActivity instanceof DecorationDefs.Container)) {
@@ -779,15 +805,18 @@ ActivityLib = {
 				var box = object.items.getBBox();
 				
 				// a simple rectange a bit wider than the actual activity boundaries
-				object.items.selectEffect = paper.rect(
-						box.x - layout.conf.selectEffectPadding,
-						box.y - layout.conf.selectEffectPadding,
-						box.width + 2*layout.conf.selectEffectPadding,
-						box.height + 2*layout.conf.selectEffectPadding)
-					.attr({
-						'stroke'           : layout.colors.selectEffect,
-						'stroke-dasharray' : '-'
-					});
+				object.items.selectEffect = paper.path(Snap.format('M {x} {y} h {width} v {height} h -{width} z',
+								   {
+									'x'      : box.x - layout.conf.selectEffectPadding,
+									'y'      : box.y - layout.conf.selectEffectPadding,
+									'width'  : box.width + 2*layout.conf.selectEffectPadding,
+									'height' : box.height + 2*layout.conf.selectEffectPadding
+								   }))
+							.attr({
+									'stroke'           : layout.colors.selectEffect,
+									'stroke-dasharray' : '5,3',
+									'fill' : 'none'
+								});
 				object.items.push(object.items.selectEffect);
 				
 				// if it's "import part" select children activities
@@ -1061,10 +1090,9 @@ ActivityLib = {
 			},
 
 			// find intersection points of the temporary transition
-			tempTransition = Raphael.parsePathString(Raphael.format(
-				'M {0} {1} L {2} {3}', points.startX, points.startY, points.endX, points.endY)),
-			fromIntersect = Raphael.pathIntersection(tempTransition, fromActivity.items.shape.attr('path')),
-			toIntersect = Raphael.pathIntersection(tempTransition, toActivity.items.shape.attr('path'));
+			tempTransitionPath = Snap.format('M {startX} {startY} L {endX} {endY}', points),
+			fromIntersect = Snap.path.intersection(tempTransitionPath, fromActivity.items.shape.attr('path')),
+			toIntersect = Snap.path.intersection(tempTransitionPath, toActivity.items.shape.attr('path'));
 		
 		// find points on borders of activities, if they exist
 		if (fromIntersect.length > 0) {
@@ -1100,12 +1128,12 @@ ActivityLib = {
 			
 			// check if it was added to an Optional or Floating Activity
 			var container = layout.floatingActivity
-							&& Raphael.isPointInsideBBox(layout.floatingActivity.items.getBBox(),x,y)
+							&& Snap.path.isPointInsideBBox(layout.floatingActivity.items.getBBox(),x,y)
 							? layout.floatingActivity : null;
 			if (!container) {
 				$.each(layout.activities, function(){
 					if (this instanceof ActivityDefs.OptionalActivity
-						&& Raphael.isPointInsideBBox(this.items.getBBox(),x,y)) {
+						&& Snap.path.isPointInsideBBox(this.items.getBBox(),x,y)) {
 						container = this;
 						return false;
 					}
@@ -1313,11 +1341,11 @@ ActivityLib = {
 				// different effects for different types of objects
 				if (object instanceof DecorationDefs.Region) {
 					object.items.shape.attr({
-						'stroke'           : 'black',
-						'stroke-dasharray' : ''
+	 			    	'stroke' : layout.colors.activityBorder,
+						'stroke-dasharray' : null
 					});
-					object.items.fitButton.hide();
-					object.items.resizeButton.hide();
+					object.items.fitButton.attr('display','none');
+					object.items.resizeButton.attr('display','none');
 					
 					var childActivities = DecorationLib.getChildActivities(object.items.shape);
 					$.each(childActivities, function(){
@@ -1441,8 +1469,7 @@ ActivityLib = {
 		transition.items.remove();
 		GeneralLib.setModified(true);
 	},
-
-
+	
 	/**
 	 * Reduce length of activity's title so it fits in its SVG shape.
 	 */
