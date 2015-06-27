@@ -437,8 +437,11 @@
             <server name="default-server">
                 <http-listener name="default" socket-binding="http"/>
                 <host name="default-host" alias="localhost">
-                    <filter-ref name="server-header"/>
-                    <filter-ref name="x-powered-by-header"/>
+                	<!-- Removing server headers
+	                    <filter-ref name="server-header"/>
+	                    <filter-ref name="x-powered-by-header"/>
+                 	-->
+                 	<access-log pattern="combined" />
                 </host>
             </server>
             <servlet-container name="default" default-encoding="UTF-8">

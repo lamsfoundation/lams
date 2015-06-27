@@ -347,7 +347,7 @@
             <buffer-pool name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:2.0">
-<cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
+			<cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
                 <local-cache name="default" />
             </cache-container>
             <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
@@ -473,8 +473,11 @@
             <server name="default-server">
                 <http-listener name="default" socket-binding="http"/>
                 <host name="default-host" alias="localhost">
-                    <filter-ref name="server-header"/>
-                    <filter-ref name="x-powered-by-header"/>
+                	<!-- Removing server headers
+	                    <filter-ref name="server-header"/>
+	                    <filter-ref name="x-powered-by-header"/>
+                 	-->
+                 	<access-log pattern="combined" />
                 </host>
             </server>
             <servlet-container name="default" default-encoding="UTF-8">
