@@ -182,6 +182,8 @@
 				PREVIEW_ERROR : decoderDiv.html('<c:out value="${PREVIEW_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.cross.branching.error" var="CROSS_BRANCHING_ERROR_VAR"/>
 				CROSS_BRANCHING_ERROR : decoderDiv.html('<c:out value="${CROSS_BRANCHING_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.support.transition.error" var="SUPPORT_TRANSITION_ERROR_VAR"/>
+				SUPPORT_TRANSITION_ERROR : decoderDiv.html('<c:out value="${SUPPORT_TRANSITION_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.end.match.error" var="END_MATCH_ERROR_VAR"/>
 				END_MATCH_ERROR : decoderDiv.html('<c:out value="${END_MATCH_ERROR_VAR}" />').text(),
 				
