@@ -882,6 +882,7 @@ ActivityLib = {
 		// no transitions to/from support activities
 		if (toActivity instanceof ActivityDefs.FloatingActivity
 			|| fromActivity instanceof ActivityDefs.FloatingActivity){
+			alert(LABELS.SUPPORT_TRANSITION_ERROR);
 			return;
 		}
 		
