@@ -8,6 +8,7 @@
 	// http://www.w3.org/TR/REC-html40/present/frames.html#h-16.5
 	var checkboxValues = {
 		scrolling: { 'true': 'yes', 'false': 'no' },
+		allowfullscreen: { 'true': 'yes', 'false': 'no' },
 		frameborder: { 'true': '1', 'false': '0' }
 	};
 
@@ -163,6 +164,14 @@
 						setup: loadValue,
 						commit: commitValue
 					},
+					{
+                                                id: 'allowfullscreen',
+                                                type: 'checkbox',
+                                                requiredContent: 'iframe[allowfullscreen]',
+                                                label: iframeLang.allowfullscreen,
+                                                setup: loadValue,
+                                                commit: commitValue
+                                        },
 					{
 						id: 'frameborder',
 						type: 'checkbox',
