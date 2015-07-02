@@ -27,7 +27,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.mobile.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript">
 		var lessonId = ${lesson.lessonID},

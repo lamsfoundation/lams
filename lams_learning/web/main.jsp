@@ -45,7 +45,7 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.layout.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<c:url value="/"/>includes/javascript/main.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
