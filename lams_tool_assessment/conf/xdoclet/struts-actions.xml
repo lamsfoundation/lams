@@ -50,6 +50,7 @@
 			<forward name="truefalse" path="/pages/authoring/parts/addtruefalse.jsp" />
 			<forward name="essay" path="/pages/authoring/parts/addessay.jsp" />
 			<forward name="ordering" path="/pages/authoring/parts/addordering.jsp" />
+			<forward name="markhedging" path="/pages/authoring/parts/addmarkhedging.jsp" />
 		</action>
 		<action path="/authoring/editQuestion"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
@@ -63,7 +64,8 @@
 			<forward name="numerical" path="/pages/authoring/parts/addnumerical.jsp" />
 			<forward name="truefalse" path="/pages/authoring/parts/addtruefalse.jsp" />
 			<forward name="essay" path="/pages/authoring/parts/addessay.jsp" />	
-			<forward name="ordering" path="/pages/authoring/parts/addordering.jsp" />			
+			<forward name="ordering" path="/pages/authoring/parts/addordering.jsp" />
+			<forward name="markhedging" path="/pages/authoring/parts/addmarkhedging.jsp" />			
 		</action>
 		<action path="/authoring/saveOrUpdateQuestion"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
@@ -199,6 +201,11 @@
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="submitAll" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		<action path="/learning/submitSingleMarkHedgingQuestion"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="submitSingleMarkHedgingQuestion" >
+			<forward name="success" path="/pages/learning/parts/markhedging.jsp" />
 		</action>
 		<action path="/learning/checkLeaderProgress"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"

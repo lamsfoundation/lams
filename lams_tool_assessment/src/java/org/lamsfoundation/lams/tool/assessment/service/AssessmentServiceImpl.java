@@ -414,7 +414,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     @Override
     public boolean storeUserAnswers(Long assessmentUid, Long userId,
-	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, boolean isAutosave) {
+	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
+	    boolean isAutosave) {
 	
 	int maximumGrade = 0;
 	float grade = 0;
@@ -430,6 +431,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	//store all answers (in all pages)
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
+		
+		//in case single MarkHedging question needs to be stored -- search for that question
+		if ((singleMarkHedgingQuestionUid != null) && !question.getUid().equals(singleMarkHedgingQuestionUid)) {
+		    continue;
+		}
 		
 		// In case if assessment was updated after result has been started check question still exists in DB as
 		// it could be deleted if modified in monitor.
@@ -465,8 +471,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
 	
-	//store grades and finished date only on user hitting submit all answers button 
-	if (!isAutosave) {
+	//store grades and finished date only on user hitting submit all answers button (and not submit mark hedging question)
+	boolean isStoreResult = !isAutosave && singleMarkHedgingQuestionUid == null;
+	if (isStoreResult) {
 	    result.setMaximumGrade(maximumGrade);
 	    result.setGrade(grade);
 	    result.setFinishDate(new Timestamp(new Date().getTime()));
@@ -512,7 +519,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	questionAnswer.setAnswerBoolean(question.getAnswerBoolean());
 	questionAnswer.setAnswerFloat(question.getAnswerFloat());
 	questionAnswer.setAnswerString(question.getAnswerString());
-	questionAnswer.setFinishDate(new Date());
 
 	int j = 0;
 	for (AssessmentQuestionOption option : question.getOptions()) {
@@ -541,6 +547,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    mark += option.getGrade() * maxMark;
 		}
 	    }
+	    
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 	    float maxMarkForCorrectAnswer = maxMark / question.getOptions().size();
 	    for (AssessmentQuestionOption option : question.getOptions()) {
@@ -548,6 +555,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
+	    
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		String optionString = option.getOptionString().trim().replaceAll("\\*", ".*");
@@ -567,6 +575,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    break;
 		}
 	    }
+	    
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    String answerString = question.getAnswerString();
 	    if (answerString != null) {
@@ -608,10 +617,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    }
 		}
 	    }
+	    
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
 	    if (question.getAnswerBoolean() == question.getCorrectAnswer() && question.getAnswerString() != null) {
 		mark = maxMark;
 	    }
+	    
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / question.getOptions().size();
 	    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(
@@ -625,10 +636,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
+	    
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+	    for (AssessmentQuestionOption option : question.getOptions()) {
+		if (option.isCorrect()) {
+		    mark += option.getAnswerInt();
+		    break;
+		}
+	    }
 	}
 	
 	//we start calculating and storing marks only in case it's not an autosave request
 	if (!isAutosave) {
+	    
+	    questionAnswer.setFinishDate(new Date());
 
 	    if (mark > maxMark) {
 		mark = maxMark;
@@ -662,6 +683,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    
 	    questionAnswer.setMark(mark);
 	    questionAnswer.setMaxMark(maxMark);
+	    //for displaying purposes in case of submitSingleMarkHedgingQuestion() Ajax call
+	    question.setMark(mark);
 	}
 	
 	return mark;
@@ -869,7 +892,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    for (AssessmentResult result : results) {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			
+			//for displaying purposes, no saving occurrs
 			questionResult.setFinishDate(result.getFinishDate());
+			
 			questionResultsForSummary.add(questionResult);
 			break;
 		    }
@@ -1997,7 +2023,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	    if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS
 		    || type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
-		    || type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+		    || type == AssessmentConstants.QUESTION_TYPE_NUMERICAL
+		    || type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 
 		if (!questionJSONData.has(RestTags.ANSWERS))
 		    throw new JSONException("REST Authoring is missing answers for a question of type " + type
@@ -2010,6 +2037,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    AssessmentQuestionOption option = new AssessmentQuestionOption();
 		    option.setSequenceId(answerData.getInt(RestTags.DISPLAY_ORDER));
 		    option.setGrade(Float.parseFloat(answerData.getString("grade")));
+		    option.setCorrect(Boolean.parseBoolean(JsonUtil.opt(answerData, "correct", "false")));
 		    option.setAcceptedError(Float.parseFloat(JsonUtil.opt(answerData, "acceptedError", "0.0")));
 		    option.setFeedback(JsonUtil.opt(answerData, "feedback", (String) null));
 		    option.setOptionString(JsonUtil.opt(answerData, RestTags.ANSWER_TEXT, (String) null));

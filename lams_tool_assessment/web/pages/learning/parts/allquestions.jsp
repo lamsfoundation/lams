@@ -44,6 +44,13 @@
 						<c:when test="${question.type == 7}">
 							<%@ include file="ordering.jsp"%>
 						</c:when>
+						<c:when test="${question.type == 8}">
+							<c:set var="questionIndex" value="${status.index}"/>
+							
+							<div id="mark-hedging-question-${question.uid}">
+								<%@ include file="markhedging.jsp"%>
+							</div>
+						</c:when>						
 					</c:choose>
 							
 					<%@ include file="questionsummary.jsp"%>
