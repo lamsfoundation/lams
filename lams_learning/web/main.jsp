@@ -208,13 +208,13 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 		<c:when test="${isTouchInterface}">
 			<div id="content-frame-container" class="ui-layout-center">
 				<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" 
-					src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>"> </iframe>
+					src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>" allowfullscreen> </iframe>
 			</div>
 		</c:when>
 		
 		<c:otherwise>
 			<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" class="ui-layout-center"
-				src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>"> </iframe>
+				src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>" allowfullscreen> </iframe>
 		</c:otherwise>
 	</c:choose>
 	
