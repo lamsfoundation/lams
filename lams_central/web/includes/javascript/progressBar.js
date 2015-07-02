@@ -33,6 +33,15 @@ var isHorizontalBar = isHorizontalBar || false,
 	PATH_QUARTER_CIRCLE = " a16 16 0 0 0 16 16 v-16 z",
 	PATH_TRIANGLE = " l8 16 l8 -16 z",
 	PATH_OCTAGON = " l-7 7 v12 l7 7 h12 l7 -7 v-12 l-7 -7 z",
+	
+	// filled in when paper gets created
+	GLOW_FILTER = null,
+	
+	DEFAULT_TEXT_ATTRIBUTES = {
+		'text-anchor' : 'middle',
+		'font-size'   : 10,
+		'font-family' : 'sans-serif'
+	},
 
 	isPreview = false,
 	controlFramePadding = 0;
@@ -221,11 +230,11 @@ var ActivityUtils = {
 		// real
 		activity.addDecoration = function(act) {
 			var paper = act.bar.paper;
-			act.decoration = paper.set();
+			act.decoration = Snap.set();
 			// get exact Y where inner shape was drawn
 			// it is different than activity.y in OptionalActivity
 			// because of gray square around it
-			var y = act.shape.attr('path')[0][2],
+			var y = Snap.parsePathString(act.shape.attr('path'))[0][2],
 				arc = paper.path('M ' + (act.middle - 8) + ' ' + y
 					+ PATH_QUARTER_CIRCLE),
 				transformation = act.shape.transform();
@@ -258,20 +267,18 @@ var ActivityUtils = {
 
 		activity.addDecoration = function(act) {
 			var paper = act.bar.paper;
-			act.decoration = paper.set();
+			act.decoration = Snap.set();
 
 			// should be internationalised?
-			var text = paper.text(act.middle, act.y + 16, 'STOP');
+			var text = paper.text(act.middle, act.y + 16, 'STOP')
+							.attr(DEFAULT_TEXT_ATTRIBUTES);
 			
 			text.attr({
 				'opacity' : 0,
 				'font-size' : 9,
-				'font' : 'sans-serif',
 				'stroke' : COLOR_GATE_TEXT,
 				'cursor' : 'pointer'
 			});
-			// correct Raphael bug
-			$('tspan', text.node).attr('dy', 0);
 			act.decoration.push(text);
 			
 			
@@ -308,6 +315,7 @@ var ActivityUtils = {
 					+ PATH_BIG_SQUARE);
 			square.attr({
 				'opacity' : 0,
+				'stroke' : COLOR_STROKE_ACTIVITY,
 				'fill' : COLOR_COMPLEX_BACKGROUND,
 				'cursor' : 'pointer'
 			});
@@ -317,13 +325,13 @@ var ActivityUtils = {
 			square.decorationWraps = true;
 
 			if (!act.decoration) {
-				act.decoration = paper.set();
+				act.decoration = Snap.set();
 			}
 			act.decoration.push(square);
 		}
 	},
 
-	// return some attributes in Raphael consumable way
+	// return some attributes in Snap consumable way
 	getShapeAttributes : function(activity) {
 		return {
 			'path' : activity.path,
@@ -339,7 +347,7 @@ var ActivityUtils = {
 		// all elements that activity consists of
 		// so they all can be moved at once
 		var paper = activity.bar.paper;
-		activity.elements = paper.set();
+		activity.elements = Snap.set();
 		// only now do the real drawing, add event handlers etc.
 		activity.shape = paper.path(activity.path);
 		// add Activity attributes
@@ -356,28 +364,30 @@ var ActivityUtils = {
 				content = content.substring(0,20) + '...';
 			}
 			label = paper.text(activity.middle,
-					40 + (activity.index % 2 == 0 ? 0 : 15),
-					content);
+							   40 + (activity.index % 2 == 0 ? 0 : 15),
+							   content)
+						.attr(DEFAULT_TEXT_ATTRIBUTES);
 		} else {
 			content = ActivityUtils.breakTitle(content, paper.width);
 			label = paper.text(activity.middle,
-					47 + 60 * activity.index + (isLarger ? 10 : 0),
-					content);
+					           47 + 60 * activity.index + (isLarger ? 10 : 0),
+					           content)
+					     .attr(DEFAULT_TEXT_ATTRIBUTES);
 		}
-		// correct Raphael bug
-		$('tspan:first-child', label.node).attr('dy', 0);
 		activity.elements.push(label);
 		
 		if (!isLast) {
 			// line between activities; last activity does not have it
 			var line = null;
 			if (isHorizontalBar) {
-				line = paper.path('M ' + (activity.middle + 15) + ' 18 h 30');
+				line = paper.path('M ' + (activity.middle + 15) + ' 18 h 30')
+							.attr('stroke', COLOR_STROKE_ACTIVITY)
 			} else {
 				var startY = activity.y + label.getBBox().height + (isLarger ? 28 : 18),
 					endY = 20 + 60 * (activity.index + 1);
 				if (startY < endY) {
-					line = paper.path('M ' + activity.middle + ' ' + startY + ' L ' + activity.middle + ' ' + endY);
+					line = paper.path('M ' + activity.middle + ' ' + startY + ' L ' + activity.middle + ' ' + endY)
+								.attr('stroke', COLOR_STROKE_ACTIVITY);
 				}
 			}
 			
@@ -394,7 +404,7 @@ var ActivityUtils = {
 				// show in 1 second
 				elem.animate({
 					'opacity' : 1
-				}, 1000, "linear");
+				}, 1000);
 			});
 		}
 
@@ -423,43 +433,43 @@ var ActivityUtils = {
 		}
 
 		var mouseover = function(e, x, y) {
-			ActivityUtils.addGlow(activity);
+				ActivityUtils.addGlow(activity);
+	
+				// add tooltip
+				var tooltipText = '<b>' + activity.name + '</b><br />'
+						+ activity.statusTooltip;
+				// move to proper place and show
+				$('#tooltip').stop(true, true).css("left", x + 10).css("top", y + 20)
+						.html(tooltipText).delay(1000).fadeIn();
+			},
 
-			// add tooltip
-			var tooltipText = '<b>' + activity.name + '</b><br />'
-					+ activity.statusTooltip;
-			// move to proper place and show
-			$('#tooltip').stop(true, true).css("left", x + 10).css("top", y + 20)
-					.html(tooltipText).delay(1000).fadeIn();
-		}
+			mouseout = function() {
+				// remove glow
+				ActivityUtils.removeGlow(activity);
+				$('#tooltip').stop(true, true).fadeOut();
+			},
 
-		var mouseout = function() {
-			// remove glow
-			ActivityUtils.removeGlow(activity);
-			$('#tooltip').stop(true, true).fadeOut();
-		}
-
-		var isSupportActivity = activity instanceof SupportActivity;
-		var dblclick = activity.url ? function() {
-			// open pop up or dialog if it is a support or completed activity
-			if (isSupportActivity
-					|| activity.status == 1
-					|| (!hasContentFrame && activity.status <= 2)) {
-				openActivity(activity.url);
-
-				if (isSupportActivity) {
-					// do not ask server, just mark the activity as attempted
-					activity.transformToAttempted();
+			isSupportActivity = activity instanceof SupportActivity,
+			dblclick = activity.url ? function() {
+				// open pop up or dialog if it is a support or completed activity
+				if (isSupportActivity
+						|| activity.status == 1
+						|| (!hasContentFrame && activity.status <= 2)) {
+					openActivity(activity.url);
+	
+					if (isSupportActivity) {
+						// do not ask server, just mark the activity as attempted
+						activity.transformToAttempted();
+					}
+				} else {
+					loadFrame(activity);
 				}
-			} else {
-				loadFrame(activity);
-			}
-		} : null;
+			} : null,
 
-		var click = activity.isComplex ? function() {
-			// show complex (Optional, Branching) activity inner content
-			ActivityUtils.showComplexContent(activity);
-		} : null;
+			click = activity.isComplex ? function() {
+				// show complex (Optional, Branching) activity inner content
+				ActivityUtils.showComplexContent(activity);
+			} : null;
 
 		// assign handlers
 		activity.shape.hover(mouseover, mouseout);
@@ -475,7 +485,9 @@ var ActivityUtils = {
 	},
 	
 	addGlow : function(activity) {
-		if (!activity.shape.glowRef) {
+		if (!activity.glows) {
+			var paper = activity.bar.paper,
+				target = null;
 			// add glowing effect on hover
 			if (activity.decorationWraps) {
 				activity.decoration.forEach(function(elem) {
@@ -484,25 +496,23 @@ var ActivityUtils = {
 						// glow the wrapping decoration element
 						// for example gray square in Optonal Activity container
 						// is bigger than inner activity shape, so it should glow
-						activity.shape.glowRef = elem.glow({
-							color : elem.attr('fill')
-						});
+						elem.attr('filter', GLOW_FILTER);
+						activity.glows = elem;
 						return false;
 					}
 				});
 			} else {
-				activity.shape.glowRef = activity.shape.glow({
-					color : activity.shape.attr('fill')
-				});
+				activity.shape.attr('filter', GLOW_FILTER);
+				activity.glows = activity.shape;
 			}
 		}
 	},
 	
 	// remove glow when mouse leaves shape
 	removeGlow : function(activity, force) {
-		if (activity.shape.glowRef && (force || activity.bar.displayedActivity != activity)) {
-			activity.shape.glowRef.remove();
-			activity.shape.glowRef = null;
+		if (activity.glows && (force || activity.bar.displayedActivity != activity)) {
+			activity.glows.attr('filter', null);
+			activity.glows = null;
 		}
 	},
 
@@ -564,7 +574,7 @@ var ActivityUtils = {
 			ActivityUtils.addDecoration(activity, oldDecoration, false);
 			// transform the shape
 			activity.shape.animate(ActivityUtils.getShapeAttributes(activity),
-					2000, 'linear', function() {
+					2000, undefined, function() {
 						if (!(activity instanceof OptionalActivity)) {
 							// inner activities do not have glow and tooltip
 							// effects
@@ -585,7 +595,7 @@ var ActivityUtils = {
 				}
 				elem.animate({
 					'opacity' : 0
-				}, quick ? 0 : 1000, 'linear', function() {
+				}, quick ? 0 : 1000, undefined, function() {
 					elem.remove();
 				});
 			});
@@ -593,9 +603,9 @@ var ActivityUtils = {
 
 		// run function that draws decoration
 		if (activity.addDecoration) {
-			var animation = Raphael.animation({
+			var animation = Snap.animation({
 				'opacity' : 1
-			}, quick ? 0 : 1000, "linear");
+			}, quick ? 0 : 1000);
 
 			activity.addDecoration(activity);
 			activity.decoration.forEach(function(elem) {
@@ -605,13 +615,16 @@ var ActivityUtils = {
 				if (elem.decorationWraps) {
 					// decoration element is bigger that activity shape,
 					// put it in background
-					elem.toBack();
+					$(elem.node).parent().prepend(elem.node);
 				} else {
-					elem.toFront();
+					$(elem.node).parent().append(elem.node);
 				}
-
-				elem.animate(animation.delay(oldDecoration ? 1000
-					: undefined));
+				
+				// delay animation if there is old decroation to remove
+				setTimeout(function(){
+					elem.animate(animation);
+				}, oldDecoration ? 1000 : 0);
+				
 			});
 		}
 	},
@@ -680,16 +693,14 @@ var ActivityUtils = {
 			}
 
 			var cellId = parentId + 'child'
-					+ childActivityIndex;
-			var cell = $('<td />').attr('id', cellId).appendTo(
-					row);
+					+ childActivityIndex,
+				cell = $('<td />').attr('id', cellId).appendTo(row);
 			if (isNested) {
 				cell.hide();
 			}
-
 			// each row has its own paper
-			var paper = childActivity.bar.paper = Raphael(
-					cellId, 145, 23);
+			var paper = childActivity.bar.paper = Snap(145, 23);
+			cell.append(paper.node);
 			// draw the inner activity
 			childActivity.shape = paper
 					.path(childActivity.path);
@@ -698,25 +709,29 @@ var ActivityUtils = {
 			ActivityUtils.addDecoration(childActivity, null,
 					true);
 			
-			var labelText = ActivityUtils.breakTitle((isNested ? '- ' : '') + childActivity.name, activity.bar.paper.width - 31),
+			var labelText = ActivityUtils.breakTitle((isNested ? '- ' : '') + childActivity.name,
+													  activity.bar.paper.attr('width') - 31),
 				label = paper.text(35, childActivity.y + 11, labelText)
+							 .attr(DEFAULT_TEXT_ATTRIBUTES)
 							 // align to left
 							 .attr('text-anchor', 'start');
-			// fix a bug in FF layout
-			$('tspan:first-child', label.node).attr('dy', 0);
 			// bbox for label is not available yet, so draw the same one on a temporary paper
-			var tempPaper = new Raphael(0, 0, 1000, 1000),
-				tempLabel = tempPaper.text(0, 0, labelText),
+			var tempPaper = Snap(1000, 1000),
+				tempLabel = tempPaper.text(0, 0, labelText).attr(DEFAULT_TEXT_ATTRIBUTES),
 				labelHeight = tempLabel.getBBox().height + 10,
 				paperHeight = Math.max(23, labelHeight),
 				shift = paperHeight - 23,
 				transformationString = 't 0 ' + (shift)/2;
 			tempLabel.remove();
 			tempPaper.remove();
-			paper.setSize(paper.width, paperHeight);
+			paper.attr({
+				'height' : paperHeight
+			});
 			childActivity.shape.transform(transformationString);
 			if (childActivity.decoration) {
-				childActivity.decoration.transform(transformationString);
+				activity.decoration.forEach(function(elem) {
+					elem.transform(transformationString);
+				});
 			}
 
 			var click = null;
@@ -734,13 +749,10 @@ var ActivityUtils = {
 					childActivity.toggleChildren = function(
 							forceCommand) {
 						if (cell.is(':visible')) {
-							var childCells = $('td[id^='
-									+ cellId + 'child]', parent);
-							var isOpen = childCells
-									.is(':visible');
-							if (!forceCommand
-									|| (isOpen ? forceCommand == 'close'
-											: forceCommand == 'open')) {
+							var childCells = $('td[id^=' + cellId + 'child]', parent),
+								isOpen = childCells.is(':visible');
+							if (!forceCommand || (isOpen ? forceCommand == 'close'
+														 : forceCommand == 'open')) {
 								var containerHeightDelta = 3;
 								childCells.each(function(){
 									containerHeightDelta += $(this).height();
@@ -811,11 +823,14 @@ var ActivityUtils = {
 				transform = 'T 0 ' + pixelShift;
 			}
 			
-			afterBranchActivity.path = Raphael.transformPath(
-					afterBranchActivity.path, transform);
+			var paper = afterBranchActivity.bar.paper,
+				transformedPathElem = paper.path(afterBranchActivity.path).transform(transform);
+			afterBranchActivity.path = transformedPathElem.attr('path');
+			transformedPathElem.remove();
+			
 			afterBranchActivity.elements.forEach(function(elem) {
-				var x = elem.attr('x');
-				var targetProperties = null;
+				var x = +elem.attr('x'),
+					targetProperties = null;
 				// text, rectangles etc. have 'x', paths have 'path'
 				if (x) {
 					// move either right or down, depending on bar orientation
@@ -825,17 +840,18 @@ var ActivityUtils = {
 							}
 							:
 							{
-							 'y' : elem.attr('y') + pixelShift
+							 'y' : +elem.attr('y') + pixelShift
 							};
 				} else {
-					var path = elem.attr('path');
+					// get the path after transformation
+					var transformMatrix = elem.transform(transform).transform().globalMatrix,
+						targetPath = Snap.path.map(elem.attr('path'), transformMatrix);
+					elem.transform('');
 					targetProperties = {
-						'path' : Raphael.transformPath(path, transform)
+						'path' : targetPath
 					};
 				}
-				elem.animate(targetProperties, 2000, "linear", function(){
-					$('tspan:first-child', elem.node).attr('dy', 0);
-				});
+				elem.animate(targetProperties, 2000);
 			});
 		}
 		
@@ -845,7 +861,7 @@ var ActivityUtils = {
 		branchActivity.elements.forEach(function(elem) {
 			elem.animate({
 				'opacity' : 0
-			}, 2000, "linear", function() {
+			}, 2000, undefined, function() {
 				elem.remove();
 			});
 		});
@@ -880,12 +896,12 @@ var ActivityUtils = {
 	
 	// break string into several lines if it is too long
 	breakTitle : function(title, width) {
-		var paper = Raphael(0,0, width, 100),
+		var paper = Snap(width, 100),
 			brokenTitle = title,
 			parts = 1,
 			elem = null;
 		do {
-			elem = paper.text(0, 0, brokenTitle);
+			elem = paper.text(0, 0, brokenTitle).attr(DEFAULT_TEXT_ATTRIBUTES);
 			if (elem.getBBox().width > width) {
 				elem.remove();
 				parts++;
@@ -1049,11 +1065,15 @@ function fillProgressBar(barId) {
 				var paper = bar.paper;
 				if (!paper) {
 					// create paper only the first time
-					paper = bar.paper = Raphael(bar.containerId,
-							isHorizontalBar ? 40 + 60 * result.activities.length : 140,
+					paper = bar.paper = Snap(isHorizontalBar ? 40 + 60 * result.activities.length : 140,
 							isHorizontalBar ? 60 : 60 * result.activities.length + 25);
+					barContainer.append(paper.node);
 					// first line on the top
 					paper.path(isHorizontalBar ? PATH_START_LINE_HORIZONTAL : PATH_START_LINE_VERTICAL);
+					
+					if (!GLOW_FILTER) {
+						GLOW_FILTER = paper.filter(Snap.filter.blur(1.5));
+					}
 				}
 
 				// we need this to scroll to the current activity
@@ -1116,13 +1136,10 @@ function fillProgressBar(barId) {
 								}
 	
 								// resize main paper to accomodate new activities
-								if (isHorizontalBar) {
-									paper.setSize(40 + 60 * (activities.length
-											+ branchActivities.length - 1), 60);
-								} else {
-									paper.setSize(140, 60 * (activities.length
-											+ branchActivities.length - 1) + 25);
-								}
+								paper.attr({
+									'width' : isHorizontalBar ? 40 + 60 * (activities.length	+ branchActivities.length - 1) : 140,
+									'height' : isHorizontalBar ? 60 : 60 * (activities.length + branchActivities.length - 1) + 25
+								});
 							}
 							
 							ActivityUtils.expandBranch(bar,
@@ -1143,12 +1160,13 @@ function fillProgressBar(barId) {
 				var supportSeparatorRow = $('#supportSeparatorRow');
 				if (result.support && supportSeparatorRow.length > 0 && !supportSeparatorRow.is(':visible')) {
 					supportSeparatorRow.show();
-					$('#supportPart').height(17 + 33 * result.support.length)
-							   .show();
+
 
 					// separate paper for Support Activities frame
-					var supportPaper = Raphael('supportPart');
-
+					var supportPaper = Snap();
+					$('#supportPart').height(17 + 33 * result.support.length)
+									 .append(supportPaper.node)
+									 .show();
 					$.each(result.support, function(activityIndex,
 							activityData) {
 						var activity = new SupportActivity(
@@ -1163,7 +1181,7 @@ function fillProgressBar(barId) {
 								true);
 						ActivityUtils.addEffects(activity);
 						supportPaper.text(90, 24 + 33 * activityIndex,
-								activity.name);
+								activity.name).attr(DEFAULT_TEXT_ATTRIBUTES);
 					});
 				}
 
