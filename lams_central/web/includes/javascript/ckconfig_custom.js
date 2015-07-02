@@ -1,5 +1,5 @@
 CKEDITOR.config.toolbar_Default = [
-	['Source','-','Maximize', 'Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','equation','-','Skype'], 
+	['Source','-','Maximize', 'Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','equation','-',], 
 	['Paint_Button','MoviePlayer','Kaltura','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
 ] ;
 // removing Video Recorder from default tool bar LDEV-2961
@@ -65,7 +65,7 @@ CKEDITOR.config.templates = CKEDITOR.basePath + '../www/htmltemplates.xml';
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'kaltura,wikilink,equation,paint,movieplayer,skype,iframe';
+CKEDITOR.config.extraPlugins = 'kaltura,wikilink,equation,paint,movieplayer,iframe';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
