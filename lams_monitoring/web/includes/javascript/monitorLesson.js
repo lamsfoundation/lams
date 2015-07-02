@@ -1162,7 +1162,7 @@ function addActivityIconsHandlers(activity) {
 		$('*[id^="act' + activity.id + 'attention"]', sequenceCanvas).click(function(event){
 			event.stopPropagation();
 			// switch to first tab where attention prompts are listed
-			$('#tabs').tabs('select', 0);     
+			$('#tabs').tabs('option', 'active', 0);     
 		});
 	}
 }
