@@ -594,14 +594,20 @@ public class AuthoringAction extends Action {
 
 	    // options are different depending on the type
 	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
-		    || Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())) {
+		    || Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())
+		    || Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType())) {
 		boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+		boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
 		
 		// setting answers is very similar in both types, so they were put together here
-		if (isMultipleChoice) {
+		if (isMarkHedgingType) {
+		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MARK_HEDGING);
+		    
+		} else if (isMultipleChoice) {
 		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
 		    assessmentQuestion.setMultipleAnswersAllowed(false);
 		    assessmentQuestion.setShuffle(false);
+		    
 		} else {
 		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER);
 		    assessmentQuestion.setCaseSensitive(false);
@@ -627,7 +633,7 @@ public class AuthoringAction extends Action {
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    // for fill in blanks question all answers are correct and get full grade
-			    if (!isMultipleChoice || correctAnswer == null) {
+			    if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
 				// whatever the correct answer holds, it becomes the question score
 				questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
 				// 100% goes to the correct answer
@@ -755,6 +761,59 @@ public class AuthoringAction extends Action {
 	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
 		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_ESSAY);
 		assessmentQuestion.setAllowRichEditor(false);
+		
+	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
+		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
+		assessmentQuestion.setShuffle(false);
+
+		String correctAnswer = null;
+		if (question.getAnswers() != null) {
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
+			    new SequencableComparator());
+		    int orderId = 1;
+		    for (Answer answer : question.getAnswers()) {
+			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+				question.getResourcesFolderPath());
+			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
+			    AuthoringAction.log.warn("Skipping an answer with same text as the correct answer: "
+				    + answerText);
+			    continue;
+			}
+			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
+			assessmentAnswer.setOptionString(answerText);
+			assessmentAnswer.setSequenceId(orderId++);
+			assessmentAnswer.setFeedback(answer.getFeedback());
+
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    // for fill in blanks question all answers are correct and get full grade
+			    if (correctAnswer == null) {
+				// whatever the correct answer holds, it becomes the question score
+				questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
+				// 100% goes to the correct answer
+				assessmentAnswer.setGrade(1);
+				correctAnswer = answerText;
+			    } else {
+				AuthoringAction.log
+					.warn("Choosing only first correct answer, despite another one was found: "
+						+ answerText);
+				assessmentAnswer.setGrade(0);
+			    }
+			} else {
+			    assessmentAnswer.setGrade(0);
+			}
+
+			optionList.add(assessmentAnswer);
+		    }
+
+		    assessmentQuestion.setOptions(optionList);
+		}
+
+		if (correctAnswer == null) {
+		    AuthoringAction.log.warn("No correct answer found for question: " + question.getText());
+		    continue;
+		}
+
+		
 	    } else {
 		AuthoringAction.log.warn("Unknow QTI question type: " + question.getType());
 		continue;
@@ -905,6 +964,24 @@ public class AuthoringAction extends Action {
 		// not much to do with essay
 		question.setType(Question.QUESTION_TYPE_ESSAY);
 		answers = null;
+		break;
+		
+	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+
+		question.setType(Question.QUESTION_TYPE_MARK_HEDGING);
+
+		for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
+		    Answer answer = new Answer();
+		    boolean isCorrectAnswer = assessmentAnswer.isCorrect();
+
+		    answer.setText(assessmentAnswer.getOptionString());
+		    answer.setScore(isCorrectAnswer ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue()
+			    : 0);
+		    answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect() : assessmentQuestion
+			    .getFeedbackOnIncorrect());
+
+		    answers.add(assessmentAnswer.getSequenceId(), answer);
+		}
 		break;
 
 	    default:
@@ -1642,6 +1719,9 @@ public class AuthoringAction extends Action {
 	case AssessmentConstants.QUESTION_TYPE_ORDERING:
 	    forward = mapping.findForward("ordering");
 	    break;
+	case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+	    forward = mapping.findForward("markhedging");
+	    break;	    
 	default:
 	    forward = null;
 	    break;
@@ -1685,7 +1765,8 @@ public class AuthoringAction extends Action {
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
-		|| (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
+		|| (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
+		|| (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 	    Set<AssessmentQuestionOption> optionList = question.getOptions();
 	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	}
@@ -1767,6 +1848,11 @@ public class AuthoringAction extends Action {
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	} else if (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+	    question.setShuffle(questionForm.isShuffle());
+	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
+	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	}
 
 	// set options
@@ -1774,7 +1860,8 @@ public class AuthoringAction extends Action {
 		|| (type == AssessmentConstants.QUESTION_TYPE_ORDERING)
 		|| (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
 		|| (type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
-		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
+		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
+		|| (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 	    Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, true);
 	    Set<AssessmentQuestionOption> options = new LinkedHashSet<AssessmentQuestionOption>();
 	    int seqId = 0;
@@ -1853,6 +1940,8 @@ public class AuthoringAction extends Action {
 
 	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
 	int questionType = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE);
+	Integer correctOptionIndex = (paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT) == null) ? null
+		: NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT));
 	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
 		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
@@ -1922,6 +2011,21 @@ public class AuthoringAction extends Action {
 		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
 		option.setAnswerInt(i);
+		optionList.add(option);
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
+		if ((optionString == null) && isForSaving) {
+		    continue;
+		}
+
+		AssessmentQuestionOption option = new AssessmentQuestionOption();
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+		option.setSequenceId(NumberUtils.toInt(sequenceId));
+		option.setOptionString(optionString);
+		if ((correctOptionIndex != null) && correctOptionIndex.equals(new Integer(sequenceId))) {
+		    option.setCorrect(true);
+		}
+		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 		optionList.add(option);
 	    }
 	}

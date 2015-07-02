@@ -108,6 +108,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     
     private String titleEscaped;
     
+    private boolean responseSubmitted;
+    
     /**
      * Grade acquired from QUestionReference in learner.
      */
@@ -607,5 +609,12 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
     public void setQuestionResults(List<Object[]> questionResults2) {
 	this.questionResults = questionResults2;
+    }
+    
+    public boolean isResponseSubmitted() {
+	return responseSubmitted;
+    }
+    public void setResponseSubmitted(boolean responseSubmitted) {
+	this.responseSubmitted = responseSubmitted;
     }
 }
