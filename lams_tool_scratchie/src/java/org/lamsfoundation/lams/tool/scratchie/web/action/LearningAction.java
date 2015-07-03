@@ -280,6 +280,16 @@ public class LearningAction extends Action {
 		}
 		item.setBurningQuestion(question);
 	    }
+	    
+	    //find general burning question
+	    String generalBurningQuestion = "";
+	    for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
+		if (burningQuestion.isGeneralQuestion()) {
+		    generalBurningQuestion = burningQuestion.getQuestion();
+		    break;
+		}
+	    }
+	    sessionMap.put(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION, generalBurningQuestion);
 	}
 
 	// calculate max score
@@ -651,33 +661,23 @@ public class LearningAction extends Action {
 		    break;
 		}
 	    }
-	    
-	    final String question = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX + i);
-	    //question = question.replaceAll("[\n\r\f]", "");
-	    
-	    //if burning question is not blank save it
-	    if (StringUtils.isNotBlank(question)) {
-		
-		//skip updating if the value wasn't changed
-		if (item.getBurningQuestion() != null && item.getBurningQuestion().equals(question)) {
-		    continue;
-		}
-		
-		// update new entry
-		tryExecute(new Callable<Object>() {
-		    @Override
-		    public Object call() throws ScratchieApplicationException {
-			LearningAction.service.saveBurningQuestion(sessionId, itemUid, question);
-			return null;
-		    }
-		});
-		
-		//update question in sessionMap
-		item.setBurningQuestion(question);
-	    }
-	    
-	}
 
+	    String oldQuestion = item.getBurningQuestion();
+	    final String question = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX + i);
+	    // update question in sessionMap
+	    item.setBurningQuestion(question);
+
+	    // update new entry
+	    saveBurningQuestions(sessionId, itemUid, question, oldQuestion);
+	}
+	
+	//handle general burning question
+	final String generalQuestion = request.getParameter(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION);
+	String oldGeneralQuestion = (String) sessionMap.get(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION);
+	saveBurningQuestions(sessionId, null, generalQuestion, oldGeneralQuestion);
+	// update general question in sessionMap
+	sessionMap.put(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION, generalQuestion);
+	
 	boolean isNotebookSubmitted = sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ENTRY) != null;
 	if (scratchie.isReflectOnActivity() && !isNotebookSubmitted) {
 	    return newReflection(mapping, form, request, response);
@@ -685,6 +685,23 @@ public class LearningAction extends Action {
 	    return showResults(mapping, form, request, response);
 	}
 
+    }
+    
+    private void saveBurningQuestions(final Long sessionId, final Long itemUid, final String question,
+	    String oldQuestion) throws ScratchieApplicationException {
+	// if burning question is blank or is the same as before - skip saving it
+	if (StringUtils.isBlank(question) || question.equals(oldQuestion)) {
+	    return;
+	}
+
+	// update new entry
+	tryExecute(new Callable<Object>() {
+	    @Override
+	    public Object call() throws ScratchieApplicationException {
+		LearningAction.service.saveBurningQuestion(sessionId, itemUid, question);
+		return null;
+	    }
+	});
     }
 
     /**

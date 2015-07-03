@@ -71,7 +71,7 @@ public interface IScratchieService {
      * Save or update burningQuestion into database.
      * 
      * @param sessionId
-     * @param itemUid
+     * @param itemUid item uid, if it's null - it signifies general burning question
      * @param question
      */
     void saveBurningQuestion(Long sessionId, Long itemUid, String question);
