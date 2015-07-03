@@ -33,6 +33,8 @@ public interface ScratchieBurningQuestionDAO extends DAO {
     
     ScratchieBurningQuestion getBurningQuestionBySessionAndItem(Long sessionId, Long itemUid);
     
+    ScratchieBurningQuestion getGeneralBurningQuestionBySession(Long sessionId);
+    
     List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
 
 }

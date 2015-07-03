@@ -73,6 +73,8 @@ public class ScratchieConstants {
     
     public static final String ATTR_BURNING_QUESTIONS = "burningQuestions";
     
+    public static final String ATTR_GENERAL_BURNING_QUESTION = "generalBurningQuestion";
+    
     public static final String ATTR_ITEM_ORDER_ID_PREFIX = "itemOrderId";
     
     public static final String ATTR_ITEM_TITLE_PREFIX = "itemTitle";

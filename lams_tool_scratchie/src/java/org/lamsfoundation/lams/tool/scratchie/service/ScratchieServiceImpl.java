@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -90,6 +91,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
+import org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -437,12 +439,19 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public void saveBurningQuestion(Long sessionId, Long itemUid, String question) {
 	
-	ScratchieBurningQuestion burningQuestion = scratchieBurningQuestionDao.getBurningQuestionBySessionAndItem(sessionId, itemUid);
+	boolean isGeneralBurningQuestion = itemUid == null;
+	
+	ScratchieBurningQuestion burningQuestion = (isGeneralBurningQuestion) ? scratchieBurningQuestionDao
+		.getGeneralBurningQuestionBySession(sessionId) : scratchieBurningQuestionDao
+		.getBurningQuestionBySessionAndItem(sessionId, itemUid);
 	
 	if (burningQuestion == null) {
 	    burningQuestion = new ScratchieBurningQuestion();
-	    ScratchieItem item = scratchieItemDao.getByUid(itemUid);
-	    burningQuestion.setScratchieItem(item);
+	    if (!isGeneralBurningQuestion) {
+		ScratchieItem item = scratchieItemDao.getByUid(itemUid);
+		burningQuestion.setScratchieItem(item);
+	    }
+	    burningQuestion.setGeneralQuestion(isGeneralBurningQuestion);
 	    burningQuestion.setSessionId(sessionId);
 	    burningQuestion.setAccessDate(new Date());	    
 	}
@@ -450,8 +459,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	scratchieBurningQuestionDao.saveObject(burningQuestion);
     }
-    
-
 
     @Override
     public ScratchieAnswer getScratchieAnswerByUid(Long answerUid) {
@@ -803,6 +810,29 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    
 	    burningQuestionDtos.add(burningQuestionDTO);
 	}
+	
+	//general burning question
+	BurningQuestionDTO generalBurningQuestionDTO = new BurningQuestionDTO();
+	ScratchieItem generalDummyItem = new ScratchieItem();
+	generalDummyItem.setUid(0L);
+	final String generalQuestionMessage = messageService.getMessage("label.general.burning.question");
+	generalDummyItem.setTitle(generalQuestionMessage);
+	generalBurningQuestionDTO.setItem(generalDummyItem);
+	Map<String, String> groupNameToBurningQuestion = new LinkedHashMap<String, String>();
+	generalBurningQuestionDTO.setGroupNameToBurningQuestion(groupNameToBurningQuestion);
+	for (ScratchieSession session : sessionList) {
+
+	    ScratchieBurningQuestion burningQuestion = scratchieBurningQuestionDao
+		    .getGeneralBurningQuestionBySession(session.getSessionId());
+	    if (burningQuestion == null) {
+		continue;
+	    }
+
+	    String groupName = StringEscapeUtils.escapeJavaScript(session.getSessionName());
+	    String burningQuestionText = StringEscapeUtils.escapeJavaScript(burningQuestion.getQuestion());
+	    groupNameToBurningQuestion.put(groupName, burningQuestionText);
+	}
+	burningQuestionDtos.add(generalBurningQuestionDTO);
 
 	return burningQuestionDtos;
     }

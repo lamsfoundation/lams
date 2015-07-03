@@ -75,8 +75,13 @@
 			<h4><fmt:message key="label.burning.question" /></h4>
 			<input type="hidden" name="itemUid${j.index}" value="${item.uid}" />
 			<textarea cols="55" rows="5" name="burningQuestion${j.index}" class="text-area" >${item.burningQuestion}</textarea>
-			<br>	<br><br>		
+			<br><br><br>		
 		</c:forEach>
+		
+		<!-- general burning Question -->
+		<h4><fmt:message key="label.general.burning.question" /></h4>
+		<textarea cols="55" rows="5" name="generalBurningQuestion" class="text-area" >${sessionMap.generalBurningQuestion}</textarea>
+		<br><br><br>		
 		
 		<div class="space-bottom-top align-right">
 			<html:button property="finish-button" styleId="finish-button" onclick="submitForm()" styleClass="button">
