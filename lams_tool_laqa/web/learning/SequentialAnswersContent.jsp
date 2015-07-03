@@ -46,13 +46,13 @@
 			>
 				<c:choose>
 					<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
-						<lams:CKEditor id="answer${questionEntry.key}" value="${generalLearnerFlowDTO.currentAnswer}"
+						<lams:CKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
 							contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 						</lams:CKEditor>
 					</c:when>
 		
 					<c:otherwise>
-						<lams:textarea  name="answer" id="answer${questionEntry.key}" rows="5" cols="60" class="text-area" ><c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' /></lams:textarea>
+						<lams:textarea  name="answer" id="answer" rows="5" cols="60" class="text-area" ><c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' /></lams:textarea>
 					</c:otherwise>
 				</c:choose>
 			</div>
