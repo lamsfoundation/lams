@@ -12,17 +12,15 @@
 	<lams:WebAppURL />
 </c:set>
 
-<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-	<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
+<ul data-role="listview" data-theme="c" id="qaQuestions">
+	<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
+		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
+			<c:if test="${questionEntry.key == answerEntry.key}">
 	
-		<c:if test="${questionEntry.key == answerEntry.key}">
-		
-			<div class="shading-bg">
-				<p>
-			 		<strong>
-			 			<fmt:message key="label.question" /> 
-			 			<c:out value="${questionEntry.key}" />:
-			 		</strong>
+			<li>
+				<p class="space-top">
+				 	<strong><fmt:message key="label.question" /> 
+				 	<c:out	value="${questionEntry.key}" />:</strong>
 					<c:if test="${questionEntry.value.required}">
 						<fmt:message key="label.required" />
 					</c:if>
@@ -30,51 +28,47 @@
 						<fmt:message key="label.minimum.number.words" >
 							<fmt:param>&nbsp;${questionEntry.value.minWordsLimit}</fmt:param>
 						</fmt:message>
-					</c:if>	
+					</c:if>
 					<c:out value="${questionEntry.value.question}" escapeXml="false" />
 				</p>
-								 
-				<p>
+					
+				<p class="small-space-top">
 					<strong><fmt:message key="label.answer" /></strong>
 				</p>
-				
-				<c:choose>
-					<c:when test="${hasEditRight}">
 					
-						<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
-							 data-min-words-limit="${questionEntry.value.minWordsLimit}"
-							<c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>
-						>
-							<c:choose>
-								<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
-									<lams:CKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
-										contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
-									</lams:CKEditor>
-								</c:when>
+				<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
+						data-min-words-limit="${questionEntry.value.minWordsLimit}"
+						class="small-space-bottom <c:if test="${questionEntry.value.minWordsLimit != 0}">min-words-limit-enabled</c:if>"
+				>
+					<c:choose>
+						<c:when test="${hasEditRight}">
+							<lams:textarea name="answer${questionEntry.key}" id="answer${questionEntry.key}" rows="5" cols="60" class="text-area" ><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+						</c:when>
 						
-								<c:otherwise>
-									<lams:textarea name="answer${questionEntry.key}" id="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
-								</c:otherwise>
-							</c:choose>
-						</div>
-						
-					</c:when>
-					
-					<c:otherwise>
-						<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" disabled="disabled"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		
-		</c:if>
-	
+						<c:otherwise>
+							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" disabled="disabled"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+						</c:otherwise>
+					</c:choose>
+
+				</div>
+			</li>
+			
+			</c:if>
+		</c:forEach>
 	</c:forEach>
-</c:forEach>
+</ul>
 
 <c:if test="${hasEditRight}">
-	<div class="space-bottom-top align-right">
-		<html:button property="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');"	styleClass="button">
+	<div class="space-top button-inside">
+		<button name="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');" data-theme="b">
 			<fmt:message key="button.submitAllContent" />
-		</html:button>
+		</button>
 	</div>
 </c:if>
+
+</div><!-- /page div -->
+
+<div data-role="footer" data-theme="b">
+	<h2>&nbsp;</h2>
+</div><!-- /footer -->
+

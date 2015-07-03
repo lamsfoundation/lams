@@ -82,6 +82,8 @@ public class QaContent implements Serializable {
     private boolean questionsSequenced;
 
     private boolean lockWhenFinished;
+    
+    private boolean noReeditAllowed;
 
     private boolean showOtherAnswers;
 
@@ -126,7 +128,7 @@ public class QaContent implements Serializable {
     /** full constructor */
     public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
 	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
-	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished,
+	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished, boolean noReeditAllowed,
 	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
 	    Set<QaQueContent> qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
 	    boolean useSelectLeaderToolOuput, int maximumRates, int minimumRates,
@@ -143,6 +145,7 @@ public class QaContent implements Serializable {
 	this.allowRateAnswers = allowRateAnswers;
 	this.notifyTeachersOnResponseSubmit = notifyTeachersOnResponseSubmit;
 	this.lockWhenFinished = lockWhenFinished;
+	this.noReeditAllowed = noReeditAllowed;
 	this.showOtherAnswers = showOtherAnswers;
 	this.reflect = reflect;
 	this.reflectionSubject = reflectionSubject;
@@ -172,7 +175,7 @@ public class QaContent implements Serializable {
 	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
 		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(),
 		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(),
-		qa.isLockWhenFinished(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
+		qa.isLockWhenFinished(), qa.isNoReeditAllowed(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
 		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
 			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput(),
 		qa.maximumRates, qa.minimumRates, new TreeSet());
@@ -547,6 +550,21 @@ public class QaContent implements Serializable {
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
+    }
+    
+    /**
+     * @return Returns the noReeditAllowed.
+     */
+    public boolean isNoReeditAllowed() {
+	return noReeditAllowed;
+    }
+
+    /**
+     * @param noReeditAllowed
+     *            The noReeditAllowed to set.
+     */
+    public void setNoReeditAllowed(boolean noReeditAllowed) {
+	this.noReeditAllowed = noReeditAllowed;
     }
 
     public boolean isAllowRichEditor() {
