@@ -51,7 +51,7 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
 
     private boolean responseFinalised;
 
-    //please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrongly name to this field)
+    //please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrong name to this field)
     private Long mcSessionId;
 
     /** nullable persistent field */

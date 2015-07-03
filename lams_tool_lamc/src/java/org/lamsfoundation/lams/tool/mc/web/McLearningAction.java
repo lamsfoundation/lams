@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -205,10 +206,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    return mapping.findForward(McAppConstants.LEARNING_STARTER);
 	}
 
-	McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
-	mcQueUsr.setResponseFinalised(true);
-	mcService.updateMcQueUsr(mcQueUsr);
-
 	response.sendRedirect(nextUrl);
 
 	return null;
@@ -319,21 +316,31 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	
 	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	String userID = user.getUserID().toString();
-	McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	String userID = userDto.getUserID().toString();
+	McQueUsr user = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	
+	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (user.isResponseFinalised()) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewAnswersRedirect"));
+	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	    redirect.addParameter(MODE, "learner");
+	    redirect.addParameter("httpSessionID", httpSessionID);
+	    return redirect;
+	}
 
 	// Have to work out in advance if passed so that we can store it against the attempts
-	boolean passed = mcQueUsr.isMarkPassed(learnerMark);
+	boolean passed = user.isMarkPassed(learnerMark);
 	mcGeneralLearnerFlowDTO.setUserOverPassMark(new Boolean(passed).toString());
 	mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(mcContent.getPassMark() != null).toString());
 
-	McLearningAction.saveUserAttempt(mcQueUsr, selectedQuestionAndCandidateAnswersDTO);
+	McLearningAction.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
 
-	Integer numberOfAttempts = mcQueUsr.getNumberOfAttempts() + 1;
-	mcQueUsr.setNumberOfAttempts(numberOfAttempts);
-	mcQueUsr.setLastAttemptTotalMark(learnerMark);
-	mcService.updateMcQueUsr(mcQueUsr);
+	Integer numberOfAttempts = user.getNumberOfAttempts() + 1;
+	user.setNumberOfAttempts(numberOfAttempts);
+	user.setLastAttemptTotalMark(learnerMark);
+	user.setResponseFinalised(true);
+	mcService.updateMcQueUsr(user);
 
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 
@@ -354,7 +361,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	//String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
-	mcGeneralLearnerFlowDTO.setLatestAttemptMark(mcQueUsr.getLastAttemptTotalMark());
+	mcGeneralLearnerFlowDTO.setLatestAttemptMark(user.getLastAttemptTotalMark());
 
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
@@ -387,6 +394,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	
+	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (user.isResponseFinalised()) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewAnswersRedirect"));
+	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	    redirect.addParameter(MODE, "learner");
+	    redirect.addParameter("httpSessionID", httpSessionID);
+	    return redirect;
+	}
 	
 	//parse learner input
 	List<String> learnerInput = McLearningAction.parseLearnerAnswers(mcLearningForm, request);
@@ -431,11 +447,17 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     }
 
     /**
-     *  prepareViewAnswersData
+     * allows the learner to view their answer history
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return ActionForward
      */
-    public void prepareViewAnswersData(ActionMapping mapping, McLearningForm mcLearningForm,
-	    HttpServletRequest request, ServletContext servletContext) {
-
+    public ActionForward viewAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McLearningForm mcLearningForm = (McLearningForm) form;
+	
 	// may have to get service from the form - if class has been created by starter action, rather than by struts
 	if (mcService == null) {
 	    if (getServlet() != null) {
@@ -580,21 +602,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, servletContext);
-    }
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,  getServlet().getServletContext());
 
-    /**
-     * allows the learner to view their answer history
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward viewAnswers(ActionMapping mapping, McLearningForm mcLearningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	prepareViewAnswersData(mapping, mcLearningForm, request, getServlet().getServletContext());
 	return mapping.findForward(McAppConstants.VIEW_ANSWERS);
     }
 
@@ -610,6 +619,10 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 	McQueUsr mcQueUsr = getCurrentUser(toolSessionID);
+	
+ 	//in order to track whether redo button is pressed store this info
+	mcQueUsr.setResponseFinalised(false);
+	mcService.updateMcQueUsr(mcQueUsr);
 	
 	//clear sessionMap
 	String httpSessionID = mcLearningForm.getHttpSessionID();
@@ -795,6 +808,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	String userID = userDto.getUserID().toString();
 	McQueUsr user = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	
+	//prohibit users from autosaving answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (user.isResponseFinalised()) {
+	    return null;
+	}
 
 	List<String> learnerInput = McLearningAction.parseLearnerAnswers(mcLearningForm, request);
 	

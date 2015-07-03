@@ -158,9 +158,9 @@
 	     />
 
 	  	<forward
-		    name="learningStarter"
-		    path="/learningIndex.jsp"
-		    redirect="false"
+		    name="viewAnswersRedirect"
+		    path="/learning.do?method=viewAnswers"
+		    redirect="true"
 	  	/>
 	  	
 	  	<forward
@@ -266,9 +266,9 @@
 	     />
 
 	  	<forward
-		    name="learningStarter"
-		    path="/learningIndex.jsp"
-		    redirect="false"
+		    name="viewAnswersRedirect"
+		    path="/learning.do?method=viewAnswers"
+		    redirect="true"
 	  	/>
 
 	     <forward
@@ -364,11 +364,7 @@
 	
    <action 	path="/clearsession" 
    			type="org.lamsfoundation.lams.tool.mc.web.ClearSessionAction"> 
-	</action>
-
-	<action path="/clearsession"
-		type="org.lamsfoundation.lams.tool.mc.web.ClearSessionAction">
-	</action>       
+	</action>    
  </action-mappings>
 	
 	<message-resources parameter="org.lamsfoundation.lams.tool.mc.ApplicationResources"/>

@@ -157,7 +157,6 @@ public interface McAppConstants {
     public static final String PASSMARK = "passMark";
     public static final String VIEW_ANSWERS = "viewAnswers";
     public static final String SHOW_AUTHORING_TABS = "showAuthoringTabs";
-    public static final String REQUEST_BY_STARTER = "requestByStarter";
 
     public static final String ON = "ON";
     public static final String OFF = "OFF";
