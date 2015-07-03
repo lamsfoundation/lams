@@ -81,3 +81,10 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 1.2.10 Release Fixes
 ===================
 * LDEV-3473: Start supporting "Course builder" user role
+
+1.2.11 Release Fixes
+===================
+* LDEV-3456: Template interface for creating boilerplate text based lessons
+This module has new calls to list the sequences in the root of a user's account and to 
+render a learning design image, which allows other deployment options on the Blackboard side.
+Also supports calls to the LAMS server to use a dummy course to suit the templates.
