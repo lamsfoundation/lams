@@ -40,7 +40,7 @@
 					 data-min-words-limit="${questionEntry.value.minWordsLimit}"
 					class="space-bottom <c:if test="${questionEntry.value.minWordsLimit != 0}">min-words-limit-enabled</c:if>"
 				>
-					<lams:textarea  name="answer" id="answer${questionEntry.key}" rows="5" cols="60" class="text-area" ><c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' /></lams:textarea>
+					<lams:textarea  name="answer" id="answer" rows="5" cols="60" class="text-area" ><c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' /></lams:textarea>
 				</div>
 				
 				<html:hidden property="currentQuestionIndex"value="${questionEntry.key}" />
