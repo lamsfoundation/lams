@@ -412,14 +412,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public void storeUserAnswers(Long assessmentUid, Long userId,
-	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, boolean isAutosave) {
+    public boolean storeUserAnswers(Long assessmentUid, Long userId,
+	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
+	    boolean isAutosave) {
 	
 	int maximumGrade = 0;
 	float grade = 0;
 
 	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
 	Assessment assessment = result.getAssessment();
+	
+	//prohibit users from submitting (or autosubmitting) answers after result is finished but Resubmit button is not pressed (e.g. using 2 browsers) 
+	if (result.getFinishDate() != null) {
+	    return false;
+	}
 	
 	//store all answers (in all pages)
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
@@ -466,6 +472,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    result.setFinishDate(new Timestamp(new Date().getTime()));
 	    assessmentResultDao.saveObject(result);
 	}
+	
+	return true;
     }
 
     /**
