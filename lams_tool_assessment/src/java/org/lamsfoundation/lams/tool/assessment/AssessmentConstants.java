@@ -55,6 +55,8 @@ public class AssessmentConstants {
     public static final short QUESTION_TYPE_ESSAY = 6;
     
     public static final short QUESTION_TYPE_ORDERING = 7;
+    
+    public static final short QUESTION_TYPE_MARK_HEDGING = 8;
 
     // for action forward name
     public static final String SUCCESS = "success";
@@ -112,6 +114,8 @@ public class AssessmentConstants {
     public static final String ATTR_OPTION_STRING_PREFIX = "optionString";
     
     public static final String ATTR_OPTION_GRADE_PREFIX = "optionGrade";
+    
+    public static final String ATTR_OPTION_CORRECT = "optionCorrect";
     
     public static final String ATTR_OPTION_FLOAT_PREFIX = "optionFloat";
     

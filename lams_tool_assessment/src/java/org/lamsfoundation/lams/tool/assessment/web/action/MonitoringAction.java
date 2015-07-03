@@ -447,33 +447,33 @@ public class MonitoringAction extends Action {
 				    assessmentUser.getUserId());
 
 			    if (assessmentResult != null) {
-				Set<AssessmentQuestionResult> assessmentQuestionResults = assessmentResult
+				Set<AssessmentQuestionResult> questionResults = assessmentResult
 					.getQuestionResults();
 
-				if (assessmentQuestionResults != null) {
+				if (questionResults != null) {
 
-				    for (AssessmentQuestionResult assessmentQuestionResult : assessmentQuestionResults) {
+				    for (AssessmentQuestionResult questionResult : questionResults) {
 
 					if (showUserNames) {
 					    ExcelCell[] userResultRow = new ExcelCell[6];
 					    userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
 					    userResultRow[1] = new ExcelCell(assessmentUser.getFullName(), false);
 					    userResultRow[2] = new ExcelCell(assessmentResult.getStartDate(), false);
-					    userResultRow[3] = new ExcelCell(assessmentQuestionResult
+					    userResultRow[3] = new ExcelCell(questionResult
 						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[4] = new ExcelCell(getAnswerObject(assessmentQuestionResult),
+					    userResultRow[4] = new ExcelCell(getAnswerObject(questionResult),
 						    false);
-					    userResultRow[5] = new ExcelCell(assessmentQuestionResult.getMark(), false);
+					    userResultRow[5] = new ExcelCell(questionResult.getMark(), false);
 					    data.add(userResultRow);
 					} else {
 					    ExcelCell[] userResultRow = new ExcelCell[5];
 					    userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
 					    userResultRow[1] = new ExcelCell(assessmentResult.getStartDate(), false);
-					    userResultRow[2] = new ExcelCell(assessmentQuestionResult
+					    userResultRow[2] = new ExcelCell(questionResult
 						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[3] = new ExcelCell(getAnswerObject(assessmentQuestionResult),
+					    userResultRow[3] = new ExcelCell(getAnswerObject(questionResult),
 						    false);
-					    userResultRow[4] = new ExcelCell(assessmentQuestionResult.getMark(), false);
+					    userResultRow[4] = new ExcelCell(questionResult.getMark(), false);
 					    data.add(userResultRow);
 					}
 				    }
@@ -573,27 +573,26 @@ public class MonitoringAction extends Action {
 		    int timeTakenCount = 0;
 		    int timeTakenTotal = 0;
 		    for (List<AssessmentQuestionResult> resultList : allResultsForQuestion) {
-			for (AssessmentQuestionResult assessmentQuestionResult : resultList) {
+			for (AssessmentQuestionResult questionResult : resultList) {
 
 			    if (showUserNames) {
 				ExcelCell[] userResultRow = new ExcelCell[10];
-				userResultRow[0] = new ExcelCell(assessmentQuestionResult.getAssessmentQuestion()
-					.getTitle(), false);
-				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(assessmentQuestionResult
-					.getAssessmentQuestion().getType()), false);
-				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult
-					.getAssessmentQuestion().getPenaltyFactor()), false);
-				Float maxMark = (assessmentQuestionResult.getMaxMark() == null) ? 0 : new Float(
-					assessmentQuestionResult.getMaxMark());
-				userResultRow[3] = new ExcelCell(maxMark, false);
-				userResultRow[4] = new ExcelCell(assessmentQuestionResult.getUser().getUserId(), false);
-				userResultRow[5] = new ExcelCell(assessmentQuestionResult.getUser().getFullName(),
+				userResultRow[0] = new ExcelCell(questionResult.getAssessmentQuestion().getTitle(),
 					false);
-				userResultRow[6] = new ExcelCell(assessmentQuestionResult.getFinishDate(), false);
-				userResultRow[7] = new ExcelCell(getAnswerObject(assessmentQuestionResult), false);
+				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(questionResult
+					.getAssessmentQuestion().getType()), false);
+				userResultRow[2] = new ExcelCell(new Float(questionResult.getAssessmentQuestion()
+					.getPenaltyFactor()), false);
+				Float maxMark = (questionResult.getMaxMark() == null) ? 0 : new Float(
+					questionResult.getMaxMark());
+				userResultRow[3] = new ExcelCell(maxMark, false);
+				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
+				userResultRow[5] = new ExcelCell(questionResult.getUser().getFullName(), false);
+				userResultRow[6] = new ExcelCell(questionResult.getFinishDate(), false);
+				userResultRow[7] = new ExcelCell(getAnswerObject(questionResult), false);
 
-				AssessmentResult assessmentResult = assessmentQuestionResult.getAssessmentResult();
-				Date finishDate = assessmentQuestionResult.getFinishDate();
+				AssessmentResult assessmentResult = questionResult.getAssessmentResult();
+				Date finishDate = questionResult.getFinishDate();
 				if (assessmentResult != null && finishDate != null) {
 				    Date startDate = assessmentResult.getStartDate();
 				    if (startDate != null) {
@@ -604,32 +603,32 @@ public class MonitoringAction extends Action {
 				    }
 				}
 
-				Float mark = assessmentQuestionResult.getMark();
+				Float mark = questionResult.getMark();
 				if (mark != null) {
-				    userResultRow[9] = new ExcelCell(assessmentQuestionResult.getMark(), false);
+				    userResultRow[9] = new ExcelCell(questionResult.getMark(), false);
 				    markCount++;
-				    markTotal += assessmentQuestionResult.getMark();
+				    markTotal += questionResult.getMark();
 				}
 
 				data.add(userResultRow);
 			    } else {
 				ExcelCell[] userResultRow = new ExcelCell[9];
-				userResultRow[0] = new ExcelCell(assessmentQuestionResult.getAssessmentQuestion()
-					.getTitle(), false);
-				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(assessmentQuestionResult
+				userResultRow[0] = new ExcelCell(questionResult.getAssessmentQuestion().getTitle(),
+					false);
+				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(questionResult
 					.getAssessmentQuestion().getType()), false);
-				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult
-					.getAssessmentQuestion().getPenaltyFactor()), false);
-				Float maxMark = (assessmentQuestionResult.getMaxMark() == null) ? 0 : new Float(
-					assessmentQuestionResult.getMaxMark());
+				userResultRow[2] = new ExcelCell(new Float(questionResult.getAssessmentQuestion()
+					.getPenaltyFactor()), false);
+				Float maxMark = (questionResult.getMaxMark() == null) ? 0 : new Float(
+					questionResult.getMaxMark());
 				userResultRow[3] = new ExcelCell(maxMark, false);
-				userResultRow[4] = new ExcelCell(assessmentQuestionResult.getUser().getUserId(), false);
-				userResultRow[5] = new ExcelCell(assessmentQuestionResult.getFinishDate(), false);
-				userResultRow[6] = new ExcelCell(getAnswerObject(assessmentQuestionResult), false);
+				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
+				userResultRow[5] = new ExcelCell(questionResult.getFinishDate(), false);
+				userResultRow[6] = new ExcelCell(getAnswerObject(questionResult), false);
 
-				if (assessmentQuestionResult.getAssessmentResult() != null) {
-				    Date startDate = assessmentQuestionResult.getAssessmentResult().getStartDate();
-				    Date finishDate = assessmentQuestionResult.getFinishDate();
+				if (questionResult.getAssessmentResult() != null) {
+				    Date startDate = questionResult.getAssessmentResult().getStartDate();
+				    Date finishDate = questionResult.getFinishDate();
 				    if (startDate != null && finishDate != null) {
 					Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
 					userResultRow[7] = new ExcelCell(seconds, false);
@@ -638,11 +637,11 @@ public class MonitoringAction extends Action {
 				    }
 				}
 
-				userResultRow[8] = new ExcelCell(assessmentQuestionResult.getMark(), false);
+				userResultRow[8] = new ExcelCell(questionResult.getMark(), false);
 
-				if (assessmentQuestionResult.getMark() != null) {
+				if (questionResult.getMark() != null) {
 				    markCount++;
-				    markTotal += assessmentQuestionResult.getMark();
+				    markTotal += questionResult.getMark();
 				}
 
 				data.add(userResultRow);
@@ -693,6 +692,9 @@ public class MonitoringAction extends Action {
 	return data.toArray(new ExcelCell[][] {});
     }
 
+    /**
+     * Used only for excell export (for getUserSummaryData() method).
+     */
     private String getQuestionTypeLanguageLabel(short type) {
 	switch (type) {
 	case AssessmentConstants.QUESTION_TYPE_ESSAY:
@@ -709,30 +711,37 @@ public class MonitoringAction extends Action {
 	    return "Short Answer";
 	case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
 	    return "True/False";
+	case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+	    return "Mark Hedging";	    
 	default:
 	    return null;
 	}
     }
 
-    private Object getAnswerObject(AssessmentQuestionResult assessmentQuestionResult) {
+    /**
+     * Used only for excell export (for getUserSummaryData() method).
+     */
+    private Object getAnswerObject(AssessmentQuestionResult questionResult) {
 	Object ret = null;
 
-	if (assessmentQuestionResult != null) {
-	    switch (assessmentQuestionResult.getAssessmentQuestion().getType()) {
+	if (questionResult != null) {
+	    switch (questionResult.getAssessmentQuestion().getType()) {
 	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
-		return removeHTMLTags(assessmentQuestionResult.getAnswerString());
+		return removeHTMLTags(questionResult.getAnswerString());
 	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-		return getOptionResponse(assessmentQuestionResult, AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
 	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-		return getOptionResponse(assessmentQuestionResult, AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
 	    case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-		return assessmentQuestionResult.getAnswerString();
+		return questionResult.getAnswerString();
 	    case AssessmentConstants.QUESTION_TYPE_ORDERING:
-		return getOptionResponse(assessmentQuestionResult, AssessmentConstants.QUESTION_TYPE_ORDERING);
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_ORDERING);
 	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-		return assessmentQuestionResult.getAnswerString();
+		return questionResult.getAnswerString();
 	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-		return assessmentQuestionResult.getAnswerBoolean();
+		return questionResult.getAnswerBoolean();
+	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MARK_HEDGING);
 	    default:
 		return null;
 	    }
@@ -740,34 +749,39 @@ public class MonitoringAction extends Action {
 	return ret;
     }
 
-    public String getOptionResponse(AssessmentQuestionResult assessmentQuestionResult, short type) {
+    /**
+     * Used only for excell export (for getUserSummaryData() method).
+     */
+    private String getOptionResponse(AssessmentQuestionResult questionResult, short type) {
 
 	StringBuilder sb = new StringBuilder();
-	Set<AssessmentOptionAnswer> optionAnswers = assessmentQuestionResult.getOptionAnswers();
-	boolean trimComma = false;
+	//whether there is a need to remove last comma
+	boolean trimLastComma = false;
+
+	Set<AssessmentQuestionOption> options = questionResult.getAssessmentQuestion().getOptions();
+	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 	if (optionAnswers != null) {
 
 	    if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 		for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-		    if (optionAnswer.getAnswerBoolean() == true) {
-			for (AssessmentQuestionOption option : assessmentQuestionResult.getAssessmentQuestion()
-				.getOptions()) {
+		    if (optionAnswer.getAnswerBoolean()) {
+			for (AssessmentQuestionOption option : options) {
 			    if (option.getUid().equals(optionAnswer.getOptionUid())) {
 				sb.append(option.getOptionString() + ", ");
-				trimComma = true;
+				trimLastComma = true;
 			    }
 			}
 		    }
 		}
+		
 	    } else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		for (int i = 0; i < optionAnswers.size(); i++) {
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (optionAnswer.getAnswerInt() == i) {
-			    for (AssessmentQuestionOption option : assessmentQuestionResult
-				    .getAssessmentQuestion().getOptions()) {
+			    for (AssessmentQuestionOption option : options) {
 				if (option.getUid().equals(optionAnswer.getOptionUid())) {
 				    sb.append(option.getOptionString() + ", ");
-				    trimComma = true;
+				    trimLastComma = true;
 				}
 			    }
 			}
@@ -776,17 +790,29 @@ public class MonitoringAction extends Action {
 
 	    } else if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 
-		for (AssessmentQuestionOption option : assessmentQuestionResult.getAssessmentQuestion()
-			.getOptions()) {
+		for (AssessmentQuestionOption option : options) {
 		    sb.append("[" + option.getOptionString() + ", ");
+		    
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (option.getUid().equals(optionAnswer.getOptionUid())) {
-			    for (AssessmentQuestionOption option2 : assessmentQuestionResult
-				    .getAssessmentQuestion().getOptions()) {
+			    for (AssessmentQuestionOption option2 : options) {
 				if (option2.getUid() == optionAnswer.getAnswerInt()) {
 				    sb.append(option2.getOptionString() + "] ");
 				}
 			    }
+			}
+		    }
+
+		}
+		
+	    } else if (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+		
+		for (AssessmentQuestionOption option : options) {
+		    sb.append("[" + option.getOptionString() + ", ");
+		    
+		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
+			if (option.getUid().equals(optionAnswer.getOptionUid())) {
+			    sb.append(optionAnswer.getAnswerInt() + "] ");
 			}
 		    }
 
@@ -796,7 +822,7 @@ public class MonitoringAction extends Action {
 	}
 	String ret = sb.toString().replaceAll("\\<.*?\\>", "");
 
-	if (trimComma) {
+	if (trimLastComma) {
 	    ret = ret.substring(0, ret.lastIndexOf(","));
 	}
 

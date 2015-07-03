@@ -16,13 +16,16 @@
 						</c:when>
 						<c:when test="${questionType == 3}">
 							<%@ include file="shortansweroption.jsp"%>
-						</c:when>						
+						</c:when>					
 						<c:when test="${questionType == 4}">
 							<%@ include file="numericaloption.jsp"%>
-						</c:when>	
+						</c:when>
 						<c:when test="${questionType == 7}">
 							<%@ include file="orderingoption.jsp"%>
-						</c:when>											
+						</c:when>
+						<c:when test="${questionType == 8}">
+							<%@ include file="optionhedgingmark.jsp"%>
+						</c:when>
 					</c:choose>	
 				</td>
 					
