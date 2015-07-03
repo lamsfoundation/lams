@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -65,10 +64,10 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.springframework.dao.DataAccessException;
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -362,7 +361,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    return;
 	}
 
-	for (NoticeboardSession session : (Set<NoticeboardSession>) nbContent.getNbSessions()) {
+	for (NoticeboardSession session : nbContent.getNbSessions()) {
 	    NoticeboardUser user = nbUserDAO.getNbUser(userId.longValue(), session.getNbSessionId());
 	    if (user != null) {
 		NotebookEntry entry = getEntry(session.getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -403,15 +402,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	return nbSession;
     }
 
-    /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
-     * @throws ToolException
-     *             if any other error occurs
-     */
-
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	NoticeboardContent toolContentObj = nbContentDAO.findNbContentById(toolContentId);
@@ -437,12 +427,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
     }
 
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *             if any other error occurs
-     */
     @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -466,14 +450,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
@@ -537,28 +513,21 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	removeSession(session);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     */
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
     @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
@@ -576,7 +545,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	nbContentDAO.saveNbContent(toolContentObj);
     }
 
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
     @Override
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
@@ -599,11 +567,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     public void setNbContentDAO(INoticeboardContentDAO nbContentDAO) {
 	this.nbContentDAO = nbContentDAO;
     }
-    
+
     public void setNbSessionDAO(INoticeboardSessionDAO nbSessionDAO) {
 	this.nbSessionDAO = nbSessionDAO;
     }
-    
+
     public void setNbUserDAO(INoticeboardUserDAO nbUserDAO) {
 	this.nbUserDAO = nbUserDAO;
     }

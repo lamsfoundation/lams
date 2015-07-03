@@ -1851,26 +1851,37 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	scratchieSessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getScratchieOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getScratchieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	Long userId = user.getUserId().longValue();
+
+	ScratchieSession session = getScratchieSessionBySessionId(toolSessionId);
+	if ((session == null) || (session.getScratchie() == null)) {
+	    return;
+	}
+	Scratchie scratchie = session.getScratchie();
+
+	// as long as leader aware feature is always ON - copy answers from leader to non-leader user
+
+	ScratchieUser scratchieUser = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
+	// create user if he hasn't accessed this activity yet
+	if (scratchieUser == null) {
+	    scratchieUser = new ScratchieUser(user.getUserDTO(), session);
+	    createUser(scratchieUser);
+	}
+	
+	// as long as there is no individual results in Scratchie tool (but rather one for entire group) there is no
+	// need to copyAnswersFromLeader()
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */

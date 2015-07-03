@@ -118,9 +118,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * 
  */
 public class EadventureServiceImpl implements IEadventureService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager
-
-{
+	ToolContentImport102Manager {
     static Logger log = Logger.getLogger(EadventureServiceImpl.class.getName());
 
     private EadventureDAO eadventureDao;
@@ -1098,15 +1096,16 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	}
     }
 
-    public void removeParams(Long toolContentId){
+    public void removeParams(Long toolContentId) {
 	List<EadventureParam> params = getEadventureParamByContentId(toolContentId);
-	if (params!=null){
-	for (EadventureParam param:params){
-	    eadventureParamDao.delete(param);
-	}
+	if (params != null) {
+	    for (EadventureParam param : params) {
+		eadventureParamDao.delete(param);
+	    }
 	}
     }
 
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	EadventureSession session = new EadventureSession();
 	session.setSessionId(toolSessionId);
@@ -1116,6 +1115,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	eadventureSessionDao.saveObject(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    EadventureServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -1139,37 +1139,35 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	eadventureSessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getEadventureOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getEadventureOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */

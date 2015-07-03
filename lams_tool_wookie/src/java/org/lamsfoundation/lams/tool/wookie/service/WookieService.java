@@ -80,7 +80,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 public class WookieService implements ToolSessionManager, ToolContentManager,
 		IWookieService, ToolContentImport102Manager {
 
-	static Logger logger = Logger.getLogger(WookieService.class.getName());
+    private static Logger logger = Logger.getLogger(WookieService.class.getName());
 
 	private IWookieDAO wookieDAO = null;
 
@@ -108,10 +108,11 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	public WookieService() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/* ************ Methods from ToolSessionManager ************* */
+	
+	@Override
 	public void createToolSession(Long toolSessionId, String toolSessionName,
 			Long toolContentId) throws ToolException {
 		if (WookieService.logger.isDebugEnabled()) {
@@ -175,54 +176,50 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		wookieSessionDAO.saveOrUpdate(session);
 	}
 
+	@Override
 	public String leaveToolSession(Long toolSessionId, Long learnerId)
 			throws DataMissingException, ToolException {
 		return learnerService.completeToolSession(toolSessionId, learnerId);
 	}
 
+	@Override
 	public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
 			throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public ToolSessionExportOutputData exportToolSession(List ToolSessionIds)
 			throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public void removeToolSession(Long toolSessionId)
 			throws DataMissingException, ToolException {
 		wookieSessionDAO.deleteBySessionID(toolSessionId);
 		// TODO check if cascade worked
 	}
 
-	/**
-	 * Get the tool output for the given tool output names.
-	 * 
-	 * @see 
-	 *      org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util
-	 *      .List<String>, java.lang.Long, java.lang.Long)
-	 */
+	@Override
 	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
 			Long toolSessionId, Long learnerId) {
 		return getWookieOutputFactory().getToolOutput(names, this,
 				toolSessionId, learnerId);
 	}
 
-	/**
-	 * Get the tool output for the given tool output name.
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
-	 *      java.lang.Long, java.lang.Long)
-	 */
+	@Override
 	public ToolOutput getToolOutput(String name, Long toolSessionId,
 			Long learnerId) {
 		return getWookieOutputFactory().getToolOutput(name, this,
 				toolSessionId, learnerId);
 	}
+	
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	// no actions required
+    }
 
 	/* ************ Methods from ToolContentManager ************************* */
 
@@ -308,20 +305,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 		wookieDAO.saveOrUpdate(toContent);
 	}
-
-	public void copyFile(File srcFile, String destPath) throws Exception {
-		if (srcFile.exists() && srcFile.canRead()) {
-			File newFile = new File(destPath);
-			FileOutputStream out = new FileOutputStream(newFile);
-			FileInputStream in = new FileInputStream(srcFile);
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-		}
-
-	}
 	
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
@@ -336,7 +319,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
     @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
-	// TODO Auto-generated method stub
     }
 
     @Override
@@ -366,16 +348,8 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	}
     }
-	/**
-	 * Export the XML fragment for the tool's content, along with any files
-	 * needed for the content.
-	 * 
-	 * @throws DataMissingException
-	 *             if no tool content matches the toolSessionId
-	 * @throws ToolException
-	 *             if any other error occurs
-	 */
-
+    
+    	@Override
 	public void exportToolContent(Long toolContentId, String rootPath)
 			throws DataMissingException, ToolException {
 		Wookie wookie = wookieDAO.getByContentId(toolContentId);
@@ -400,13 +374,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
-	/**
-	 * Import the XML fragment for the tool's content, along with any files
-	 * needed for the content.
-	 * 
-	 * @throws ToolException
-	 *             if any other error occurs
-	 */
+    	@Override
 	public void importToolContent(Long toolContentId, Integer newUserUid,
 			String toolContentPath, String fromVersion, String toVersion)
 			throws ToolException {
@@ -463,6 +431,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
+    	@Override
 	public String getFileExtension(String fileName) {
 		String ext = "";
 		int i = fileName.lastIndexOf('.');
@@ -472,16 +441,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		return ext;
 	}
 
-	/**
-	 * Get the definitions for possible output for an activity, based on the
-	 * toolContentId. These may be definitions that are always available for the
-	 * tool (e.g. number of marks for Multiple Choice) or a custom definition
-	 * created for a particular activity such as the answer to the third
-	 * question contains the word Koala and hence the need for the toolContentId
-	 * 
-	 * @return SortedMap of ToolOutputDefinitions with the key being the name of
-	 *         each definition
-	 */
+    	@Override
 	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(
 			Long toolContentId, int definitionType) throws ToolException {
 		Wookie wookie = getWookieDAO().getByContentId(toolContentId);
@@ -492,14 +452,17 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 				definitionType);
 	}
 	    
+    	@Override
         public String getToolContentTitle(Long toolContentId) {
     		return getWookieByContentId(toolContentId).getTitle();
         }
         
+    	@Override
         public boolean isContentEdited(Long toolContentId) {
             return getWookieByContentId(toolContentId).isDefineLater();
         }
 
+    	@Override
 	@SuppressWarnings("unchecked")
 	public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 		return getWookieOutputFactory().getSupportedDefinitionClasses(
@@ -508,6 +471,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	/* ********** IWookieService Methods ********************************* */
 
+    	@Override
 	public Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String entry) {
 		return coreNotebookService.createNotebookEntry(id, idType, signature,

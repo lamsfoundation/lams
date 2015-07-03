@@ -1084,6 +1084,42 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getQaOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	Long userId = user.getUserId().longValue();
+
+	QaSession session = getSessionById(toolSessionId);
+	if ((session == null) || (session.getQaContent() == null)) {
+	    return;
+	}
+	QaContent content = session.getQaContent();
+
+	// copy answers only in case leader aware feature is ON
+	if (content.isUseSelectLeaderToolOuput()) {
+
+	    QaQueUsr qaUser = getUserByIdAndSession(userId, toolSessionId);
+	    // create user if he hasn't accessed this activity yet
+	    if (qaUser == null) {
+
+		String userName = user.getLogin();
+		String fullName = user.getFirstName() + " " + user.getLastName();
+		qaUser = new QaQueUsr(userId, userName, fullName, session, new TreeSet());
+		qaQueUsrDAO.createUsr(qaUser);
+	    }
+
+	    QaQueUsr groupLeader = session.getGroupLeader();
+
+	    // check if leader has submitted answers
+	    if (groupLeader != null && groupLeader.isResponseFinalized()) {
+
+		// we need to make sure specified user has the same scratches as a leader
+		copyAnswersFromLeader(qaUser, groupLeader);
+	    }
+
+	}
+
+    }
 
     public IToolVO getToolBySignature(String toolSignature) {
 	IToolVO tool = toolService.getToolBySignature(toolSignature);

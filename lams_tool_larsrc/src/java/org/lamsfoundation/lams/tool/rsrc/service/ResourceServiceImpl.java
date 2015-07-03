@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -89,8 +88,8 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
 import org.lamsfoundation.lams.tool.rsrc.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
 import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
@@ -101,7 +100,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
-import org.lamsfoundation.lams.tool.rsrc.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -816,6 +814,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return messageService.getMessage(key, args);
     }
     
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -824,6 +823,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Resource toolContentObj = resourceDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -848,6 +848,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
@@ -892,15 +893,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     * @throws ResourceApplicationException
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Resource content = getResourceByContentId(toolContentId);
@@ -914,6 +907,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return getResourceOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SharedResourceFiles tool seession");
@@ -945,6 +939,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
     
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getResourceByContentId(toolContentId).getTitle();
     }
@@ -958,10 +953,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resource.setDefineLater(false);
     }
 
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getResourceByContentId(toolContentId).isDefineLater();
     }
     
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	Resource resource = resourceDao.getByContentId(toolContentId);
@@ -976,6 +973,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resourceDao.delete(resource);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
@@ -1025,6 +1023,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
     }
 
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ResourceSession session = new ResourceSession();
 	session.setSessionId(toolSessionId);
@@ -1034,6 +1033,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resourceSessionDao.saveObject(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    ResourceServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -1057,44 +1057,40 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	resourceSessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getResourceOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getResourceOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Resource toolContentObj = new Resource();
