@@ -75,7 +75,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
-/**d
+/**
  * This class is used to load the default content and initialize the presentation Map for Learner mode.
  * It is important that ALL the session attributes created in this action gets removed by: QaUtils.cleanupSession(request)
  * 
@@ -158,7 +158,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    }
 	}
 
-	/* holds the question contents for a given tool session and relevant content s*/
+	/* holds the question contents for a given tool session and relevant content */
 	Map mapQuestionStrings = new TreeMap(new QaComparator());
 	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<Integer, QaQuestionDTO>();
 
@@ -287,7 +287,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	    return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
+	    return (mapping.findForward(LEARNER_REP));
 	}
 
 	//check if there is submission deadline
@@ -344,7 +344,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			return (mapping.findForward(REVISITED_LEARNER_REP));
 		    } else {
 			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(false).toString());
-			return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
+			return (mapping.findForward(LEARNER_REP));
 		    }
 		}
 	    }
