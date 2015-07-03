@@ -52,7 +52,7 @@
 				//check for min words limit 
 				jQuery(".min-words-limit-enabled").each(function() {
 					
-					var questionId = $(this).data("sequence-id");
+					var questionId = (${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}) ? "" : $(this).data("sequence-id");
 					var isCkeditor = $(this).data("is-ckeditor");
 					
 					var value;
