@@ -179,6 +179,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setShowOtherAnswers(qaContent.isShowOtherAnswers() ? "1" : "0");
 	qaAuthoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced() ? "1" : "0");
 	qaAuthoringForm.setLockWhenFinished(qaContent.isLockWhenFinished() ? "1" : "0");
+	qaAuthoringForm.setNoReeditAllowed(qaContent.isNoReeditAllowed() ? "1" : "0");
 	qaAuthoringForm.setMaximumRates(qaContent.getMaximumRates());
 	qaAuthoringForm.setMinimumRates(qaContent.getMinimumRates());
 

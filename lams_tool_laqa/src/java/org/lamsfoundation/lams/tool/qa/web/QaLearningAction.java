@@ -186,6 +186,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		forwardName = QaAppConstants.LOAD_LEARNER;
 	    }
 	}
+	
+	//in case noReeditAllowed finalize response so user can't refresh the page and post answers again
+	if (errors.isEmpty() && qaContent.isNoReeditAllowed()) {
+	    qaQueUsr.setResponseFinalized(true);
+	    QaLearningAction.qaService.updateUser(qaQueUsr);
+	}
 
 	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
 	generalLearnerFlowDTO.setMapAnswersPresentable(mapAnswersPresentable);
@@ -203,6 +209,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
@@ -247,9 +254,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    HttpServletResponse response) throws IOException, ServletException {
 	initializeQAService();
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
+	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	 
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
+	//prohibit users from autosaving answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
+	if (qaQueUsr.isResponseFinalized()) {
+	    return null;
+	}
 
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
 	int intTotalQuestionCount = qaContent.getQaQueContents().size();
@@ -322,6 +335,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO,
 		QaLearningAction.qaService);
+	
+	//in order to track whether redo button is pressed store this info
+	qaQueUsr.setResponseFinalized(false);
+	QaLearningAction.qaService.updateUser(qaQueUsr);
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	qaLearningForm.resetAll();
@@ -376,6 +393,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	    boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	    generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 
 	    boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	    generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
@@ -470,6 +488,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
@@ -942,6 +961,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	//handle rating criterias
 	int commentsMinWordsLimit = 0;
 	boolean isCommentsEnabled = false;
+	int countRatedQuestions = 0;
 	if (qaContent.isAllowRateAnswers()) {
 	    
 	    // create itemIds list
@@ -971,13 +991,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		
 		response.setItemRatingDto(itemRatingDto);
 	    }
-	    
+
 	    // store how many items are rated
-	    int countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
-	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
+	    countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	}
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
+	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	
 	generalLearnerFlowDTO.setUserResponses(userResponses);
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());

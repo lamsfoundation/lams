@@ -330,6 +330,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    // the learner is in the same session and has already responsed to this content
 
 		    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(qaContent.isLockWhenFinished()).toString());
+		    generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 		    /*
 		     * the report should have all the users' entries OR the report should have only the current
 		     * session's entries
