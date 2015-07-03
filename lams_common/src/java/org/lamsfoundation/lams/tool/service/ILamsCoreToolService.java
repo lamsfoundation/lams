@@ -257,6 +257,17 @@ public interface ILamsCoreToolService {
 	    Integer learnerId) throws ToolException;
     
     /**
+     * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which
+     * copy results from leader to non-leader.
+     * 
+     * @param toolSession
+     * @param learner
+     *            user to be force completed
+     * @throws ToolException
+     */
+    void forceCompleteActivity(ToolSession toolSession, User learner) throws ToolException;
+    
+    /**
      * Get activity's max possible mark.
      * 
      * @param activity

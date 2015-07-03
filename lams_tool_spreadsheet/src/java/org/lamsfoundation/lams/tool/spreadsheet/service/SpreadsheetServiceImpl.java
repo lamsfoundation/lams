@@ -99,7 +99,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  */
 public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
-    static Logger log = Logger.getLogger(SpreadsheetServiceImpl.class.getName());
+    private static Logger log = Logger.getLogger(SpreadsheetServiceImpl.class.getName());
     private SpreadsheetDAO spreadsheetDao;
     private SpreadsheetUserDAO spreadsheetUserDao;
     private SpreadsheetSessionDAO spreadsheetSessionDao;
@@ -118,7 +118,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-
 
     public Spreadsheet getSpreadsheetByContentId(Long contentId) {
 	Spreadsheet rs = spreadsheetDao.getByContentId(contentId);
@@ -483,6 +482,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Spreadsheet toolContentObj = spreadsheetDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -506,6 +506,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	}
     }
 
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
@@ -542,14 +543,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
@@ -696,6 +690,11 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */

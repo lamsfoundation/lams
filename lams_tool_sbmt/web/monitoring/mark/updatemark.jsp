@@ -73,7 +73,7 @@
 									</c:set>
 									<a href="<c:out value='${downloadMarkFileURL}' escapeXml='false'/>"  class="button"> <fmt:message key="label.download" /> </a>&nbsp;
 									
-									<a href="javascript:removeMarkFile()"  class="button"> <fmt:message key="label.authoring.online.delete" /> </a>
+									<a href="javascript:removeMarkFile()"  class="button"> <fmt:message key="label.monitoring.file.delete" /> </a>
 									
 									<br />
 									<br />

@@ -94,7 +94,7 @@ import org.lamsfoundation.lams.util.MessageService;
  */
 public class TaskListServiceImpl implements ITaskListService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
-    static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
+    private static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
     private TaskListDAO taskListDao;
     private TaskListItemDAO taskListItemDao;
     private TaskListConditionDAO taskListConditionDAO;
@@ -118,9 +118,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     // Methods implements ITaskListService.
     // *******************************************************************************
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskList getTaskListByContentId(Long contentId) {
 	TaskList rs = taskListDao.getByContentId(contentId);
 	if (rs == null) {
@@ -129,9 +127,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return rs;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskList getDefaultContent(Long contentId) throws TaskListException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -146,16 +142,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return content;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List getAuthoredItems(Long taskListUid) {
 	return taskListItemDao.getAuthoringItems(taskListUid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException {
 	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
@@ -177,72 +169,47 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return file;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void createUser(TaskListUser taskListUser) {
 	taskListUserDao.saveObject(taskListUser);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskListUser getUserByIDAndContent(Long userId, Long contentId) {
 	return taskListUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskListUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return taskListUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskListUser getUser(Long uid) {
 	return (TaskListUser) taskListUserDao.getObject(TaskListUser.class, uid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveOrUpdateTaskList(TaskList taskList) {
 	taskListDao.saveObject(taskList);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteTaskListCondition(Long conditionUid) {
 	taskListConditionDAO.removeObject(TaskListCondition.class, conditionUid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void deleteTaskListItemAttachment(Long attachmentUid) {
-	taskListItemAttachmentDao.removeObject(TaskListItemAttachment.class, attachmentUid);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveOrUpdateTaskListItem(TaskListItem item) {
 	taskListItemDao.saveObject(item);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void deleteTaskListItem(Long uid) {
 	taskListItemDao.removeObject(TaskListItem.class, uid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskList getTaskListBySessionId(Long sessionId) {
 	TaskListSession session = taskListSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -251,30 +218,22 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return taskList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskListItem getTaskListItemByUid(Long itemUid) {
 	return taskListItemDao.getByUid(itemUid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TaskListSession getTaskListSessionBySessionId(Long sessionId) {
 	return taskListSessionDao.getSessionBySessionId(sessionId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void saveOrUpdateTaskListSession(TaskListSession resSession) {
 	taskListSessionDao.saveObject(resSession);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws TaskListException {
 	TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -295,9 +254,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return nextUrl;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setItemComplete(Long taskListItemUid, Long userId, Long sessionId) {
 	TaskListItemVisitLog log = taskListItemVisitDao.getTaskListItemLog(taskListItemUid, userId);
 	if (log == null) {
@@ -313,9 +270,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	taskListItemVisitDao.saveObject(log);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setItemAccess(Long taskListItemUid, Long userId, Long sessionId) {
 	TaskListItemVisitLog log = taskListItemVisitDao.getTaskListItemLog(taskListItemUid, userId);
 	if (log == null) {
@@ -331,9 +286,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void retrieveComplete(Set<TaskListItem> taskListItemList, TaskListUser user) {
 	for (TaskListItem item : taskListItemList) {
 	    TaskListItemVisitLog log = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user.getUserId());
@@ -345,9 +298,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<Summary> getSummary(Long contentId) {
 
 	TaskList taskList = taskListDao.getByContentId(contentId);
@@ -394,9 +345,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return summaryList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ItemSummary getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing) {
 
 	TaskListItem taskListItem = taskListItemDao.getByUid(taskListItemUid);
@@ -480,9 +429,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return itemSummary;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<ItemSummary> exportForTeacher(Long contentId) {
 	TaskList taskList = taskListDao.getByContentId(contentId);
 	ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
@@ -508,9 +455,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return itemSummaries;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<ItemSummary> exportForLearner(Long sessionId, TaskListUser learner) {
 	Long contentId = getTaskListBySessionId(sessionId).getContentId();
 
@@ -545,16 +490,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return itemSummaries;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int getNumTasksCompletedByUser(Long toolSessionId, Long userUid) {
 	return getTaskListItemVisitDao().getTasksCompletedCountByUser(toolSessionId, userUid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean checkCondition(String conditionName, Long toolSessionId, Long userUid) {
 	TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userUid, toolSessionId);
 	TaskList taskList = taskListSessionDao.getSessionBySessionId(toolSessionId).getTaskList();
@@ -591,9 +532,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<TaskListUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
 	List<TaskListItemVisitLog> logList = taskListItemVisitDao.getTaskListItemLogBySession(sessionId, itemUid);
 	List<TaskListUser> userList = new ArrayList(logList.size());
@@ -605,25 +544,19 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return userList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public List<TaskListUser> getUserListBySessionId(Long sessionId) {
 	return taskListUserDao.getBySessionID(sessionId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 	if (list == null || list.isEmpty()) {
@@ -633,13 +566,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
     
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -738,6 +670,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     // Methods implementing ToolContentManager, ToolSessionManager
     // *******************************************************************************
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	TaskList toolContentObj = taskListDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -766,9 +699,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
@@ -810,15 +741,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     * @throws TaskListException
-     */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	TaskList taskList = getTaskListByContentId(toolContentId);
@@ -893,6 +816,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	taskListDao.delete(taskList);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
@@ -955,9 +879,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	TaskListSession session = new TaskListSession();
 	session.setSessionId(toolSessionId);
@@ -967,9 +889,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	taskListSessionDao.saveObject(session);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    TaskListServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -993,34 +913,23 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	taskListSessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return taskListOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
@@ -1034,19 +943,21 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return taskListOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
+    }
 
     // *******************************************************************************
     // Methods implementing ToolContentImport102Manager
     // *******************************************************************************
 
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard. Was left only for the reasons of implementing
-     * ToolContentImport102Manager interface.
-     */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
     }
 
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    @Override
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 

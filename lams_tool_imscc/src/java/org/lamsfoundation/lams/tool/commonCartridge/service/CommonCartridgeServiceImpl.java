@@ -110,9 +110,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * 
  */
 public class CommonCartridgeServiceImpl implements ICommonCartridgeService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager
-
-{
+	ToolContentImport102Manager {
     static Logger log = Logger.getLogger(CommonCartridgeServiceImpl.class.getName());
 
     private CommonCartridgeDAO commonCartridgeDao;
@@ -895,10 +893,12 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	commonCartridge.setDefineLater(false);
     }
     
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getCommonCartridgeByContentId(toolContentId).isDefineLater();
     }
     
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
@@ -913,6 +913,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	commonCartridgeDao.delete(commonCartridge);
     }
     
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
@@ -965,6 +966,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	CommonCartridgeSession session = new CommonCartridgeSession();
 	session.setSessionId(toolSessionId);
@@ -974,6 +976,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	commonCartridgeSessionDao.saveObject(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    CommonCartridgeServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -997,37 +1000,35 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	commonCartridgeSessionDao.deleteBySessionId(toolSessionId);
     }
 
-    /**
-     * Get the tool output for the given tool output names.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
     }
 
-    /**
-     * Get the tool output for the given tool output name.
-     * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
-     */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public void forceCompleteUser(Long toolSessionId, User user) {
+	//no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
