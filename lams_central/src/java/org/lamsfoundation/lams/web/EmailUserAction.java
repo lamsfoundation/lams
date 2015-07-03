@@ -41,7 +41,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -106,8 +108,19 @@ public class EmailUserAction extends LamsDispatchAction {
 		    + " sent email to user ID " + userId + ": \n[subject] " + subject + "\n[message] " + body);
 	}
 
+	boolean IS_HTML_FORMAT = false;
 	getEventNotificationService().sendMessage(currentUser.getUserID(), userId.intValue(),
-		IEventNotificationService.DELIVERY_METHOD_MAIL, subject, body, false);
+		IEventNotificationService.DELIVERY_METHOD_MAIL, subject, body, IS_HTML_FORMAT);
+	
+	String ccEmail = emailForm.getCcEmail();
+	if (StringUtils.isNotBlank(ccEmail) && ValidationUtil.isEmailValid(ccEmail, false)) {
+	    Emailer.sendFromSupportEmail(subject, ccEmail, body, IS_HTML_FORMAT);
+	    
+	    if (EmailUserAction.log.isDebugEnabled()) {
+		EmailUserAction.log.debug("User " + currentUser.getLogin() + " (" + currentUser.getEmail() + ") "
+			+ " sent email to user ID " + userId + ": \n[subject] " + subject + "\n[message] " + body);
+	    }
+	}
 
 	return null;
     }
