@@ -102,6 +102,9 @@ public class LearningAction extends Action {
 	if (param.equals("nextPage")) {
 	    return nextPage(mapping, form, request, response);
 	}
+	if (param.equals("submitSingleMarkHedgingQuestion")) {
+	    return submitSingleMarkHedgingQuestion(mapping, form, request, response);
+	}
 	if (param.equals("submitAll")) {
 	    return submitAll(mapping, form, request, response);
 	}
@@ -423,6 +426,58 @@ public class LearningAction extends Action {
     }
     
     /**
+     * Handling submittion of MarkHedging type of Questions (in case of leader aware tool).
+     */
+    private ActionForward submitSingleMarkHedgingQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
+	IAssessmentService service = getAssessmentService();
+	
+	//get user answers from request and store them into sessionMap
+	storeUserAnswersIntoSessionMap(request);
+	
+	// store results from sessionMap into DB
+	Long singleMarkHedgingQuestionUid = WebUtil.readLongParam(request, "singleMarkHedgingQuestionUid") ;
+	boolean isResultsStored = service.storeUserAnswers(assessment.getUid(), userId, pagedQuestions,
+		singleMarkHedgingQuestionUid, false);
+	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
+	// using 2 browsers). Then show last stored results
+ 	if (!isResultsStored) {
+ 	    //loadupLastAttempt(sessionMap);
+ 	}
+ 	
+ 	//find according question in order to get its mark
+	AssessmentQuestion question = null;
+	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	    for (AssessmentQuestion questionIter : questionsForOnePage) {
+		if (questionIter.getUid().equals(singleMarkHedgingQuestionUid)) {
+		    question = questionIter;
+		    question.setResponseSubmitted(true);
+		}
+	    }
+	}
+	
+	// populate info for displaying results page
+	//prepareResultsPageData(sessionMap);
+	
+ 	request.setAttribute("finishedLock", false);
+ 	request.setAttribute("assessment", assessment);
+ 	request.setAttribute("question", question);
+ 	long questionIndex = WebUtil.readLongParam(request, "questionIndex");
+ 	request.setAttribute("questionIndex", questionIndex);
+ 	request.setAttribute("isEditingDisabled", true);
+ 	request.setAttribute("isLeadershipEnabled", assessment.isUseSelectLeaderToolOuput());
+ 	request.setAttribute("isUserLeader", sessionMap.get(AssessmentConstants.ATTR_IS_USER_LEADER));
+	
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+    
+    /**
      * Display same entire authoring page content from HttpSession variable.
      */
     private ActionForward submitAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -707,28 +762,43 @@ public class LearningAction extends Action {
 		    }
 		    option.setAnswerBoolean(answerBoolean);
 		}
+		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 		for (AssessmentQuestionOption option : question.getOptions()) {
 		    int answerInt = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + option.getSequenceId()); 
 		    option.setAnswerInt(answerInt);
 		}
+		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		question.setAnswerString(answerString);
+		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		question.setAnswerString(answerString);
+		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		if (answerString != null) {
 		    question.setAnswerBoolean(Boolean.parseBoolean(answerString));
 		    question.setAnswerString("answered");
 		}
+		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		answerString = answerString.replaceAll("[\n\r\f]", "");
 		question.setAnswerString(answerString);
+		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+		for (AssessmentQuestionOption option : question.getOptions()) {
+		    Integer markHedging = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
+			    + option.getSequenceId(), true);
+		    if (markHedging != null) {
+			option.setAnswerInt(markHedging);
+		    }
+		}
 	    }
 	}
     }
@@ -777,6 +847,14 @@ public class LearningAction extends Action {
 
 		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 			isAnswered = true;
+			
+		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+
+			int sumMarkHedging = 0;
+			for (AssessmentQuestionOption option : question.getOptions()) {
+			    sumMarkHedging += option.getAnswerInt();
+			}
+			isAnswered = sumMarkHedging == question.getGrade(); 
 		    }
 
 		    // check all questions were answered
@@ -834,6 +912,7 @@ public class LearningAction extends Action {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
 			question.setMark(questionResult.getMark());
+			question.setResponseSubmitted(questionResult.getFinishDate() != null);
 			question.setPenalty(questionResult.getPenalty());
 
 			question.setQuestionFeedback(null);
@@ -890,14 +969,29 @@ public class LearningAction extends Action {
 	    return;
 	}
 	
+	//get the latest finished result (required for mark hedging type of questions only)
+	AssessmentResult lastFinishedResult = null;
+	if (lastResult.getFinishDate() == null) {
+	    lastFinishedResult = service.getLastFinishedAssessmentResult(assessmentUid, userId);
+	}
+	
 	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
-		for (AssessmentQuestionResult questionResult : lastResult.getQuestionResults()) {
+		
+		//load last finished results for hedging type of questions (in order to prevent retry)
+		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
+		if ((question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)
+			&& (lastResult.getFinishDate() == null) && (lastFinishedResult != null)) {
+		    questionResults = lastFinishedResult.getQuestionResults();
+		}
+		
+		for (AssessmentQuestionResult questionResult : questionResults) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
 			question.setAnswerBoolean(questionResult.getAnswerBoolean());
 			question.setAnswerFloat(questionResult.getAnswerFloat());
 			question.setAnswerString(questionResult.getAnswerString());
 			question.setMark(questionResult.getMark());
+			question.setResponseSubmitted(questionResult.getFinishDate() != null);
 			question.setPenalty(questionResult.getPenalty());
 			
 			for (AssessmentQuestionOption option : question.getOptions()) {

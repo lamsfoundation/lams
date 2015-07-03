@@ -84,6 +84,35 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	
 	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			//if isLeadershipEnabled - enable/disable submit buttons
+			if (${isLeadershipEnabled}) {
+				$(".mark-hedging-select").on('change', function() {
+					var questionIndex = $(this).data("question-index");
+					var grade = eval($(this).find('option:last-child').val());
+					
+					var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
+					
+					//if totalSelected equals to question's grade - show button
+					if (totalSelected == grade) {
+						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "").removeClass("button-disabled");
+					} else {
+						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "true").addClass("button-disabled");
+					}
+				}).trigger("change");
+			}
+
+		});
+		
+		function countHedgeQuestionSelectTotal(questionIndex) {
+			var totalSelected = 0;
+			$("select[name^=question" + questionIndex + "_]").each(function() {
+				totalSelected += eval(this.value);
+			});
+			return totalSelected;
+		}
+	
 		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
 		var isWaitingForConfirmation = ${not finishedLock && assessment.timeLimit > 0 && empty param.secondsLeft};
 	
@@ -200,6 +229,7 @@
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
+		
 		function continueReflect(){
 			if (!validateAnswers()) {
 				return;
@@ -207,6 +237,7 @@
 			
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
+		
 		function nextPage(pageNumber){
 			if (!validateAnswers()) {
 				return;
@@ -221,6 +252,7 @@
         	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber + "&secondsLeft=" + secondsLeft);
         	myForm.submit();
 		}
+		
 		function submitAll(isTimelimitExpired){
 			
 			var secondsLeft = 0;
@@ -241,7 +273,25 @@
         	var myForm = $("#answers");
         	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&secondsLeft=" + secondsLeft + "&isTimelimitExpired=" + isTimelimitExpired);
         	myForm.submit();
-		}	
+		}
+		
+		function submitSingleMarkHedgingQuestion(singleMarkHedgingQuestionUid, questionIndex){
+			
+			//only if time limit is not expired
+			if ((typeof isTimelimitExpired !== 'undefined') && isTimelimitExpired) {
+				return;
+			}
+			
+			//ajax form submit
+			$('#answers').ajaxSubmit({
+				url: "<c:url value='/learning/submitSingleMarkHedgingQuestion.do'/>?sessionMapID=${sessionMapID}&singleMarkHedgingQuestionUid=" + singleMarkHedgingQuestionUid +"&questionIndex="+ questionIndex +"&date=" + new Date().getTime(),
+				target: '#mark-hedging-question-' + singleMarkHedgingQuestionUid,
+                success: function() {
+                	$('#question-area-' + questionIndex).removeClass('warning-answer-required');
+                }
+			});
+		}		
+		
 		function resubmit(){
 			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
 			return false;			
@@ -301,6 +351,7 @@
 			var missingRequiredQuestions = [];
 			var minWordsLimitNotReachedQuestions = [];
 			var maxWordsLimitExceededQuestions = [];
+			var markHedgingWrongTotalQuestions = [];
 			
 			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 				<c:if test="${question.answerRequired}">
@@ -353,6 +404,20 @@
 						<c:when test="${question.type == 7}">
 							//ordering - do nothing
 						</c:when>
+							
+						<c:when test="${question.type == 8}">
+							//mark hedging
+							
+						//	var questionIndex = ${status.index};
+						//	var grade = ${question.grade};
+						//	var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
+					
+							//if totalSelected not equals to question's grade - show warning
+						//	if (totalSelected != grade) {
+						//		markHedgingWrongTotalQuestions.push("${status.index}");
+						//	}
+							
+						</c:when>
 					</c:choose>
 				</c:if>
 				
@@ -373,11 +438,34 @@
 						minWordsLimitNotReachedQuestions.push("${status.index}");
 					}
 				</c:if>
+				
+				//mark hedging question and leader aware feature is ON => question is required to answer
+				<c:if test="${question.type == 8}">
+				
+					var questionIndex = ${status.index};
+					
+					if (${isLeadershipEnabled}) {
+						if ($("[type=button][name=submit-hedging-question"+ questionIndex +"]").length > 0) {
+							missingRequiredQuestions.push("${status.index}");
+						}
+						
+					} else {
+						var grade = ${question.grade};
+						var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
+				
+						//if totalSelected not equals to question's grade - show warning
+						if (totalSelected != grade) {
+							markHedgingWrongTotalQuestions.push("${status.index}");
+						}
+					}
+					
+				</c:if>
+				
 			</c:forEach>
 			
 			//return true in case all required questions were answered, false otherwise
 			if (missingRequiredQuestions.length == 0 && minWordsLimitNotReachedQuestions.length == 0 
-					&& maxWordsLimitExceededQuestions.length == 0) {
+					&& maxWordsLimitExceededQuestions.length == 0 && markHedgingWrongTotalQuestions.length == 0) {
 				return true;
 				
 			} else {
@@ -385,6 +473,7 @@
 				$('[id^=question-area-]').removeClass('warning-answer-required');
 				$('#warning-answers-required').hide();
 				$('#warning-words-limit').hide();
+				$('#warning-mark-hedging-wrong-total').hide();
 				
 				if (missingRequiredQuestions.length != 0) {
 					//add .warning-answer-required class to those needs to be filled
@@ -412,6 +501,15 @@
 					}
 					//show alert message as well
 					$("#warning-words-limit").show();		
+				}
+				
+				if (markHedgingWrongTotalQuestions.length != 0) {
+					//add .warning-answer-required class to those needs to be filled
+					for (i = 0; i < markHedgingWrongTotalQuestions.length; i++) {
+					    $("#question-area-" + markHedgingWrongTotalQuestions[i]).addClass('warning-answer-required');
+					}
+					//show alert message as well
+					$("#warning-mark-hedging-wrong-total").show();		
 				}
 				
 				$("html, body").animate({ scrollTop: 0 }, "slow");//window.scrollTo(0, 0);
@@ -476,6 +574,10 @@
 		
 		<div class="warning" id="warning-words-limit">
 			<fmt:message key="warn.answers.word.requirements.limit" />
+		</div>
+		
+		<div class="warning" id="warning-mark-hedging-wrong-total">
+			<fmt:message key="warn.mark.hedging.wrong.total" />
 		</div>
 		
 		<div id="timelimit-start-dialog"> 

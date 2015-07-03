@@ -49,6 +49,8 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     
     private float grade;
     
+    private boolean correct;
+    
     private String feedback;
     
     // *************** NON Persist Fields ********************    
@@ -168,6 +170,18 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
      */
     public void setGrade(float grade) {
 	this.grade = grade;
+    }
+    
+    /**
+     * @hibernate.property column="correct"
+     * @return
+     */
+    public boolean isCorrect() {
+	return correct;
+    }
+
+    public void setCorrect(boolean correct) {
+	this.correct = correct;
     }
     
     /**

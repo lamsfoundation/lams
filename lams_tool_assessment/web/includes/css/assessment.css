@@ -165,7 +165,7 @@ table.question-table td {
 	border-bottom: 1px solid white !important;
 }
 
-#warning-answers-required, #warning-words-limit, .hidden {
+#warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total, .hidden {
 	display: none;
 }
 
@@ -174,4 +174,8 @@ table.question-table td {
 	margin-left: 10px;
 	margin-bottom: 10px;
 	width: 80%;
+}
+
+.button-disabled {
+	opacity:.2;
 }

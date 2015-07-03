@@ -48,7 +48,10 @@
 							</c:when>
 							<c:when test="${question.type == 7}">
 								<fmt:message key="label.authoring.basic.type.ordering" />
-							</c:when>							
+							</c:when>
+							<c:when test="${question.type == 8}">
+								<fmt:message key="label.authoring.basic.type.mark.hedging" />
+							</c:when>
 						</c:choose>
 					</span>
 				</td>
@@ -161,7 +164,10 @@
 							</c:when>
 							<c:when test="${question.type == 7}">
 								<fmt:message key="label.authoring.basic.type.ordering" />
-							</c:when>							
+							</c:when>
+							<c:when test="${question.type == 8}">
+								<fmt:message key="label.authoring.basic.type.mark.hedging" />
+							</c:when>
 						</c:choose>
 					</span>
 				</td>

@@ -53,9 +53,9 @@ public class AssessmentQuestionResult {
     private Float maxMark;
     private float penalty;
     private Set<AssessmentOptionAnswer> optionAnswers;
+    private Date finishDate;
     
     // DTO fields:
-    private Date finishDate;
     private AssessmentUser user;
     private String answerStringEscaped;
     
