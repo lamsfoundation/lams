@@ -41,7 +41,7 @@
 				</select>
 			</td>
 			
-			<c:if test="${(finishedLock || question.responseSubmitted) && (option.answerInt > 0) && assessment.allowQuestionFeedback}">
+			<c:if test="${(finishedLock || question.responseSubmitted) && assessment.allowQuestionFeedback}">
 
 				<c:choose>
                 	<c:when test="${option.correct}">
@@ -52,8 +52,10 @@
         			</c:otherwise>
         		</c:choose>
 
-				<td style="padding:5px 10px 2px; font-style: italic; color:${color}; width=30%;">
-					<c:out value="${option.feedback}" escapeXml="false" />
+				<td width="30%" style="padding:5px 10px 2px; font-style: italic; color:${color};">
+					<c:if test="${option.answerInt > 0}">
+						<c:out value="${option.feedback}" escapeXml="false" />
+					</c:if>
 				</td>
 			</c:if>
 			
