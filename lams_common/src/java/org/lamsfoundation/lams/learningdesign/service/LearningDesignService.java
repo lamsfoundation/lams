@@ -294,6 +294,7 @@ public class LearningDesignService implements ILearningDesignService {
 			    + ".svg";
 		    toolDTO.setIconPath(iconPath);
 		    toolDTO.setSupportsOutputs(tool.getSupportsOutputs());
+		    toolDTO.setDefaultToolContentId(tool.getDefaultToolContentId());
 		}
 
 		tools.add(toolDTO);

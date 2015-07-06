@@ -601,7 +601,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		    lesson.setLockedForEdit(false);
 
 		    // LDEV-1899 only mark learners uncompleted if a change was saved and an activity added
-		    if (!cancelled && firstAddedActivityId != null) {
+		    if (!cancelled && (firstAddedActivityId != null)) {
 			// the lesson may now have additional activities on the end,
 			// so clear any completed flags
 			lessonService.performMarkLessonUncompleted(lesson.getLessonId(), firstAddedActivityId);
@@ -1986,6 +1986,24 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	activity.setXcoord(300);
 	activity.setYcoord(300);
 	activityDAO.insert(activity);
+
+	// make Gradebook aware of the activity
+	List<ToolOutputDefinitionDTO> defnDTOList = getToolOutputDefinitions(toolContentID,
+		ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
+	String gradebookToolOutputDefinitionName = null;
+	for (ToolOutputDefinitionDTO definition : defnDTOList) {
+	    // find the default output
+	    if (definition.getIsDefaultGradebookMark()) {
+		gradebookToolOutputDefinitionName = definition.getName();
+		break;
+	    }
+	}
+	if (gradebookToolOutputDefinitionName != null) {
+	    ActivityEvaluation evaluation = new ActivityEvaluation();
+	    evaluation.setActivity(activity);
+	    evaluation.setToolOutputDefinition(gradebookToolOutputDefinitionName);
+	    baseDAO.insert(evaluation);
+	}
 
 	learningDesign.getActivities().add(activity);
 	learningDesign.setFirstActivity(activity);

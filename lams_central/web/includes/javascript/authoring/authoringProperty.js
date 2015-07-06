@@ -605,6 +605,10 @@ var PropertyDefs = {
 				// parts of Parallel Activity can not be grouped
 				$('.propertiesContentFieldGrouping', content).closest('tr').remove();
 			}
+
+			if (activity.outputDefinitions) {
+				PropertyLib.fillOutputDefinitionsDropdown(activity);
+			}
 			
 			$('input, select', content).change(function(){
 				// extract changed properties and redraw the activity
@@ -625,12 +629,16 @@ var PropertyDefs = {
 				
 				var selectedGrouping = $('.propertiesContentFieldGrouping option:selected', content);
 				if (selectedGrouping.length > 0){
-					var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
-										.data('grouping');
+					var newGroupingValue = selectedGrouping.data('grouping');
 					if (newGroupingValue != activity.grouping) {
 						activity.grouping = newGroupingValue;
 						redrawNeeded = true;
 					}
+				}
+				
+				var selectedGradebookToolOutputDefinition = $('.propertiesContentFieldGradebook option:selected', content);
+				if (selectedGradebookToolOutputDefinition.length > 0){
+					activity.gradebookToolOutputDefinitionName = selectedGradebookToolOutputDefinition.val();
 				}
 				
 				if (redrawNeeded) {
@@ -1022,25 +1030,13 @@ PropertyLib = {
 		outputConditionsDialog.dialog('option', 
 			{
 			/**
-			 * Get output definitions from Tool activity
+			 * Get output definitions from a Tool activity
 			 */
 			'refreshDefinitions' : function(){
 				var dialog = layout.outputConditionsDialog,
 					activity = dialog.dialog('option', 'parentObject');
-				
-				$.ajax({
-					url : LAMS_URL + 'authoring/author.do',
-					data : {
-						'method' : 'getToolOutputDefinitionsJSON',
-						'toolContentID' : activity.input.toolContentID || activity.input.toolID
-					},
-					cache : false,
-					async: false,
-					dataType : 'json',
-					success : function(response) {
-						activity.input.outputDefinitions = response;
-					}
-				});
+				// sets the output definitions and their default value
+				ActivityLib.getOutputDefinitions(activity.input);
 			},
 			
 			
@@ -1574,7 +1570,41 @@ PropertyLib = {
 				option.attr('selected', 'selected');
 			}
 		});
+	},
+	
+	
+	/**
+	 * Fill outpu definitions of given activity for Gradebook.
+	 */
+	fillOutputDefinitionsDropdown : function(activity) {
+		// find all tools that support input and fill dropdown menu with their titles
+		var emptyOption = $('<option />'),
+			gradebookDropdown = $('.propertiesContentFieldGradebook', activity.propertiesContent).empty().append(emptyOption);
 
+			// build output dropdown and bind data to each option
+			$.each(activity.outputDefinitions,function(){
+				var suffix = '';
+				switch(this.type) {
+					case 'OUTPUT_COMPLEX' :
+						suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
+						break;
+											
+					case 'OUTPUT_LONG' :
+						suffix = LABELS.RANGE_OUTPUT_SUFFIX;
+						break;
+				};
+
+				var option = $('<option />')
+							   .text(this.name + ' ' + suffix)
+							   .val(this.name)
+							   .appendTo(gradebookDropdown);
+				
+				// select the default output
+				if (activity.gradebookToolOutputDefinitionName == this.name) {
+					option.attr('selected', 'selected');
+					emptyOption.attr('selected', null);
+				}
+			});
 	},
 	
 		
