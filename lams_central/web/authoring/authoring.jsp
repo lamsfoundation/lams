@@ -386,6 +386,7 @@
 							 Id="tool${tool.toolDisplayName}"
 							 toolId="${tool.toolId}"
 							 learningLibraryId="${tool.learningLibraryId}"
+							 defaultToolContentId="${tool.defaultToolContentId}"
 							 supportsOutputs="${tool.supportsOutputs}"
 							 activityCategoryId="${tool.activityCategoryID}"
 							 childToolIds="
@@ -546,6 +547,14 @@
 				</td>
 				<td>
 					  <select class="propertiesContentFieldGrouping"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="authoring.fla.page.prop.gradebook" />
+				</td>
+				<td>
+					  <select class="propertiesContentFieldGradebook"></select>
 				</td>
 			</tr>
 		</table>
