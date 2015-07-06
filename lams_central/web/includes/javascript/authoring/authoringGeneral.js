@@ -156,6 +156,7 @@ GeneralInitLib = {
 			// register tool properties so they are later easily accessible
 			layout.toolMetadata[learningLibraryID] = {
 				'iconPath' 			 	  : iconPath,
+				'defaultToolContentID'    : $(this).attr('defaultToolContentId'),
 				'supportsOutputs' 	 	  : $(this).attr('supportsOutputs'),
 				'activityCategoryID' 	  : activityCategoryID,
 				'parallelChildActivityDefs' : parallelChildActivityDefs
@@ -2359,9 +2360,7 @@ GeneralLib = {
 				'maxOptions'			 : activity.maxOptions || null,
 				'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
 				'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
-				
-				'gradebookToolOutputDefinitionName' : null,
-				'helpText' : null
+				'gradebookToolOutputDefinitionName' : activity.gradebookToolOutputDefinitionName
 			});
 
 			var activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?

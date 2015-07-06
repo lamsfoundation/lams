@@ -62,8 +62,9 @@ tr.propertiesContentRowGateSchedule input.spinner {
 	width: 30px;
 }
 
-input.propertiesContentFieldTitle, textarea.propertiesContentFieldDescription {
-	width: 98%;	
+input.propertiesContentFieldTitle, textarea.propertiesContentFieldDescription,
+select.propertiesContentFieldGradebook {
+	width: 99%;	
 }
 
 input.groupName {

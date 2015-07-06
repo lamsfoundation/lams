@@ -219,6 +219,9 @@ var ActivityDefs = {
 			'to'   : []
 		};
 		
+		// set Gradebook output name right now
+		ActivityLib.getOutputDefinitions(this);
+
 		if (!isReadOnlyMode){
 			this.loadPropertiesDialogContent = PropertyDefs.toolProperties;
 		}
@@ -1045,6 +1048,73 @@ ActivityLib = {
 	},
 	
 	
+	/**
+	 * Drop the dragged activity on the canvas.
+	 */
+	dropActivity : function(activity, x, y) {
+		if (!(activity instanceof ActivityDefs.OptionalActivity || activity instanceof ActivityDefs.FloatingActivity)) {
+			// check if it was removed from an Optional or Floating Activity
+			if (activity.parentActivity && activity.parentActivity instanceof DecorationDefs.Container) {
+				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
+				if ($.inArray(activity, childActivities) == -1) {
+					activity.parentActivity.draw();
+					ActivityLib.redrawTransitions(activity.parentActivity);
+					activity.parentActivity = null;
+				}
+			}
+			
+			// check if it was added to an Optional or Floating Activity
+			var container = layout.floatingActivity
+							&& Snap.path.isPointInsideBBox(layout.floatingActivity.items.getBBox(),x,y)
+							? layout.floatingActivity : null;
+			if (!container) {
+				$.each(layout.activities, function(){
+					if (this instanceof ActivityDefs.OptionalActivity
+						&& Snap.path.isPointInsideBBox(this.items.getBBox(),x,y)) {
+						container = this;
+						return false;
+					}
+				});
+			}
+			if (container) {
+				// system activities can not be added to optional and support activities
+				if (activity instanceof ActivityDefs.GateActivity
+					|| activity instanceof ActivityDefs.GroupingActivity
+					|| activity instanceof ActivityDefs.BranchingEdgeActivity){
+					alert(LABELS.ACTIVITY_IN_CONTAINER_ERROR);
+					return false;
+				}
+				
+				if ($.inArray(activity, container.childActivities) == -1) {
+					$.each(activity.transitions.from, function(){
+						ActivityLib.removeTransition(this);
+					});
+					$.each(activity.transitions.to, function(){
+						ActivityLib.removeTransition(this);
+					});
+	
+					// for properties dialog to reload
+					ActivityLib.removeSelectEffect(container);
+					
+					container.childActivities.push(activity);
+					container.draw(null, null, null, null, childActivities);
+					ActivityLib.redrawTransitions(container);
+				}
+			}
+		}
+		
+		ActivityLib.redrawTransitions(activity);
+		
+		$.each(layout.regions, function(){
+			// redraw all annotation regions so they are pushed to back
+			this.draw();
+		});
+		
+		GeneralLib.setModified(true);
+		return true;
+	},
+	
+	
 	findNestedBranching : function(branchingActivity) {
 		var nestedBranching = [];
 		$.each(branchingActivity.branches, function(){
@@ -1113,72 +1183,36 @@ ActivityLib = {
 	
 	
 	/**
-	 * Drop the dragged activity on the canvas.
+	 * Get output definitions from Tool activity
 	 */
-	dropActivity : function(activity, x, y) {
-		if (!(activity instanceof ActivityDefs.OptionalActivity || activity instanceof ActivityDefs.FloatingActivity)) {
-			// check if it was removed from an Optional or Floating Activity
-			if (activity.parentActivity && activity.parentActivity instanceof DecorationDefs.Container) {
-				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
-				if ($.inArray(activity, childActivities) == -1) {
-					activity.parentActivity.draw();
-					ActivityLib.redrawTransitions(activity.parentActivity);
-					activity.parentActivity = null;
-				}
-			}
-			
-			// check if it was added to an Optional or Floating Activity
-			var container = layout.floatingActivity
-							&& Snap.path.isPointInsideBBox(layout.floatingActivity.items.getBBox(),x,y)
-							? layout.floatingActivity : null;
-			if (!container) {
-				$.each(layout.activities, function(){
-					if (this instanceof ActivityDefs.OptionalActivity
-						&& Snap.path.isPointInsideBBox(this.items.getBBox(),x,y)) {
-						container = this;
+	getOutputDefinitions : function(activity){
+		if (!activity.toolID) {
+			return;
+		}
+		
+		$.ajax({
+			url : LAMS_URL + 'authoring/author.do',
+			data : {
+				'method' : 'getToolOutputDefinitionsJSON',
+				'toolContentID' : activity.toolContentID 
+								|| layout.toolMetadata[activity.learningLibraryID].defaultToolContentID
+			},
+			cache : false,
+			async: false,
+			dataType : 'json',
+			success : function(response) {
+				activity.outputDefinitions = response;
+				$.each(activity.outputDefinitions, function() {
+					if (this.isDefaultGradebookMark){
+						activity.gradebookToolOutputDefinitionName = this.name;
 						return false;
 					}
 				});
 			}
-			if (container) {
-				// system activities can not be added to optional and support activities
-				if (activity instanceof ActivityDefs.GateActivity
-					|| activity instanceof ActivityDefs.GroupingActivity
-					|| activity instanceof ActivityDefs.BranchingEdgeActivity){
-					alert(LABELS.ACTIVITY_IN_CONTAINER_ERROR);
-					return false;
-				}
-				
-				if ($.inArray(activity, container.childActivities) == -1) {
-					$.each(activity.transitions.from, function(){
-						ActivityLib.removeTransition(this);
-					});
-					$.each(activity.transitions.to, function(){
-						ActivityLib.removeTransition(this);
-					});
-	
-					// for properties dialog to reload
-					ActivityLib.removeSelectEffect(container);
-					
-					container.childActivities.push(activity);
-					container.draw(null, null, null, null, childActivities);
-					ActivityLib.redrawTransitions(container);
-				}
-			}
-		}
-		
-		ActivityLib.redrawTransitions(activity);
-		
-		$.each(layout.regions, function(){
-			// redraw all annotation regions so they are pushed to back
-			this.draw();
 		});
-		
-		GeneralLib.setModified(true);
-		return true;
 	},
 	
-
+	
 	/**
 	 * Open separate window with activity authoring on double click.
 	 */
