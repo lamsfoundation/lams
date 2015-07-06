@@ -294,6 +294,7 @@ public class LearningDesignService implements ILearningDesignService {
 			    + ".svg";
 		    toolDTO.setIconPath(iconPath);
 		    toolDTO.setSupportsOutputs(tool.getSupportsOutputs());
+		    toolDTO.setDefaultToolContentId(tool.getDefaultToolContentId());
 		}
 
 		tools.add(toolDTO);
@@ -391,7 +392,7 @@ public class LearningDesignService implements ILearningDesignService {
 	String fileExtension;
 	if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) {
 	    fileExtension = ".svg";
-	} else if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY){
+	} else if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY) {
 	    // mark it as a special version of SVG as it contains icons that refer to LAMS Community server
 	    fileExtension = ".export.svg";
 	} else {
