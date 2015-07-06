@@ -50,6 +50,7 @@ public class AssessmentQuestionForm extends ActionForm {
     private String generalFeedback;
     private String feedback;
     private boolean multipleAnswersAllowed;
+    private boolean incorrectAnswerNullifiesMark;
     private String feedbackOnCorrect;
     private String feedbackOnPartiallyCorrect;
     private String feedbackOnIncorrect;
@@ -162,6 +163,14 @@ public class AssessmentQuestionForm extends ActionForm {
 
     public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
 	this.multipleAnswersAllowed = multipleAnswersAllowed;
+    }
+    
+    public boolean isIncorrectAnswerNullifiesMark() {
+	return incorrectAnswerNullifiesMark;
+    }
+
+    public void setIncorrectAnswerNullifiesMark(boolean incorrectAnswerNullifiesMark) {
+	this.incorrectAnswerNullifiesMark = incorrectAnswerNullifiesMark;
     }
 
     public String getFeedbackOnCorrect() {
