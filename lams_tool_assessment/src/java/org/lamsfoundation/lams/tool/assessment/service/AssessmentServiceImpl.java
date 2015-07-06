@@ -542,10 +542,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	float mark = 0;
 	float maxMark = question.getGrade();
 	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    boolean isMarkNullified = false;
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		if (option.getAnswerBoolean()) {
 		    mark += option.getGrade() * maxMark;
+		    
+		    //if option of "incorrect answer nullifies mark" is ON check if selected answer has a zero grade and if so nullify question's mark 
+		    if (question.isIncorrectAnswerNullifiesMark() && option.getGrade() == 0) {
+			isMarkNullified = true;
+		    }
 		}
+	    }
+	    
+	    if (isMarkNullified) {
+		mark = 0;
 	    }
 	    
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
@@ -2018,6 +2028,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    question.setMaxWordsLimit(JsonUtil.opt(questionJSONData, "maxWordsLimit", 0));
 	    question.setMinWordsLimit(JsonUtil.opt(questionJSONData, "minWordsLimit", 0));
 	    question.setMultipleAnswersAllowed(JsonUtil.opt(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
+	    question.setIncorrectAnswerNullifiesMark(JsonUtil.opt(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
 	    question.setPenaltyFactor(Float.parseFloat(JsonUtil.opt(questionJSONData, "penaltyFactor", "0.0")));
 	    // question.setUnits(units); Needed for numerical type question
 
