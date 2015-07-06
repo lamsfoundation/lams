@@ -1580,31 +1580,29 @@ PropertyLib = {
 		// find all tools that support input and fill dropdown menu with their titles
 		var emptyOption = $('<option />'),
 			gradebookDropdown = $('.propertiesContentFieldGradebook', activity.propertiesContent).empty().append(emptyOption);
-
-			// build output dropdown and bind data to each option
-			$.each(activity.outputDefinitions,function(){
-				var suffix = '';
-				switch(this.type) {
-					case 'OUTPUT_COMPLEX' :
-						suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
-						break;
-											
-					case 'OUTPUT_LONG' :
-						suffix = LABELS.RANGE_OUTPUT_SUFFIX;
-						break;
-				};
-
-				var option = $('<option />')
-							   .text(this.name + ' ' + suffix)
-							   .val(this.name)
-							   .appendTo(gradebookDropdown);
-				
-				// select the default output
-				if (activity.gradebookToolOutputDefinitionName == this.name) {
-					option.attr('selected', 'selected');
-					emptyOption.attr('selected', null);
-				}
-			});
+		// build output dropdown and bind data to each option
+		$.each(activity.outputDefinitions,function(){
+			if (this.type != 'OUTPUT_LONG') {
+				return true;
+			}
+			optionsFound = true;
+			
+			var option = $('<option />')
+						   .text(this.name + ' ' + LABELS.RANGE_OUTPUT_SUFFIX)
+						   .val(this.name)
+						   .appendTo(gradebookDropdown);
+			
+			// select the default output
+			if (activity.gradebookToolOutputDefinitionName == this.name) {
+				option.attr('selected', 'selected');
+				emptyOption.attr('selected', null);
+			}
+		});
+		
+		if (gradebookDropdown.children().length == 1) {
+			// no valid ouput definitons, remove the whole row
+			gradebookDropdown.parent().parent().remove();
+		}
 	},
 	
 		
