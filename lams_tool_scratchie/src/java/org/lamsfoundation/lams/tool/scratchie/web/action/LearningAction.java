@@ -273,7 +273,7 @@ public class LearningAction extends Action {
 		// find corresponding burningQuestion
 		String question = "";
 		for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
-		    if (burningQuestion.getScratchieItem().getUid().equals(item.getUid())) {
+		    if (!burningQuestion.isGeneralQuestion() && burningQuestion.getScratchieItem().getUid().equals(item.getUid())) {
 			question = burningQuestion.getQuestion();
 			break;
 		    }
