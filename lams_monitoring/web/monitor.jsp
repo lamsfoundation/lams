@@ -55,7 +55,7 @@
 				<fmt:message key="force.complete.activity.confirm" var="FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR"/>
 				FORCE_COMPLETE_ACTIVITY_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR}" />').text(),
 				<fmt:message key="force.complete.remove.content" var="FORCE_COMPLETE_REMOVE_CONTENT_VAR"/>
-				FORCE_COMPLETE_REMOVE_CONTENT : '<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_VAR}" />',
+				FORCE_COMPLETE_REMOVE_CONTENT : decoderDiv.html('<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_VAR}" />').text(),
 				<fmt:message key="force.complete.remove.content.yes" var="FORCE_COMPLETE_REMOVE_CONTENT_YES_VAR"/>
 				FORCE_COMPLETE_REMOVE_CONTENT_YES : '<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_YES_VAR}" />',
 				<fmt:message key="force.complete.remove.content.no" var="FORCE_COMPLETE_REMOVE_CONTENT_NO_VAR"/>
