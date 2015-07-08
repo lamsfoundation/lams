@@ -305,7 +305,7 @@ var MenuLib = {
 			var startActivity = null,
 				targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 			if (targetElement) {
-				startActivity = targetElement.data('parentObject');
+				startActivity = ActivityLib.getParentObject(targetElement);
 				if (startActivity) {
 					HandlerTransitionLib.drawTransitionStartHandler(startActivity, null, event.pageX, event.pageY);
 				}
