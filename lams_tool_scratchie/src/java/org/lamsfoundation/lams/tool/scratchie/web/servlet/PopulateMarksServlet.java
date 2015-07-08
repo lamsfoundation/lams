@@ -60,6 +60,11 @@ public class PopulateMarksServlet extends HttpServlet {
 	super.init();
     }
 
+    /*
+     * Expects arbitrary parameter "toolContentId". And when it's available - it recalculates marks only for the
+     * sessions belonging to that toolContent, if this parameter is missing - it goes in a loop and recalculates for
+     * session uids from 1 to 20 000.
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	PrintWriter out = response.getWriter();
