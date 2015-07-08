@@ -52,9 +52,9 @@ var HandlerLib = {
 			// show that we are in the middle of something
 			HandlerLib.resetCanvasMode();
 			items.isDragged = true;
-			GeneralLib.applyToSet(items, 'attr', ['cursor', 'move']);
+			items.attr('cursor', 'move');
 			
-			var parentObject = draggedElement.data('parentObject');
+			var parentObject = ActivityLib.getParentObject(draggedElement);
 				sticky = parentObject && (parentObject instanceof ActivityDefs.ParallelActivity
 										  || parentObject instanceof ActivityDefs.OptionalActivity
 										  || parentObject instanceof ActivityDefs.FloatingActivity);
@@ -63,14 +63,10 @@ var HandlerLib = {
 			// they will be redrawn when the parent is dropped
 			if (sticky) {
 				$.each(parentObject.childActivities, function(){
-					this.items.forEach(function(item){
-						item.attr('display', 'none');
-					});
+					this.items.attr('display', 'none');
 					if (this.childActivities) {
 						$.each(this.childActivities, function() {
-							this.items.forEach(function(item){
-								item.attr('display', 'none');
-							});
+							this.items.attr('display', 'none');
 						});
 					}
 				});
@@ -83,7 +79,7 @@ var HandlerLib = {
 			var mouseup = function(mouseupEvent){
 				// finish dragging - restore various elements' default state
 				items.isDragged = false;
-				GeneralLib.applyToSet(items, 'unmouseup');
+				items.unmouseup();
 				HandlerLib.resetCanvasMode(true);
 				if (layout.bin.glowEffect) {
 					layout.bin.glowEffect.remove();
@@ -113,11 +109,11 @@ var HandlerLib = {
 		var dx = event.pageX - startX,
 			dy = event.pageY - startY;
 		
-		GeneralLib.applyToSet(items, 'transform', ['t' + dx + ' ' + dy]);
+		items.transform('t' + dx + ' ' + dy);
 		
-		if (items.groupingEffect) {
-			GeneralLib.toBack(items.groupingEffect);
-		}
+//		if (items.groupingEffect) {
+//			GeneralLib.toBack(items.groupingEffect);
+//		}
 		
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
@@ -147,10 +143,10 @@ var HandlerLib = {
 	 */
 	dropObject : function(object) {
 		// finally transform the dragged elements
-		var transformation = Snap.parseTransformString(object.items.shape.transform().string);
-		GeneralLib.applyToSet(object.items, 'transform', ['']);
+		var transformation = Snap.parseTransformString(object.items.transform().string);
+		object.items.transform('');
 		
-		var box = object.items.shape.getBBox(),
+		var box = object.items.getBBox(),
 			originalCoordinates = {
 				x : box.x,
 				// adjust this coordinate for annotation labels
@@ -186,7 +182,7 @@ var HandlerLib = {
 			return;
 		}
 		
-		var parentObject = this.data('parentObject');
+		var parentObject = ActivityLib.getParentObject(this);
 		// if it's "import part" allow multiple selection of activities
 		if (activitiesOnlySelectable) {
 			if (parentObject.items.selectEffect) {
@@ -239,7 +235,7 @@ HandlerActivityLib = {
 	 * Double click opens activity authoring.
 	 */
 	activityDblclickHandler : function(event) {
-		var activity = this.data('parentObject');
+		var activity = ActivityLib.getParentObject(this);
 		ActivityLib.openActivityAuthoring(activity);
 	},
 	
@@ -253,7 +249,7 @@ HandlerActivityLib = {
 			return;
 		}
 		
-		var activity = this.data('parentObject');
+		var activity = ActivityLib.getParentObject(this);
 		if (event.ctrlKey) {
 			 // when CTRL is held down, start drawing a transition
 			 HandlerTransitionLib.drawTransitionStartHandler(activity, event, x, y);
@@ -287,7 +283,7 @@ HandlerActivityLib = {
 	 * Lighthens up branching edges in the same colour for identifictation.
 	 */
 	branchingEdgeMouseoverHandler : function() {
-		var branchingActivity = this.data('parentObject').branchingActivity,
+		var branchingActivity = ActivityLib.getParentObject(this).branchingActivity,
 			startItems = branchingActivity.start.items,
 			endItems = branchingActivity.end.items;
 		if (!startItems.isDragged && !endItems.isDragged) {
@@ -301,7 +297,7 @@ HandlerActivityLib = {
 	 * Return branching edges to their normal colours.
 	 */
 	branchingEdgeMouseoutHandler : function() {
-		var branchingActivity = this.data('parentObject').branchingActivity,
+		var branchingActivity = ActivityLib.getParentObject(this).branchingActivity,
 			startItems = branchingActivity.start.items,
 			endItems = branchingActivity.end.items;
 		
@@ -328,7 +324,7 @@ HandlerDecorationLib = {
 			return;
 		}
 		
-		var container = this.data('parentObject');
+		var container = ActivityLib.getParentObject(this);
 		// allow transition dragging
 		var mouseupHandler = function(event){
 			if (HandlerLib.isElemenentBinned(event)) {
@@ -439,7 +435,7 @@ HandlerDecorationLib = {
 			return;
 		}
 		
-		var label = this.data('parentObject');
+		var label = ActivityLib.getParentObject(this);
 		// allow transition dragging
 		var mouseupHandler = function(event){
 			if (HandlerLib.isElemenentBinned(event)) {
@@ -464,7 +460,7 @@ HandlerDecorationLib = {
 		
 		HandlerLib.resetCanvasMode();
 		
-		var region = this.data('parentObject');
+		var region = ActivityLib.getParentObject(this);
 			
 		canvas.mousemove(function(event){
 			HandlerDecorationLib.resizeRegionMoveHandler(region, event);
@@ -610,7 +606,7 @@ HandlerTransitionLib = {
 		var endActivity = null,
 			targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 		if (targetElement) {
-			endActivity = targetElement.data('parentObject');
+			endActivity = ActivityLib.getParentObject(targetElement);
 		}
 
 		if (endActivity && activity != endActivity) {
@@ -626,7 +622,7 @@ HandlerTransitionLib = {
 	 * Starts dragging a transition.
 	 */
 	transitionMousedownHandler : function(event, x, y){
-		var transition = this.data('parentObject');
+		var transition = ActivityLib.getParentObject(this);
 		// allow transition dragging
 		var mouseupHandler = function(event){
 			if (HandlerLib.isElemenentBinned(event)) {

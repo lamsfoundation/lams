@@ -76,7 +76,9 @@ var DecorationDefs = {
 				}
 				
 				// the label
-				this.items = Snap.set();
+				this.items = paper.g();
+				// uiid is needed in Monitoring
+				this.items.attr('uiid', this.uiid);
 				if (this.title) {
 					var label = paper.text(x + 7, y + 14, this.title)
 									 .attr(layout.defaultTextAttributes)
@@ -85,37 +87,36 @@ var DecorationDefs = {
 						label.attr('cursor', 'pointer');
 					}
 					
-					GeneralLib.toBack(label);
-					this.items.push(label);
+					this.items.append(label);
 					
 					// make sure title fits
 					x2 = Math.max(x2, label.getBBox().x2 + 5);
 				}
 				
 				// the rectangle
-				this.items.shape = paper.path(Snap.format('M {x} {y} H {x2} V {y2} H {x} z',
+				this.items.shape = paper.path(Snap.format('M {x} {y} h {width} v {height} h -{width} z',
 														  {
-														   'x'  : x,
-														   'y'  : y,
-														   'x2' : x2,
-														   'y2' : y2
+														   'x'     : x,
+														   'y'     : y,
+														   'width' : x2 - x,
+														   'height'    : y2 - y
 														  }))
 						 			    .attr({
 						 			    	'stroke' : layout.colors.activityBorder,
 						 			    	'fill'   : color
 						 			    });
-				GeneralLib.toBack(this.items.shape);
-				this.items.push(this.items.shape);
+				this.items.prepend(this.items.shape);
+				GeneralLib.toBack(this.items);
 				
 				if (isReadOnlyMode){
 					if (activitiesOnlySelectable) {
-						this.items.shape.attr('cursor', 'pointer');
-						GeneralLib.applyToSet(this.items, 'click',[HandlerLib.itemClickHandler]);
+						this.items.attr('cursor', 'pointer')
+								  .click(HandlerLib.itemClickHandler);
 					}
 				} else {
-					this.items.shape.attr('cursor', 'pointer');
-					GeneralLib.applyToSet(this.items, 'mousedown',[HandlerDecorationLib.containerMousedownHandler]);
-					GeneralLib.applyToSet(this.items, 'click',[HandlerLib.itemClickHandler]);
+					this.items.attr('cursor', 'pointer')
+							  .mousedown(HandlerDecorationLib.containerMousedownHandler)
+							  .click(HandlerLib.itemClickHandler);
 				}
 			},	
 	
@@ -159,19 +160,21 @@ var DecorationDefs = {
 					this.items.remove();
 				}
 				
-				this.items = Snap.set();
+				this.items = paper.g();
+				// uiid is needed in Monitoring
+				this.items.attr('uiid', this.uiid);
 				this.items.shape = paper.text(x, y, this.title)
 										.attr(layout.defaultTextAttributes)
 										.attr('text-anchor', 'start');
-				this.items.push(this.items.shape);
+				this.items.append(this.items.shape);
 				
-				this.items.shape.attr('cursor', 'pointer');
-				GeneralLib.applyToSet(this.items, 'click',[HandlerLib.itemClickHandler]);
+				this.items.attr('cursor', 'pointer')
+						  .click(HandlerLib.itemClickHandler);
 				if (!isReadOnlyMode){
-					this.items.shape.mousedown(HandlerDecorationLib.labelMousedownHandler);
+					this.items.mousedown(HandlerDecorationLib.labelMousedownHandler);
 				}
 				
-				GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
+				this.items.data('parentObject', this);
 			}
 		},
 		
@@ -197,11 +200,11 @@ var DecorationDefs = {
 										 })
 										 .click(function(event){
 											event.stopImmediatePropagation();
-											var region = this.data('parentObject');
+											var region = ActivityLib.getParentObject(this);
 											region.fit();
 											ActivityLib.addSelectEffect(region, true);
 										 });
-					this.items.push(this.items.fitButton);
+					this.items.append(this.items.fitButton);
 					
 					this.items.resizeButton = paper.path(Snap.format('M {x} {y} v {side} h -{side} z',
 																	 {
@@ -219,10 +222,10 @@ var DecorationDefs = {
 												   });
 					
 					this.items.resizeButton.mousedown(HandlerDecorationLib.resizeRegionStartHandler);
-					this.items.push(this.items.resizeButton);
+					this.items.append(this.items.resizeButton);
 				}
 				
-				GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
+				this.items.data('parentObject', this);
 			}
 		}
 	}
@@ -275,7 +278,7 @@ DecorationLib = {
 			}
 		});
 		
-		var parentObject = shape.data('parentObject');
+		var parentObject = ActivityLib.getParentObject(shape);
 		// store the result in the shape's object
 		if (parentObject && !(parentObject instanceof DecorationDefs.Region)) {
 			parentObject.childActivities = result;
