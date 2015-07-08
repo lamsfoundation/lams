@@ -2409,7 +2409,7 @@ GeneralLib = {
 				'yCoord'    	 : parseInt(box.y),
 				'endXCoord' 	 : isRegion ? parseInt(box.x2) : null,
 				'endYCoord' 	 : isRegion ? parseInt(box.y2) : null,
-				'color'	    	 : isRegion ? this.items.shape.attr('fill') : null
+				'color'	    	 : isRegion ? Snap.color(this.items.shape.attr('fill')).hex : null
 			});
 		});
 

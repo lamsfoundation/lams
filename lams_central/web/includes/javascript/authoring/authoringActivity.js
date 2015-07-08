@@ -271,8 +271,8 @@ ActivityDraw = {
 	branching : function(x, y) {
 		if (x == undefined || y == undefined) {
 			// just redraw the activity
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+			x = this.items.getBBox().x;
+			y = this.items.getBBox().y;
 		}
 		
 		if (this.items) {
@@ -280,7 +280,6 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		this.items = Snap.set();
 		var shape = paper.path(Snap.format('M {x} {y} a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
 										   {
 											'x' : x,
@@ -297,7 +296,11 @@ ActivityDraw = {
 	                                        		 	 				   : LABELS.BRANCHING_END_SUFFIX))
 	                     .attr(layout.defaultTextAttributes);
 		
-		this.items.push(shape).push(label);
+		this.items = paper.g(shape, label);
+		if (this.isStart) {
+			// uiid is needed in Monitoring
+			this.items.attr('uiid', this.branchingActivity.uiid);
+		}
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -310,8 +313,8 @@ ActivityDraw = {
 	floatingActivity : function(x, y, ignoredParam1, ignoredParam2, childActivities) {
 		if (x == undefined || y == undefined) {
 			// if no new coordinates are given, just redraw the activity
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+			x = this.items.getBBox().x;
+			y = this.items.getBBox().y;
 		}
 		
 		// either check what children are on canvas or use the priovided parameter
@@ -324,7 +327,7 @@ ActivityDraw = {
 			var activityX = x + layout.conf.containerActivityPadding,
 				allElements = Snap.set(),
 				floatingActivity = this,
-				box = this.items.shape.getBBox();
+				box = this.items.getBBox();
 			$.each(this.childActivities, function(orderID){
 				this.parentActivity = floatingActivity;
 				this.orderID = orderID;
@@ -348,7 +351,7 @@ ActivityDraw = {
 							   layout.colors.optionalActivity);
 		}
 		
-		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
+		this.items.data('parentObject', this);
 	},
 	
 	
@@ -357,8 +360,8 @@ ActivityDraw = {
 	 */
 	gate : function(x, y) {
 		if (x == undefined || y == undefined) {
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+			x = this.items.getBBox().x;
+			y = this.items.getBBox().y;
 		}
 
 		if (this.items) {
@@ -366,7 +369,6 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		this.items = Snap.set();
 		var shape = paper.path(Snap.format('M {x} {y} l-9 9 v16 l9 9 h16 l9 -9 v-16 l-9 -9 z',
 										   {
 											'x' : x + 9,
@@ -381,7 +383,9 @@ ActivityDraw = {
 						 .attr(layout.defaultTextAttributes)
 						 .attr('stroke', layout.colors.gateText);
 		
-		this.items.push(shape).push(label);
+		this.items = paper.g(shape, label);
+		// uiid is needed in Monitoring
+		this.items.attr('uiid', this.uiid);
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -394,8 +398,8 @@ ActivityDraw = {
 	grouping : function(x, y) {
 		if (x == undefined || y == undefined) {
 			// just redraw the activity
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+			x = this.items.getBBox().x;
+			y = this.items.getBBox().y;
 		}
 
 		if (this.items) {
@@ -403,7 +407,6 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		this.items = Snap.set();
 		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
 										   {
 											'x' : x,
@@ -418,7 +421,9 @@ ActivityDraw = {
 			label = paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
 						 .attr(layout.defaultTextAttributes);
 		
-		this.items.push(shape).push(icon).push(label);
+		this.items = paper.g(shape, icon, label);
+		// uiid is needed in Monitoring
+		this.items.attr('uiid', this.uiid);
 		this.items.shape = shape;
 		
 		ActivityLib.activityHandlersInit(this);
@@ -431,8 +436,8 @@ ActivityDraw = {
 	optionalActivity : function(x, y, ignoredParam1, ignoredParam2, childActivities) {
 		if (x == undefined || y == undefined) {
 			// if no new coordinates are given, just redraw the activity
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+			x = this.items.getBBox().x;
+			y = this.items.getBBox().y;
 		}
 		
 		// either check what children are on canvas or use the priovided parameter
@@ -445,11 +450,12 @@ ActivityDraw = {
 			var activityY = y + layout.conf.containerActivityPadding + 10,
 				allElements = Snap.set(),
 				optionalActivity = this,
-				box = this.items.shape.getBBox(),
+				box = this.items.getBBox(),
 				boxWidth = box.width;
 			$.each(this.childActivities, function(orderID){
 				this.parentActivity = optionalActivity;
 				this.orderID = orderID + 1;
+				// for some reason, this.items.getBBox() can't be used here
 				var childBox = this.items.shape.getBBox();
 				this.draw(x + Math.max(layout.conf.containerActivityPadding, (boxWidth - childBox.width)/2), activityY);
 				childBox = this.items.shape.getBBox();
@@ -472,11 +478,10 @@ ActivityDraw = {
 		
 		if (!isReadOnlyMode){
 			// allow transition drawing and other activity behaviour
-			GeneralLib.applyToSet(this.items, 'unmousedown');
-			GeneralLib.applyToSet(this.items, 'mousedown', [HandlerActivityLib.activityMousedownHandler]);
+			this.items.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
 		}
 		
-		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
+		this.items.data('parentObject', this);
 	},
 	
 	
@@ -486,10 +491,10 @@ ActivityDraw = {
 	parallelActivity : function(x, y) {
 		// if no new coordinates are given, just redraw the activity or give default value
 		if (x == undefined) {
-			x = this.items ? this.items.shape.getBBox().x : 0;
+			x = this.items ? this.items.getBBox().x : 0;
 		}
 		if (y == undefined) {
-			y = this.items ? this.items.shape.getBBox().y : 0;
+			y = this.items ? this.items.getBBox().y : 0;
 		}
 		
 		if (this.childActivities && this.childActivities.length > 0) {
@@ -501,7 +506,7 @@ ActivityDraw = {
 				this.parentActivity = optionalActivity;
 				this.orderID = orderID + 1;
 				this.draw(x + layout.conf.containerActivityPadding, activityY);
-				activityY = this.items.shape.getBBox().y2 + layout.conf.containerActivityChildrenPadding;
+				activityY = this.items.getBBox().y2 + layout.conf.containerActivityChildrenPadding;
 				allElements.push(this.items.shape);
 			});
 			// area containing all drawn child activities
@@ -524,11 +529,10 @@ ActivityDraw = {
 		
 		if (!isReadOnlyMode){
 			// allow transition drawing and other activity behaviour
-			GeneralLib.applyToSet(this.items, 'unmousedown');
-			GeneralLib.applyToSet(this.items, 'mousedown', [HandlerActivityLib.activityMousedownHandler]);
+			this.items.unmousedown().mousedown(HandlerActivityLib.activityMousedownHandler);
 		}
 		
-		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
+		this.items.data('parentObject', this);
 	},
 	
 	
@@ -547,7 +551,6 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		this.items = Snap.set();
 		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
 										   {
 											'x' : x,
@@ -563,8 +566,10 @@ ActivityDraw = {
 			label = paper.text(x + 62, y + 43, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr('fill', layout.colors.activityText);
-			 			 
-		this.items.push(shape).push(icon).push(label);
+		
+		this.items = paper.g(shape, icon, label);
+		// uiid is needed in Monitoring
+		this.items.attr('uiid', this.uiid);
 		this.items.shape = shape;
 		
 		if (this.grouping) {
@@ -588,7 +593,6 @@ ActivityDraw = {
 		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity);
 		
 		// create transition SVG elements
-		this.items = Snap.set();
 		var arrowShaft = paper.path(Snap.format('M {startX} {startY} L {endX} {endY}', points))
 				              .attr({
 						          	 'stroke'       : layout.colors.transition,
@@ -607,7 +611,8 @@ ActivityDraw = {
 								'stroke' : layout.colors.transition,
 								'fill'   : layout.colors.transition
 							 });
-		this.items.push(arrowShaft).push(arrowPath);
+		this.items = paper.g(arrowShaft, arrowPath);
+		this.items.attr('uiid', this.uiid);
 		if (this.title) {
 			// adjust X & Y depending on the angle, so the label does not overlap with the transition;
 			// angle in Javascript is -90 <= a <= 270
@@ -617,22 +622,22 @@ ActivityDraw = {
 					   	     .attr(layout.defaultTextAttributes)
 					   	     .attr('text-anchor', 'start');
 			
-			this.items.push(label);
+			this.items.append(label);
 		}
 
 		GeneralLib.toBack(this.items);
 		
 		// region annotations could cover grouping effect
 		$.each(layout.regions, function(){
-			GeneralLib.toBack(this.items.shape);
+			GeneralLib.toBack(this.items);
 		});
-		
-		GeneralLib.applyToSet(this.items, 'data', ['parentObject', this]);
+
+		this.items.data('parentObject', this);
 		
 		if (!isReadOnlyMode){
-			GeneralLib.applyToSet(this.items, 'attr', ['cursor', 'pointer']);
-			GeneralLib.applyToSet(this.items, 'mousedown', [HandlerTransitionLib.transitionMousedownHandler]);
-			GeneralLib.applyToSet(this.items, 'click', [HandlerLib.itemClickHandler]);
+			this.items.attr('cursor', 'pointer')
+					  .mousedown(HandlerTransitionLib.transitionMousedownHandler)
+					  .click(HandlerLib.itemClickHandler);
 		}
 	}
 },
@@ -648,29 +653,28 @@ ActivityLib = {
 	 * Make a new activity fully functional on canvas.
 	 */
 	activityHandlersInit : function(activity) {
-		GeneralLib.applyToSet(activity.items, 'data', ['parentObject', activity]);
+		activity.items.data('parentObject', activity);
 		
 		if (isReadOnlyMode) {
 			if (activitiesOnlySelectable) {
-				GeneralLib.applyToSet(activity.items, 'click', [HandlerLib.itemClickHandler]);
-				GeneralLib.applyToSet(activity.items, 'attr', [{'cursor' : 'pointer'}]);
+				activity.items.attr('cursor', 'pointer')
+				  			  .click(HandlerLib.itemClickHandler);
 			}
 		} else {
 			// set all the handlers
-			GeneralLib.applyToSet(activity.items, 'mousedown', [HandlerActivityLib.activityMousedownHandler]);
-			GeneralLib.applyToSet(activity.items, 'click', [HandlerLib.itemClickHandler]);
-			GeneralLib.applyToSet(activity.items, 'dblclick', [HandlerActivityLib.activityDblclickHandler]);
-			GeneralLib.applyToSet(activity.items, 'attr', [{'cursor' : 'pointer'}]);
+			activity.items.attr('cursor', 'pointer')
+						  .mousedown(HandlerActivityLib.activityMousedownHandler)
+			  		      .click(HandlerLib.itemClickHandler)
+			  		      .dblclick(HandlerActivityLib.activityDblclickHandler);
 			
 			if (activity instanceof ActivityDefs.BranchingEdgeActivity
 					&& activity.branchingActivity.end) {
 				// highligh branching edges on hover
-				GeneralLib.applyToSet(activity.branchingActivity.start.items, 'hover',
-						[HandlerActivityLib.branchingEdgeMouseoverHandler,
-						HandlerActivityLib.branchingEdgeMouseoutHandler]);
-				GeneralLib.applyToSet(activity.branchingActivity.end.items, 'hover',
-						[HandlerActivityLib.branchingEdgeMouseoverHandler,
-						HandlerActivityLib.branchingEdgeMouseoutHandler]);
+				
+				activity.branchingActivity.start.items.hover(HandlerActivityLib.branchingEdgeMouseoverHandler,
+															 HandlerActivityLib.branchingEdgeMouseoutHandler);
+				activity.branchingActivity.end.items.hover(HandlerActivityLib.branchingEdgeMouseoverHandler,
+						 HandlerActivityLib.branchingEdgeMouseoutHandler);
 			}
 		}
 
@@ -741,7 +745,7 @@ ActivityLib = {
 		// do not draw twice if it already exists
 		if (!activity.items.groupingEffect) {
 			var shape = activity.items.shape,
-				activityBox = shape.getBBox();
+				activityBox = activity.items.getBBox();
 			
 			activity.items.groupingEffect = paper.rect(
 					activityBox.x + layout.conf.groupingEffectPadding,
@@ -753,12 +757,11 @@ ActivityLib = {
 					'fill' : shape.attr('fill')
 				});
 			
-			GeneralLib.toBack(activity.items.groupingEffect);
-			activity.items.push(activity.items.groupingEffect);
+			activity.items.prepend(activity.items.groupingEffect);
 			
 			// region annotations could cover grouping effect
 			$.each(layout.regions, function(){
-				GeneralLib.toBack(this.items.shape);
+				GeneralLib.toBack(this.items);
 			});
 		}
 	},
@@ -820,7 +823,7 @@ ActivityLib = {
 									'stroke-dasharray' : '5,3',
 									'fill' : 'none'
 								});
-				object.items.push(object.items.selectEffect);
+				object.items.append(object.items.selectEffect);
 				
 				// if it's "import part" select children activities
 				if (activitiesOnlySelectable) {
@@ -1183,13 +1186,28 @@ ActivityLib = {
 	
 	
 	/**
+	 * Finds activity/region this shape is bound with.
+	 */
+	getParentObject : function(item) {
+		var parentObject = item.data('parentObject');
+		if (!parentObject) {
+			var parentNode = item.parent();
+			if (parentNode.type == 'g') {
+				parentObject = parentNode.data('parentObject');
+			}
+		}
+		return parentObject;
+	},
+	
+	
+	/**
 	 * Get output definitions from Tool activity
 	 */
 	getOutputDefinitions : function(activity){
 		if (!activity.toolID) {
 			return;
-		}
-		
+			}
+			
 		$.ajax({
 			url : LAMS_URL + 'authoring/author.do',
 			data : {
@@ -1205,14 +1223,14 @@ ActivityLib = {
 				$.each(activity.outputDefinitions, function() {
 					if (this.isDefaultGradebookMark){
 						activity.gradebookToolOutputDefinitionName = this.name;
-						return false;
-					}
-				});
-			}
+					return false;
+				}
+					});
+		}
 		});
 	},
 	
-	
+
 	/**
 	 * Open separate window with activity authoring on double click.
 	 */

@@ -38,7 +38,11 @@ var originalSequenceCanvas = null,
 
 // double tap support
 	tapTimeout = 500,
-	lastTap = 0;
+	lastTap = 0,
+
+// after first entering of branching in old SVGs layout gets a bit broken
+// setting this property fixes it
+	branchingEntered = false;
 
 // ********* GENERAL TABS FUNCTIONS *********
 
@@ -763,6 +767,8 @@ function updateSequenceTab() {
 		return;
 	}
 	sequenceRefreshInProgress = true;
+	// SVG modifications are made only the first time this method is called
+	var sequenceCanvasFirstFetch = false;
 	
 	if (originalSequenceCanvas) {
 		// put bottom layer, LD SVG
@@ -781,15 +787,20 @@ function updateSequenceTab() {
 				'branchingActivityID' : sequenceBranchingId
 			},
 			success : function(response) {
+				sequenceCanvasFirstFetch = true;
 				originalSequenceCanvas = response;
+				// store body dimensions before manipulating HTML
+				// otherwise resizing will yield bad results
+				var width = $('body').width(),
+					height = $('body').height();
 				sequenceCanvas = $('#sequenceCanvas')
 					// remove previously set padding and dimensions, if any
 					.removeAttr('style')
 					.html(originalSequenceCanvas)
 					// if it was faded out by showBranchingSequence()
-					.fadeIn();
-				
-				resizeSequenceCanvas();
+					.fadeIn(function(){
+						resizeSequenceCanvas(width, height);
+					});
 			}
 		});
 	}
@@ -811,9 +822,40 @@ function updateSequenceTab() {
 		data : {
 			'method'    : 'getLessonProgress',
 			'lessonID'  : lessonId,
-			'branchingActivityID' : sequenceBranchingId
+			'branchingActivityID' : sequenceBranchingId,
+			'getTransitions' : sequenceCanvasFirstFetch
 		},		
 		success : function(response) {
+			if (sequenceCanvasFirstFetch) {
+				// FLA activities have uiids but no ids, set it here
+				$.each(response.activities, function(activityIndex, activity){
+					$('g[uiid="' + activity.uiid + '"]', sequenceCanvas).attr('id', activity.id);
+				});
+				
+				// add some metadata to activities
+				$.each(response.activities, function(activityIndex, activity){
+					var activityGroup = $('g[id="' + activity.id + '"]', sequenceCanvas),
+						isGate = [3,4,5,14].indexOf(activity.type) > -1,
+						isOptional = activity.type == 7,
+						isFloating = activity.type == 15;
+					if (isGate) {
+						activityGroup.attr('class', 'gate');
+					} else if (isOptional) {
+						activityGroup.attr('class', 'optional');
+					} else if (isFloating) {
+						activityGroup.attr('class', 'floating');
+					}
+				});
+				
+				// FLA transitions have uiid but no ids; needed for forceComplete()
+				$.each(response.transitions, function(index, transition){
+					$('g[uiid="' + transition.uiid + '"]', sequenceCanvas)
+						.attr('id', transition.fromID + '_to_' + transition.toID);
+				});
+				
+				originalSequenceCanvas = sequenceCanvas.html();
+			}
+			
 			// remove the loading animation
 			$('img#sequenceCanvasLoading', sequenceTopButtonsContainer).remove();
 
@@ -851,13 +893,7 @@ function updateSequenceTab() {
 				
 				var isBranching = [10,11,12,13].indexOf(activity.type) > -1;
 				if (activity.url || (isBranching && !activity.flaFormat)) {
-					// find the activity in SVG
-					var coord = getActivityCoordinates(activity);
-					if (!coord || !coord.elem) {
-						return;
-					}
-					
-					var activityElems = [coord.elem],
+					var activityGroup = $('g[id="' + activity.id + '"]'),
 						dblClickFunction = 
 							// different behaviour for regular/branching activities
 							isBranching ? 
@@ -867,31 +903,18 @@ function updateSequenceTab() {
 								// double click on activity shape to open Monitoring for this activity
 								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
 							};
-							
-					// find the activity image, but skip learner and attention icons
-					$('image:not([id^="act"])', sequenceCanvas).each(function(){
-						var image = $(this),
-							x = +image.attr('x'),
-							y = +image.attr('y');
-						if (x > coord.x && x < coord.x2 && y > coord.y && y < coord.y2) {
-							activityElems.push(image);
-						}
-					});
 					
-					// find activity group, if it is not hidden
-					$.each(activityElems, function(){
-						$(this).css('cursor', 'pointer')
-							  // double tap detection on mobile devices; it works also for mouse clicks
-							  .tap(function(event){
-								  var currentTime = new Date().getTime(),
-								  	  tapLength = currentTime - lastTap;
-								  if (tapLength < tapTimeout && tapLength > 0) {
-									  event.preventDefault();
-									  dblClickFunction();
-								  }
-								  lastTap = currentTime;
-							  });
-					});
+					activityGroup.css('cursor', 'pointer')
+							  	 // double tap detection on mobile devices; it works also for mouse clicks
+							  	 .tap(function(event){
+									  var currentTime = new Date().getTime(),
+									  	  tapLength = currentTime - lastTap;
+									  if (tapLength < tapTimeout && tapLength > 0) {
+										  event.preventDefault();
+										  dblClickFunction();
+									  }
+									  lastTap = currentTime;
+								  });
 				}
 			});	
 			
@@ -906,84 +929,104 @@ function updateSequenceTab() {
  */
 function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 	autoRefreshBlocked = true;
+	
+	var foundActivities = [],
+		targetActivity = null;
 	// check all activities and "users who finished lesson" bar
-	$('rect[id^="act"], g polygon', sequenceCanvas).add('#completedLearnersContainer').each(function(){
+	// rootElement is only in Flash LDs
+	$('g[id]:not([id*="_to_"]):not(#rootElement)', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
 		var act = $(this),
-			actX = act.offset().left,
-			actY = act.offset().top,
-			actWidth = act.width(),
-			actHeight = act.height();
-		if (!actWidth) {
-			actWidth = +act.attr('width');
-			actHeight = +act.attr('height');
-		}
-		if (!actWidth && act.is('polygon')){
-			// just for Gate activity
-			var polygonPoints = act.attr('points').split(' ');
-			actWidth = +polygonPoints[5].split(',')[0] - +polygonPoints[2].split(',')[0];
-			actHeight = +polygonPoints[0].split(',')[1] - +polygonPoints[3].split(',')[1];
-		}
-		var actEndX = actX + actWidth,
-			actEndY = actY + actHeight;
-		
-		if (x >= actX && x<= actEndX && y>= actY && y<=actEndY) {
-			var targetActivityId = null;
-			var executeForceComplete = false;
-			
-			if (act.attr('id') == 'completedLearnersContainer') {
-				executeForceComplete =  currentActivityId && confirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM
-						.replace('[0]',learnerName));
-			} else {
-				var targetActivityId = act.parent().attr('id');
-				if (currentActivityId != targetActivityId) {
-					
-					var precedingActivityId = currentActivityId,
-						targetActivityName = act.is('polygon') ? "Gate" 
-							: act.siblings('text[id^="TextElement"]').text();
-					
-					// find out if we are moving learner forward or backwards
-					while (precedingActivityId){
-						// find transition line and extract activity IDs from them
-						var transitionLine = $('line[id$="to_' 
-								+ precedingActivityId + '"]:not([id^="arrow"])'
-								, sequenceCanvas);
-						precedingActivityId = transitionLine.length == 1 ? 
-								transitionLine.attr('id').split('_')[0] : null;
-						if (targetActivityId == precedingActivityId) {
-							break;
-						}
-					};
-					
-					// check if the target activity was found or we are moving the learner from end of lesson
-					if (!currentActivityId || precedingActivityId) {
-						// move the learner backwards
-						$('#forceBackwardsDialog').text(LABELS.FORCE_COMPLETE_REMOVE_CONTENT
-									.replace('[0]', learnerName).replace('[1]', targetActivityName))
-									.dialog('option', {
-										'learnerId' : learnerId,
-										'activityId': targetActivityId
-									})
-									.dialog('open');
-						// so autoRefreshBlocked = false is not set
-						return;
-					} else {
-						// move the learner forward
-						executeForceComplete = confirm(LABELS.FORCE_COMPLETE_ACTIVITY_CONFIRM
-									.replace('[0]', learnerName).replace('[1]', targetActivityName));
-					}
+			coord = {
+					'x' : act.offset().left,
+					'y' : act.offset().top
 				}
-			}
-			
-			if (executeForceComplete) {
-				
-				forceCompleteExecute(learnerId, targetActivityId, false);
-			}
-			// we found our target, stop iteration
-			return false;
+		if (act.is('g')) {
+			var box = act[0].getBBox();
+			coord.width = box.width;
+			coord.height = box.height;
+		} else {
+			// end of lesson container
+			coord.width = act.width();
+			coord.height = act.height();
+		}
+		
+		coord.x2 = coord.x + coord.width;
+		coord.y2 = coord.y + coord.height;
+		
+		if (x >= coord.x && x <= coord.x2 && y >= coord.y && y <= coord.y2) {
+			foundActivities.push(act);
 		}
 	});
 	
+	$.each(foundActivities, function(){
+		if (this.attr('class') == 'floating') {
+			// no force complete to support activities
+			targetActivity = null;
+			return false;
+		}
+		// the enveloping OptionalActivity has priority
+		if (targetActivity == null || this.attr('class') == 'optional') {
+			targetActivity = this;
+		}
+	});
+	
+	if (!targetActivity) {
+		return;
+	}
+	
+	var targetActivityId = null,
+		executeForceComplete = false,
+		isEndLesson = !targetActivity.is('g');
+	
+	if (isEndLesson) {
+		executeForceComplete =  currentActivityId && confirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM
+				.replace('[0]',learnerName));
+	} else {
+		var targetActivityId = +targetActivity.attr('id');
+		if (currentActivityId != targetActivityId) {
+			
+			var precedingActivityId = currentActivityId,
+				targetActivityName = targetActivity.attr('class') == 'gate' ? "Gate" : targetActivity.children('text').text();
+			
+			// find out if we are moving learner forward or backwards
+			while (precedingActivityId){
+				// find transition line and extract activity IDs from them
+				// it is Batik format adopted to new SVGs
+				var transitionLine = $('*[id$="to_' 
+						+ precedingActivityId + '"]:not([id^="arrow"])'
+						, sequenceCanvas);
+				precedingActivityId = transitionLine.length == 1 ? 
+						transitionLine.attr('id').split('_')[0] : null;
+				if (targetActivityId == precedingActivityId) {
+					break;
+				}
+			};
+			
+			// check if the target activity was found or we are moving the learner from end of lesson
+			if (!currentActivityId || precedingActivityId) {
+				// move the learner backwards
+				$('#forceBackwardsDialog').text(LABELS.FORCE_COMPLETE_REMOVE_CONTENT
+							.replace('[0]', learnerName).replace('[1]', targetActivityName))
+							.dialog('option', {
+								'learnerId' : learnerId,
+								'activityId': targetActivityId
+							})
+							.dialog('open');
+				// so autoRefreshBlocked = false is not set
+				return;
+			} else {
+				// move the learner forward
+				executeForceComplete = confirm(LABELS.FORCE_COMPLETE_ACTIVITY_CONFIRM
+							.replace('[0]', learnerName).replace('[1]', targetActivityName));
+			}
+		}
+	}
+	
+	if (executeForceComplete) {
+		forceCompleteExecute(learnerId, targetActivityId, false);
+	}
+
 	autoRefreshBlocked = false;
 }
 
@@ -1029,16 +1072,14 @@ function addActivityIcons(activity) {
 	}
 	
 	// add group of users icon
-	var activityGroup = $('g#' + activity.id, sequenceCanvas),
-		// in old SVG format, add to a group; in new, go straight for the SVG root element
-		appendTarget = (activityGroup.length > 0 ? activityGroup : $('svg', sequenceCanvas))[0],
+	var appendTarget = $('svg', sequenceCanvas)[0],
 		// branching and gates require extra adjustments
 		isNewBranching =  [10,11,12,13].indexOf(activity.type) > -1 && activity.flaFormat,
 		isGate = [3,4,5,14].indexOf(activity.type) > -1;
 	
 	if (activity.learners){
 		var	groupTitle = activity.learners.length + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
-		// if icons do not fit in shape anymore, show a group icon
+			// if icons do not fit in shape anymore, show a group icon
 			element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'learnerGroup',
 			'x'          : isNewBranching ? coord.x + 2  : (isGate ? coord.x + 10 : coord.x2 - 18),
@@ -1257,42 +1298,33 @@ function getActivityCoordinates(activity){
 		}
 	}
 	
-	// get either rectangle from old Batik SVG format
-	// or path from new Flashless Authoring format (IE and other browsers format paths differently)
-	var elem = $('rect[x="'    + activity.x + '.0"][y="' + activity.y + '.0"], ' + 
-				 'rect[x="'    + activity.x + '"][y="'   + activity.y + '"], ' + 
-				 'path[d^="M'  + activity.x + ',' 	     + activity.y +'"], ' + 
-				 'path[d^="M ' + activity.x + ' '        + activity.y +'"]',
-				 sequenceCanvas);
-	if (elem.length == 0) {
+	var group = $('g[id="' + activity.id + '"]', sequenceCanvas);
+	if (group.length == 0) {
 		return;
 	}
-	
-	// if it's a rectangle, it has these attributes
-	var width = elem.attr('width'),
+	var elem = $('rect, path', group),
+		// if it's a rectangle, it has these attributes; rectangles are in old SVGs
+		width = elem.attr('width'),
 		height = elem.attr('height');
 	if (width) {
 		return {
-			'elem' : elem,
 			'x'    : activity.x,
 			'y'    : activity.y,
 			'x2'   : activity.x + +width,
 			'y2'   : activity.y + +height
 		}
 	} else {
-		// extract width and height from path M<x>,<y>H<width>V<height>... or M <x> <y> H <width> V <height>...
-		var match = /H\s?(\d+)\s?V\s?(\d+)/i.exec(elem.attr('d'));
+		// extract width and height from path M<x>,<y>h<width>v<height>... or M <x> <y> h <width> v <height>...
+		var match = /h\s?(\d+)\s?v\s?(\d+)/.exec(elem.attr('d'));
 		if (match) {
 			return {
-				'elem' : elem,
 				'x'    : activity.x,
 				'y'    : activity.y + 1,
-				'x2'   : +match[1],
-				'y2'   : +match[2]
+				'x2'   : activity.x + +match[1],
+				'y2'   : activity.y + +match[2]
 			}
 		}
 	}
-
 }
 
 
@@ -1444,6 +1476,7 @@ function openLiveEdit(){
 function showBranchingSequence(branchingActivityId){
 	sequenceBranchingId = branchingActivityId;
 	originalSequenceCanvas = null;
+	branchingEntered = true;
 	$('#closeBranchingButton').show();
 	sequenceCanvas.fadeOut(function(){
 		sequenceCanvas.html(null);
@@ -1464,11 +1497,6 @@ function closeBranchingSequence(){
  * Adjusts sequence canvas (SVG) based on space available in the dialog.
  */
 function resizeSequenceCanvas(width, height){
-	// Initial resize sends no parameters.
-	// When resizing the dialog, parameters are sent.
-	// Taking body's dimensions when resizing yields erroneous results.
-	width = width || $('body').width();
-	height = height || $('body').height();
 	var sequenceCanvas = $('#sequenceCanvas'),
 		// can it be done nicer?
 		canvasHeight = height - $('#tabs>ul').height() - $('#sequenceTopButtonsContainer').height()
@@ -1480,10 +1508,12 @@ function resizeSequenceCanvas(width, height){
 		canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2);
 		
 		sequenceCanvas.css({
-			'padding-top'  : canvasPaddingTop,
-			'padding-left' : canvasPaddingLeft,
-			'width'        : canvasWidth - canvasPaddingLeft,
-			'height'       : canvasHeight - canvasPaddingTop
+			'padding-top'    : canvasPaddingTop,
+			// after first entering of Branching in old SVGs we need this adjustment
+			'padding-bottom' : branchingEntered ? 20 : 0,
+			'padding-left'   : canvasPaddingLeft,
+			'width'          : canvasWidth - canvasPaddingLeft,
+			'height'         : canvasHeight - canvasPaddingTop
 		});
 }
 

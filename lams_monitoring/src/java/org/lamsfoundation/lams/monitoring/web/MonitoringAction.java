@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -1082,11 +1083,13 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	// few details for each activity
 	Map<Long, JSONObject> activitiesMap = new TreeMap<Long, JSONObject>();
-	for (Activity activity : (Set<Activity>) lesson.getLearningDesign().getActivities()) {
+	LearningDesign learningDesign = lesson.getLearningDesign();
+	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
 	    if ((branchingActivityId == null) || MonitoringAction.isBranchingChild(branchingActivityId, activity)) {
 		Long activityId = activity.getActivityId();
 		JSONObject activityJSON = new JSONObject();
 		activityJSON.put("id", activityId);
+		activityJSON.put("uiid", activity.getActivityUIID());
 		activityJSON.put("title", activity.getTitle());
 
 		int activityType = activity.getActivityTypeId();
@@ -1163,6 +1166,21 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
+
+	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
+	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
+	    JSONArray transitions = new JSONArray();
+	    for (Transition transition : (Set<Transition>) learningDesign.getTransitions()) {
+		JSONObject transitionJSON = new JSONObject();
+		transitionJSON.put("uiid", transition.getTransitionUIID());
+		transitionJSON.put("fromID", transition.getFromActivity().getActivityId());
+		transitionJSON.put("toID", transition.getToActivity().getActivityId());
+		
+		transitions.put(transitionJSON);
+	    }
+	    responseJSON.put("transitions", transitions);
+	}
+
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
 	// remove "attention required" marker for hidden activities in Flash Authoring
 	if (contributeActivities != null) {
