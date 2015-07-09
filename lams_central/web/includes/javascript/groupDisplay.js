@@ -197,6 +197,14 @@ function showAddLessonDialog(orgID) {
 					.attr('src', LAMS_URL
 						+ 'home.do?method=addLesson&organisationID='
 						+ $(this).dialog('option', 'orgID'));
+			
+			//in case of mobile devices allow iframe scrolling
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			    setTimeout(function() {
+			    	 $('.dialogContainer').css('overflow-y','scroll');
+			        $('.dialogContainer').css('-webkit-overflow-scrolling','touch');
+			    },500);
+			}
 		}
 	});
 }
