@@ -537,8 +537,8 @@ function closeEmailDialog(){
 
 
 function updatePresenceAvailableCount(){
-	var checked = $('#presenceAvailableField').is(':checked');
-	var counter = $('#presenceAvailableCount');
+	var checked = $('#presenceAvailableField').is(':checked'),
+		counter = $('#presenceAvailableCount');
 	if (checked) {
 		$.ajax({
 			dataType : 'json',
@@ -1402,15 +1402,15 @@ function fillClassDialogList(listId, users, disableCreator) {
 	    		});
 	    		
 	    		if (selectAllState) {
-	    			$('#' + listId + 'SelectAll').attr('checked', 'checked');
+	    			$('#' + listId + 'SelectAll').prop('checked', 'checked');
 	    		}
 	    	} else {
-	    		$('#' + listId + 'SelectAll').attr('checked', null);
+	    		$('#' + listId + 'SelectAll').prop('checked', null);
 	    	}
 	    	
 	      });
 		if (user.classMember) {
-			checkbox.attr('checked', 'checked');
+			checkbox.prop('checked', 'checked');
 			if (disableCreator && user.lessonCreator) {
 				// user creator must not be deselected
 				checkbox.attr('disabled', 'disabled');
@@ -1432,13 +1432,13 @@ function fillClassDialogList(listId, users, disableCreator) {
 		} else {
 			userDiv.click(function(event){
 				if (event.target == this) {
-		    		checkbox.attr('checked', checkbox.is(':checked') ? null : 'checked');
+		    		checkbox.prop('checked', checkbox.is(':checked') ? null : 'checked');
 		    	}
 		    })
 		}
 	});	
 
-	$('#' + listId + 'SelectAll').attr('checked', selectAllInitState ? 'checked' : null);
+	$('#' + listId + 'SelectAll').prop('checked', selectAllInitState ? 'checked' : null);
 }
 
 
@@ -1904,7 +1904,7 @@ function selectAllInDialogList(listId) {
 	var targetState = $('#' + listId + 'SelectAll').is(':checked') ? 'checked' : null;
 	$('#' + listId + 'List input').each(function(){
 		if (!$(this).is(':disabled')) {
-			$(this).attr('checked', targetState);
+			$(this).prop('checked', targetState);
 		}		
 	});
 }
