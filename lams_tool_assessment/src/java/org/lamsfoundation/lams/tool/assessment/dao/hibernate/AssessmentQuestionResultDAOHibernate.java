@@ -46,7 +46,7 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	    + " AS q, "
 	    + AssessmentResult.class.getName()
 	    + " AS r "
-	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND q.mark < q.assessmentQuestion.defaultGrade";
+	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND q.mark < q.assessmentQuestion.defaultGrade AND (r.finishDate != null)";
     
     private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  "
 	    + AssessmentQuestionResult.class.getName()
