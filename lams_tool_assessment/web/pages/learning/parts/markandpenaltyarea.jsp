@@ -12,7 +12,7 @@
 		<div class="question-feedback" style="padding-bottom: 10px;">
 			<fmt:message key="label.learning.marks" >
 				<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
-				<fmt:param>${question.defaultGrade}</fmt:param>
+				<fmt:param>${question.grade}</fmt:param>
 			</fmt:message>
 			<c:if test="${(question.mark != question.defaultGrade) && (fn:length(question.questionResults) > 1)}">
 				<fmt:message key="label.learning.penalty" >

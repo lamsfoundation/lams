@@ -100,7 +100,10 @@
 		    		}
 		  		});
 		    	
-		    	
+				$("#multipleAnswersAllowed").on('change', function() {
+					$("#incorrect-answer-nullifies-mark-area").toggle(eval($(this).val()));
+				}).trigger("change");
+
 			});
     		// post-submit callback 
     		function afterRatingSubmit(responseText, statusText)  { 
@@ -186,6 +189,13 @@
 					<html:option value="false"><fmt:message key="label.authoring.choice.one.answer" /></html:option>
 					<html:option value="true"><fmt:message key="label.authoring.choice.multiple.answers" /></html:option>
 				</html:select>
+				
+				<div class="field-name space-top" id="incorrect-answer-nullifies-mark-area">
+					<html:checkbox property="incorrectAnswerNullifiesMark" styleId="incorrect-answer-nullifies-mark"/>
+					<label for="incorrect-answer-nullifies-mark">
+						<fmt:message key="label.incorrect.answer.nullifies.mark" />
+					</label>
+				</div>				
 	
 				<div class="field-name space-top" >
 					<html:checkbox property="shuffle" styleId="shuffle"/>

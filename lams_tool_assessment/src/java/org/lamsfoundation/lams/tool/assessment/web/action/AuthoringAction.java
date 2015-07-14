@@ -1748,6 +1748,7 @@ public class AuthoringAction extends Action {
 	form.setGeneralFeedback(question.getGeneralFeedback());
 	form.setFeedback(question.getFeedback());
 	form.setMultipleAnswersAllowed(question.isMultipleAnswersAllowed());
+	form.setIncorrectAnswerNullifiesMark(question.isIncorrectAnswerNullifiesMark());
 	form.setFeedbackOnCorrect(question.getFeedbackOnCorrect());
 	form.setFeedbackOnPartiallyCorrect(question.getFeedbackOnPartiallyCorrect());
 	form.setFeedbackOnIncorrect(question.getFeedbackOnIncorrect());
@@ -1823,6 +1824,9 @@ public class AuthoringAction extends Action {
 
 	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    question.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
+	    boolean incorrectAnswerNullifiesMark = questionForm.isMultipleAnswersAllowed() ? questionForm
+		    .isIncorrectAnswerNullifiesMark() : false;
+	    question.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setShuffle(questionForm.isShuffle());
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());

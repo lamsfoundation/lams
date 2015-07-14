@@ -179,6 +179,17 @@
 						<c:out value="${questionSummary.question.question}" escapeXml="false"/>
 					</td>
 				</tr>
+				
+				<c:if test="${questionSummary.question.type == 1}">
+					<tr>
+						<th style="width: 180px;" >
+							<fmt:message key="label.incorrect.answer.nullifies.mark" />
+						</th>
+						<td>
+							<c:out value="${questionSummary.question.incorrectAnswerNullifiesMark}" escapeXml="false"/>
+						</td>
+					</tr>
+				</c:if>
 					
 				<tr>
 					<th style="width: 180px;" >
