@@ -70,6 +70,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     
     private boolean multipleAnswersAllowed;
     
+    private boolean incorrectAnswerNullifiesMark;
+    
     private String feedbackOnCorrect;
     
     private String feedbackOnPartiallyCorrect;
@@ -349,6 +351,18 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
 	this.multipleAnswersAllowed = multipleAnswersAllowed;
+    }
+    
+    /**
+     * @hibernate.property column="incorrect_answer_nullifies_mark"
+     * @return
+     */
+    public boolean isIncorrectAnswerNullifiesMark() {
+	return incorrectAnswerNullifiesMark;
+    }
+
+    public void setIncorrectAnswerNullifiesMark(boolean incorrectAnswerNullifiesMark) {
+	this.incorrectAnswerNullifiesMark = incorrectAnswerNullifiesMark;
     }
 
     /**
