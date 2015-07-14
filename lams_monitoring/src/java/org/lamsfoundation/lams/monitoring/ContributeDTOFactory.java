@@ -89,7 +89,7 @@ public class ContributeDTOFactory {
 
 		// once a gate was opened, it does not require attention
 		if (ContributionTypes.PERMISSION_GATE.equals(contributionTypeEntry)
-			&& ((GateActivity) activity).getGateOpen()) {
+			&& Boolean.TRUE.equals(((GateActivity) activity).getGateOpen())) {
 		    entry.setIsComplete(true);
 
 		} else if (ContributionTypes.CHOSEN_GROUPING.equals(contributionTypeEntry)) {
