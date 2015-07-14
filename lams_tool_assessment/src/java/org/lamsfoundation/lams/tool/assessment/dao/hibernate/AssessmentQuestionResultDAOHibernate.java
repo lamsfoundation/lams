@@ -50,7 +50,7 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
 			+ " AS q, "
 			+ AssessmentResult.class.getName()
 			+ " AS r "
-			+ " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND q.mark < q.assessmentQuestion.defaultGrade";
+			+ " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND (ROUND(q.mark + q.penalty) < q.maxMark) AND (r.finishDate != null)";
 
 	private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  "
 			+ AssessmentQuestionResult.class.getName()
