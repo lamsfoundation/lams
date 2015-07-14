@@ -24,6 +24,7 @@ td#messageCell {
 
 .dialogContainer {
 	display: none;
+	-webkit-overflow-scrolling: touch !important;
 }
 
 .dialogContainer iframe {
