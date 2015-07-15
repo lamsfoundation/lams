@@ -352,7 +352,8 @@ var MenuLib = {
 			
 			var ctx = crop.workspace.getContext('2d'),
 			w = crop.x2 - crop.x,
-			h = crop.y2 - crop.y,
+			// slight adjustment so bottom activities are not clipped
+			h = crop.y2 - crop.y + 2,
 			cut = ctx.getImageData(crop.x, crop.y, w, h);
 	
 			crop.workspace.width = w;
@@ -834,20 +835,4 @@ var MenuLib = {
 			$('.templateContainer').height($('#ldDescriptionDiv').height() + $('#canvas').height() - 10);
 		});
 	}
-	
-	
-	/*
-	,zoom : function(){
-		var zoomButton = $('#zoomButton > span');
-		if (layout.isZoomed) {
-			paper.setViewBox(0, 0, paper.width, paper.height, true);
-			layout.isZoomed = false;
-			zoomButton.text('Zoom out');
-		} else {
-			paper.setViewBox(-paper.width / 2, -paper.height / 2, paper.width * 2, paper.height * 2, true);
-			layout.isZoomed = true;
-			zoomButton.text('Cancel zoom');
-		}
-	}
-	*/
 };
