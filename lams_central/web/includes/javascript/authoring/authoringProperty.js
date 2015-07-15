@@ -63,6 +63,9 @@ var PropertyDefs = {
 					branchingActivity = activity.branchingActivity,
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != branchingActivity.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
@@ -183,7 +186,9 @@ var PropertyDefs = {
 					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
-				
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
@@ -288,7 +293,9 @@ var PropertyDefs = {
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val(),
 					newGroupCount = +$('.propertiesContentFieldGroupCount', content).val();
-				
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
@@ -395,7 +402,9 @@ var PropertyDefs = {
 					label = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != label.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
@@ -437,7 +446,9 @@ var PropertyDefs = {
 				var content = $(this).closest('.dialogContainer'),
 					activity = content.data('parentObject'),
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
@@ -505,7 +516,9 @@ var PropertyDefs = {
 					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
@@ -566,7 +579,9 @@ var PropertyDefs = {
 					newTitle = $('.propertiesContentFieldTitle', content).val(),
 					color = region.items.shape.attr('fill'),
 					newColor = $('.propertiesContentFieldColor', content).val();
-				
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != region.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
@@ -616,7 +631,9 @@ var PropertyDefs = {
 					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
-				
+				if (newTitle == '') {
+					newTitle = undefined;
+				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
