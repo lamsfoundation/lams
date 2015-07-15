@@ -823,7 +823,6 @@ ActivityLib = {
 									'stroke-dasharray' : '5,3',
 									'fill' : 'none'
 								});
-				object.items.append(object.items.selectEffect);
 				
 				// if it's "import part" select children activities
 				if (activitiesOnlySelectable) {
@@ -1383,7 +1382,7 @@ ActivityLib = {
 	 */
 	removeSelectEffect : function(object) {
 		// remove the effect from the given object or the selected one, whatever it is
-		if (!object) {
+		if (!object || !object.items.selectEffect) {
 			object = layout.selectedObject;
 		}
 		
