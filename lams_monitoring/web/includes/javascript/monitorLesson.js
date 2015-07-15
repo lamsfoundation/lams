@@ -904,17 +904,8 @@ function updateSequenceTab() {
 								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
 							};
 					
-					activityGroup.css('cursor', 'pointer')
-							  	 // double tap detection on mobile devices; it works also for mouse clicks
-							  	 .tap(function(event){
-									  var currentTime = new Date().getTime(),
-									  	  tapLength = currentTime - lastTap;
-									  if (tapLength < tapTimeout && tapLength > 0) {
-										  event.preventDefault();
-										  dblClickFunction();
-									  }
-									  lastTap = currentTime;
-								  });
+					activityGroup.css('cursor', 'pointer');
+					dblTap(activityGroup, dblClickFunction);
 				}
 			});	
 			
@@ -1181,7 +1172,7 @@ function addActivityIconsHandlers(activity) {
 							});
 			
 			if (usersViewable) {
-				learnerIcon.dblclick(function(event){
+				dblTap(learnerIcon, function(event){
 					 // double click on learner icon to see activity from his perspective
 					event.stopPropagation();
 					var url = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
@@ -1191,8 +1182,8 @@ function addActivityIconsHandlers(activity) {
 			}
 		});
 		
-		
-		$('*[id^="act' + activity.id + 'learnerGroup"]', sequenceCanvas).dblclick(function(event){
+		var learnerGroup = $('*[id^="act' + activity.id + 'learnerGroup"]', sequenceCanvas);
+		dblTap(learnerGroup, function(event){
 			 // double click on learner group icon to see list of learners
 			event.stopPropagation();
 			showLearnerGroupDialog(activity.id, activity.title, activity.learners, true, usersViewable);
@@ -1257,13 +1248,14 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 		});
 		
 		// show a group icon
-		$('<img />').attr({
+		var groupIcon = $('<img />').attr({
 			'src' : LAMS_URL + 'images/icons/group.png',
 			'title'      : LABELS.LEARNER_GROUP_SHOW
-		}).css('cursor', 'pointer')
-		  .dblclick(function(){
+		}).css('cursor', 'pointer').appendTo(iconsContainer);
+		
+		dblTap(groupIcon, function(){
 			showLearnerGroupDialog(null, LABELS.LEARNER_FINISHED_DIALOG_TITLE, learners, true, false);
-		}).appendTo(iconsContainer);
+		});
 	}
 }
 
@@ -1817,7 +1809,7 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 				    		.attr('disabled', null);
 			    });
 				if (allowView){
-					learnerDiv.dblclick(function(){
+					dblTap(learnerDiv, function(){
 						// same as clicking View Learner button
 						openPopUp(viewUrl, "LearnActivity", 600, 800, true);
 					});
@@ -1934,4 +1926,20 @@ function appendXMLElement(tagName, attributesObject, content, target) {
 
 	target.appendChild(element);
 	return element;
+}
+
+/**
+ * Works as dblclick for mobile devices.
+ */
+function dblTap(elem, dblClickFunction) {
+ 	 // double tap detection on mobile devices; it works also for mouse clicks
+ 	 elem.tap(function(event){
+		  var currentTime = new Date().getTime(),
+		  	  tapLength = currentTime - lastTap;
+		  if (tapLength < tapTimeout && tapLength > 0) {
+			  event.preventDefault();
+			  dblClickFunction(event);
+		  }
+		  lastTap = currentTime;
+	  });
 }
