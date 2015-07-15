@@ -274,10 +274,10 @@ var ActivityUtils = {
 							.attr(DEFAULT_TEXT_ATTRIBUTES);
 			
 			text.attr({
-				'opacity' : 0,
+				'opacity'   : 0,
 				'font-size' : 9,
-				'stroke' : COLOR_GATE_TEXT,
-				'cursor' : 'pointer'
+				'stroke'    : COLOR_GATE_TEXT,
+				'cursor'    : 'pointer'
 			});
 			act.decoration.push(text);
 			
@@ -288,10 +288,11 @@ var ActivityUtils = {
 
 				var edge = paper.path(act.path);
 				edge.attr({
-					'opacity' : 0,
-					'stroke' : COLOR_CURRENT_ACTIVITY,
+					'opacity'      : 0,
+					'stroke'       : COLOR_CURRENT_ACTIVITY,
 					'stroke-width' : 3,
-					'cursor' : 'pointer'
+					'fill'         : 'none',
+					'cursor'       : 'pointer'
 				});
 				act.decoration.push(edge);
 			} else {
