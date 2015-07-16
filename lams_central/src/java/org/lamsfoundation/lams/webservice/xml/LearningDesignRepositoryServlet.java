@@ -326,27 +326,43 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		// do export
 		exportLD(request, response);
 		
-	    } else if (method != null && method.equals("getLearningDesignsJSON")) {
+	    } else if (method != null && ( method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON")) ) {
 
-		ExtUserUseridMap userMap = null;
-		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
-		if (firstName == null && lastName == null) {
-		    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
-		} else {
-		    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
-			    lang, country, email, prefix, isUpdateUserDetails);
-		}
+    		ExtUserUseridMap userMap = null;
+    		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
+    		if (firstName == null && lastName == null) {
+    		    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
+    		} else {
+    		    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
+    			    lang, country, email, prefix, isUpdateUserDetails);
+    		}
+        
+    		// create group for external course if necessary
+    		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+       		Integer userId = userMap.getUser().getUserId();
+        
+       		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
+       		 
+       		String folderContentsJSON = null;
+       		if ( method.equals("getLearningDesignsJSON") ) {
+       		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
+       		    folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns);
+       		} else {
+       		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
+       		    Integer page = WebUtil.readIntParam(request, "page", true);
+       		    Integer size = WebUtil.readIntParam(request, "size", true);
+       		    String sortName = request.getParameter("sortName");
+       		    String sortDate = request.getParameter("sortDate");
+       		    String search = request.getParameter("search");
+       		    folderContentsJSON = service.getPagedLearningDesignsJSON(userId, allowInvalidDesigns, search, page, size, 
+       			sortName == null ? null : ( sortName.equals("0") ? "DESC" : "ASC" ),
+       			sortDate == null ? null : ( sortDate.equals("0") ? "DESC" : "ASC" ));
+       		}
 
-		// create group for external course if necessary
-		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
-		Integer userId = userMap.getUser().getUserId();
-
-		Integer folderID = WebUtil.readIntParam(request, "folderID", true);
-		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
-		String folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns);
-
-		response.setContentType("application/json;charset=UTF-8");
-		response.getWriter().write(folderContentsJSON);
+       		log.debug("LearningDesignRepositoryServlet returning "+folderContentsJSON);
+       		
+        	response.setContentType("application/json;charset=UTF-8");
+        	response.getWriter().write(folderContentsJSON);
 	
 	    //TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
 	    } else {
@@ -395,7 +411,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	}
 
     }
-    
+        
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	doGet(request, response);
     }
