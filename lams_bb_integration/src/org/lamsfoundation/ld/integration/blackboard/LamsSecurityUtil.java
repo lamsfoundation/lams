@@ -194,7 +194,7 @@ public class LamsSecurityUtil {
     }
 
     /**
-     * Gets a list of learning designs for the current user from LAMS
+     * Gets a list of learning designs & workspace folders for the current user from LAMS. 
      * 
      * @param ctx
      *            the blackboard context, contains session data
@@ -206,7 +206,25 @@ public class LamsSecurityUtil {
      * @return a string containing the LAMS workspace tree in tigra format
      */
     public static String getLearningDesigns(Context ctx, String courseId, String folderId) {
-	String serverAddr = getServerAddress();
+	return getLearningDesigns(ctx, courseId, folderId,"getLearningDesignsJSON",null,null,null,null,null);
+    }
+    
+    /**
+     * Gets a list of learning designs & workspace folders for the current user from LAMS. 
+     * 
+     * @param ctx  the blackboard context, contains session data
+     * @param courseId blackboard courseid. We pass it as a parameter as ctx.getCourse().getCourseId() is null when called
+     *            from LamsLearningDesignServlet.
+     * @param folderId folderID in LAMS. It can be null and then LAMS returns default workspace folders.
+     * @param method which method to call on the LAMS end
+     * @param page used only for method = getPagedHomeLearningDesignsJSON
+     * @param size used only for method = getPagedHomeLearningDesignsJSON
+     * @return a string containing the LAMS workspace tree in tigra format (method = getLearningDesignsJSON) or 
+     *  a string containing the learning designs in JSON (method = getPagedHomeLearningDesignsJSON)
+     */
+    public static String getLearningDesigns(Context ctx, String courseId, String folderId, String method, 
+	    String search, String page, String size, String sortName, String sortDate) {
+		String serverAddr = getServerAddress();
 	String serverId = getServerID();
 
 	// If lams.properties could not be read, throw exception
@@ -225,7 +243,6 @@ public class LamsSecurityUtil {
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 
-	// LamsSecurityUtil.getLearningDesigns(null, userDTO.getUserID(), false);
 	// the mode to call upon learning designs
 	final Integer MODE = 2;
 
@@ -233,23 +250,37 @@ public class LamsSecurityUtil {
 	String learningDesigns = ""; // empty 
 	try {
 
-	    String serviceURLBase = serverAddr
-		    + "/services/xml/LearningDesignRepository?method=getLearningDesignsJSON" + "&datetime="
+	    
+	    String serviceURL = serverAddr
+		    + "/services/xml/LearningDesignRepository?method="+method+"&datetime="
 		    + timestamp + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
 		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + MODE
 		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
 		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8");
-	    String serviceURL = serviceURLBase;
-	    
-	    boolean isHome = false;
 	    
 	    if (folderId != null ) {
-		if ( folderId.equalsIgnoreCase("home") ) {
-		    isHome = true;
-		} else {
-		    serviceURL += "&folderID=" + folderId;
-		}
+		serviceURL += "&folderID=" + ( folderId.equalsIgnoreCase("home") ? "-1" : folderId);
+	    }
+	    
+	    // The following parameters are only used for getPagedLearningDesignsJSON
+	    if (page != null ) {
+		serviceURL += "&page=" + page;
+	    }
+	    if (size != null ) {
+		serviceURL += "&size=" + size;
+	    }
+	    // sort by name, ascending = 1, descending = 0
+	    if (sortName != null ) {
+		serviceURL += "&sortName=" + sortName;
+	    }
+	    // sort by date, ascending = 1, descending = 0
+	    if (sortDate != null ) {
+		serviceURL += "&sortDate=" + sortDate;
+	    }
+	    // get all the designs that contain this string
+	    if (search != null ) {
+		serviceURL += "&search=" + search;
 	    }
 
 	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
@@ -259,22 +290,6 @@ public class LamsSecurityUtil {
 	    IOUtils.copy(is, writer, "UTF-8");
 	    learningDesigns = writer.toString();
 
-	    if ( isHome ) {
-		// we are after the designs in the root of the user's personal folder
-		String newFolderId = findPersonalFolderId(learningDesigns);
-		if ( newFolderId != null ) {
-        		serviceURL = serviceURLBase + "&folderID=" + newFolderId;
-        		is = LamsSecurityUtil.callLamsServer(serviceURL);
-        		writer = new StringWriter();
-        		IOUtils.copy(is, writer, "UTF-8");
-        		learningDesigns = writer.toString();
-		} else {
-		    logger.error("Unable to find personal folder ID from learning design response "+learningDesigns);
-		    learningDesigns = "{}";
-		}
-	    }
-		
-	    
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to get LAMS learning designs, bad URL: '" + serverAddr
 		    + "', please check lams.properties", e);
@@ -295,19 +310,7 @@ public class LamsSecurityUtil {
 	return learningDesigns;
     }
 
-    private static String findPersonalFolderId(String response) {
-	// {"folders":[{"isRunSequencesFolder":false,"name":"Teacher Pontiff","folderID":47},{.........}]}
-	int indexStart = response.indexOf("folderID");
-	if ( indexStart > 0 ) {
-	    indexStart += 10;
-	    int indexEnd = response.indexOf("}",indexStart);
-	    if ( indexEnd > 0 ) {
-		return response.substring(indexStart, indexEnd);
-	    }
-	}
-	return null;	
-    }
-    
+ 
     /**
      * Starts lessons in lams through a LAMS webservice
      * 
