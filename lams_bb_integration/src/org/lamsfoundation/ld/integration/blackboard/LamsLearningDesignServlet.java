@@ -59,10 +59,23 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	String courseId = request.getParameter("courseId");
 
 	// validate method parameter and associated parameters
-	if ((folderId == null) || (courseId == null)) {
-	    throw new RuntimeException("Requred parameters missing. courseId=" + courseId + ", folderId=" + folderId);
+	if (courseId == null) {
+	    throw new RuntimeException("Required parameter missing. courseId=" + courseId);
 	}
 
+	//paging parameters of tablesorter - used in the LAMS Template Wizard
+	boolean usePaging = false;
+	String page = request.getParameter("page");
+	String size = request.getParameter("size");
+	if ( page != null && page.length()>0) {
+	    usePaging = true;
+	    if ( size == null || size.length()==0)
+		size="10";
+	}
+	String sortName = request.getParameter("sortName");
+	String sortDate = request.getParameter("sortDate");
+	String search = request.getParameter("search");
+	
 	ContextManager ctxMgr = null;
 	Context ctx = null;
 	try {
@@ -70,7 +83,8 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
 	    
-	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, courseId, folderId);
+	    String method = usePaging ? "getPagedHomeLearningDesignsJSON" : "getLearningDesignsJSON";
+	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, courseId, folderId, method, search, page, size, sortName, sortDate);
 	    
 	    response.setContentType("application/json;charset=UTF-8");
 	    response.getWriter().print(learningDesigns);
