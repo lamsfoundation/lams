@@ -34,6 +34,7 @@ input[type="checkbox"] {
 .dialogContainer,
 .dialog-no-title .ui-dialog-titlebar {
 	display: none;
+	-webkit-overflow-scrolling: touch !important;
 }
 
 .dialogContainer iframe {
