@@ -23,7 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -45,6 +47,13 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	
 	private static final String ALL_IN_FOLDER ="from " + TABLENAME +" in class " + LearningDesign.class.getName()+
 												" where workspace_folder_id=?";
+
+        private static final String COUNT_VALID_IN_FOLDER = "SELECT COUNT(*) from " + TABLENAME
+        	    + " where valid_design_flag=true AND workspace_folder_id=?";
+        
+            private static final String COUNT_ALL_IN_FOLDER = "SELECT COUNT(*) from " + TABLENAME + " where workspace_folder_id=?";
+        
+
 	private static final String FIND_BY_ORIGINAL ="from " + TABLENAME +" in class " + LearningDesign.class.getName()+
 												" where original_learning_design_id=?";
 	private static final String FIND_LD_NAMES_IN_FOLDER = "select title from " + LearningDesign.class.getName()+
@@ -124,4 +133,46 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
         public List<LearningDesignAccess> getAccessByUser(Integer userId) {
     		return this.getHibernateTemplate().find(ACCESS_BY_USER, userId);
         }
+        
+    	@SuppressWarnings("unchecked")
+	public List<LearningDesign> getAllPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size, String sortName, String sortDate) {
+            String sortingOrder = setupSortString(sortName, sortDate);
+            Query query = getSession().createQuery(ALL_IN_FOLDER + sortingOrder)
+        	    .setParameter(0, workspaceFolderID.longValue());
+    	    if ( page != null && size != null )
+    		query.setFirstResult(page * size).setMaxResults(size);
+    		
+    	    return (List<LearningDesign>) query.list();
+   	}
+
+        @SuppressWarnings("unchecked")
+	public List<LearningDesign> getValidPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size, String sortName, String sortDate) {
+            String sortingOrder = setupSortString(sortName, sortDate);
+            Query query = getSession().createQuery(VALID_IN_FOLDER + sortingOrder)
+        	    .setParameter(0, workspaceFolderID.longValue());
+    	    if ( page != null && size != null )
+    		query.setFirstResult(page * size).setMaxResults(size);
+    		
+    	    return (List<LearningDesign>) query.list();
+        }
+
+	private String setupSortString(String sortName, String sortDate) {
+            if ( sortName != null && sortDate != null ) {
+        	return " order by title "+sortName +", last_modified_date_time "+sortDate;
+            } else if ( sortDate != null ) {
+        	return " order by last_modified_date_time "+sortDate;
+            } else {
+        	// default to sorting by name
+        	return " order by title "+ (sortName!=null ? sortName : "ASC");
+            }
+	}
+
+        public long countAllLearningDesigns(Integer workspaceFolderID, boolean validDesignsOnly) {
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put("workspaceFolder.workspaceFolderId", workspaceFolderID);
+            if ( validDesignsOnly ) 
+        	properties.put("validDesign", Boolean.valueOf(validDesignsOnly));
+            return countByProperties(LearningDesign.class, properties);
+        }
+
     }
