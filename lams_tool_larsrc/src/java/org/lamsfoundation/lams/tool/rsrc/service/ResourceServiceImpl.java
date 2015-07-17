@@ -236,9 +236,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     @Override
     public Resource getResourceByContentId(Long contentId) {
 	Resource rs = resourceDao.getByContentId(contentId);
-	if (rs == null) {
-	    ResourceServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
-	}
 	return rs;
     }
 

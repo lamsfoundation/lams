@@ -293,9 +293,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public Assessment getAssessmentByContentId(Long contentId) {
 	Assessment rs = assessmentDao.getByContentId(contentId);
-	if (rs == null) {
-	    AssessmentServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
-	}
 	return rs;
     }
 

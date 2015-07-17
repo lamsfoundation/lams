@@ -361,9 +361,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	} catch (Exception e) {
 	    SubmitFilesService.log.error("Could not find the content by given ID:" + contentID + ". Excpetion is " + e);
 	}
-	if (content == null) {
-	    SubmitFilesService.log.error("Could not find the content by given ID:" + contentID);
-	}
 
 	return content;
     }

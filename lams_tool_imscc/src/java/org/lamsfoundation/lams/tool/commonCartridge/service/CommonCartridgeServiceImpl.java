@@ -229,9 +229,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     public CommonCartridge getCommonCartridgeByContentId(Long contentId) {
 	CommonCartridge rs = commonCartridgeDao.getByContentId(contentId);
-	if (rs == null) {
-	    CommonCartridgeServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
-	}
 	return rs;
     }
 

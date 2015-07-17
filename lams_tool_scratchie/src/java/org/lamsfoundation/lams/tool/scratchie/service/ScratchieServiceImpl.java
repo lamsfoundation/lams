@@ -156,9 +156,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public Scratchie getScratchieByContentId(Long contentId) {
 	Scratchie rs = scratchieDao.getByContentId(contentId);
-	if (rs == null) {
-	    ScratchieServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
-	}
 	return rs;
     }
 
