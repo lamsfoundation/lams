@@ -169,9 +169,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     @Override
     public ImageGallery getImageGalleryByContentId(Long contentId) {
 	ImageGallery rs = imageGalleryDao.getByContentId(contentId);
-	if (rs == null) {
-	    ImageGalleryServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
-	}
 	return rs;
     }
 

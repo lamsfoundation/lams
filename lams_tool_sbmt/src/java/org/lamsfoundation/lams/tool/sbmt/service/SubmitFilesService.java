@@ -361,9 +361,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	} catch (Exception e) {
 	    SubmitFilesService.log.error("Could not find the content by given ID:" + contentID + ". Excpetion is " + e);
 	}
-	if (content == null) {
-	    SubmitFilesService.log.error("Could not find the content by given ID:" + contentID);
-	}
 
 	return content;
     }
@@ -490,7 +487,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
-    /** Remove a tool session. The session parameter must not be null. */
     private void removeToolSession(SubmitFilesSession session) {
 	Set filesUploaded = session.getSubmissionDetails();
 	if (filesUploaded != null) {
