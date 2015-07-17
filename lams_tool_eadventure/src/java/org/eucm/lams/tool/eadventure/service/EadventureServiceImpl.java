@@ -246,9 +246,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 
     public Eadventure getEadventureByContentId(Long contentId) {
 	Eadventure rs = eadventureDao.getByContentId(contentId);
-	if (rs == null) {
-	    EadventureServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
-	}
 	return rs;
     }
 
