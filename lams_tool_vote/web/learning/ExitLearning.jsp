@@ -13,20 +13,16 @@
 <lams:head>
 	<html:base />
 	<lams:css />
+	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
 	
 	<title><fmt:message key="activity.title" /></title>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.bar.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/chart.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 	
 	<script type="text/javascript">
-		var chartDataUrl = '<lams:WebAppURL />chartGenerator.do';
-		
 		function submitMethod(actionMethod) 
 		{
 			if (actionMethod == "learnerFinished") {
