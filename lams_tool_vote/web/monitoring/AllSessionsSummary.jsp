@@ -151,15 +151,16 @@
 	
 	<c:if test="${!statsTabActive}">
 		<p class="float-right " style="margin-right: 8%;">
+			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${sessionDto.sessionId}&toolContentID=${toolContentID}" />
 			<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
 				title="<fmt:message key='label.tip.displayPieChart'/>"
 				style="cursor: pointer; height: 30px; border: none"
-				onclick="javascript:drawChart('pie', ${sessionDto.sessionId})">
+				onclick="javascript:drawChart('pie', 'chartDiv${sessionDto.sessionId}', '${chartURL}')">
 	
 			<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
 				title="<fmt:message key='label.tip.displayBarChart'/>" 
 				style="cursor: pointer;" height="30" border="0"
-				onclick="javascript:drawChart('bar', ${sessionDto.sessionId})">
+				onclick="javascript:drawChart('bar', 'chartDiv${sessionDto.sessionId}', '${chartURL}')">
 		</p>
 	
 		<p id="chartDiv${sessionDto.sessionId}" style="height: 220px; display: none;" class="space-bottom"></p>

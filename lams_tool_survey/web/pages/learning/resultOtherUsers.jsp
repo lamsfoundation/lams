@@ -2,6 +2,7 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <lams:html>
@@ -10,6 +11,7 @@
 	<%@ include file="/common/header.jsp"%>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
 		#other-users-answers-title {
 			margin-top: 20px;
@@ -21,17 +23,12 @@
 	</style>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/raphael/raphael.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/raphael/g.raphael.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/raphael/g.pie.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/raphael/chart.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 
 	<script type="text/javascript">
-		var chartDataUrl = '<lams:WebAppURL />showChart.do';
-		var alwaysFetchChartValues = true;
-	
 		$(document).ready(function(){
 	
 			$(".tablesorter").tablesorter({
@@ -221,10 +218,11 @@
 						<%-- Only show pie/bar chart when question is single/multiple choics type --%>
 						<c:if test="${question.type != 3}">
 							<div style="float:right">
+								<c:set var="chartURL" value="${tool}showChart.do?toolSessionID=${sessionMap.toolSessionID}&questionUid=${question.uid}" />
 								<img src='<c:out value="${tool}"/>includes/images/piechart.gif'
 									title="<fmt:message key='message.view.pie.chart'/>"
 									style="cursor: pointer; width: 30px; border: none"
-									onclick="javascript:drawChart('pie', ${queStatus.index}, {'toolSessionID' : '${sessionMap.toolSessionID}','questionUid' : '${question.uid}'})">
+									onclick="javascript:drawChart('pie', 'chartDiv${queStatus.index}', '${chartURL}')">
 							</div>
 						</c:if>
 					</th>
