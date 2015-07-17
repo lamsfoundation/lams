@@ -108,15 +108,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div>
 				<div class="float-right">
+					<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${VoteLearningForm.toolSessionID}" />
 					<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
 						title="<fmt:message key='label.tip.displayPieChart'/>"
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:drawChart('pie', 0, {'currentSessionId' : '${VoteLearningForm.toolSessionID}'})">
+						onclick="javascript:drawChart('pie', 'chartDiv', '${chartURL}')">
 
 					<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
 						title="<fmt:message key='label.tip.displayBarChart'/>" 
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:drawChart('bar', 0, {'currentSessionId' : '${VoteLearningForm.toolSessionID}'})">
+						onclick="javascript:drawChart('pie', 'chartDiv', '${chartURL}')">
 				</div>
 				
 				<c:if test="${VoteLearningForm.allowTextEntry}">
@@ -150,5 +151,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<lams:out value="${VoteLearningForm.userEntry}" escapeHtml="true" />
 				</div>
 				
-				<div id="chartDiv0" style="height: 220px; display: none;"></div>
+				<div id="chartDiv" style="height: 220px; display: none;"></div>
 		</div>
