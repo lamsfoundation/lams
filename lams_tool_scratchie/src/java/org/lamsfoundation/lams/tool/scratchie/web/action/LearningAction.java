@@ -689,11 +689,6 @@ public class LearningAction extends Action {
     
     private void saveBurningQuestions(final Long sessionId, final Long itemUid, final String question,
 	    String oldQuestion) throws ScratchieApplicationException {
-	// if burning question is blank or is the same as before - skip saving it
-	if (StringUtils.isBlank(question) || question.equals(oldQuestion)) {
-	    return;
-	}
-
 	// update new entry
 	tryExecute(new Callable<Object>() {
 	    @Override
