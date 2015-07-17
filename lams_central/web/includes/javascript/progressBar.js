@@ -181,8 +181,6 @@ function handleClicks(elem, click, dblClick) {
 	}
 }
 
-// ------------- RAPHAEL --------------
-
 // This should be the super class for Activities,
 // but it's hard to accomplish in JS.
 // It is a set of common methods instead.
