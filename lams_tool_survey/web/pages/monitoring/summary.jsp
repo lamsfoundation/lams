@@ -10,6 +10,7 @@
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"> 
+<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
 
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -27,15 +28,10 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/chart.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
-	var chartDataUrl = '<lams:WebAppURL />showChart.do';
-	var alwaysFetchChartValues = true;
-	
 	function exportSurvey(sessionId){
 		var url = "<c:url value="/monitoring/exportSurvey.do"/>";
 	    var reqIDVar = new Date();
@@ -95,10 +91,11 @@
 					<div style="float:right">
 					<%-- Only show pie/bar chart when question is single/multiple choics type --%>
 					<c:if test="${question.type != 3}">
+						<c:set var="chartURL" value="${tool}showChart.do?toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}" />
 						<img src='<c:out value="${tool}"/>includes/images/piechart.gif'
 							title="<fmt:message key='message.view.pie.chart'/>"
 							style="cursor: pointer; width: 30px; border: none"
-							onclick="javascript:drawChart('pie', ${queStatus.index}, {'toolSessionID' : '${surveySession.sessionId}','questionUid' : '${question.uid}'})">
+							onclick="javascript:drawChart('pie', 'chartDiv${queStatus.index}', '${chartURL}')"> 
 					</c:if>
 					</div>
 				</th>

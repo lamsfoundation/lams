@@ -39,14 +39,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
+	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
+	
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>		
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.bar.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/chart.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 	
 	<script type="text/javascript">
 		var chartDataUrl = '<lams:WebAppURL />chartGenerator.do';
@@ -185,15 +184,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div>
 				<div class="float-right">
+					<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${formBean.toolSessionID}" />
 					<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
 						title="<fmt:message key='label.tip.displayPieChart'/>"
-						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:drawChart('pie', 0, {'currentSessionId' : '${formBean.toolSessionID}'})">
-
+						style="cursor: pointer; height: 30px; border: none"
+						onclick="javascript:drawChart('pie', 'chartDiv', '${chartURL}')">
 					<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
 						title="<fmt:message key='label.tip.displayBarChart'/>" 
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:drawChart('bar', 0, {'currentSessionId' : '${formBean.toolSessionID}'})">
+						onclick="javascript:drawChart('bar', 'chartDiv', '${chartURL}')">
 				</div>
 				
 				<c:if test="${VoteLearningForm.allowTextEntry}">

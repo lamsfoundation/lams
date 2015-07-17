@@ -4,22 +4,20 @@
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet">
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.bar.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/chart.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
+
 <script type="text/javascript">
-	var chartDataUrl = '<lams:WebAppURL />chartGenerator.do';
-	
-	$(document).ready(function(){
+	$(window).load(function(){
 		<c:forEach var="currentDto" items="${voteGeneralMonitoringDTO.sessionDTOs}">
-			drawChart('pie', ${currentDto.sessionId}, {'currentSessionId' : '${currentDto.sessionId}', 'toolContentID' : '${toolContentID}'});
+			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${currentDto.sessionId}&toolContentID=${toolContentID}" />
+			drawChart('pie', 'chartDiv${currentDto.sessionId}', '${chartURL}');
 		</c:forEach>
 	});
 
