@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -26,10 +27,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -42,6 +45,8 @@ import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
@@ -287,7 +292,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	    String country = request.getParameter(CentralConstants.PARAM_COUNTRY);
 	    String lang = request.getParameter(CentralConstants.PARAM_LANG);
-	    String modeStr = request.getParameter(CentralConstants.PARAM_MODE);
+	    Integer mode = WebUtil.readIntParam(request, CentralConstants.PARAM_MODE, true);
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
 	    final boolean isUpdateUserDetails = false;
@@ -297,7 +302,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
 	    
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null
-		    || country == null || lang == null || modeStr == null) {
+		    || country == null || lang == null ) {
 		String msg = "Parameters missing";
 		log.error(msg);
 		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
@@ -311,8 +316,6 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    		courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
 	    	}
 	    }
-
-	    Integer mode = new Integer(modeStr);
 
 	    // get Server map
 	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
@@ -328,18 +331,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		
 	    } else if (method != null && ( method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON")) ) {
 
-    		ExtUserUseridMap userMap = null;
-    		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
-    		if (firstName == null && lastName == null) {
-    		    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
-    		} else {
-    		    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
-    			    lang, country, email, prefix, isUpdateUserDetails);
-    		}
-        
-    		// create group for external course if necessary
-    		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
-       		Integer userId = userMap.getUser().getUserId();
+    		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
+			isUpdateUserDetails, firstName, lastName, email, serverMap);
         
        		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
        		 
@@ -363,9 +356,39 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
        		
         	response.setContentType("application/json;charset=UTF-8");
         	response.getWriter().write(folderContentsJSON);
-	
+
+	    } else if (method != null && method.equals("deleteLearningDesignJSON") ) {
+		
+		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
+			isUpdateUserDetails, firstName, lastName, email, serverMap);
+		
+		Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
+		log.debug("User "+userId+" "+username+" deleting learning design "+learningDesignId);
+		String wddxResponse = service.deleteResource(learningDesignId, FolderContentDTO.DESIGN, userId);
+		Hashtable table = (Hashtable) WDDXProcessor.deserialize(wddxResponse);
+
+		log.debug("Delete response "+wddxResponse);
+
+		Double messageTypeDouble = (Double) table.get("messageType");
+		int messageType = messageTypeDouble != null ? messageTypeDouble.intValue() : 0;
+		if ( messageType == FlashMessage.OBJECT_MESSAGE ) {
+		    JSONObject jsonObject = new JSONObject(table);
+		    response.setContentType("application/json;charset=utf-8");
+		    response.getWriter().print(jsonObject.toString());
+
+		} else {
+		    log.error("Unable to delete learning design "+learningDesignId+" for user "+userId+" error "+table.get("messageValue"));
+		    response.sendError(response.SC_INTERNAL_SERVER_ERROR, table.get("messageValue").toString());
+		}
+
 	    //TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
 	    } else {
+
+		if ( mode == null) {
+		    String msg = "Parameter missing: mode";
+		    log.error(msg);
+		    response.sendError(response.SC_BAD_REQUEST, msg);
+		}
 
 		ExtUserUseridMap userMap = null;
 		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
@@ -410,6 +433,24 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    response.sendError(response.SC_BAD_REQUEST, "Problem with LearningDesignRepositoryServlet request");
 	}
 
+    }
+
+    private Integer getUserId(String username, String courseId, String courseName, String country, String lang,
+	    String usePrefix, final boolean isUpdateUserDetails, String firstName, String lastName, String email,
+	    ExtServerOrgMap serverMap) throws UserInfoFetchException, UserInfoValidationException {
+	ExtUserUseridMap userMap = null;
+	boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
+	if (firstName == null && lastName == null) {
+	    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
+	} else {
+	    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
+		    lang, country, email, prefix, isUpdateUserDetails);
+	}
+      
+	// create group for external course if necessary
+	integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+	Integer userId = userMap.getUser().getUserId();
+	return userId;
     }
         
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
