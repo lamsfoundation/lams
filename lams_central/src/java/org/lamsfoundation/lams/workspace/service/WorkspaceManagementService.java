@@ -534,7 +534,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
 	JSONObject completeResult = new JSONObject();
 	completeResult.put("total_rows", numDesigns);
-	completeResult.put("rows", result);
+	if ( result.length() > 0)
+	    completeResult.put("rows", result);
 	return completeResult.toString();
     }
 
