@@ -92,4 +92,23 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID, String prefix);
 	
 	public List<LearningDesignAccess> getAccessByUser(Integer userId);
+	
+        /**
+         * Get a portion of the learning designs in the given folder. If page & size are null, the effect the same data
+         * is returned as getAllLearningDesignsInFolder but sorted.
+         */
+        public List<LearningDesign> getAllPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
+    	    String sortName, String sortDate);
+    
+        /**
+         * Get a portion of the valid learning designs in the given folder. If page & size are null, the effect the same data
+         * is returned as getAllValidLearningDesignsInFolder but sorted.
+         */
+        public List<LearningDesign> getValidPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
+    	    String sortName, String sortDate);
+
+        /**
+         * Count how many learning designs exist in a given folder.
+         */
+        public long countAllLearningDesigns(Integer workspaceFolderID, boolean validDesignsOnly);
 }
