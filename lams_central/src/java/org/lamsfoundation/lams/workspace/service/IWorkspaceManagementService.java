@@ -137,9 +137,25 @@ public interface IWorkspaceManagementService {
 	
 	/**
 	 * Returns Folder Contents in JSON format.
+	 * If folderID == null, returns the top level folders available to the user.
+	 * If folderID == -1, return only the learning designs in the root of the user's folder
+	 * Otherwise returns the learning designs and subfolders of the given folder.
+	 * Sample output: 
 	 */
-    String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns) throws JSONException,
+	String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns) throws JSONException,
 	    IOException, UserAccessDeniedException, RepositoryCheckedException;
+	
+    /**
+     * Returns a section of the learning designs in the root of the user's personal folder. Returns the data in in JSON
+     * format. If searchString is not null, it does a case insenstive "contains" comparison on name (title). Otherwise
+     * sortName and sortDate should be null, ASC or DESC and the data will be paged.
+     * Sample output:
+     * {"total_rows":2,"rows":[{"learningDesignId":19,"description":"Team Based Learning: Blah Blah","name":"Blah Blah",
+     * "date":"2015-07-13 10:16:35.0"},{"learningDesignId":18,"description":"Team Based Learning Design: BBBBBB",
+     * "name":"TBL_BBBBB","date":"2015-07-13 10:07:41.0"}]}
+     */
+    public String getPagedLearningDesignsJSON(Integer userID, boolean allowInvalidDesigns, String searchString, int page, int size,
+	    String sortName, String sortDate) throws JSONException, IOException;
 	
 	/**
 	 * This method creates a new folder under the given parentFolder

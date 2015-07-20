@@ -34,8 +34,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
@@ -72,7 +75,6 @@ import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.web.HomeAction;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.dto.UpdateContentDTO;
@@ -165,7 +167,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	if ((resourceID == null) || (resourceType == null) || (userID == null)) {
 	    errorMessage = messageService.getMessage("delete.resource.error.value.miss");
 	} else if (FolderContentDTO.DESIGN.equals(resourceType)) {
-	    return deleteLearningDesign(resourceID, userID);
+	    return deleteLearningDesignWDDX(resourceID, userID);
 	} else if (FolderContentDTO.FOLDER.equals(resourceType)) {
 	    return deleteFolder(new Integer(resourceID.intValue()), userID);
 	} else if (FolderContentDTO.FILE.equals(resourceType)) {
@@ -398,29 +400,45 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     @SuppressWarnings("unchecked")
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns)
 	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
+	
+	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false);
+    }
+    
+    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns, boolean designsOnly)
+	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
 	JSONObject result = new JSONObject();
 	Vector<FolderContentDTO> folderContents = null;
 
-	// get user accessible folders in the start
-	if (folderID == null) {
-	    folderContents = new Vector<FolderContentDTO>(3);
-
+	// folderID == null: get all user accessible folders
+	// folderID == -1: get the learning designs at the root of the user's home folder - used for simplified deployment
+	if (folderID == null || folderID == -1 ) {
+	   
 	    FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
-	    if (userFolder != null) {
-		folderContents.add(userFolder);
-	    }
 
-	    FolderContentDTO myGroupsFolder = new FolderContentDTO(messageService.getMessage("organisations"),
+	    if ( folderID == null ) {
+		folderContents = new Vector<FolderContentDTO>(3);
+
+		if (userFolder != null) {
+		    folderContents.add(userFolder);
+		}
+
+		FolderContentDTO myGroupsFolder = new FolderContentDTO(messageService.getMessage("organisations"),
 		    messageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
 		    WorkspaceAction.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
 
-	    folderContents.add(myGroupsFolder);
+		folderContents.add(myGroupsFolder);
 
-	    FolderContentDTO publicFolder = getPublicWorkspaceFolder(userID);
-	    if (publicFolder != null) {
-		folderContents.add(publicFolder);
-	    }
-	    // special behaviour for organisation folders
+		FolderContentDTO publicFolder = getPublicWorkspaceFolder(userID);
+		if (publicFolder != null) {
+		    folderContents.add(publicFolder);
+		}
+		
+	    } else if ( userFolder != null ) {
+		return getFolderContentsJSON(userFolder.getResourceID().intValue(), userID, allowInvalidDesigns, true);
+	    
+	    } // else we want to return an empty JSON, which will be done by falling through to the folderContents loop.
+	    
+	// special behaviour for organisation folders
 	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
 	    folderContents = getAccessibleOrganisationWorkspaceFolders(userID);
 	    Collections.sort(folderContents);
@@ -442,7 +460,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	// fill JSON object with folders and LDs
 	for (FolderContentDTO folderContent : folderContents) {
 	    String contentType = folderContent.getResourceType();
-	    if (FolderContentDTO.FOLDER.equals(contentType)) {
+	    if (FolderContentDTO.FOLDER.equals(contentType) && !designsOnly) {
 		JSONObject subfolderJSON = new JSONObject();
 		subfolderJSON.put("name", folderContent.getName());
 		subfolderJSON.put("isRunSequencesFolder",
@@ -453,6 +471,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		JSONObject learningDesignJSON = new JSONObject();
 		learningDesignJSON.put("name", folderContent.getName());
 		learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
+		learningDesignJSON.put("description", folderContent.getDescription());
+		learningDesignJSON.put("date", folderContent.getLastModifiedDateTime());
 		result.append("learningDesigns", learningDesignJSON);
 	    } else {
 		if (log.isDebugEnabled()) {
@@ -462,6 +482,61 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	}
 
 	return result.toString();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getPagedLearningDesignsJSON(Integer userID, boolean allowInvalidDesigns, String searchString,
+	    int page, int size, String sortName, String sortDate) throws JSONException, IOException {
+
+	JSONArray result = new JSONArray();
+	Pattern searchPattern = searchString != null ? Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE) : null;
+	FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
+	long numDesigns = 0;
+	
+	if (userFolder != null) {
+	    Integer mode = allowInvalidDesigns ? WorkspaceManagementService.AUTHORING
+		    : WorkspaceManagementService.MONITORING;
+
+	    int folderId = userFolder.getResourceID().intValue();
+	    List designs = null;
+	    if (WorkspaceManagementService.AUTHORING.equals(mode)) {
+		if ( searchPattern != null ) 
+		    designs = learningDesignDAO.getAllPagedLearningDesigns(folderId, null, null, sortName, sortDate);
+		else 
+		    designs = learningDesignDAO.getAllPagedLearningDesigns(folderId, page, size, sortName, sortDate);
+	    } else {
+		if ( searchPattern != null )
+		    designs = learningDesignDAO.getValidPagedLearningDesigns(folderId, null, null, sortName, sortDate);
+	    	else 
+	    	    designs = learningDesignDAO.getValidPagedLearningDesigns(folderId, page, size, sortName, sortDate);
+	    }
+	
+	    
+	    Iterator iterator = designs.iterator();
+	    while (iterator.hasNext()) {
+		LearningDesign design = (LearningDesign) iterator.next();
+		if (searchPattern == null || (searchPattern.matcher(design.getTitle()).find()) ) {
+		    JSONObject learningDesignJSON = new JSONObject();
+		    learningDesignJSON.put("name", StringEscapeUtils.escapeHtml(design.getTitle()));
+		    learningDesignJSON.put("learningDesignId", design.getLearningDesignId());
+		    learningDesignJSON.put("description", StringEscapeUtils.escapeHtml(design.getDescription()));
+		    learningDesignJSON.put("date", design.getLastModifiedDateTime());
+		    result.put(learningDesignJSON);
+		}
+	    }
+	    
+	    // what is the total number (so the pager knows whether to allow paging)
+	    // if we did a search, then no paging just return the whole lot. 
+	    // otherwise need the whole count from the db.
+	    numDesigns = searchPattern != null ? result.length() : learningDesignDAO.countAllLearningDesigns(folderId, !allowInvalidDesigns);
+	}
+
+	JSONObject completeResult = new JSONObject();
+	completeResult.put("total_rows", numDesigns);
+	if ( result.length() > 0)
+	    completeResult.put("rows", result);
+	return completeResult.toString();
     }
 
     /**
@@ -825,7 +900,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @return String The acknowledgement/error message in WDDX format for FLASH
      * @throws IOException
      */
-    private String deleteLearningDesign(Long learningDesignID, Integer userID) throws IOException {
+    private String deleteLearningDesignWDDX(Long learningDesignID, Integer userID) throws IOException {
 	User user = (User) baseDAO.find(User.class, userID);
 	FlashMessage flashMessage = null;
 	if (user != null) {

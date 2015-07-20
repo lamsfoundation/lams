@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -26,10 +27,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -42,6 +45,8 @@ import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
@@ -326,30 +331,66 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		// do export
 		exportLD(request, response);
 		
-	    } else if (method != null && method.equals("getLearningDesignsJSON")) {
+	    } else if (method != null && ( method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON")) ) {
 
-		ExtUserUseridMap userMap = null;
-		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
-		if (firstName == null && lastName == null) {
-		    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
+    		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
+			isUpdateUserDetails, firstName, lastName, email, serverMap);
+        
+       		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
+       		 
+       		String folderContentsJSON = null;
+       		if ( method.equals("getLearningDesignsJSON") ) {
+       		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
+       		    folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns);
+       		} else {
+       		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
+       		    Integer page = WebUtil.readIntParam(request, "page", true);
+       		    Integer size = WebUtil.readIntParam(request, "size", true);
+       		    String sortName = request.getParameter("sortName");
+       		    String sortDate = request.getParameter("sortDate");
+       		    String search = request.getParameter("search");
+       		    folderContentsJSON = service.getPagedLearningDesignsJSON(userId, allowInvalidDesigns, search, page, size, 
+       			sortName == null ? null : ( sortName.equals("0") ? "DESC" : "ASC" ),
+       			sortDate == null ? null : ( sortDate.equals("0") ? "DESC" : "ASC" ));
+       		}
+
+       		log.debug("LearningDesignRepositoryServlet returning "+folderContentsJSON);
+       		
+        	response.setContentType("application/json;charset=UTF-8");
+        	response.getWriter().write(folderContentsJSON);
+
+	    } else if (method != null && method.equals("deleteLearningDesignJSON") ) {
+		
+		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
+			isUpdateUserDetails, firstName, lastName, email, serverMap);
+		
+		Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
+		log.debug("User "+userId+" "+username+" deleting learning design "+learningDesignId);
+		String wddxResponse = service.deleteResource(learningDesignId, FolderContentDTO.DESIGN, userId);
+		Hashtable table = (Hashtable) WDDXProcessor.deserialize(wddxResponse);
+
+		log.debug("Delete response "+wddxResponse);
+
+		Double messageTypeDouble = (Double) table.get("messageType");
+		int messageType = messageTypeDouble != null ? messageTypeDouble.intValue() : 0;
+		if ( messageType == FlashMessage.OBJECT_MESSAGE ) {
+		    JSONObject jsonObject = new JSONObject(table);
+		    response.setContentType("application/json;charset=utf-8");
+		    response.getWriter().print(jsonObject.toString());
+
 		} else {
-		    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
-			    lang, country, email, prefix, isUpdateUserDetails);
+		    log.error("Unable to delete learning design "+learningDesignId+" for user "+userId+" error "+table.get("messageValue"));
+		    response.sendError(response.SC_INTERNAL_SERVER_ERROR, table.get("messageValue").toString());
 		}
 
-		// create group for external course if necessary
-		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
-		Integer userId = userMap.getUser().getUserId();
-
-		Integer folderID = WebUtil.readIntParam(request, "folderID", true);
-		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
-		String folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns);
-
-		response.setContentType("application/json;charset=UTF-8");
-		response.getWriter().write(folderContentsJSON);
-	
 	    //TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
 	    } else {
+
+		if ( mode == null) {
+		    String msg = "Parameter missing: mode";
+		    log.error(msg);
+		    response.sendError(response.SC_BAD_REQUEST, msg);
+		}
 
 		ExtUserUseridMap userMap = null;
 		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
@@ -395,7 +436,25 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	}
 
     }
-    
+
+    private Integer getUserId(String username, String courseId, String courseName, String country, String lang,
+	    String usePrefix, final boolean isUpdateUserDetails, String firstName, String lastName, String email,
+	    ExtServerOrgMap serverMap) throws UserInfoFetchException, UserInfoValidationException {
+	ExtUserUseridMap userMap = null;
+	boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
+	if (firstName == null && lastName == null) {
+	    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
+	} else {
+	    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
+		    lang, country, email, prefix, isUpdateUserDetails);
+	}
+      
+	// create group for external course if necessary
+	integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+	Integer userId = userMap.getUser().getUserId();
+	return userId;
+    }
+        
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	doGet(request, response);
     }
