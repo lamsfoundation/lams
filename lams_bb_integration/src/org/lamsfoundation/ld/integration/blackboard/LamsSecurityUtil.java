@@ -107,7 +107,7 @@ public class LamsSecurityUtil {
 
 	// Even for authoring calls we still need a 'course' the user, role & organisation are all bound up together
 	// do to be authorised to use authoring you must be in an organisation.
-	String courseId = ctx.getCourse()!=null ? ctx.getCourse().getCourseId() : DUMMY_COURSE;
+	String courseId = setupCourseId(ctx, null);
 
 	String secretkey = LamsPluginUtil.getSecretKey();
 
@@ -213,7 +213,7 @@ public class LamsSecurityUtil {
      * Gets a list of learning designs & workspace folders for the current user from LAMS. 
      * 
      * @param ctx  the blackboard context, contains session data
-     * @param courseId blackboard courseid. We pass it as a parameter as ctx.getCourse().getCourseId() is null when called
+     * @param courseId blackboard course id. We pass it as a parameter as ctx.getCourse().getCourseId() is null when called
      *            from LamsLearningDesignServlet.
      * @param folderId folderID in LAMS. It can be null and then LAMS returns default workspace folders.
      * @param method which method to call on the LAMS end
@@ -222,9 +222,11 @@ public class LamsSecurityUtil {
      * @return a string containing the LAMS workspace tree in tigra format (method = getLearningDesignsJSON) or 
      *  a string containing the learning designs in JSON (method = getPagedHomeLearningDesignsJSON)
      */
-    public static String getLearningDesigns(Context ctx, String courseId, String folderId, String method, 
+    public static String getLearningDesigns(Context ctx, String urlCourseId, String folderId, String method, 
 	    String search, String page, String size, String sortName, String sortDate) {
 		String serverAddr = getServerAddress();
+		
+	String courseId = setupCourseId(ctx, urlCourseId);
 	String serverId = getServerID();
 
 	// If lams.properties could not be read, throw exception
@@ -308,6 +310,84 @@ public class LamsSecurityUtil {
 	}
 	
 	return learningDesigns;
+    }
+
+    /**
+     * Gets a list of learning designs & workspace folders for the current user from LAMS. 
+     * 
+     * @param ctx  the blackboard context, contains session data
+     * @param courseId blackboard courseid. We pass it as a parameter as ctx.getCourse().getCourseId() is null when called
+     *            from LamsLearningDesignServlet.
+     * @param ldId learning design to delete
+     * @return JSON response from server
+     */
+    public static String deleteLearningDesigns(Context ctx, String urlCourseId, Long ldId) {
+	
+	String courseId = setupCourseId(ctx, urlCourseId);
+
+	String serverAddr = getServerAddress();
+	String serverId = getServerID();
+
+	// If lams.properties could not be read, throw exception
+	if (serverAddr == null || serverId == null) {
+	    throw new RuntimeException("lams.properties file could not be read. serverAddr:" + serverAddr + ", serverId:" + serverId);
+	}
+	
+	String timestamp = new Long(System.currentTimeMillis()).toString();
+	String username = ctx.getUser().getUserName();
+	String firstName = ctx.getUser().getGivenName();
+	String lastName = ctx.getUser().getFamilyName();
+	String email = ctx.getUser().getEmailAddress();
+	String hash = generateAuthenticationHash(timestamp, username, serverId);
+
+	String locale = ctx.getUser().getLocale();
+	String country = getCountry(locale);
+	String lang = getLanguage(locale);
+
+	try {
+
+	    String serviceURL = serverAddr
+		    + "/services/xml/LearningDesignRepository?method=deleteLearningDesignJSON&datetime="
+		    + timestamp + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
+		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
+		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang
+		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
+		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8")
+		    + "&learningDesignID="+ldId;
+	    
+	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+
+	    // Read/convert response to a String 
+	    StringWriter writer = new StringWriter();
+	    IOUtils.copy(is, writer, "UTF-8");
+	    return writer.toString();
+
+	} catch (MalformedURLException e) {
+	    throw new RuntimeException("Unable to get LAMS learning designs, bad URL: '" + serverAddr
+		    + "', please check lams.properties", e);
+	} catch (IllegalStateException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (ConnectException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new RuntimeException(e);
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
+    }
+
+    private static String setupCourseId(Context ctx, String urlCourseId) {
+	// can we pull the alphanumeric course id from the context, rather than the on passed in from the URL? If neither exist, use the dummy Preview course.
+	String courseId = null;
+	if ( ctx.getCourse()!=null )
+	    courseId = ctx.getCourse().getCourseId();
+	if ( courseId == null )
+	    courseId = urlCourseId != null && urlCourseId.length() > 0 ? urlCourseId : DUMMY_COURSE;
+	return courseId;
     }
 
  
