@@ -14,6 +14,10 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>LamsLearningDesignDeleteServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignDeleteServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>GradebookServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookServlet</servlet-class>
   </servlet>
@@ -29,6 +33,10 @@
   <servlet-mapping>
     <servlet-name>LamsLearningDesignServlet</servlet-name>
     <url-pattern>/LamsLearningDesign</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LamsLearningDesignDeleteServlet</servlet-name>
+    <url-pattern>/LamsLearningDesignDelete</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UserDataServlet</servlet-name>

@@ -88,3 +88,7 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 This module has new calls to list the sequences in the root of a user's account and to 
 render a learning design image, which allows other deployment options on the Blackboard side.
 Also supports calls to the LAMS server to use a dummy course to suit the templates.
+
+1.2.12 Release Fixes
+===================
+* LDEV-3456: Supports deleting learning designs.
