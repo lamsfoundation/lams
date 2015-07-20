@@ -38,9 +38,9 @@ import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
 
 /**
- * Makes a call to LAMS server to get learning designs and returns it.
+ * Makes a call to LAMS server to delete a learning design.
  */
-public class LamsLearningDesignServlet extends HttpServlet {
+public class LamsLearningDesignDeleteServlet extends HttpServlet {
 
     private static final long serialVersionUID = -351131323404991332L;
 
@@ -55,21 +55,24 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	}
 
 	// get request parameters
-	String folderId = request.getParameter(Constants.PARAM_FOLDER_ID);
-	String courseId = request.getParameter("courseId");
+	String courseId = request.getParameter("course_id");
 
-	//paging parameters of tablesorter - used in the LAMS Template Wizard
-	boolean usePaging = false;
-	String page = request.getParameter("page");
-	String size = request.getParameter("size");
-	if ( page != null && page.length()>0) {
-	    usePaging = true;
-	    if ( size == null || size.length()==0)
-		size="10";
+	String strLearningDesignId = request.getParameter("sequence_id");
+	if ( strLearningDesignId != null ) {
+	    strLearningDesignId.trim();
 	}
-	String sortName = request.getParameter("sortName");
-	String sortDate = request.getParameter("sortDate");
-	String search = request.getParameter("search");
+
+	// validate method parameter and associated parameters
+	if ( strLearningDesignId == null || strLearningDesignId.length() == 0 ) {
+	    throw new RuntimeException("Required parameters missing. Add sequence_id for the id of the learning design to be deleted");
+	}
+
+	long learningDesignId = 0;
+	try {
+	    learningDesignId = Long.parseLong(strLearningDesignId);
+	} catch ( Exception e ) {
+	    throw new RuntimeException("Required parameters missing. Add sequence_id for the id of the learning design to be deleted",e);
+	}
 	
 	ContextManager ctxMgr = null;
 	Context ctx = null;
@@ -78,11 +81,10 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
 	    
-	    String method = usePaging ? "getPagedHomeLearningDesignsJSON" : "getLearningDesignsJSON";
-	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, courseId, folderId, method, search, page, size, sortName, sortDate);
+	    String serverResponse = LamsSecurityUtil.deleteLearningDesigns(ctx, courseId, learningDesignId);
 	    
 	    response.setContentType("application/json;charset=UTF-8");
-	    response.getWriter().print(learningDesigns);
+	    response.getWriter().print(serverResponse);
 	    
 	} catch (InitializationException e) {
 	    throw new RuntimeException(e);
