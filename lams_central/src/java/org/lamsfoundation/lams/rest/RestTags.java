@@ -49,7 +49,6 @@ public class RestTags {
     public static String LOCK_WHEN_FINISHED = "lockWhenFinished";
     public static String REFLECT_ON_ACTIVITY = "reflectOnActivity";
     public static String REFLECT_INSTRUCTIONS = "reflectInstructions";
-    public static String SUBMISSION_DEADLINE = "submissionDeadline";
     public static String ALLOW_RICH_TEXT_EDITOR = "allowRichEditor";
     public static String USE_SELECT_LEADER_TOOL_OUTPUT = "useSelectLeaderToolOuput";
     public static String MINIMUM_RATES = "minimumRates";
