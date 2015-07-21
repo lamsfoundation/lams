@@ -159,6 +159,17 @@
     Score current_score = null;
 	if (strLineitemId != null) { // there won't be "lineitemid" parameter in case lesson had been created in LAMS building block version prior to 1.2 
 	    
+	    //check if it was created in old versions (e.g. 1.2.1) where lineitemId parameter had the following format "PkId(key=_XXXX_1, %20dataType=blackboard.data.gradebook.impl.OutcomeDefinition, %20container=blackboard.persist.DatabaseContainer@xxxx)"
+	    //in which case transform it to the more regular one
+		if (strLineitemId.contains("key=")) {
+			int pos1 = strLineitemId.indexOf("key=") + 4;
+			int pos2 = strLineitemId.indexOf(",", pos1);
+
+			if (pos1 != -1 && pos2 != -1 && pos1 <= pos2 && pos2 <= strLineitemId.length()) {
+			    strLineitemId = strLineitemId.substring(pos1, pos2);
+			}
+		}
+	    
 	    Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, strLineitemId.trim());
 	    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
 		try {
