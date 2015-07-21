@@ -83,7 +83,18 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 			    String strTitle = f.getTitle().replace("'", "\\'");
 			    sb.append("{type:'Text', label:'" + strTitle + "', id:'" + strId + "'}");
 			    //			return sb.toString();
-			    
+			
+			} else if (f.getContentHandler().equals("resource/x-ntu-hdllams")) {
+			    String strUrl = f.getUrl();
+				String strId = "0";
+			    if (strUrl.indexOf("&seq_id=") != -1) {
+			       int pos1 = strUrl.indexOf("&seq_id=") + 8;
+//				   int pos2 = strUrl.indexOf("&", pos1);
+				   strId = strUrl.substring(pos1);
+			    }
+				String strTitle = f.getTitle().replace("'", "\\'");
+	            sb.append("{type:'Text', label:'" + strTitle + "', id:'" + strId + "'}");
+ 
 			} else {
 			    //	        sb.append("{type:'HTML', html:'<i>null</i>', id:0}");
 			}
