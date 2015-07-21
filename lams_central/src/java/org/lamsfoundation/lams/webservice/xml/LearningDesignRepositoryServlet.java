@@ -292,7 +292,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	    String country = request.getParameter(CentralConstants.PARAM_COUNTRY);
 	    String lang = request.getParameter(CentralConstants.PARAM_LANG);
-	    String modeStr = request.getParameter(CentralConstants.PARAM_MODE);
+	    Integer mode = WebUtil.readIntParam(request, CentralConstants.PARAM_MODE, true);
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
 	    final boolean isUpdateUserDetails = false;
@@ -302,7 +302,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
 	    
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null
-		    || country == null || lang == null || modeStr == null) {
+		    || country == null || lang == null ) {
 		String msg = "Parameters missing";
 		log.error(msg);
 		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
@@ -316,8 +316,6 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    		courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
 	    	}
 	    }
-
-	    Integer mode = new Integer(modeStr);
 
 	    // get Server map
 	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
