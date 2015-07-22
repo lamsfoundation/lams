@@ -12,7 +12,12 @@
 		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
 		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
 		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
-		<property name="proxyTargetClass"><value>true</value></property>     
+		<property name="proxyTargetClass"><value>true</value></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>  
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>

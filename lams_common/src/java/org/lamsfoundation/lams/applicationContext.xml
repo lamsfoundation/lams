@@ -53,5 +53,8 @@
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-
+	
+	<!-- Extra wrapper for all proxied methods.
+		 In case of DataIntegrityViolationException it retrires the transaction up to 3 times -->
+	<bean id="transactionRetryInterceptor" class="org.lamsfoundation.lams.web.filter.TransactionRetryInterceptor" />
 </beans>

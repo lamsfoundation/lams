@@ -24,6 +24,11 @@
 	</bean> 
 	<bean id="chatService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.chat.service.ChatService">
 				<property name="chatMessageDAO"><ref bean="chatMessageDAO"/></property>				
