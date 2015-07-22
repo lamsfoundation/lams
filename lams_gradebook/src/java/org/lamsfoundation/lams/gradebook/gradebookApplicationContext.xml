@@ -28,6 +28,11 @@
 	<bean id="gradebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="gradebookServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>

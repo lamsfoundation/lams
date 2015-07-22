@@ -44,6 +44,11 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="userManagementServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property> 
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
@@ -74,6 +79,11 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="learningDesignServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="validateLearningDesign">PROPAGATION_REQUIRED</prop>
@@ -92,6 +102,11 @@
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="themeServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
@@ -109,6 +124,11 @@
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="timezoneServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
@@ -127,6 +147,11 @@
 		<property name="transactionManager"><ref bean="transactionManager" /></property>
 		<property name="target"><ref bean="signupServiceTarget" /></property>
 		<property name="proxyTargetClass"><value>true</value></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="signupUser">PROPAGATION_REQUIRED</prop>
@@ -151,7 +176,11 @@
 	<bean id="exportToolContentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="exportToolContentServiceTarget"/></property>
-		
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
 		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
 		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
@@ -207,7 +236,11 @@
 	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="coreNotebookServiceTarget"/></property>
-		
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
 		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
 		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
@@ -238,6 +271,11 @@
 			</bean>
 		</property>
 		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
@@ -280,6 +318,11 @@
 
     <bean id="eventNotificationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.events.EventNotificationService">
 				<property name="eventDAO"><ref bean="eventDAO" /></property>
@@ -323,6 +366,11 @@
 	
 	<bean id="logEventService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.logevent.service.LogEventService">
 				<property name="logEventDAO"><ref bean="logEventDAO"/></property>
@@ -361,6 +409,11 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="securityServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>

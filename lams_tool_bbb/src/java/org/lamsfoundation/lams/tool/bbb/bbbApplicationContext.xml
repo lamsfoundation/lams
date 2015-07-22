@@ -12,6 +12,11 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 	<bean id="bbbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.bbb.service.BbbService">
 				<property name="bbbSessionDAO"><ref bean="bbbSessionDAO"/></property>
