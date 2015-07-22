@@ -45,4 +45,7 @@
 	<!-- PostProcessor to convert Hibernate specific (checked) exceptions to Runtime DataAccessExceptions -->
 	<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 
+	<!-- Extra wrapper for all proxied methods.
+		 In case of DataIntegrityViolationException it retrires the transaction up to 3 times -->
+	<bean id="transactionRetryInterceptor" class="org.lamsfoundation.lams.web.filter.TransactionRetryInterceptor" />
 </beans>

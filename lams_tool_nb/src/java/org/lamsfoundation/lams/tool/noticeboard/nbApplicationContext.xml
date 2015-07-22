@@ -15,6 +15,11 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 	<bean id="nbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServicePOJO">
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>

@@ -22,6 +22,11 @@
 	</bean> 
 	<bean id="kalturaService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.kaltura.service.KalturaService">
 				<property name="kalturaSessionDao"><ref bean="kalturaSessionDao"/></property>

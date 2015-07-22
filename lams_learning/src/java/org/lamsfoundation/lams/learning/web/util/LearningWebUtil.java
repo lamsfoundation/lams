@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -68,8 +68,6 @@ public class LearningWebUtil {
     // Class level constants - session attributes
     // ---------------------------------------------------------------------
     public static final String PARAM_PROGRESS_ID = "progressID";
-
-    private static final int COMPLETE_ACTIVITY_MAX_ATTEMPTS = 3;
 
     // public static final String POPUP_WINDOW_NAME = "LearnerActivity";
     // public static final String LEARNER_WINDOW_NAME = "lWindow";
@@ -227,7 +225,7 @@ public class LearningWebUtil {
 	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	} else {
-	    progress = LearningWebUtil.completeActivity(learnerService, learnerId, progress, currentActivity, 1);
+	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);
 	}
 
 	if ((currentActivity != null) && currentActivity.isFloating()) {
@@ -405,31 +403,5 @@ public class LearningWebUtil {
 	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
 	}
 	return positionDTO;
-    }
-
-    /**
-     * Tries to complete the activity for the learner. Because of concurrency problems (deadlocks, indexes when
-     * inserting) the operation can fail and the easiet recovery is to repeat it.
-     */
-    private static LearnerProgress completeActivity(ICoreLearnerService learnerService, Integer learnerId,
-	    LearnerProgress progress, Activity currentActivity, int attempt) {
-	try {
-	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);
-	} catch (DataAccessException e) {
-	    attempt++;
-	    StringBuilder message = new StringBuilder("Could not complete activity due to a data access exception.");
-	    if (attempt <= LearningWebUtil.COMPLETE_ACTIVITY_MAX_ATTEMPTS) {
-		message.append("Retrying. Attempt #").append(attempt).append(". The exception was: ")
-			.append(e.getMessage());
-		LearningWebUtil.log.warn(message.toString());
-		LearningWebUtil.completeActivity(learnerService, learnerId, progress, currentActivity, attempt);
-	    } else {
-		message.append("Reached limit of retries: " + LearningWebUtil.COMPLETE_ACTIVITY_MAX_ATTEMPTS);
-		LearningWebUtil.log.warn(message.toString());
-		throw e;
-	    }
-	}
-
-	return progress;
     }
 }

@@ -31,6 +31,11 @@
 	<bean id="toolContentIDGenerator" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="toolContentIDGeneratorTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW</prop>
@@ -49,6 +54,11 @@
 	<bean id="lamsCoreToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="lamsCoreToolServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="createToolSession*">PROPAGATION_REQUIRED</prop>
@@ -62,6 +72,11 @@
 	
 	<bean id="lamsToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name="target">
 				<bean class="org.lamsfoundation.lams.tool.service.LamsToolService">
 					<property name="toolDAO"><ref bean="toolDAO"/></property>	
