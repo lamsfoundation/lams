@@ -8,11 +8,16 @@
 	<bean id="ldapService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="ldapServiceTarget"/></property>
-		
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+				
 		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
 		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
 		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
-		<property name="proxyTargetClass"><value>true</value></property>     
+		<property name="proxyTargetClass"><value>true</value></property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="addLDAPUser">PROPAGATION_REQUIRED</prop>

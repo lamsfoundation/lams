@@ -24,6 +24,11 @@
 	</bean> 
 	<bean id="leaderselectionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionService">
 				<property name="leaderselectionSessionDAO"><ref bean="leaderselectionSessionDAO"/></property>

@@ -104,6 +104,11 @@
         <property name="proxyTargetClass">
             <value>false</value>
         </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
         <property name="transactionAttributes">
             <props>
                 <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
