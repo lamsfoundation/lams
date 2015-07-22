@@ -92,3 +92,4 @@ Also supports calls to the LAMS server to use a dummy course to suit the templat
 1.2.12 Release Fixes
 ===================
 * LDEV-3456: Supports deleting learning designs.
+* LDEV-3513: Transform lineitemId parameter stored in some older versions to the format required now
