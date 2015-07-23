@@ -2046,7 +2046,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, originalLearningDesignID + fullExtension);
 	if (image.canRead()) {
 	    FileUtils.copyFile(image, new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID
-		    + fullExtension), false);
+		    + fullExtension), true);
 	}
     }
 }
