@@ -28,7 +28,7 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
-;
+
 /**
  * @author Manpreet Minhas
  */
@@ -39,22 +39,6 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	 * @return LearningDesign populated LearningDesign object
 	 */
 	public LearningDesign getLearningDesignById(Long learningDesignId);
-	/**
-	 * @param title
-	 * @return LearningDesign populated LearningDesign object
-	 */
-	public LearningDesign getLearningDesignByTitle(String title);
-	
-	/**
-	 * @return List of all Learning designs
-	 */
-	public List getAllLearningDesigns();	
-	
-	/**
-	 * @param userID
-	 * @return List of learning designs with given userID
-	 */
-	public List getLearningDesignByUserId(Long userID);
 	
 	/**
 	 * This method returns a list of all designs that are valid in 
@@ -76,16 +60,15 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	 */
 	public List getAllLearningDesignsInFolder(Integer workspaceFolderID);
 	
-	/**
-	 * This method returns a List of Learning Designs with given  
-	 * <code>original_learning_design_id</code>
-	 * 
-	 * @param originalDesignID The <code>original_learning_design_id</code>
-	 * @return List The List of all corresponding Learning designs with
-	 * 				given <code>original_learning_design_id</code> 
-	 */
-	public List getLearningDesignsByOriginalDesign(Long originalDesignID);
-	
+       /** This method returns a List of Learning Designs with given  	  	  	  	 
+ 	* <code>original_learning_design_id</code> 	  	  	  	 
+ 	* 	  	  	  	 
+ 	* @param originalDesignID The <code>original_learning_design_id</code> 	  	  	  	 
+ 	* @return List The List of all corresponding Learning designs with 	  	  	  	 
+ 	*                              given <code>original_learning_design_id</code> 	  	  	  	 
+ 	*/ 	  	  	  	 
+ 	public List getLearningDesignsByOriginalDesign(Long originalDesignID); 	  	  	  	 
+    
 	/**
 	 * Get the titles of all the learning designs with the given prefix in the given folder.
 	 */
@@ -111,4 +94,5 @@ public interface ILearningDesignDAO extends IBaseDAO{
          * Count how many learning designs exist in a given folder.
          */
         public long countAllLearningDesigns(Integer workspaceFolderID, boolean validDesignsOnly);
+        
 }

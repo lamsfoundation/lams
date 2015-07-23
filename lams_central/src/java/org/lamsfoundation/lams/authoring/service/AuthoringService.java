@@ -378,14 +378,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningDesigns()
-     */
-    @Override
-    public List getAllLearningDesigns() {
-	return learningDesignDAO.getAllLearningDesigns();
-    }
-
-    /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraries()
      */
     @Override
@@ -1719,19 +1711,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningDesignDetails()
-     */
-    @Override
-    public String getAllLearningDesignDetails() throws IOException {
-	Iterator iterator = getAllLearningDesigns().iterator();
-	ArrayList arrayList = createDesignDetailsPacket(iterator);
-	FlashMessage flashMessage = new FlashMessage("getAllLearningDesignDetails", arrayList);
-	return flashMessage.serializeMessage();
-    }
-
-    /**
      * This is a utility method used by the method <code>getAllLearningDesignDetails</code> to pack the required
      * information in a data transfer object.
      * 
@@ -1746,19 +1725,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    arrayList.add(designDetailDTO);
 	}
 	return arrayList;
-    }
-
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignsForUser(java.lang.Long)
-     */
-    @Override
-    public String getLearningDesignsForUser(Long userID) throws IOException {
-	List list = learningDesignDAO.getLearningDesignByUserId(userID);
-	ArrayList arrayList = createDesignDetailsPacket(list.iterator());
-	FlashMessage flashMessage = new FlashMessage("getLearningDesignsForUser", arrayList);
-	return flashMessage.serializeMessage();
     }
 
     /**

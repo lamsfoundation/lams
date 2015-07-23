@@ -276,33 +276,6 @@ public class AuthoringAction extends LamsDispatchAction {
 
     }
 
-    public ActionForward getLearningDesignsForUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException {
-	String wddxPacket;
-	IAuthoringService authoringService = getAuthoringService();
-	try {
-	    Long userID = new Long(getUserId());
-
-	    wddxPacket = authoringService.getLearningDesignsForUser(userID);
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLearningDesignsForUser", authoringService, true).serializeMessage();
-	}
-	return outputPacket(mapping, request, response, wddxPacket, "details");
-    }
-
-    public ActionForward getAllLearningDesignDetails(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String wddxPacket;
-	IAuthoringService authoringService = getAuthoringService();
-	try {
-	    wddxPacket = authoringService.getAllLearningDesignDetails();
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getAllLearningDesignDetails", authoringService, true).serializeMessage();
-	}
-	AuthoringAction.log.debug("getAllLearningDesignDetails: returning " + wddxPacket);
-	return outputPacket(mapping, request, response, wddxPacket, "details");
-    }
-
     public ActionForward getAllLearningLibraryDetails(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String wddxPacket;

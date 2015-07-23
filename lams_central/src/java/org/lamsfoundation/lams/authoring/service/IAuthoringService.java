@@ -153,11 +153,6 @@ public interface IAuthoringService {
 	    throws UserException, LearningDesignException, WorkspaceFolderException, IOException;
 
     /**
-     * @return List Returns the list of all the available LearningDesign's
-     */
-    public List getAllLearningDesigns();
-
-    /**
      * @return List Returns a list of all available Learning Libraries
      */
     public List getAllLearningLibraries();
@@ -222,30 +217,12 @@ public interface IAuthoringService {
 	    throws IOException;
 
     /**
-     * This method returns a list of all available Learning Designs in WDDX format.
-     * 
-     * @return String The required list in WDDX format
-     * @throws IOException
-     */
-    public String getAllLearningDesignDetails() throws IOException;
-
-    /**
      * Saves the LearningDesign to the database. Will update if already saved. Used when a design is run.
      * 
      * @param learningDesign
      *            The LearningDesign to be saved
      */
     public void saveLearningDesign(LearningDesign learningDesign);
-
-    /**
-     * Returns a list of LearningDesign's in WDDX format, belonging to the given user
-     * 
-     * @param user
-     *            The user_id of the User for whom the designs are to be fetched
-     * @return The requested list of LearningDesign's in WDDX format
-     * @throws IOException
-     */
-    public String getLearningDesignsForUser(Long userID) throws IOException;
 
     /**
      * This method returns a list of all available system libraries in WDDX format.
