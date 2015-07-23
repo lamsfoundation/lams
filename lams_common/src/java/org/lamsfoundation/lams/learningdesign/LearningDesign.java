@@ -156,7 +156,10 @@ public class LearningDesign implements Serializable {
 	
 	/** persistent field*/
 	private Date lastModifiedDateTime;
-	
+
+	/** persistent field*/
+	private Boolean removed;
+
     /* If the values for createDateTime and/or lastModifiedDateTime
      * are null, then it will default to the current datetime.
      */
@@ -219,6 +222,7 @@ public class LearningDesign implements Serializable {
 		this.editOverrideLock = editOverrideLock;
 		this.editOverrideUser = editOverrideUser;
 		this.designVersion = designVersion;
+		this.removed = Boolean.FALSE;
 	}
 
 	/** default constructor */
@@ -228,6 +232,7 @@ public class LearningDesign implements Serializable {
 	    this.lastModifiedDateTime = new Date();
 	    this.editOverrideLock = false;
 	    this.designVersion = new Integer(1);
+	    this.removed = Boolean.FALSE;
 	}
 
 	/** minimal constructor */
@@ -259,6 +264,7 @@ public class LearningDesign implements Serializable {
 		this.lastModifiedDateTime = new Date();
 		this.editOverrideLock = false;
 		this.designVersion = new Integer(1);
+		this.removed = Boolean.FALSE;
 	}
 	/** Create a new learning design based on an existing learning design. If setOriginalDesign is true, then set the input design
 	 * as the original design in the copied design - this is used when runtime copies of a design are created. It is not used
@@ -297,6 +303,7 @@ public class LearningDesign implements Serializable {
 		newDesign.setEditOverrideLock(design.getEditOverrideLock());
 		newDesign.setEditOverrideUser(design.getEditOverrideUser());
 		newDesign.setOriginalUser(design.getOriginalUser());
+		newDesign.setRemoved(design.getRemoved());
 		return newDesign;
 	}	
 
@@ -593,4 +600,11 @@ public class LearningDesign implements Serializable {
 	public FloatingActivity getFloatingActivity() {
 		return floatingActivity;
 	}
+	public Boolean getRemoved() {
+		return removed;
+	}
+	public void setRemoved(Boolean removed) {
+		this.removed = removed;
+	}
+
 }
