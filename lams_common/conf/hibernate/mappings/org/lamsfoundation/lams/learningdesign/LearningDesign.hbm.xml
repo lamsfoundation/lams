@@ -151,6 +151,14 @@
         </meta>    
     </property>
     
+    <property
+            name="removed"
+            type="java.lang.Boolean"
+            column="removed"
+            length="1"
+            not-null="true"            
+        />
+    
     <property name="duration" type="java.lang.Long" column="duration">
     	<meta attribute="field-description">@hibernate.property column ="duration"</meta>
     </property>

@@ -27,8 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.lamsfoundation.lams.authoring.web.AuthoringAction;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
@@ -38,26 +40,19 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
  * @author Manpreet Minhas
  */
 public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
-
+    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    
 	private static final String TABLENAME ="lams_learning_design";
-	private static final String FIND_BY_USERID = "from " + TABLENAME +" in class " + LearningDesign.class.getName()+ " where user_id =?";
-	
 	private static final String VALID_IN_FOLDER ="from " + TABLENAME +" in class " + LearningDesign.class.getName()+
-												 " where valid_design_flag=true AND workspace_folder_id=?";
+												 " where valid_design_flag=true AND workspace_folder_id=? AND removed=0";
 	
 	private static final String ALL_IN_FOLDER ="from " + TABLENAME +" in class " + LearningDesign.class.getName()+
-												" where workspace_folder_id=?";
-
-        private static final String COUNT_VALID_IN_FOLDER = "SELECT COUNT(*) from " + TABLENAME
-        	    + " where valid_design_flag=true AND workspace_folder_id=?";
-        
-            private static final String COUNT_ALL_IN_FOLDER = "SELECT COUNT(*) from " + TABLENAME + " where workspace_folder_id=?";
-        
+												" where workspace_folder_id=? AND removed=0";
 
 	private static final String FIND_BY_ORIGINAL ="from " + TABLENAME +" in class " + LearningDesign.class.getName()+
-												" where original_learning_design_id=?";
+												" where original_learning_design_id=? AND removed=0";
 	private static final String FIND_LD_NAMES_IN_FOLDER = "select title from " + LearningDesign.class.getName()+
-												" where workspace_folder_id=? and title like ?";
+												" where workspace_folder_id=? AND title like ? AND removed=0";
 	
 	private static final String ACCESS_BY_USER = "from " + LearningDesignAccess.class.getName()
 	    + " as a where a.userId = ? order by a.accessDate desc";
@@ -66,35 +61,10 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.ILearningDesignDAO#getLearningDesignById(java.lang.Long)
 	 */
 	public LearningDesign getLearningDesignById(Long learningDesignId) {
-		return (LearningDesign)super.find(LearningDesign.class,learningDesignId);	
-	}
-
-	/* 
-	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.ILearningDesignDAO#getLearningDesignByTitle(java.lang.String)
-	 */
-	public LearningDesign getLearningDesignByTitle(String title) {
-			return (LearningDesign) super.find(LearningDesign.class,title);
-	}
-
-	/* 
-	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.ILearningDesignDAO#getAllLearningDesigns()
-	 */
-	public List getAllLearningDesigns() {
-		return super.findAll(LearningDesign.class);		
+		LearningDesign design = (LearningDesign) super.find(LearningDesign.class,learningDesignId);	
+		return design != null && ! design.getRemoved() ? design : null;
 	}
 	
-	public List getLearningDesignByUserId(Long userID){		
-		if ( userID != null ) {
-			try{
-				Query query = this.getSession().createQuery(FIND_BY_USERID);
-				query.setLong(0,userID.longValue());
-				return query.list();
-			}catch(HibernateException he){
-			}		
-		}
-		return null;			
-	}
-
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getAllValidLearningDesignsInFolder(java.lang.Integer)
@@ -115,6 +85,7 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	 * @see getLearningDesignsByOriginalDesign#getLearningDesignsByParent(java.lang.Long)
 	 */
 	public List getLearningDesignsByOriginalDesign(Long originalDesignID){
+	    log.error("getLearningDesignsByOriginalDesign called");
 		List list = this.getHibernateTemplate().find(FIND_BY_ORIGINAL,originalDesignID);
 		return list;
 	}
@@ -131,7 +102,7 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
         @SuppressWarnings("unchecked")
         @Override
         public List<LearningDesignAccess> getAccessByUser(Integer userId) {
-    		return this.getHibernateTemplate().find(ACCESS_BY_USER, userId);
+   		return this.getHibernateTemplate().find(ACCESS_BY_USER, userId);
         }
         
     	@SuppressWarnings("unchecked")
@@ -170,9 +141,19 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
         public long countAllLearningDesigns(Integer workspaceFolderID, boolean validDesignsOnly) {
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("workspaceFolder.workspaceFolderId", workspaceFolderID);
+            properties.put("removed", Boolean.FALSE);
             if ( validDesignsOnly ) 
         	properties.put("validDesign", Boolean.valueOf(validDesignsOnly));
             return countByProperties(LearningDesign.class, properties);
         }
 
+        /** Overrides the standard delete to merely mark as removed in the database. */
+        public void delete(Object object) {
+            LearningDesign design = (LearningDesign) object;	
+            log.debug("Removing learning design "+design);
+            if ( design != null && ! design.getRemoved() ) {
+        	design.setRemoved(Boolean.TRUE);
+        	update(design);
+            }
+        }
     }
