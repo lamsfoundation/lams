@@ -1,0 +1,56 @@
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-04-07 10:42:43
+# 
+INSERT INTO lams_tool
+(
+tool_signature,
+service_name,
+tool_display_name,
+description,
+tool_identifier,
+tool_version,
+learning_library_id,
+default_tool_content_id,
+valid_flag,
+grouping_support_type_id,
+supports_run_offline_flag,
+learner_url,
+learner_preview_url,
+learner_progress_url,
+author_url,
+monitor_url,
+define_later_url,
+export_pfolio_learner_url,
+export_pfolio_class_url,
+help_url,
+language_file,
+create_date_time,
+modified_date_time
+)
+VALUES
+(
+'laprev11',
+'peerreviewService',
+'Peerreview',
+'Peerreview',
+'peerreview',
+'@tool_version@',
+NULL,
+NULL,
+0,
+2,
+1,
+'tool/laprev11/learning/start.do?mode=learner',
+'tool/laprev11/learning/start.do?mode=author',
+'tool/laprev11/learning/start.do?mode=teacher',
+'tool/laprev11/authoring/start.do',
+'tool/laprev11/monitoring/summary.do',
+'tool/laprev11/definelater.do',
+'tool/laprev11/exportPortfolio?mode=learner',
+'tool/laprev11/exportPortfolio?mode=teacher',
+'http://wiki.lamsfoundation.org/display/lamsdocs/laprev11',
+'org.lamsfoundation.lams.tool.peerreview.ApplicationResources',
+NOW(),
+NOW()
+)

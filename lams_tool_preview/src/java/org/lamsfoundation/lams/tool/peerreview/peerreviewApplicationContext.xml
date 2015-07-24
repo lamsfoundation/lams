@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="peerreviewMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.peerreview.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+	
+    <!-- core beans -->
+    <bean id="peerreviewDao" class="org.lamsfoundation.lams.tool.peerreview.dao.hibernate.PeerreviewDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="peerreviewUserDao" class="org.lamsfoundation.lams.tool.peerreview.dao.hibernate.PeerreviewUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="peerreviewSessionDao" class="org.lamsfoundation.lams.tool.peerreview.dao.hibernate.PeerreviewSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- Managers -->
+	<bean id="peerreviewToolContentHandler" class="org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler">
+	 	<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="peerreviewManagerTarget" class="org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl">
+        <property name="peerreviewDao">
+            <ref local="peerreviewDao"/>
+        </property>
+        <property name="peerreviewUserDao">
+            <ref local="peerreviewUserDao"/>
+        </property>
+        <property name="peerreviewSessionDao">
+            <ref local="peerreviewSessionDao"/>
+        </property>
+        <property name="peerreviewToolContentHandler">
+            <ref local="peerreviewToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="peerreviewMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		<property name="ratingService"><ref bean="ratingService"/></property> 
+    </bean>
+
+    <bean id="peerreviewService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="peerreviewManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="markUserFinished">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="fetchUsersFromLesson">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
