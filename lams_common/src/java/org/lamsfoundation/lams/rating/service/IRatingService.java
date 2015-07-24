@@ -56,7 +56,21 @@ public interface IRatingService {
 
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz);
     
+    /**
+     * Checks if comments are enabled (i.e. if comments' criteria is available).
+     * 
+     * @param toolContentId
+     * @return
+     */
     boolean isCommentsEnabled(Long toolContentId);
+    
+    /**
+     * If comments enabled then there might be commentsMinWords limit set. Returns its value or 0 otherwise.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    int getCommentsMinWordsLimit(Long toolContentId);
 
     /**
      * Return Rating by the given itemId and userId.
@@ -92,6 +106,15 @@ public interface IRatingService {
      */
     List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId);
+    
+    /**
+     * Returns item DTO with all corresponding ratings and comments. Doesn't contain average and total amount of rates.
+     * 
+     * @param contentId
+     * @param itemId
+     * @return
+     */
+    ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId);
 
     /**
      * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This

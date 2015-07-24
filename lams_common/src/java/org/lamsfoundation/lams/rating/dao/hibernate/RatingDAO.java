@@ -48,6 +48,9 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 
     private static final String FIND_RATING_BY_CRITERIA_AND_USER = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=?";
+    
+    private static final String FIND_RATINGS_BY_ITEM = "FROM " + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? AND r.itemId=?";
 
     private static final String FIND_RATINGS_BY_USER = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.toolContentId=? AND r.learner.userId=?";
@@ -89,6 +92,11 @@ public class RatingDAO extends BaseDAO implements IRatingDAO {
 	} else {
 	    return null;
 	}
+    }
+    
+    @Override
+    public List<Rating> getRatingsByItem(Long contentId, Long itemId) {
+	return getHibernateTemplate().find(FIND_RATINGS_BY_ITEM, new Object[] { contentId, itemId });
     }
 
     // method is not used at the moment

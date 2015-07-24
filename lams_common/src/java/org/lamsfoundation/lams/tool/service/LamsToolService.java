@@ -29,12 +29,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
@@ -244,6 +247,47 @@ public class LamsToolService implements ILamsToolService {
 	}
 
 	return null;
+    }
+    
+    @Override
+    public Set<User> getUsersFromGroupingActivity(Long toolSessionId) {
+	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
+	ToolActivity activity = session.getToolActivity();
+	
+	Set<User> users = new TreeSet<User>();
+	if (activity.getApplyGrouping()) {
+	    Grouping grouping = activity.getGrouping();
+	    
+	    if (grouping != null) {
+		
+		//find group that corresponds to specified toolSessionId
+		for (Group group : (Set<Group>)grouping.getGroups()) {
+
+		    if (!grouping.isLearnerGroup(group)) {
+			continue;
+		    }
+
+		    for (ToolSession sessionIter : (Set<ToolSession>)group.getToolSessions()) {
+			if (sessionIter.getToolSessionId().equals(toolSessionId)) {
+			    users.addAll(group.getUsers());
+			    log.warn("AAAAA groupId: " + group.getGroupId());
+			    break;
+			}
+		    }
+//		    if (grouping.isLearnerGroup(group) && group.hasLearner(learner)) {
+//			users.addAll(group.getUsers());
+//		    }
+		}
+	    }
+	    
+//	    activity.getGroupFor(learner)
+	
+	// if there is no grouping specified just add all learners from the lesson
+	} else {
+	    users.addAll(session.getLesson().getLessonClass().getLearners());
+	}
+	
+	return users;
     }
 
     /**
