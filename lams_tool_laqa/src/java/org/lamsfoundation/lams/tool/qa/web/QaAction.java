@@ -157,12 +157,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    qaContent.getQaQueContents().remove(removeableQuestion);
 		    qaService.removeQuestion(removeableQuestion);
 		}
-	    }
-	    
-	    // ************************* Handle rating criterias *******************
-	    List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap
-		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
-	    qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
+	    }	    
 
 	    // store content
 	    SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
@@ -181,6 +176,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		qaService.saveOrUpdateQuestion(existingQaQueContent);
 		displayOrder++;
 	    }
+	    
+	    // ************************* Handle rating criterias *******************
+	    List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap
+		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
+	    qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
 
 	    QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
 
