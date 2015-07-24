@@ -26,7 +26,9 @@
 package org.lamsfoundation.lams.rating.service;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +45,7 @@ import org.lamsfoundation.lams.rating.dao.IRatingDAO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
+import org.lamsfoundation.lams.rating.dto.RatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
@@ -139,57 +142,8 @@ public class RatingService implements IRatingService {
 	boolean isSingleItem = itemIds.size() == 1;
 	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
 	
-	//initialize itemDtos
-	List<ItemRatingDTO> itemDtos = new LinkedList<ItemRatingDTO>();
-	for (Long itemId : itemIds) {
-	    ItemRatingDTO itemDto = new ItemRatingDTO();
-	    itemDto.setItemId(itemId);
-	    itemDtos.add(itemDto);
-	}
-	
 	//handle comments criteria
-	for (RatingCriteria criteria : criterias) {
-	    if (criteria.isCommentsEnabled()) {
-		Long commentCriteriaId = criteria.getRatingCriteriaId();
-		
-		List<RatingCommentDTO> commentDtos;
-		if (isSingleItem) {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, singleItemId);
-		
-		//query DB using itemIds
-		} else if (isCommentsByOtherUsersRequired) {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, itemIds);
-		    
-		// get only comments for current user
-		} else {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItemsAndUser(commentCriteriaId, itemIds,
-			    userId.intValue());
-		}
-		
-		for (ItemRatingDTO itemDto: itemDtos) {
-		    itemDto.setCommentsEnabled(true);
-		    itemDto.setCommentsCriteriaId(commentCriteriaId);
-		    itemDto.setCommentsMinWordsLimit(criteria.getCommentsMinWordsLimit());
-		    
-		    //assign commentDtos by the appropriate items
-		    List<RatingCommentDTO> commentDtosPerItem = new LinkedList<RatingCommentDTO>();
-		    for (RatingCommentDTO commentDto: commentDtos) {
-			if (commentDto.getItemId().equals(itemDto.getItemId())) {
-			    commentDtosPerItem.add(commentDto);
-			    
-			    //fill in commentPostedByUser field
-			    if (commentDto.getUserId().equals(userId)) {
-				itemDto.setCommentPostedByUser(commentDto);
-			    }
-			}
-		    }
-		    
-		    itemDto.setCommentDtos(commentDtosPerItem);
-		}
-		
-		break;
-	    }
-	}
+	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, itemIds, isCommentsByOtherUsersRequired, userId);
 	
 	//get all data from DB
 	List<Rating> userRatings = ratingDAO.getRatingsByUser(contentId, userId.intValue());
@@ -253,6 +207,121 @@ public class RatingService implements IRatingService {
 	}
 
 	return itemDtos;
+    }
+    
+    /*
+     * Fetches all required comments from the DB.
+     */
+    private List<ItemRatingDTO> handleCommentsCriteria(List<RatingCriteria> criterias, Collection<Long> itemIds,
+	    boolean isCommentsByOtherUsersRequired, Long userId) {
+	
+	boolean isSingleItem = itemIds.size() == 1;
+	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
+
+	// initialize itemDtos
+	List<ItemRatingDTO> itemDtos = new LinkedList<ItemRatingDTO>();
+	for (Long itemId : itemIds) {
+	    ItemRatingDTO itemDto = new ItemRatingDTO();
+	    itemDto.setItemId(itemId);
+	    itemDtos.add(itemDto);
+	}
+	
+	//handle comments criteria
+	for (RatingCriteria criteria : criterias) {
+	    if (criteria.isCommentsEnabled()) {
+		Long commentCriteriaId = criteria.getRatingCriteriaId();
+		
+		List<RatingCommentDTO> commentDtos;
+		if (isSingleItem) {
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, singleItemId);
+		
+		//query DB using itemIds
+		} else if (isCommentsByOtherUsersRequired) {
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, itemIds);
+		    
+		// get only comments done by the specified user
+		} else {
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItemsAndUser(commentCriteriaId, itemIds,
+			    userId.intValue());
+		}
+		
+		for (ItemRatingDTO itemDto: itemDtos) {
+		    itemDto.setCommentsEnabled(true);
+		    itemDto.setCommentsCriteriaId(commentCriteriaId);
+		    itemDto.setCommentsMinWordsLimit(criteria.getCommentsMinWordsLimit());
+		    
+		    //assign commentDtos by the appropriate items
+		    List<RatingCommentDTO> commentDtosPerItem = new LinkedList<RatingCommentDTO>();
+		    for (RatingCommentDTO commentDto: commentDtos) {
+			if (commentDto.getItemId().equals(itemDto.getItemId())) {
+			    commentDtosPerItem.add(commentDto);
+			    
+			    //fill in commentPostedByUser field
+			    if (commentDto.getUserId().equals(userId)) {
+				itemDto.setCommentPostedByUser(commentDto);
+			    }
+			}
+		    }
+		    
+		    itemDto.setCommentDtos(commentDtosPerItem);
+		}
+		
+		break;
+	    }
+	}
+	
+	return itemDtos;
+    }
+    
+    @Override
+    public ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId) {
+
+	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	numberFormat.setMaximumFractionDigits(1);
+	List<RatingCriteria> criterias = getCriteriasByToolContentId(contentId);
+	
+	// handle comments criteria
+	List<Long> itemIds = Collections.singletonList(itemId);
+	boolean isCommentsByOtherUsersRequired = false;// not important as it's not used
+	Long userId = -1L; // passing impossible user id as there is no need in this info
+	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, itemIds, isCommentsByOtherUsersRequired,
+		userId);
+	ItemRatingDTO itemDto = itemDtos.get(0);
+	
+	//get all data from DB
+	List<Rating> itemRatings = ratingDAO.getRatingsByItem(contentId, itemId);
+
+	// handle all criterias except for comments' one
+	List<ItemRatingCriteriaDTO> criteriaDtos = new LinkedList<ItemRatingCriteriaDTO>();
+	for (RatingCriteria criteria : criterias) {
+	    Long criteriaId = criteria.getRatingCriteriaId();
+
+	    // comments' criteria are handled earlier, at the beginning of this function
+	    if (criteria.isCommentsEnabled()) {
+		continue;
+	    }
+
+	    ItemRatingCriteriaDTO criteriaDto = new ItemRatingCriteriaDTO();
+	    criteriaDto.setRatingCriteria(criteria);
+	    List<RatingDTO> ratingDtos = new ArrayList<RatingDTO>();
+	    
+	    //find according to that criteria itemRatings
+	    for (Rating itemRating : itemRatings) {
+		if (itemRating.getRatingCriteria().getRatingCriteriaId().equals(criteria.getRatingCriteriaId())) {
+		    RatingDTO ratingDto = new RatingDTO();
+		    String ratingStr = numberFormat.format(itemRating.getRating());
+		    ratingDto.setRating(ratingStr);
+		    ratingDto.setLearner(itemRating.getLearner());
+		    ratingDtos.add(ratingDto);
+		}
+	    }
+	    criteriaDto.setRatingDtos(ratingDtos);
+
+	    criteriaDtos.add(criteriaDto);
+	}
+	itemDto.setCriteriaDtos(criteriaDtos);
+	
+	return itemDto;
     }
 
     @Override
@@ -345,16 +414,13 @@ public class RatingService implements IRatingService {
     }
     
     @Override
-    public boolean isCommentsEnabled(Long toolContentId) {
-	//TODO implement as new DAO method without getting all criterias
-	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
-	
-	boolean isCommentsEnabled = false;
-	for (RatingCriteria criteria : criterias) {
-	    isCommentsEnabled |= criteria.isCommentsEnabled();
-	}
-	
-	return isCommentsEnabled;
+    public boolean isCommentsEnabled(Long toolContentId) {	
+	return ratingCriteriaDAO.isCommentsEnabledForToolContent(toolContentId);
+    }
+    
+    @Override
+    public int getCommentsMinWordsLimit(Long toolContentId) {
+	return ratingCriteriaDAO.getCommentsMinWordsLimitForToolContent(toolContentId);
     }
 
     /* ********** Used by Spring to "inject" the linked objects ************* */

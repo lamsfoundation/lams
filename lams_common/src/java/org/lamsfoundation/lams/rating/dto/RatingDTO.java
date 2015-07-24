@@ -21,38 +21,35 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.rating.dao;
+package org.lamsfoundation.lams.rating.dto;
 
-import java.util.List;
+import org.lamsfoundation.lams.usermanagement.User;
 
-import org.lamsfoundation.lams.rating.model.RatingCriteria;
+/**
+ */
+public class RatingDTO {
 
-public interface IRatingCriteriaDAO {
+    private User learner;
 
-    void saveOrUpdate(RatingCriteria criteria);
-    
-    void deleteRatingCriteria(Long ratingCriteriaId);
-    
-    List<RatingCriteria> getByToolContentId(Long toolContentId);
+    private String rating;
 
-    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId);
-    
-    RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId, Class clasz);
-    
     /**
-     * Checks if comments are enabled (i.e. if comments' criteria is available).
-     * 
-     * @param toolContentId
-     * @return
      */
-    boolean isCommentsEnabledForToolContent(Long toolContentId);
-    
-    /**
-     * If comments enabled then there might be commentsMinWords limit set. Returns its value or 0 otherwise.
-     * 
-     * @param toolContentId
-     * @return
-     */
-    int getCommentsMinWordsLimitForToolContent(Long toolContentId);
+    public User getLearner() {
+	return learner;
+    }
 
+    public void setLearner(User learner) {
+	this.learner = learner;
+    }
+
+    /**
+     */
+    public void setRating(String rating) {
+	this.rating = rating;
+    }
+
+    public String getRating() {
+	return this.rating;
+    }
 }

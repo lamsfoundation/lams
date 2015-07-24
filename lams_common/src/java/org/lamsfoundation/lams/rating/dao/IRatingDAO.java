@@ -36,6 +36,8 @@ public interface IRatingDAO {
     void saveOrUpdate(Object object);
 
     Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId);
+    
+    List<Rating> getRatingsByItem(Long contentId, Long itemId);
 
     List<Rating> getRatingsByUser(Long contentId, Integer userId);
 

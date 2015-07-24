@@ -23,6 +23,8 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.rating.dto;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
 public class ItemRatingCriteriaDTO {
@@ -34,6 +36,9 @@ public class ItemRatingCriteriaDTO {
     private String userRating;
     private String averageRating;
     private String numberOfVotes;
+    
+    //used in case of filling with all rating
+    private List<RatingDTO> ratingDtos;    
 
     public ItemRatingCriteriaDTO() {
     }
@@ -73,6 +78,14 @@ public class ItemRatingCriteriaDTO {
 
     public void setNumberOfVotes(String numberOfVotes) {
 	this.numberOfVotes = numberOfVotes;
+    }
+    
+    public List<RatingDTO> getRatingDtos() {
+	return ratingDtos;
+    }
+
+    public void setRatingDtos(List<RatingDTO> ratingDtos) {
+	this.ratingDtos = ratingDtos;
     }
   
 }

@@ -99,4 +99,10 @@ public interface ILamsToolService {
      * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
+    
+    /**
+     * @param toolSessionId
+     * @return
+     */
+    Set<User> getUsersFromGroupingActivity(Long toolSessionId);
 }
