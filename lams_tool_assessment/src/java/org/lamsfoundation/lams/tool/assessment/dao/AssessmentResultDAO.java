@@ -18,34 +18,34 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.dao;  
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.assessment.dao;
 
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
- 
+
 public interface AssessmentResultDAO extends DAO {
 
     List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId);
-    
+
     List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId);
-    
+
+    List<AssessmentResult> getFinishedAssessmentResultsBySession(Long sessionId, Long userId);
+
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
-    
+
     AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
-    
+
     Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId);
-    
+
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
     AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId);
-    
-    int getAssessmentResultCount(Long assessmentUid, Long userId);
-    
-    AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
 
+    int getAssessmentResultCount(Long assessmentUid, Long userId);
+
+    AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
 }
- 

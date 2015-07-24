@@ -18,34 +18,34 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.dao.hibernate;  
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
- 
+
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
-    
-    private static final String FIND_BY_ASSESSMENT_AND_USER = "FROM " 
-	    + AssessmentResult.class.getName()
+
+    private static final String FIND_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? ORDER BY r.startDate DESC LIMIT 1";
-    
-    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM "
-	    + AssessmentResult.class.getName()
+
+    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
-    
+
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
 
-    private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "FROM "
-	    + AssessmentResult.class.getName()
+    private static final String FIND_BY_SESSION_AND_USER = "FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=?";
+
+    private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
-    
+
     private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
@@ -53,11 +53,11 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
-    
+
     private static final String FIND_LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
-    
+
     private static final String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select r.finishDate - r.startDate FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
@@ -66,64 +66,78 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 
     @Override
     public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
-	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
+	return getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED,
+		new Object[] { userId, assessmentUid });
     }
-    
+
+    @Override
+    public List<AssessmentResult> getFinishedAssessmentResultsBySession(Long sessionId, Long userId) {
+	return getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER_AND_FINISHED,
+		new Object[] { userId, sessionId });
+    }
+
     @Override
     public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
-	return getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED, new Object[] { userId, sessionId });
+	return getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER,
+		new Object[] { userId, sessionId });
     }
-    
+
     @Override
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
+	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_BY_ASSESSMENT_AND_USER,
+		new Object[] { userId, assessmentUid });
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (AssessmentResult) list.get(0);
 	}
     }
-    
+
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
+	List list = getHibernateTemplate().find(
+		AssessmentResultDAOHibernate.FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1,
+		new Object[] { userId, assessmentUid });
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (AssessmentResult) list.get(0);
 	}
     }
-    
+
     @Override
     public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_LAST_ASSESSMENT_RESULT_GRADE, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return null;   
+	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_LAST_ASSESSMENT_RESULT_GRADE,
+		new Object[] { userId, assessmentUid });
+	if ((list == null) || (list.size() == 0)) {
+	    return null;
 	} else {
 	    return ((Number) list.get(0)).floatValue();
 	}
     }
-    
+
     @Override
     public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
-	
+
 	String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
-		    + AssessmentResult.class.getName()
-		    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
-	
-	
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_TIME_TAKEN, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return null;   
+		+ AssessmentResult.class.getName()
+		+ " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+
+	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_TIME_TAKEN,
+		new Object[] { userId, assessmentUid });
+	if ((list == null) || (list.size() == 0)) {
+	    return null;
 	} else {
 	    return ((Number) list.get(0)).intValue();
 	}
     }
-    
+
     @Override
     public AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1, new Object[] { userId, sessionId });
-	if (list == null || list.size() == 0) {
+	List list = getHibernateTemplate().find(
+		AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1,
+		new Object[] { userId, sessionId });
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (AssessmentResult) list.get(0);
@@ -132,22 +146,24 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 
     @Override
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
-	if (list == null || list.size() == 0) {
-	    return 0;   
+	List list = getHibernateTemplate().find(
+		AssessmentResultDAOHibernate.FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER,
+		new Object[] { userId, assessmentUid });
+	if ((list == null) || (list.size() == 0)) {
+	    return 0;
 	} else {
 	    return ((Number) list.get(0)).intValue();
 	}
     }
-    
+
     @Override
     public AssessmentResult getAssessmentResultByUid(Long assessmentResultUid) {
-	List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { assessmentResultUid });
-	if (list == null || list.size() == 0)
+	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_BY_UID,
+		new Object[] { assessmentResultUid });
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
+	}
 	return (AssessmentResult) list.get(0);
     }
 
 }
-
- 
