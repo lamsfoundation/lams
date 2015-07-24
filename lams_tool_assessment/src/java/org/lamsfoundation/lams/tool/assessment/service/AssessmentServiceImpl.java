@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -115,7 +114,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * @author Andrey Balan
  */
 public class AssessmentServiceImpl implements IAssessmentService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, ToolRestManager{
+	ToolContentImport102Manager, ToolRestManager {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -148,7 +147,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-    
+
     private IGradebookService gradebookService;
 
     private ICoreNotebookService coreNotebookService;
@@ -156,9 +155,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private IEventNotificationService eventNotificationService;
 
     private ILessonService lessonService;
-    
+
     private IActivityDAO activityDAO;
-    
+
     private IUserManagementService userService;
 
     // *******************************************************************************
@@ -169,14 +168,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
 	AssessmentUser groupLeader = session.getGroupLeader();
-	
+
 	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
 	return isUserLeader;
     }
-    
+
     @Override
     public AssessmentUser checkLeaderSelectToolForSessionLeader(AssessmentUser user, Long toolSessionId) {
-	if (user == null || toolSessionId == null) {
+	if ((user == null) || (toolSessionId == null)) {
 	    return null;
 	}
 
@@ -192,7 +191,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 		// create new user in a DB
 		if (leader == null) {
-		    log.debug("creating new user with userId: " + leaderUserId);
+		    AssessmentServiceImpl.log.debug("creating new user with userId: " + leaderUserId);
 		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
@@ -208,7 +207,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	return leader;
     }
-    
+
     @Override
     public void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader) {
 
@@ -217,7 +216,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	Long assessmentUid = leader.getSession().getAssessment().getUid();
 
-	AssessmentResult leaderResult = assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid, leader.getUserId());
+	AssessmentResult leaderResult = assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid,
+		leader.getUserId());
 	AssessmentResult userResult = assessmentResultDao.getLastAssessmentResult(assessmentUid, user.getUserId());
 	Set<AssessmentQuestionResult> leaderQuestionResults = leaderResult.getQuestionResults();
 
@@ -227,17 +227,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    userResult.setAssessment(leaderResult.getAssessment());
 	    userResult.setUser(user);
 	    userResult.setSessionId(leaderResult.getSessionId());
-	    
+
 	    Set<AssessmentQuestionResult> userQuestionResults = userResult.getQuestionResults();
-	    for (AssessmentQuestionResult leaderQuestionResult: leaderQuestionResults) {
+	    for (AssessmentQuestionResult leaderQuestionResult : leaderQuestionResults) {
 		AssessmentQuestionResult userQuestionResult = new AssessmentQuestionResult();
 		userQuestionResult.setAssessmentQuestion(leaderQuestionResult.getAssessmentQuestion());
 		userQuestionResult.setAssessmentResult(userResult);
 		userQuestionResults.add(userQuestionResult);
-		
+
 		Set<AssessmentOptionAnswer> leaderOptionAnswers = leaderQuestionResult.getOptionAnswers();
 		Set<AssessmentOptionAnswer> userOptionAnswers = userQuestionResult.getOptionAnswers();
-		for (AssessmentOptionAnswer leaderOptionAnswer: leaderOptionAnswers) {
+		for (AssessmentOptionAnswer leaderOptionAnswer : leaderOptionAnswers) {
 		    AssessmentOptionAnswer userOptionAnswer = new AssessmentOptionAnswer();
 		    userOptionAnswer.setOptionUid(leaderOptionAnswer.getOptionUid());
 		    userOptionAnswers.add(userOptionAnswer);
@@ -245,17 +245,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
 
-	//copy results from leader to user in both cases (when there is no userResult yet and when if it's been changed by the leader)
+	// copy results from leader to user in both cases (when there is no userResult yet and when if it's been changed
+	// by the leader)
 	userResult.setStartDate(leaderResult.getStartDate());
 	userResult.setFinishDate(leaderResult.getFinishDate());
 	userResult.setMaximumGrade(leaderResult.getMaximumGrade());
 	userResult.setGrade(leaderResult.getGrade());
-	
+
 	Set<AssessmentQuestionResult> userQuestionResults = userResult.getQuestionResults();
 	for (AssessmentQuestionResult leaderQuestionResult : leaderQuestionResults) {
 	    for (AssessmentQuestionResult userQuestionResult : userQuestionResults) {
-		if (userQuestionResult.getAssessmentQuestion().getUid().equals(leaderQuestionResult.getAssessmentQuestion().getUid())) {
-		    
+		if (userQuestionResult.getAssessmentQuestion().getUid()
+			.equals(leaderQuestionResult.getAssessmentQuestion().getUid())) {
+
 		    userQuestionResult.setAnswerString(leaderQuestionResult.getAnswerString());
 		    userQuestionResult.setAnswerFloat(leaderQuestionResult.getAnswerFloat());
 		    userQuestionResult.setAnswerBoolean(leaderQuestionResult.getAnswerBoolean());
@@ -269,22 +271,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    for (AssessmentOptionAnswer leaderOptionAnswer : leaderOptionAnswers) {
 			for (AssessmentOptionAnswer userOptionAnswer : userOptionAnswers) {
 			    if (userOptionAnswer.getOptionUid().equals(leaderOptionAnswer.getOptionUid())) {
-				
+
 				userOptionAnswer.setAnswerBoolean(leaderOptionAnswer.getAnswerBoolean());
 				userOptionAnswer.setAnswerInt(leaderOptionAnswer.getAnswerInt());
-				
+
 			    }
 			}
 
 		    }
-		    
+
 		}
 	    }
 	}
-	
+
 	assessmentResultDao.saveObject(userResult);
     }
-    
+
     @Override
     public List<AssessmentUser> getUsersBySession(Long toolSessionID) {
 	return assessmentUserDao.getBySessionID(toolSessionID);
@@ -335,13 +337,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void saveOrUpdateAssessment(Assessment assessment) {
 	assessmentDao.saveObject(assessment);
     }
-    
+
     @Override
     public void releaseQuestionsAndReferencesFromCache(Assessment assessment) {
-	for (AssessmentQuestion question : (Set<AssessmentQuestion>)assessment.getQuestions()) {
+	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
 	    assessmentQuestionDao.evict(question);
 	}
-	for (QuestionReference reference : (Set<QuestionReference>)assessment.getQuestionReferences()) {
+	for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
 	    assessmentQuestionDao.evict(reference);
 	}
     }
@@ -350,7 +352,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void deleteAssessmentQuestion(Long uid) {
 	assessmentQuestionDao.removeObject(AssessmentQuestion.class, uid);
     }
-    
+
     @Override
     public void deleteQuestionReference(Long uid) {
 	assessmentQuestionDao.removeObject(QuestionReference.class, uid);
@@ -396,11 +398,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
-	//don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
+	// don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
 	if ((lastResult != null) && (lastResult.getFinishDate() == null)) {
 	    return;
 	}
-	
+
 	AssessmentResult result = new AssessmentResult();
 	result.setAssessment(assessment);
 	result.setUser(assessmentUser);
@@ -413,37 +415,39 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public boolean storeUserAnswers(Long assessmentUid, Long userId,
 	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
 	    boolean isAutosave) {
-	
+
 	int maximumGrade = 0;
 	float grade = 0;
 
 	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
 	Assessment assessment = result.getAssessment();
-	
-	//prohibit users from submitting (or autosubmitting) answers after result is finished but Resubmit button is not pressed (e.g. using 2 browsers) 
+
+	// prohibit users from submitting (or autosubmitting) answers after result is finished but Resubmit button is
+	// not pressed (e.g. using 2 browsers)
 	if (result.getFinishDate() != null) {
 	    return false;
 	}
-	
-	//store all answers (in all pages)
+
+	// store all answers (in all pages)
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
-		
-		//in case single MarkHedging question needs to be stored -- search for that question
+
+		// in case single MarkHedging question needs to be stored -- search for that question
 		if ((singleMarkHedgingQuestionUid != null) && !question.getUid().equals(singleMarkHedgingQuestionUid)) {
 		    continue;
 		}
-		
+
 		// In case if assessment was updated after result has been started check question still exists in DB as
 		// it could be deleted if modified in monitor.
 		if ((assessment.getUpdated() != null) && assessment.getUpdated().after(result.getStartDate())) {
 
 		    Set<QuestionReference> references = assessment.getQuestionReferences();
 		    Set<AssessmentQuestion> questions = assessment.getQuestions();
-		    
+
 		    boolean isQuestionExists = false;
 		    for (QuestionReference reference : references) {
-			if (!reference.isRandomQuestion() && reference.getQuestion().getUid().equals(question.getUid())) {
+			if (!reference.isRandomQuestion()
+				&& reference.getQuestion().getUid().equals(question.getUid())) {
 			    isQuestionExists = true;
 			    break;
 			}
@@ -460,34 +464,36 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			continue;
 		    }
 		}
-		
+
 		float userQeustionGrade = storeUserAnswer(result, question, isAutosave);
 		grade += userQeustionGrade;
 
 		maximumGrade += question.getGrade();
 	    }
 	}
-	
-	//store grades and finished date only on user hitting submit all answers button (and not submit mark hedging question)
-	boolean isStoreResult = !isAutosave && singleMarkHedgingQuestionUid == null;
+
+	// store grades and finished date only on user hitting submit all answers button (and not submit mark hedging
+	// question)
+	boolean isStoreResult = !isAutosave && (singleMarkHedgingQuestionUid == null);
 	if (isStoreResult) {
 	    result.setMaximumGrade(maximumGrade);
 	    result.setGrade(grade);
 	    result.setFinishDate(new Timestamp(new Date().getTime()));
 	    assessmentResultDao.saveObject(result);
 	}
-	
+
 	return true;
     }
 
     /**
      * Stores given AssessmentQuestion's answer.
      * 
-     * @param isAutosave in case of autosave there is no need to calculate marks
+     * @param isAutosave
+     *            in case of autosave there is no need to calculate marks
      * @return grade that user scored by answering that question
      */
     private float storeUserAnswer(AssessmentResult assessmentResult, AssessmentQuestion question, boolean isAutosave) {
-	
+
 	AssessmentQuestionResult questionAnswer = null;
 	// get questionResult from DB instance of AssessmentResult
 	for (AssessmentQuestionResult dbQuestionAnswer : assessmentResult.getQuestionResults()) {
@@ -495,31 +501,31 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		questionAnswer = dbQuestionAnswer;
 	    }
 	}
-	
-	//create new questionAnswer if it's nonexistent
+
+	// create new questionAnswer if it's nonexistent
 	if (questionAnswer == null) {
 	    questionAnswer = new AssessmentQuestionResult();
 	    questionAnswer.setAssessmentQuestion(question);
 	    questionAnswer.setAssessmentResult(assessmentResult);
-	    
+
 	    Set<AssessmentOptionAnswer> optionAnswers = questionAnswer.getOptionAnswers();
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
 		optionAnswer.setOptionUid(option.getUid());
 		optionAnswers.add(optionAnswer);
 	    }
-	    
+
 	    assessmentQuestionResultDao.saveObject(questionAnswer);
 	}
-	
-	//store question answer values
+
+	// store question answer values
 	questionAnswer.setAnswerBoolean(question.getAnswerBoolean());
 	questionAnswer.setAnswerFloat(question.getAnswerFloat());
 	questionAnswer.setAnswerString(question.getAnswerString());
 
 	int j = 0;
 	for (AssessmentQuestionOption option : question.getOptions()) {
-	    
+
 	    // get optionAnswer from questionAnswer
 	    AssessmentOptionAnswer optionAnswer = null;
 	    for (AssessmentOptionAnswer dbOptionAnswer : questionAnswer.getOptionAnswers()) {
@@ -527,8 +533,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    optionAnswer = dbOptionAnswer;
 		}
 	    }
-	    
-	    //store option answer values
+
+	    // store option answer values
 	    optionAnswer.setAnswerBoolean(option.getAnswerBoolean());
 	    optionAnswer.setAnswerInt(option.getAnswerInt());
 	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
@@ -543,18 +549,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		if (option.getAnswerBoolean()) {
 		    mark += option.getGrade() * maxMark;
-		    
-		    //if option of "incorrect answer nullifies mark" is ON check if selected answer has a zero grade and if so nullify question's mark 
-		    if (question.isIncorrectAnswerNullifiesMark() && option.getGrade() == 0) {
+
+		    // if option of "incorrect answer nullifies mark" is ON check if selected answer has a zero grade
+		    // and if so nullify question's mark
+		    if (question.isIncorrectAnswerNullifiesMark() && (option.getGrade() == 0)) {
 			isMarkNullified = true;
 		    }
 		}
 	    }
-	    
+
 	    if (isMarkNullified) {
 		mark = 0;
 	    }
-	    
+
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 	    float maxMarkForCorrectAnswer = maxMark / question.getOptions().size();
 	    for (AssessmentQuestionOption option : question.getOptions()) {
@@ -562,7 +569,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
-	    
+
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		String optionString = option.getOptionString().trim().replaceAll("\\*", ".*");
@@ -570,11 +577,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		if (question.isCaseSensitive()) {
 		    pattern = Pattern.compile(optionString);
 		} else {
-		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE
-			    | java.util.regex.Pattern.UNICODE_CASE);
+		    pattern = Pattern.compile(optionString,
+			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
-		boolean isAnswerCorrect = (question.getAnswerString() != null) ? pattern.matcher(
-			question.getAnswerString().trim()).matches() : false;
+		boolean isAnswerCorrect = (question.getAnswerString() != null)
+			? pattern.matcher(question.getAnswerString().trim()).matches() : false;
 
 		if (isAnswerCorrect) {
 		    mark = option.getGrade() * maxMark;
@@ -582,7 +589,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    break;
 		}
 	    }
-	    
+
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    String answerString = question.getAnswerString();
 	    if (answerString != null) {
@@ -590,25 +597,25 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    boolean isAnswerCorrect = false;
 		    try {
 			float answerFloat = Float.valueOf(question.getAnswerString());
-			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError())) && (answerFloat <= (option
-				.getOptionFloat() + option.getAcceptedError())));
+			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
+				&& (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
 
 		    if (!isAnswerCorrect) {
 			for (AssessmentUnit unit : question.getUnits()) {
 			    String regex = ".*" + unit.getUnit() + "$";
-			    Pattern pattern = Pattern.compile(regex, java.util.regex.Pattern.CASE_INSENSITIVE
-				    | java.util.regex.Pattern.UNICODE_CASE);
+			    Pattern pattern = Pattern.compile(regex,
+				    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 			    if (pattern.matcher(answerString).matches()) {
-				String answerFloatStr = answerString.substring(0, answerString.length()
-					- unit.getUnit().length());
+				String answerFloatStr = answerString.substring(0,
+					answerString.length() - unit.getUnit().length());
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
-				    isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option
-					    .getAcceptedError())) && (answerFloat <= (option.getOptionFloat() + option
-					    .getAcceptedError())));
+				    isAnswerCorrect = ((answerFloat >= (option.getOptionFloat()
+					    - option.getAcceptedError()))
+					    && (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
 				    if (isAnswerCorrect) {
 					break;
 				    }
@@ -624,12 +631,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    }
 		}
 	    }
-	    
+
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
-	    if (question.getAnswerBoolean() == question.getCorrectAnswer() && question.getAnswerString() != null) {
+	    if ((question.getAnswerBoolean() == question.getCorrectAnswer()) && (question.getAnswerString() != null)) {
 		mark = maxMark;
 	    }
-	    
+
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / question.getOptions().size();
 	    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(
@@ -643,7 +650,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
-	    
+
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		if (option.isCorrect()) {
@@ -652,16 +659,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	}
-	
-	//we start calculating and storing marks only in case it's not an autosave request
+
+	// we start calculating and storing marks only in case it's not an autosave request
 	if (!isAutosave) {
-	    
+
 	    questionAnswer.setFinishDate(new Date());
 
 	    if (mark > maxMark) {
 		mark = maxMark;
-	
-	    // in case options have negative grades (<0), their total mark can't be less than -maxMark
+
+		// in case options have negative grades (<0), their total mark can't be less than -maxMark
 	    } else if (mark < -maxMark) {
 		mark = -maxMark;
 	    }
@@ -681,19 +688,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    penalty = maxMark;
 		}
 		questionAnswer.setPenalty(penalty);
-		
-		//don't let penalty make mark less than 0
+
+		// don't let penalty make mark less than 0
 		if (mark < 0) {
 		    mark = 0;
 		}
 	    }
-	    
+
 	    questionAnswer.setMark(mark);
 	    questionAnswer.setMaxMark(maxMark);
-	    //for displaying purposes in case of submitSingleMarkHedgingQuestion() Ajax call
+	    // for displaying purposes in case of submitSingleMarkHedgingQuestion() Ajax call
 	    question.setMark(mark);
 	}
-	
+
 	return mark;
     }
 
@@ -706,17 +713,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid, userId);
     }
-    
+
     @Override
     public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastFinishedAssessmentResultGrade(assessmentUid, userId);
     }
-    
+
     @Override
     public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastFinishedAssessmentResultTimeTaken(assessmentUid, userId);
     }
-    
+
     @Override
     public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {
 	AssessmentResult result = getLastFinishedAssessmentResult(assessmentUid, userId);
@@ -730,16 +737,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId,
-	    Long questionUid) {
+    public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
 	return assessmentQuestionResultDao.getAssessmentQuestionResultList(assessmentUid, userId, questionUid);
     }
-    
+
     @Override
     public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
 	return assessmentQuestionResultDao.getQuestionResultMark(assessmentUid, userId, questionSequenceId);
     }
-    
+
     @Override
     public Long createNotebookEntry(Long sessionId, Integer userId, String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -750,7 +756,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public NotebookEntry getEntry(Long sessionId, Integer userId) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		AssessmentConstants.TOOL_SIGNATURE, userId);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -761,7 +767,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
-    
+
     @Override
     public List<ReflectDTO> getReflectList(Long contentId) {
 	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
@@ -777,18 +783,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		if (entry != null) {
 		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified() : entry
-			    .getCreateDate();
+		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+			    : entry.getCreateDate();
 		    ref.setDate(postedDate);
 		    reflectList.add(ref);
 		}
-		
+
 	    }
 	}
 
 	return reflectList;
     }
-
 
     @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException {
@@ -832,11 +837,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    } else {
 		users = assessmentUserDao.getBySessionID(sessionId);
 	    }
-	    
+
 	    ArrayList<AssessmentResult> assessmentResults = new ArrayList<AssessmentResult>();
 	    for (AssessmentUser user : users) {
-		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(
-			sessionId, user.getUserId());
+		AssessmentResult assessmentResult = assessmentResultDao
+			.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
 		if (assessmentResult == null) {
 		    assessmentResult = new AssessmentResult();
 		    assessmentResult.setUser(user);
@@ -852,7 +857,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    summaryList.add(summary);
 	}
 
-	escapeQuotes(summaryList);
+	AssessmentServiceImpl.escapeQuotes(summaryList);
 
 	return summaryList;
     }
@@ -866,7 +871,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    new AssessmentQuestionResultComparator());
 	    questionResults.addAll(lastFinishedResult.getQuestionResults());
 	    lastFinishedResult.setQuestionResults(questionResults);
-	    escapeQuotes(lastFinishedResult);
+	    AssessmentServiceImpl.escapeQuotes(lastFinishedResult);
 	}
 
 	return lastFinishedResult;
@@ -877,13 +882,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
-	List<AssessmentResult> results = assessmentResultDao.getAssessmentResultsBySession(sessionId, userId);
+	List<AssessmentResult> results = assessmentResultDao.getFinishedAssessmentResultsBySession(sessionId, userId);
 	userSummary.setNumberOfAttempts(results.size());
 
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
 		userId);
-	long timeTaken = lastFinishedResult == null ? 0 : lastFinishedResult.getFinishDate().getTime()
-		- lastFinishedResult.getStartDate().getTime();
+	long timeTaken = lastFinishedResult == null ? 0
+		: lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime();
 	userSummary.setTimeOfLastAttempt(new Date(timeTaken));
 	if (lastFinishedResult != null) {
 	    userSummary.setLastAttemptGrade(lastFinishedResult.getGrade());
@@ -899,17 +904,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    for (AssessmentResult result : results) {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
-			
-			//for displaying purposes, no saving occurrs
+
+			// for displaying purposes, no saving occurrs
 			questionResult.setFinishDate(result.getFinishDate());
-			
+
 			questionResultsForSummary.add(questionResult);
 			break;
 		    }
 		}
 	    }
-	    
-	    //skip questions without answers
+
+	    // skip questions without answers
 	    if (questionResultsForSummary.isEmpty()) {
 		continue;
 	    } else {
@@ -919,7 +924,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	userSummary.setUserSummaryItems(userSummaryItems);
 
-	escapeQuotes(userSummary);
+	AssessmentServiceImpl.escapeQuotes(userSummary);
 
 	return userSummary;
     }
@@ -933,14 +938,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	List<List<AssessmentQuestionResult>> questionResults = new ArrayList<List<AssessmentQuestionResult>>();
 	SortedSet<AssessmentSession> sessionList = new TreeSet<AssessmentSession>(new AssessmentSessionComparator());
 	sessionList.addAll(assessmentSessionDao.getByContentId(contentId));
-	
+
 	for (AssessmentSession session : sessionList) {
-	    
+
 	    Assessment assessment = session.getAssessment();
 	    Long sessionId = session.getSessionId();
 	    List<AssessmentUser> users = new ArrayList<AssessmentUser>();
-	    
-	    //in case of leader aware tool show only leaders' responses
+
+	    // in case of leader aware tool show only leaders' responses
 	    if (assessment.isUseSelectLeaderToolOuput()) {
 		AssessmentUser leader = session.getGroupLeader();
 		if (leader != null) {
@@ -949,11 +954,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    } else {
 		users = assessmentUserDao.getBySessionID(sessionId);
 	    }
-	    
+
 	    ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<AssessmentQuestionResult>();
 	    for (AssessmentUser user : users) {
-		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(
-			sessionId, user.getUserId());
+		AssessmentResult assessmentResult = assessmentResultDao
+			.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
 		AssessmentQuestionResult questionResult = null;
 		if (assessmentResult == null) {
 		    questionResult = new AssessmentQuestionResult();
@@ -989,7 +994,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	float averageMark = (count == 0) ? 0 : total / count;
 	questionSummary.setAverageMark(averageMark);
 
-	escapeQuotes(questionSummary);
+	AssessmentServiceImpl.escapeQuotes(questionSummary);
 
 	return questionSummary;
     }
@@ -1000,12 +1005,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		.getAssessmentQuestionResultByUid(questionResultUid);
 	float oldMark = questionAnswer.getMark();
 	AssessmentResult assessmentResult = questionAnswer.getAssessmentResult();
-	float totalMark = assessmentResult.getGrade() - oldMark + newMark;
-	
+	float totalMark = (assessmentResult.getGrade() - oldMark) + newMark;
+
 	Long toolSessionId = assessmentResult.getSessionId();
 	Assessment assessment = assessmentResult.getAssessment();
 	Long questionUid = questionAnswer.getAssessmentQuestion().getUid();
-	
+
 	// When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
 	// students within the group
 	List<AssessmentUser> users = new ArrayList<AssessmentUser>();
@@ -1016,21 +1021,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    AssessmentUser user = assessmentResult.getUser();
 	    users.add(user);
 	}
-	
+
 	for (AssessmentUser user : users) {
 	    Long userId = user.getUserId();
-	    
+
 	    List<Object[]> questionResults = assessmentQuestionResultDao
 		    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionUid);
 
-	    if (questionResults == null || questionResults.isEmpty()) {
-		log.warn("User with uid: " + user.getUid() + " doesn't have any results despite the fact group leader has some.");
+	    if ((questionResults == null) || questionResults.isEmpty()) {
+		AssessmentServiceImpl.log.warn("User with uid: " + user.getUid()
+			+ " doesn't have any results despite the fact group leader has some.");
 		continue;
 	    }
-	    
+
 	    Object[] lastAssessmentQuestionResultObj = questionResults.get(questionResults.size() - 1);
 	    AssessmentQuestionResult lastAssessmentQuestionResult = (AssessmentQuestionResult) lastAssessmentQuestionResultObj[0];
-	    
+
 	    lastAssessmentQuestionResult.setMark(newMark);
 	    assessmentQuestionResultDao.saveObject(lastAssessmentQuestionResult);
 
@@ -1054,51 +1060,51 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences,
 	    List<QuestionReference> deletedReferences) {
 
-	//create list of modified questions
+	// create list of modified questions
 	List<AssessmentQuestion> modifiedQuestions = new ArrayList<AssessmentQuestion>();
 	for (AssessmentQuestion oldQuestion : oldQuestions) {
 	    for (AssessmentQuestion newQuestion : newQuestions) {
 		if (oldQuestion.getUid().equals(newQuestion.getUid())) {
-		    
+
 		    boolean isQuestionModified = false;
 
-		    //title or question is different
+		    // title or question is different
 		    if (!oldQuestion.getTitle().equals(newQuestion.getTitle())
 			    || !oldQuestion.getQuestion().equals(newQuestion.getQuestion())
 			    || (oldQuestion.getCorrectAnswer() != newQuestion.getCorrectAnswer())) {
 			isQuestionModified = true;
 		    }
-		    
-		    //options are different
+
+		    // options are different
 		    Set<AssessmentQuestionOption> oldOptions = oldQuestion.getOptions();
 		    Set<AssessmentQuestionOption> newOptions = newQuestion.getOptions();
 		    for (AssessmentQuestionOption oldOption : oldOptions) {
 			for (AssessmentQuestionOption newOption : newOptions) {
 			    if (oldOption.getUid().equals(newOption.getUid())) {
-				
-				if (((oldQuestion.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) && (oldOption
-					.getSequenceId() != newOption.getSequenceId()))
+
+				if (((oldQuestion.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)
+					&& (oldOption.getSequenceId() != newOption.getSequenceId()))
 					|| !StringUtils.equals(oldOption.getQuestion(), newOption.getQuestion())
 					|| !StringUtils.equals(oldOption.getOptionString(), newOption.getOptionString())
 					|| (oldOption.getOptionFloat() != newOption.getOptionFloat())
 					|| (oldOption.getAcceptedError() != newOption.getAcceptedError())
 					|| (oldOption.getGrade() != newOption.getGrade())) {
 				    isQuestionModified = true;
-				}			
+				}
 			    }
 			}
 		    }
-		    
+
 		    if (isQuestionModified) {
 			modifiedQuestions.add(newQuestion);
 		    }
 		}
-	    }    
+	    }
 	}
 
-	//create list of modified references
-	//modifiedReferences holds pairs newReference -> oldReference.getDefaultGrade()
-	Map<QuestionReference, Integer> modifiedReferences= new HashMap<QuestionReference, Integer>();
+	// create list of modified references
+	// modifiedReferences holds pairs newReference -> oldReference.getDefaultGrade()
+	Map<QuestionReference, Integer> modifiedReferences = new HashMap<QuestionReference, Integer>();
 	for (QuestionReference oldReference : oldReferences) {
 	    for (QuestionReference newReference : newReferences) {
 		if (oldReference.getUid().equals(newReference.getUid())
@@ -1107,37 +1113,37 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	}
-	
-	//create list of added references
-	List<QuestionReference> addedReferences= new ArrayList<QuestionReference>();
+
+	// create list of added references
+	List<QuestionReference> addedReferences = new ArrayList<QuestionReference>();
 	for (QuestionReference newReference : newReferences) {
 	    boolean isNewReferenceMetInOldReferences = false;
-	    
+
 	    for (QuestionReference oldReference : oldReferences) {
 		if (oldReference.getUid().equals(newReference.getUid())) {
 		    isNewReferenceMetInOldReferences = true;
 		}
 	    }
-	    
-	    //if the new reference was not met in old references then it's the newly added reference
+
+	    // if the new reference was not met in old references then it's the newly added reference
 	    if (!isNewReferenceMetInOldReferences) {
 		addedReferences.add(newReference);
 	    }
 	}
-	
+
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(assessment.getContentId());
 	for (AssessmentSession session : sessionList) {
 	    Long toolSessionId = session.getSessionId();
 	    Set<AssessmentUser> sessionUsers = session.getAssessmentUsers();
-	    
+
 	    for (AssessmentUser user : sessionUsers) {
-		
-		//get all finished user results
-		List<AssessmentResult> assessmentResults = assessmentResultDao.getAssessmentResults(
-			assessment.getUid(), user.getUserId());
-		AssessmentResult lastAssessmentResult = (assessmentResults.isEmpty()) ? null : assessmentResults
-			.get(assessmentResults.size() - 1);
-		
+
+		// get all finished user results
+		List<AssessmentResult> assessmentResults = assessmentResultDao.getAssessmentResults(assessment.getUid(),
+			user.getUserId());
+		AssessmentResult lastAssessmentResult = (assessmentResults.isEmpty()) ? null
+			: assessmentResults.get(assessmentResults.size() - 1);
+
 		for (AssessmentResult assessmentResult : assessmentResults) {
 
 		    float assessmentMark = assessmentResult.getGrade();
@@ -1148,10 +1154,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    while (iter.hasNext()) {
 			AssessmentQuestionResult questionAnswer = iter.next();
 			AssessmentQuestion question = questionAnswer.getAssessmentQuestion();
-			
+
 			boolean isRemoveQuestionResult = false;
 
-			//[+] if the question reference was removed
+			// [+] if the question reference was removed
 			for (QuestionReference deletedReference : deletedReferences) {
 			    if (!deletedReference.isRandomQuestion()
 				    && question.getUid().equals(deletedReference.getQuestion().getUid())) {
@@ -1160,8 +1166,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 				break;
 			    }
 			}
-    		    
-			//[+] if the question reference mark is modified
+
+			// [+] if the question reference mark is modified
 			for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
 			    if (!modifiedReference.isRandomQuestion()
 				    && question.getUid().equals(modifiedReference.getQuestion().getUid())) {
@@ -1170,7 +1176,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 				// update question answer's mark
 				Float oldQuestionAnswerMark = questionAnswer.getMark();
-				float newQuestionAnswerMark = oldQuestionAnswerMark * newReferenceGrade
+				float newQuestionAnswerMark = (oldQuestionAnswerMark * newReferenceGrade)
 					/ oldReferenceGrade;
 				questionAnswer.setMark(newQuestionAnswerMark);
 				questionAnswer.setMaxMark((float) newReferenceGrade);
@@ -1183,22 +1189,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 			}
 
-			//[+] if the question is modified
+			// [+] if the question is modified
 			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
 			    if (question.getUid().equals(modifiedQuestion.getUid())) {
 				isRemoveQuestionResult = true;
 				break;
 			    }
 			}
-			
-			//[+] if the question was removed 
+
+			// [+] if the question was removed
 			for (AssessmentQuestion deletedQuestion : deletedQuestions) {
 			    if (question.getUid().equals(deletedQuestion.getUid())) {
 				isRemoveQuestionResult = true;
 				break;
 			    }
 			}
-			
+
 			if (isRemoveQuestionResult) {
 
 			    assessmentMark -= questionAnswer.getMark();
@@ -1206,34 +1212,35 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
 				    questionAnswer.getUid());
 			}
-			
-			//[+] doing nothing if the new question was added
+
+			// [+] doing nothing if the new question was added
 
 		    }
-		    
-		    //find all question answers from random question reference
+
+		    // find all question answers from random question reference
 		    ArrayList<AssessmentQuestionResult> nonRandomQuestionAnswers = new ArrayList<AssessmentQuestionResult>();
 		    for (AssessmentQuestionResult questionAnswer : questionAnswers) {
 			for (QuestionReference reference : newReferences) {
-			    if (!reference.isRandomQuestion()
-				    && questionAnswer.getAssessmentQuestion().getUid().equals(reference.getQuestion().getUid())) {
+			    if (!reference.isRandomQuestion() && questionAnswer.getAssessmentQuestion().getUid()
+				    .equals(reference.getQuestion().getUid())) {
 				nonRandomQuestionAnswers.add(questionAnswer);
 			    }
 			}
 		    }
-		    Collection<AssessmentQuestionResult> randomQuestionAnswers = CollectionUtils.subtract(
-			    questionAnswers, nonRandomQuestionAnswers);
-		    
+		    Collection<AssessmentQuestionResult> randomQuestionAnswers = CollectionUtils
+			    .subtract(questionAnswers, nonRandomQuestionAnswers);
+
 		    // [+] if the question reference was removed (in case of random question references)
 		    for (QuestionReference deletedReference : deletedReferences) {
-			
-			//in case of random question reference - search for the answer with the same maxmark
+
+			// in case of random question reference - search for the answer with the same maxmark
 			if (deletedReference.isRandomQuestion()) {
-			    
+
 			    Iterator<AssessmentQuestionResult> iter2 = randomQuestionAnswers.iterator();
 			    while (iter2.hasNext()) {
 				AssessmentQuestionResult randomQuestionAnswer = iter2.next();
-				if (randomQuestionAnswer.getMaxMark().intValue() == deletedReference.getDefaultGrade()) {
+				if (randomQuestionAnswer.getMaxMark().intValue() == deletedReference
+					.getDefaultGrade()) {
 
 				    assessmentMark -= randomQuestionAnswer.getMark();
 				    assessmentMaxMark -= deletedReference.getDefaultGrade();
@@ -1249,19 +1256,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 		    // [+] if the question reference mark is modified (in case of random question references)
 		    for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
-			
-			//in case of random question reference - search for the answer with the same maxmark
+
+			// in case of random question reference - search for the answer with the same maxmark
 			if (modifiedReference.isRandomQuestion()) {
-			    
+
 			    for (AssessmentQuestionResult randomQuestionAnswer : randomQuestionAnswers) {
 				int newReferenceGrade = modifiedReference.getDefaultGrade();
 				int oldReferenceGrade = modifiedReferences.get(modifiedReference);
-				    
+
 				if (randomQuestionAnswer.getMaxMark().intValue() == oldReferenceGrade) {
 
 				    // update question answer's mark
 				    Float oldQuestionAnswerMark = randomQuestionAnswer.getMark();
-				    float newQuestionAnswerMark = oldQuestionAnswerMark * newReferenceGrade
+				    float newQuestionAnswerMark = (oldQuestionAnswerMark * newReferenceGrade)
 					    / oldReferenceGrade;
 				    randomQuestionAnswer.setMark(newQuestionAnswerMark);
 				    randomQuestionAnswer.setMaxMark((float) newReferenceGrade);
@@ -1277,13 +1284,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			}
 
 		    }
-		    
-    		    
+
 		    // [+] if the new question reference was added
 		    for (QuestionReference addedReference : addedReferences) {
 			assessmentMaxMark += addedReference.getDefaultGrade();
 		    }
-    
+
 		    // store new mark and maxMark if they were changed
 		    if ((assessmentResult.getGrade() != assessmentMark)
 			    || (assessmentResult.getMaximumGrade() != assessmentMaxMark)) {
@@ -1298,8 +1304,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 			// if this is the last assessment result - propagade total mark to Gradebook
 			if (lastAssessmentResult.getUid().equals(assessmentResult.getUid())) {
-			    gradebookService.updateActivityMark(new Double(assessmentMark), null, user.getUserId()
-				    .intValue(), toolSessionId, true);
+			    gradebookService.updateActivityMark(new Double(assessmentMark), null,
+				    user.getUserId().intValue(), toolSessionId, true);
 			}
 		    }
 
@@ -1307,28 +1313,27 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	    }
 	}
-	
 
     }
-    
+
     @Override
     public void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId) {
-	
+
 	User requestUser = userService.getUserByLogin(requestUserDTO.getLogin());
 	Lesson lesson = lessonService.getLesson(lessonId);
 	Organisation organisation = lesson.getOrganisation();
-	
+
 	// skip doing anything if the user doesn't have permission
 	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId()
-		.equals(OrganisationType.COURSE_TYPE)) ? organisation.getOrganisationId() : organisation
-		.getParentOrganisation().getOrganisationId();
+		.equals(OrganisationType.COURSE_TYPE)) ? organisation.getOrganisationId()
+			: organisation.getParentOrganisation().getOrganisationId();
 	boolean isGroupManager = userService.isUserInRole(requestUser.getUserId(), organisationToCheckPermission,
 		Role.GROUP_MANAGER);
 	if (!(lesson.getLessonClass().isStaffMember(requestUser) || isGroupManager)) {
 	    return;
 	}
 
-	//get all lesson activities
+	// get all lesson activities
 	Set<Activity> lessonActivities = new TreeSet<Activity>();
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
@@ -1337,18 +1342,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
-	Activity firstActivity = activityDAO.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity()
-		.getActivityId());
+	Activity firstActivity = activityDAO
+		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
 	lessonActivities.add(firstActivity);
 	lessonActivities.addAll(lesson.getLearningDesign().getActivities());
 
-	//iterate through all assessment activities in the lesson
+	// iterate through all assessment activities in the lesson
 	for (Activity activity : lessonActivities) {
-	    
+
 	    // check if it's assessment activity
-	    if ((activity instanceof ToolActivity)
-		    && ((ToolActivity) activity).getTool().getToolSignature()
-			    .equals(AssessmentConstants.TOOL_SIGNATURE)) {
+	    if ((activity instanceof ToolActivity) && ((ToolActivity) activity).getTool().getToolSignature()
+		    .equals(AssessmentConstants.TOOL_SIGNATURE)) {
 		ToolActivity assessmentActivity = (ToolActivity) activity;
 
 		for (ToolSession toolSession : (Set<ToolSession>) assessmentActivity.getToolSessions()) {
@@ -1407,22 +1411,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public AssessmentUser getUser(Long uid) {
 	return (AssessmentUser) assessmentUserDao.getObject(AssessmentUser.class, uid);
     }
-    
+
     @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
-    
+
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
     }
-    
+
     @Override
     public void notifyTeachersOnAttemptCompletion(Long sessionId, String userName) {
 	String message = getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { userName });
@@ -1434,23 +1438,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // *****************************************************************************
 
     /**
-     * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly
-     * escapes all quotes in the following way \").
+     * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
+     * all quotes in the following way \").
      */
     private static void escapeQuotes(Object object) {
 	if (object instanceof UserSummary) {
 	    UserSummary userSummary = (UserSummary) object;
 	    for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
 		for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
-		    escapeQuotesInQuestionResult(questionResult);
+		    AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
 		}
 	    }
 	} else if (object instanceof QuestionSummary) {
 	    QuestionSummary questionSummary = (QuestionSummary) object;
 
-	    for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary.getQuestionResultsPerSession()) {
+	    for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary
+		    .getQuestionResultsPerSession()) {
 		for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
-		    escapeQuotesInQuestionResult(questionResult);
+		    AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
 		}
 	    }
 	} else if (object instanceof List) {
@@ -1459,7 +1464,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    for (Summary summary : summaryList) {
 		for (AssessmentResult result : summary.getAssessmentResults()) {
 		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-			escapeQuotesInQuestionResult(questionResult);
+			AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
 		    }
 		}
 	    }
@@ -1467,7 +1472,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    AssessmentResult assessmentResult = (AssessmentResult) object;
 
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
-		escapeQuotesInQuestionResult(questionResult);
+		AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
 	    }
 	}
     }
@@ -1531,7 +1536,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
     }
-    
+
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
@@ -1576,6 +1581,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Assessment toolContentObj = assessmentDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1598,13 +1604,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
     }
 
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(AssessmentImportContentVersionFilter.class);
-	    
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, assessmentToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Assessment)) {
@@ -1647,6 +1654,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
@@ -1656,6 +1664,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return getAssessmentOutputFactory().getToolOutputDefinitions(assessment, definitionType);
     }
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SharedAssessmentFiles tool seession");
@@ -1686,8 +1695,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessment.setDefineLater(false);
     }
 
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    @Override
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	Assessment assessment = assessmentDao.getByContentId(toolContentId);
 	if (removeSessionData) {
 	    List list = assessmentSessionDao.getByContentId(toolContentId);
@@ -1699,12 +1709,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	assessmentDao.delete(assessment);
     }
-    
+
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Assessment results for user ID " + userId + " and toolContentId " + toolContentId);
+	if (AssessmentServiceImpl.log.isDebugEnabled()) {
+	    AssessmentServiceImpl.log
+		    .debug("Removing Assessment results for user ID " + userId + " and toolContentId " + toolContentId);
 	}
-	
+
 	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
 	for (AssessmentSession session : sessions) {
 	    List<AssessmentResult> results = assessmentResultDao.getAssessmentResultsBySession(session.getSessionId(),
@@ -1732,6 +1744,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
     }
 
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	AssessmentSession session = new AssessmentSession();
 	session.setSessionId(toolSessionId);
@@ -1741,6 +1754,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessmentSessionDao.saveObject(session);
     }
 
+    @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
 	    AssessmentServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
@@ -1764,15 +1778,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
 
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    @Override
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    @Override
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
+    @Override
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	assessmentSessionDao.deleteBySessionId(toolSessionId);
     }
@@ -1783,6 +1801,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
      *      java.lang.Long)
      */
+    @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
@@ -1793,10 +1812,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
      *      java.lang.Long)
      */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
@@ -1820,7 +1840,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    // check if leader has submitted answers
-	    if (groupLeader != null && groupLeader.isSessionFinished()) {
+	    if ((groupLeader != null) && groupLeader.isSessionFinished()) {
 
 		// we need to make sure specified user has the same scratches as a leader
 		copyAnswersFromLeader(assessmentUser, groupLeader);
@@ -1828,8 +1848,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	}
 
-    }   
+    }
 
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getAssessmentByContentId(toolContentId).isDefineLater();
     }
@@ -1839,14 +1860,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
     }
 
     /**
      * Set the description, throws away the title value as this is not supported in 2.0
      */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Assessment toolContentObj = getAssessmentByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1864,7 +1887,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
     }
-    
+
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
     }
@@ -1893,6 +1916,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	this.eventNotificationService = eventNotificationService;
     }
 
+    @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
@@ -1909,23 +1933,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	this.lessonService = lessonService;
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getAssessmentOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getAssessmentByContentId(toolContentId).getTitle();
     }
 
-    
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
-    
+
     public void setUserService(IUserManagementService userService) {
 	this.userService = userService;
     }
-    
+
     // ****************** REST methods *************************
 
     /**
@@ -1939,8 +1964,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      * The answers entry should be JSONArray containing JSON objects, which in turn must contain "answerText" or
      * "answerFloat", "displayOrder" (Integer), "grade" (Integer).
      * 
-     * The references entry should be a JSONArray containing JSON objects, which in turn must contain "displayOrder" (Integer), 
-     * "questionDisplayOrder" (Integer - to match to the question). It may also have "defaultGrade" (Integer) and "randomQuestion" (Boolean)
+     * The references entry should be a JSONArray containing JSON objects, which in turn must contain "displayOrder"
+     * (Integer), "questionDisplayOrder" (Integer - to match to the question). It may also have "defaultGrade" (Integer)
+     * and "randomQuestion" (Boolean)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -1959,18 +1985,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessment.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
 	assessment.setAllowGradesAfterAttempt(JsonUtil.opt(toolContentJSON, "allowGradesAfterAttempt", Boolean.FALSE));
 	assessment.setAllowHistoryResponses(JsonUtil.opt(toolContentJSON, "allowHistoryResponses", Boolean.FALSE));
-	assessment.setAllowOverallFeedbackAfterQuestion(JsonUtil.opt(toolContentJSON,
-		"allowOverallFeedbackAfterQuestion", Boolean.FALSE));
+	assessment.setAllowOverallFeedbackAfterQuestion(
+		JsonUtil.opt(toolContentJSON, "allowOverallFeedbackAfterQuestion", Boolean.FALSE));
 	assessment.setAllowQuestionFeedback(JsonUtil.opt(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
-	assessment.setAllowRightAnswersAfterQuestion(JsonUtil.opt(toolContentJSON, "allowRightAnswersAfterQuestion",
-		Boolean.FALSE));
-	assessment.setAllowWrongAnswersAfterQuestion(JsonUtil.opt(toolContentJSON, "allowWrongAnswersAfterQuestion",
-		Boolean.FALSE));
+	assessment.setAllowRightAnswersAfterQuestion(
+		JsonUtil.opt(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
+	assessment.setAllowWrongAnswersAfterQuestion(
+		JsonUtil.opt(toolContentJSON, "allowWrongAnswersAfterQuestion", Boolean.FALSE));
 	assessment.setAttemptsAllowed(JsonUtil.opt(toolContentJSON, "attemptsAllows", 1));
 	assessment.setDefineLater(false);
 	assessment.setDisplaySummary(JsonUtil.opt(toolContentJSON, "displaySummary", Boolean.FALSE));
-	assessment.setNotifyTeachersOnAttemptCompletion(JsonUtil.opt(toolContentJSON,
-		"notifyTeachersOnAttemptCompletion", Boolean.FALSE));
+	assessment.setNotifyTeachersOnAttemptCompletion(
+		JsonUtil.opt(toolContentJSON, "notifyTeachersOnAttemptCompletion", Boolean.FALSE));
 	assessment.setNumbered(JsonUtil.opt(toolContentJSON, "numbered", Boolean.TRUE));
 	assessment.setPassingMark(JsonUtil.opt(toolContentJSON, "passingMark", 0));
 	assessment.setQuestionsPerPage(JsonUtil.opt(toolContentJSON, "questionsPerPage", 0));
@@ -1983,8 +2009,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
 
 	if (toolContentJSON.has("overallFeedback")) {
-	    throw new JSONException("Assessment Tool does not support Overall Feedback for REST Authoring. "
-		    + toolContentJSON);
+	    throw new JSONException(
+		    "Assessment Tool does not support Overall Feedback for REST Authoring. " + toolContentJSON);
 	}
 
 	AssessmentUser assessmentUser = getUserByIDAndContent(userID.longValue(), toolContentID);
@@ -2019,27 +2045,29 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    question.setFeedback(JsonUtil.opt(questionJSONData, "feedback", (String) null));
 	    question.setFeedbackOnCorrect(JsonUtil.opt(questionJSONData, "feedbackOnCorrect", (String) null));
 	    question.setFeedbackOnIncorrect(JsonUtil.opt(questionJSONData, "feedbackOnIncorrect", (String) null));
-	    question.setFeedbackOnPartiallyCorrect(JsonUtil.opt(questionJSONData, "feedbackOnPartiallyCorrect",
-		    (String) null));
+	    question.setFeedbackOnPartiallyCorrect(
+		    JsonUtil.opt(questionJSONData, "feedbackOnPartiallyCorrect", (String) null));
 	    question.setGeneralFeedback(JsonUtil.opt(questionJSONData, "generalFeedback", ""));
 	    question.setMaxWordsLimit(JsonUtil.opt(questionJSONData, "maxWordsLimit", 0));
 	    question.setMinWordsLimit(JsonUtil.opt(questionJSONData, "minWordsLimit", 0));
 	    question.setMultipleAnswersAllowed(JsonUtil.opt(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
-	    question.setIncorrectAnswerNullifiesMark(JsonUtil.opt(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
+	    question.setIncorrectAnswerNullifiesMark(
+		    JsonUtil.opt(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
 	    question.setPenaltyFactor(Float.parseFloat(JsonUtil.opt(questionJSONData, "penaltyFactor", "0.0")));
 	    // question.setUnits(units); Needed for numerical type question
 
-	    if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS
-		    || type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
-		    || type == AssessmentConstants.QUESTION_TYPE_NUMERICAL
-		    || type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+	    if ((type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
+		    || (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
+		    || (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
+		    || (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 
-		if (!questionJSONData.has(RestTags.ANSWERS))
+		if (!questionJSONData.has(RestTags.ANSWERS)) {
 		    throw new JSONException("REST Authoring is missing answers for a question of type " + type
 			    + ". Data:" + toolContentJSON);
+		}
 
 		Set<AssessmentQuestionOption> optionList = new LinkedHashSet<AssessmentQuestionOption>();
-		JSONArray optionsData = (JSONArray) questionJSONData.getJSONArray(RestTags.ANSWERS);
+		JSONArray optionsData = questionJSONData.getJSONArray(RestTags.ANSWERS);
 		for (int j = 0; j < optionsData.length(); j++) {
 		    JSONObject answerData = (JSONObject) optionsData.get(j);
 		    AssessmentQuestionOption option = new AssessmentQuestionOption();
@@ -2088,14 +2116,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     // find the question that matches this sequence id - used by the REST calls only.
     AssessmentQuestion matchQuestion(Set<AssessmentQuestion> newReferenceSet, Integer displayOrder) {
-	if ( displayOrder != null ) {
-	    for ( AssessmentQuestion question : newReferenceSet ) {
-		if ( displayOrder.equals(question.getSequenceId()) )
-			return question;
+	if (displayOrder != null) {
+	    for (AssessmentQuestion question : newReferenceSet) {
+		if (displayOrder.equals(question.getSequenceId())) {
+		    return question;
+		}
 	    }
 	}
 	return null;
     }
+
     // TODO Implement REST support for all types and then remove checkType method
     void checkType(short type) throws JSONException {
 	if (type != AssessmentConstants.QUESTION_TYPE_ESSAY) {
