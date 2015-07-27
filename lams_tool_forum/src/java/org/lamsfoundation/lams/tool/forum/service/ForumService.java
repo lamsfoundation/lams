@@ -1584,7 +1584,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setAllowUpload(JsonUtil.opt(toolContentJSON, "allowUpload", Boolean.FALSE));
 	forum.setContentInUse(false);
 	forum.setDefineLater(false);
-	forum.setLimitedMaxCharacters(JsonUtil.opt(toolContentJSON, "limitedMaxCharacters", Boolean.FALSE));
+	forum.setLimitedMaxCharacters(JsonUtil.opt(toolContentJSON, "limitedMaxCharacters", Boolean.TRUE));
 	forum.setLimitedMinCharacters(JsonUtil.opt(toolContentJSON, "limitedMinCharacters", Boolean.FALSE));
 	forum.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
 	forum.setMaxCharacters(JsonUtil.opt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the default entry in the db.
@@ -1639,7 +1639,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     	    newMsg.setParent(null);
     	    newMsg.setReplyNumber(0);
     	    newMsg.setReport(null);
-    	    newMsg.setSequenceId(1);
+    	    newMsg.setSequenceId(i);
     //	    newMsg.setSessionClones(sessionClones); Used for updating in monitoring
     	    newMsg.setToolSession(null);
     	    createRootTopic(forum.getUid(), (ForumToolSession)null, newMsg);
