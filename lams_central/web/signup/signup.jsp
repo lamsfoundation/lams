@@ -48,7 +48,6 @@
 		</h1>
 		
 		<c:if test="${not empty signupOrganisation}">
-			<p>&nbsp;</p>
 			<h1 align="center">
 				<c:out value="${signupOrganisation.organisation.name}" /> 
 				<c:if test="${not empty signupOrganisation.organisation.code}">
@@ -56,9 +55,9 @@
 				</c:if>
 			</h1>
 			<c:if test="${not empty signupOrganisation.blurb}">
-				<p style="padding-top: 15px; font-size: 12px; text-align: center;">
-					<c:out value="${signupOrganisation.blurb}" />
-				</p>
+				<div id="signup-intro">
+					<c:out value="${signupOrganisation.blurb}" escapeXml="false" />
+				</div>
 			</c:if>
 		</c:if>
 		
