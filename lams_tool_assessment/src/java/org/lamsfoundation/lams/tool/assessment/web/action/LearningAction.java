@@ -909,12 +909,15 @@ public class LearningAction extends Action {
 	
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
+		
+		//find corresponding questionResult
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			
+			//copy questionResult's info to the question
 			question.setMark(questionResult.getMark());
 			question.setResponseSubmitted(questionResult.getFinishDate() != null);
 			question.setPenalty(questionResult.getPenalty());
-
 			question.setQuestionFeedback(null);
 			for (AssessmentQuestionOption option : question.getOptions()) {
 			    if (option.getUid().equals(questionResult.getSubmittedOptionUid())) {
@@ -922,7 +925,14 @@ public class LearningAction extends Action {
 				break;
 			    }
 			}
+			//required for showing right/wrong answers icons on results page correctly 
+			if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
+				|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+			    boolean isAnsweredCorrectly = questionResult.getSubmittedOptionUid() != null;
+			    question.setAnswerBoolean(isAnsweredCorrectly);
+			}
 
+			//required for markandpenalty area and if it's on - on question's summary page
 			List<Object[]> questionResults = service.getAssessmentQuestionResultList(assessment.getUid(),
 				userId, question.getUid());
 			question.setQuestionResults(questionResults);
