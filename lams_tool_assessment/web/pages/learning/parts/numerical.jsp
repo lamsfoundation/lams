@@ -9,10 +9,10 @@
 		<c:if test="${finishedLock}">
 			<td class="complete-item-gif">
 			
-				<c:if test="${assessment.allowRightAnswersAfterQuestion && (question.mark > 0)}">
+				<c:if test="${assessment.allowRightAnswersAfterQuestion && question.answerBoolean}">
 					<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
 				</c:if>			
-				<c:if test="${assessment.allowWrongAnswersAfterQuestion && !(question.mark > 0)}">
+				<c:if test="${assessment.allowWrongAnswersAfterQuestion && !question.answerBoolean}">
 					<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">
 				</c:if>
 				
