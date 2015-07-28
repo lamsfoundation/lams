@@ -47,7 +47,7 @@
 			<td><fmt:message key="admin.description.txt" />:</td>
 			<td>
 			  <lams:CKEditor id="blurb" 
-			     value="${blurb}" 
+			     value="${signupForm.map.blurb}" 
 			     contentFolderID="../public/signups">
 			  </lams:CKEditor>
 			</td>
