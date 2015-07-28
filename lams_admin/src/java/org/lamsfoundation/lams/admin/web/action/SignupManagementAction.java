@@ -95,6 +95,7 @@ public class SignupManagementAction extends Action {
 		signupForm.set("disabled", signup.getDisabled());
 		signupForm.set("loginTabActive", signup.getLoginTabActive());
 		signupForm.set("context", signup.getContext());
+		request.setAttribute("signupForm", signupForm);
 
 		List organisations = signupService.getOrganisationCandidates();
 		request.setAttribute("organisations", organisations);
