@@ -45,7 +45,12 @@
 		</tr>
 		<tr>
 			<td><fmt:message key="admin.description.txt" />:</td>
-			<td><html:textarea property="blurb" cols="40" rows="3"/></td>
+			<td>
+			  <lams:CKEditor id="blurb" 
+			     value="${signupForm.map.blurb}" 
+			     contentFolderID="../public/signups">
+			  </lams:CKEditor>
+			</td>
 			<td></td>
 		</tr>
 		<tr>
