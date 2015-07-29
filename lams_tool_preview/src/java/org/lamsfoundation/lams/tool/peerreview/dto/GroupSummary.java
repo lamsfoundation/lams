@@ -23,8 +23,6 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.peerreview.dto;
 
-import java.util.LinkedList;
-import java.util.List;
 
 public class GroupSummary {
 

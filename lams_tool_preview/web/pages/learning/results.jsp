@@ -95,32 +95,34 @@
 				<fmt:message key="message.activityLocked" />
 			</div>
 		</c:if>
-				
-		<table class="tablesorter">
-			<thead>
-				<tr>
-					<th title="<fmt:message key='label.sort.by.user.name'/>" >
-						<fmt:message key="label.user.name" />
-					</th>
-					<th>
-						<fmt:message key="label.rating" />
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<c:forEach var="itemRatingDto" items="${itemRatingDtos}">
+		
+		<c:if test="${not empty itemRatingDtos}">
+			<table class="tablesorter">
+				<thead>
 					<tr>
-						<td>
-							<c:out value="${userNameMap[itemRatingDto.itemId]}" escapeXml="true"/>
-						</td>
-						
-						<td style="width:50%; text-align: right;">
-							<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true" isItemAuthoredByUser="false"/>
-						</td>
+						<th title="<fmt:message key='label.sort.by.user.name'/>" >
+							<fmt:message key="label.user.name" />
+						</th>
+						<th>
+							<fmt:message key="label.rating" />
+						</th>
 					</tr>
-				</c:forEach>
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					<c:forEach var="itemRatingDto" items="${itemRatingDtos}">
+						<tr>
+							<td>
+								<c:out value="${userNameMap[itemRatingDto.itemId]}" escapeXml="true"/>
+							</td>
+							
+							<td style="width:50%; text-align: right;">
+								<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true" isItemAuthoredByUser="false"/>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
 		
 		<c:if test="${peerreview.showRatingsLeftForUser}">
 			<h2>
@@ -130,7 +132,7 @@
 			<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true" isItemAuthoredByUser="true"/>
 		</c:if>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+		<c:if test="${sessionMap.isSessionCompleted and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h3><fmt:message key="title.reflection" /></h3>
 				<strong>
@@ -168,7 +170,7 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>			
-					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+					<c:when test="${sessionMap.reflectOn && (not sessionMap.isSessionCompleted)}">
 						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
 							<fmt:message key="label.continue" />
 						</html:button>

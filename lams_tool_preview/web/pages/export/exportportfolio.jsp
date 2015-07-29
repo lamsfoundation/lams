@@ -154,24 +154,6 @@
 							</td>
 
 							<td align="center">
-								<c:choose>
-									<c:when test="${item.itemType == 1}">
-										<a href="javascript:;"
-											onclick="launchPopup('${item.url}','openurl');"> <fmt:message
-												key="label.authoring.basic.resource.preview" /> </a>
-									</c:when>
-									<c:when test="${item.itemType == 2}">
-										<a href="${item.attachmentLocalUrl}"> <fmt:message
-												key="label.download" /> </a>
-									</c:when>
-									<c:when test="${item.itemType == 3}">
-										<a href="${item.attachmentLocalUrl}"> <fmt:message
-												key="label.download" /> </a>
-									</c:when>
-									<c:when test="${item.itemType == 4}">
-										<fmt:message key="export.label.no.learning.object" />
-									</c:when>
-								</c:choose>
 							</td>
 
 							<c:if test="${mode == 'teacher'}">

@@ -26,10 +26,12 @@ package org.lamsfoundation.lams.tool.peerreview.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -359,6 +361,11 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
+    
+    @Override
+    public String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
 
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
@@ -578,6 +585,26 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     @Override
     public ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId) {
 	return ratingService.getRatingCriteriaDtoWithActualRatings(contentId, itemId);
+    }
+    
+    @Override
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem) {
+	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired,
+		userId);
+	
+	if (isCountUsersRatedEachItem) {
+	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, itemIds, userId.intValue());
+	    
+	    for (ItemRatingDTO itemRatingDTO : itemRatingDTOs) {
+		Long itemId = itemRatingDTO.getItemId();
+		
+		int countUsersRatedEachItem = itemIdToRatedUsersCountMap.get(itemId).intValue();
+		itemRatingDTO.setCountUsersRatedEachItem(countUsersRatedEachItem);
+	    }
+	}
+	
+	return itemRatingDTOs;
     }
 
     @Override

@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.peerreview.web.action;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,8 +57,6 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -84,9 +81,6 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("getSubgridData")) {
 	    return getSubgridData(mapping, form, request, response);
-	}
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
 	}
 
 	return mapping.findForward(PeerreviewConstants.ERROR);
@@ -150,9 +144,9 @@ public class MonitoringAction extends Action {
 	int sorting = PeerreviewConstants.SORT_BY_NO;
 	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_ROW_NAME)) {
 	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
-		sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
-	    } else {
 		sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
+	    } else {
+		sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
 	    }
 	}
 
@@ -163,9 +157,9 @@ public class MonitoringAction extends Action {
 	JSONObject responcedata = new JSONObject();
 	JSONArray rows = new JSONArray();
 
-	responcedata.put("total", "" + service.getCountUsersBySession(toolSessionId, userId));
-	responcedata.put("page", "" + page);
-	responcedata.put("records", "" + size);
+	responcedata.put("page", page+1);
+	responcedata.put("total", Math.ceil((float)service.getCountUsersBySession(toolSessionId, userId)/size));
+	responcedata.put("records", service.getCountUsersBySession(toolSessionId, userId));
 	
 	// handle rating criterias
 	List<ItemRatingDTO> itemRatingDtos = null;
@@ -197,18 +191,27 @@ public class MonitoringAction extends Action {
 		}
 	    }
 	    
-	    String criteriasString = "";
+	    String criteriasString = "<div class='rating-stars-holder'>";
 	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
-		JSONObject criteriasRow = new JSONObject();
-		criteriasRow.put("ratingCriteriaId", criteriaDto.getRatingCriteria().getRatingCriteriaId());
-		criteriasRow.put("title", criteriaDto.getRatingCriteria().getTitle());
-		criteriasRow.put("averageRating", criteriaDto.getAverageRating());
-		criteriasRow.put("numberOfVotes", criteriaDto.getNumberOfVotes());
-		criteriasRow.put("userRating", criteriaDto.getUserRating());
-		
-		criteriasString += criteriaDto.getRatingCriteria().getTitle() + ": Avg rating " + criteriaDto.getAverageRating()
-			+ " out of " + criteriaDto.getNumberOfVotes() + " votes <br>";
+		Long ratingCriteriaId = criteriaDto.getRatingCriteria().getRatingCriteriaId();
+		String title = StringEscapeUtils.escapeHtml(criteriaDto.getRatingCriteria().getTitle());
+		String averageRating = criteriaDto.getAverageRating();
+		String numberOfVotes = criteriaDto.getNumberOfVotes();
+
+		criteriasString += "<b>";
+		criteriasString += 	title;
+		criteriasString += "</b>";
+
+		criteriasString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating + "' data-id='" + ratingCriteriaId + "'>";
+		criteriasString += "</div>";
+
+		criteriasString += "<div class='rating-stars-caption' id='rating-stars-caption-" + ratingCriteriaId + "' >";
+		String msg = service.getLocalisedMessage("label.average.rating", new Object[] { averageRating, numberOfVotes });
+		criteriasString += msg;
+		criteriasString += "</div>";
+
 	    }
+	    criteriasString += 	"</div>";
 	    rowData.put(criteriasString);
 
 	    JSONObject row = new JSONObject();
@@ -237,20 +240,19 @@ public class MonitoringAction extends Action {
 
 	// ratings left by others for this user
 	ItemRatingDTO userRatingDto = service.getRatingCriteriaDtoWithActualRatings(contentId, userId);
-//	request.setAttribute("itemRatingDto", userRatingDto);
 
 	JSONArray rows = new JSONArray();
-	DateFormat timeTakenFormatter = new SimpleDateFormat("H:mm:ss");
-	DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
 	int i = 0;
 	for (ItemRatingCriteriaDTO criteriaDto : userRatingDto.getCriteriaDtos()) {
 
 	    for (RatingDTO ratingDto : criteriaDto.getRatingDtos()) {
 		JSONArray userData = new JSONArray();
 		userData.put(i);
-		userData.put(ratingDto.getLearner().getFirstName() + " " + ratingDto.getLearner().getLastName());
+		String userName = StringEscapeUtils.escapeHtml(ratingDto.getLearner().getFirstName() + " "
+			+ ratingDto.getLearner().getLastName());
+		userData.put(userName);
 		userData.put(ratingDto.getRating());
-		String title = criteriaDto.getRatingCriteria().getTitle();
+		String title = StringEscapeUtils.escapeHtml(criteriaDto.getRatingCriteria().getTitle());
 		userData.put(title);
 
 		JSONObject userRow = new JSONObject();
@@ -266,8 +268,9 @@ public class MonitoringAction extends Action {
 	    for (RatingCommentDTO commentDto : userRatingDto.getCommentDtos()) {
 		JSONArray userData = new JSONArray();
 		userData.put(i);
-		userData.put(userNameMap.get(commentDto.getUserId()));
-		userData.put(commentDto.getComment());
+		String userName = StringEscapeUtils.escapeHtml(userNameMap.get(commentDto.getUserId()));
+		userData.put(userName);
+		userData.put(StringEscapeUtils.escapeHtml(commentDto.getComment()));
 		userData.put("Comments");
 
 		JSONObject userRow = new JSONObject();
@@ -287,33 +290,6 @@ public class MonitoringAction extends Action {
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
-    }
-
-    private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long uid = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	IPeerreviewService service = getPeerreviewService();
-	PeerreviewUser user = service.getUser(uid);
-	NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		PeerreviewConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-	PeerreviewSession session = service.getPeerreviewSessionBySessionId(sessionID);
-
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
-	}
-	refDTO.setReflectInstrctions(session.getPeerreview().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
-	return mapping.findForward("success");
     }
 
     // *************************************************************************************

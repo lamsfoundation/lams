@@ -23,7 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.peerreview.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
@@ -214,4 +216,14 @@ public interface IPeerreviewService extends ToolRatingManager {
      * @return
      */
     ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId);
+
+    /**
+     * It's a modification of org.lamsfoundation.lams.rating.ToolRatingManager.getRatingCriteriaDtos(Long contentId,
+     * Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) method, added additional parameter
+     * isCountUsersRatedEachItem.
+     * 
+     */
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem);
+    
+    String getLocalisedMessage(String key, Object[] args);
 }
