@@ -39,6 +39,9 @@ public class ItemRatingDTO {
     private List<RatingCommentDTO> commentDtos;
     private RatingCommentDTO commentPostedByUser;
     
+    //used only if certain options is ON
+    private int countUsersRatedEachItem;
+    
     public ItemRatingDTO () {
 	commentsEnabled = false;
     }
@@ -97,5 +100,13 @@ public class ItemRatingDTO {
 
     public void setCommentPostedByUser(RatingCommentDTO commentPostedByUser) {
 	this.commentPostedByUser = commentPostedByUser;
+    }
+    
+    public int getCountUsersRatedEachItem() {
+	return countUsersRatedEachItem;
+    }
+
+    public void setCountUsersRatedEachItem(int countUsersRatedEachItem) {
+	this.countUsersRatedEachItem = countUsersRatedEachItem;
     }
 }

@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.rating.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -125,5 +126,15 @@ public interface IRatingService {
      * @return
      */
     int getCountItemsRatedByUser(final Long toolContentId, final Integer userId);
+    
+    /**
+     * Count how many users rated and commented each item.
+     * 
+     * @param contentId
+     * @param itemIds
+     * @param excludeUserId
+     * @return
+     */
+    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds, Integer excludeUserId);
 
 }
