@@ -58,7 +58,7 @@ public class PeerreviewConstants {
     public static final String PARAM_SEARCH_FIELD = "searchField";
     public static final String PARAM_SEARCH_OPERATION = "searchOper";
     public static final String PARAM_SEARCH_STRING = "searchString";
-    public static final String PARAM_ROW_NAME = "rowName";
+    public static final String PARAM_ROW_NAME = "userName";
     public static final String PARAM_TIME_TAKEN = "timeTaken";
     public static final String PARAM_AVG_TIME_TAKEN = "avgTimeTaken";
     public static final String PARAM_AVG_MARK = "avgMark";

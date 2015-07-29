@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.peerreview.model;
 
-import java.util.Date;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -51,14 +49,6 @@ public class PeerreviewUser implements Cloneable {
 
     private PeerreviewSession session;
     private Peerreview peerreview;
-
-    // =============== NON Persisit value: for display use ===========
-    // the user access some reousrce item date time. Use in monitoring summary page
-    private Date accessDate;
-    // peerreview item complete date. Use in monitoring summary page
-    private Date completeDate;
-    // difference between completeDate and accessDate
-    private Date timeTaken;
 
     public PeerreviewUser() {
     }
@@ -223,30 +213,6 @@ public class PeerreviewUser implements Cloneable {
 
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
-    }
-
-    public Date getAccessDate() {
-	return accessDate;
-    }
-
-    public void setAccessDate(Date accessDate) {
-	this.accessDate = accessDate;
-    }
-
-    public Date getCompleteDate() {
-	return completeDate;
-    }
-
-    public void setCompleteDate(Date completeDate) {
-	this.completeDate = completeDate;
-    }
-
-    public Date getTimeTaken() {
-	return timeTaken;
-    }
-
-    public void setTimeTaken(Date timeTaken) {
-	this.timeTaken = timeTaken;
     }
 
 }

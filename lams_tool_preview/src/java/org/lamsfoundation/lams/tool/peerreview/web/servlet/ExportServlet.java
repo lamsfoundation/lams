@@ -25,8 +25,6 @@
 
 package org.lamsfoundation.lams.tool.peerreview.web.servlet;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,14 +46,10 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewApplicationException;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceProxy;
-import org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Export portfolio servlet to export all peerreview into offline HTML package.

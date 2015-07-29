@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.peerreview.model;
 
 import java.util.Date;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 

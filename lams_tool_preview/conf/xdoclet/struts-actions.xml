@@ -96,11 +96,6 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="getSubgridData" >
 		</action>
-		<action path="/monitoring/viewReflection"
-			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
-			parameter="viewReflection" >
-			<forward name="success" path="/pages/monitoring/reflections.jsp" />
-		</action>
 		
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"

@@ -3,9 +3,6 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if test="${not empty param.sessionMapID}">
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-</c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionId" value="${sessionMap.toolSessionId}" />
@@ -70,7 +67,7 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/learning/getUsers.do'/>?page={page}&size={size}&{sortList:column}&toolContentId=${peerreview.contentId}&toolSessionId=${toolSessionId}&userId=<lams:user property='userID' />",
+				ajaxUrl : "<c:url value='/learning/getUsers.do'/>?page={page}&size={size}&{sortList:column}&sessionMapID=${sessionMapID}&toolContentId=${peerreview.contentId}&toolSessionId=${toolSessionId}&userId=<lams:user property='userID' />",
 				ajaxProcessing: function (data) {
 			    	if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -85,6 +82,7 @@
 						for (i = 0; i < data.rows.length; i++){
 							var userData = data.rows[i];
 							var itemId = userData["userId"];
+							var isMaximumRatesPerUserReached = (${peerreview.maximumRatesPerUser} != 0) && (userData.ratesPerUser >= ${peerreview.maximumRatesPerUser});
 							
 							rows += '<tr>';
 							rows += '<td>';
@@ -94,6 +92,10 @@
 							rows += 			userData["userName"];
 							rows += 		'</span> ';
 							rows += 	'</div>';
+							
+							if (isMaximumRatesPerUserReached) {
+								rows += "<div class='info'><fmt:message key='label.cant.rate' /></div>";
+							}
 							
 							rows += '</td>';
 							
@@ -108,7 +110,8 @@
 								var userRating = criteriaDto.userRating;
 								var isCriteriaNotRatedByUser = userRating == "";
 								var averageRatingDisplayed = (!isCriteriaNotRatedByUser) ? averageRating : 0;
-								var ratingStarsClass = (IS_DISABLED || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES) || ${peerreview.maximumRatesPerUser} <= numberOfVotes || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
+								var isDisabled = IS_DISABLED || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES) || isMaximumRatesPerUserReached;
+								var ratingStarsClass = (isDisabled || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
 							
 								rows += '<h4>';
 								rows += 	 criteriaDto.title;
@@ -145,7 +148,7 @@
 									rows += '</div>';
 										
 								//show comments textarea and a submit button
-								} else if (!IS_DISABLED) {
+								} else if (!isDisabled) {
 									rows += '<div id="add-comment-area-' + itemId + '">';											
 									rows +=		'<textarea name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
 									
@@ -298,8 +301,7 @@
 		   		<img class="tablesorter-next"/>
 		    	<img class="tablesorter-last"/>
 		    	<select class="pagesize">
-		    	<option selected="selected" value="3">3</option>
-		      		<option selected="selected" value="2">2</option>
+		      		<option selected="selected" value="10">10</option>
 		      		<option value="20">20</option>
 		      		<option value="30">30</option>
 		      		<option value="40">40</option>

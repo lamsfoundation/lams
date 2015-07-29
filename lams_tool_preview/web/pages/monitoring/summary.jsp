@@ -5,6 +5,8 @@
 
 <link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
 <style media="screen,projection" type="text/css">
 	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
 	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
@@ -15,11 +17,39 @@
 	    vertical-align:text-top;
 	    padding-top:2px;
 	}
+	
+	.subgrid-data .ui-jqgrid-hdiv {
+		display:none !important;
+	}
+	
+	.subgrid-data td[colspan]:not([colspan="1"]) {
+		background: #F0F0F0;
+	}
+	
+	.ui-jqgrid tr.jqgrow td {
+		vertical-align: top;
+	}
 </style>
 
+<script type="text/javascript">
+	//var for jquery.jRating.js
+	var pathToImageFolder = "${lams}images/css/";
+		
+	//vars for rating.js
+	var MAX_RATES = 0,
+	MIN_RATES = 0,
+	COMMENTS_MIN_WORDS_LIMIT = 0,
+	LAMS_URL = '',
+	COUNT_RATED_ITEMS = 0,
+	COMMENT_TEXTAREA_TIP_LABEL = '',
+	WARN_COMMENTS_IS_BLANK_LABEL = '',
+	WARN_MIN_NUMBER_WORDS_LABEL = '';
+</script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
+<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		
@@ -41,15 +71,20 @@
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
 			   		{name:'userId', index:'userId', width:0, hidden: true},
 			   		{name:'userName', index:'userName', width:260},
-			   		{name:'rating', index:'rating', width:160, align:"center"}
+			   		{name:'rating', index:'rating', width:160, align:"center", sortable:false}
 			   	],
 			   	rowNum:10,
 			   	rowList:[10,20,30,40,50,100],
 			   	pager: '#pager${groupSummary.sessionId}',
-			    loadonce: true,
-			    pagerpos:'left',
+			   	viewrecords:true,
+				loadComplete: function(){
+					initializeJRating();
+				},
 			   	caption: "${groupSummary.sessionName}",
 				subGrid: true,
+				subGridOptions: {
+					reloadOnExpand : false 
+				},
 				subGridRowExpanded: function(subgrid_id, row_id) {
 					var subgridTableId = subgrid_id+"_t";
 					var sessionId = jQuery("#group${groupSummary.sessionId}").getRowData(row_id)["sessionId"];
@@ -59,23 +94,24 @@
 					   
 					jQuery("#"+subgridTableId).jqGrid({
 						datatype: "json",
-						loadonce: true,
 						url: "<c:url value='/monitoring/getSubgridData.do'/>?sessionMapID=${sessionMapID}&userID=" + userId,
 						height: "100%",
 						rowNum: 10000,
 						autowidth:true,
+						loadonce:true,
 						grouping:true,	
-						groupingView : { 
+						groupingView : {
 							groupField : ['criteriaId'],
 							groupColumnShow : [false],
 							groupText : ['<b>{0}</b>']
 						},
-						colNames: [
-						   '',
-						   "<fmt:message key="monitoring.label.user.name"/>",
-						   "<fmt:message key="label.rating"/>",
-						   ''
-						],
+						loadComplete: function(){
+							//remove empty subgrids
+					        var table_value = $('#'+subgridTableId).getGridParam('records');
+					        if(table_value === 0){
+					            $('#'+subgrid_id).parent().unbind('click').html('<fmt:message key="label.no.ratings.left" />');
+					        }
+						},
 						colModel:[
 						   {name:'id', index:'id', hidden:true},
 						   {name:'userName',index:'userName'},
@@ -88,7 +124,8 @@
 					    }
 					})
 				}
-			}).jqGrid('navGrid','#pager${groupSummary.sessionId}',{add:false,del:false,edit:false,position:'right'});
+			}).jqGrid('navGrid','#pager${groupSummary.sessionId}',{add:false,del:false,edit:false,search:false});
+			//$("#group${groupSummary.sessionId}").parents('div.ui-jqgrid-bdiv').css("max-height","1000px");
 			
 		</c:forEach>
         
@@ -136,6 +173,7 @@
 	</c:if>
 	
 	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+	<div id="pager${groupSummary.sessionId}"></div> 
 	<br>
 		
 </c:forEach>

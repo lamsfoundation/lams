@@ -205,6 +205,7 @@ public class LearningAction extends Action {
 	sessionMap.put("isDisabled", peerreview.getLockWhenFinished() && user.isSessionFinished() || (mode != null)
 		&& mode.isTeacher());
 	sessionMap.put(PeerreviewConstants.ATTR_USER_FINISHED, user.isSessionFinished());
+	sessionMap.put("isSessionCompleted", user.getSession().getStatus() == PeerreviewConstants.COMPLETED);
 
 	// show results page
 	if (user.isSessionFinished() && peerreview.isShowRatingsLeftForUser()) {
@@ -240,6 +241,7 @@ public class LearningAction extends Action {
 	//markUserFinished if it hasn't been done previously
 	if (!mode.isTeacher() && !user.isSessionFinished()) {
 	    service.markUserFinished(sessionId, user.getUserId());
+	    sessionMap.put(PeerreviewConstants.ATTR_USER_FINISHED, true);
 	}
 	
 	// ratings left by the user
@@ -305,6 +307,12 @@ public class LearningAction extends Action {
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	IPeerreviewService service = getPeerreviewService();
 
+	// get back SessionMap
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+	Peerreview peerreview = (Peerreview) sessionMap.get(PeerreviewConstants.ATTR_PEERREVIEW);
+	
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
@@ -342,8 +350,9 @@ public class LearningAction extends Action {
 
 	    // all comments required only for monitoring
 	    boolean isCommentsByOtherUsersRequired = isMonitoring;
+	    boolean isCountUsersRatedEachItem = peerreview.getMaximumRatesPerUser() != 0;
 	    itemRatingDtos = service.getRatingCriteriaDtos(toolContentId, itemIds, isCommentsByOtherUsersRequired,
-		    userId);
+		    userId, isCountUsersRatedEachItem);
 
 	    // store how many items are rated
 	    int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, userId.intValue());
@@ -364,12 +373,13 @@ public class LearningAction extends Action {
 		    break;
 		}
 	    }
+	    userRow.put("ratesPerUser", itemRatingDto.getCountUsersRatedEachItem());
 
 	    JSONArray criteriasRows = new JSONArray();
 	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
 		JSONObject criteriasRow = new JSONObject();
 		criteriasRow.put("ratingCriteriaId", criteriaDto.getRatingCriteria().getRatingCriteriaId());
-		criteriasRow.put("title", criteriaDto.getRatingCriteria().getTitle());
+		criteriasRow.put("title", StringEscapeUtils.escapeCsv(criteriaDto.getRatingCriteria().getTitle()));
 		criteriasRow.put("averageRating", criteriaDto.getAverageRating());
 		criteriasRow.put("numberOfVotes", criteriaDto.getNumberOfVotes());
 		criteriasRow.put("userRating", criteriaDto.getUserRating());
@@ -382,7 +392,7 @@ public class LearningAction extends Action {
 	    userRow.put("commentsCriteriaId", itemRatingDto.getCommentsCriteriaId());
 	    String commentPostedByUser = itemRatingDto.getCommentPostedByUser() == null ? "" : itemRatingDto
 		    .getCommentPostedByUser().getComment();
-	    userRow.put("commentPostedByUser", commentPostedByUser);
+	    userRow.put("commentPostedByUser", StringEscapeUtils.escapeCsv(commentPostedByUser));
 	    if (itemRatingDto.getCommentDtos() != null) {
 		JSONArray comments = new JSONArray();
 		for (RatingCommentDTO commentDto : itemRatingDto.getCommentDtos()) {
@@ -418,7 +428,6 @@ public class LearningAction extends Action {
 		sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
 
 	IPeerreviewService service = getPeerreviewService();
@@ -461,11 +470,11 @@ public class LearningAction extends Action {
 	refForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	IPeerreviewService submitFilesService = getPeerreviewService();
+	IPeerreviewService service = getPeerreviewService();
 
 	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = service.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		PeerreviewConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
