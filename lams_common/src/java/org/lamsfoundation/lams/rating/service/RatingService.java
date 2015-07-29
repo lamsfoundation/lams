@@ -83,6 +83,11 @@ public class RatingService implements IRatingService {
     public int getCountItemsRatedByUser(final Long toolContentId, final Integer userId) {
 	return ratingDAO.getCountItemsRatedByUser(toolContentId, userId);
     }
+    
+    @Override
+    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds, Integer excludeUserId) {
+	return ratingDAO.countUsersRatedEachItem(contentId, itemIds, excludeUserId);
+    }
 
     @Override
     public void saveOrUpdateRating(Rating rating) {

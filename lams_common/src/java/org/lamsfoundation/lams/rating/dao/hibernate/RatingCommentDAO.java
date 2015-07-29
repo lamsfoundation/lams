@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,7 +69,7 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
     @Override
     public List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Collection<Long> itemIds) {
 	
-	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS)
+	List<Object[]> results = (itemIds.isEmpty()) ? new ArrayList<Object[]>() : getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS)
 		    .setLong("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds).list();
 	
 	return convertIntoCommentDtos(results);
@@ -78,7 +79,7 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
     public List<RatingCommentDTO> getCommentsByCriteriaAndItemsAndUser(Long ratingCriteriaId, Collection<Long> itemIds,
 	    Integer userId) {
 
-	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS_AND_USER)
+	List<Object[]> results = (itemIds.isEmpty()) ? new ArrayList<Object[]>() : getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS_AND_USER)
 		.setLong("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds)
 		.setInteger("userId", userId).list();
 
