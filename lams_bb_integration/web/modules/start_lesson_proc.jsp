@@ -48,7 +48,7 @@
 
     <%
     	//Set the new LAMS Lesson Content Object
-    	ExternalLink bbContent = new blackboard.data.content.ExternalLink();
+    	CourseDocument bbContent = new blackboard.data.content.CourseDocument();
     
         // Authorise current user for Course Control Panel (automatic redirect)
         try{
@@ -134,6 +134,8 @@
 
         bbContent.setRenderType(Content.RenderType.URL);
         bbContent.setBody(description);
+        
+        bbContent.setLaunchInNewWindow(true);
 
         // Start the Lesson in LAMS (via Webservices) and capture the lesson ID
         final long LamsLessonIdLong = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);

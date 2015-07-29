@@ -37,6 +37,7 @@
     String lamsServerId = request.getParameter("lams_server_id");
     String bbReqSrc =  request.getParameter("bb_req_src");
     String lamsServerTimeRefreshInterval = request.getParameter("lams_server_time_refresh_interval");
+    String lamsAltServerUrl = request.getParameter("lams_alt_server_url");
 
     // Save the properties to Blackboard
     p.setProperty(LamsPluginUtil.PROP_LAMS_URL, lamsServerUrl);
@@ -44,6 +45,7 @@
     p.setProperty(LamsPluginUtil.PROP_LAMS_SERVER_ID, lamsServerId);
     p.setProperty(LamsPluginUtil.PROP_REQ_SRC, bbReqSrc); 
     p.setProperty(LamsPluginUtil.PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL, lamsServerTimeRefreshInterval); 
+    p.setProperty(LamsPluginUtil.PROP_ALT_LAMS_URL, lamsAltServerUrl); 
     
     // Persist the properties object
     LamsPluginUtil.setProperties(p); 
@@ -71,8 +73,9 @@
             LAMS_SERVER_URL: <%= lamsServerUrl %><br>
             LAMS_SERVER_SKEY: <%= lamsServerSkey %><br>
             LAMS_SERVER_ID: <%= lamsServerId %><br>
-            BB_REQ_SRC: <%= bbReqSrc %>
-            LAMS_SERVER_TIME_REFRESH_INTERVAL: <%= lamsServerTimeRefreshInterval %>
+            BB_REQ_SRC: <%= bbReqSrc %><br>
+            LAMS_SERVER_TIME_REFRESH_INTERVAL: <%= lamsServerTimeRefreshInterval %><br>
+            LAMS_ALT_SERVER_URL: <%= lamsAltServerUrl %>
     </bbNG:receipt>
     
 </bbNG:genericPage>

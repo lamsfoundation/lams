@@ -33,6 +33,7 @@
     String SecretKey = p.getProperty("LAMS_SERVER_SKEY", "");
     String ReqSrc = p.getProperty("BB_REQ_SRC");
     String lamsServerTimeRefreshInterval = p.getProperty("LAMS_SERVER_TIME_REFRESH_INTERVAL");
+    String lamsAltServerUrl = p.getProperty("LAMS_ALT_SERVER_URL", "https://");
 
     //Add port to the url if the port is in the blackboard url
     int bbport = request.getServerPort();
@@ -70,6 +71,9 @@
                 </bbNG:dataElement>
                 <bbNG:dataElement label="LAMS SERVER TIME REFRESH INTERVAL (HOURS)" isRequired="true" labelFor="lams_server_time_refresh_interval">
                     <input type="text" name="lams_server_time_refresh_interval" size="20" value="<%=lamsServerTimeRefreshInterval%>">
+                </bbNG:dataElement>                
+                <bbNG:dataElement label="LAMS ALTERNATIVE SERVER URL" isRequired="false" labelFor="lams_alt_server_url">
+                    <input type="text" name="lams_alt_server_url"  size="70" value="<%=lamsAltServerUrl%>">
                 </bbNG:dataElement>                
 				<p>For further information on how to configure these settings, see <a target="_blank" href="http://wiki.lamsfoundation.org/display/lamsdocs/Blackboard+9">this tutorial</a>.</p>
             </bbNG:step>  

@@ -50,6 +50,7 @@ public class LamsPluginUtil {
     public static final String PROP_LAMS_URL = "LAMS_SERVER_URL";
     public static final String PROP_REQ_SRC = "BB_REQ_SRC";
     public static final String PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL = "LAMS_SERVER_TIME_REFRESH_INTERVAL";
+    public static final String PROP_ALT_LAMS_URL = "LAMS_ALT_SERVER_URL";
 
     private static Properties lamsProperties = null;
 
