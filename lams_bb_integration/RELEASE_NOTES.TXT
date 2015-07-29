@@ -93,3 +93,5 @@ Also supports calls to the LAMS server to use a dummy course to suit the templat
 ===================
 * LDEV-3456: Supports deleting learning designs.
 * LDEV-3513: Transform lineitemId parameter stored in some older versions to the format required now
+* LDEV-3510: LAMS Lessons always appear at the top of the content list - should able to be moved further down the list.
+* LDEV-3521: Supporting an alternative URL for LAMS where needed for mixed https/http integrations.

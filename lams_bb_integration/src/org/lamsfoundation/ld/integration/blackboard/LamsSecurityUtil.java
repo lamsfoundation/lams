@@ -72,6 +72,24 @@ public class LamsSecurityUtil {
     private static final String DUMMY_COURSE = "Previews"; 
     
     /**
+     * Generates login requests to LAMS for author, monitor and learner, using the alternative URL.
+     * 
+     * @param ctx
+     *            the blackboard contect, contains session data
+     * @param method
+     *            the mehtod to request of LAMS "author", "monitor", "learnerStrictAuth"
+     * @param lsid
+     *            lesson id. It is expected to be present in case of "monitor" and "learnerStrictAuth"
+     * @return a url pointing to the LAMS lesson, monitor, author session
+     * @throws IOException 
+     * @throws PersistenceException 
+     * @throws Exception
+     */
+    public static String generateRequestAltURL(Context ctx, String method, String lsid) throws PersistenceException, IOException {
+	return generateRequestURLForServer(ctx, method, lsid, getAltServerAddress());
+    }
+
+    /**
      * Generates login requests to LAMS for author, monitor and learner
      * 
      * @param ctx
@@ -86,8 +104,10 @@ public class LamsSecurityUtil {
      * @throws Exception
      */
     public static String generateRequestURL(Context ctx, String method, String lsid) throws PersistenceException, IOException {
+	return generateRequestURLForServer(ctx, method, lsid, getServerAddress());
+    }
 	
-	String serverAddr = getServerAddress();
+    private static String generateRequestURLForServer(Context ctx, String method, String lsid, String serverAddr) throws PersistenceException, IOException {
 	String serverId = getServerID();
 	String reqSrc = getReqSrc();
 
@@ -826,6 +846,14 @@ public class LamsSecurityUtil {
     public static String getServerAddress() {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_URL);
     }
+
+    /**
+     * @return gets alternative server address from the lams.properties file
+     */
+    public static String getAltServerAddress() {
+	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_ALT_LAMS_URL);
+    }
+
 
     /**
      * @return gets server id from the lams.properties file
