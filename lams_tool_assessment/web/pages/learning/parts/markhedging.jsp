@@ -61,10 +61,24 @@
 			
 		</tr>
 	</c:forEach>
+	
+	<tr>
+		<td>
+			<c:if test="${!isEditingDisabled && !question.responseSubmitted}">
+				<div>
+					<fmt:message key="label.justify.hedging.marks" />
+				</div>
+			</c:if>
+			
+			<lams:STRUTS-textarea property="question${questionIndex}" rows="4" cols="60" value="${question.answerString}" 
+				disabled="${isEditingDisabled || question.responseSubmitted}" styleClass="mark-hedging-select"
+			/>
+		</td>
+	</tr>
 </table>
 
 <c:if test="${!finishedLock && !question.responseSubmitted && isLeadershipEnabled && isUserLeader}">
-	<div>
+	<div class="float-right">
 		<html:button property="submit-hedging-question${questionIndex}" onclick="return submitSingleMarkHedgingQuestion(${question.uid}, ${questionIndex});" 
 				styleClass="button">
 			<fmt:message key="label.learning.submit" />

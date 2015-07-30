@@ -792,6 +792,8 @@ public class LearningAction extends Action {
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+		
+		//store hedging marks
 		for (AssessmentQuestionOption option : question.getOptions()) {
 		    Integer markHedging = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
 			    + option.getSequenceId(), true);
@@ -799,6 +801,11 @@ public class LearningAction extends Action {
 			option.setAnswerInt(markHedging);
 		    }
 		}
+		
+		//store justificaion of hedging
+		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		answerString = answerString.replaceAll("[\n\r\f]", "");
+		question.setAnswerString(answerString);
 	    }
 	}
     }
@@ -821,13 +828,15 @@ public class LearningAction extends Action {
 	int pageCount;
 	for (pageCount = 0; pageCount < pagedQuestions.size(); pageCount++) {
 	    LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageCount);
-	    
+
 	    for (AssessmentQuestion question : questionsForOnePage) {
-		if (question.isAnswerRequired()) {
+		int questionType = question.getType();
+		    
+		//enforce all hedging marks question type to be answered as well
+		if (question.isAnswerRequired() || (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 
 		    boolean isAnswered = false;
 
-		    int questionType = question.getType();
 		    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 
 			for (AssessmentQuestionOption option : question.getOptions()) {
@@ -850,11 +859,15 @@ public class LearningAction extends Action {
 			
 		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 
+			//verify sum of all hedging marks is equal to question's grade
 			int sumMarkHedging = 0;
 			for (AssessmentQuestionOption option : question.getOptions()) {
 			    sumMarkHedging += option.getAnswerInt();
 			}
-			isAnswered = sumMarkHedging == question.getGrade(); 
+			isAnswered = sumMarkHedging == question.getGrade();
+			
+			//verify justification of hedging is provided
+			isAnswered &= StringUtils.isNotBlank(question.getAnswerString());
 		    }
 
 		    // check all questions were answered

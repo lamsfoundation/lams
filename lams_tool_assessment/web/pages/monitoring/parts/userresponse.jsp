@@ -82,7 +82,9 @@
 									responseStr +='</div>';
 								responseStr +='</div>';
 								responseStr +='<br>';
-							</c:forEach>					
+							</c:forEach>
+							
+							responseStr +="${questionResult.answerStringEscaped}";
 						</c:when>						
 	
 					</c:choose>
