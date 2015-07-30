@@ -86,21 +86,29 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
-			//if isLeadershipEnabled - enable/disable submit buttons
+			//if isLeadershipEnabled - enable/disable submit buttons for hedging marks type of questions
 			if (${isLeadershipEnabled}) {
-				$(".mark-hedging-select").on('change', function() {
-					var questionIndex = $(this).data("question-index");
-					var grade = eval($(this).find('option:last-child').val());
+				$(".mark-hedging-select").on('change keydown keypress keyup paste', function() {
 					
+					//get questionIndex based on whether element is select or textbox
+					var questionIndex = $(this).is("select") ? $(this).data("question-index") : $(this).attr("name").substring(8, $(this).attr("name").indexOf("__"));
+					
+					var selects = $("select[name^=question" + questionIndex + "_]");
+					var grade = selects.length == 0 ? 0 : eval(selects.first().find('option:last-child').val())
 					var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
 					
+					var textareaValue = $("#question" + questionIndex + "__lamstextarea").val();
+
+					var isButtonEnabled = (totalSelected == grade) && $.trim(textareaValue);
+					
 					//if totalSelected equals to question's grade - show button
-					if (totalSelected == grade) {
+					if (isButtonEnabled) {
 						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "").removeClass("button-disabled");
 					} else {
 						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "true").addClass("button-disabled");
 					}
 				}).trigger("change");
+				
 			}
 
 		});
@@ -406,17 +414,7 @@
 						</c:when>
 							
 						<c:when test="${question.type == 8}">
-							//mark hedging
-							
-						//	var questionIndex = ${status.index};
-						//	var grade = ${question.grade};
-						//	var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
-					
-							//if totalSelected not equals to question's grade - show warning
-						//	if (totalSelected != grade) {
-						//		markHedgingWrongTotalQuestions.push("${status.index}");
-						//	}
-							
+							//mark hedging - processed below
 						</c:when>
 					</c:choose>
 				</c:if>
@@ -446,15 +444,18 @@
 					
 					if (${isLeadershipEnabled}) {
 						if ($("[type=button][name=submit-hedging-question"+ questionIndex +"]").length > 0) {
-							missingRequiredQuestions.push("${status.index}");
+							markHedgingWrongTotalQuestions.push("${status.index}");
 						}
 						
 					} else {
 						var grade = ${question.grade};
 						var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
+
+				        var justificationTextareaValue = $("#question" + questionIndex + "__lamstextarea").val();
 				
-						//if totalSelected not equals to question's grade - show warning
-						if (totalSelected != grade) {
+						//if totalSelected not equals to question's grade OR textarea is empty or contains only white-space - show warning
+						if (totalSelected != grade
+								|| !$.trim(justificationTextareaValue)) {
 							markHedgingWrongTotalQuestions.push("${status.index}");
 						}
 					}
