@@ -52,9 +52,9 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 		Emailer.sendFromSupportEmail(subject, toEmail, message, isHtmlFormat);
 	    } else {
 		User fromUser = (User) EventNotificationService.getInstance().getUserManagementService()
-			.findById(User.class, toUserId);
+			.findById(User.class, fromUserId);
 		if (fromUser == null) {
-		    log.error("Source user with ID " + toUserId + " was not found.");
+		    log.error("Source user with ID " + fromUserId + " was not found.");
 		}
 		String fromEmail = fromUser.getEmail();
 		if (!DeliveryMethodMail.emailValidator.isValid(fromEmail)) {
