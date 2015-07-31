@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.rating.dao;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
@@ -36,6 +37,8 @@ public interface IRatingDAO {
     void saveOrUpdate(Object object);
 
     Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId);
+    
+    List<Rating> getRatingsByItem(Long contentId, Long itemId);
 
     List<Rating> getRatingsByUser(Long contentId, Integer userId);
 
@@ -77,5 +80,15 @@ public interface IRatingDAO {
      * @return
      */
     int getCountItemsRatedByUser(final Long toolContentId, final Integer userId);
+    
+    /**
+     * Count how many users rated and commented each item.
+     * 
+     * @param contentId
+     * @param itemIds
+     * @param excludeUserId
+     * @return
+     */
+    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds, Integer excludeUserId);
 
 }

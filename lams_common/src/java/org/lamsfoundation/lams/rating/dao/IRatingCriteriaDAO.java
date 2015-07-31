@@ -38,5 +38,21 @@ public interface IRatingCriteriaDAO {
     RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId);
     
     RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId, Class clasz);
+    
+    /**
+     * Checks if comments are enabled (i.e. if comments' criteria is available).
+     * 
+     * @param toolContentId
+     * @return
+     */
+    boolean isCommentsEnabledForToolContent(Long toolContentId);
+    
+    /**
+     * If comments enabled then there might be commentsMinWords limit set. Returns its value or 0 otherwise.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    int getCommentsMinWordsLimitForToolContent(Long toolContentId);
 
 }

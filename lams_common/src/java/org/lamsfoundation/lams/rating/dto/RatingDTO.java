@@ -23,59 +23,31 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.rating.dto;
 
-import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.usermanagement.User;
 
 public class RatingDTO {
 
-    private String userRating;
-    private String averageRating;
-    private String numberOfVotes;
-    private Long itemId;
-    private RatingCriteria ratingCriteria;
+    private User learner;
 
-    public RatingDTO(String rating, String numberOfVotes) {
-	this.averageRating = rating;
-	this.numberOfVotes = numberOfVotes;
-    }
-    
-    public String getUserRating() {
-	return userRating;
+    private String rating;
+
+    /**
+     */
+    public User getLearner() {
+	return learner;
     }
 
-    public void setUserRating(String userRating) {
-	this.userRating = userRating;
+    public void setLearner(User learner) {
+	this.learner = learner;
     }
 
-    public String getAverageRating() {
-	return averageRating;
+    /**
+     */
+    public void setRating(String rating) {
+	this.rating = rating;
     }
 
-    public void setAverageRating(String averageRating) {
-	this.averageRating = averageRating;
+    public String getRating() {
+	return this.rating;
     }
-
-    public String getNumberOfVotes() {
-	return numberOfVotes;
-    }
-
-    public void setNumberOfVotes(String numberOfVotes) {
-	this.numberOfVotes = numberOfVotes;
-    }
-
-    public Long getItemId() {
-	return itemId;
-    }
-
-    public void setItemId(Long itemId) {
-	this.itemId = itemId;
-    }
-    
-    public RatingCriteria getRatingCriteria() {
-	return ratingCriteria;
-    }
-
-    public void setRatingCriteria(RatingCriteria ratingCriteria) {
-	this.ratingCriteria = ratingCriteria;
-    }
-  
 }

@@ -27,9 +27,11 @@ package org.lamsfoundation.lams.rating.dao.hibernate;
 
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -48,6 +50,9 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
     private static final String FIND_RATING_BY_CRITERIA_AND_USER = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=?";
+    
+    private static final String FIND_RATINGS_BY_ITEM = "FROM " + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? AND r.itemId=?";
 
     private static final String FIND_RATINGS_BY_USER = "FROM " + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.toolContentId=? AND r.learner.userId=?";
@@ -90,7 +95,12 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	    return null;
 	}
     }
-
+    
+    @Override
+    public List<Rating> getRatingsByItem(Long contentId, Long itemId) {
+	return super.find(FIND_RATINGS_BY_ITEM, new Object[] { contentId, itemId });
+    }
+    
     // method is not used at the moment
     private Rating getRating(Long ratingCriteriaId, Integer userId) {
 	List<Rating> list = (List<Rating>) doFind(FIND_RATING_BY_CRITERIA_AND_USER,
@@ -172,4 +182,61 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
 	return unionItemIds.size();
     }
+    
+    @Override
+    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds, Integer excludeUserId) {
+	
+	HashMap<Long, Long> itemIdToRatedUsersCountMap = new HashMap<Long, Long>();
+	if (itemIds.isEmpty()) {
+	    return itemIdToRatedUsersCountMap;
+	}
+
+	// unions don't work in HQL so doing 2 separate DB queries (http://stackoverflow.com/a/3940445)
+	String FIND_ITEMID_USERID_PAIRS_BY_CONTENT_AND_ITEMS = "SELECT r.itemId, r.learner.userId FROM "
+		+ Rating.class.getName()
+		+ " AS r where r.ratingCriteria.toolContentId=:contentId AND r.itemId IN (:itemIds)";
+	
+	String FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS = "SELECT comment.itemId, comment.learner.userId FROM "
+		+ RatingComment.class.getName()
+		+ " AS r where comment.ratingCriteria.toolContentId=:contentId AND comment.itemId IN (:itemIds) AND comment.ratingCriteria.commentsEnabled IS TRUE";
+	
+	List<Object[]> ratedItemObjs = getSession().createQuery(FIND_ITEMID_USERID_PAIRS_BY_CONTENT_AND_ITEMS)
+		.setLong("contentId", contentId).setParameterList("itemIds", itemIds).list();
+	
+	List<Object[]> commentedItemObjs = getSession().createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS)
+		.setLong("contentId", contentId).setParameterList("itemIds", itemIds).list();
+	
+	for (Long itemId : itemIds) {
+	    HashSet<Integer> userIds = new HashSet<Integer>();
+	    
+	    //put all corresponding userIds into the userIds set 
+	    for (Object[] ratedItemObj: ratedItemObjs) {
+		Long itemIdIter = (Long) ratedItemObj[0];
+		Integer userIdIter = (Integer) ratedItemObj[1];
+		
+		if (itemIdIter.equals(itemId)) {
+		    userIds.add(userIdIter);
+		}
+	    }
+	    
+	    //put all corresponding userIds into the userIds set 
+	    for (Object[] commentedItemObj: commentedItemObjs) {
+		Long itemIdIter = (Long) commentedItemObj[0];
+		Integer userIdIter = (Integer) commentedItemObj[1];
+		
+		if (itemIdIter.equals(itemId)) {
+		    userIds.add(userIdIter);
+		}
+	    }
+	    
+	    //exclude user that is doing comment now
+	    userIds.remove(excludeUserId);
+	    
+	    //count how many userIds is rated and commented item
+	    itemIdToRatedUsersCountMap.put(itemId, new Long(userIds.size()));
+	}
+
+	return itemIdToRatedUsersCountMap;
+    }
+
 }
