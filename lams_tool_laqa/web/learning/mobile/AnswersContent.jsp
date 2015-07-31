@@ -82,7 +82,7 @@
 					jQuery(".text-area").each(function() {
 						if (jQuery.trim($(this).val()) == "") {
 							if (confirm("<fmt:message key="warning.empty.answers" />")) {
-								doSubmit(actionMethod);
+								doSubmit();
 								return submit = false;
 							} else {
 								this.focus();
@@ -96,7 +96,7 @@
 			return submit;
 		}
 		
-		function doSubmit(actionMethod) {
+		function doSubmit() {
 			document.QaLearningForm.submit();
 		}
 		
@@ -151,8 +151,7 @@
 			    e.preventDefault();
 
 			    if (validateForm()) {
-			    	//run an AJAX post request
-				    $.post($this.attr('action'), $this.serialize());
+			    	doSubmit();
 			    } else {
 			    	return false;
 			    }
