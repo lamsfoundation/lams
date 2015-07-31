@@ -60,6 +60,7 @@ public class AssessmentQuestionForm extends ActionForm {
     private boolean allowRichEditor;
     private int maxWordsLimit;
     private int minWordsLimit;
+    private boolean hedgingJustificationEnabled;
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -245,4 +246,11 @@ public class AssessmentQuestionForm extends ActionForm {
 	this.minWordsLimit = minWordsLimit;
     }
 
+    public boolean isHedgingJustificationEnabled() {
+	return hedgingJustificationEnabled;
+    }
+
+    public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
+	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
+    }
 }

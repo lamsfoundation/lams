@@ -97,9 +97,14 @@
 					var grade = selects.length == 0 ? 0 : eval(selects.first().find('option:last-child').val())
 					var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
 					
-					var textareaValue = $("#question" + questionIndex + "__lamstextarea").val();
 
-					var isButtonEnabled = (totalSelected == grade) && $.trim(textareaValue);
+					var isButtonEnabled = (totalSelected == grade);
+					
+					//check if hedging justification is enabled
+					var justificationTextarea = $("#question" + questionIndex + "__lamstextarea");
+					if( justificationTextarea.length) {
+						isButtonEnabled = isButtonEnabled && $.trim(justificationTextarea.val());
+					}
 					
 					//if totalSelected equals to question's grade - show button
 					if (isButtonEnabled) {
@@ -450,12 +455,10 @@
 					} else {
 						var grade = ${question.grade};
 						var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
-
-				        var justificationTextareaValue = $("#question" + questionIndex + "__lamstextarea").val();
 				
 						//if totalSelected not equals to question's grade OR textarea is empty or contains only white-space - show warning
 						if (totalSelected != grade
-								|| !$.trim(justificationTextareaValue)) {
+								|| ${question.hedgingJustificationEnabled} && !$.trim($("#question" + questionIndex + "__lamstextarea").val())) {
 							markHedgingWrongTotalQuestions.push("${status.index}");
 						}
 					}

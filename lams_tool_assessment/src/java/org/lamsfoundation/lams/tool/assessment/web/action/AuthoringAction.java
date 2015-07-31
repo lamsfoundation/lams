@@ -1757,6 +1757,7 @@ public class AuthoringAction extends Action {
 	form.setAllowRichEditor(question.isAllowRichEditor());
 	form.setMaxWordsLimit(question.getMaxWordsLimit());
 	form.setMinWordsLimit(question.getMinWordsLimit());
+	form.setHedgingJustificationEnabled(question.isHedgingJustificationEnabled());
 	if (questionIdx >= 0) {
 	    form.setQuestionIndex(new Integer(questionIdx).toString());
 	}
@@ -1857,6 +1858,7 @@ public class AuthoringAction extends Action {
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	    question.setHedgingJustificationEnabled(questionForm.isHedgingJustificationEnabled());
 	}
 
 	// set options

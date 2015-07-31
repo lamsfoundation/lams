@@ -84,7 +84,9 @@
 								responseStr +='<br>';
 							</c:forEach>
 							
-							responseStr +="${questionResult.answerStringEscaped}";
+							<c:if test="${question.hedgingJustificationEnabled}">
+								responseStr +="${questionResult.answerStringEscaped}";
+							</c:if>
 						</c:when>						
 	
 					</c:choose>
