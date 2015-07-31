@@ -305,7 +305,7 @@ public class LearningAction extends Action {
 	boolean isScratchingFinished = toolSession.isScratchingFinished();
 	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
 	boolean isWaitingForLeaderToSubmitBurningQuestions = scratchie.isBurningQuestionsEnabled()
-		&& (burningQuestions == null || burningQuestions.isEmpty());
+		&& (burningQuestions == null || burningQuestions.isEmpty()) && !toolSession.isSessionFinished();
 	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook && !isWaitingForLeaderToSubmitBurningQuestions)
 		&& !mode.isTeacher();
 
@@ -406,7 +406,7 @@ public class LearningAction extends Action {
 	    burningQuestions = LearningAction.service.getBurningQuestionsBySession(toolSessionId);
 	}
 	isWaitingForLeaderToSubmitNotebook |= isBurningQuestionsEnabled
-		&& (burningQuestions == null || burningQuestions.isEmpty());
+		&& (burningQuestions == null || burningQuestions.isEmpty()) && !toolSession.isSessionFinished();
 
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK, isWaitingForLeaderToSubmitNotebook);
@@ -689,11 +689,6 @@ public class LearningAction extends Action {
     
     private void saveBurningQuestions(final Long sessionId, final Long itemUid, final String question,
 	    String oldQuestion) throws ScratchieApplicationException {
-	// if burning question is blank or is the same as before - skip saving it
-	if (StringUtils.isBlank(question) || question.equals(oldQuestion)) {
-	    return;
-	}
-
 	// update new entry
 	tryExecute(new Callable<Object>() {
 	    @Override
