@@ -374,13 +374,13 @@ public class AuthoringAction extends Action {
 	    iter.remove();
 	}
 
-	// ************************* Handle rating criterias *******************
-	List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
-	service.saveRatingCriterias(request, oldCriterias, contentId);
-
 	// **********************************************
 	// finally persist imageGalleryPO again
 	service.saveOrUpdateImageGallery(imageGalleryPO);
+
+	// ************************* Handle rating criterias *******************
+	List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
+	service.saveRatingCriterias(request, oldCriterias, contentId);
 
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
