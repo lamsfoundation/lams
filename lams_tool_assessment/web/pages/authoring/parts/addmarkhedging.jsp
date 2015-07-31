@@ -160,6 +160,13 @@
 					</label>
 				</div>
 				
+				<div class="field-name space-top" >
+					<html:checkbox property="hedgingJustificationEnabled" styleId="ask-for-justification"/>
+					<label for="ask-for-justification">
+						<fmt:message key="label.ask.for.hedging.justification" />
+					</label>
+				</div>
+				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.answer.options" />
 				</div>

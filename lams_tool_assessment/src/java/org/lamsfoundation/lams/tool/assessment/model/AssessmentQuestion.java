@@ -99,6 +99,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     //only for essay type of question
     private int minWordsLimit;
     
+    //only for hedging mark type of question
+    private boolean hedgingJustificationEnabled;
+    
     // DTO fields:
     private String answerString;
     
@@ -546,6 +549,18 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
      */
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
+    }
+    
+    /**
+     * @hibernate.property column="hedging_justification_enabled"
+     * @return
+     */
+    public boolean isHedgingJustificationEnabled() {
+	return hedgingJustificationEnabled;
+    }
+
+    public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
+	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
     
     public String getAnswerString() {

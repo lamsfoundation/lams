@@ -115,7 +115,7 @@
 		    	// alert("using clientHeight");
 		    }
 			// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
+		    height -= document.getElementById('TB_iframeContent').offsetTop + 140;
 		    document.getElementById('TB_iframeContent').style.height = height +"px";
 	
 			TB_HEIGHT = height + 28;

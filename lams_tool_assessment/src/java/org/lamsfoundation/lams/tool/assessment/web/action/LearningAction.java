@@ -802,10 +802,12 @@ public class LearningAction extends Action {
 		    }
 		}
 		
-		//store justificaion of hedging
-		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		answerString = answerString.replaceAll("[\n\r\f]", "");
-		question.setAnswerString(answerString);
+		//store justification of hedging if enabled
+		if (question.isHedgingJustificationEnabled()) {
+		    String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		    answerString = answerString.replaceAll("[\n\r\f]", "");
+		    question.setAnswerString(answerString);
+		}
 	    }
 	}
     }
@@ -866,8 +868,10 @@ public class LearningAction extends Action {
 			}
 			isAnswered = sumMarkHedging == question.getGrade();
 			
-			//verify justification of hedging is provided
-			isAnswered &= StringUtils.isNotBlank(question.getAnswerString());
+			//verify justification of hedging is provided if it was enabled
+			if (question.isHedgingJustificationEnabled()) {
+			    isAnswered &= StringUtils.isNotBlank(question.getAnswerString());
+			}
 		    }
 
 		    // check all questions were answered
