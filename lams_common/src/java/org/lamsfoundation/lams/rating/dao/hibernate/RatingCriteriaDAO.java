@@ -36,8 +36,14 @@ import org.springframework.dao.DataRetrievalFailureException;
 
 public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO {
 
-    private static final String FIND_BY_TOOL_CONTENT_ID = "from " + RatingCriteria.class.getName()
-	    + " as r where r.toolContentId=? order by r.orderId asc";
+    private static final String FIND_BY_TOOL_CONTENT_ID = "FROM " + RatingCriteria.class.getName()
+	    + " AS r WHERE r.toolContentId=? order by r.orderId asc";
+    
+    private static final String IS_COMMENTS_ENABLED_FOR_TOOL_CONTENT_ID = "SELECT COUNT(*) FROM "
+	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.commentsEnabled=1";
+    
+    private static final String GET_COMMENTS_MIN_WORDS_LIMIT_FOR_TOOL_CONTENT_ID = "SELECT r.commentsMinWordsLimit FROM "
+	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.commentsEnabled=1";
 
     @Override
     public void saveOrUpdate(RatingCriteria criteria) {
@@ -94,5 +100,20 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
     @Override
     public RatingCriteria getByRatingCriteriaId(Long ratingCriteriaId, Class clasz) {
 	return (RatingCriteria) super.find(clasz, ratingCriteriaId);
+    }
+    
+    @Override
+    public boolean isCommentsEnabledForToolContent(Long toolContentId) {
+	List list = super.find(IS_COMMENTS_ENABLED_FOR_TOOL_CONTENT_ID, new Object[] { toolContentId });
+	return ((Number) list.get(0)).intValue() == 1;
+    }
+    
+    @Override
+    public int getCommentsMinWordsLimitForToolContent(Long toolContentId) {
+	List list = super.find(GET_COMMENTS_MIN_WORDS_LIMIT_FOR_TOOL_CONTENT_ID, new Object[] { toolContentId });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
     }
 }
