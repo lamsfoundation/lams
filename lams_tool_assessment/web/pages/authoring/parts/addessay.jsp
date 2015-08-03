@@ -60,10 +60,28 @@
 		  		});
 		    	
 		    	//spinner
-		    	var maximumWordsSpinner = $( "#max-words-limit" ).spinner({ 
-		    		min: 0,
-		    		disabled: ($( "#max-words-limit" ).val() == 0)
-		    	});
+		    	var validateMinMax = function() {
+		    			// min can't be more than max
+		    			var min = $( "#min-words-limit" ),
+		    				max = $( "#max-words-limit" ),
+		    				minVal = +min.val(),
+		    				maxVal = +max.val();
+		    			if (minVal > maxVal){
+		    				max.val(minVal);
+		    			}
+		    		},
+		    		maximumWordsSpinner = $( "#max-words-limit" ).spinner({ 
+			    		min: 0,
+			    		disabled: ($( "#max-words-limit" ).val() == 0),
+			    		change: validateMinMax,
+			    		stop: validateMinMax
+		    		}),
+		    		minimumWordsSpinner = $( "#min-words-limit" ).spinner({ 
+			    		min: 0,
+			    		disabled: ($( "#min-words-limit" ).val() == 0),
+			    		change: validateMinMax,
+			    		stop: validateMinMax
+		    		});
 		    	$("#max-words-limit-checkbox").click(function() {
 		    		if ( maximumWordsSpinner.spinner( "option", "disabled" ) ) {
 		    			 maximumWordsSpinner.spinner( "enable" );
@@ -73,10 +91,6 @@
 		        });
 		    	
 		    	//spinner
-		    	var minimumWordsSpinner = $( "#min-words-limit" ).spinner({ 
-		    		min: 0,
-		    		disabled: ($( "#min-words-limit" ).val() == 0)
-		    	});
 		    	$("#min-words-limit-checkbox").click(function() {
 		    		if ( minimumWordsSpinner.spinner( "option", "disabled" ) ) {
 		    			minimumWordsSpinner.spinner( "enable" );
