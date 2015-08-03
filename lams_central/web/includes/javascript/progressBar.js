@@ -367,11 +367,9 @@ var ActivityUtils = {
 							   content)
 						.attr(DEFAULT_TEXT_ATTRIBUTES);
 		} else {
-			content = ActivityUtils.breakTitle(content, paper.width);
-			label = paper.text(activity.middle,
-					           47 + 60 * activity.index + (isLarger ? 10 : 0),
-					           content)
-					     .attr(DEFAULT_TEXT_ATTRIBUTES);
+			label = ActivityUtils.breakTitle(paper, +paper.attr('width'),
+											 activity.middle, 47 + 60 * activity.index + (isLarger ? 10 : 0),
+											 content );
 		}
 		activity.elements.push(label);
 		
@@ -708,21 +706,15 @@ var ActivityUtils = {
 			ActivityUtils.addDecoration(childActivity, null,
 					true);
 			
-			var labelText = ActivityUtils.breakTitle((isNested ? '- ' : '') + childActivity.name,
-													  activity.bar.paper.attr('width') - 31),
-				label = paper.text(35, childActivity.y + 11, labelText)
-							 .attr(DEFAULT_TEXT_ATTRIBUTES)
+			var label = ActivityUtils.breakTitle(paper, activity.bar.paper.attr('width') - 31,
+					 							 35, childActivity.y + 11,
+												 (isNested ? '- ' : '') + childActivity.name)
 							 // align to left
-							 .attr('text-anchor', 'start');
-			// bbox for label is not available yet, so draw the same one on a temporary paper
-			var tempPaper = Snap(1000, 1000),
-				tempLabel = tempPaper.text(0, 0, labelText).attr(DEFAULT_TEXT_ATTRIBUTES),
-				labelHeight = tempLabel.getBBox().height + 10,
+							 .attr('text-anchor', 'start'),
+				labelHeight = label.getBBox().height + 10,
 				paperHeight = Math.max(23, labelHeight),
 				shift = paperHeight - 23,
 				transformationString = 't 0 ' + (shift)/2;
-			tempLabel.remove();
-			tempPaper.remove();
 			paper.attr({
 				'height' : paperHeight
 			});
@@ -894,31 +886,38 @@ var ActivityUtils = {
 	},
 	
 	// break string into several lines if it is too long
-	breakTitle : function(title, width) {
-		var paper = Snap(width, 100),
-			brokenTitle = title,
-			parts = 1,
+	breakTitle : function(paper, width, x, y, title) {
+		var brokenTitle = [title],
 			elem = null;
 		do {
-			elem = paper.text(0, 0, brokenTitle).attr(DEFAULT_TEXT_ATTRIBUTES);
+			elem = paper.text(x, y, brokenTitle).attr(DEFAULT_TEXT_ATTRIBUTES);
+			// move each line, except the first, a bit lower
+			$('tspan', elem.node).each(function(index, tspan){
+				if (index > 0) {
+					$(tspan).attr({
+						'x'  : x,
+						'dy' : '1.1em'
+					});
+				}
+			});
 			if (elem.getBBox().width > width) {
+				// break the title into more chunks
 				elem.remove();
-				parts++;
-				var chunk = Math.ceil(title.length/parts);
-				brokenTitle = '';
+				var parts = brokenTitle.length + 1,
+					chunk = Math.ceil(title.length/parts);
+				brokenTitle = [];
 				for (var part = 1; part <= parts; part++) {
 					var startIndex = (part - 1) * chunk,
-						endIndex = part == parts ? null : part*chunk;
-					brokenTitle += endIndex ? title.substring(startIndex, endIndex) + '\n' : title.substring(startIndex);
+						endIndex = part == parts ? undefined : part*chunk;
+					brokenTitle.push(title.substring(startIndex, endIndex));
 				}
 			} else {
-				elem.remove();
-				elem = null;
+				// stop the iteration
+				brokenTitle = null;
 			}
-		} while (elem);
-		
-		paper.remove();
-		return brokenTitle;
+		} while (brokenTitle);
+
+		return elem;
 	}
 }
 
