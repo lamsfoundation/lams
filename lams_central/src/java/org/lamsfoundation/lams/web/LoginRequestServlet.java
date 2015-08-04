@@ -145,17 +145,21 @@ public class LoginRequestServlet extends HttpServlet {
 		}
 	    }
 	    Authenticator.authenticateLoginRequest(serverMap, timestamp, extUsername, method, lsId, hash);
-	    
+
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
 	    // The "extUser" attribute works as a flag to indicate if the user has logged in
 	    String loginRequestUsername = (String) hses.getAttribute("extUser");
-	    if ((loginRequestUsername != null) && loginRequestUsername.equals(login)) {
+	    // for checking if requested role is the same as already assigned
+	    String role = method.equals(LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION)
+		    ? LoginRequestDispatcher.METHOD_LEARNER : method;
+	    role = role.toUpperCase();
+	    if ((loginRequestUsername != null) && loginRequestUsername.equals(login) && request.isUserInRole(role)) {
 		String url = LoginRequestDispatcher.getRequestURL(request);
 		response.sendRedirect(response.encodeRedirectURL(url));
 		return;
-	    } else if (loginRequestUsername == null ? request.getRemoteUser() != null : !loginRequestUsername
-		    .equals(login)) {
+	    } else if (loginRequestUsername == null ? request.getRemoteUser() != null
+		    : (!loginRequestUsername.equals(login) || !request.isUserInRole(role))) {
 		hses = recreateSession(request, response);
 	    }
 
