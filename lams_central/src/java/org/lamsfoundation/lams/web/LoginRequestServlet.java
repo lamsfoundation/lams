@@ -136,7 +136,10 @@ public class LoginRequestServlet extends HttpServlet {
 	    String login = user.getLogin();
 	    UserDTO loggedInUserDTO = (UserDTO) hses.getAttribute(AttributeNames.USER);
 	    String loggedInLogin = loggedInUserDTO == null ? null : loggedInUserDTO.getLogin();
-	    if ((loggedInLogin != null) && loggedInLogin.equals(login)) {
+	    // for checking if requested role is the same as already assigned
+	    String role = method.equals(LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION)
+		    ? LoginRequestDispatcher.METHOD_LEARNER : method;
+	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
 		String url = LoginRequestDispatcher.getRequestURL(request);
 		response.sendRedirect(response.encodeRedirectURL(url));
 		return;
