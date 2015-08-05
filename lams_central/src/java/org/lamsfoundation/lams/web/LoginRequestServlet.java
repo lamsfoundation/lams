@@ -132,6 +132,12 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	    Authenticator.authenticateLoginRequest(serverMap, timestamp, extUsername, method, lsId, hash);
 	    
+	    if (extCourseId != null) {
+		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
+		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
+			courseName, method, prefix);
+	    }
+
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
 	    UserDTO loggedInUserDTO = (UserDTO) hses.getAttribute(AttributeNames.USER);
@@ -143,12 +149,6 @@ public class LoginRequestServlet extends HttpServlet {
 		String url = LoginRequestDispatcher.getRequestURL(request);
 		response.sendRedirect(response.encodeRedirectURL(url));
 		return;
-	    }
-
-	    if (extCourseId != null) {
-		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
-			courseName, method, prefix);
 	    }
 
 	    // check if there is a redirect URL parameter already
