@@ -85,7 +85,6 @@ public class LoginRequestServlet extends HttpServlet {
      * @throws IOException
      *             if an error occurred
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	HttpSession hses = request.getSession(true);
@@ -115,8 +114,8 @@ public class LoginRequestServlet extends HttpServlet {
 
 	// LDEV-2196 preserve character encoding if necessary
 	if (request.getCharacterEncoding() == null) {
-	    LoginRequestServlet.log
-		    .debug("request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
+	    LoginRequestServlet.log.debug(
+		    "request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
 	    extUsername = new String(extUsername.getBytes("8859_1"), "UTF-8");
 	    if (courseName != null) {
 		courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
@@ -134,10 +133,10 @@ public class LoginRequestServlet extends HttpServlet {
 			langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
 	    }
 
-	    //in case of request for learner with strict authentication check cache should also contain lsid
+	    // in case of request for learner with strict authentication check cache should also contain lsid
 	    String lsId = null;
 	    if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
-		
+
 		lsId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
 		if (lsId == null) {
 		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
@@ -145,6 +144,12 @@ public class LoginRequestServlet extends HttpServlet {
 		}
 	    }
 	    Authenticator.authenticateLoginRequest(serverMap, timestamp, extUsername, method, lsId, hash);
+
+	    if (extCourseId != null) {
+		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
+		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
+			courseName, method, prefix);
+	    }
 
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
@@ -163,12 +168,6 @@ public class LoginRequestServlet extends HttpServlet {
 		hses = recreateSession(request, response);
 	    }
 
-	    if (extCourseId != null) {
-		//check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
-			courseName, method, prefix);
-	    }
-
 	    LoginRequestServlet.log.debug("Session Id - " + hses.getId());
 	    // connect to DB and get password here
 	    String pass = getUserPassword(userMap.getUser().getLogin());
@@ -179,7 +178,8 @@ public class LoginRequestServlet extends HttpServlet {
 	    response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
 	} catch (AuthenticationException e) {
 	    LoginRequestServlet.log.error("Authentication error: ", e);
-	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - authentication error. " + e.getMessage());
+	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+		    "Login Failed - authentication error. " + e.getMessage());
 	} catch (UserInfoFetchException e) {
 	    LoginRequestServlet.log.error("User fetch info error: ", e);
 	    response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
@@ -198,7 +198,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 	}
     }
-    
+
     /**
      * The doPost method of the servlet. <br>
      * 
