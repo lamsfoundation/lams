@@ -103,7 +103,7 @@
         <property name="proxyTargetClass">
             <value>false</value>
         </property>
-        <property name="preInterceptors">
+        <property name="postInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>

@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+/* TransactionRetryInterceptor.java,v 1.1 2015/07/22 08:00:18 marcin Exp */
 package org.lamsfoundation.lams.web.filter;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
- * Retries proxied method in case of an exception.
- * Is the first interceptor in the processing chain.
+ * Retries proxied method in case of an exception. It should kick in after Hibernate session gets created.
+ * 
  * @author Marcin Cieslak
  *
  */
 public class TransactionRetryInterceptor implements MethodInterceptor {
-    
+
     private static final Logger log = Logger.getLogger(TransactionRetryInterceptor.class);
 
     private static final int MAX_ATTEMPTS = 3;
@@ -49,8 +49,8 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 		return invocation.proceed();
 	    } catch (DataIntegrityViolationException e) {
 		exception = e;
-		StringBuilder message = new StringBuilder("When invoking method  ")
-			.append(invocation.getMethod().getName()).append(" caught ").append(e.getMessage())
+		StringBuilder message = new StringBuilder("When invoking method \"")
+			.append(invocation.getMethod().getName()).append("\" caught ").append(e.getMessage())
 			.append(". Attempt #").append(attempt);
 		attempt++;
 		if (attempt <= TransactionRetryInterceptor.MAX_ATTEMPTS) {

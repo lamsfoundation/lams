@@ -47,8 +47,12 @@
 		</property>
 		<property name="preInterceptors">
 			<list>
-				<ref bean="transactionRetryInterceptor" />	
 				<ref local="checkCredentialTicketBeforeAdvice"/>
+			</list>
+		</property>
+		<property name="postInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />	
 			</list>
 		</property>
 	</bean>
