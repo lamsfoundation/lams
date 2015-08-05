@@ -35,7 +35,7 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="lessonServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="preInterceptors">
+		<property name="postInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
