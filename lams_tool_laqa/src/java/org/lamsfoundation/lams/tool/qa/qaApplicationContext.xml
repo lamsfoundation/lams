@@ -67,7 +67,7 @@
 	
 	<bean id="qaService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="preInterceptors">
+		<property name="postInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>

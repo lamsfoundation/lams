@@ -32,7 +32,7 @@
 	<bean id="toolContentIDGenerator" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref local="toolContentIDGeneratorTarget"/></property>
-		<property name="preInterceptors">
+		<property name="postInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -55,7 +55,7 @@
 	<bean id="lamsCoreToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref local="lamsCoreToolServiceTarget"/></property>
-		<property name="preInterceptors">
+		<property name="postInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -73,7 +73,7 @@
 	
 	<bean id="lamsToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="preInterceptors">
+		<property name="postInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
