@@ -339,9 +339,9 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
        		String folderContentsJSON = null;
        		if ( method.equals("getLearningDesignsJSON") ) {
        		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
-       		    folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns);
+       		    String designType = request.getParameter("type");
+       		    folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns, designType);
        		} else {
-       		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
        		    Integer page = WebUtil.readIntParam(request, "page", true);
        		    Integer size = WebUtil.readIntParam(request, "size", true);
        		    String sortName = request.getParameter("sortName");

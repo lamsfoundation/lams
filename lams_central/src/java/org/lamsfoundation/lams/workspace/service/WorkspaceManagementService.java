@@ -401,10 +401,19 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns)
 	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
 	
-	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false);
+	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, null);
     }
-    
-    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns, boolean designsOnly)
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns, String designType)
+	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
+	
+	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, designType);
+    }
+
+    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns, 
+	    boolean designsOnly, String designType)
 	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
 	JSONObject result = new JSONObject();
 	Vector<FolderContentDTO> folderContents = null;
@@ -434,7 +443,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		}
 		
 	    } else if ( userFolder != null ) {
-		return getFolderContentsJSON(userFolder.getResourceID().intValue(), userID, allowInvalidDesigns, true);
+		return getFolderContentsJSON(userFolder.getResourceID().intValue(), userID, allowInvalidDesigns, true, designType);
 	    
 	    } // else we want to return an empty JSON, which will be done by falling through to the folderContents loop.
 	    
@@ -468,12 +477,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
 		result.append("folders", subfolderJSON);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
-		JSONObject learningDesignJSON = new JSONObject();
-		learningDesignJSON.put("name", folderContent.getName());
-		learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
-		learningDesignJSON.put("description", folderContent.getDescription());
-		learningDesignJSON.put("date", folderContent.getLastModifiedDateTime());
-		result.append("learningDesigns", learningDesignJSON);
+		if ( designType == null || designType.equals(folderContent.getDesignType())) {
+		    JSONObject learningDesignJSON = new JSONObject();
+		    learningDesignJSON.put("name", folderContent.getName());
+		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
+		    learningDesignJSON.putOpt("type", folderContent.getDesignType());
+		    learningDesignJSON.put("date", folderContent.getLastModifiedDateTime());
+		    result.append("learningDesigns", learningDesignJSON);
+		}
 	    } else {
 		if (log.isDebugEnabled()) {
 		    log.debug("Unsupported folder content found, named \"" + folderContent.getName() + "\"");
@@ -520,7 +531,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", StringEscapeUtils.escapeHtml(design.getTitle()));
 		    learningDesignJSON.put("learningDesignId", design.getLearningDesignId());
-		    learningDesignJSON.put("description", StringEscapeUtils.escapeHtml(design.getDescription()));
+		    learningDesignJSON.putOpt("type", design.getDesignType());
 		    learningDesignJSON.put("date", design.getLastModifiedDateTime());
 		    result.put(learningDesignJSON);
 		}

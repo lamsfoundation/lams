@@ -57,6 +57,7 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
 	public Long licenseID; // applicable for designs only
 	public String licenseText; // applicable for designs only
 	public Boolean readOnly; // applicable for designs only
+	public String designType; // applicable for designs only
 	public String author;
 	public String originalAuthor;
 	public FolderContentDTO(){
@@ -77,6 +78,7 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
 		this.permissionCode = permissionCode;
 		this.licenseID = licenseID;
 		this.versionDetails = null;
+		this.designType = null;
 		this.readOnly = false;
 	}
 	public FolderContentDTO(LearningDesign design, Integer permissionCode, User user){
@@ -90,6 +92,7 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
 		this.permissionCode = permissionCode;
 		this.licenseID = ( design.getLicense() != null ? design.getLicense().getLicenseID() : null);
 		this.licenseText = design.getLicenseText();
+        	this.designType = design.getDesignType();
 		this.versionDetails = null;
 		this.readOnly = design.getReadOnly();
 		this.author = design.getUser().getFullName();
@@ -106,6 +109,7 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
 		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
 		this.permissionCode = permissionCode;
 		this.licenseID = null;
+		this.designType = null;
 		this.versionDetails = null;
 		this.readOnly = Boolean.FALSE;
 	}	
@@ -125,6 +129,7 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
 		this.versionDetails = new Vector();
 		versionDetails.addAll(details);
 		this.readOnly = Boolean.FALSE;
+		this.designType = null;
 	}
 	
 	@Override
@@ -186,6 +191,12 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
 	 */
 	public String getResourceType() {
 		return resourceType!=null?resourceType:WDDXTAGS.STRING_NULL_VALUE;
+	}
+	/**
+	 * @return Returns the designType.
+	 */
+	public String getDesignType() {
+		return designType;
 	}
 	/**
 	 * @return Returns the resourceTypeID.

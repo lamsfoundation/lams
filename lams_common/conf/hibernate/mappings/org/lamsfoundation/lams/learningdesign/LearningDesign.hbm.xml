@@ -173,6 +173,13 @@
 		<meta attribute="field-description">@hibernate.property column="content_folder_id" length="32"</meta>
 	</property>
 
+    <property
+        name="designType"
+        type="java.lang.String"
+        column="design_type"
+        length="255"
+    />
+
     <!-- Associations -->
     
     <!-- bi-directional many-to-one association to License-->  
