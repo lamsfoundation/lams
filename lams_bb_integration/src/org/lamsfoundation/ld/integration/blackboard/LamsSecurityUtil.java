@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -226,7 +227,7 @@ public class LamsSecurityUtil {
      * @return a string containing the LAMS workspace tree in tigra format
      */
     public static String getLearningDesigns(Context ctx, String courseId, String folderId) {
-	return getLearningDesigns(ctx, courseId, folderId,"getLearningDesignsJSON",null,null,null,null,null);
+	return getLearningDesigns(ctx, courseId, folderId,"getLearningDesignsJSON",null,null,null,null,null,null);
     }
     
     /**
@@ -237,14 +238,16 @@ public class LamsSecurityUtil {
      *            from LamsLearningDesignServlet.
      * @param folderId folderID in LAMS. It can be null and then LAMS returns default workspace folders.
      * @param method which method to call on the LAMS end
+     * @param type used onlu for method = getLearningDesignsJSON, restricts by type
      * @param page used only for method = getPagedHomeLearningDesignsJSON
      * @param size used only for method = getPagedHomeLearningDesignsJSON
      * @return a string containing the LAMS workspace tree in tigra format (method = getLearningDesignsJSON) or 
      *  a string containing the learning designs in JSON (method = getPagedHomeLearningDesignsJSON)
      */
-    public static String getLearningDesigns(Context ctx, String urlCourseId, String folderId, String method, 
+    public static String getLearningDesigns(Context ctx, String urlCourseId, String folderId, String method, String type,
 	    String search, String page, String size, String sortName, String sortDate) {
-		String serverAddr = getServerAddress();
+	
+	String serverAddr = getServerAddress();
 		
 	String courseId = setupCourseId(ctx, urlCourseId);
 	String serverId = getServerID();
@@ -284,6 +287,11 @@ public class LamsSecurityUtil {
 	    if (folderId != null ) {
 		serviceURL += "&folderID=" + ( folderId.equalsIgnoreCase("home") ? "-1" : folderId);
 	    }
+
+	    // The following parameter is only used for getLearningDesignsJSON
+	    if ( type != null && type.length() > 0 ) {
+		serviceURL += "&type=" +type;
+	    }
 	    
 	    // The following parameters are only used for getPagedLearningDesignsJSON
 	    if (page != null ) {
@@ -305,7 +313,7 @@ public class LamsSecurityUtil {
 		serviceURL += "&search=" + search;
 	    }
 
-	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
 
 	    // Read/convert response to a String 
 	    StringWriter writer = new StringWriter();
@@ -375,7 +383,7 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8")
 		    + "&learningDesignID="+ldId;
 	    
-	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
 
 	    // Read/convert response to a String 
 	    StringWriter writer = new StringWriter();
@@ -455,7 +463,7 @@ public class LamsSecurityUtil {
 	    String hash = generateAuthenticationHash(timestamp, username, serverId);
 	    String course = courseId != null ? "&courseId=" + URLEncoder.encode(courseId, "UTF8") : "";
 
-	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "&serverId="
+	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + course
 		    + "&ldId=" + new Long(ldId).toString() + "&country="
@@ -465,7 +473,7 @@ public class LamsSecurityUtil {
 	    logger.info("LAMS START LESSON Req: " + serviceURL);
 
 	    // InputStream is = url.openConnection().getInputStream();
-	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
 
 	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -618,7 +626,7 @@ public class LamsSecurityUtil {
 	    logger.info("LAMS Preadd users Req: " + serviceURL);
 	    System.out.println("LAMS Preadd users Req: " + serviceURL);
 
-	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
 	    
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to preadd users to the lesson, bad URL: '" + serverAddr
@@ -688,7 +696,7 @@ public class LamsSecurityUtil {
 	    logger.info("Retirieving learner progress: " + serviceURL);
 
 	    // InputStream is = url.openConnection().getInputStream();
-	    InputStream is = LamsSecurityUtil.callLamsServer(serviceURL);
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
 
 	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -758,6 +766,56 @@ public class LamsSecurityUtil {
 	return is;
     }
     
+    
+    /**
+     * Make a call to LAMS server.
+     * 
+     * @param serviceURL
+     * @return resulted InputStream
+     * @throws IOException
+     */
+    private static InputStream callLamsServerPost(String serviceURL) throws IOException {
+
+	String path;
+	String body;
+	
+	int bodyStart = serviceURL.indexOf('?');
+	if ( bodyStart < 0 ) {
+	    path = serviceURL;
+	    body = "";
+	} else {
+	    path = serviceURL.substring(0,bodyStart);
+	    body = serviceURL.substring(bodyStart+1);
+	}
+
+	byte[] postData       = body.getBytes("UTF-8");
+	int    postDataLength = postData.length;
+
+	URL url = new URL(path);
+	URLConnection conn = url.openConnection();
+	if (!(conn instanceof HttpURLConnection)) {
+	    throw new IOException("Unable to open connection to: " + serviceURL);
+	}
+
+	HttpURLConnection httpConn = (HttpURLConnection) conn;
+	conn.setDoOutput( true );
+	httpConn.setRequestMethod("POST");
+	conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
+	conn.setRequestProperty( "charset", "utf-8");
+	conn.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+	conn.setUseCaches( false );
+
+        conn.getOutputStream().write(postData);
+        
+	if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+	    throw new IOException("LAMS server responded with HTTP response code: " + httpConn.getResponseCode()
+		    + ", HTTP response message: " + httpConn.getResponseMessage());
+	}
+
+	InputStream is = conn.getInputStream();
+	return is;
+    }
+
     public static String getServerTime() throws IOException, PersistenceException {
 	long now = (new Date()).getTime();
 	
