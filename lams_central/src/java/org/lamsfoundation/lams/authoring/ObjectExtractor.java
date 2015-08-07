@@ -559,8 +559,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	    version = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
 	}
 	learningDesign.setDesignType((String)JsonUtil.opt(ldJSON, AuthoringJsonTags.DESIGN_TYPE));
-	log.debug("authoring: design type is "+learningDesign.getDesignType());
-
 	learningDesign.setVersion(version);
 	learningDesign.setDuration(JsonUtil.optLong(ldJSON, AuthoringJsonTags.DURATION));
 
