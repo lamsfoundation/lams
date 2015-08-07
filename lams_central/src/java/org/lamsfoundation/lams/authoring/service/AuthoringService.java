@@ -1914,7 +1914,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	LearningDesign learningDesign = new LearningDesign(null, null, null, learningDesignTitle, null, null, 1, false,
 		false, null, null, null, new Date(), Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER), user,
-		user, null, null, null, null, null, null, null, null, contentFolderID, false, null, 1);
+		user, null, null, null, null, null, null, null, null, contentFolderID, false, null, 1, null);
 
 	WorkspaceFolder folder = null;
 

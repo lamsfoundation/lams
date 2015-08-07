@@ -155,6 +155,7 @@ public interface AuthoringJsonTags {
     public static final String LICENSE_TEXT = "licenseText";
     public static final String CONTENT_FOLDER_ID = "contentFolderID";
     public static final String SAVE_MODE = "saveMode";
+    public static final String DESIGN_TYPE = "designType";
 
     /** ComplexActivity specific tags */
     public static final String CHILD_ACTIVITIES = "childActivities";
