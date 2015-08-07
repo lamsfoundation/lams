@@ -70,6 +70,7 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	String sortName = request.getParameter("sortName");
 	String sortDate = request.getParameter("sortDate");
 	String search = request.getParameter("search");
+	String type = request.getParameter("type");
 	
 	ContextManager ctxMgr = null;
 	Context ctx = null;
@@ -79,7 +80,7 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	    ctx = ctxMgr.setContext(request);
 	    
 	    String method = usePaging ? "getPagedHomeLearningDesignsJSON" : "getLearningDesignsJSON";
-	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, courseId, folderId, method, search, page, size, sortName, sortDate);
+	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, courseId, folderId, method, type, search, page, size, sortName, sortDate);
 	    
 	    response.setContentType("application/json;charset=UTF-8");
 	    response.getWriter().print(learningDesigns);
