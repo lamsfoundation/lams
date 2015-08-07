@@ -159,6 +159,9 @@ public class LearningDesign implements Serializable {
 
 	/** persistent field*/
 	private Boolean removed;
+	
+	/** persistent field */
+	private String designType; 
 
     /* If the values for createDateTime and/or lastModifiedDateTime
      * are null, then it will default to the current datetime.
@@ -191,7 +194,8 @@ public class LearningDesign implements Serializable {
 			String contentFolderID,
 			Boolean editOverrideLock,
 			User editOverrideUser,
-			Integer designVersion
+			Integer designVersion,
+			String designType
 			) {
 		this.learningDesignId = learningDesignId;
 		this.learningDesignUIID = ui_id;
@@ -223,6 +227,7 @@ public class LearningDesign implements Serializable {
 		this.editOverrideUser = editOverrideUser;
 		this.designVersion = designVersion;
 		this.removed = Boolean.FALSE;
+		this.designType = designType;
 	}
 
 	/** default constructor */
@@ -304,6 +309,7 @@ public class LearningDesign implements Serializable {
 		newDesign.setEditOverrideUser(design.getEditOverrideUser());
 		newDesign.setOriginalUser(design.getOriginalUser());
 		newDesign.setRemoved(design.getRemoved());
+		newDesign.setDesignType(design.getDesignType());
 		return newDesign;
 	}	
 
@@ -606,5 +612,12 @@ public class LearningDesign implements Serializable {
 	public void setRemoved(Boolean removed) {
 		this.removed = removed;
 	}
+	public String getDesignType() {
+		return this.designType;
+	}
+	public void setDesignType(String designType) {
+		this.designType = designType;
+	}
+
 
 }
