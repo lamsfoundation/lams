@@ -77,12 +77,16 @@
 		}
 		
 		function refreshQuestionList() {
-			var url = "<c:url value="/learning/refreshQuestionList.do"/>";
+			var url = "<c:url value="/learning/refreshQuestionList.do"/>",
+				scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
 			$("#questionListArea").load(
 				url,
 				{
 					sessionMapID: "${sessionMapID}",
 					reqId: (new Date()).getTime()
+				},
+				function(){
+					$("html,body").scrollTop(scrollTop);
 				}
 			);
 		}
