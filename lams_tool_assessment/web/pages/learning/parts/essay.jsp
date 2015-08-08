@@ -36,11 +36,8 @@
 		};
 		
 		if (${question.allowRichEditor}) {
-		    // @todo Make this more elegant (.on('change') once we upgrade to Ckeditor 4 
-		    CKEDITOR.instances["question${status.index}"].on('paste', counter${status.index});
-			CKEDITOR.instances["question${status.index}"].on('afterCommandExec', counter${status.index});
-			CKEDITOR.instances["question${status.index}"].on("instanceReady", function(){                    
-			     this.document.on("keyup", counter${status.index});
+			CKEDITOR.instances["question${status.index}"].on("instanceReady", function(){    
+			     this.on("change", counter${status.index});
 			});
 			//count words initially
 		    CKEDITOR.instances["question${status.index}"].on('instanceReady', counter${status.index});
