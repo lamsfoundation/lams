@@ -114,8 +114,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager,
-	QaAppConstants  {
+public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
+	ToolRestManager, QaAppConstants {
     private static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 
     private IQaContentDAO qaDAO;
@@ -212,7 +212,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    }
 	}
     }
-    
+
     @Override
     public void setDefineLater(String strToolContentID, boolean value) {
 
@@ -249,13 +249,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid) {
 	return qaQuestionDAO.getQuestionByDisplayOrder(displayOrder, contentUid);
     }
-    
+
     @Override
     public QaQueContent getQuestionByUid(Long questionUid) {
 	if (questionUid == null) {
 	    return null;
 	}
-	
+
 	return qaQuestionDAO.getQuestionByUid(questionUid);
     }
 
@@ -276,16 +276,21 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	QaSession qaSession = getSessionById(toolSessionID.longValue());
 
 	QaQueUsr qaUser = new QaQueUsr(userId.longValue(), userName, fullName, qaSession, new TreeSet());
-	qaQueUsrDAO.createUsr(qaUser);
-
-	return qaUser;
+	// make sure the user was not created in the meantime
+	QaQueUsr existingUser = getUserByIdAndSession(userId.longValue(), toolSessionID);
+	if (existingUser == null) {
+	    qaQueUsrDAO.createUsr(qaUser);
+	    return qaUser;
+	} else {
+	    return existingUser;
+	}
     }
 
     @Override
     public QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId) {
 	return qaQueUsrDAO.getQaUserBySession(queUsrId, qaSessionId);
     }
-    
+
     @Override
     public List<QaUsrResp> getResponsesByUserUid(final Long userUid) {
 	return qaUsrRespDAO.getResponsesByUserUid(userUid);
@@ -295,20 +300,21 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId) {
 	return qaUsrRespDAO.getResponseByUserAndQuestion(queUsrId, qaQueContentId);
     }
-    
+
     @Override
     public List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId) {
 	return qaUsrRespDAO.getResponseBySessionAndQuestion(qaSessionId, questionId);
     }
-    
+
     @Override
-    public List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
-	    int page, int size, int sorting) {
+    public List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId,
+	    final Long excludeUserId, int page, int size, int sorting) {
 	return qaUsrRespDAO.getResponsesForTablesorter(qaSessionId, questionId, excludeUserId, page, size, sorting);
-    }    
-    
+    }
+
     @Override
-    public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId) {
+    public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId,
+	    final Long excludeUserId) {
 	return qaUsrRespDAO.getCountResponsesBySessionAndQuestion(qaSessionId, questionId, excludeUserId);
     }
 
@@ -376,8 +382,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     @Override
     public void removeUserResponse(QaUsrResp resp) {
-	auditService.logChange(QaAppConstants.MY_SIGNATURE, resp.getQaQueUser().getQueUsrId(), resp.getQaQueUser()
-		.getUsername(), resp.getAnswer(), null);
+	auditService.logChange(QaAppConstants.MY_SIGNATURE, resp.getQaQueUser().getQueUsrId(),
+		resp.getQaQueUser().getUsername(), resp.getAnswer(), null);
 	qaUsrRespDAO.removeUserResponse(resp);
     }
 
@@ -426,7 +432,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 	return countResponses > 0;
     }
-    
+
     @Override
     public void recalculateUserAnswers(QaContent content, Set<QaQueContent> oldQuestions,
 	    List<QaQuestionDTO> questionDTOs, List<QaQuestionDTO> deletedQuestions) {
@@ -491,7 +497,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentId.longValue());
@@ -543,8 +549,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     @Override
-    public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentID, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	if (toolContentID == null) {
 	    throw new ToolException("toolContentID is missing");
 	}
@@ -623,8 +629,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		for (QaQueUsr user : (Set<QaQueUsr>) session.getQaQueUsers()) {
 
 		    NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
-				    .getQueUsrId().toString()));
+			    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE,
+			    new Integer(user.getQueUsrId().toString()));
 
 		    if (notebookEntry != null) {
 			ReflectionDTO reflectionDTO = new ReflectionDTO();
@@ -649,8 +655,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 		    if (user.getQueUsrId().toString().equals(userID)) {
 			NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
-					.getQueUsrId().toString()));
+				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE,
+				new Integer(user.getQueUsrId().toString()));
 
 			if (notebookEntry != null) {
 			    ReflectionDTO reflectionDTO = new ReflectionDTO();
@@ -658,8 +664,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			    reflectionDTO.setSessionId(session.getQaSessionId().toString());
 			    reflectionDTO.setUserName(user.getFullname());
 			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    Date postedDate = (notebookEntry.getLastModified() != null) ? notebookEntry
-				    .getLastModified() : notebookEntry.getCreateDate();
+			    Date postedDate = (notebookEntry.getLastModified() != null)
+				    ? notebookEntry.getLastModified() : notebookEntry.getCreateDate();
 			    reflectionDTO.setDate(postedDate);
 			    // String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
 			    reflectionDTO.setEntry(notebookEntry.getEntry());
@@ -672,7 +678,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	return reflectionDTOs;
     }
-    
+
     @Override
     public List exportLearner(QaContent qaContent, boolean isUserNamesVisible, boolean isLearnerRequest,
 	    String sessionId, String userId) {
@@ -725,8 +731,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		    qaMonitoredAnswersDTO.setSessionId(sessionId);
 		    qaMonitoredAnswersDTO.setSessionName(sessionName);
 
-		    Map questionAttemptData = exportGroupsAttemptData(qaContent, question.getUid()
-			    .toString(), true, false, sessionId, null);
+		    Map questionAttemptData = exportGroupsAttemptData(qaContent, question.getUid().toString(), true,
+			    false, sessionId, null);
 		    qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 		    qaMonitoredAnswersDTOs.add(qaMonitoredAnswersDTO);
 		}
@@ -739,7 +745,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 	return groupDTOs;
     }
-    
+
     /**
      * User id is needed if learnerRequest = true, as it is required to work out if the data being analysed is the
      * current user (for not show other names) or to work out which is the user's answers (for not show all answers).
@@ -756,8 +762,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		QaSession session = getSessionById(new Long(sessionId).longValue());
 		QaQueUsr groupLeader = session.getGroupLeader();
 		if (groupLeader != null) {
-		    QaUsrResp response = getResponseByUserAndQuestion(groupLeader.getQueUsrId(), new Long(
-			    questionUid));
+		    QaUsrResp response = getResponseByUserAndQuestion(groupLeader.getQueUsrId(), new Long(questionUid));
 		    if (response != null) {
 			responses.add(response);
 		    }
@@ -847,7 +852,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	QaQueUsr user = getUserByIdAndSession(userId, new Long(sessionId));
 	String fullName = user.getFullname();
 
-	//add question-answer pairs to email message
+	// add question-answer pairs to email message
 	List<QaUsrResp> responses = qaUsrRespDAO.getResponsesByUserUid(user.getUid());
 	Date attemptTime = new Date();
 	String message = new String();
@@ -858,11 +863,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    message += NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + question + " " + answer;
 	    attemptTime = response.getAttemptTime();
 	}
-	
-	message = NEW_LINE_CHARACTER
-		+ NEW_LINE_CHARACTER
-		+ messageService
-			.getMessage("label.user.has.answered.questions", new Object[] { fullName, attemptTime })
+
+	message = NEW_LINE_CHARACTER + NEW_LINE_CHARACTER
+		+ messageService.getMessage("label.user.has.answered.questions", new Object[] { fullName, attemptTime })
 		+ message + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER;
 
 	eventNotificationService.notifyLessonMonitors(sessionId, message, true);
@@ -875,8 +878,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    toolContentObj = getQaContent(defaultToolContentId);
 	    if (toolContentObj != null && toolContentObj.getConditions().isEmpty()) {
-		toolContentObj.getConditions().add(
-			getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
+		toolContentObj.getConditions()
+			.add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
 	    }
 	}
 	if (toolContentObj == null) {
@@ -908,11 +911,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(QaImportContentVersionFilter.class);
 
-	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, qaToolContentHandler,
-		    fromVersion, toVersion);
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, qaToolContentHandler, fromVersion,
+		    toVersion);
 	    if (!(toolPOJO instanceof QaContent)) {
-		throw new ImportToolContentException("Import QA tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import QA tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    QaContent toolContentObj = (QaContent) toolPOJO;
 
@@ -948,7 +951,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public String getToolContentTitle(Long toolContentId) {
 	return qaDAO.getQaByContentId(toolContentId).getTitle();
     }
-    
+
     public boolean isContentEdited(Long toolContentId) {
 	return qaDAO.getQaByContentId(toolContentId).isDefineLater();
     }
@@ -1033,25 +1036,26 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 
     }
-    
 
     @Override
     public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
 	return ratingService.getCriteriasByToolContentId(toolContentId);
     }
-    
+
     @Override
-    public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId) {
+    public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias,
+	    Long toolContentId) {
 	ratingService.saveRatingCriterias(request, oldCriterias, toolContentId);
     }
-    
+
     @Override
     public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingService.isCommentsEnabled(toolContentId);
     }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) {
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+	    boolean isCommentsByOtherUsersRequired, Long userId) {
 	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
     }
 
@@ -1063,15 +1067,16 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     /**
      * ToolSessionManager CONTRACT
      */
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
     }
 
     /**
      * ToolSessionManager CONTRACT
      */
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
     }
 
@@ -1084,7 +1089,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getQaOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
@@ -1266,10 +1271,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	} catch (WDDXProcessorConversionException e) {
 	    QaServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + toolContentObj.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
+		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
 	// leave as empty, no need to set them to anything.
@@ -1288,8 +1291,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     @Override
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	QaContent qaContent = null;
 	if (toolContentId != null) {
@@ -1319,7 +1322,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
-    
+
     public void setRatingService(IRatingService ratingService) {
 	this.ratingService = ratingService;
     }
@@ -1440,7 +1443,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void removeQuestionsFromCache(QaContent qaContent) {
 	qaDAO.removeQuestionsFromCache(qaContent);
     }
-    
+
     @Override
     public void removeQaContentFromCache(QaContent qaContent) {
 	qaDAO.removeQaContentFromCache(qaContent);
@@ -1450,15 +1453,17 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getQaOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     // ****************** REST methods *************************
 
-    /** Rest call to create a new Q&A content. Required fields in toolContentJSON: title, instructions, questions.
-     * The questions entry should be JSONArray containing JSON objects, which in turn must contain "questionText", "displayOrder"
-     * and may also contain feedback and required (boolean)
+    /**
+     * Rest call to create a new Q&A content. Required fields in toolContentJSON: title, instructions, questions. The
+     * questions entry should be JSONArray containing JSON objects, which in turn must contain "questionText",
+     * "displayOrder" and may also contain feedback and required (boolean)
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	QaContent qa = new QaContent();
 	Date updateDate = new Date();
@@ -1470,44 +1475,44 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qa.setQaContentId(toolContentID);
 	qa.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	qa.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
-	
+
 	qa.setDefineLater(false);
 
 	qa.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	qa.setNoReeditAllowed(JsonUtil.opt(toolContentJSON, "noReeditAllowed", Boolean.FALSE));
 	qa.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	qa.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	qa.setUseSelectLeaderToolOuput(
+		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	qa.setMinimumRates(JsonUtil.opt(toolContentJSON, RestTags.MINIMUM_RATES, 0));
 	qa.setMaximumRates(JsonUtil.opt(toolContentJSON, RestTags.MAXIMUM_RATES, 0));
 	qa.setShowOtherAnswers(JsonUtil.opt(toolContentJSON, "showOtherAnswers", Boolean.TRUE));
 	qa.setUsernameVisible(JsonUtil.opt(toolContentJSON, "usernameVisible", Boolean.FALSE));
 	qa.setAllowRateAnswers(JsonUtil.opt(toolContentJSON, "allowRateAnswers", Boolean.FALSE));
-	qa.setNotifyTeachersOnResponseSubmit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnResponseSubmit", Boolean.FALSE));
+	qa.setNotifyTeachersOnResponseSubmit(
+		JsonUtil.opt(toolContentJSON, "notifyTeachersOnResponseSubmit", Boolean.FALSE));
 	qa.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS,(String)null));
+	qa.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
 	qa.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 
 	// submissionDeadline is set in monitoring
 	// qa.setMonitoringReportTitle(); Can't find this field in the database - assuming unused.
 	// qa.setReportTitle(); Can't find this field in the database - assuming unused.
-	// qa.setContent(content);  Can't find this field in the database - assuming unused.
+	// qa.setContent(content); Can't find this field in the database - assuming unused.
 
 	saveOrUpdateQaContent(qa);
 	// Questions
 	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for (int i=0; i<questions.length(); i++) {
+	for (int i = 0; i < questions.length(); i++) {
 	    JSONObject questionData = (JSONObject) questions.get(i);
-	    QaQueContent question = new QaQueContent(questionData.getString(RestTags.QUESTION_TEXT), 
-		    questionData.getInt(RestTags.DISPLAY_ORDER), 
-		    JsonUtil.opt(questionData,"feedback",(String)null), 
+	    QaQueContent question = new QaQueContent(questionData.getString(RestTags.QUESTION_TEXT),
+		    questionData.getInt(RestTags.DISPLAY_ORDER), JsonUtil.opt(questionData, "feedback", (String) null),
 		    JsonUtil.opt(questionData, "required", Boolean.FALSE),
-		    JsonUtil.opt(questionData,"minWordsLimit",0), qa );
+		    JsonUtil.opt(questionData, "minWordsLimit", 0), qa);
 	    saveOrUpdateQuestion(question);
 	}
 
 	// TODO
-//	qa.setConditions(conditions);
-
+	// qa.setConditions(conditions);
 
     }
 }

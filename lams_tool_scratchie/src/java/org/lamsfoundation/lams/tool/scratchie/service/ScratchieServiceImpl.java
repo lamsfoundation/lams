@@ -119,9 +119,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     private ScratchieSessionDAO scratchieSessionDao;
 
     private ScratchieAnswerVisitDAO scratchieAnswerVisitDao;
-    
+
     private ScratchieBurningQuestionDAO scratchieBurningQuestionDao;
-    
+
     private ScratchieConfigItemDAO scratchieConfigItemDao;
 
     // tool service
@@ -182,7 +182,11 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public void createUser(ScratchieUser scratchieUser) {
-	scratchieUserDao.saveObject(scratchieUser);
+	ScratchieUser existingUser = getUserByIDAndSession(scratchieUser.getUserId(),
+		scratchieUser.getSession().getSessionId());
+	if (existingUser == null) {
+	    scratchieUserDao.saveObject(scratchieUser);
+	}
     }
 
     @Override
@@ -195,14 +199,14 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public void saveOrUpdateScratchie(Scratchie scratchie) {
 	scratchieDao.saveObject(scratchie);
     }
-    
+
     @Override
     public void releaseItemsFromCache(Scratchie scratchie) {
-	for (ScratchieItem item : (Set<ScratchieItem>)scratchie.getScratchieItems()) {
+	for (ScratchieItem item : (Set<ScratchieItem>) scratchie.getScratchieItems()) {
 	    scratchieItemDao.releaseItemFromCache(item);
 	}
     }
-    
+
     @Override
     public ScratchieConfigItem getConfigItem(String key) {
 	return scratchieConfigItemDao.getConfigItemByKey(key);
@@ -264,12 +268,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 
-	    gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(), user
-		    .getSession().getSessionId(), false);
+	    gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
+		    user.getSession().getSessionId(), false);
 
 	    // record mark change with audit service
-	    auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(), ""
-		    + oldMark, "" + newMark);
+	    auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(),
+		    "" + oldMark, "" + newMark);
 	}
 
     }
@@ -341,52 +345,52 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(), user
-			.getSession().getSessionId(), false);
+		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
+			user.getSession().getSessionId(), false);
 	    }
 	}
     }
-    
+
     @Override
     public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
 	    List<ScratchieItem> deletedItems) {
 
-	//create list of modified questions
+	// create list of modified questions
 	List<ScratchieItem> modifiedItems = new ArrayList<ScratchieItem>();
 	for (ScratchieItem oldItem : oldItems) {
 	    for (ScratchieItem newItem : newItems) {
 		if (oldItem.getUid().equals(newItem.getUid())) {
-		    
+
 		    boolean isItemModified = false;
 
-		    //title or description is different
+		    // title or description is different
 		    if (!oldItem.getTitle().equals(newItem.getTitle())
 			    || !oldItem.getDescription().equals(newItem.getDescription())) {
 			isItemModified = true;
 		    }
-		    
-		    //options are different
+
+		    // options are different
 		    Set<ScratchieAnswer> oldAnswers = oldItem.getAnswers();
 		    Set<ScratchieAnswer> newAnswers = newItem.getAnswers();
 		    for (ScratchieAnswer oldAnswer : oldAnswers) {
 			for (ScratchieAnswer newAnswer : newAnswers) {
 			    if (oldAnswer.getUid().equals(newAnswer.getUid())) {
-				
+
 				if (!StringUtils.equals(oldAnswer.getDescription(), newAnswer.getDescription())
 					|| (oldAnswer.isCorrect() != newAnswer.isCorrect())) {
 				    isItemModified = true;
-				}			
+				}
 			    }
 			}
 		    }
-		    
+
 		    if (isItemModified) {
 			modifiedItems.add(newItem);
 		    }
 		}
-	    }    
+	    }
 	}
-	
+
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
 	    Long toolSessionId = session.getSessionId();
@@ -397,19 +401,19 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	    // [+] if the item was removed
 	    for (ScratchieItem deletedItem : deletedItems) {
-		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(
-			toolSessionId, deletedItem.getUid());
+		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(toolSessionId,
+			deletedItem.getUid());
 		visitLogsToDelete.addAll(visitLogs);
 	    }
 
 	    // [+] if the question is modified
 	    for (ScratchieItem modifiedItem : modifiedItems) {
-		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(
-			toolSessionId, modifiedItem.getUid());
+		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(toolSessionId,
+			modifiedItem.getUid());
 		visitLogsToDelete.addAll(visitLogs);
 	    }
-	    
-	    //remove all visit logs marked for deletion
+
+	    // remove all visit logs marked for deletion
 	    Iterator<ScratchieAnswerVisitLog> iter = visitLogsToDelete.iterator();
 	    while (iter.hasNext()) {
 		ScratchieAnswerVisitLog visitLogToDelete = iter.next();
@@ -427,21 +431,21 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 
     }
-    
+
     @Override
     public List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId) {
 	return scratchieBurningQuestionDao.getBurningQuestionsBySession(sessionId);
     }
-    
+
     @Override
     public void saveBurningQuestion(Long sessionId, Long itemUid, String question) {
-	
+
 	boolean isGeneralBurningQuestion = itemUid == null;
-	
-	ScratchieBurningQuestion burningQuestion = (isGeneralBurningQuestion) ? scratchieBurningQuestionDao
-		.getGeneralBurningQuestionBySession(sessionId) : scratchieBurningQuestionDao
-		.getBurningQuestionBySessionAndItem(sessionId, itemUid);
-	
+
+	ScratchieBurningQuestion burningQuestion = (isGeneralBurningQuestion)
+		? scratchieBurningQuestionDao.getGeneralBurningQuestionBySession(sessionId)
+		: scratchieBurningQuestionDao.getBurningQuestionBySessionAndItem(sessionId, itemUid);
+
 	if (burningQuestion == null) {
 	    burningQuestion = new ScratchieBurningQuestion();
 	    if (!isGeneralBurningQuestion) {
@@ -450,7 +454,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	    burningQuestion.setGeneralQuestion(isGeneralBurningQuestion);
 	    burningQuestion.setSessionId(sessionId);
-	    burningQuestion.setAccessDate(new Date());	    
+	    burningQuestion.setAccessDate(new Date());
 	}
 	burningQuestion.setQuestion(question);
 
@@ -579,9 +583,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	return getItemsWithIndicatedScratches(toolSessionId, items);
     }
-    
+
     @Override
-    public Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, Collection<ScratchieItem> items) {
+    public Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId,
+	    Collection<ScratchieItem> items) {
 	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(toolSessionId);
 
 	for (ScratchieItem item : items) {
@@ -606,7 +611,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    boolean isItemUnraveled = this.isItemUnraveled(item, userLogs);
 	    item.setUnraveled(isItemUnraveled);
 	}
-	
+
 	return items;
     }
 
@@ -646,13 +651,13 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      * @param item
      * @param userLogs
      *            uses list of logs to reduce number of queries to DB
-     * @param presetMarks 
-     * 		  presetMarks to reduce number of queries to DB
+     * @param presetMarks
+     *            presetMarks to reduce number of queries to DB
      * @return
      */
     private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
 	    String presetMarks) {
-	
+
 	String[] marksArray = presetMarks.split(",");
 
 	int mark = 0;
@@ -668,7 +673,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
 		mark++;
 	    }
-	    
+
 	}
 
 	return mark;
@@ -769,28 +774,28 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	return groupSummaryList;
     }
-    
+
     @Override
     public List<BurningQuestionDTO> getBurningQuestionDtos(Scratchie scratchie) {
-	
+
 	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 
 	// get all available leaders associated with this content as only leaders have reflections
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
-	
+
 	List<BurningQuestionDTO> burningQuestionDtos = new LinkedList<BurningQuestionDTO>();
 	for (ScratchieItem item : items) {
 	    BurningQuestionDTO burningQuestionDTO = new BurningQuestionDTO();
 	    burningQuestionDTO.setItem(item);
-	    
+
 	    List<ScratchieBurningQuestion> burningQuestions = scratchieBurningQuestionDao
 		    .getBurningQuestionsByItemUid(item.getUid());
-	    
+
 	    Map<String, String> groupNameToBurningQuestion = new LinkedHashMap<String, String>();
 	    for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
-		
-		//find corresponding session
+
+		// find corresponding session
 		ScratchieSession session = null;
 		for (ScratchieSession sessionIter : sessionList) {
 		    if (burningQuestion.getSessionId().equals(sessionIter.getSessionId())) {
@@ -798,17 +803,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 			break;
 		    }
 		}
-		
+
 		String groupName = StringEscapeUtils.escapeJavaScript(session.getSessionName());
 		String burningQuestionText = StringEscapeUtils.escapeJavaScript(burningQuestion.getQuestion());
 		groupNameToBurningQuestion.put(groupName, burningQuestionText);
 	    }
 	    burningQuestionDTO.setGroupNameToBurningQuestion(groupNameToBurningQuestion);
-	    
+
 	    burningQuestionDtos.add(burningQuestionDTO);
 	}
-	
-	//general burning question
+
+	// general burning question
 	BurningQuestionDTO generalBurningQuestionDTO = new BurningQuestionDTO();
 	ScratchieItem generalDummyItem = new ScratchieItem();
 	generalDummyItem.setUid(0L);
@@ -1470,7 +1475,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      */
     private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<GroupSummary>();
-	
+
 	String presetMarks = getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS).getConfigValue();
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
@@ -1602,11 +1607,11 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public void setScratchieAnswerVisitDao(ScratchieAnswerVisitDAO scratchieItemVisitDao) {
 	this.scratchieAnswerVisitDao = scratchieItemVisitDao;
     }
-    
+
     public void setScratchieBurningQuestionDao(ScratchieBurningQuestionDAO scratchieBurningQuestionDao) {
 	this.scratchieBurningQuestionDao = scratchieBurningQuestionDao;
     }
-    
+
     public void setScratchieConfigItemDao(ScratchieConfigItemDAO scratchieConfigItemDao) {
 	this.scratchieConfigItemDao = scratchieConfigItemDao;
     }
@@ -1631,7 +1636,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	// set ScratchieToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Scratchie.newInstance(toolContentObj, toolContentId);
-	
+
 	// wipe out the links from ScratchieAnswer back to ScratchieItem, or it will try to
 	// include the hibernate object version of the ScratchieItem within the XML
 	Set<ScratchieItem> items = toolContentObj.getScratchieItems();
@@ -1641,10 +1646,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		answer.setScratchieItem(null);
 	    }
 	}
-	
+
 	try {
-	    exportContentService
-		    .exportToolContent(toolContentId, toolContentObj, scratchieToolContentHandler, rootPath);
+	    exportContentService.exportToolContent(toolContentId, toolContentObj, scratchieToolContentHandler,
+		    rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -1745,7 +1750,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public String getToolContentTitle(Long toolContentId) {
 	return getScratchieByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
@@ -1759,10 +1764,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public boolean isContentEdited(Long toolContentId) {
 	return getScratchieByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
 	if (removeSessionData) {
 	    List list = scratchieSessionDao.getByContentId(toolContentId);
@@ -1774,7 +1779,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 	scratchieDao.delete(scratchie);
     }
-    
+
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
@@ -1833,13 +1838,14 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -1857,7 +1863,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getScratchieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
@@ -1876,7 +1882,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    scratchieUser = new ScratchieUser(user.getUserDTO(), session);
 	    createUser(scratchieUser);
 	}
-	
+
 	// as long as there is no individual results in Scratchie tool (but rather one for entire group) there is no
 	// need to copyAnswersFromLeader()
     }
@@ -1892,8 +1898,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
     @Override
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Scratchie toolContentObj = getScratchieByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1972,7 +1978,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public void setScratchieOutputFactory(ScratchieOutputFactory scratchieOutputFactory) {
 	this.scratchieOutputFactory = scratchieOutputFactory;
     }
-    
+
     // ****************** REST methods *************************
 
     /**
@@ -2042,5 +2048,5 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	saveOrUpdateScratchie(scratchie);
 
     }
-    
+
 }
