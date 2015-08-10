@@ -67,6 +67,7 @@
         <bbNG:pageTitleBar title="Modify A LAMS Lesson"/>
     </bbNG:pageHeader>
     
+    <!-- Position <%=bbContent.getPosition()%> -->
     <%-- Form for the LAMS Lesson Attributes --%>
     <form name="lams_form" id="lams_form" action="modify_proc.jsp" method="post" onSubmit="return validateModify();">
         <input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
@@ -76,7 +77,7 @@
 	
             <bbNG:step title="Name and describe the lesson">
             
-                <bbNG:dataElement label="Name" isRequired="true" labelFor="title">
+                 <bbNG:dataElement label="Name" isRequired="true" labelFor="title">
                     <input id="title" type="text" name="title" value="<%=bbContent.getTitle()%>">
                 </bbNG:dataElement>
         

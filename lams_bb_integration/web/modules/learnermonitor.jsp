@@ -122,6 +122,7 @@
     String title = "";
     String description = "";
     String strLineitemId = null;
+    String position = "unknown";
     //contentId is available in versions after 1.2.3
     if (contentIdStr != null) {
     	
@@ -131,6 +132,7 @@
         Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
         title = courseDoc.getTitle();
         description = courseDoc.getBody().getFormattedText();
+        position = String.valueOf(courseDoc.getPosition());
         
         //get lineitemid from the storage (bbContentId -> lineitemid)
 	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
@@ -199,6 +201,8 @@
         <bbNG:actionButton id="cancel" url="javascript:back();" title="Cancel" primary="false"/>                        <%-- Cancel (Go Back) --%>
     </bbNG:actionControlBar>
     
+	<!-- Position <%=position%> -->
+
     <% if((description != "") && (description != null)) { %>
 	    <div class="vtbegenerated"> 
 	    	<%=description%> 
