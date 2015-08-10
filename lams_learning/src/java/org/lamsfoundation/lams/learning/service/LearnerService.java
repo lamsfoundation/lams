@@ -651,7 +651,8 @@ public class LearnerService implements ICoreLearnerService {
 	    }
 
 	} else {
-
+	    // load the activity again so it is attached to the current Hibernate session
+	    activity = getActivity(activity.getActivityId());
 	    nextLearnerProgress = calculateProgress(activity, learnerId, progress);
 
 	    ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(progress.getUser(), activity);

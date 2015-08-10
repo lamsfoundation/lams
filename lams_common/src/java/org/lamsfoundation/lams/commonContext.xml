@@ -25,6 +25,19 @@
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 	</bean>
 	
+	<bean id="transactionRetryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.util.TransactionRetryService" />
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRES_NEW</prop>
+			</props>
+		</property>
+	</bean>	
+	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 
 	<!-- LAMS primary business object: Hibernate implementation -->
@@ -44,7 +57,7 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="userManagementServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -79,7 +92,7 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="learningDesignServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -102,7 +115,7 @@
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="themeServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -124,7 +137,7 @@
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="timezoneServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -147,7 +160,7 @@
 		<property name="transactionManager"><ref bean="transactionManager" /></property>
 		<property name="target"><ref bean="signupServiceTarget" /></property>
 		<property name="proxyTargetClass"><value>true</value></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -176,7 +189,7 @@
 	<bean id="exportToolContentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="exportToolContentServiceTarget"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -236,7 +249,7 @@
 	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="coreNotebookServiceTarget"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -271,7 +284,7 @@
 			</bean>
 		</property>
 		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -318,7 +331,7 @@
 
     <bean id="eventNotificationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -366,7 +379,7 @@
 	
 	<bean id="logEventService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
@@ -409,7 +422,7 @@
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="securityServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>

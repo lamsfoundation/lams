@@ -23,22 +23,30 @@
 /* TransactionRetryInterceptor.java,v 1.1 2015/07/22 08:00:18 marcin Exp */
 package org.lamsfoundation.lams.web.filter;
 
+import java.util.Random;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.log4j.Logger;
+import org.hibernate.exception.ConstraintViolationException;
+import org.lamsfoundation.lams.util.ITransactionRetryService;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
- * Retries proxied method in case of an exception. It should kick in after Hibernate session gets created.
+ * Retries proxied method in case of an exception. First attempt is processed as usual. Retrying requires a new
+ * transaction, which is done by the service.
  * 
  * @author Marcin Cieslak
  *
  */
 public class TransactionRetryInterceptor implements MethodInterceptor {
-    
     private static final Logger log = Logger.getLogger(TransactionRetryInterceptor.class);
 
-    private static final int MAX_ATTEMPTS = 3;
+    private ITransactionRetryService transactionRetryService;
+
+    private static final int MAX_ATTEMPTS = 5;
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -46,21 +54,44 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 	Throwable exception = null;
 	do {
 	    try {
-		return invocation.proceed();
+		if (attempt == 1) {
+		    return invocation.proceed();
+		} else {
+		    return transactionRetryService.retry(invocation);
+		}
 	    } catch (DataIntegrityViolationException e) {
 		exception = e;
-		StringBuilder message = new StringBuilder("When invoking method \"")
-			.append(invocation.getMethod().getName()).append("\" caught ").append(e.getMessage())
-			.append(". Attempt #").append(attempt);
 		attempt++;
-		if (attempt <= TransactionRetryInterceptor.MAX_ATTEMPTS) {
-		    message.append(". Retrying.");
-		} else {
-		    message.append(". Giving up.");
-		}
-		TransactionRetryInterceptor.log.warn(message);
+		TransactionRetryInterceptor.processException(e, invocation, attempt);
+	    } catch (ConstraintViolationException e) {
+		exception = e;
+		attempt++;
+		TransactionRetryInterceptor.processException(e, invocation, attempt);
+	    } catch (CannotAcquireLockException e) {
+		exception = e;
+		attempt++;
+		TransactionRetryInterceptor.processException(e, invocation, attempt);
+	    } catch (UnexpectedRollbackException e) {
+		exception = e;
+		attempt++;
+		TransactionRetryInterceptor.processException(e, invocation, attempt);
 	    }
 	} while (attempt <= TransactionRetryInterceptor.MAX_ATTEMPTS);
 	throw exception;
+    }
+
+    private static void processException(Exception e, MethodInvocation invocation, int attempt) {
+	StringBuilder message = new StringBuilder("When invoking method \"").append(invocation.getMethod().getName())
+		.append("\" caught ").append(e.getMessage()).append(". Attempt #").append(attempt - 1);
+	if (attempt <= TransactionRetryInterceptor.MAX_ATTEMPTS) {
+	    message.append(". Retrying.");
+	} else {
+	    message.append(". Giving up.");
+	}
+	TransactionRetryInterceptor.log.warn(message);
+    }
+
+    public void setTransactionRetryService(ITransactionRetryService transactionRetryService) {
+	this.transactionRetryService = transactionRetryService;
     }
 }
