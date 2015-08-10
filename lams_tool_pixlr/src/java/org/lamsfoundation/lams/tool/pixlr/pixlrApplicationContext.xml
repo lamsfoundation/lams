@@ -24,7 +24,7 @@
 	</bean> 
 	<bean id="pixlrService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>

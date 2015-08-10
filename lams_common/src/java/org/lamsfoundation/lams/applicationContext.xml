@@ -56,5 +56,7 @@
 	
 	<!-- Extra wrapper for all proxied methods.
 		 In case of DataIntegrityViolationException it retrires the transaction up to 3 times -->
-	<bean id="transactionRetryInterceptor" class="org.lamsfoundation.lams.web.filter.TransactionRetryInterceptor" />
+	<bean id="transactionRetryInterceptor" class="org.lamsfoundation.lams.web.filter.TransactionRetryInterceptor">
+		<property name="transactionRetryService"><ref bean="transactionRetryService"/></property>
+	</bean>
 </beans>

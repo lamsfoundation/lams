@@ -25,7 +25,7 @@
 	<bean id="workspaceManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="workspaceServiceTarget"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>

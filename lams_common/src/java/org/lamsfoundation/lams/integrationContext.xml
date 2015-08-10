@@ -13,7 +13,7 @@
 		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
 		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
 		<property name="proxyTargetClass"><value>true</value></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>
