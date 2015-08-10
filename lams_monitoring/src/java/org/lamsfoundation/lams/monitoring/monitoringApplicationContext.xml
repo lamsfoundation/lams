@@ -54,7 +54,7 @@
 	<bean id="monitoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="monitoringServiceTarget"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>
 				<ref bean="transactionRetryInterceptor" />			
 			</list>

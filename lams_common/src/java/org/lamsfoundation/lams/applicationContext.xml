@@ -46,6 +46,8 @@
 	<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 
 	<!-- Extra wrapper for all proxied methods.
-		 In case of DataIntegrityViolationException it retrires the transaction up to 3 times -->
-	<bean id="transactionRetryInterceptor" class="org.lamsfoundation.lams.web.filter.TransactionRetryInterceptor" />
+		In case of optimistic locking exceptions it retrires the transaction up to 5 times -->
+	<bean id="transactionRetryInterceptor" class="org.lamsfoundation.lams.web.filter.TransactionRetryInterceptor">
+		<property name="transactionRetryService"><ref bean="transactionRetryService"/></property>
+	</bean>
 </beans>
