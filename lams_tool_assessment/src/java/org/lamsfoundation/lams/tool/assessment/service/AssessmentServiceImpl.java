@@ -320,7 +320,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     @Override
     public void createUser(AssessmentUser assessmentUser) {
-	assessmentUserDao.saveObject(assessmentUser);
+	// make sure the user was not created in the meantime
+	AssessmentUser existingUser = getUserByIDAndSession(assessmentUser.getUserId(),
+		assessmentUser.getSession().getSessionId());
+	if (existingUser == null) {
+	    assessmentUserDao.saveObject(assessmentUser);
+	}
     }
 
     @Override
