@@ -23,12 +23,11 @@
 /* TransactionRetryInterceptor.java,v 1.1 2015/07/22 08:00:18 marcin Exp */
 package org.lamsfoundation.lams.web.filter;
 
-import java.util.Random;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.log4j.Logger;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.LockAcquisitionException;
 import org.lamsfoundation.lams.util.ITransactionRetryService;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -68,6 +67,10 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 		attempt++;
 		TransactionRetryInterceptor.processException(e, invocation, attempt);
 	    } catch (CannotAcquireLockException e) {
+		exception = e;
+		attempt++;
+		TransactionRetryInterceptor.processException(e, invocation, attempt);
+	    } catch (LockAcquisitionException e) {
 		exception = e;
 		attempt++;
 		TransactionRetryInterceptor.processException(e, invocation, attempt);
