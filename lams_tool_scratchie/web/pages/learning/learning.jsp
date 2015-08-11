@@ -46,7 +46,11 @@
 	            		//disable scratching
 	            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
 	            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
-	            		$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+
+		            	var isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+		            	if (!isiOS) {
+		            		$("a[id^=imageLink-" + itemUid + "]").not('#imageLink' + id).fadeTo(1300, 0.3);
+		            	}
 
 	            	} else {
 	            		
@@ -57,6 +61,8 @@
 	            	}
 	            }
 	       	});
+        	
+        	return false;
 		}
 
 		function finish(method){
