@@ -88,9 +88,8 @@ public class StartLessonServlet extends HttpServlet {
 	    String strSequenceID = getTrimmedString(request,"sequence_id");
 	    
 	    if ( courseIdStr == null || contentIdStr == null || strSequenceID.length()==0 || strTitle.length() == 0) {
-		String msg = "Unable to create error - parameter missing. course_id, content_id, sequence_id and title required";
-		logger.error(msg);
-		sendErrorResponse(response, msg, null);
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, 
+			"Unable to create error - parameter missing. course_id, content_id, sequence_id and title required");
 
 	    } else {
 	    
@@ -214,12 +213,11 @@ public class StartLessonServlet extends HttpServlet {
         	    preaddLearnersMonitorsThread.start();
         
         	    response.setContentType("application/json;charset=UTF-8");
-        	    response.getWriter().print("{content_id:"+bbContentId+"}");
+        	    response.getWriter().print("{\"content_id\":"+bbContentId+"}");
 	    }
 	    
 	} catch (Exception e) {
-	    throw new IOException(e);
-//	    sendErrorResponse(response, "Unable to start lesson ",e);
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
 	} finally {
 	    // make sure context is released
 	    if (ctxMgr != null) {
@@ -234,14 +232,5 @@ public class StartLessonServlet extends HttpServlet {
 	return value != null ? value.trim() : "";
     }
 
-    private void sendErrorResponse(HttpServletResponse response, String message, Exception e) throws IOException {
-	if ( e != null )
-	    logger.error(message+" "+e.getMessage(), e);
-	else 
-	    logger.error(message, e);
-	
-	response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,message);
-
-    }
 }
 
