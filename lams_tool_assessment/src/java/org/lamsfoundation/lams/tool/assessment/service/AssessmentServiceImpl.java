@@ -2007,11 +2007,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessment.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
 	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setShuffled(JsonUtil.opt(toolContentJSON, "shuffled", Boolean.FALSE));
-	assessment.setSubmissionDeadline(JsonUtil.opt(toolContentJSON, "submissionDeadline", (Date) null));
 	assessment.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
-	assessment
-		.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
-
+	assessment.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	// submission deadline set in monitoring
+	
 	if (toolContentJSON.has("overallFeedback")) {
 	    throw new JSONException(
 		    "Assessment Tool does not support Overall Feedback for REST Authoring. " + toolContentJSON);
@@ -2132,11 +2131,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     // TODO Implement REST support for all types and then remove checkType method
     void checkType(short type) throws JSONException {
-	if (type != AssessmentConstants.QUESTION_TYPE_ESSAY) {
+	if (type != AssessmentConstants.QUESTION_TYPE_ESSAY && type != AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    throw new JSONException(
-		    "Assessment Tool does not support REST Authoring for anything but Essay Type. Found type " + type);
+		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type " + type);
 	}
-	// public static final short QUESTION_TYPE_MULTIPLE_CHOICE = 1;
 	// public static final short QUESTION_TYPE_MATCHING_PAIRS = 2;
 	// public static final short QUESTION_TYPE_SHORT_ANSWER = 3;
 	// public static final short QUESTION_TYPE_NUMERICAL = 4;
