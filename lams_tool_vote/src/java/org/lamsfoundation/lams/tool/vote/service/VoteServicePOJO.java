@@ -42,6 +42,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
@@ -52,6 +55,8 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -87,6 +92,7 @@ import org.lamsfoundation.lams.tool.vote.web.MonitoringUtil;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -103,7 +109,7 @@ import org.springframework.dao.DataAccessException;
  * @author Ozgur Demirtas
  */
 public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, VoteAppConstants {
+	ToolContentImport102Manager, VoteAppConstants, ToolRestManager {
     private static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
 
     private IVoteContentDAO voteContentDAO;
@@ -1901,4 +1907,61 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getVoteOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
+    
+    // ****************** REST methods *************************
+
+    /**
+     * Rest call to create a new Vote content. Required fields in toolContentJSON: "title", "instructions",
+     * "answers". The "answers" entry should be a JSONArray of Strings.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
+
+	Date updateDate = new Date();
+
+	VoteContent vote = new VoteContent();
+	vote.setVoteContentId(toolContentID);
+	vote.setContent(toolContentID.toString());
+	vote.setTitle(toolContentJSON.getString(RestTags.TITLE));
+	vote.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
+	vote.setCreatedBy(userID);
+	vote.setCreationDate(updateDate);
+	vote.setUpdateDate(updateDate);
+
+	vote.setAllowText(JsonUtil.opt(toolContentJSON, "allowText", Boolean.FALSE));
+	vote.setDefineLater(false);
+	vote.setLockOnFinish(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
+	vote.setMaxNominationCount(JsonUtil.opt(toolContentJSON, "maxNominations", "1"));
+	vote.setMinNominationCount(JsonUtil.opt(toolContentJSON, "minNominations", "1"));
+	vote.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
+	vote.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
+	vote.setShowResults(JsonUtil.opt(toolContentJSON, "showResults", Boolean.TRUE));
+	vote.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+
+	// Is the data flow functionality actually used anywhere?
+	vote.setAssignedDataFlowObject((Boolean)JsonUtil.opt(toolContentJSON, "assignedDataFlowObject", null));
+	vote.setExternalInputsAdded((Short)JsonUtil.opt(toolContentJSON, "externalInputsAdded", null));
+	vote.setMaxExternalInputs(JsonUtil.opt(toolContentJSON, "maxInputs", Short.valueOf("0")));
+
+	// submissionDeadline is set in monitoring
+	
+	// **************************** Nomination entries *********************
+	JSONArray answers = toolContentJSON.getJSONArray(RestTags.ANSWERS);
+	Set newAnswersSet = vote.getVoteQueContents(); 
+	for (int i = 0; i < answers.length(); i++) {
+	    String answerJSONData = (String) answers.get(i);
+	    VoteQueContent answer = new VoteQueContent();
+	    answer.setDisplayOrder(i);
+	    answer.setMcContent(vote);
+	    answer.setQuestion((String) answers.get(i));
+	    answer.setVoteContent(vote);
+	    vote.getVoteQueContents().add(answer);
+	}
+
+	saveVoteContent(vote);
+
+    }
+
 }
