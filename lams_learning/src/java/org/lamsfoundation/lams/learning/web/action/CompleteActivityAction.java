@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
@@ -41,60 +42,73 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author daveg
  * 
- * XDoclet definition:
+ *         XDoclet definition:
  * 
- * @struts:action path="/CompleteActivity" name="activityForm"
- *                validate="false" scope="request"
+ * @struts:action path="/CompleteActivity" name="activityForm" validate="false" scope="request"
  * 
  */
 public class CompleteActivityAction extends ActivityAction {
-    
+
     protected static String className = "CompleteActivity";
-	
-	/**
-	 * Sets the current activity as complete and uses the progress engine to find
-	 * the next activity (may be null).  
-	 * 
-	 * Called when completing an optional activity, or triggered by completeToolSession (via a tool call).
-	 * The activity to be marked as complete must 
-	 * @throws IOException 
-	 * @throws ServletException 
-	 */
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException, ServletException {
-		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
-		
-		ICoreLearnerService learnerService = getLearnerService();
+    private static IntegrationService integrationService = null;
 
-		Integer learnerId = LearningWebUtil.getUserId();
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		
-		// This must get the learner progress from the progress id, not cached from the request,
-		// otherwise we may be using an old version of a lesson while a teacher is starting a 
-		// live edit, and then the lock flag can't be checked correctly.
-	    LearnerProgress progress = learnerService.getProgressById(WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID, true));
+    /**
+     * Sets the current activity as complete and uses the progress engine to find the next activity (may be null).
+     * 
+     * Called when completing an optional activity, or triggered by completeToolSession (via a tool call). The activity
+     * to be marked as complete must
+     * 
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-		ActionForward forward = null;
-		// Set activity as complete
-		try {
-			forward = LearningWebUtil.completeActivity(request, response,
-		    		actionMappings, progress, activity, 
-		    			learnerId, learnerService, false);
-		}
-		catch (LearnerServiceException e) {
-			return mapping.findForward("error");
-		}
+	ICoreLearnerService learnerService = getLearnerService();
 
-		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, progress);
-		return forward;
+	Integer learnerId = LearningWebUtil.getUserId();
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	// This must get the learner progress from the progress id, not cached from the request,
+	// otherwise we may be using an old version of a lesson while a teacher is starting a
+	// live edit, and then the lock flag can't be checked correctly.
+	LearnerProgress progress = learnerService.getProgressById(WebUtil.readLongParam(request,
+		LearningWebUtil.PARAM_PROGRESS_ID, true));
+
+	// if user has already completed the lesson - we need to let integrations servers know to come and pick up
+	// updated marks (as it won't happen at lessoncomplete.jsp page)
+	if (progress.isComplete()) {
+	    String lessonFinishCallbackUrl = getIntegrationService().getLessonFinishCallbackUrl(progress.getUser(),
+		    progress.getLesson());
+	    if (lessonFinishCallbackUrl != null) {
+		request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
+	    }
 	}
 
-	
+	ActionForward forward = null;
+	// Set activity as complete
+	try {
+	    forward = LearningWebUtil.completeActivity(request, response, actionMappings, progress, activity,
+		    learnerId, learnerService, false);
+	} catch (LearnerServiceException e) {
+	    return mapping.findForward("error");
+	}
+
+	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, progress);
+	return forward;
+    }
+    
+    private IntegrationService getIntegrationService() {
+	if (integrationService == null) {
+	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    getServlet().getServletContext()).getBean("integrationService");
+	}
+	return integrationService;
+    }
 }
