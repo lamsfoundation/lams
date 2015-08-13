@@ -22,7 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 
- 	<script language="JavaScript" type="text/Javascript"><!--
+ <script language="JavaScript" type="text/Javascript">
     function doCloseRedirect() {
         if ( window.name.match("LearnerActivity") != null ) {
         	<%-- In popup window (ie have revisited a completed activity. Just the one activity in the window so close --%>
@@ -39,17 +39,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             </c:if>
         }
     }
+    
     window.onload = doCloseRedirect;
-    //-->
-    </script>
+</script>
 
-	<div id="content">
+<div id="content">
 
-		<p><fmt:message key="message.window.closing"/></p>
+	<p><fmt:message key="message.window.closing"/></p>
 
-	</div>  <!--closes content-->
+</div>  <!--closes content-->
 
 
-	<div id="footer">
-	</div><!--closes footer-->
+<div id="footer">
+</div><!--closes footer-->
 
+<c:if test="${not empty lessonFinishUrl}">
+	<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />
+</c:if>
