@@ -25,12 +25,17 @@ package org.lamsfoundation.lams.web.filter;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.lamsfoundation.lams.util.ITransactionRetryService;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
@@ -44,50 +49,53 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
     private static final Logger log = Logger.getLogger(TransactionRetryInterceptor.class);
 
     private ITransactionRetryService transactionRetryService;
+    private SessionFactory sessionFactory;
 
     private static final int MAX_ATTEMPTS = 5;
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-	int attempt = 1;
+	MutableInt attempt = new MutableInt(1);
 	Throwable exception = null;
 	do {
 	    try {
-		if (attempt == 1) {
+		if (attempt.intValue() == 1) {
 		    return invocation.proceed();
 		} else {
 		    return transactionRetryService.retry(invocation);
 		}
 	    } catch (DataIntegrityViolationException e) {
 		exception = e;
-		attempt++;
-		TransactionRetryInterceptor.processException(e, invocation, attempt);
+		processException(e, invocation, attempt);
 	    } catch (ConstraintViolationException e) {
 		exception = e;
-		attempt++;
-		TransactionRetryInterceptor.processException(e, invocation, attempt);
+		processException(e, invocation, attempt);
 	    } catch (CannotAcquireLockException e) {
 		exception = e;
-		attempt++;
-		TransactionRetryInterceptor.processException(e, invocation, attempt);
+		processException(e, invocation, attempt);
 	    } catch (LockAcquisitionException e) {
 		exception = e;
-		attempt++;
-		TransactionRetryInterceptor.processException(e, invocation, attempt);
+		processException(e, invocation, attempt);
 	    } catch (UnexpectedRollbackException e) {
 		exception = e;
-		attempt++;
-		TransactionRetryInterceptor.processException(e, invocation, attempt);
+		processException(e, invocation, attempt);
 	    }
-	} while (attempt <= TransactionRetryInterceptor.MAX_ATTEMPTS);
+	} while (attempt.intValue() <= TransactionRetryInterceptor.MAX_ATTEMPTS);
 	throw exception;
     }
 
-    private static void processException(Exception e, MethodInvocation invocation, int attempt) {
+    private void processException(Exception e, MethodInvocation invocation, MutableInt attempt) {
 	StringBuilder message = new StringBuilder("When invoking method \"").append(invocation.getMethod().getName())
-		.append("\" caught ").append(e.getMessage()).append(". Attempt #").append(attempt - 1);
-	if (attempt <= TransactionRetryInterceptor.MAX_ATTEMPTS) {
+		.append("\" caught \"").append(e.getMessage()).append("\". Attempt #").append(attempt);
+
+	attempt.increment();
+	if (attempt.intValue() <= TransactionRetryInterceptor.MAX_ATTEMPTS) {
 	    message.append(". Retrying.");
+
+	    // the exception could have closed the session; try to recreate it here
+	    Session session = SessionFactoryUtils.getSession(sessionFactory, true);
+	    // same as in CustomizedOpenSessionInViewFilter
+	    session.setFlushMode(FlushMode.AUTO);
 	} else {
 	    message.append(". Giving up.");
 	}
@@ -96,5 +104,9 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 
     public void setTransactionRetryService(ITransactionRetryService transactionRetryService) {
 	this.transactionRetryService = transactionRetryService;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 }
