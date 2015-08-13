@@ -169,8 +169,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
 	AssessmentUser groupLeader = session.getGroupLeader();
 
-	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
-	return isUserLeader;
+	return (groupLeader != null) && user.getUserId().equals(groupLeader.getUserId());
     }
 
     @Override
