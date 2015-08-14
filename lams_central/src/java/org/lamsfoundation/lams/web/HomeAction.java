@@ -232,7 +232,7 @@ public class HomeAction extends DispatchAction {
 		    + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
 	    getServlet().getServletContext().getContext(serverURLContextPath + "learning")
-		    .getRequestDispatcher("/main.jsp").forward(req, res);
+		    .getRequestDispatcher("/index.jsp").forward(req, res);
 	    return null;
 
 	} catch (Exception e) {

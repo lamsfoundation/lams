@@ -1,35 +1,5 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
- 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%
-String userAgent = request.getHeader("User-Agent").toLowerCase();
-boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
-%>
-<c:set var="isTouchInterface"><%=isTouchInterface%></c:set>
-
-<!DOCTYPE html>
 
 <lams:html>
 <lams:head>
@@ -73,7 +43,6 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 			isHorizontalBar = false,
 			hasContentFrame = true,
 			hasDialog = false,
-			isTouchInterface = ${isTouchInterface},
 			
 			bars = {
 				'learnerMainBar' : {
@@ -105,19 +74,7 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 						togglerTip_open : '<c:out value="${togglerTip_open_VAR}" />',
 						<fmt:message key="label.learner.progress.closed.tooltip" var="togglerTip_closed_VAR"/>
 						togglerTip_closed : '<c:out value="${togglerTip_closed_VAR}" />',
-						onopen_start : function() {$('#controlFrame').css('visibility','visible');},
-						onopen_end : function() {
-										//expand contentFrame width altogether with content-frame-container
-										if (isTouchInterface) {
-											$("#contentFrame").width($("#content-frame-container").width());
-										};
-									 },
-						onclose_end : function() {
-										//shrink contentFrame width altogether with content-frame-container
-										if (isTouchInterface) {
-											$("#contentFrame").width($("#content-frame-container").width());
-										};
-									 },
+						onopen_start : function() {$('#controlFrame').css('visibility','visible');}
 					}
 				});
 				
@@ -204,22 +161,9 @@ boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
 		<%@ include file="presenceChat.jsp"%>
 	</c:if>
 
-	<c:choose>
-		<c:when test="${isTouchInterface}">
-			<div id="content-frame-container" class="ui-layout-center">
-				<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" 
-					src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>" allowfullscreen> </iframe>
-			</div>
-		</c:when>
-		
-		<c:otherwise>
-			<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" class="ui-layout-center"
-				src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>" allowfullscreen> </iframe>
-		</c:otherwise>
-	</c:choose>
-	
-	<div id="tooltip"></div>
-	
-</body>
+	<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" class="ui-layout-center"
+		src="<c:url value="/"/>content.do?lessonID=<c:out value="${lessonID}"/>" allowfullscreen> </iframe>
 
+	<div id="tooltip"></div>
+</body>
 </lams:html>
