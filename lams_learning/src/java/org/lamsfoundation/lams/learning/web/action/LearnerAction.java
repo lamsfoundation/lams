@@ -86,7 +86,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action path="/learner" parameter="method" validate="false"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
- * @struts:action-forward name="displayProgress" path="/progress.jsp"
+ * @struts:action-forward name="displayProgress" path="/mobile/progress.jsp"
  * @struts:action-forward name="message" path=".message"
  */
 public class LearnerAction extends LamsDispatchAction {
