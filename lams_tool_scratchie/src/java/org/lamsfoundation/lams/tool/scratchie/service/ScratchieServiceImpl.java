@@ -182,11 +182,15 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public void createUser(ScratchieUser scratchieUser) {
-	ScratchieUser existingUser = getUserByIDAndSession(scratchieUser.getUserId(),
+	ScratchieUser user = getUserByIDAndSession(scratchieUser.getUserId(),
 		scratchieUser.getSession().getSessionId());
-	if (existingUser == null) {
-	    scratchieUserDao.saveObject(scratchieUser);
+	if (user == null) {
+	    user = scratchieUser;
 	}
+	// Save it no matter if the user already exists.
+	// At checkLeaderSelectToolForSessionLeader() the user is added to session.
+	// Sometimes session save is earlier that user save in another thread, leading to an exception.
+	scratchieUserDao.saveObject(user);
     }
 
     @Override
