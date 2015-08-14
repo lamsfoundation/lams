@@ -29,11 +29,6 @@ border: 10px solid blue;
 	margin-left: 160px;
 }
 
-#content-frame-container {
-	overflow: auto !important;
-	-webkit-overflow-scrolling: touch !important;
-}
-
 table#logoTable {
 	height: 20px;
 	table-layout: fixed;
