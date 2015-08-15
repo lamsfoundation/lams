@@ -1953,7 +1953,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	for (int i = 0; i < answers.length(); i++) {
 	    String answerJSONData = (String) answers.get(i);
 	    VoteQueContent answer = new VoteQueContent();
-	    answer.setDisplayOrder(i);
+	    answer.setDisplayOrder(i+1);
 	    answer.setMcContent(vote);
 	    answer.setQuestion((String) answers.get(i));
 	    answer.setVoteContent(vote);
