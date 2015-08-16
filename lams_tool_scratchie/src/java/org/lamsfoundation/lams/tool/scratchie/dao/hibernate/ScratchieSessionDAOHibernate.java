@@ -23,10 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 
 public class ScratchieSessionDAOHibernate extends BaseDAOHibernate implements ScratchieSessionDAO {
 
@@ -43,7 +47,12 @@ public class ScratchieSessionDAOHibernate extends BaseDAOHibernate implements Sc
     }
 
     public List<ScratchieSession> getByContentId(Long toolContentId) {
-	return getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
+	List<ScratchieSession> sessions = getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
+	
+	Set<ScratchieSession> sortedSessions = new TreeSet<ScratchieSession>(new ScratchieSessionComparator());
+	sortedSessions.addAll(sessions);
+	
+	return new ArrayList<ScratchieSession>(sortedSessions);
     }
 
     public void delete(ScratchieSession session) {
