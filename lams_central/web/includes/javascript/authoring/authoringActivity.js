@@ -1382,7 +1382,7 @@ ActivityLib = {
 	 */
 	removeSelectEffect : function(object) {
 		// remove the effect from the given object or the selected one, whatever it is
-		if (!object || !object.items.selectEffect) {
+		if (!object) {
 			object = layout.selectedObject;
 		}
 		
