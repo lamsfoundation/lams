@@ -619,7 +619,6 @@ GeneralInitLib = {
 			 */
 			'buttonsSave' : sharedButtons.concat([
 				             {
-				            	'class'  : 'defaultFocus',
 				            	'text'   : LABELS.SAVE_BUTTON,
                                                 'id'     : 'saveLdStoreButton',
 				            	'click'  : function() {	
@@ -789,7 +788,6 @@ GeneralInitLib = {
 					leftButtonContainer = $('<div />').attr('id','leftDialogButtonContainer');
 				$('input', nameContainer).val($(this).dialog('option', 'learningDesignTitle'));
 				$(this).siblings('.ui-dialog-buttonpane').append(leftButtonContainer).append(nameContainer);
-				$('#ldStoreDialogNameField', nameContainer).focus();
 
 				$('.leftDialogButton')
 				   .attr('disabled', 'disabled')

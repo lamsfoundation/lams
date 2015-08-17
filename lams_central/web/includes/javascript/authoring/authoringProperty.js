@@ -115,6 +115,7 @@ var PropertyDefs = {
 
 				// if title changed, redraw branching and converge points
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(layout.selectedObject);
 					branchingActivity.start.draw();
 					branchingActivity.end.draw();
 					ActivityLib.addSelectEffect(layout.selectedObject, true);
@@ -230,6 +231,7 @@ var PropertyDefs = {
 				}
 				
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(activity);
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
 				}
@@ -341,6 +343,7 @@ var PropertyDefs = {
 				activity.viewLearners = $('.propertiesContentFieldViewLearners', content).is(':checked');
 				
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(activity);
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
 				}
@@ -416,6 +419,7 @@ var PropertyDefs = {
 				}
 				
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(label);
 					label.draw();
 					ActivityLib.addSelectEffect(label, true);
 					GeneralLib.setModified(true);
@@ -453,6 +457,7 @@ var PropertyDefs = {
 				if (newTitle != activity.title) {
 					if (GeneralLib.nameValidator.test(newTitle)) {
             			activity.title = newTitle;
+    					ActivityLib.removeSelectEffect(activity);
 						activity.draw();
 						ActivityLib.addSelectEffect(activity, true);
 						GeneralLib.setModified(true);
@@ -536,6 +541,7 @@ var PropertyDefs = {
 				}
 				
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(activity);
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
 					GeneralLib.setModified(true);
@@ -594,6 +600,7 @@ var PropertyDefs = {
 				redrawNeeded |= newColor != color;
 				
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(region);
 					region.draw(null, null, null, null, newColor);
 					ActivityLib.addSelectEffect(region, true);
 					GeneralLib.setModified(true);
@@ -659,6 +666,7 @@ var PropertyDefs = {
 				}
 				
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(activity);
 					activity.draw();
 					ActivityLib.addSelectEffect(activity, true);
 					GeneralLib.setModified(true);
@@ -724,6 +732,7 @@ var PropertyDefs = {
 				}
 				
 				if (redrawNeeded) {
+					ActivityLib.removeSelectEffect(activity);
 					transition.draw();
 					ActivityLib.addSelectEffect(activity, true);
 					GeneralLib.setModified(true);
