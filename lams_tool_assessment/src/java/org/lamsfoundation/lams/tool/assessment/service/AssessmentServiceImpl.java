@@ -320,11 +320,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public void createUser(AssessmentUser assessmentUser) {
 	// make sure the user was not created in the meantime
-	AssessmentUser existingUser = getUserByIDAndSession(assessmentUser.getUserId(),
+	AssessmentUser user = getUserByIDAndSession(assessmentUser.getUserId(),
 		assessmentUser.getSession().getSessionId());
-	if (existingUser == null) {
-	    assessmentUserDao.saveObject(assessmentUser);
+	if (user == null) {
+	    user = assessmentUser;
 	}
+	// Save it no matter if the user already exists.
+	// At checkLeaderSelectToolForSessionLeader() the user is added to session.
+	// Sometimes session save is earlier that user save in another thread, leading to an exception.
+	assessmentUserDao.saveObject(user);
     }
 
     @Override
@@ -2010,7 +2014,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessment.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
 	assessment.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	// submission deadline set in monitoring
-	
+
 	if (toolContentJSON.has("overallFeedback")) {
 	    throw new JSONException(
 		    "Assessment Tool does not support Overall Feedback for REST Authoring. " + toolContentJSON);
