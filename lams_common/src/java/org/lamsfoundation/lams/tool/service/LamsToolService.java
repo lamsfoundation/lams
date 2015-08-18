@@ -157,7 +157,8 @@ public class LamsToolService implements ILamsToolService {
 	
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId, toolSession.getLesson().getLessonId());
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
+		toolSession.getLesson().getLessonId());
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
@@ -165,12 +166,14 @@ public class LamsToolService implements ILamsToolService {
 	    String outputName = LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
 	    ToolSession leaderSelectionSession = toolSessionDAO.getToolSessionByLearner(learner,
 		    leaderSelectionActivity);
+	    if (leaderSelectionSession != null) {
 	    ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
 
 	    // check if tool produced output
 	    if (output != null && output.getValue() != null) {
 		leaderUserId = output.getValue().getLong();
 	    }
+	}
 	}
 
 	return leaderUserId;
