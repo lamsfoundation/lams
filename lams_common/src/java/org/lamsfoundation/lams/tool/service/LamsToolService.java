@@ -65,8 +65,8 @@ import org.lamsfoundation.lams.util.FileUtilException;
  */
 public class LamsToolService implements ILamsToolService {
     private static Logger log = Logger.getLogger(LamsToolService.class);
-    
-    //Leader selection tool Constants
+
+    // Leader selection tool Constants
     private static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
@@ -153,14 +153,15 @@ public class LamsToolService implements ILamsToolService {
 	    return null;
 	}
     }
-    
+
     @Override
     public Long getLeaderUserId(Long toolSessionId, Integer learnerId) {
 	Long leaderUserId = null;
-	
+
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId, toolSession.getLesson().getLessonId());
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
+		toolSession.getLesson().getLessonId());
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
@@ -168,11 +169,13 @@ public class LamsToolService implements ILamsToolService {
 	    String outputName = LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
 	    ToolSession leaderSelectionSession = toolSessionDAO.getToolSessionByLearner(learner,
 		    leaderSelectionActivity);
-	    ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
+	    if (leaderSelectionSession != null) {
+		ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
 
-	    // check if tool produced output
-	    if (output != null && output.getValue() != null) {
-		leaderUserId = output.getValue().getLong();
+		// check if tool produced output
+		if (output != null && output.getValue() != null) {
+		    leaderUserId = output.getValue().getLong();
+		}
 	    }
 	}
 
@@ -203,22 +206,22 @@ public class LamsToolService implements ILamsToolService {
 	    if (LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
 		return activity;
 	    }
-	    
-	//in case of floating activity
+
+	    // in case of floating activity
 	} else if (activityClass.equals(FloatingActivity.class)) {
 	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
 	    Map<Activity, CompletedActivityProgress> completedActivities = learnerProgress.getCompletedActivities();
-	    
-	    //find the earliest finished Leader Select Activity
+
+	    // find the earliest finished Leader Select Activity
 	    Date leaderSelectActivityFinishDate = null;
 	    Activity leaderSelectionActivity = null;
 	    for (Activity completedActivity : completedActivities.keySet()) {
-		
+
 		if (completedActivity instanceof ToolActivity) {
 		    ToolActivity completedToolActivity = (ToolActivity) completedActivity;
 		    if (LEADER_SELECTION_TOOL_SIGNATURE.equals(completedToolActivity.getTool().getToolSignature())) {
 			Date finishDate = completedActivities.get(completedActivity).getFinishDate();
-			
+
 			if ((leaderSelectActivityFinishDate == null)
 				|| (finishDate.compareTo(leaderSelectActivityFinishDate) < 0)) {
 			    leaderSelectionActivity = completedToolActivity;
@@ -227,9 +230,9 @@ public class LamsToolService implements ILamsToolService {
 
 		    }
 		}
-		
+
 	    }
-	    
+
 	    return leaderSelectionActivity;
 	}
 
@@ -248,45 +251,45 @@ public class LamsToolService implements ILamsToolService {
 
 	return null;
     }
-    
+
     @Override
     public Set<User> getUsersFromGroupingActivity(Long toolSessionId) {
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
 	ToolActivity activity = session.getToolActivity();
-	
+
 	Set<User> users = new TreeSet<User>();
 	if (activity.getApplyGrouping()) {
 	    Grouping grouping = activity.getGrouping();
-	    
+
 	    if (grouping != null) {
-		
-		//find group that corresponds to specified toolSessionId
-		for (Group group : (Set<Group>)grouping.getGroups()) {
+
+		// find group that corresponds to specified toolSessionId
+		for (Group group : (Set<Group>) grouping.getGroups()) {
 
 		    if (!grouping.isLearnerGroup(group)) {
 			continue;
 		    }
 
-		    for (ToolSession sessionIter : (Set<ToolSession>)group.getToolSessions()) {
+		    for (ToolSession sessionIter : (Set<ToolSession>) group.getToolSessions()) {
 			if (sessionIter.getToolSessionId().equals(toolSessionId)) {
 			    users.addAll(group.getUsers());
 			    log.warn("AAAAA groupId: " + group.getGroupId());
 			    break;
 			}
 		    }
-//		    if (grouping.isLearnerGroup(group) && group.hasLearner(learner)) {
-//			users.addAll(group.getUsers());
-//		    }
+		    // if (grouping.isLearnerGroup(group) && group.hasLearner(learner)) {
+		    // users.addAll(group.getUsers());
+		    // }
 		}
 	    }
-	    
-//	    activity.getGroupFor(learner)
-	
-	// if there is no grouping specified just add all learners from the lesson
+
+	    // activity.getGroupFor(learner)
+
+	    // if there is no grouping specified just add all learners from the lesson
 	} else {
 	    users.addAll(session.getLesson().getLessonClass().getLearners());
 	}
-	
+
 	return users;
     }
 
@@ -328,7 +331,7 @@ public class LamsToolService implements ILamsToolService {
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
 	this.toolContentDAO = toolContentDAO;
     }
-    
+
     /**
      * 
      * @param toolContentDAO
@@ -336,7 +339,7 @@ public class LamsToolService implements ILamsToolService {
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 	this.lamsCoreToolService = lamsCoreToolService;
     }
-    
+
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
