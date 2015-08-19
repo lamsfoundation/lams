@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:message key="label.learner.choice.group.full"/>
 					</c:when>
 					<c:otherwise>
-						<html:form action="/grouping.do?method=learnerChooseGroup&userId=${user.userId}&activityID=${activityID}&groupId=${group.groupId}" target="_self">
+						<html:form action="/grouping.do?method=learnerChooseGroup&userId=${user.userID}&activityID=${activityID}&groupId=${group.groupId}" target="_self">
 							<html:submit styleClass="button"><fmt:message key="label.choose.group.button"/></html:submit>
 						</html:form>
 					</c:otherwise>
