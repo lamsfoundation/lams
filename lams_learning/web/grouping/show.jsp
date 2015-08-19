@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self" styleId="messageForm">
+	<html:form action="/grouping.do?method=completeActivity&userId=${user.userID}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self" styleId="messageForm">
 
 	<div id="content">
 
