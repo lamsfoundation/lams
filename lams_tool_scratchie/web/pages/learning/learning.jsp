@@ -46,11 +46,7 @@
 	            		//disable scratching
 	            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
 	            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
-
-		            	var isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-		            	if (!isiOS) {
-		            		$("a[id^=imageLink-" + itemUid + "]").not('#imageLink' + id).fadeTo(1300, 0.3);
-		            	}
+		            	$("a[id^=imageLink-" + itemUid + "]").not('#imageLink' + id).fadeTo(1300, 0.3);
 
 	            	} else {
 	            		
