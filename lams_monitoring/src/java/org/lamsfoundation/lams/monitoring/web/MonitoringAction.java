@@ -1458,9 +1458,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	if ((branchingActivityId == null) || (activity == null)) {
 	    return false;
 	}
+
 	Activity parentActivity = activity.getParentActivity();
-	return (parentActivity != null) && (parentActivity.getParentActivity() != null)
-		&& parentActivity.getParentActivity().getActivityId().equals(branchingActivityId);
+	while (parentActivity != null) {
+	    if (parentActivity.isBranchingActivity()) {
+		return parentActivity.getActivityId().equals(branchingActivityId);
+	    }
+	    parentActivity = parentActivity.getParentActivity();
+	}
+	return false;
     }
 
     @SuppressWarnings("unchecked")
