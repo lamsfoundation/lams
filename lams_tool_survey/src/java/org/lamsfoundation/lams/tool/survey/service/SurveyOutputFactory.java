@@ -131,7 +131,7 @@ public class SurveyOutputFactory extends OutputFactory {
 	    String[] textAnswers = null;
 	    List<String> answersList = new ArrayList<String>();
 	    SurveyUser user = surveyService.getUserByIDAndSession(learnerId, toolSessionId);
-	    List<AnswerDTO> answerDTOs = surveyService.getQuestionAnswers(toolSessionId, user.getUid());
+	    List<AnswerDTO> answerDTOs = user == null ? null : surveyService.getQuestionAnswers(toolSessionId, user.getUid());
 	    if (answerDTOs != null && !answerDTOs.isEmpty()) {
 		for (AnswerDTO answerDTO : answerDTOs) {
 		    SurveyAnswer surveyAnswer = answerDTO.getAnswer();
