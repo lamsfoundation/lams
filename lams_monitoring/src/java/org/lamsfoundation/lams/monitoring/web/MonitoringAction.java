@@ -54,6 +54,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.authoring.ObjectExtractor;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -158,17 +159,19 @@ public class MonitoringAction extends LamsDispatchAction {
 	MonitoringAction.auditService.log(MonitoringAction.class.getName() + ":" + methodKey, e.toString());
 
 	if (e instanceof UserAccessDeniedException) {
-	    return new FlashMessage(methodKey, monitoringService.getMessageService().getMessage(
-		    "error.user.noprivilege"), FlashMessage.ERROR);
+	    return new FlashMessage(methodKey,
+		    monitoringService.getMessageService().getMessage("error.user.noprivilege"), FlashMessage.ERROR);
 	} else {
 	    String[] msg = new String[1];
 	    msg[0] = e.getMessage();
-	    return new FlashMessage(methodKey, monitoringService.getMessageService().getMessage("error.system.error",
-		    msg), FlashMessage.CRITICAL_ERROR);
+	    return new FlashMessage(methodKey,
+		    monitoringService.getMessageService().getMessage("error.system.error", msg),
+		    FlashMessage.CRITICAL_ERROR);
 	}
     }
 
-    private FlashMessage handleCriticalError(String methodKey, String messageKey, IMonitoringService monitoringService) {
+    private FlashMessage handleCriticalError(String methodKey, String messageKey,
+	    IMonitoringService monitoringService) {
 	String message = monitoringService.getMessageService().getMessage(messageKey);
 	LamsDispatchAction.log.error("Error occured " + methodKey + " error ");
 	MonitoringAction.auditService = getAuditService();
@@ -197,8 +200,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward initializeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 
 	String title = WebUtil.readStrParam(request, "lessonName");
 	if (title == null) {
@@ -260,8 +263,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward startLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.startLesson(lessonId, getUserId());
@@ -281,10 +284,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	IUserManagementService userManagementService = MonitoringServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	List<User> allUsers = userManagementService.getUsersFromOrganisation(organisationId);
@@ -325,8 +328,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean imEnable = WebUtil.readBooleanParam(request, "imEnable", false);
 	Integer splitNumberLessons = WebUtil.readIntParam(request, "splitNumberLessons", true);
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
-	Date schedulingDatetime = schedulingEnable ? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request
-		.getParameter("schedulingDatetime")) : null;
+	Date schedulingDatetime = schedulingEnable
+		? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request.getParameter("schedulingDatetime"))
+		: null;
 	boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
 
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
@@ -338,11 +342,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	Integer timeLimitIndividual = timeLimitEnable && timeLimitIndividualField ? timeLimitDays : null;
 	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 
-	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
-		.getServletContext());
+	IUserManagementService userManagementService = MonitoringServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	Integer userId = getUserId();
@@ -360,8 +364,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	String staffGroupName = organisation.getName() + " staff";
 
 	// either all users participate in a lesson, or we split them among instances
-	List<User> lessonInstanceLearners = splitNumberLessons == null ? learners : new ArrayList<User>(
-		(learners.size() / splitNumberLessons) + 1);
+	List<User> lessonInstanceLearners = splitNumberLessons == null ? learners
+		: new ArrayList<User>((learners.size() / splitNumberLessons) + 1);
 	for (int lessonIndex = 1; lessonIndex <= (splitNumberLessons == null ? 1 : splitNumberLessons); lessonIndex++) {
 	    String lessonInstanceName = lessonName;
 	    String learnerGroupInstanceName = learnerGroupName;
@@ -373,15 +377,18 @@ public class MonitoringAction extends LamsDispatchAction {
 		learnerGroupInstanceName += " " + lessonIndex;
 		staffGroupInstanceName += " " + lessonIndex;
 		lessonInstanceLearners.clear();
-		for (int learnerIndex = lessonIndex - 1; learnerIndex < learners.size(); learnerIndex += splitNumberLessons) {
+		for (int learnerIndex = lessonIndex - 1; learnerIndex < learners
+			.size(); learnerIndex += splitNumberLessons) {
 		    lessonInstanceLearners.add(learners.get(learnerIndex));
 		}
 	    }
 
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
-		LamsDispatchAction.log.debug("Creating lesson "
-			+ (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ")
-			+ "\"" + lessonInstanceName + "\"");
+		LamsDispatchAction.log
+			.debug("Creating lesson "
+				+ (splitNumberLessons == null ? ""
+					: "(" + lessonIndex + "/" + splitNumberLessons + ") ")
+				+ "\"" + lessonInstanceName + "\"");
 	    }
 
 	    Lesson lesson = null;
@@ -434,8 +441,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward startOnScheduleLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ParseException, IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
 	Date startDate = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr);
@@ -469,8 +476,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward archiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.unsuspendLesson(lessonId, getUserId());
@@ -501,8 +508,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward unarchiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.unarchiveLesson(lessonId, getUserId());
@@ -527,8 +534,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward suspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.suspendLesson(lessonId, getUserId());
@@ -552,8 +559,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward unsuspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.unsuspendLesson(lessonId, getUserId());
@@ -585,8 +592,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	JSONObject jsonObject = new JSONObject();
@@ -625,8 +632,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	getAuditService();
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 
 	// get parameters
 	Long activityId = null;
@@ -655,8 +662,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	if (LamsDispatchAction.log.isDebugEnabled()) {
-	    LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "
-		    + message);
+	    LamsDispatchAction.log
+		    .debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". " + message);
 	}
 
 	// audit log force completion attempt
@@ -673,8 +680,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLessonLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	    wddxPacket = monitoringService.getLessonLearners(lessonID, getUserId());
@@ -697,8 +704,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean getMonitors = Role.MONITOR.equalsIgnoreCase(role);
 	boolean classOnly = WebUtil.readBooleanParam(request, "classOnly", true);
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	Set<User> classUsers = getMonitors ? lesson.getLessonClass().getStaffGroup().getUsers() : lesson
-		.getLessonClass().getLearners();
+	Set<User> classUsers = getMonitors ? lesson.getLessonClass().getStaffGroup().getUsers()
+		: lesson.getLessonClass().getLearners();
 	JSONArray responseJSON = new JSONArray();
 
 	// get class members
@@ -717,10 +724,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	// add non-class, organisation members, if requested
 	if (!classOnly) {
-	    IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
-		    .getServletContext());
-	    List<User> orgUsers = userManagementService.getUsersFromOrganisationByRole(lesson.getOrganisation()
-		    .getOrganisationId(), getMonitors ? Role.MONITOR : Role.LEARNER, false, true);
+	    IUserManagementService userManagementService = MonitoringServiceProxy
+		    .getUserManagementService(getServlet().getServletContext());
+	    List<User> orgUsers = userManagementService.getUsersFromOrganisationByRole(
+		    lesson.getOrganisation().getOrganisationId(), getMonitors ? Role.MONITOR : Role.LEARNER, false,
+		    true);
 	    for (User user : orgUsers) {
 		if (!classUsers.contains(user)) {
 		    JSONObject userJSON = WebUtil.userToJSON(user);
@@ -744,16 +752,16 @@ public class MonitoringAction extends LamsDispatchAction {
 	Lesson lesson = getLessonService().getLesson(lessonId);
 
 	// monitor user opted for removing lesson progress for following users
-	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
-		.getServletContext());
-	List<User> allUsers = userManagementService.getUsersFromOrganisation(lesson.getOrganisation()
-		.getOrganisationId());
+	IUserManagementService userManagementService = MonitoringServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
+	List<User> allUsers = userManagementService
+		.getUsersFromOrganisation(lesson.getOrganisation().getOrganisationId());
 	List<User> removedLearners = parseUserList(request, "removedLearners", allUsers);
 	for (User removedLearner : removedLearners) {
 	    getLessonService().removeLearnerProgress(lessonId, removedLearner.getUserId());
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
-		LamsDispatchAction.log.debug("Removed progress for user ID: " + removedLearner.getUserId()
-			+ " in lesson ID: " + lessonId);
+		LamsDispatchAction.log.debug(
+			"Removed progress for user ID: " + removedLearner.getUserId() + " in lesson ID: " + lessonId);
 	    }
 	}
 
@@ -769,8 +777,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLessonStaff(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	    wddxPacket = monitoringService.getLessonStaff(lessonID, getUserId());
@@ -785,8 +793,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLearningDesignDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	    getSecurityService().isLessonMonitor(lessonID, getUserId(), "get learning design details", true);
@@ -802,8 +810,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getDictionaryXML(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	MessageService messageService = monitoringService.getMessageService();
 
 	String module = WebUtil.readStrParam(request, "module", false);
@@ -858,8 +866,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLearnerActivityURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, LamsToolServiceException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	Integer learnerUserID = new Integer(WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID));
 	Long activityID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID));
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
@@ -875,8 +883,8 @@ public class MonitoringAction extends LamsDispatchAction {
     /** Calls the server to bring up the activity's monitoring page. Assumes destination is a new window */
     public ActionForward getActivityMonitorURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, LamsToolServiceException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
@@ -891,8 +899,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward moveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	String wddxPacket = null;
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
@@ -942,8 +950,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    request.setAttribute("sequenceTabShowInfo", true);
 	}
 
-	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
-		.getServletContext());
+	IUserManagementService userManagementService = MonitoringServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
 		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
@@ -972,8 +980,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	List<LearnerProgress> learnerProgresses = new ArrayList<LearnerProgress>(lesson.getLearnerProgresses());
 	// sort either by user's name or his progress
-	Collections.sort(learnerProgresses, isProgressSorted ? new LearnerProgressComparator()
-		: new LearnerProgressNameComparator());
+	Collections.sort(learnerProgresses,
+		isProgressSorted ? new LearnerProgressComparator() : new LearnerProgressNameComparator());
 
 	if (!StringUtils.isBlank(searchPhrase)) {
 	    // get only users whose names match the given phrase
@@ -1041,8 +1049,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
 	responseJSON.put("lessonStateID", lessonDetails.getLessonStateID());
 
-	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate() : lesson
-		.getStartDateTime();
+	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
+		: lesson.getStartDateTime();
 	if (startOrScheduleDate != null) {
 	    DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
 	    Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), startOrScheduleDate);
@@ -1076,8 +1084,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long branchingActivityId = WebUtil.readLongParam(request, "branchingActivityID", true);
 
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	LessonDetailsDTO lessonDetails = lesson.getLessonDetails();
 	String contentFolderId = lessonDetails.getContentFolderID();
 
@@ -1099,25 +1107,31 @@ public class MonitoringAction extends LamsDispatchAction {
 		    // old branching is just a rectangle like Tool
 		    // new branching has start and finish points, it's exploded
 		    activityJSON.put("flaFormat", true);
-		    activityJSON.put("x", ((BranchingActivity) activity).getStartXcoord());
-		    activityJSON.put("y", ((BranchingActivity) activity).getStartYcoord());
+		    activityJSON.put("x",
+			    MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartXcoord()));
+		    activityJSON.put("y",
+			    MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartYcoord()));
 		} else if (activity.isOptionsWithSequencesActivity()
 			&& (((OptionsWithSequencesActivity) activity).getXcoord() == null)) {
 		    // old optional sequences is just a long rectangle
 		    // new optional sequences has start and finish points, it's exploded
 		    activityJSON.put("flaFormat", true);
-		    activityJSON.put("x", ((OptionsWithSequencesActivity) activity).getStartXcoord());
-		    activityJSON.put("y", ((OptionsWithSequencesActivity) activity).getStartYcoord());
+		    activityJSON.put("x", MonitoringAction
+			    .getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartXcoord()));
+		    activityJSON.put("y", MonitoringAction
+			    .getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartYcoord()));
 		} else if ((parentActivity != null)
 			&& ((Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId())
-				|| (Activity.PARALLEL_ACTIVITY_TYPE == parentActivity.getActivityTypeId()) || (Activity.FLOATING_ACTIVITY_TYPE == parentActivity
-				.getActivityTypeId()))) {
+				|| (Activity.PARALLEL_ACTIVITY_TYPE == parentActivity.getActivityTypeId())
+				|| (Activity.FLOATING_ACTIVITY_TYPE == parentActivity.getActivityTypeId()))) {
 		    // Optional Activity children had coordinates relative to parent
-		    activityJSON.put("x", parentActivity.getXcoord() + activity.getXcoord());
-		    activityJSON.put("y", parentActivity.getYcoord() + activity.getYcoord());
+		    activityJSON.put("x", MonitoringAction.getActivityCoordinate(parentActivity.getXcoord())
+			    + MonitoringAction.getActivityCoordinate(activity.getXcoord()));
+		    activityJSON.put("y", MonitoringAction.getActivityCoordinate(parentActivity.getYcoord())
+			    + MonitoringAction.getActivityCoordinate(activity.getYcoord()));
 		} else {
-		    activityJSON.put("x", activity.getXcoord());
-		    activityJSON.put("y", activity.getYcoord());
+		    activityJSON.put("x", MonitoringAction.getActivityCoordinate(activity.getXcoord()));
+		    activityJSON.put("y", MonitoringAction.getActivityCoordinate(activity.getYcoord()));
 		}
 
 		String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
@@ -1140,19 +1154,18 @@ public class MonitoringAction extends LamsDispatchAction {
 		responseJSON.append("completedLearners", learnerJSON);
 	    } else {
 		Activity currentActivity = learnerProgress.getCurrentActivity();
-		if ((currentActivity != null)
-			&& ((branchingActivityId == null) || MonitoringAction.isBranchingChild(branchingActivityId,
-				currentActivity))) {
+		if ((currentActivity != null) && ((branchingActivityId == null)
+			|| MonitoringAction.isBranchingChild(branchingActivityId, currentActivity))) {
 		    JSONObject learnerJSON = WebUtil.userToJSON(learner);
 
 		    // assign learners to child activity or parent branching/options with sequences?
 		    Activity parentActivity = currentActivity.getParentActivity();
-		    Long targetActivityId = (branchingActivityId != null)
-			    || (parentActivity == null)
+		    Long targetActivityId = (branchingActivityId != null) || (parentActivity == null)
 			    || (parentActivity.getParentActivity() == null)
-			    || !(parentActivity.getParentActivity().isBranchingActivity() || parentActivity
-				    .getParentActivity().isOptionsWithSequencesActivity()) ? currentActivity
-			    .getActivityId() : parentActivity.getParentActivity().getActivityId();
+			    || !(parentActivity.getParentActivity().isBranchingActivity()
+				    || parentActivity.getParentActivity().isOptionsWithSequencesActivity())
+					    ? currentActivity.getActivityId()
+					    : parentActivity.getParentActivity().getActivityId();
 
 		    JSONObject targetActivityJSON = activitiesMap.get(targetActivityId);
 		    if (Boolean.TRUE.equals(JsonUtil.opt(targetActivityJSON, "flaFormat"))) {
@@ -1175,7 +1188,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		transitionJSON.put("uiid", transition.getTransitionUIID());
 		transitionJSON.put("fromID", transition.getFromActivity().getActivityId());
 		transitionJSON.put("toID", transition.getToActivity().getActivityId());
-		
+
 		transitions.put(transitionJSON);
 	    }
 	    responseJSON.put("transitions", transitions);
@@ -1188,13 +1201,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	    while (activityIterator.hasNext()) {
 		ContributeActivityDTO contributeActivityDTO = activityIterator.next();
 		Activity contributeActivity = monitoringService.getActivityById(contributeActivityDTO.getActivityID());
-		Activity topParentActivity = contributeActivity.getParentActivity() == null ? null : contributeActivity
-			.getParentActivity().getParentActivity();
+		Activity topParentActivity = contributeActivity.getParentActivity() == null ? null
+			: contributeActivity.getParentActivity().getParentActivity();
 
-		if ((branchingActivityId == null)
-			&& (topParentActivity != null)
-			&& (topParentActivity.isBranchingActivity() || topParentActivity
-				.isOptionsWithSequencesActivity())) {
+		if ((branchingActivityId == null) && (topParentActivity != null)
+			&& (topParentActivity.isBranchingActivity()
+				|| topParentActivity.isOptionsWithSequencesActivity())) {
 		    JSONObject topContributeActivityJSON = activitiesMap.get(topParentActivity.getActivityId());
 		    if (!Boolean.TRUE.equals(JsonUtil.opt(topContributeActivityJSON, "flaFormat"))) {
 			activityIterator.remove();
@@ -1213,8 +1225,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward releaseGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	String wddxPacket = null;
 	try {
 	    Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
@@ -1230,8 +1242,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward startPreviewLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	FlashMessage flashMessage = null;
 
 	try {
@@ -1267,8 +1279,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	Integer userID = getUserId();
 
-	IAuthoringService authoringService = MonitoringServiceProxy.getAuthoringService(getServlet()
-		.getServletContext());
+	IAuthoringService authoringService = MonitoringServiceProxy
+		.getAuthoringService(getServlet().getServletContext());
 
 	if (authoringService.setupEditOnFlyLock(learningDesignId, userID)) {
 	    authoringService.setupEditOnFlyGate(learningDesignId, userID);
@@ -1286,8 +1298,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     private IAuditService getAuditService() {
 	if (MonitoringAction.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    MonitoringAction.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return MonitoringAction.auditService;
@@ -1300,8 +1312,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     private ITimezoneService getTimezoneService() {
 	if (MonitoringAction.timezoneService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    MonitoringAction.timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
 	}
 	return MonitoringAction.timezoneService;
@@ -1309,8 +1321,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private ILessonService getLessonService() {
 	if (MonitoringAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    MonitoringAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return MonitoringAction.lessonService;
@@ -1318,8 +1330,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (MonitoringAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    MonitoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return MonitoringAction.securityService;
@@ -1331,8 +1343,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward learnerExportPortfolioAvailable(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean learnerExportPortfolioAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
@@ -1350,8 +1362,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward presenceAvailable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
@@ -1375,8 +1387,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward presenceImAvailable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
@@ -1393,8 +1405,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward viewTimeChart(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 
 	try {
 
@@ -1423,8 +1435,8 @@ public class MonitoringAction extends LamsDispatchAction {
      * Creates a list of users out of string with comma-delimited user IDs.
      */
     private List<User> parseUserList(HttpServletRequest request, String paramName, Collection<User> users) {
-	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
-		.getServletContext());
+	IUserManagementService userManagementService = MonitoringServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
 	String userIdList = request.getParameter(paramName);
 	String[] userIdArray = userIdList.split(",");
 	List<User> result = new ArrayList<User>(userIdArray.length);
@@ -1453,8 +1465,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     @SuppressWarnings("unchecked")
     private List<ContributeActivityDTO> getContributeActivities(Long lessonId, boolean skipCompletedBranching) {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
 	Lesson lesson = getLessonService().getLesson(lessonId);
 
@@ -1495,5 +1507,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	    return resultContributeActivities;
 	}
 	return null;
+    }
+
+    private static int getActivityCoordinate(Integer coord) {
+	return (coord == null) || (coord < 0) ? ObjectExtractor.DEFAULT_COORD : coord;
     }
 }
