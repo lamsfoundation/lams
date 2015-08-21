@@ -119,7 +119,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  */
 public class ObjectExtractor implements IObjectExtractor {
 
-    private static final Integer DEFAULT_COORD = new Integer(10); // default coordinate used if the entry from Flash
+    public static final Integer DEFAULT_COORD = new Integer(10); // default coordinate used if the entry from Flash
     // is 0 or less.
 
     protected IBaseDAO baseDAO = null;
@@ -559,7 +559,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	    version = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
 	}
 	learningDesign.setDesignType((String)JsonUtil.opt(ldJSON, AuthoringJsonTags.DESIGN_TYPE));
-
 	learningDesign.setVersion(version);
 	learningDesign.setDuration(JsonUtil.optLong(ldJSON, AuthoringJsonTags.DURATION));
 
