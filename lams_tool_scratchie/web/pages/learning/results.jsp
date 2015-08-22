@@ -67,6 +67,8 @@
 				   	    feedback:"<lams:out value='${burningQuestion}' escapeHtml='true' />"
 			   	   	});
 		        </c:forEach>
+
+		        jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid('sortGrid','groupName', false, 'asc');
 	        </c:forEach>
 			
 			<!-- Display reflection entries -->
