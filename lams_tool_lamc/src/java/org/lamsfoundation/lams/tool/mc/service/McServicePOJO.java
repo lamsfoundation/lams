@@ -1027,18 +1027,16 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.learner"));
 	
-	int groupCount = 0;
 	ArrayList<Integer> totalPercentList = new ArrayList<Integer>();
 	int[] numberOfCorrectAnswersPerQuestion = new int[questions.size()];
 	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
 	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
-	    groupCount++;
 
 	    for (McUserMarkDTO userMark : usersMarksMap.values()) {
 		row = sheet.createRow(rowCount++);
 		count = 0;
 		cell = row.createCell(count++);
-		cell.setCellValue(groupCount);
+		cell.setCellValue(sessionMarkDTO.getSessionName());
 		
 		cell = row.createCell(count++);
 		cell.setCellValue(userMark.getFullName());
