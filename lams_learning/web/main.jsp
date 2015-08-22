@@ -1,3 +1,7 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
@@ -116,14 +120,14 @@
 		<div id="supportSeparatorRow" class="separatorRow progressStaticHeight"
 		     onClick="javascript:toggleBarPart('support')">
 			<span><fmt:message key="label.learner.progress.support" /></span>
-			<span id="supportTogglerCell" class="togglerCell" />▼</span>
+			<span id="supportTogglerCell" class="togglerCell" />â¼</span>
 		</div>
 		<div id="supportPart" class="progressStaticHeight"></div>
 		
 		<div id="notebookSeparatorRow" class="separatorRow progressStaticHeight" 
 		     onClick="javascript:toggleBarPart('notebook')">
 			<span><fmt:message key="label.learner.progress.notebook" /></span>
-			<span id="notebookTogglerCell" class="togglerCell"/>▲</span>
+			<span id="notebookTogglerCell" class="togglerCell"/>â²</span>
 		</div>
 		<form id="notebookForm" action="<lams:WebAppURL />notebook.do?method=processNewEntry" method="post">
 			<input type="hidden" name="lessonID" value="${lessonID}" />
