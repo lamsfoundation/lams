@@ -23,11 +23,15 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -47,7 +51,12 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 
     @SuppressWarnings("unchecked")
     public List<ScratchieSession> getByContentId(Long toolContentId) {
-	return (List<ScratchieSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	List<ScratchieSession> sessions = (List<ScratchieSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	
+	Set<ScratchieSession> sortedSessions = new TreeSet<ScratchieSession>(new ScratchieSessionComparator());
+	sortedSessions.addAll(sessions);
+	
+	return new ArrayList<ScratchieSession>(sortedSessions);
     }
 
     public void delete(ScratchieSession session) {

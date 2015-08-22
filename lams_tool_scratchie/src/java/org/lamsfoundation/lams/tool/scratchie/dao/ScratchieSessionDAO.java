@@ -31,6 +31,12 @@ public interface ScratchieSessionDAO extends DAO {
 
     ScratchieSession getSessionBySessionId(Long sessionId);
 
+    /**
+     * Returns list of sessions sorted alphanumerically (that is taking into account Group 1, Group 2, Group 10 case).
+     * 
+     * @param toolContentId
+     * @return
+     */
     List<ScratchieSession> getByContentId(Long toolContentId);
 
     void delete(ScratchieSession session);

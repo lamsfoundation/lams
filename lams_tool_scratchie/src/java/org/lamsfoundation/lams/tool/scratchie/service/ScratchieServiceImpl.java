@@ -90,6 +90,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
+import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 import org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -527,9 +528,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
-	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
+	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
-	for (ScratchieSession session : sessionList) {
+	for (ScratchieSession session : sessions) {
 	    Long sessionId = session.getSessionId();
 
 	    // one new summary for one session.
@@ -937,13 +938,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	row[columnCount++] = new ExcelCell(getMessage("label.total") + " %", true);
 	rowList.add(row);
 
-	int groupCount = 1;
 	List<GroupSummary> summaryByTeam = getSummaryByTeam(scratchie, items);
 	for (GroupSummary summary : summaryByTeam) {
 
 	    row = new ExcelCell[numberOfItems + 4];
 	    columnCount = 1;
-	    row[columnCount++] = new ExcelCell("T" + groupCount++, true);
+	    row[columnCount++] = new ExcelCell(summary.getSessionName(), true);
 
 	    int numberOfFirstChoiceEvents = 0;
 	    for (ScratchieItem item : summary.getItems()) {
@@ -1019,13 +1019,13 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	row[0] = new ExcelCell(getMessage("monitoring.label.group"), false);
 	rowList.add(row);
 
-	groupCount = 1;
+	int groupCount = 1;
 	int[] percentages = new int[summaryByTeam.size()];
 	for (GroupSummary summary : summaryByTeam) {
 
 	    row = new ExcelCell[numberOfItems + 3];
 	    columnCount = 0;
-	    row[columnCount++] = new ExcelCell(groupCount, false);
+	    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
 
 	    int numberOfFirstChoiceEvents = 0;
 	    for (ScratchieItem item : summary.getItems()) {
