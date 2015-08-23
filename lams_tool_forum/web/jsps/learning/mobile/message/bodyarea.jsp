@@ -27,7 +27,7 @@
 			    return wordCount;
 			}
 			
-		//bind to pagebeforechange in order to prevent form submition (as per https://github.com/jquery/jquery-mobile/issues/729)
+		//bind to pagebeforechange in order to prevent form submission (as per https://github.com/jquery/jquery-mobile/issues/729)
 		$(document).bind('pageinit', function(){
 			
 			$('#topic-form').submit(function (e) {
@@ -35,13 +35,12 @@
 			    //cache the form element for use in this function
 			    var $this = $(this);
 
-			    //prevent the default submission of the form
+			    //prevent the default submission of the form when false is returned
+			    // jquery mobile automatically triggers the submit.
 			    e.preventDefault();
 
-			    if (validateForm()) {
-			    	//run an AJAX post request
-				    $.post($this.attr('action'), $this.serialize());
-			    } else {
+			    if (! validateForm()) {
+			    	e.stopImmediatePropagation();
 			    	return false;
 			    }
 			});
