@@ -30,11 +30,7 @@
 		//bind to pagebeforechange in order to prevent form submission (as per https://github.com/jquery/jquery-mobile/issues/729)
 		$(document).bind('pageinit', function(){
 			
-			console.log("pageinit for submit. sessionMap.minCharacters="+${sessionMap.minCharacters});
-
 			$('#topic-form').submit(function (e) {
-
-				console.log("in submit event.data"+e.data+" event.delegateTarget "+e.delegateTarget+" event.target "+e.target+" event.type "+e.type+" event.timeStamp "+e.timeStamp);
 
 			    //cache the form element for use in this function
 			    var $this = $(this);
