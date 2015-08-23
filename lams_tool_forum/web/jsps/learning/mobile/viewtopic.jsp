@@ -74,7 +74,7 @@
 
 	<div data-role="header" data-theme="b">
 		<a id="backToForum"	href="${backToForum}" data-role="button" data-icon="arrow-l">
-			Back
+			<fmt:message key="label.back.to.forum" />
 		</a>
 		<h1>
 			<c:out value="${sessionMap.title}" escapeXml="true"/>
@@ -162,7 +162,6 @@
 		<div class="scroll" >
 		<%@ include file="message/topicview.jsp"%>
 		</div>
-		</div>
 		<script>
 			<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
 			<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
@@ -178,7 +177,7 @@
 	
 	<div data-role="footer" data-theme="b" class="ui-bar">
 		<a id="backToForumFooter"	href="${backToForum}" data-role="button" data-icon="arrow-l">
-			Back
+			<fmt:message key="label.back.to.forum" />
 		</a>
 	</div><!-- /footer -->
 </div>
