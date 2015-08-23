@@ -27,21 +27,24 @@
 			    return wordCount;
 			}
 			
-		//bind to pagebeforechange in order to prevent form submition (as per https://github.com/jquery/jquery-mobile/issues/729)
+		//bind to pagebeforechange in order to prevent form submission (as per https://github.com/jquery/jquery-mobile/issues/729)
 		$(document).bind('pageinit', function(){
 			
+			console.log("pageinit for submit. sessionMap.minCharacters="+${sessionMap.minCharacters});
+
 			$('#topic-form').submit(function (e) {
+
+				console.log("in submit event.data"+e.data+" event.delegateTarget "+e.delegateTarget+" event.target "+e.target+" event.type "+e.type+" event.timeStamp "+e.timeStamp);
 
 			    //cache the form element for use in this function
 			    var $this = $(this);
 
-			    //prevent the default submission of the form
+			    //prevent the default submission of the form when false is returned
+			    // jquery mobile automatically triggers the submit.
 			    e.preventDefault();
 
-			    if (validateForm()) {
-			    	//run an AJAX post request
-				    $.post($this.attr('action'), $this.serialize());
-			    } else {
+			    if (! validateForm()) {
+			    	e.stopImmediatePropagation();
 			    	return false;
 			    }
 			});
@@ -122,6 +125,7 @@
 			
 			//character count fuction
 			var counter = function() {
+				console.log("In counter"+$('textarea[id="message.body__lamstextarea"]').val());
 				var value = $('textarea[id="message.body__lamstextarea"]').val();
 
 				var isCkeditor = false;
