@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.peerreview.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -49,6 +48,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
@@ -413,6 +413,13 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
+	    if (toolContentObj.getRatingCriterias() != null) {
+		    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+			criteria.setToolContentId(toolContentId);
+		    }
+		}
+	    
+	    // reset the user
 	    PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
 		    toolContentId);
 	    if (user == null) {
