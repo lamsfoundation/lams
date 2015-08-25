@@ -739,6 +739,13 @@
 			<fileset dir="${server.home}/standalone/deployments" includes="lams.ear.*"/>
 		</delete>
 		<touch file="${server.home}/standalone/deployments/lams.ear.dodeploy" />
+		
+		<echo>${ant.project.name}: Deploying root context content</echo>
+		<delete dir="${server.home}welcome-content" />
+		<mkdir dir="${server.home}/welcome-content" />
+		<copy todir="${server.home}/welcome-content" verbose="true">
+			<fileset dir="conf/welcome-content" />
+		</copy>
 	</target>
 	
 	
