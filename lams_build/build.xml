@@ -815,7 +815,7 @@
 	        description="Builds entire LAMS without tools (used for CruiseControl instance)" />
 	
 
-	<target name="slim-wildfly" description="Makes a backup and removes unnecessary files from Wildfly 8.1; do not run twice!">
+	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 8.2; do not run twice!">
 		<delete includeemptydirs="true" verbose="true" failonerror="false">
 			<!-- Domain version of server. Standalone is used. -->
 			<fileset dir="${server.home}/domain/" />
