@@ -113,10 +113,11 @@ public class LearningAction extends Action {
      * method run successfully.
      * 
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+     * @throws IOException 
      * 
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException  {
 
 	IPeerreviewService service = getPeerreviewService();
 
@@ -174,9 +175,13 @@ public class LearningAction extends Action {
 	    return mapping.findForward("defineLater");
 	}
 
-	// handle rating criterias
-	service.fetchUsersFromLesson(sessionId);
+	try {
+	    service.fetchUsersFromLesson(sessionId);
+	} catch ( Throwable e ) {
+	    throw new IOException(e);
+	}
 	
+	// handle rating criterias
 	boolean isCommentsEnabled = service.isCommentsEnabled(peerreview.getContentId());
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
 
