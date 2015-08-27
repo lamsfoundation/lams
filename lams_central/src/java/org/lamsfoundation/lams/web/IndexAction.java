@@ -161,7 +161,7 @@ public class IndexAction extends Action {
 	    if (isPedagogicalPlannerAvailable()) {
 		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
 	    }
-	    headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
+	    headerLinks.add(new IndexLinkBean("index.author", "javascript:showFlashlessAuthoringDialog()"));
 	}
 	headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?tab=profile"));
 
