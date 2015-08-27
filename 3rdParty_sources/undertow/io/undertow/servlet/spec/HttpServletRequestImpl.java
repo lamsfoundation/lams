@@ -408,12 +408,10 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
                 throw UndertowServletMessages.MESSAGES.authenticationFailed();
             }
         } else {
-            if(exchange.isResponseStarted()) {
-                //the auth mechanism commited the response, so we return false
-                return false;
-            } else {
-                //as the response was not commited we throw an exception as per the javadoc
+            if(!exchange.isResponseStarted() && exchange.getResponseCode() == 200) {
                 throw UndertowServletMessages.MESSAGES.authenticationFailed();
+            } else {
+                return false;
             }
         }
     }
@@ -901,7 +899,7 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
 
     @Override
     public String getLocalName() {
-        return exchange.getDestinationAddress().getHostName();
+        return exchange.getDestinationAddress().getHostString();
     }
 
     @Override
@@ -1075,9 +1073,24 @@ public final class HttpServletRequestImpl implements HttpServletRequest {
     }
 
     private SessionConfig.SessionCookieSource sessionCookieSource() {
+        HttpSession session = getSession(false);
+        if(session == null || session.isNew()) {
+            return SessionConfig.SessionCookieSource.NONE;
+        }
         if(sessionCookieSource == null) {
             sessionCookieSource = originalServletContext.getSessionConfig().sessionCookieSource(exchange);
         }
         return sessionCookieSource;
+    }
+
+    @Override
+    public String toString() {
+        return "HttpServletRequestImpl [ " + getMethod() + ' ' + getRequestURI() + " ]";
+    }
+
+    public void clearAttributes() {
+        if(attributes != null) {
+            this.attributes.clear();
+        }
     }
 }

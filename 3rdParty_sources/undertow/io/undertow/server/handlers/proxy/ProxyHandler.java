@@ -68,6 +68,7 @@ import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.SameThreadExecutor;
+import io.undertow.util.StatusCodes;
 import org.jboss.logging.Logger;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
@@ -291,7 +292,7 @@ public final class ProxyHandler implements HttpHandler {
             if (exchange.isResponseStarted()) {
                 IoUtils.safeClose(exchange.getConnection());
             } else {
-                exchange.setResponseCode(503);
+                exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
                 exchange.endExchange();
             }
         }
@@ -308,7 +309,7 @@ public final class ProxyHandler implements HttpHandler {
             if (exchange.isResponseStarted()) {
                 IoUtils.safeClose(exchange.getConnection());
             } else {
-                exchange.setResponseCode(503);
+                exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
                 exchange.endExchange();
             }
         }
@@ -372,7 +373,7 @@ public final class ProxyHandler implements HttpHandler {
                 }
             } catch (UnsupportedEncodingException e) {
                 //impossible
-                exchange.setResponseCode(500);
+                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
                 exchange.endExchange();
                 return;
             }
@@ -419,19 +420,46 @@ public final class ProxyHandler implements HttpHandler {
             }
 
             // Set the protocol header and attachment
-            final String proto = exchange.getRequestScheme().equals("https") ? "https" : "http";
-            request.getRequestHeaders().put(Headers.X_FORWARDED_PROTO, proto);
-            request.putAttachment(ProxiedRequestAttachments.IS_SSL, proto.equals("https"));
+            if(reuseXForwarded && exchange.getRequestHeaders().contains(Headers.X_FORWARDED_PROTO)) {
+                final String proto = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PROTO);
+                request.putAttachment(ProxiedRequestAttachments.IS_SSL, proto.equals("https"));
+            } else {
+                final String proto = exchange.getRequestScheme().equals("https") ? "https" : "http";
+                request.getRequestHeaders().put(Headers.X_FORWARDED_PROTO, proto);
+                request.putAttachment(ProxiedRequestAttachments.IS_SSL, proto.equals("https"));
+            }
 
             // Set the server name
-            final String hostName = exchange.getHostName();
-            request.getRequestHeaders().put(Headers.X_FORWARDED_HOST, hostName);
-            request.putAttachment(ProxiedRequestAttachments.SERVER_NAME, hostName);
+            if(reuseXForwarded && exchange.getRequestHeaders().contains(Headers.X_FORWARDED_SERVER)) {
+                final String hostName = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_SERVER);
+                request.putAttachment(ProxiedRequestAttachments.SERVER_NAME, hostName);
+            } else {
+                final String hostName = exchange.getHostName();
+                request.getRequestHeaders().put(Headers.X_FORWARDED_SERVER, hostName);
+                request.putAttachment(ProxiedRequestAttachments.SERVER_NAME, hostName);
+            }
+            if(!exchange.getRequestHeaders().contains(Headers.X_FORWARDED_HOST)) {
+                final String hostName = exchange.getHostName();
+                if(hostName != null) {
+                    request.getRequestHeaders().put(Headers.X_FORWARDED_HOST, hostName);
+                }
+            }
 
             // Set the port
-            int port = exchange.getConnection().getLocalAddress(InetSocketAddress.class).getPort();
-            request.getRequestHeaders().put(Headers.X_FORWARDED_PORT, port);
-            request.putAttachment(ProxiedRequestAttachments.SERVER_PORT, port);
+            if(reuseXForwarded && exchange.getRequestHeaders().contains(Headers.X_FORWARDED_PORT)) {
+                try {
+                    int port = Integer.parseInt(exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PORT));
+                    request.putAttachment(ProxiedRequestAttachments.SERVER_PORT, port);
+                } catch (NumberFormatException e) {
+                    int port = exchange.getConnection().getLocalAddress(InetSocketAddress.class).getPort();
+                    request.getRequestHeaders().put(Headers.X_FORWARDED_PORT, port);
+                    request.putAttachment(ProxiedRequestAttachments.SERVER_PORT, port);
+                }
+            } else {
+                int port = exchange.getConnection().getLocalAddress(InetSocketAddress.class).getPort();
+                request.getRequestHeaders().put(Headers.X_FORWARDED_PORT, port);
+                request.putAttachment(ProxiedRequestAttachments.SERVER_PORT, port);
+            }
 
             SSLSessionInfo sslSessionInfo = exchange.getConnection().getSslSessionInfo();
             if (sslSessionInfo != null) {
@@ -512,7 +540,7 @@ public final class ProxyHandler implements HttpHandler {
                 public void failed(IOException e) {
                     UndertowLogger.PROXY_REQUEST_LOGGER.proxyRequestFailed(exchange.getRequestURI(), e);
                     if (!exchange.isResponseStarted()) {
-                        exchange.setResponseCode(503);
+                        exchange.setResponseCode(StatusCodes.SERVICE_UNAVAILABLE);
                         exchange.endExchange();
                     } else {
                         IoUtils.safeClose(exchange.getConnection());
@@ -567,7 +595,7 @@ public final class ProxyHandler implements HttpHandler {
         public void failed(IOException e) {
             UndertowLogger.PROXY_REQUEST_LOGGER.proxyRequestFailed(exchange.getRequestURI(), e);
             if (!exchange.isResponseStarted()) {
-                exchange.setResponseCode(500);
+                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
                 exchange.endExchange();
             } else {
                 IoUtils.safeClose(exchange.getConnection());
@@ -631,13 +659,13 @@ public final class ProxyHandler implements HttpHandler {
                 IoUtils.safeClose(clientConnection);
                 UndertowLogger.REQUEST_IO_LOGGER.debug("Exception reading from target server", exception);
                 if (!exchange.isResponseStarted()) {
-                    exchange.setResponseCode(500);
+                    exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
                     exchange.endExchange();
                 } else {
                     IoUtils.safeClose(exchange.getConnection());
                 }
             } else {
-                exchange.setResponseCode(500);
+                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
                 exchange.endExchange();
             }
         }

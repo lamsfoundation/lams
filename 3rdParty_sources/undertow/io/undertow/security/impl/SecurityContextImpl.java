@@ -35,10 +35,9 @@ import io.undertow.security.idm.Account;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.StatusCodes;
 
 import static io.undertow.UndertowMessages.MESSAGES;
-import static io.undertow.util.StatusCodes.FORBIDDEN;
-import static io.undertow.util.StatusCodes.OK;
 
 /**
  * The internal SecurityContext used to hold the state of security for the current exchange.
@@ -94,8 +93,11 @@ public class SecurityContextImpl implements SecurityContext {
      */
 
     public boolean authenticate() {
-        // TODO - I don't see a need to force single threaded - if this request is from the servlet APIs then the request will
-        // have already been dispatched.
+        if(authenticationState == AuthenticationState.ATTEMPTED) {
+            //we are re-attempted, so we just reset the state
+            //see UNDERTOW-263
+            authenticationState = AuthenticationState.NOT_ATTEMPTED;
+        }
         return !authTransition();
     }
 
@@ -335,7 +337,7 @@ public class SecurityContextImpl implements SecurityContext {
                     if (chosenStatusCode == null) {
                         chosenStatusCode = desiredCode;
                     } else if (desiredCode != null) {
-                        if (chosenStatusCode.equals(OK)) {
+                        if (chosenStatusCode.equals(StatusCodes.OK)) {
                             // Allows a more specific code to be chosen.
                             // TODO - Still need a more complex code resolution strategy if many different codes are
                             // returned (Although those mechanisms may just never work together.)
@@ -349,16 +351,17 @@ public class SecurityContextImpl implements SecurityContext {
                 return transition();
 
             } else {
-                // Iterated all mechanisms, now need to select a suitable status code.
-                if (atLeastOneChallenge) {
-                    if (chosenStatusCode != null) {
-                        exchange.setResponseCode(chosenStatusCode);
+                if(!exchange.isResponseStarted()) {
+                    // Iterated all mechanisms, now need to select a suitable status code.
+                    if (atLeastOneChallenge) {
+                        if (chosenStatusCode != null) {
+                            exchange.setResponseCode(chosenStatusCode);
+                        }
+                    } else {
+                        // No mechanism generated a challenge so send a 403 as our challenge - i.e. just rejecting the request.
+                        exchange.setResponseCode(StatusCodes.FORBIDDEN);
                     }
-                } else {
-                    // No mechanism generated a challenge so send a 403 as our challenge - i.e. just rejecting the request.
-                    exchange.setResponseCode(FORBIDDEN);
                 }
-
                 return AuthenticationState.CHALLENGE_SENT;
 
             }

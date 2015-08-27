@@ -25,7 +25,6 @@ import java.nio.channels.FileChannel;
 
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.TruncatedResponseException;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.HttpString;
@@ -118,137 +117,146 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
         if(done) {
             throw new ClosedChannelException();
         }
-        assert state != STATE_BODY;
-        if (state == STATE_BUF_FLUSH) {
-            final ByteBuffer byteBuffer = pooledBuffer.getResource();
+        try {
+            assert state != STATE_BODY;
+            if (state == STATE_BUF_FLUSH) {
+                final ByteBuffer byteBuffer = pooledBuffer.getResource();
+                do {
+                    long res = 0;
+                    ByteBuffer[] data;
+                    if (userData == null || length == 0) {
+                        res = next.write(byteBuffer);
+                    } else if (userData instanceof ByteBuffer) {
+                        data = writevBuffer;
+                        if (data == null) {
+                            data = writevBuffer = new ByteBuffer[2];
+                        }
+                        data[0] = byteBuffer;
+                        data[1] = (ByteBuffer) userData;
+                        res = next.write(data, 0, 2);
+                    } else {
+                        data = writevBuffer;
+                        if (data == null || data.length < length + 1) {
+                            data = writevBuffer = new ByteBuffer[length + 1];
+                        }
+                        data[0] = byteBuffer;
+                        System.arraycopy(userData, pos, data, 1, length);
+                        res = next.write(data, 0, data.length);
+                    }
+                    if (res == 0) {
+                        return STATE_BUF_FLUSH;
+                    }
+                } while (byteBuffer.hasRemaining());
+                bufferDone();
+                return STATE_BODY;
+            } else if (state != STATE_START) {
+                return processStatefulWrite(state, userData, pos, length);
+            }
+
+            //merge the cookies into the header map
+            Connectors.flattenCookies(exchange);
+
+            if (pooledBuffer == null) {
+                pooledBuffer = pool.allocate();
+            }
+            ByteBuffer buffer = pooledBuffer.getResource();
+
+
+            assert buffer.remaining() >= 0x100;
+            exchange.getProtocol().appendTo(buffer);
+            buffer.put((byte) ' ');
+            int code = exchange.getResponseCode();
+            assert 999 >= code && code >= 100;
+            buffer.put((byte) (code / 100 + '0'));
+            buffer.put((byte) (code / 10 % 10 + '0'));
+            buffer.put((byte) (code % 10 + '0'));
+            buffer.put((byte) ' ');
+            String string = StatusCodes.getReason(code);
+            writeString(buffer, string);
+            buffer.put((byte) '\r').put((byte) '\n');
+
+            int remaining = buffer.remaining();
+
+
+            HeaderMap headers = exchange.getResponseHeaders();
+            long fiCookie = headers.fastIterateNonEmpty();
+            while (fiCookie != -1) {
+                HeaderValues headerValues = headers.fiCurrent(fiCookie);
+
+                HttpString header = headerValues.getHeaderName();
+                int headerSize = header.length();
+                int valueIdx = 0;
+                while (valueIdx < headerValues.size()) {
+                    remaining -= (headerSize + 2);
+
+                    if (remaining < 0) {
+                        this.fiCookie = fiCookie;
+                        this.string = string;
+                        this.headerValues = headerValues;
+                        this.valueIdx = valueIdx;
+                        this.charIndex = 0;
+                        this.state = STATE_HDR_NAME;
+                        buffer.flip();
+                        return processStatefulWrite(STATE_HDR_NAME, userData, pos, length);
+                    }
+                    header.appendTo(buffer);
+                    buffer.put((byte) ':').put((byte) ' ');
+                    string = headerValues.get(valueIdx++);
+
+                    remaining -= (string.length() + 2);
+                    if (remaining < 2) {//we use 2 here, to make sure we always have room for the final \r\n
+                        this.fiCookie = fiCookie;
+                        this.string = string;
+                        this.headerValues = headerValues;
+                        this.valueIdx = valueIdx;
+                        this.charIndex = 0;
+                        this.state = STATE_HDR_VAL;
+                        buffer.flip();
+                        return processStatefulWrite(STATE_HDR_VAL, userData, pos, length);
+                    }
+                    writeString(buffer, string);
+                    buffer.put((byte) '\r').put((byte) '\n');
+                }
+                fiCookie = headers.fiNextNonEmpty(fiCookie);
+            }
+            buffer.put((byte) '\r').put((byte) '\n');
+            buffer.flip();
             do {
                 long res = 0;
                 ByteBuffer[] data;
-                if (userData == null || length == 0) {
-                    res = next.write(byteBuffer);
-                } else if (userData instanceof ByteBuffer){
+                if (userData == null) {
+                    res = next.write(buffer);
+                } else if (userData instanceof ByteBuffer) {
                     data = writevBuffer;
-                    if(data == null) {
+                    if (data == null) {
                         data = writevBuffer = new ByteBuffer[2];
                     }
-                    data[0] = byteBuffer;
+                    data[0] = buffer;
                     data[1] = (ByteBuffer) userData;
                     res = next.write(data, 0, 2);
                 } else {
                     data = writevBuffer;
-                    if(data == null || data.length < length + 1) {
+                    if (data == null || data.length < length + 1) {
                         data = writevBuffer = new ByteBuffer[length + 1];
                     }
-                    data[0] = byteBuffer;
+                    data[0] = buffer;
                     System.arraycopy(userData, pos, data, 1, length);
-                    res = next.write(data, 0, data.length);
+                    res = next.write(data, 0, length + 1);
                 }
                 if (res == 0) {
                     return STATE_BUF_FLUSH;
                 }
-            } while (byteBuffer.hasRemaining());
+            } while (buffer.hasRemaining());
             bufferDone();
             return STATE_BODY;
-        } else if (state != STATE_START) {
-            return processStatefulWrite(state, userData, pos, length);
-        }
-
-        //merge the cookies into the header map
-        Connectors.flattenCookies(exchange);
-
-        if(pooledBuffer == null) {
-            pooledBuffer = pool.allocate();
-        }
-        ByteBuffer buffer = pooledBuffer.getResource();
-
-
-        assert buffer.remaining() >= 0x100;
-        exchange.getProtocol().appendTo(buffer);
-        buffer.put((byte) ' ');
-        int code = exchange.getResponseCode();
-        assert 999 >= code && code >= 100;
-        buffer.put((byte) (code / 100 + '0'));
-        buffer.put((byte) (code / 10 % 10 + '0'));
-        buffer.put((byte) (code % 10 + '0'));
-        buffer.put((byte) ' ');
-        String string = StatusCodes.getReason(code);
-        writeString(buffer, string);
-        buffer.put((byte) '\r').put((byte) '\n');
-
-        int remaining = buffer.remaining();
-
-
-        HeaderMap headers = exchange.getResponseHeaders();
-        long fiCookie = headers.fastIterateNonEmpty();
-        while (fiCookie != -1) {
-            HeaderValues headerValues = headers.fiCurrent(fiCookie);
-
-            HttpString header = headerValues.getHeaderName();
-            int headerSize = header.length();
-            int valueIdx = 0;
-            while (valueIdx < headerValues.size()) {
-                remaining -= (headerSize + 2);
-
-                if (remaining < 0) {
-                    this.fiCookie = fiCookie;
-                    this.string = string;
-                    this.headerValues = headerValues;
-                    this.valueIdx = valueIdx;
-                    this.charIndex = 0;
-                    this.state = STATE_HDR_NAME;
-                    buffer.flip();
-                    return processStatefulWrite(STATE_HDR_NAME, userData, pos, length);
-                }
-                header.appendTo(buffer);
-                buffer.put((byte) ':').put((byte) ' ');
-                string = headerValues.get(valueIdx++);
-
-                remaining -= (string.length() + 2);
-                if (remaining < 2) {//we use 2 here, to make sure we always have room for the final \r\n
-                    this.fiCookie = fiCookie;
-                    this.string = string;
-                    this.headerValues = headerValues;
-                    this.valueIdx = valueIdx;
-                    this.charIndex = 0;
-                    this.state = STATE_HDR_VAL;
-                    buffer.flip();
-                    return processStatefulWrite(STATE_HDR_VAL, userData, pos ,length);
-                }
-                writeString(buffer, string);
-                buffer.put((byte) '\r').put((byte) '\n');
+        } catch (IOException|RuntimeException e) {
+            //WFLY-4696, just to be safe
+            if(pooledBuffer != null) {
+                pooledBuffer.free();
+                pooledBuffer = null;
             }
-            fiCookie = headers.fiNextNonEmpty(fiCookie);
+            throw e;
         }
-        buffer.put((byte) '\r').put((byte) '\n');
-        buffer.flip();
-        do {
-            long res = 0;
-            ByteBuffer[] data;
-            if (userData == null) {
-                res = next.write(buffer);
-            }  else if (userData instanceof ByteBuffer){
-                data = writevBuffer;
-                if(data == null) {
-                    data = writevBuffer = new ByteBuffer[2];
-                }
-                data[0] = buffer;
-                data[1] = (ByteBuffer) userData;
-                res = next.write(data, 0, 2);
-            } else {
-                data = writevBuffer;
-                if(data == null || data.length < length + 1) {
-                    data = writevBuffer = new ByteBuffer[length + 1];
-                }
-                data[0] = buffer;
-                System.arraycopy(userData, pos, data, 1, length);
-                res = next.write(data, 0, data.length);
-            }
-            if (res == 0) {
-                return STATE_BUF_FLUSH;
-            }
-        } while (buffer.hasRemaining());
-        bufferDone();
-        return STATE_BODY;
     }
 
     private void bufferDone() {
@@ -554,29 +562,34 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     }
 
     public int write(final ByteBuffer src) throws IOException {
-        int oldState = this.state;
-        int state = oldState & MASK_STATE;
-        int alreadyWritten = 0;
-        int originalRemaining = -1;
         try {
-            if (state != 0) {
-                originalRemaining = src.remaining();
-                state = processWrite(state, src, -1, -1);
+            int oldState = this.state;
+            int state = oldState & MASK_STATE;
+            int alreadyWritten = 0;
+            int originalRemaining = -1;
+            try {
                 if (state != 0) {
-                    return 0;
+                    originalRemaining = src.remaining();
+                    state = processWrite(state, src, -1, -1);
+                    if (state != 0) {
+                        return 0;
+                    }
+                    alreadyWritten = originalRemaining - src.remaining();
+                    if (allAreSet(oldState, FLAG_SHUTDOWN)) {
+                        next.terminateWrites();
+                        throw new ClosedChannelException();
+                    }
                 }
-                alreadyWritten = originalRemaining - src.remaining();
-                if (allAreSet(oldState, FLAG_SHUTDOWN)) {
-                    next.terminateWrites();
-                    throw new ClosedChannelException();
+                if (alreadyWritten != originalRemaining) {
+                    return next.write(src) + alreadyWritten;
                 }
+                return alreadyWritten;
+            } finally {
+                this.state = oldState & ~MASK_STATE | state;
             }
-            if (alreadyWritten != originalRemaining) {
-                return next.write(src) + alreadyWritten;
-            }
-            return alreadyWritten;
-        } finally {
-            this.state = oldState & ~MASK_STATE | state;
+        } catch(IOException|RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
         }
     }
 
@@ -607,27 +620,64 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                 return ret;
             }
             return length == 1 ? next.write(srcs[offset]) : next.write(srcs, offset, length);
+        } catch (IOException | RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
         }
     }
 
     public long transferFrom(final FileChannel src, final long position, final long count) throws IOException {
-        return src.transferTo(position, count, new ConduitWritableByteChannel(this));
+        try {
+            if (state != 0) {
+                final Pooled<ByteBuffer> pooled = exchange.getConnection().getBufferPool().allocate();
+                ByteBuffer buffer = pooled.getResource();
+                try {
+                    int res = src.read(buffer);
+                    if (res <= 0) {
+                        return res;
+                    }
+                    buffer.flip();
+                    return write(buffer);
+                } finally {
+                    pooled.free();
+                }
+            } else {
+                return next.transferFrom(src, position, count);
+            }
+        } catch (IOException | RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
+        }
     }
 
     public long transferFrom(final StreamSourceChannel source, final long count, final ByteBuffer throughBuffer) throws IOException {
-        return IoUtils.transfer(source, count, throughBuffer, new ConduitWritableByteChannel(this));
+        if (state != 0) {
+            return IoUtils.transfer(source, count, throughBuffer, new ConduitWritableByteChannel(this));
+        } else {
+            return next.transferFrom(source, count, throughBuffer);
+        }
     }
 
     @Override
     public int writeFinal(ByteBuffer src) throws IOException {
-        return Conduits.writeFinalBasic(this, src);
+        try {
+            return Conduits.writeFinalBasic(this, src);
+        } catch (IOException | RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
+        }
     }
 
     @Override
     public long writeFinal(ByteBuffer[] srcs, int offset, int length) throws IOException {
-        return Conduits.writeFinalBasic(this, srcs, offset, length);
+        try {
+            return Conduits.writeFinalBasic(this, srcs, offset, length);
+        } catch (IOException | RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
+        }
     }
 
     public boolean flush() throws IOException {
@@ -645,6 +695,9 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                 }
             }
             return next.flush();
+        } catch (IOException | RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
         }
@@ -652,28 +705,30 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
 
 
     public void terminateWrites() throws IOException {
-        int oldVal = this.state;
-        if (allAreClear(oldVal, MASK_STATE)) {
-            next.terminateWrites();
-            return;
+        try {
+            int oldVal = this.state;
+            if (allAreClear(oldVal, MASK_STATE)) {
+                next.terminateWrites();
+                return;
+            }
+            this.state = oldVal | FLAG_SHUTDOWN;
+        } catch (IOException | RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
         }
-        this.state = oldVal | FLAG_SHUTDOWN;
     }
 
     public void truncateWrites() throws IOException {
-        int oldVal = this.state;
-        if (allAreClear(oldVal, MASK_STATE)) {
-            try {
-                next.truncateWrites();
-            } finally {
-                if (pooledBuffer != null) {
-                    bufferDone();
-                }
+        try {
+            next.truncateWrites();
+        } catch (IOException | RuntimeException e) {
+            IoUtils.safeClose(exchange.getConnection());
+            throw e;
+        } finally {
+            if (pooledBuffer != null) {
+                bufferDone();
             }
-            return;
         }
-        this.state = oldVal & ~MASK_STATE | FLAG_SHUTDOWN | STATE_BODY;
-        throw new TruncatedResponseException();
     }
 
     public XnioWorker getWorker() {
