@@ -44,6 +44,7 @@ import org.hibernate.hql.internal.ast.util.ASTPrinter;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.collections.CollectionHelper;
 import org.hibernate.param.ParameterSpecification;
 import org.hibernate.type.Type;
 
@@ -145,8 +146,8 @@ public class SqlGenerator extends SqlGeneratorBase implements ErrorReporter {
 	}
 
 	@Override
-	protected void commaBetweenParameters(String comma) {
-		writer.commaBetweenParameters( comma );
+	protected void betweenFunctionArguments() {
+		writer.betweenFunctionArguments();
 	}
 
 	@Override
@@ -208,7 +209,12 @@ public class SqlGenerator extends SqlGeneratorBase implements ErrorReporter {
 		else {
 			// this function has a registered SQLFunction -> redirect output and catch the arguments
 			outputStack.addFirst( writer );
-			writer = new FunctionArguments();
+			if ( node.getType() == CAST ) {
+				writer = new CastFunctionArguments();
+			}
+			else {
+				writer = new StandardFunctionArguments();
+			}
 		}
 	}
 
@@ -222,7 +228,7 @@ public class SqlGenerator extends SqlGeneratorBase implements ErrorReporter {
 		else {
 			final Type functionType = functionNode.getFirstArgumentType();
 			// this function has a registered SQLFunction -> redirect output and catch the arguments
-			FunctionArguments functionArguments = (FunctionArguments) writer;
+			FunctionArgumentsCollectingWriter functionArguments = (FunctionArgumentsCollectingWriter) writer;
 			writer = outputStack.removeFirst();
 			out( sqlFunction.render( functionType, functionArguments.getArgs(), sessionFactory ) );
 		}
@@ -236,21 +242,18 @@ public class SqlGenerator extends SqlGeneratorBase implements ErrorReporter {
 	interface SqlWriter {
 		void clause(String clause);
 
-		/**
-		 * todo remove this hack
-		 * The parameter is either ", " or " , ". This is needed to pass sql generating tests as the old
-		 * sql generator uses " , " in the WHERE and ", " in SELECT.
-		 *
-		 * @param comma either " , " or ", "
-		 */
-		void commaBetweenParameters(String comma);
+		void betweenFunctionArguments();
+	}
+
+	interface FunctionArgumentsCollectingWriter extends SqlWriter {
+		public List getArgs();
 	}
 
 	/**
 	 * SQL function processing code redirects generated SQL output to an instance of this class
 	 * which catches function arguments.
 	 */
-	class FunctionArguments implements SqlWriter {
+	class StandardFunctionArguments implements FunctionArgumentsCollectingWriter {
 		private int argInd;
 		private final List<String> args = new ArrayList<String>( 3 );
 
@@ -265,12 +268,58 @@ public class SqlGenerator extends SqlGeneratorBase implements ErrorReporter {
 		}
 
 		@Override
-		public void commaBetweenParameters(String comma) {
+		public void betweenFunctionArguments() {
 			++argInd;
 		}
 
 		public List getArgs() {
 			return args;
+		}
+	}
+
+	/**
+	 * SQL function processing code redirects generated SQL output to an instance of this class
+	 * which catches function arguments.
+	 */
+	class CastFunctionArguments implements FunctionArgumentsCollectingWriter {
+		private String castExpression;
+		private String castTargetType;
+
+		private boolean startedType;
+
+		@Override
+		public void clause(String clause) {
+			if ( startedType ) {
+				if ( castTargetType == null ) {
+					castTargetType = clause;
+				}
+				else {
+					castTargetType += clause;
+				}
+			}
+			else {
+				if ( castExpression == null ) {
+					castExpression = clause;
+				}
+				else {
+					castExpression += clause;
+				}
+			}
+		}
+
+		@Override
+		public void betweenFunctionArguments() {
+			if ( startedType ) {
+				throw new QueryException( "CAST function should only have 2 arguments" );
+			}
+			startedType = true;
+		}
+
+		public List getArgs() {
+			List<String> rtn = CollectionHelper.arrayList( 2 );
+			rtn.add( castExpression );
+			rtn.add( castTargetType );
+			return rtn;
 		}
 	}
 
@@ -284,8 +333,8 @@ public class SqlGenerator extends SqlGeneratorBase implements ErrorReporter {
 		}
 
 		@Override
-		public void commaBetweenParameters(String comma) {
-			getStringBuilder().append( comma );
+		public void betweenFunctionArguments() {
+			getStringBuilder().append( ", " );
 		}
 	}
 

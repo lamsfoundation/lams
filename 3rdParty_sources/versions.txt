@@ -19,7 +19,7 @@ Commons IO 2.4
 
 gson 2.2.4
 
-Hibernate Core 3.6.10
+Hibernate Core 4.3.7
 
 httpunit 1.7
 
@@ -48,9 +48,9 @@ Spring 4.0.6
 
 Struts 1.2.9
 
-Undertow core 1.1.0
+Undertow core 1.1.8
 
-Undertow servlet 1.1.0
+Undertow servlet 1.1.8
 
 xmltooling 1.4.0
 

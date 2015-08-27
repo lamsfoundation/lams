@@ -36,6 +36,11 @@ import org.hibernate.type.Type;
  * @author Gavin King
  */
 public class CastFunction implements SQLFunction {
+	/**
+	 * Singleton access
+	 */
+	public static final CastFunction INSTANCE = new CastFunction();
+
 	@Override
 	public boolean hasArguments() {
 		return true;
@@ -55,7 +60,7 @@ public class CastFunction implements SQLFunction {
 	@Override
 	public String render(Type columnType, List args, SessionFactoryImplementor factory) throws QueryException {
 		if ( args.size()!=2 ) {
-			throw new QueryException("cast() requires two arguments");
+			throw new QueryException( "cast() requires two arguments; found : " + args.size() );
 		}
 		final String type = (String) args.get( 1 );
 		final int[] sqlTypeCodes = factory.getTypeResolver().heuristicType( type ).sqlTypes( factory );
