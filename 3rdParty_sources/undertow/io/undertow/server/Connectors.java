@@ -22,6 +22,8 @@ import io.undertow.UndertowLogger;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.util.DateUtils;
 import io.undertow.util.Headers;
+import io.undertow.util.StatusCodes;
+import io.undertow.util.URLUtils;
 import org.xnio.Pooled;
 import org.xnio.channels.StreamSourceChannel;
 
@@ -215,12 +217,80 @@ public class Connectors {
         } catch (Throwable t) {
             exchange.setInCall(false);
             if (!exchange.isResponseStarted()) {
-                exchange.setResponseCode(500);
+                exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
             }
             UndertowLogger.REQUEST_LOGGER.errorf(t, "Undertow request failed %s", exchange);
             exchange.endExchange();
         }
     }
+
+
+    /**
+     * Sets the request path and query parameters, decoding to the requested charset.
+     *
+     * @param exchange    The exchange
+     * @param encodedPath        The encoded path
+     * @param charset     The charset
+     */
+    public static void setExchangeRequestPath(final HttpServerExchange exchange, final String encodedPath, final String charset, boolean decode, final boolean allowEncodedSlash, StringBuilder decodeBuffer) {
+        boolean requiresDecode = false;
+        for (int i = 0; i < encodedPath.length(); ++i) {
+            char c = encodedPath.charAt(i);
+            if (c == '?') {
+                String part;
+                String encodedPart = encodedPath.substring(0, i);
+                if (requiresDecode) {
+                    part = URLUtils.decode(encodedPart, charset, allowEncodedSlash, decodeBuffer);
+                } else {
+                    part = encodedPart;
+                }
+                exchange.setRequestPath(part);
+                exchange.setRelativePath(part);
+                exchange.setRequestURI(encodedPart);
+                final String qs = encodedPath.substring(i + 1);
+                exchange.setQueryString(qs);
+                URLUtils.parseQueryString(qs, exchange, charset, decode);
+                return;
+            } else if(c == ';') {
+                String part;
+                String encodedPart = encodedPath.substring(0, i);
+                if (requiresDecode) {
+                    part = URLUtils.decode(encodedPart, charset, allowEncodedSlash, decodeBuffer);
+                } else {
+                    part = encodedPart;
+                }
+                exchange.setRequestPath(part);
+                exchange.setRelativePath(part);
+                for(int j = i; j < encodedPath.length(); ++j) {
+                    if (encodedPath.charAt(j) == '?') {
+                        exchange.setRequestURI(encodedPath.substring(0, j));
+                        String pathParams = encodedPath.substring(i + 1, j);
+                        URLUtils.parsePathParms(pathParams, exchange, charset, decode);
+                        String qs = encodedPath.substring(j + 1);
+                        exchange.setQueryString(qs);
+                        URLUtils.parseQueryString(qs, exchange, charset, decode);
+                        return;
+                    }
+                }
+                exchange.setRequestURI(encodedPath);
+                URLUtils.parsePathParms(encodedPath.substring(i + 1), exchange, charset, decode);
+                return;
+            } else if(c == '%' || c == '+') {
+                requiresDecode = true;
+            }
+        }
+
+        String part;
+        if (requiresDecode) {
+            part = URLUtils.decode(encodedPath, charset, allowEncodedSlash, decodeBuffer);
+        } else {
+            part = encodedPath;
+        }
+        exchange.setRequestPath(part);
+        exchange.setRelativePath(part);
+        exchange.setRequestURI(encodedPath);
+    }
+
 
     /**
      * Returns the existing request channel, if it exists. Otherwise returns null
@@ -229,5 +299,16 @@ public class Connectors {
      */
     public static StreamSourceChannel getExistingRequestChannel(final HttpServerExchange exchange) {
         return exchange.requestChannel;
+    }
+
+    public static boolean isEntityBodyAllowed(HttpServerExchange exchange){
+        int code = exchange.getResponseCode();
+        if(code >= 100 && code < 200) {
+            return false;
+        }
+        if(code == 204 || code == 304) {
+            return false;
+        }
+        return true;
     }
 }

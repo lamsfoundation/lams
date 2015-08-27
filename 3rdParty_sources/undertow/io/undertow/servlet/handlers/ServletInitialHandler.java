@@ -31,6 +31,7 @@ import io.undertow.servlet.api.ThreadSetupAction;
 import io.undertow.servlet.core.ApplicationListeners;
 import io.undertow.servlet.core.CompositeThreadSetupAction;
 import io.undertow.servlet.core.ServletBlockingHttpExchange;
+import io.undertow.servlet.spec.AsyncContextImpl;
 import io.undertow.servlet.spec.HttpServletRequestImpl;
 import io.undertow.servlet.spec.HttpServletResponseImpl;
 import io.undertow.servlet.spec.RequestDispatcherImpl;
@@ -115,7 +116,7 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
         final String path = exchange.getRelativePath();
         if(isForbiddenPath(path)) {
-            exchange.setResponseCode(404);
+            exchange.setResponseCode(StatusCodes.NOT_FOUND);
             return;
         }
         final ServletPathMatch info = paths.getServletHandlerByPath(path);
@@ -129,7 +130,7 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
         if (info.getType() == ServletPathMatch.Type.REDIRECT && !isUpgradeRequest) {
             //UNDERTOW-89
             //we redirect on GET requests to the root context to add an / to the end
-            exchange.setResponseCode(302);
+            exchange.setResponseCode(StatusCodes.TEMPORARY_REDIRECT);
             exchange.getResponseHeaders().put(Headers.LOCATION, RedirectBuilder.redirect(exchange, exchange.getRelativePath() + "/", true));
             return;
         } else if (info.getType() == ServletPathMatch.Type.REWRITE) {
@@ -254,7 +255,6 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
 
         ThreadSetupAction.Handle handle = setupAction.setup(exchange);
         try {
-            SecurityActions.setCurrentRequestContext(servletRequestContext);
             servletRequestContext.setRunningInsideHandler(true);
             try {
                 listeners.requestInitialized(request);
@@ -276,11 +276,11 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
                 } else {
                     if (!exchange.isResponseStarted()) {
                         response.reset();                       //reset the response
-                        exchange.setResponseCode(500);
+                        exchange.setResponseCode(StatusCodes.INTERNAL_SERVER_ERROR);
                         exchange.getResponseHeaders().clear();
                         String location = servletContext.getDeployment().getErrorPages().getErrorLocation(t);
                         if (location == null) {
-                            location = servletContext.getDeployment().getErrorPages().getErrorLocation(500);
+                            location = servletContext.getDeployment().getErrorPages().getErrorLocation(StatusCodes.INTERNAL_SERVER_ERROR);
                         }
                         if (location != null) {
                             RequestDispatcherImpl dispatcher = new RequestDispatcherImpl(location, servletContext);
@@ -293,7 +293,7 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
                             if (servletRequestContext.displayStackTraces()) {
                                 ServletDebugPageHandler.handleRequest(exchange, servletRequestContext, t);
                             } else {
-                                servletRequestContext.getOriginalResponse().doErrorDispatch(500, StatusCodes.INTERNAL_SERVER_ERROR_STRING);
+                                servletRequestContext.getOriginalResponse().doErrorDispatch(StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR_STRING);
                             }
                         }
                     }
@@ -306,13 +306,16 @@ public class ServletInitialHandler implements HttpHandler, ServletDispatcher {
             //if it is not dispatched and is not a mock request
             if (!exchange.isDispatched() && !(exchange.getConnection() instanceof MockServerConnection)) {
                 servletRequestContext.getOriginalResponse().responseDone();
+                servletRequestContext.getOriginalRequest().clearAttributes();
+            }
+            if(!exchange.isDispatched()) {
+                AsyncContextImpl ctx = servletRequestContext.getOriginalRequest().getAsyncContextInternal();
+                if(ctx != null) {
+                    ctx.complete();
+                }
             }
         } finally {
-            try {
-                handle.tearDown();
-            } finally {
-                SecurityActions.clearCurrentServletAttachments();
-            }
+            handle.tearDown();
         }
     }
 

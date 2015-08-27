@@ -38,8 +38,10 @@ import io.undertow.util.Cookies;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import io.undertow.util.Methods;
 import io.undertow.util.NetworkUtils;
 import io.undertow.util.Protocols;
+import io.undertow.util.StatusCodes;
 import org.jboss.logging.Logger;
 import org.xnio.Buffers;
 import org.xnio.ChannelExceptionHandler;
@@ -276,7 +278,6 @@ public final class HttpServerExchange extends AbstractAttachable {
     private static final int FLAG_IN_CALL = 1 << 17;
     private static final int FLAG_SHOULD_RESUME_READS = 1 << 18;
     private static final int FLAG_SHOLD_RESUME_WRITES = 1 << 19;
-
     /**
      * The source address for the request. If this is null then the actual source address from the channel is used
      */
@@ -577,7 +578,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     public String getHostName() {
         String host = requestHeaders.getFirst(Headers.HOST);
         if (host == null) {
-            host = getDestinationAddress().getAddress().getHostAddress();
+            host = getDestinationAddress().getHostString();
         } else {
             if (host.startsWith("[")) {
                 host = host.substring(1, host.indexOf(']'));
@@ -600,10 +601,11 @@ public final class HttpServerExchange extends AbstractAttachable {
     public String getHostAndPort() {
         String host = requestHeaders.getFirst(Headers.HOST);
         if (host == null) {
-            host = NetworkUtils.formatPossibleIpv6Address(getDestinationAddress().getAddress().getHostAddress());
-            int port = getDestinationAddress().getPort();
+            InetSocketAddress address = getDestinationAddress();
+            host = NetworkUtils.formatPossibleIpv6Address(address.getHostString());
+            int port = address.getPort();
             if (!((getRequestScheme().equals("http") && port == 80)
-                    || (getRequestScheme().equals("https") && port == 8080))) {
+                    || (getRequestScheme().equals("https") && port == 443))) {
                 host = host + ":" + port;
             }
         }
@@ -665,7 +667,7 @@ public final class HttpServerExchange extends AbstractAttachable {
      * @return True if this exchange represents an upgrade response
      */
     public boolean isUpgrade() {
-        return getResponseCode() == 101;
+        return getResponseCode() == StatusCodes.SWITCHING_PROTOCOLS;
     }
 
     /**
@@ -820,7 +822,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             throw UndertowMessages.MESSAGES.upgradeNotSupported();
         }
         connection.setUpgradeListener(listener);
-        setResponseCode(101);
+        setResponseCode(StatusCodes.SWITCHING_PROTOCOLS);
         getResponseHeaders().put(Headers.CONNECTION, Headers.UPGRADE_STRING);
         return this;
     }
@@ -839,7 +841,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             throw UndertowMessages.MESSAGES.upgradeNotSupported();
         }
         connection.setUpgradeListener(listener);
-        setResponseCode(101);
+        setResponseCode(StatusCodes.SWITCHING_PROTOCOLS);
         final HeaderMap headers = getResponseHeaders();
         headers.put(Headers.UPGRADE, productName);
         headers.put(Headers.CONNECTION, Headers.UPGRADE_STRING);
@@ -1468,7 +1470,7 @@ public final class HttpServerExchange extends AbstractAttachable {
                         //so we attempt to drain, and if we have not drained anything then we
                         //assume the server has not sent any data
 
-                        if (getResponseCode() != 417 || totalRead > 0) {
+                        if (getResponseCode() != StatusCodes.EXPECTATION_FAILED || totalRead > 0) {
                             requestChannel.getReadSetter().set(ChannelListeners.drainListener(Long.MAX_VALUE,
                                     new ChannelListener<StreamSourceChannel>() {
                                         @Override
@@ -1499,8 +1501,9 @@ public final class HttpServerExchange extends AbstractAttachable {
                     }
                 } catch (IOException e) {
                     UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                    invokeExchangeCompleteListeners();
                     IoUtils.safeClose(connection);
-                    break;
+                    return this;
                 }
 
             }
@@ -1521,7 +1524,10 @@ public final class HttpServerExchange extends AbstractAttachable {
         }
         try {
             if (isResponseChannelAvailable()) {
-                getResponseHeaders().put(Headers.CONTENT_LENGTH, "0");
+                if(!getRequestMethod().equals(Methods.CONNECT) && !(getRequestMethod().equals(Methods.HEAD) && getResponseHeaders().contains(Headers.CONTENT_LENGTH)) && Connectors.isEntityBodyAllowed(this)) {
+                    //according to
+                    getResponseHeaders().put(Headers.CONTENT_LENGTH, "0");
+                }
                 getResponseChannel();
             }
             responseChannel.shutdownWrites();
@@ -1548,6 +1554,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             }
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+            invokeExchangeCompleteListeners();
 
             IoUtils.safeClose(connection);
         }

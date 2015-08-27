@@ -25,6 +25,8 @@ import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.protocol.ParseTimeoutUpdater;
 import io.undertow.util.ClosingChannelExceptionHandler;
+import io.undertow.util.HttpString;
+import io.undertow.util.Protocols;
 import io.undertow.util.StringWriteChannelListener;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
@@ -32,7 +34,6 @@ import org.xnio.IoUtils;
 import org.xnio.Pooled;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
-import org.xnio.channels.StreamSourceChannel;
 import org.xnio.conduits.ConduitStreamSinkChannel;
 import org.xnio.conduits.ConduitStreamSourceChannel;
 
@@ -60,6 +61,7 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
     private final int maxRequestSize;
     private final long maxEntitySize;
     private final boolean recordRequestStartTime;
+    private final boolean allowUnknownProtocols;
 
     //0 = new request ok, reads resumed
     //1 = request running, new request not ok
@@ -76,6 +78,7 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
         this.maxRequestSize = connection.getUndertowOptions().get(UndertowOptions.MAX_HEADER_SIZE, UndertowOptions.DEFAULT_MAX_HEADER_SIZE);
         this.maxEntitySize = connection.getUndertowOptions().get(UndertowOptions.MAX_ENTITY_SIZE, UndertowOptions.DEFAULT_MAX_ENTITY_SIZE);
         this.recordRequestStartTime = connection.getUndertowOptions().get(UndertowOptions.RECORD_REQUEST_START_TIME, false);
+        this.allowUnknownProtocols = connection.getUndertowOptions().get(UndertowOptions.ALLOW_UNKNOWN_PROTOCOLS, false);
         int requestParseTimeout = connection.getUndertowOptions().get(UndertowOptions.REQUEST_PARSE_TIMEOUT, -1);
         int requestIdleTimeout = connection.getUndertowOptions().get(UndertowOptions.NO_REQUEST_TIMEOUT, -1);
         if(requestIdleTimeout < 0 && requestParseTimeout < 0) {
@@ -93,6 +96,7 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
         if(parseTimeoutUpdater != null) {
             parseTimeoutUpdater.connectionIdle();
         }
+        connection.setCurrentExchange(null);
     }
 
     public void handleEvent(final ConduitStreamSourceChannel channel) {
@@ -152,12 +156,13 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
                 } else {
                     buffer.flip();
                 }
+                int begin = buffer.remaining();
                 parser.handle(buffer, state, httpServerExchange);
                 if (buffer.hasRemaining()) {
                     free = false;
                     connection.setExtraBytes(pooled);
                 }
-                int total = read + res;
+                int total = read + (begin - buffer.remaining());
                 read = total;
                 if (read > maxRequestSize) {
                     UndertowLogger.REQUEST_LOGGER.requestHeaderWasTooLarge(connection.getPeerAddress(), maxRequestSize);
@@ -173,6 +178,15 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
             httpServerExchange.setRequestScheme(connection.getSslSession() != null ? "https" : "http");
             this.httpServerExchange = null;
             requestStateUpdater.set(this, 1);
+
+            if(!allowUnknownProtocols) {
+                HttpString protocol = httpServerExchange.getProtocol();
+                if(protocol != Protocols.HTTP_1_1 && protocol != Protocols.HTTP_1_0 && protocol != Protocols.HTTP_0_9) {
+                    UndertowLogger.REQUEST_IO_LOGGER.debugf("Closing connection from %s due to unknown protocol %s", connection.getChannel().getPeerAddress(), protocol);
+                    sendBadRequestAndClose(connection.getChannel(), new IOException());
+                    return;
+                }
+            }
             HttpTransferEncoding.setupRequest(httpServerExchange);
             if (recordRequestStartTime) {
                 Connectors.setRequestStartTime(httpServerExchange);
@@ -192,20 +206,6 @@ final class HttpReadListener implements ChannelListener<ConduitStreamSourceChann
             channel.setReadListener(this);
             channel.resumeReads();
         } else if (res == -1) {
-            handleConnectionClose(channel);
-        }
-    }
-
-    private void handleConnectionClose(StreamSourceChannel channel) {
-        try {
-            channel.suspendReads();
-            channel.shutdownReads();
-            final StreamSinkChannel responseChannel = this.connection.getChannel().getSinkChannel();
-            responseChannel.shutdownWrites();
-            IoUtils.safeClose(connection);
-        } catch (IOException e) {
-            UndertowLogger.REQUEST_IO_LOGGER.debug("Error reading request", e);
-            // fuck it, it's all ruined
             IoUtils.safeClose(connection);
         }
     }
