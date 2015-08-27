@@ -242,7 +242,7 @@
 	<div id="footer">
 		<p>
 			<a id="openFla" style="color: #999999; text-decoration: none; border: none;"
-			   onClick="javascript:showFlashlessAuthoringDialog()">
+			   onClick="javascript:openAuthor()">
 				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
 			</a>
 			<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
