@@ -203,6 +203,11 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
+		
+		function refresh(){
+			document.location.href='<c:url value="/learning/start.do?mode=learner&toolSessionID=${toolSessionId}"/>';
+		}
+
     </script>
 </lams:head>
 <body class="stripes">
@@ -349,6 +354,11 @@
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
+			<div class="space-bottom-top align-left">
+				<html:button property="FinishButton" styleId="finishButton" onclick="refresh()" styleClass="button">
+					<fmt:message key="label.refresh" />
+				</html:button>
+			</div>
 			<div class="space-bottom-top align-right" id="learner-submit">
 				<c:choose>
 					<c:when test="${peerreview.showRatingsLeftForUser}">

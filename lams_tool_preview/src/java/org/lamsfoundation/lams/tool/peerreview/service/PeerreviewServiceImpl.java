@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.peerreview.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -33,7 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -91,7 +94,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     private PeerreviewUserDAO peerreviewUserDao;
 
     private PeerreviewSessionDAO peerreviewSessionDao;
-
+    
     // tool service
     private PeerreviewToolContentHandler peerreviewToolContentHandler;
 
@@ -111,6 +114,12 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     
     private IRatingService ratingService;
 
+    private SortedSet<Long> creatingUsersForSessionIds;
+
+    PeerreviewServiceImpl() {
+	creatingUsersForSessionIds = Collections.synchronizedSortedSet(new TreeSet<Long>());
+    }
+    
     // *******************************************************************************
     // Service method
     // *******************************************************************************
@@ -302,38 +311,70 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     }
     
     @Override
-    public List<PeerreviewUser> fetchUsersFromLesson(Long toolSessionId) {
+    public boolean fetchUsersFromLesson(Long toolSessionId) throws Throwable {
 	//can we change lesson's class?
 	//boolean isGroupedActivity = isGroupedActivity(toolContentId);
 
-	PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
-	Set<User> lessonUsers = toolService.getUsersFromGroupingActivity(toolSessionId);
-	List<PeerreviewUser> sessionUsers = peerreviewUserDao.getBySessionID(toolSessionId);
-	
-	//create all new users
-	for (User lessonUser: lessonUsers) {
-	    
-	    boolean isCorrespondingUserExist = false;
-	    for (PeerreviewUser sessionUser: sessionUsers) {
-		if (lessonUser.getUserId().longValue() == sessionUser.getUserId().longValue()) {
-		    isCorrespondingUserExist = true;
-		    break;
-		}
+	try {
+	    boolean wasNotInSetAlready = creatingUsersForSessionIds.add(toolSessionId);
+	    if ( ! wasNotInSetAlready ) {
+		log.debug("Peer Review: Already processing session "+toolSessionId);
+		return false;
 	    }
 
-	    if (!isCorrespondingUserExist) {
-		PeerreviewUser newUser = new PeerreviewUser(lessonUser.getUserDTO(), session);
-		createUser(newUser);
-	    }
-
+	    log.debug("Peer Review: Processing session "+toolSessionId);
+	    Thread t = new Thread(new UserCreateThread(toolSessionId));
+	    t.start();
+	    return true;
+	} catch (Throwable e) {
+	    creatingUsersForSessionIds.remove(toolSessionId);
+	    String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+	    this.log.error("Exception thrown creating Peer Review users for session "+toolSessionId+": "+message,e);
+	    e.printStackTrace();
+	    throw(e);
 	}
-	
-	return sessionUsers;
     }
-
+	    
     // *****************************************************************************
     // private methods
     // *****************************************************************************
+   private class UserCreateThread implements Runnable {
+	private Long toolSessionId;
+
+	private Logger log = Logger.getLogger(UserCreateThread.class);
+
+	public UserCreateThread(Long toolSessionId) {
+	    this.toolSessionId = toolSessionId;
+	}
+
+	public void run() {
+	    long start = System.currentTimeMillis();
+	    try {
+		PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
+		Set<User> lessonUsers = toolService.getUsersFromGroupingActivity(toolSessionId);
+		List<Long> sessionUserIds = peerreviewUserDao.getUserIdsBySessionID(toolSessionId);
+		boolean needsUpdate = sessionUserIds.size() <= lessonUsers.size();
+
+		if ( needsUpdate ) {
+		    //create all new users
+		    for (User lessonUser: lessonUsers) {
+			if (!sessionUserIds.contains(lessonUser.getUserId().longValue())) {
+			    PeerreviewUser newUser = new PeerreviewUser(lessonUser.getUserDTO(), session);
+			    createUser(newUser);
+			}
+		    }
+		}
+		this.log.debug("UserCreateThread "+toolSessionId+": Update Took "+ (System.currentTimeMillis()-start) +"ms.");
+	    } catch (Throwable e) {
+		String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+		this.log.error("Exception thrown creating Peer Review users for session "+toolSessionId+": "+message,e);
+		e.printStackTrace();
+	    } finally {
+		creatingUsersForSessionIds.remove(toolSessionId);
+	    }
+	}
+   } // end Thread class
+		
     private Peerreview getDefaultPeerreview() throws PeerreviewApplicationException {
 	Long defaultPeerreviewId = getToolDefaultContentIdBySignature(PeerreviewConstants.TOOL_SIGNATURE);
 	Peerreview defaultPeerreview = getPeerreviewByContentId(defaultPeerreviewId);

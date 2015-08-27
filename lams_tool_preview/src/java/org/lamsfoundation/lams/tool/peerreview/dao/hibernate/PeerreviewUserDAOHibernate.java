@@ -37,6 +37,8 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
 	    + " AS u WHERE u.userId =? AND u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "FROM " + PeerreviewUser.class.getName()
 	    + " AS u WHERE u.session.sessionId=?";
+    private static final String GET_USERIDS_BY_SESSION_ID = "SELECT userId FROM " + PeerreviewUser.class.getName()
+	    + " AS u WHERE u.session.sessionId=?";
     
     private static final String FIND_BY_CONTENT_ID = "FROM " + PeerreviewUser.class.getName()
 	    + " AS u WHERE u.session.peerreview.contentId=?";
@@ -68,6 +70,11 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
 	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
     }
     
+    @Override
+    public List<Long> getUserIdsBySessionID(Long sessionId) {
+	return this.getHibernateTemplate().find(GET_USERIDS_BY_SESSION_ID, sessionId);
+    }
+
     @Override
     public List<PeerreviewUser> getByContentId(Long toolContentId) {
 	return this.getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);

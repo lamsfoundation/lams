@@ -35,6 +35,8 @@ public interface PeerreviewUserDAO extends DAO {
 
     List<PeerreviewUser> getBySessionID(Long sessionId);
 
+    List<Long> getUserIdsBySessionID(Long sessionId);
+    
     List<PeerreviewUser> getByContentId(Long toolContentId);
 
     int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId);
