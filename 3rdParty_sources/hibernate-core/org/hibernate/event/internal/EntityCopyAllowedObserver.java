@@ -1,10 +1,10 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+ * Copyright (c) 2014, Red Hat Inc. or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat Middleware LLC.
+ * distributed under license by Red Hat Inc.
  *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
@@ -20,32 +20,38 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- *
  */
-package org.hibernate.hql.internal.ast.tree;
+package org.hibernate.event.internal;
 
-import org.hibernate.hql.internal.ast.util.ColumnHelper;
-import org.hibernate.type.Type;
-
-import antlr.SemanticException;
+import org.hibernate.event.spi.EntityCopyObserver;
+import org.hibernate.event.spi.EventSource;
 
 /**
- * Represents a case ... when .. then ... else ... end expression in a select.
+ * An {@link org.hibernate.event.spi.EntityCopyObserver} implementation that allows multiple representations of
+ * the same persistent entity to be merged.
  *
- * @author Gavin King
+ * @author Gail Badner
  */
-public class Case2Node extends AbstractSelectExpression implements SelectExpression {
-	
-	public Type getDataType() {
-		return getFirstThenNode().getDataType();
+public class EntityCopyAllowedObserver implements EntityCopyObserver {
+
+	public static final String SHORT_NAME = "allow";
+
+	@Override
+	public void entityCopyDetected(
+			Object managedEntity,
+			Object mergeEntity1,
+			Object mergeEntity2,
+			EventSource session) {
+		// do nothing.
 	}
 
-	private SelectExpression getFirstThenNode() {
-		return (SelectExpression) getFirstChild().getNextSibling().getFirstChild().getNextSibling();
+	public void clear() {
+		// do nothing.
 	}
 
-	public void setScalarColumnText(int i) throws SemanticException {
-		ColumnHelper.generateSingleScalarColumn( this, i );
-	}
 
+	@Override
+	public void topLevelMergeComplete(EventSource session) {
+		// do nothing.
+	}
 }

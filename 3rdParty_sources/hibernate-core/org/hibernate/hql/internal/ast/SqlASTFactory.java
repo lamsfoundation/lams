@@ -32,8 +32,9 @@ import org.hibernate.hql.internal.ast.tree.BetweenOperatorNode;
 import org.hibernate.hql.internal.ast.tree.BinaryArithmeticOperatorNode;
 import org.hibernate.hql.internal.ast.tree.BinaryLogicOperatorNode;
 import org.hibernate.hql.internal.ast.tree.BooleanLiteralNode;
-import org.hibernate.hql.internal.ast.tree.Case2Node;
-import org.hibernate.hql.internal.ast.tree.CaseNode;
+import org.hibernate.hql.internal.ast.tree.CastFunctionNode;
+import org.hibernate.hql.internal.ast.tree.SearchedCaseNode;
+import org.hibernate.hql.internal.ast.tree.SimpleCaseNode;
 import org.hibernate.hql.internal.ast.tree.CollectionFunction;
 import org.hibernate.hql.internal.ast.tree.ConstructorNode;
 import org.hibernate.hql.internal.ast.tree.CountNode;
@@ -133,6 +134,8 @@ public class SqlASTFactory extends ASTFactory implements HqlSqlTokenTypes {
 				return SqlFragment.class;
 			case METHOD_CALL:
 				return MethodNode.class;
+			case CAST:
+				return CastFunctionNode.class;
 			case ELEMENTS:
 			case INDICES:
 				return CollectionFunction.class;
@@ -171,9 +174,9 @@ public class SqlASTFactory extends ASTFactory implements HqlSqlTokenTypes {
 			case UNARY_PLUS:
 				return UnaryArithmeticNode.class;
 			case CASE2:
-				return Case2Node.class;
+				return SimpleCaseNode.class;
 			case CASE:
-				return CaseNode.class;
+				return SearchedCaseNode.class;
 			case PARAM:
 			case NAMED_PARAM:
 				return ParameterNode.class;
