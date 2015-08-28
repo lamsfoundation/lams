@@ -99,22 +99,19 @@ public class OrgManageAction extends Action {
 	    org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	}
 
-	boolean isGlobalManager = request.isUserInRole(Role.SYSADMIN)
-		&& !userManagementService.isUserGlobalGroupAdmin();
-
 	// check if user is allowed to view and edit groups
-	if (!isGlobalManager
-		&& !(isRootOrganisation ? request.isUserInRole(Role.GROUP_ADMIN)
-			|| request.isUserInRole(Role.GROUP_MANAGER) : securityService.hasOrgRole(orgId, userId,
-			new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER }, "manage courses", false))) {
+	if (!request.isUserInRole(Role.SYSADMIN) && !(isRootOrganisation
+		? request.isUserInRole(Role.GROUP_ADMIN) || request.isUserInRole(Role.GROUP_MANAGER)
+		: securityService.hasOrgRole(orgId, userId, new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER },
+			"manage courses", false))) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	    return null;
 	}
 
 	// get number of users figure
 	// TODO use hql that does a count instead of getting whole objects
-	int numUsers = org == rootOrganisation ? userManagementService.getCountUsers() : userManagementService
-		.getUsersFromOrganisation(orgId).size();
+	int numUsers = org == rootOrganisation ? userManagementService.getCountUsers()
+		: userManagementService.getUsersFromOrganisation(orgId).size();
 	String key = org == rootOrganisation ? "label.users.in.system" : "label.users.in.group";
 	MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 	request.setAttribute("numUsers", messageService.getMessage(key, new String[] { String.valueOf(numUsers) }));
@@ -156,8 +153,8 @@ public class OrgManageAction extends Action {
 	    List<Organisation> organisations = userManagementService.findByProperties(Organisation.class, properties);
 
 	    for (Organisation organisation : organisations) {
-		Organisation parentOrg = (typeId.equals(OrganisationType.CLASS_TYPE)) ? organisation
-			.getParentOrganisation() : organisation;
+		Organisation parentOrg = (typeId.equals(OrganisationType.CLASS_TYPE))
+			? organisation.getParentOrganisation() : organisation;
 		// do not list this org if it is not a child of the requested parent
 		if (typeId.equals(OrganisationType.CLASS_TYPE) && !parentOrg.getOrganisationId().equals(orgId)) {
 		    continue;
@@ -178,7 +175,8 @@ public class OrgManageAction extends Action {
 	}
 
 	// let the jsp know whether to display links
-	request.setAttribute("createGroup", isGlobalManager);
+	request.setAttribute("createGroup",
+		request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin());
 	request.setAttribute("editGroup", true);
 	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 	return mapping.findForward("orglist");
