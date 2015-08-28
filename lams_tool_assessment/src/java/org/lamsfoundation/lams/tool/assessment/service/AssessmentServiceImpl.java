@@ -1744,6 +1744,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    assessmentDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
 
+		if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+		    session.setGroupLeader(null);
+		}
+
 		// propagade changes to Gradebook
 		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);
 
