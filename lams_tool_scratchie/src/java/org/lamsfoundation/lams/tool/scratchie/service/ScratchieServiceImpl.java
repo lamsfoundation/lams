@@ -1801,6 +1801,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    scratchieDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
 
+		if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+		    session.setGroupLeader(null);
+		}
+
 		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
 
 		gradebookService.updateActivityMark(null, null, userId, session.getSessionId(), false);

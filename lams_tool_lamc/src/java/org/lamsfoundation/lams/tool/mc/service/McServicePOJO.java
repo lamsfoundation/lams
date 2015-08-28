@@ -1293,6 +1293,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			mcContentDAO.delete(entry);
 		    }
 
+		    if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+			session.setGroupLeader(null);
+		    }
+
 		    mcUserDAO.removeMcUser(user);
 
 		    gradebookService.updateActivityMark(null, null, userId, session.getMcSessionId(), false);
