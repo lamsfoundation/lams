@@ -602,6 +602,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			qaUsrRespDAO.removeUserResponse(response);
 		    }
 
+		    if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+			session.setGroupLeader(null);
+		    }
+
 		    qaQueUsrDAO.deleteQaQueUsr(user);
 
 		    NotebookEntry entry = getEntry(session.getQaSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
