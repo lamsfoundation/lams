@@ -194,14 +194,16 @@ public interface IPeerreviewService extends ToolRatingManager {
     
     /**
      * Trigger the user creation, based on the lesson/grouping class, if needed. This
-     * should be called by the web layer to trigger an update. Returns almost straight away -
-     * any updates are done in a separate thread.
+     * should be called by the web layer to trigger an update. Could take a while to run so 
+     * should be called from a new thread in the Action classm rather than holding up the Action
+     * class.
+     * 
      * Returns true if a check/update is triggered, returns false if a check is already underway.
      * @param toolSessionId
      * @return
      * @throws Throwable 
      */
-    boolean fetchUsersFromLesson(Long toolSessionId) throws Throwable;
+    boolean createUsersFromLesson(Long toolSessionId) throws Throwable;
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
