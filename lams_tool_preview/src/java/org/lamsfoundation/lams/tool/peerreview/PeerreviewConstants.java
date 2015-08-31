@@ -110,6 +110,8 @@ public class PeerreviewConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
     
     public static final String ATTR_IS_URL_ITEM_TYPE = "isUrlItemType";
+    
+    public static final String ATTR_CREATING_USERS = "creatingUsers";
 
     // error message keys
 

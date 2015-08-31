@@ -311,70 +311,57 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     }
     
     @Override
-    public boolean fetchUsersFromLesson(Long toolSessionId) throws Throwable {
-	//can we change lesson's class?
-	//boolean isGroupedActivity = isGroupedActivity(toolContentId);
+    public boolean createUsersFromLesson(Long toolSessionId) throws Throwable {
+	// can we change lesson's class?
+	// boolean isGroupedActivity = isGroupedActivity(toolContentId);
 
+	User currentUser = null;
 	try {
 	    boolean wasNotInSetAlready = creatingUsersForSessionIds.add(toolSessionId);
-	    if ( ! wasNotInSetAlready ) {
-		log.debug("Peer Review: Already processing session "+toolSessionId);
+	    if (!wasNotInSetAlready) {
+		log.debug("Peer Review: Already processing session " + toolSessionId);
 		return false;
 	    }
 
-	    log.debug("Peer Review: Processing session "+toolSessionId);
-	    Thread t = new Thread(new UserCreateThread(toolSessionId));
-	    t.start();
+	    log.debug("Peer Review: Processing session " + toolSessionId);
+	    long start = System.currentTimeMillis();
+	    ArrayList<Integer> userIdsAdded = new ArrayList<Integer>();
+
+	    PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
+	    Set<User> lessonUsers = toolService.getUsersFromGroupingActivity(toolSessionId);
+	    List<Long> sessionUserIds = peerreviewUserDao.getUserIdsBySessionID(toolSessionId);
+	    boolean needsUpdate = sessionUserIds.size() != lessonUsers.size();
+
+	    if (needsUpdate) {
+		// create all new users
+		for (User lessonUser : lessonUsers) {
+		    currentUser = lessonUser;
+		    if (!sessionUserIds.contains(lessonUser.getUserId().longValue())) {
+			PeerreviewUser newUser = new PeerreviewUser(lessonUser.getUserDTO(), session);
+			createUser(newUser);
+			userIdsAdded.add(lessonUser.getUserId());
+		    }
+		}
+	    }
+
+	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update Took "
+		    + (System.currentTimeMillis() - start) + "ms. Added " + userIdsAdded.size());
+	    creatingUsersForSessionIds.remove(toolSessionId);
 	    return true;
 	} catch (Throwable e) {
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-	    this.log.error("Exception thrown creating Peer Review users for session "+toolSessionId+": "+message,e);
+	    log.error("Exception thrown creating Peer Review users for session " + toolSessionId + " user id: "
+		    + (currentUser != null ? currentUser.getUserId().toString() : "null") + "; " + message, e);
 	    e.printStackTrace();
-	    throw(e);
-	}
+	    throw (e);
+	} 
     }
 	    
     // *****************************************************************************
     // private methods
     // *****************************************************************************
-   private class UserCreateThread implements Runnable {
-	private Long toolSessionId;
 
-	private Logger log = Logger.getLogger(UserCreateThread.class);
-
-	public UserCreateThread(Long toolSessionId) {
-	    this.toolSessionId = toolSessionId;
-	}
-
-	public void run() {
-	    long start = System.currentTimeMillis();
-	    try {
-		PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
-		Set<User> lessonUsers = toolService.getUsersFromGroupingActivity(toolSessionId);
-		List<Long> sessionUserIds = peerreviewUserDao.getUserIdsBySessionID(toolSessionId);
-		boolean needsUpdate = sessionUserIds.size() <= lessonUsers.size();
-
-		if ( needsUpdate ) {
-		    //create all new users
-		    for (User lessonUser: lessonUsers) {
-			if (!sessionUserIds.contains(lessonUser.getUserId().longValue())) {
-			    PeerreviewUser newUser = new PeerreviewUser(lessonUser.getUserDTO(), session);
-			    createUser(newUser);
-			}
-		    }
-		}
-		this.log.debug("UserCreateThread "+toolSessionId+": Update Took "+ (System.currentTimeMillis()-start) +"ms.");
-	    } catch (Throwable e) {
-		String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-		this.log.error("Exception thrown creating Peer Review users for session "+toolSessionId+": "+message,e);
-		e.printStackTrace();
-	    } finally {
-		creatingUsersForSessionIds.remove(toolSessionId);
-	    }
-	}
-   } // end Thread class
-		
     private Peerreview getDefaultPeerreview() throws PeerreviewApplicationException {
 	Long defaultPeerreviewId = getToolDefaultContentIdBySignature(PeerreviewConstants.TOOL_SIGNATURE);
 	Peerreview defaultPeerreview = getPeerreviewByContentId(defaultPeerreviewId);
@@ -566,7 +553,6 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 		    peerreviewDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
 
-		peerreviewUserDao.removeObject(PeerreviewUser.class, user.getUid());
 	    }
 	}
     }

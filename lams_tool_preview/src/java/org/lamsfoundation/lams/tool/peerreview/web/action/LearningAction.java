@@ -58,7 +58,6 @@ import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
-import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewApplicationException;
@@ -134,7 +133,11 @@ public class LearningAction extends Action {
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, sessionId);
 
-	// create user if needed
+	// If user already exists go straight to the normal screen, otherwise go to a refresh screen
+	// until the user is created. The user will be created by the UserCreateThread(), which should
+	// always be run as even if this user exists, others may have been added to the lesson/group
+	// and need to be included for this user. If it is an update, the user won't see them this time
+	// but they will if they choose to refresh the activity. 
 	PeerreviewUser user = null;
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
@@ -144,7 +147,58 @@ public class LearningAction extends Action {
 	} else {
 	    user = getCurrentUser(service, sessionId);
 	}
-	Long userId = user.getUserId();
+	
+	try {
+	    Thread t = new Thread(new UserCreateThread(sessionId, service));
+	    t.start();
+	} catch ( Throwable e ) {
+	    throw new IOException(e);
+	}
+
+	if (user == null) {
+	    // goto refresh screen TODO create a specialised page
+	    request.setAttribute(PeerreviewConstants.ATTR_CREATING_USERS,"true"); 
+	    return mapping.findForward("defineLater");
+	} else {
+	    // goto standard screen
+	    return startRating(mapping, form, request, response, service, sessionMap, sessionId, user, mode);
+	}
+
+    }
+
+    private class UserCreateThread implements Runnable {
+ 	private Long toolSessionId;
+ 	private IPeerreviewService service;
+
+ 	private Logger log = Logger.getLogger(UserCreateThread.class);
+
+ 	public UserCreateThread(Long toolSessionId, IPeerreviewService service) {
+ 	    this.toolSessionId = toolSessionId;
+ 	    this.service = service;
+ 	}
+
+ 	public void run() {
+ 	    try {
+ 		service.createUsersFromLesson(toolSessionId);
+ 	    } catch (Throwable e) {
+ 		String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+ 		this.log.error("Exception thrown creating Peer Review users for session "+toolSessionId+": "+message,e);
+ 		e.printStackTrace();
+ 	    } 
+ 	}
+    } // end Thread class
+ 		
+    /**
+     * Read peerreview data from database and put them into HttpSession. It will redirect to init.do directly after this
+     * method run successfully.
+     * 
+     * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+     * @throws IOException 
+     * 
+     */
+    private ActionForward startRating(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response, IPeerreviewService service, SessionMap sessionMap, Long sessionId, 
+	    PeerreviewUser user, ToolAccessMode mode) throws IOException  {
 
 	Peerreview peerreview = service.getPeerreviewBySessionId(sessionId);
 
@@ -175,11 +229,6 @@ public class LearningAction extends Action {
 	    return mapping.findForward("defineLater");
 	}
 
-	try {
-	    service.fetchUsersFromLesson(sessionId);
-	} catch ( Throwable e ) {
-	    throw new IOException(e);
-	}
 	
 	// handle rating criterias
 	boolean isCommentsEnabled = service.isCommentsEnabled(peerreview.getContentId());
@@ -189,7 +238,7 @@ public class LearningAction extends Action {
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 
 	// store how many items are rated
-	int countRatedUsers = service.getCountItemsRatedByUser(peerreview.getContentId(), userId.intValue());
+	int countRatedUsers = service.getCountItemsRatedByUser(peerreview.getContentId(), user.getUserId().intValue());
 	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedUsers);
 
 	// set contentInUse flag to true!
@@ -543,14 +592,7 @@ public class LearningAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	PeerreviewUser peerreviewUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
-
-	if (peerreviewUser == null) {
-	    PeerreviewSession session = service.getPeerreviewSessionBySessionId(sessionId);
-	    peerreviewUser = new PeerreviewUser(user, session);
-	    service.createUser(peerreviewUser);
-	}
-	return peerreviewUser;
+	return service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
     }
 
     private PeerreviewUser getSpecifiedUser(IPeerreviewService service, Long sessionId, Integer userId) {
