@@ -409,13 +409,8 @@ public class HomeAction extends DispatchAction {
 	    url += URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_URL), "UTF8");
 	    res.sendRedirect(url);
 	    return null;
-
 	} else {
 	    req.getSession().invalidate();
-
-	    // clear system shared session.
-	    SessionManager.getSession().invalidate();
-
 	    return mapping.findForward("index");
 	}
     }
