@@ -254,6 +254,62 @@ public class HomeAction extends DispatchAction {
     }
 
     /**
+     * request for old, Flash author environment
+     */
+    public ActionForward authorFlash(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+	    HttpServletResponse res) throws IOException, ServletException {
+	try {
+	    UserDTO user = getUser();
+	    if (user == null) {
+		HomeAction.log.error("admin: User missing from session. ");
+		return mapping.findForward("error");
+	    }
+
+	    Long learningDesignID = null;
+	    String layout = null;
+	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+	    req.setAttribute("serverUrl", serverUrl);
+
+	    String requestSrc = req.getParameter("requestSrc");
+	    String notifyCloseURL = req.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
+	    String isPostMessageToParent = req.getParameter("isPostMessageToParent");
+	    String customCSV = req.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
+	    String extLmsId = req.getParameter(AttributeNames.PARAM_EXT_LMS_ID);
+
+	    if (req.getParameter("learningDesignID") != null) {
+		learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
+	    }
+
+	    if (req.getParameter("layout") != null) {
+		layout = WebUtil.readStrParam(req, "layout");
+	    }
+
+	    if (layout != null) {
+		req.setAttribute("layout", layout);
+	    }
+
+	    if (req.getParameter("learningDesignID") != null) {
+		learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
+	    }
+
+	    if (learningDesignID != null) {
+		req.setAttribute("learningDesignID", learningDesignID);
+	    }
+
+	    req.setAttribute("requestSrc", requestSrc);
+	    req.setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+	    req.setAttribute("isPostMessageToParent", isPostMessageToParent);
+	    req.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
+	    req.setAttribute(AttributeNames.PARAM_EXT_LMS_ID, extLmsId);
+
+	    return mapping.findForward("author");
+	} catch (Exception e) {
+	    HomeAction.log.error("Failed to load author", e);
+	    return mapping.findForward("error");
+	}
+    }
+
+    /**
      * Request for Monitor environment.
      */
     public ActionForward monitorLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,

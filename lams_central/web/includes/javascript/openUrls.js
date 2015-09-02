@@ -52,13 +52,13 @@
 		
 		function openAuthor() {
 			if (isMac) {
-					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+					authorWin = window.open('home.do?method=authorFlash','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 			} else {
 				if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('home.do?method=author') > -1) {
 					//authorWin.location = 'home.do?method=author';
 					authorWin.focus();
 				} else {
-					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+					authorWin = window.open('home.do?method=authorFlash','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 					authorWin.focus();
 				}
 			}
@@ -75,23 +75,6 @@
 					authorWin.focus();
 				}
 			}
-		}
-
-		function openAuthorForEditOnFly( learningDesignID ) {
-			if (isMac) {
-				monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-			} else {
-				if(monitorLessonWin && !monitorLessonWin.closed) {
-					monitorLessonWin.location = '../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID;
-				} else {
-					monitorLessonWin = window.open('../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID,'mWindow', 'width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-					monitorLessonWin.focus();
-				}
-			}
-		}
-		
-		function openAuthorForEditOnFlyIntegrated( learningDesignID ) {
-			window.location = '../home.do?method=author&layout=editonfly&learningDesignID='+learningDesignID;
 		}
 		
 		function returnToMonitorLessonIntegrated( lessonID ) {
