@@ -401,9 +401,6 @@ public class HomeAction extends DispatchAction {
 	    HomeAction.log.debug("Need to log out user from lamscoomunity");
 	    req.getSession().invalidate();
 
-	    // clear system shared session.
-	    SessionManager.getSession().invalidate();
-
 	    // redirect to lamscommunity logout servlet to log out.
 	    String url = "http://lamscommunity.org/register/logout?return_url=";
 	    url += URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_URL), "UTF8");
