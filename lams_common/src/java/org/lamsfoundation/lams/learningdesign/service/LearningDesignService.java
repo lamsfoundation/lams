@@ -285,8 +285,7 @@ public class LearningDesignService implements ILearningDesignService {
 
 		if (libraryActivityDTO.getToolID() == null) {
 		    String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
-		    // to be uncommented as soon as SVG images are delivered
-		    // iconPath = iconPath.replace(".swf", ".svg");
+		    iconPath = iconPath.replace(".swf", ".svg");
 		    toolDTO.setIconPath(iconPath);
 		} else {
 		    Tool tool = (Tool) learningLibraryDAO.find(Tool.class, libraryActivityDTO.getToolID());
