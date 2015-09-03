@@ -131,6 +131,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     protected Logger log = Logger.getLogger(AuthoringService.class);
 
+    private static final String[] LD_IMAGE_EXTENSIONS = new String[] { "png", "svg" };
+
     /** Required DAO's */
     protected LearningDesignDAO learningDesignDAO;
 
@@ -919,10 +921,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	updateEvaluations(newActivities);
 
 	try {
-	    AuthoringService.copyLearningDesignImage(originalLearningDesign.getLearningDesignId(),
-		    newLearningDesign.getLearningDesignId(), "svg");
-	    AuthoringService.copyLearningDesignImage(originalLearningDesign.getLearningDesignId(),
-		    newLearningDesign.getLearningDesignId(), "png");
+	    AuthoringService.copyLearningDesignImages(originalLearningDesign.getLearningDesignId(),
+		    newLearningDesign.getLearningDesignId());
 	} catch (IOException e) {
 	    log.error("Error while copying Learning Design " + originalLearningDesign.getLearningDesignId() + " image",
 		    e);
@@ -1602,7 +1602,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    }
 
 	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
+	}
 
+	if (existingLearningDesign != null) {
+	    AuthoringService.deleteLearningDesignImages(existingLearningDesign.getLearningDesignId());
 	}
 
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, userID, design.getLearningDesignId(),
@@ -2055,17 +2058,30 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Copies LD thumbnail, SVG or PNG.
+     * Copies LD thumbnails, SVG and PNG.
      */
-    private static void copyLearningDesignImage(long originalLearningDesignID, long newLearningDesignID,
-	    String extension) throws IOException {
-	String fullExtension = "." + extension;
-	File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
-		originalLearningDesignID + fullExtension);
-	if (image.canRead()) {
-	    FileUtils.copyFile(image,
-		    new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID + fullExtension),
-		    true);
+    private static void copyLearningDesignImages(long originalLearningDesignID, long newLearningDesignID)
+	    throws IOException {
+	for (String extension : AuthoringService.LD_IMAGE_EXTENSIONS) {
+	    String fullExtension = "." + extension;
+	    File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
+		    originalLearningDesignID + fullExtension);
+	    if (image.canRead()) {
+		FileUtils.copyFile(image,
+			new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID + fullExtension),
+			false);
+	    }
+	}
+    }
+
+    /**
+     * Deletes LD thumbnails, SVG and PNG.
+     */
+    private static void deleteLearningDesignImages(long learningDesignID) throws IOException {
+	for (String extension : AuthoringService.LD_IMAGE_EXTENSIONS) {
+	    String fullExtension = "." + extension;
+	    File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, learningDesignID + fullExtension);
+	    FileUtils.deleteQuietly(image);
 	}
     }
 }
