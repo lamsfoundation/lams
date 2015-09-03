@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.peerreview.model;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -53,8 +54,8 @@ public class PeerreviewUser implements Cloneable {
     public PeerreviewUser() {
     }
 
-    public PeerreviewUser(UserDTO user, PeerreviewSession session) {
-	this.userId = new Long(user.getUserID().intValue());
+    public PeerreviewUser(User user, PeerreviewSession session) {
+	this.userId = new Long(user.getUserId());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
