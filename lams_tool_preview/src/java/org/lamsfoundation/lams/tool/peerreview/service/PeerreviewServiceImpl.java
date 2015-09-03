@@ -325,7 +325,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 
 	    log.debug("Peer Review: Processing session " + toolSessionId);
 	    long start = System.currentTimeMillis();
-	    ArrayList<Integer> userIdsAdded = new ArrayList<Integer>();
+	    int usersAdded = 0;
 
 	    PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
 	    Set<User> lessonUsers = toolService.getUsersFromGroupingActivity(toolSessionId);
@@ -337,15 +337,14 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 		for (User lessonUser : lessonUsers) {
 		    currentUser = lessonUser;
 		    if (!sessionUserIds.contains(lessonUser.getUserId().longValue())) {
-			PeerreviewUser newUser = new PeerreviewUser(lessonUser.getUserDTO(), session);
-			createUser(newUser);
-			userIdsAdded.add(lessonUser.getUserId());
+			createUser(new PeerreviewUser(lessonUser, session));
+			usersAdded++;
 		    }
 		}
 	    }
 
-	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update Took "
-		    + (System.currentTimeMillis() - start) + "ms. Added " + userIdsAdded.size());
+	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update needsUpdate "+needsUpdate+" took: "
+		    + (System.currentTimeMillis() - start) + "ms. Added " + usersAdded);
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    return true;
 	} catch (Throwable e) {
