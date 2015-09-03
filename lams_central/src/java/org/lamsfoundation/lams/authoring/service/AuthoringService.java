@@ -2038,7 +2038,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    if (learningDesign == null) {
 		log.warn("When getting recent access list for Author with ID " + userId + " LD with ID "
 			+ access.getLearningDesignId() + " was found missing. Deleting access entry.");
-		learningDesignDAO.delete(access);
+		baseDAO.delete(access);
 	    } else {
 		access.setTitle(learningDesign.getTitle());
 		access.setWorkspaceFolderId(learningDesign.getWorkspaceFolder().getWorkspaceFolderId());
