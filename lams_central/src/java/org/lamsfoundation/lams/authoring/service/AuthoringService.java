@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -2020,12 +2021,20 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public List<LearningDesignAccess> getLearningDesignAccessByUser(Integer userId) {
 	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
+	List<LearningDesignAccess> result = new LinkedList<LearningDesignAccess>();
 	for (LearningDesignAccess access : accessList) {
 	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(access.getLearningDesignId());
-	    access.setTitle(learningDesign.getTitle());
-	    access.setWorkspaceFolderId(learningDesign.getWorkspaceFolder().getWorkspaceFolderId());
+	    if (learningDesign == null) {
+		log.warn("When getting recent access list for Author with ID " + userId + " LD with ID "
+			+ access.getLearningDesignId() + " was found missing. Deleting access entry.");
+		learningDesignDAO.delete(access);
+	    } else {
+		access.setTitle(learningDesign.getTitle());
+		access.setWorkspaceFolderId(learningDesign.getWorkspaceFolder().getWorkspaceFolderId());
+		result.add(access);
+	    }
 	}
-	return accessList;
+	return result;
     }
 
     @Override
