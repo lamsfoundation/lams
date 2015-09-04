@@ -2544,7 +2544,7 @@ GeneralLib = {
 						});
 					});
 					
-					GeneralLib.saveLearningDesignImages();
+					GeneralLib.saveLearningDesignImage();
 					
 					if (response.validation.length == 0) {
 						alert(LABELS.SAVE_SUCCESSFUL);
@@ -2566,9 +2566,9 @@ GeneralLib = {
 	
 	
 	/**
-	 * Stores SVG and PNG LD thumbnails on server.
+	 * Stores SVG LD thumbnail on server.
 	 */
-	saveLearningDesignImages : function() {
+	saveLearningDesignImage : function() {
 		$.ajax({
 			type : 'POST',
 			url : LAMS_URL + 'authoring/author.do',
@@ -2577,16 +2577,6 @@ GeneralLib = {
 				'learningDesignID' : layout.ld.learningDesignID,
 				'extension' : 'SVG',
 				'image' : MenuLib.exportSVG()
-			}
-		});
-		$.ajax({
-			type : 'POST',
-			url : LAMS_URL + 'authoring/author.do',
-			data : {
-				'method' : 'saveLearningDesignImage',
-				'learningDesignID' : layout.ld.learningDesignID,
-				'extension' : 'PNG',
-				'image' : MenuLib.exportPNG()
 			}
 		});
 	},

@@ -14,7 +14,7 @@ function initLessonTab(){
 		// show the thumbnail
 		$('#ldScreenshotAuthor').css('display', 'inline');
 		// resize if needed
-		var resized = resizeImage('ldScreenshotAuthor', 477, null);
+		var resized = resizeImage('ldScreenshotAuthor', 477);
 		toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
 				: CANVAS_RESIZE_OPTION_NONE);
 	});
@@ -318,19 +318,19 @@ function addLesson(){
 
 // ********** LESSON TAB FUNCTIONS **********
 
-function resizeImage(id, width, height) {
-	var resized = false;
-	var elem = $('#' + id);
-
-	if (width != null && elem.width() > width) {
-		elem.css('width', width);
-		resized = true;
+function resizeImage(id, width) {
+	var elem = $('#' + id),
+		elemWidth = elem.width();
+	
+	if (width != null && elemWidth > width) {
+		elem.css({
+			'width'  : width,
+			// compute ratio same as width change
+			'height' : Math.round(elem.height() * (width / elemWidth))
+		});
+		return true;
 	}
-	if (height != null && elem.height() > height) {
-		elem.css('height', height);
-		resized = true;
-	}
-	return resized;
+	return false;
 }
 
 
@@ -349,7 +349,7 @@ function toggleCanvasResize(mode) {
 					toggleCanvasResize(CANVAS_RESIZE_OPTION_FULL)
 				});
 		toggleCanvasResizeLink.css('display', 'inline');
-		resizeImage('ldScreenshotAuthor', 477, null);
+		resizeImage('ldScreenshotAuthor', 477);
 		break;
 	case CANVAS_RESIZE_OPTION_FULL:
 		toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FIT).one('click',
