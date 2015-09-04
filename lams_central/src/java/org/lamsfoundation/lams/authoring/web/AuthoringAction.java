@@ -139,7 +139,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 	request.setAttribute("learningLibraryGroups", groupsJSON.toString());
 
-	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(getUserId());
+	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(getUserId());
 	accessList = accessList.subList(0,
 		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	Gson gson = new GsonBuilder().create();
@@ -247,7 +247,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	Gson gson = new GsonBuilder().create();
 	responseJSON.put("ld", new JSONObject(gson.toJson(learningDesignDTO)));
 
-	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(userId);
+	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
 	accessList = accessList.subList(0,
 		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	responseJSON.put("access", new JSONArray(gson.toJson(accessList)));
@@ -549,7 +549,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		Integer userId = getUserId();
 		getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
 
-		List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(userId);
+		List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
 		accessList = accessList.subList(0,
 			Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 		responseJSON.put("access", new JSONArray(gson.toJson(accessList)));
@@ -568,7 +568,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException {
 	Integer userId = getUserId();
 
-	List<LearningDesignAccess> accessList = getAuthoringService().getLearningDesignAccessByUser(userId);
+	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
 	accessList = accessList.subList(0,
 		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	Gson gson = new GsonBuilder().create();
