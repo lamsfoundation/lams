@@ -367,7 +367,7 @@ public interface IAuthoringService {
     public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
 	    String contentFolderID, Integer organisationID);
 
-    public List<LearningDesignAccess> getLearningDesignAccessByUser(Integer userId);
+    public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId);
 
     public void storeLearningDesignAccess(Long learningDesignId, Integer userId);
 }

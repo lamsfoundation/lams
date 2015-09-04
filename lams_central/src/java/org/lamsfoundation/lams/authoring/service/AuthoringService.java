@@ -2029,8 +2029,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	return authorUrl;
     }
 
+    /**
+     * Fetches latest LD access by Author. Optionally removes broken entries. The method is prefixed with update* to
+     * make the transaction writable.
+     */
     @Override
-    public List<LearningDesignAccess> getLearningDesignAccessByUser(Integer userId) {
+    public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId) {
 	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
 	List<LearningDesignAccess> result = new LinkedList<LearningDesignAccess>();
 	for (LearningDesignAccess access : accessList) {
