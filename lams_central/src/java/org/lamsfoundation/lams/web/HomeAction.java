@@ -191,8 +191,6 @@ public class HomeAction extends DispatchAction {
 			// create svg, png files on the server
 			getLearningDesignService().createLearningDesignSVG(learningDesignId,
 				SVGGenerator.OUTPUT_FORMAT_SVG);
-			getLearningDesignService().createLearningDesignSVG(learningDesignId,
-				SVGGenerator.OUTPUT_FORMAT_PNG);
 		    }
 		}
 		return mapping.findForward("lessonIntro");
@@ -419,7 +417,7 @@ public class HomeAction extends DispatchAction {
 	    HttpServletResponse res) throws JDOMException, IOException, TranscoderException {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	Integer format = WebUtil.readIntParam(req, CentralConstants.PARAM_SVG_FORMAT, true);
-	format = format == null ? SVGGenerator.OUTPUT_FORMAT_PNG : format;
+	format = format == null ? SVGGenerator.OUTPUT_FORMAT_SVG : format;
 	Long branchingActivityId = WebUtil.readLongParam(req, "branchingActivityID", true);
 	boolean download = WebUtil.readBooleanParam(req, "download", false);
 	String imagePath = null;
@@ -433,12 +431,12 @@ public class HomeAction extends DispatchAction {
 	if (download) {
 	    String name = getLearningDesignService()
 		    .getLearningDesignDTO(learningDesignId, getUser().getLocaleLanguage()).getTitle();
-	    name += "." + (format == SVGGenerator.OUTPUT_FORMAT_PNG ? "png" : "svg");
+	    name += "." + "svg";
 	    name = FileUtil.encodeFilenameForDownload(req, name);
 	    res.setContentType("application/x-download");
 	    res.setHeader("Content-Disposition", "attachment;filename=" + name);
 	} else {
-	    res.setContentType(format == SVGGenerator.OUTPUT_FORMAT_PNG ? "image/png" : "image/svg+xml");
+	    res.setContentType("image/svg+xml");
 	}
 	OutputStream output = res.getOutputStream();
 	FileInputStream input = new FileInputStream(imagePath);

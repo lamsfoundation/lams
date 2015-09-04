@@ -193,8 +193,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     public static final String SVG_IMAGE_FILE_NAME = "learning_design.svg";
 
-    public static final String PNG_IMAGE_FILE_NAME = "learning_design.png";
-
     private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
 
     private static final String ERROR_SERVICE_ERROR = "error.import.tool.service.fail";
@@ -655,13 +653,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    // remove the file as its icons refer to LAMS Community server instead of local resources
 		    // and should not be used in Monitoring
 		    svgFile.delete();
-		}
-
-		destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.PNG_IMAGE_FILE_NAME);
-		String pngPath = service.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_PNG);
-		File pngFile = new File(pngPath);
-		if (pngFile.canRead()) {
-		    FileUtils.copyFile(pngFile, new File(destinationPath));
 		}
 	    }
 
