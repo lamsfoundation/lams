@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.LamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -319,20 +320,25 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	try {
 	    boolean wasNotInSetAlready = creatingUsersForSessionIds.add(toolSessionId);
 	    if (!wasNotInSetAlready) {
-		log.debug("Peer Review: Already processing session " + toolSessionId);
+//		log.debug("Peer Review: Already processing session " + toolSessionId);
 		return false;
 	    }
 
-	    log.debug("Peer Review: Processing session " + toolSessionId);
+//	    log.debug("Peer Review: Processing session " + toolSessionId);
 	    long start = System.currentTimeMillis();
 	    int usersAdded = 0;
 
 	    PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
-	    Set<User> lessonUsers = toolService.getUsersFromGroupingActivity(toolSessionId);
+	    Integer numberPotentialLearners = toolService.getCountUsersForActivity(toolSessionId);
+//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": getCountUsersForActivity took: "
+//		    + (System.currentTimeMillis() - start) + "ms. numLearners "+numberPotentialLearners);
 	    List<Long> sessionUserIds = peerreviewUserDao.getUserIdsBySessionID(toolSessionId);
-	    boolean needsUpdate = sessionUserIds.size() != lessonUsers.size();
+//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": getUserIdsBySessionID took: "
+//		    + (System.currentTimeMillis() - start) + "ms.");
+	    boolean needsUpdate = sessionUserIds.size() != numberPotentialLearners.intValue();
 
 	    if (needsUpdate) {
+		Set<User> lessonUsers = toolService.getToolSession(toolSessionId).getLearners();
 		// create all new users
 		for (User lessonUser : lessonUsers) {
 		    currentUser = lessonUser;
@@ -343,8 +349,8 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 		}
 	    }
 
-	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update needsUpdate "+needsUpdate+" took: "
-		    + (System.currentTimeMillis() - start) + "ms. Added " + usersAdded);
+//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update needsUpdate "+needsUpdate+" took: "
+//		    + (System.currentTimeMillis() - start) + "ms. Added " + usersAdded);
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    return true;
 	} catch (Throwable e) {
