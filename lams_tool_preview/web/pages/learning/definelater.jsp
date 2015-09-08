@@ -7,7 +7,7 @@
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 		<c:choose>
-		<c:when test="${creatingUsers == 'true'}"><meta http-equiv="refresh" content="3"></c:when>
+		<c:when test="${creatingUsers == 'true'}"><meta http-equiv="refresh" content="2"></c:when>
 		<c:otherwise><meta http-equiv="refresh" content="60"></c:otherwise>
 		</c:choose>
 </lams:head>
