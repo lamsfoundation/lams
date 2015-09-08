@@ -626,6 +626,12 @@ public class LessonService implements ILessonService {
 	List<LearnerProgress> list = learnerProgressDAO.getLearnerProgressForLesson(lessonId);
 	return list;
     }
+    
+    @Override
+    public List<LearnerProgress> getUserProgressForLesson(Long lessonId, List<Integer> userIds) {
+	List<LearnerProgress> list = learnerProgressDAO.getLearnerProgressForLesson(lessonId, userIds);
+	return list;
+    }
 
     @Override
     public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId) {

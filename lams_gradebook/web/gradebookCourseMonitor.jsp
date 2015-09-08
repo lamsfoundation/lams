@@ -46,7 +46,7 @@
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
 			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false, width:80},
-			      {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:80, align:"center"},
+			      {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'avgTimeTaken',index:'avgTimeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'avgMark',index:'avgMark', sortable:true, editable:false, search:false, width:50, align:"center"}
 			    ],
@@ -172,7 +172,7 @@
 			jQuery("#userView").jqGrid({
 				caption: "<fmt:message key="gradebook.gridtitle.learner.view"/>",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monCourse&organisationID=${organisationID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=listView&organisationID=${organisationID}",
 			    height: "100%",
 			    width: 660,
 			    sortorder: "asc", 
@@ -182,19 +182,11 @@
 			    rowNum:10,
 			    colNames:[
 					'',
-					"<fmt:message key="gradebook.columntitle.learnerName"/>",
-					"<fmt:message key="gradebook.columntitle.progress"/>", 
-					"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
-					"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
-			    	"<fmt:message key="gradebook.columntitle.mark"/>"
+					"<fmt:message key="gradebook.columntitle.learnerName"/>"
 			    ],
 			    colModel:[
 					{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-					{name:'rowName',index:'rowName', sortable:true, editable:false},
-					{name:'status', index:'status', sortable:false, editable:false, search:false, title:false, width:50, align:"center", hidden:true},
-					{name:'timeTaken', index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center", hidden:true},
-					{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, hidden:true},
-					{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center", hidden:true}
+					{name:'rowName',index:'rowName', sortable:true, editable:false}
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
@@ -306,14 +298,6 @@
 							     			jQuery("#"+subgrid_table_id).setCell(rowid, "mark", markStr, "", "");
 							     		}
 							     	}
-							     	
-							     	// Update the aggregated lesson mark
-							     	var lessonID = jQuery("#"+subgrid_table_id).getRowData(rowid)["id"];
-							     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getLessonMarkAggregate", lessonID:lessonID, userID:userID}, function(xml) {
-								    	if (xml!=null) {
-								    		jQuery("#userView").setCell(row_id, "mark", xml, "", "");
-								    	} 
-								    });							     	
 						     	}
 						     	$("#organisationGrid").trigger("reloadGrid");
 						     },
@@ -352,20 +336,11 @@
 					});
 				}
 			});
-				
-			// Allowing column editing for this grid
-			jQuery("#userView").navButtonAdd('#userViewPager',{
-				caption: "",
-				buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-				onClickButton: function(){
-					jQuery("#userView").setColumns();
-				}
-			});
 			
 			//initialize lesson list 
 			jQuery("#lessons-jqgrid").jqGrid({
 				datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monCourse&organisationID=${organisationID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=listView&organisationID=${organisationID}",
 				colNames:['Id', '<fmt:message key="gradebook.columntitle.lessonName"/>'],
 				colModel:[
 					{name:'id',index:'id', width:35, sorttype:"int", hidden:true},
