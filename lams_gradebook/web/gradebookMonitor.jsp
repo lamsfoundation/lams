@@ -91,7 +91,7 @@
 			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
 			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
-			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
+			      {name:'feedback',index:'feedback', sortable:true, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 			    ],
 			    loadError: function(xhr,st,err) {
@@ -119,9 +119,6 @@
 						     	'',
 						     	"<fmt:message key="gradebook.columntitle.activity"/>",
 						     	"<fmt:message key="gradebook.columntitle.progress"/>",
-						     	"<fmt:message key="gradebook.columntitle.outputs"/>", 
-						     	"<fmt:message key="gradebook.columntitle.competences"/>",
-						     	"<fmt:message key="gradebook.columntitle.startDate"/>",
 						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
 						     	"<fmt:message key="gradebook.columntitle.mark"/>"
@@ -131,9 +128,6 @@
 						       	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 								{name:'rowName',  index:'rowName', sortable:false, editable: false},
 								{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
-								{name:'output',  index:'output', sortable:false, editable: false, width:200, hidden:true},
-								{name:'competences',  index:'competences', sortable:false, editable: false, hidden:true},
-								{name:'startDate', index:'startDate', sortable:true, editable: false, hidden:true, width:60, align:"center"},
 								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200, hidden:true},
 								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" }
@@ -311,9 +305,7 @@
 						     	'',
 						     	"<fmt:message key="gradebook.columntitle.name"/>",
 						     	"<fmt:message key="gradebook.columntitle.progress"/>", 
-						     	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
-						     	"<fmt:message key="gradebook.columntitle.outputs"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
 						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
@@ -322,9 +314,7 @@
 						     	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 						      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
-						      	{name:'startDate', index:'startDate', sortable:true, editable: false, hidden:true, width:60, align:"center"},
 						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
-						      	{name:'output', index:'output', sortable:false, editable: false, search:false, width:200, hidden:true},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 						     ],
@@ -339,8 +329,7 @@
 					    	 		var string = removeHTMLTags(rowData["mark"]);
 					    	 		
 					    	 		
-					    	 		if (string.indexOf("-") != -1)
-					    	 		{
+					    	 		if (string.indexOf("-") != -1) {
 					    	 			string = " ";
 					    	 			
 					    	 		} else if (string.indexOf("/") != -1) {

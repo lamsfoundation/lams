@@ -387,6 +387,19 @@ public interface ILessonService {
      * @return learner's progress
      */
     List<LearnerProgress> getUserProgressForLesson(Long lessonId);
+    
+    
+    /**
+     * Gets the progresses for learners from supplied userIds list in a particular lesson.
+     * 
+     * @param lessonId
+     *            lesson's id
+     * @param userIds
+     *            supplied userIds list
+     * @return learner's progress
+     */
+    List<LearnerProgress> getUserProgressForLesson(Long lessonId, List<Integer> userIds);
+    
 
     /**
      * Gets list of lessons which are originally based on the given learning design id.

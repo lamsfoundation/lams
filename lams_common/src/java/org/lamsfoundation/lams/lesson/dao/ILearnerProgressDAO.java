@@ -25,13 +25,9 @@ package org.lamsfoundation.lams.lesson.dao;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * Inteface defines Lesson DAO Methods
@@ -104,7 +100,16 @@ public interface ILearnerProgressDAO {
      * @param lessonId
      * @return
      */
-    List getLearnerProgressForLesson(final Long lessonId);
+    List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId);
+    
+    /**
+     * Get all the learner progress records for a lesson restricted by list of these user ids.
+     * 
+     * @param lessonId
+     * @param userIds return progresses for only these users
+     * @return
+     */
+    List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId, final List<Integer> userIds);
 
     /**
      * Get all the users records where the user has attempted the given activity. Uses the progress records to determine

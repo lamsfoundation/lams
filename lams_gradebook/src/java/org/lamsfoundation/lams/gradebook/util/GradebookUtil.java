@@ -23,16 +23,11 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.util;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,14 +40,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageMarkComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageTimeTakenComparator;
@@ -61,7 +48,6 @@ import org.lamsfoundation.lams.gradebook.dto.comparators.GBMarkComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBStartDateComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBTimeTakenComparator;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -323,6 +309,8 @@ public class GradebookUtil {
 	    return GBGridView.LRN_COURSE;
 	else if (view.equals(GradebookConstants.VIEW_LRN_ACTIVITY))
 	    return GBGridView.LRN_ACTIVITY;
+	else if (view.equals(GradebookConstants.VIEW_LIST))
+	    return GBGridView.LIST;	
 	else
 	    throw new IllegalArgumentException("[" + view + "] is not a legal gradebook view");
     }
