@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -129,7 +130,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		GradebookMonitoringAction.log.error("User missing from session. ");
 		return mapping.findForward("error");
 	    }
-	    if (!getSecurityService().isGroupMonitor(organisationID, user.getUserID(), "get course monitor", false)) {
+	    if (!getSecurityService().hasOrgRole(organisationID, user.getUserID(),
+		    new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook page", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
