@@ -958,7 +958,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 		    commonCartridgeDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
 
-		commonCartridgeUserDao.removeObject(CommonCartridgeUser.class, user.getUserId());
+		commonCartridgeUserDao.removeObject(CommonCartridgeUser.class, user.getUid());
 	    }
 	}
     }
