@@ -120,14 +120,14 @@
 		<div id="supportSeparatorRow" class="separatorRow progressStaticHeight"
 		     onClick="javascript:toggleBarPart('support')">
 			<span><fmt:message key="label.learner.progress.support" /></span>
-			<span id="supportTogglerCell" class="togglerCell" />â¼</span>
+			<span id="supportTogglerCell" class="togglerCell" />▼</span>
 		</div>
 		<div id="supportPart" class="progressStaticHeight"></div>
 		
 		<div id="notebookSeparatorRow" class="separatorRow progressStaticHeight" 
 		     onClick="javascript:toggleBarPart('notebook')">
 			<span><fmt:message key="label.learner.progress.notebook" /></span>
-			<span id="notebookTogglerCell" class="togglerCell"/>â²</span>
+			<span id="notebookTogglerCell" class="togglerCell"/>▲</span>
 		</div>
 		<form id="notebookForm" action="<lams:WebAppURL />notebook.do?method=processNewEntry" method="post">
 			<input type="hidden" name="lessonID" value="${lessonID}" />
