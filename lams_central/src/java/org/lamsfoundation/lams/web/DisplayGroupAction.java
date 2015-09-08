@@ -177,7 +177,7 @@ public class DisplayGroupAction extends Action {
 
 		// Adding gradebook course monitor links if enabled
 		if (org.getEnableGradebookForMonitors()
-			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
+			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN))) {
 		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "course-gradebook-button",
 			    "index.coursegradebook.tooltip"));
@@ -194,7 +194,7 @@ public class DisplayGroupAction extends Action {
 
 		// Adding gradebook course monitor links if enabled
 		if (org.getParentOrganisation().getEnableGradebookForMonitors()
-			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
+			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN))) {
 		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "my-grades-button", null));
 		}
