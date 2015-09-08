@@ -33,6 +33,9 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
@@ -42,7 +45,9 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -253,44 +258,21 @@ public class LamsToolService implements ILamsToolService {
     }
 
     @Override
-    public Set<User> getUsersFromGroupingActivity(Long toolSessionId) {
+    public Set<User> getUsersForActivity(Long toolSessionId) {
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
-	ToolActivity activity = session.getToolActivity();
+	return session != null ? session.getLearners() : new HashSet<User>();
+    }
 
-	Set<User> users = new TreeSet<User>();
-	if (activity.getApplyGrouping()) {
-	    Grouping grouping = activity.getGrouping();
+    @Override
+    public Integer getCountUsersForActivity(Long toolSessionId) {
 
-	    if (grouping != null) {
-
-		// find group that corresponds to specified toolSessionId
-		for (Group group : (Set<Group>) grouping.getGroups()) {
-
-		    if (!grouping.isLearnerGroup(group)) {
-			continue;
-		    }
-
-		    for (ToolSession sessionIter : (Set<ToolSession>) group.getToolSessions()) {
-			if (sessionIter.getToolSessionId().equals(toolSessionId)) {
-			    users.addAll(group.getUsers());
-			    log.warn("AAAAA groupId: " + group.getGroupId());
-			    break;
-			}
-		    }
-		    // if (grouping.isLearnerGroup(group) && group.hasLearner(learner)) {
-		    // users.addAll(group.getUsers());
-		    // }
-		}
-	    }
-
-	    // activity.getGroupFor(learner)
-
-	    // if there is no grouping specified just add all learners from the lesson
+	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
+	if ( session.getToolSessionTypeId() == ToolSession.GROUPED_TYPE ) {
+	    return toolSessionDAO.getCountUsersGrouped(toolSessionId);
 	} else {
-	    users.addAll(session.getLesson().getLessonClass().getLearners());
+	    // expect it to be 0 or 1 
+	    return session.getLearners().size();
 	}
-
-	return users;
     }
 
     /**

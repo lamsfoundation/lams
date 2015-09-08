@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.tool.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
@@ -33,6 +35,7 @@ import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -53,7 +56,9 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
         "from ToolSession s where s.toolActivity = :activity";
     protected static final String LOAD_TOOL_SESSION_BY_LESSON =  
         "from ToolSession s where s.lesson = :lesson";
-
+    private final static String COUNT_GROUPED_LEARNERS_SQL = "select count(*) from lams_user_group ug, lams_tool_session s "
+	 + " where ug.group_id = s.group_id and s.tool_session_id = :toolSessionId";
+	    
     /**
      * Retrieves the ToolSession
      * @param toolSessionId identifies the ToolSession to get
@@ -136,6 +141,20 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
         getHibernateTemplate().update(toolSession);
     }
 
+    /**
+     * Get a count of all the possible users for an activity connected to a tool session, where 
+     * it is a GroupedToolSession ie discriminator-value="1". Don't call on any other type of 
+     * tool session.
+     */
+    public Integer getCountUsersGrouped(final long toolSessionId) {
+	return (Integer) getHibernateTemplate().execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createSQLQuery(ToolSessionDAO.COUNT_GROUPED_LEARNERS_SQL);
+		query.setLong("toolSessionId", toolSessionId);
+		Object value = query.uniqueResult();
+		return new Integer(((Number) value).intValue());
+	    }
+	});
+    }
 
-    
 }
