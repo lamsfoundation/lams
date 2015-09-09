@@ -172,10 +172,10 @@ function showMonitorLessonDialog(lessonID) {
 	// if it was just created
 	if (dialog) {
 		// tell the dialog contents that it was resized
-		dialog.closest('.ui-dialog').on('resizestop', function(event, ui){
+		dialog.closest('.ui-dialog').on('resizestop dialogextendmaximize dialogextendrestore', function(){
 			var frame = $('iframe', dialog)[0],
 				win = frame.contentWindow || frame.contentDocument;
-			win.resizeSequenceCanvas(ui.size.width, ui.size.height);
+			win.resizeSequenceCanvas(dialog.width() - 10, dialog.height() - 10);
 		});
 		dialog.dialog('open');
 	}
