@@ -471,7 +471,7 @@
 		</table>
 		<%-- This will be moved to dialog's button pane using JS --%>
 		<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
-			<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" type="text"/>
+			<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" class="defaultFocus" type="text"/>
 		</div>
 	</div>
 	
