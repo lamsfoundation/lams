@@ -422,7 +422,7 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
 			"AND ug.group.groupId = g.groupId " +
 			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND completedActivityProgress.learnerProgress.lesson.lessonId = :lessonId" +
+			"AND completedActivityProgress.learnerProgress.lesson.lessonId = :lessonId " +
 			"AND completedActivityProgress.learnerProgress.user.userId = ug.user.userId " +
 			"AND completedActivityProgress.activity.activityId = :activityId " +
 		"ORDER BY TIMEDIFF(completedActivityProgress.finishDate, completedActivityProgress.startDate) " + sortOrder;
