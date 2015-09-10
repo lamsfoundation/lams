@@ -77,6 +77,9 @@ var DecorationDefs = {
 				
 				// the label
 				this.items = paper.g();
+				if (this.readOnly) {
+					this.items.attr('filter', layout.conf.readOnlyFilter);
+				}
 				// uiid is needed in Monitoring
 				this.items.attr('uiid', this.uiid);
 				if (this.title) {

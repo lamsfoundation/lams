@@ -774,12 +774,31 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		gate.setTransitionTo(fromTransition);
 
 		// set x / y position for Gate
-		Integer x1 = activity.getXcoord() == null ? 0 : activity.getXcoord();
-		Integer x2 = toActivity.getXcoord() == null ? 0 : toActivity.getXcoord();
-		gate.setXcoord(((x1.intValue() + 123 + x2.intValue()) / 2) - 13);
+		Integer x1 = null;
+		Integer x2 = null;
+		Integer y1 = null;
+		Integer y2 = null;
 
-		Integer y1 = activity.getYcoord() == null ? 0 : activity.getYcoord();
-		Integer y2 = toActivity.getYcoord() == null ? 0 : toActivity.getYcoord();
+		// Braching and plain Tools position is described differently
+		if (activity.isBranchingActivity()) {
+		    BranchingActivity branchingActivity = (BranchingActivity) activity;
+		    x1 = branchingActivity.getEndXcoord();
+		    y1 = branchingActivity.getEndYcoord();
+		} else {
+		    x1 = activity.getXcoord() == null ? 0 : activity.getXcoord();
+		    y1 = activity.getYcoord() == null ? 0 : activity.getYcoord();
+		}
+		
+		if (toActivity.isBranchingActivity()) {
+		    BranchingActivity branchingActivity = (BranchingActivity) toActivity;
+		    x2 = branchingActivity.getEndXcoord();
+		    y2 = branchingActivity.getEndYcoord();
+		} else {
+		    x2 = toActivity.getXcoord() == null ? 0 : toActivity.getXcoord();
+		    y2 = toActivity.getYcoord() == null ? 0 : toActivity.getYcoord();
+		}
+
+		gate.setXcoord(((x1.intValue() + 123 + x2.intValue()) / 2) - 13);
 		gate.setYcoord((y1.intValue() + 50 + y2.intValue()) / 2);
 	    }
 	}

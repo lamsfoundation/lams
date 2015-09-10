@@ -166,7 +166,7 @@ var MenuLib = {
 				y = translatedEvent[1] - 8;
 			
 			// if it is start point, branchingActivity is null and constructor acts accordingly
-			var branchingEdge = new ActivityDefs.BranchingEdgeActivity(null, null, x, y, null, null, branchingActivity);
+			var branchingEdge = new ActivityDefs.BranchingEdgeActivity(null, null, x, y, null, false, null, branchingActivity);
 			layout.activities.push(branchingEdge);
 			
 			if (branchingActivity) {

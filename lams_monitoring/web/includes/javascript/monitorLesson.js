@@ -1452,8 +1452,7 @@ function openLiveEdit(){
 				if (response) {
 					alert(response);
 				} else {
-					openPopUp(LAMS_URL + 'home.do?method=authorFlash&layout=editonfly&learningDesignID=' + ldId,
-							'LiveEdit', 600, 800, false);
+					window.parent.showFlashlessAuthoringDialog(ldId, 'editonfly');
 					closeMonitorLessonDialog();
 				}
 			}

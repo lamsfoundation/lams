@@ -24,7 +24,6 @@
 
 package org.lamsfoundation.lams.authoring.service;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -34,8 +33,6 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 
 public class EditOnFlyProcessor extends LearningDesignProcessor {
-    private static Logger log = Logger.getLogger(EditOnFlyProcessor.class);
-
     public Activity lastReadOnlyActivity = null;
     // were there any activities added after the Gate?
     public Activity firstAddedActivity = null;
@@ -67,7 +64,10 @@ public class EditOnFlyProcessor extends LearningDesignProcessor {
     @Override
     public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
 	if (activity.isActivityReadOnly()) {
-	    lastReadOnlyActivity = activity;
+	    // skip Floating Activity as it is not in the main flow
+	    if ((activity.getParentActivity() == null) || !activity.getParentActivity().isFloatingActivity()) {
+		lastReadOnlyActivity = activity;
+	    }
 	} else if (firstAddedActivity == null) {
 	    firstAddedActivity = activity;
 	}

@@ -10,7 +10,7 @@ var ActivityDefs = {
 	/**
 	 * Either branching (start) or converge (end) point.
 	 */
-	BranchingEdgeActivity : function(id, uiid, x, y, title, branchingType, branchingActivity) {
+	BranchingEdgeActivity : function(id, uiid, x, y, title, readOnly, branchingType, branchingActivity) {
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -23,7 +23,7 @@ var ActivityDefs = {
 		} else {
 			// this is the branching point
 			this.isStart = true;
-			branchingActivity = new ActivityDefs.BranchingActivity(id, uiid, this);
+			branchingActivity = new ActivityDefs.BranchingActivity(id, uiid, this, readOnly);
 			branchingActivity.branchingType = branchingType || 'chosen';
 			branchingActivity.title = title || LABELS.DEFAULT_BRANCHING_TITLE;
 		}
@@ -41,10 +41,11 @@ var ActivityDefs = {
 	/**
 	 * Represents a set of branches. It is not displayed on canvas, but holds all the vital data.
 	 */
-	BranchingActivity : function(id, uiid, branchingEdgeStart) {
+	BranchingActivity : function(id, uiid, branchingEdgeStart, readOnly) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.start = branchingEdgeStart;
+		this.readOnly = readOnly;
 		this.branches = [];
 		// mapping between groups and branches, if applicable
 		this.groupsToBranches = [];
@@ -92,11 +93,12 @@ var ActivityDefs = {
 	/**
 	 * Constructor for a Gate Activity.
 	 */
-	GateActivity : function(id, uiid, x, y, title, description, gateType, startTimeOffset, gateActivityCompletionBased) {
+	GateActivity : function(id, uiid, x, y, title, description, readOnly, gateType, startTimeOffset, gateActivityCompletionBased) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title;
 		this.description = description;
+		this.readOnly = readOnly;
 		this.gateType = gateType || 'permission';
 		if (gateType == 'schedule') {
 			var day = 24*60;
@@ -126,13 +128,14 @@ var ActivityDefs = {
 	/**
 	 * Constructor for a Grouping Activity.
 	 */
-	GroupingActivity : function(id, uiid, x, y, title, groupingID, groupingUIID, groupingType, groupDivide,
+	GroupingActivity : function(id, uiid, x, y, title, readOnly, groupingID, groupingUIID, groupingType, groupDivide,
 								groupCount, learnerCount, equalSizes, viewLearners, groups) {
 		this.id = +id || null;
 		this.groupingID = +groupingID || null;
 		this.groupingUIID = +groupingUIID  || ++layout.ld.maxUIID;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title || LABELS.DEFAULT_GROUPING_TITLE;
+		this.readOnly = readOnly;
 		this.groupingType = groupingType || 'random';
 		this.groupDivide = groupDivide || 'groups';
 		this.groupCount = +groupCount || layout.conf.defaultGroupingGroupCount;
@@ -157,11 +160,12 @@ var ActivityDefs = {
 	/**
 	 * Constructor for an Optional Activity.
 	 */
-	OptionalActivity : function(id, uiid, x, y, title, minOptions, maxOptions) {
+	OptionalActivity : function(id, uiid, x, y, title, readOnly, minOptions, maxOptions) {
 		DecorationDefs.Container.call(this, id, uiid, title || LABELS.DEFAULT_OPTIONAL_ACTIVITY_TITLE);
 		
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
+		this.readOnly = readOnly;
 		this.minOptions = minOptions || 0;
 		this.maxOptions = maxOptions || 0;
 		this.transitions = {
@@ -180,11 +184,12 @@ var ActivityDefs = {
 	/**
 	 * Constructor for a Parallel (double) Activity
 	 */
-	ParallelActivity : function(id, uiid, learningLibraryID, x, y, title, childActivities){
+	ParallelActivity : function(id, uiid, learningLibraryID, x, y, title, readOnly, childActivities){
 		DecorationDefs.Container.call(this, id, uiid, title);
 		
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
+		this.readOnly = readOnly;
 		this.learningLibraryID = +learningLibraryID;
 		this.transitions = {
 			'from' : [],
@@ -206,7 +211,7 @@ var ActivityDefs = {
 	/**
 	 * Constructor for a Tool Activity.
 	 */
-	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL, x, y, title) {
+	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL, x, y, title, readOnly) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
@@ -214,6 +219,7 @@ var ActivityDefs = {
 		this.learningLibraryID = +learningLibraryID;
 		this.authorURL = authorURL;
 		this.title = title;
+		this.readOnly = readOnly;
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -271,8 +277,8 @@ ActivityDraw = {
 	branching : function(x, y) {
 		if (x == undefined || y == undefined) {
 			// just redraw the activity
-			x = this.items.getBBox().x;
-			y = this.items.getBBox().y;
+			x = this.items.shape.getBBox().x;
+			y = this.items.shape.getBBox().y;
 		}
 		
 		if (this.items) {
@@ -297,6 +303,9 @@ ActivityDraw = {
 	                     .attr(layout.defaultTextAttributes);
 		
 		this.items = paper.g(shape, label);
+		if (this.readOnly) {
+			this.items.attr('filter', layout.conf.readOnlyFilter);
+		}
 		if (this.isStart) {
 			// uiid is needed in Monitoring
 			this.items.attr('uiid', this.branchingActivity.uiid);
@@ -384,6 +393,9 @@ ActivityDraw = {
 						 .attr('stroke', layout.colors.gateText);
 		
 		this.items = paper.g(shape, label);
+		if (this.readOnly) {
+			this.items.attr('filter', layout.conf.readOnlyFilter);
+		}
 		// uiid is needed in Monitoring
 		this.items.attr('uiid', this.uiid);
 		this.items.shape = shape;
@@ -422,6 +434,9 @@ ActivityDraw = {
 						 .attr(layout.defaultTextAttributes);
 		
 		this.items = paper.g(shape, icon, label);
+		if (this.readOnly) {
+			this.items.attr('filter', layout.conf.readOnlyFilter);
+		}
 		// uiid is needed in Monitoring
 		this.items.attr('uiid', this.uiid);
 		this.items.shape = shape;
@@ -559,7 +574,7 @@ ActivityDraw = {
 						 // activity colour depends on its category ID
 						 .attr({
 							'stroke' : layout.colors.activityBorder,
-							'fill' : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
+							'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 						 }),
 			// check for icon in the library
 			icon =  paper.image(layout.toolMetadata[this.learningLibraryID].iconPath, x + 47, y + 3, 30, 30),
@@ -568,6 +583,9 @@ ActivityDraw = {
 			 			 .attr('fill', layout.colors.activityText);
 		
 		this.items = paper.g(shape, icon, label);
+		if (this.readOnly) {
+			this.items.attr('filter', layout.conf.readOnlyFilter);
+		}
 		// uiid is needed in Monitoring
 		this.items.attr('uiid', this.uiid);
 		this.items.shape = shape;
@@ -664,8 +682,8 @@ ActivityLib = {
 			// set all the handlers
 			activity.items.attr('cursor', 'pointer')
 						  .mousedown(HandlerActivityLib.activityMousedownHandler)
-			  		      .click(HandlerLib.itemClickHandler)
-			  		      .dblclick(HandlerActivityLib.activityDblclickHandler);
+						  .click(HandlerLib.itemClickHandler)
+	  		      		  .dblclick(HandlerActivityLib.activityDblclickHandler);
 			
 			if (activity instanceof ActivityDefs.BranchingEdgeActivity
 					&& activity.branchingActivity.end) {
@@ -1057,8 +1075,17 @@ ActivityLib = {
 		if (!(activity instanceof ActivityDefs.OptionalActivity || activity instanceof ActivityDefs.FloatingActivity)) {
 			// check if it was removed from an Optional or Floating Activity
 			if (activity.parentActivity && activity.parentActivity instanceof DecorationDefs.Container) {
-				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
+				var existingChildActivities = activity.parentActivity.childActivities,
+					childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
 				if ($.inArray(activity, childActivities) == -1) {
+					if (activity.readOnly || activity.parentActivity.readOnly) {
+						// put the activity back
+						activity.parentActivity.childActivities = existingChildActivities;
+						
+						alert(LABELS.LIVEEDIT_READONLY_MOVE_PARENT_ERROR);
+						return false;
+					}
+					
 					activity.parentActivity.draw();
 					ActivityLib.redrawTransitions(activity.parentActivity);
 					activity.parentActivity = null;
@@ -1086,22 +1113,29 @@ ActivityLib = {
 					alert(LABELS.ACTIVITY_IN_CONTAINER_ERROR);
 					return false;
 				}
-				
-				if ($.inArray(activity, container.childActivities) == -1) {
-					$.each(activity.transitions.from, function(){
-						ActivityLib.removeTransition(this);
-					});
-					$.each(activity.transitions.to, function(){
-						ActivityLib.removeTransition(this);
-					});
-	
-					// for properties dialog to reload
-					ActivityLib.removeSelectEffect(container);
-					
-					container.childActivities.push(activity);
-					container.draw(null, null, null, null, childActivities);
-					ActivityLib.redrawTransitions(container);
+				if (activity.readOnly || container.readOnly) {
+					alert(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
+					return false;
 				}
+				
+				$.each(activity.transitions.from, function(){
+					ActivityLib.removeTransition(this);
+				});
+				$.each(activity.transitions.to, function(){
+					ActivityLib.removeTransition(this);
+				});
+
+				// for properties dialog to reload
+				ActivityLib.removeSelectEffect(container);
+				
+				// check if the activity is already detected by the container
+				// if not, add it manually
+				var childActivities = DecorationLib.getChildActivities(container.items.shape);
+				if ($.inArray(activity, container.childActivities) == -1) {
+					childActivities.push(activity);
+				}
+				container.draw(null, null, null, null, childActivities);
+				ActivityLib.redrawTransitions(container);
 			}
 		}
 		
@@ -1366,7 +1400,7 @@ ActivityLib = {
 		
 		// remove child activities
 		if (activity instanceof DecorationDefs.Container) {
-			$.each(activity.childActivities, function(){
+			$.each(activity.childActivities.slice(), function(){
 				ActivityLib.removeActivity(this);
 			});
 		}

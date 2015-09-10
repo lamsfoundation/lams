@@ -377,7 +377,7 @@ function showSearchLessonDialog(orgID){
 }
 
 
-function showFlashlessAuthoringDialog(){
+function showFlashlessAuthoringDialog(learningDesignID){
 	showDialog('dialogFlashlessAuthoring', {
 		'height' : 865,
 		'width' : 1280,
@@ -392,9 +392,15 @@ function showFlashlessAuthoringDialog(){
 			}
 		},
 		'open' : function() {
-			var orgID = $(this).dialog('option', 'orgID');
+			var orgID = $(this).dialog('option', 'orgID'),
+				url = LAMS_URL + 'authoring/author.do?method=openAuthoring';
+			
+			if (learningDesignID) {
+				url += '&learningDesignID=' + learningDesignID;
+			}
+			
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL + 'authoring/author.do?method=openAuthoring');
+			$('iframe', this).attr('src', url);
 		}
 	}, true);
 }
