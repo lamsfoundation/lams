@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -261,8 +262,6 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 	return 0;
     }
     
-
-    
     @Override
     public List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size,
 	    String sortBy, String sortOrder, String searchString) {
@@ -286,7 +285,7 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 	
 	//when :sortBy='avgTimeTaken'
 	final String LOAD_LESSONS_ORDERED_BY_AVERAGE_TIME_TAKEN = "SELECT DISTINCT lesson " +
-		"FROM Lesson lesson, LearningDesign ld, Group g, GroupUser ug, Organisation lo, LearnerProgress progress " +
+		"FROM LearnerProgress progress right outer join progress.lesson lesson, LearningDesign ld, Group g, GroupUser ug, Organisation lo " +
 		"WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId " +
 		"AND ld.copyTypeID != 3 " +
 		"AND lesson.organisation.organisationId = lo.organisationId " +
@@ -295,7 +294,6 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 		"AND lesson.lessonStateId != 7 " +
 		"AND ug.group.groupId = g.groupId " +
 		"AND ug.user.userId = :userId " +
-		"AND progress.lesson.lessonId = lesson.lessonId " +
 		"AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') " +
 		"GROUP BY lesson " +
 		"ORDER BY AVG(TIMEDIFF(progress.finishDate,progress.startDate)) " + sortOrder;
@@ -341,46 +339,50 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder, String searchString) {
 	
-	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT ug.user " +
- 		"FROM Lesson lesson, Group g, GroupUser ug " +
- 		"WHERE lesson.lessonId = :lessonId " +
-			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
-			"AND ug.group.groupId = g.groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-		"ORDER BY CONCAT(ug.user.lastName, ' ', ug.user.firstName) " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT user.* " +
+ 		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
+ 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" WHERE lesson.lesson_id = :lessonId " +
+        		" AND lesson.class_grouping_id=g.grouping_id " +
+        		" AND ug.group_id=g.group_id " +
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
+		"ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 	
 	//when :sortBy='timeTaken'
-	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN = "SELECT ug.user " +
- 		"FROM Lesson lesson, Group g, GroupUser ug, LearnerProgress progress " +
- 		"WHERE lesson.lessonId = :lessonId " +
-			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
-			"AND ug.group.groupId = g.groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND progress.lesson.lessonId = lesson.lessonId " +
-			"AND progress.user.userId = ug.user.userId " +
-		"ORDER BY TIMEDIFF(progress.finishDate, progress.startDate) " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN = "SELECT user.* " +
+ 		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
+ 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" LEFT OUTER JOIN lams_learner_progress progress " +
+		" ON progress.user_id=user.user_id AND progress.lesson_id=:lessonId " +
+ 		" WHERE lesson.lesson_id = :lessonId " +
+        		" AND lesson.class_grouping_id=g.grouping_id " +
+        		" AND ug.group_id=g.group_id " +
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
+		"ORDER BY TIMEDIFF(progress.finish_date_time, progress.start_date_time) " + sortOrder;
 	
 	//when :sortBy='mark'
-	final String LOAD_LEARNERS_ORDERED_BY_MARK = "SELECT ug.user " +
- 		"FROM Lesson lesson, Group g, GroupUser ug, GradebookUserLesson gradebookUserLesson " +
- 		"WHERE lesson.lessonId = :lessonId " +
-			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
-			"AND ug.group.groupId = g.groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND gradebookUserLesson.lesson.lessonId = lesson.lessonId " +
-			"AND gradebookUserLesson.learner.userId = ug.user.userId " +			
-		"ORDER BY gradebookUserLesson.mark " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_MARK = "SELECT user.* " +
+ 		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
+ 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" LEFT OUTER JOIN lams_gradebook_user_lesson gradebookUserLesson " +
+ 		" ON user.user_id=gradebookUserLesson.user_id AND gradebookUserLesson.lesson_id =:lessonId " +
+ 		" WHERE lesson.lesson_id = :lessonId " +
+        		" AND lesson.class_grouping_id=g.grouping_id " +
+        		" AND ug.group_id=g.group_id " +
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +			
+		" ORDER BY gradebookUserLesson.mark " + sortOrder;
 	
 	//when :sortBy='feedback'
-	final String LOAD_LEARNERS_ORDERED_BY_FEEDBACK = "SELECT ug.user " +
- 		"FROM Lesson lesson, Group g, GroupUser ug, GradebookUserLesson gradebookUserLesson " +
- 		"WHERE lesson.lessonId = :lessonId " +
-			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
-			"AND ug.group.groupId = g.groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND gradebookUserLesson.lesson.lessonId = lesson.lessonId " +
-			"AND gradebookUserLesson.learner.userId = ug.user.userId " +			
-		"ORDER BY gradebookUserLesson.feedback " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_FEEDBACK = "SELECT user.* " +
+ 		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
+ 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" LEFT OUTER JOIN lams_gradebook_user_lesson gradebookUserLesson " +
+ 		" ON user.user_id=gradebookUserLesson.user_id AND gradebookUserLesson.lesson_id =:lessonId " +
+ 		" WHERE lesson.lesson_id = :lessonId " +
+        		" AND lesson.class_grouping_id=g.grouping_id " +
+        		" AND ug.group_id=g.group_id " +	
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +			
+		" ORDER BY gradebookUserLesson.feedback " + sortOrder;
 	
 	String queryString;
 	if (sortBy.equals("timeTaken")) {
@@ -393,7 +395,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 	    queryString = LOAD_LEARNERS_ORDERED_BY_NAME;
 	}
 	
-	Query query = getSession().createQuery(queryString);
+	SQLQuery query = getSession().createSQLQuery(queryString);
+	query.addEntity(User.class);
 	query.setLong("lessonId", lessonId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
@@ -407,35 +410,40 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     public List<User> getUsersByActivity(Long lessonId, Long activityId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	
-	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT ug.user " +
- 		"FROM Lesson lesson, Group g, GroupUser ug " +
- 		"WHERE lesson.lessonId = :lessonId " +
-			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
-			"AND ug.group.groupId = g.groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-		"ORDER BY CONCAT(ug.user.lastName, ' ', ug.user.firstName) " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT user.* " +
+		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
+		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+		" WHERE lesson.lesson_id = :lessonId " +
+			" AND lesson.class_grouping_id=g.grouping_id " +
+			" AND ug.group_id=g.group_id " +		
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
+		" ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 	
 	//when :sortBy='timeTaken'
-	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_ACTIVITY = "SELECT ug.user " +
- 		"FROM Lesson lesson, Group g, GroupUser ug, CompletedActivityProgress completedActivityProgress " +
- 		"WHERE lesson.lessonId = :lessonId " +
-			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
-			"AND ug.group.groupId = g.groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND completedActivityProgress.learnerProgress.lesson.lessonId = :lessonId " +
-			"AND completedActivityProgress.learnerProgress.user.userId = ug.user.userId " +
-			"AND completedActivityProgress.activity.activityId = :activityId " +
-		"ORDER BY TIMEDIFF(completedActivityProgress.finishDate, completedActivityProgress.startDate) " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_ACTIVITY = "SELECT user.* " +
+ 		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
+		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" LEFT OUTER JOIN lams_learner_progress progress " + 
+			" INNER JOIN lams_progress_completed completedActivityProgress " + 
+			" ON completedActivityProgress.learner_progress_id=progress.learner_progress_id " +
+			" AND completedActivityProgress.activity_id=:activityId "+
+		" ON progress.user_id=user.user_id " +
+ 		" WHERE lesson.lesson_id = :lessonId " +
+			" AND lesson.class_grouping_id=g.grouping_id " +
+			" AND ug.group_id=g.group_id " +
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
+		"ORDER BY TIMEDIFF(completedActivityProgress.completed_date_time, completedActivityProgress.start_date_time) " + sortOrder;
 	
 	//when :sortBy='mark'
-	final String LOAD_LEARNERS_ORDERED_BY_MARK_ACTIVITY = "SELECT ug.user " +
- 		"FROM Lesson lesson, Group g, GroupUser ug, GradebookUserActivity gradebookUserActivity " +
- 		"WHERE lesson.lessonId = :lessonId " +
-			"AND lesson.lessonClass.groupingId = g.grouping.groupingId " +
-			"AND ug.group.groupId = g.groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND gradebookUserActivity.activity.activityId = :activityId " +
-			"AND gradebookUserActivity.learner.userId = ug.user.userId " +			
+	final String LOAD_LEARNERS_ORDERED_BY_MARK_ACTIVITY = "SELECT user.* " +
+		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
+ 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" LEFT OUTER JOIN lams_gradebook_user_activity gradebookUserActivity " +
+ 		" ON user.user_id=gradebookUserActivity.user_id AND gradebookUserActivity.activity_id =:activityId " +
+ 		" WHERE lesson.lesson_id = :lessonId " +
+			" AND lesson.class_grouping_id=g.grouping_id " +
+			" AND ug.group_id=g.group_id " +
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
 		"ORDER BY gradebookUserActivity.mark " + sortOrder;
 	
 	String queryString;
@@ -447,7 +455,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 	    queryString = LOAD_LEARNERS_ORDERED_BY_NAME;
 	}
 	
-	Query query = getSession().createQuery(queryString);
+	SQLQuery query = getSession().createSQLQuery(queryString);
+	query.addEntity(User.class);
 	query.setLong("lessonId", lessonId);
 	if (sortBy.equals("timeTaken") || sortBy.equals("mark")) {
 	    query.setLong("activityId", activityId);
@@ -464,29 +473,35 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     public List<User> getUsersByGroup(Long lessonId, Long activityId, Long groupId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	
-	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT ug.user " +
- 		"FROM GroupUser ug " +
- 		"WHERE ug.group.groupId = :groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-		"ORDER BY CONCAT(ug.user.lastName, ' ', ug.user.firstName) " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT user.* " +
+		" FROM lams_user_group ug " +
+		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+		" WHERE ug.group_id=:groupId " +
+		" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
+		" ORDER BY CONCAT(user.last_name, ' ', user.first_name) " +
+		sortOrder;
 	
 	//when :sortBy='timeTaken'
-	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_GROUP = "SELECT ug.user " +
- 		"FROM GroupUser ug, CompletedActivityProgress completedActivityProgress " +
- 		"WHERE ug.group.groupId = :groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND completedActivityProgress.learnerProgress.lesson.lessonId = :lessonId " +
-			"AND completedActivityProgress.learnerProgress.user.userId = ug.user.userId " +
-			"AND completedActivityProgress.activity.activityId = :activityId " +
-		"ORDER BY TIMEDIFF(completedActivityProgress.finishDate, completedActivityProgress.startDate) " + sortOrder;
+	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_GROUP = "SELECT user.* " +
+ 		" FROM lams_user_group ug " +
+		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" LEFT OUTER JOIN lams_learner_progress progress " + 
+ 			" INNER JOIN lams_progress_completed completedActivityProgress " + 
+ 			" ON completedActivityProgress.learner_progress_id=progress.learner_progress_id " +
+ 			" AND completedActivityProgress.activity_id=:activityId "+
+ 		" ON progress.user_id=user.user_id " +
+		" WHERE ug.group_id=:groupId " +  
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
+		" ORDER BY TIMEDIFF(completedActivityProgress.completed_date_time, completedActivityProgress.start_date_time) " + sortOrder;
 	
 	//when :sortBy='mark'
-	final String LOAD_LEARNERS_ORDERED_BY_MARK_GROUP = "SELECT ug.user " +
- 		"FROM GroupUser ug, GradebookUserActivity gradebookUserActivity " +
- 		"WHERE ug.group.groupId = :groupId " +
-			"AND CONCAT(ug.user.lastName, ' ', ug.user.firstName) LIKE CONCAT('%', :searchString, '%') " +
-			"AND gradebookUserActivity.activity.activityId = :activityId " +
-			"AND gradebookUserActivity.learner.userId = ug.user.userId " +			
+	final String LOAD_LEARNERS_ORDERED_BY_MARK_GROUP = "SELECT user.* " +
+ 		" FROM lams_user_group ug " +
+ 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
+ 		" LEFT OUTER JOIN lams_gradebook_user_activity gradebookUserActivity " +
+ 		" ON user.user_id=gradebookUserActivity.user_id AND gradebookUserActivity.activity_id =:activityId " +
+ 		" WHERE ug.group_id=:groupId " +
+			" AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
 		"ORDER BY gradebookUserActivity.mark " + sortOrder;
 	
 	String queryString;
@@ -498,12 +513,10 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 	    queryString = LOAD_LEARNERS_ORDERED_BY_NAME;
 	}
 	
-	Query query = getSession().createQuery(queryString);
+	SQLQuery query = getSession().createSQLQuery(queryString);
+	query.addEntity(User.class);
 	if (sortBy.equals("timeTaken") || sortBy.equals("mark")) {
 	    query.setLong("activityId", activityId);
-	}
-	if (sortBy.equals("timeTaken")) {
-	    query.setLong("lessonId", lessonId);
 	}
 	query.setLong("groupId", groupId);
 	// support for custom search from a toolbar
