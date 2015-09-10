@@ -74,6 +74,11 @@
 				CIRCULAR_SEQUENCE_ERROR : decoderDiv.html('<c:out value="${CIRCULAR_SEQUENCE_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.activity.in.container.error" var="ACTIVITY_IN_CONTAINER_ERROR_VAR"/>
 				ACTIVITY_IN_CONTAINER_ERROR : decoderDiv.html('<c:out value="${ACTIVITY_IN_CONTAINER_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.liveedit.readonly.activity.error" var="LIVEEDIT_READONLY_ACTIVITY_ERROR_VAR"/>
+				LIVEEDIT_READONLY_ACTIVITY_ERROR : '<c:out value="${LIVEEDIT_READONLY_ACTIVITY_ERROR_VAR}" />',
+				<fmt:message key="authoring.fla.liveedit.readonly.move.parent.error" var="LIVEEDIT_READONLY_MOVE_PARENT_ERROR_VAR"/>
+				LIVEEDIT_READONLY_MOVE_PARENT_ERROR : '<c:out value="${LIVEEDIT_READONLY_MOVE_PARENT_ERROR_VAR}" />',
+				
 				
 				// DecorationLib
 				<fmt:message key="authoring.fla.default.annotation.label.title" var="DEFAULT_ANNOTATION_LABEL_TITLE_VAR"/>
@@ -120,6 +125,8 @@
 				SAVE_SEQUENCE_TITLE_PROMPT : decoderDiv.html('<c:out value="${SAVE_SEQUENCE_TITLE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.import.part.choose.prompt" var="IMPORT_PART_CHOOSE_PROMPT_VAR"/>
 				IMPORT_PART_CHOOSE_PROMPT : decoderDiv.html('<c:out value="${IMPORT_PART_CHOOSE_PROMPT_VAR}" />').text(),
+				<fmt:message key="authoring.fla.liveedit.cancel.confirm" var="LIVEEDIT_CANCEL_CONFIRM_VAR"/>
+				LIVEEDIT_CANCEL_CONFIRM : '<c:out value="${LIVEEDIT_CANCEL_CONFIRM_VAR}" />',
 				<fmt:message key="authoring.fla.folder.not.selected.error" var="FOLDER_NOT_SELECTED_ERROR_VAR"/>
 				FOLDER_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${FOLDER_NOT_SELECTED_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.title.validation.error" var="TITLE_VALIDATION_ERROR_VAR"/>
@@ -138,7 +145,15 @@
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>
 				TRANSITION_FROM_EXISTS_ERROR : decoderDiv.html('<c:out value="${TRANSITION_FROM_EXISTS_ERROR_VAR}" />').text(),
-				
+				<fmt:message key="authoring.fla.liveedit.readonly.remove.activity.error" var="LIVEEDIT_REMOVE_ACTIVITY_ERROR_VAR"/>
+				LIVEEDIT_REMOVE_ACTIVITY_ERROR : '<c:out value="${LIVEEDIT_REMOVE_ACTIVITY_ERROR_VAR}" />',
+				<fmt:message key="authoring.fla.liveedit.readonly.remove.parent.error" var="LIVEEDIT_REMOVE_PARENT_ERROR_VAR"/>
+				LIVEEDIT_REMOVE_PARENT_ERROR : '<c:out value="${LIVEEDIT_REMOVE_PARENT_ERROR_VAR}" />',
+				<fmt:message key="authoring.fla.liveedit.readonly.remove.child.error" var="LIVEEDIT_REMOVE_CHILD_ERROR_VAR"/>
+				LIVEEDIT_REMOVE_CHILD_ERROR : '<c:out value="${LIVEEDIT_REMOVE_CHILD_ERROR_VAR}" />',
+				<fmt:message key="authoring.fla.liveedit.readonly.remove.transition.error" var="LIVEEDIT_REMOVE_TRANSITION_ERROR_VAR"/>
+				LIVEEDIT_REMOVE_TRANSITION_ERROR : '<c:out value="${LIVEEDIT_REMOVE_TRANSITION_ERROR_VAR}" />',
+					
 				// MenuLib
 				<fmt:message key="authoring.fla.export.image.dialog.title" var="EXPORT_IMAGE_DIALOG_TITLE_VAR"/>
 				EXPORT_IMAGE_DIALOG_TITLE : '<c:out value="${EXPORT_IMAGE_DIALOG_TITLE_VAR}" />',
@@ -313,6 +328,9 @@
 				</li>
 			</ul>
 		</div>
+		<div id="cancelLiveEditButton" class="ui-button" onClick="javascript:GeneralLib.cancelLiveEdit()">
+			<fmt:message key="authoring.fla.cancel.button" />
+		</div>
 		<div id="copyButton" class="ui-button" onClick="javascript:MenuLib.copyActivity()">
 			<fmt:message key="authoring.fla.page.menu.copy" />
 		</div>
@@ -471,7 +489,7 @@
 		</table>
 		<%-- This will be moved to dialog's button pane using JS --%>
 		<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
-			<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" class="defaultFocus" type="text"/>
+			<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" type="text"/>
 		</div>
 	</div>
 	

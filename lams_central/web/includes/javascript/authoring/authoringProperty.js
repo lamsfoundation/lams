@@ -170,6 +170,12 @@ var PropertyDefs = {
 			content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null)
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
+			if (activity.gateType == 'system') {
+				// remove everything except for the title
+				$('.propertiesContentFieldTitle', content).closest('tr').siblings().remove();
+				return;
+			}
+			
 			$('.propertiesContentFieldDescription', content).val(activity.description ? activity.description : '');
 			$('.propertiesContentFieldGateType', content).val(activity.gateType);
 			
@@ -1757,6 +1763,11 @@ PropertyLib = {
 		var dialog = layout.propertiesDialog;
 		dialog.children().detach();
 		dialog.append(object.propertiesContent);
+		if (object.readOnly) {
+			// make all widgets read-only
+			dialog.find('input, select, textarea').attr('disabled', 'disabled');
+			dialog.find('.spinner').spinner('option', 'disabled', true);
+		}
 		dialog.dialog('open');
 		dialog.find('input').blur();
 		var box = object.items.getBBox(),

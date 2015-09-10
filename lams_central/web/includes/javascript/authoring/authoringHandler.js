@@ -141,26 +141,33 @@ var HandlerLib = {
 	/**
 	 * Rewrites a shape's coordinates, so it is where the user dropped it.
 	 */
-	dropObject : function(object) {
+	dropObject : function(object, cancel) {
 		// finally transform the dragged elements
 		var transformation = Snap.parseTransformString(object.items.transform().string);
 		object.items.transform('');
 		
-		var box = object.items.getBBox(),
-			originalCoordinates = {
-				x : box.x,
-				// adjust this coordinate for annotation labels
-				y : box.y + (object instanceof DecorationDefs.Label ? 6 : 0)
-			};
-		
-		if (transformation && transformation.length > 0) {
-			object.draw(originalCoordinates.x + transformation[0][1],
-						originalCoordinates.y + transformation[0][2]);
+		// cancel means that the object will be redrawn in its original place
+		if (cancel) {
+			object.draw();
+		} else {
+			// finialise the drop
+			var box = object.items.shape.getBBox(),
+				originalCoordinates = {
+					x : box.x,
+					// adjust this coordinate for annotation labels
+					y : box.y + (object instanceof DecorationDefs.Label ? 6 : 0)
+				};
+			
+			if (transformation && transformation.length > 0) {
+				object.draw(originalCoordinates.x + transformation[0][1],
+							originalCoordinates.y + transformation[0][2]);
+			}
+			
+			// add space if dropped object is next to border
+			GeneralLib.resizePaper();
+			
+			return originalCoordinates;
 		}
-		
-		// add space if dropped object is next to border
-		GeneralLib.resizePaper();
-		return originalCoordinates;
 	},
 	
 	
@@ -236,7 +243,11 @@ HandlerActivityLib = {
 	 */
 	activityDblclickHandler : function(event) {
 		var activity = ActivityLib.getParentObject(this);
-		ActivityLib.openActivityAuthoring(activity);
+		if (activity.readOnly) {
+			alert(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
+		} else {
+			ActivityLib.openActivityAuthoring(activity);
+		}
 	},
 	
 	
@@ -258,7 +269,28 @@ HandlerActivityLib = {
 			var mouseupHandler = function(event){
 				if (HandlerLib.isElemenentBinned(event)) {
 					// if the activity was over rubbish bin, remove it
-					ActivityLib.removeActivity(activity);
+					var canRemove = true;
+					// check if the activity or its parent are read-only
+					if (activity.readOnly) {
+						canRemove = false;
+						alert(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
+					} else if (activity.branchingActivity){
+						if (activity.branchingActivity.readOnly) {
+							canRemove = false;
+							alert(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
+						}
+					}
+					else if (activity.parentActivity && activity.parentActivity.readOnly){
+						canRemove = false;
+						alert(LABELS.LIVEEDIT_REMOVE_PARENT_ERROR);
+					}
+					
+					if (canRemove) {
+						ActivityLib.removeActivity(activity);
+					} else {
+						//revert to the original position
+						HandlerLib.dropObject(activity, true);
+					}
 				} else {
 					// finalise movement - rewrite coordinates, see if the activity was not added to a container
 					var originalCoordinates = HandlerLib.dropObject(activity),
@@ -332,7 +364,27 @@ HandlerDecorationLib = {
 				if (container instanceof DecorationDefs.Region) {
 					DecorationLib.removeRegion(container);
 				} else {
-					ActivityLib.removeActivity(container);
+					var canRemove = true;
+					if (container.readOnly) {
+						canRemove = false;
+						alert(LABELS.LIVEEDIT_REMOVE_ACTIVITY_ERROR);
+					} else if (container.childActivities){
+						// if any of the child activities is read-only, the parent activity can not be removed
+						$.each(container.childActivities, function(){
+							if (this.readOnly) {
+								canRemove = false;
+								alert(LABELS.LIVEEDIT_REMOVE_CHILD_ERROR);
+								return false;
+							}
+						});
+					}
+					
+					if (canRemove) {
+						ActivityLib.removeActivity(container);
+					} else {
+						// revert the activity back to its original place
+						HandlerLib.dropObject(container, true);
+					}
 				}
 			} else {
 				HandlerLib.dropObject(container);
@@ -626,8 +678,14 @@ HandlerTransitionLib = {
 		// allow transition dragging
 		var mouseupHandler = function(event){
 			if (HandlerLib.isElemenentBinned(event)) {
-				// if the transition was over rubbish bin, remove it
-				ActivityLib.removeTransition(transition);
+				if (transition.toActivity.readOnly || transition.fromActivity.readOnly) {
+					alert(LABELS.LIVEEDIT_REMOVE_TRANSITION_ERROR);
+					// just draw it again in the original place
+					transition.draw();
+				} else {
+					// if the transition was over rubbish bin, remove it
+					ActivityLib.removeTransition(transition);
+				}
 			} else {
 				transition.draw();
 			}

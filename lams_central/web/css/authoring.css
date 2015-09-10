@@ -326,6 +326,10 @@ table#authoringTable {
 	padding-left: 25px;
 }
 
+#cancelLiveEditButton {
+	display: none;
+}
+
 td#templateContainerCell {
 	width: 150px;
 	vertical-align: top;

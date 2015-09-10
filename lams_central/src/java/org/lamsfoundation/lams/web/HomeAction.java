@@ -247,6 +247,12 @@ public class HomeAction extends DispatchAction {
     public ActionForward author(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
 	    throws IOException {
 	String url = Configuration.get(ConfigurationKeys.SERVER_URL) + "authoring/author.do?method=openAuthoring";
+	Long learningDesignID = WebUtil.readLongParam(req, "learningDesignID", true);
+
+	if (learningDesignID != null) {
+	    url += "&learningDesignID=" + learningDesignID;
+	}
+
 	res.sendRedirect(url);
 	return null;
     }

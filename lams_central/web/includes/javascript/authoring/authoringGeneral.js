@@ -40,6 +40,8 @@ var paper = null,
 	layout = {
 		// draw mode prevents some handlers (click, mouseover etc.) from triggering
 		'drawMode'   : false,
+		// is the LD being live edited?
+		'liveEdit'   : false,
 		// should the sequence be saved before exiting?
 		'modified'   : false,
 		// list of all dialogs, so they can be easily closed all at once 
@@ -84,7 +86,10 @@ var paper = null,
 			'groupingEffectPadding'			   : 5,
 			'selectEffectPadding'			   : 7,
 			
-			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined'
+			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined',
+			
+			// will be initialised when paper gets created
+			'readOnlyFilter'				   : null
 		},
 		
 		'colors' : {
@@ -273,9 +278,9 @@ GeneralInitLib = {
 					    		childActivities.push(childActivity);
 					    	});
 					    	
-					    	activity = new ActivityDefs.ParallelActivity(null, null, learningLibraryID, x, y, label, childActivities);
+					    	activity = new ActivityDefs.ParallelActivity(null, null, learningLibraryID, x, y, label, false, childActivities);
 					    } else {
-					    	activity = new ActivityDefs.ToolActivity(null, null, null, toolID, learningLibraryID, null, x, y, label);
+					    	activity = new ActivityDefs.ToolActivity(null, null, null, toolID, learningLibraryID, null, x, y, label, false);
 					    }
 					    
 						layout.activities.push(activity);
@@ -821,10 +826,10 @@ GeneralInitLib = {
 					if (activity.isStart) {
 						var branchingActivity = activity.branchingActivity,
 							branchingEdge = addActivity = new ActivityDefs.BranchingEdgeActivity(
-								null, branchingActivity.uiid, 0, 0, branchingActivity.title, branchingActivity.branchingType);
+								null, branchingActivity.uiid, 0, 0, branchingActivity.title, false, branchingActivity.branchingType);
 						
 						branchingEdge = new ActivityDefs.BranchingEdgeActivity(
-								null, null, 0, 0, null, null, branchingEdge.branchingActivity);
+								null, null, 0, 0, null, null, false, branchingEdge.branchingActivity);
 						addActivities.push(branchingEdge);
 						
 						if (branchingActivity.branchingType == 'optional'){
@@ -839,17 +844,17 @@ GeneralInitLib = {
 					addActivity = new ActivityDefs.FloatingActivity(null, activity.uiid, 0, 0);
 				} else if (activity instanceof frameActivityDefs.GateActivity) {
 					addActivity = new ActivityDefs.GateActivity(
-							null, activity.uiid, 0, 0, activity.title, activity.description, activity.gateType,
+							null, activity.uiid, 0, 0, activity.title, activity.description, false, activity.gateType,
 							activity.startTimeoffset, activity.gateActivityCompletionBased
 							);
 				} else if (activity instanceof frameActivityDefs.GroupingActivity) {
 					addActivity = new ActivityDefs.GroupingActivity(
-							null, activity.uiid, 0, 0, activity.title, null, null, activity.groupingType, activity.groupDivide,
+							null, activity.uiid, 0, 0, activity.title, false, null, null, activity.groupingType, activity.groupDivide,
 							activity.groupCount, activity.learnerCount, activity.equalSizes, activity.viewLearners, null
 							);
 				} else if (activity instanceof frameActivityDefs.OptionalActivity) {
 					addActivity = new ActivityDefs.OptionalActivity(
-							null, activity.uiid, 0, 0, activity.title, activity.minOptions, activity.maxOptions
+							null, activity.uiid, 0, 0, activity.title, false, activity.minOptions, activity.maxOptions
 							);
 				} else if (activity instanceof frameActivityDefs.ParallelActivity) {
 					addActivity = new ActivityDefs.ParallelActivity(
@@ -1360,6 +1365,30 @@ GeneralLib = {
 	},
 	
 	
+	/**
+	 * Tells the backend to remove the system gate.
+	 */
+	cancelLiveEdit : function(){
+		if (GeneralLib.canClose() || confirm(LABELS.LIVEEDIT_CANCEL_CONFIRM)) {
+			$.ajax({
+				type  : 'POST',
+				async : false,
+				cache : false,
+				url : LAMS_URL + 'authoring/author.do',
+				data : {
+					'method' : 'finishLearningDesignEdit',
+					'learningDesignID' : layout.ld.learningDesignID,
+					'cancelled' : 'true'
+				},
+				success : function() {
+					GeneralLib.setModified(false);
+					window.parent.closeDialog('dialogFlashlessAuthoring');
+				}
+			});
+		}
+	},
+	
+	
 	canClose : function(){
 		return !(layout.modified &&
 			(layout.activities.length > 0
@@ -1426,6 +1455,8 @@ GeneralLib = {
 				paper = Snap(canvas.width() - 5, canvas.height() - 5);
 				canvas.append(paper.node);
 			}
+			// initialise filter for read-only activities in Live Edit
+			layout.conf.readOnlyFilter = paper.filter(Snap.filter.grayscale(1));
 			
 			GeneralLib.resizePaper();
 		} else {
@@ -1491,6 +1522,8 @@ GeneralLib = {
 				}
 				
 				var arrangeNeeded = false,
+					// if system gate is found, it is Live Edit
+					systemGate = null,
 					branchToBranching = {},
 					// helper for finding last activity in a branch
 					branchToActivityDefs = {};
@@ -1519,7 +1552,8 @@ GeneralLib = {
 													 + '&contentFolderID=' + layout.ld.contentFolderID,
 											activityData.xCoord ? activityData.xCoord : 1,
 											activityData.yCoord ? activityData.yCoord : 1,
-											activityData.activityTitle);
+											activityData.activityTitle,
+											activityData.readOnly);
 							// for later reference
 							activityData.activity = activity;
 							break;
@@ -1565,6 +1599,7 @@ GeneralLib = {
 											activityData.xCoord,
 											activityData.yCoord,
 											activityData.activityTitle,
+											activityData.readOnly,
 											groupingData.groupingID,
 											groupingData.groupingUIID,
 											groupingType,
@@ -1584,6 +1619,7 @@ GeneralLib = {
 						case 3: var gateType = 'sync';
 						case 4: var gateType = gateType || 'schedule';
 						case 5: var gateType = gateType || 'permission';
+						case 9: var gateType = gateType || 'system';
 						case 14:
 							var gateType = gateType || 'condition';
 							activity = new ActivityDefs.GateActivity(
@@ -1593,9 +1629,14 @@ GeneralLib = {
 								activityData.yCoord,
 								activityData.activityTitle,
 								activityData.description,
+								activityData.readOnly,
 								gateType,
 								activityData.gateStartTimeOffset,
 								activityData.gateActivityCompletionBased);
+							
+							if (gateType == 'system'){
+								systemGate = activity;
+							};
 							break;
 
 						// Parallel Activity
@@ -1606,7 +1647,8 @@ GeneralLib = {
 									activityData.learningLibraryID,
 									activityData.xCoord,
 									activityData.yCoord,
-									activityData.activityTitle);
+									activityData.activityTitle,
+									activityData.readOnly);
 							break;
 							
 						// Optional Activity
@@ -1617,6 +1659,7 @@ GeneralLib = {
 									activityData.xCoord,
 									activityData.yCoord,
 									activityData.activityTitle,
+									activityData.readOnly,
 									activityData.minOptions,
 									activityData.maxOptions);
 							break;
@@ -1635,6 +1678,7 @@ GeneralLib = {
 										arrangeNeeded ? 0 : activityData.startXCoord,
 										arrangeNeeded ? 0 : activityData.startYCoord,
 										activityData.activityTitle,
+										activityData.readOnly,
 										branchingType);
 							layout.activities.push(branchingEdge);
 							// for later reference
@@ -1645,7 +1689,8 @@ GeneralLib = {
 									null, null,
 									arrangeNeeded ? 0 : activityData.endXCoord,
 									arrangeNeeded ? 0 : activityData.endYCoord,
-									null, null, branchingEdge.branchingActivity);
+									null, null, null,
+									branchingEdge.branchingActivity);
 							layout.activities.push(branchingEdge);
 							
 							branchingEdge.branchingActivity.defaultActivityUIID = activityData.defaultActivityUIID;
@@ -1948,11 +1993,21 @@ GeneralLib = {
 					}
 				});
 				
-				
 				if (arrangeNeeded) {
 				 	GeneralLib.arrangeActivities();
 				} else {
 					GeneralLib.resizePaper();
+				}
+
+
+				if (systemGate) {
+					// if system gate exists, it is Live Edit
+					layout.liveEdit = true;
+					
+					// remove unnecessary buttons, show Cancel, move Open after Save and Cancel
+					$('#newButton, #importSequenceButton, #saveAsButton, #exportLamsButton, #exportImsButton, #previewButton').remove();
+					$('#cancelLiveEditButton').show()
+											  .after($('#openButton').parent().parent());
 				}
 				
 				GeneralLib.setModified(false);
@@ -2036,7 +2091,7 @@ GeneralLib = {
 			branchMappings = [],
 			annotations = [],
 			layoutActivityDefs = [],
-			// trim the 
+			systemGate = null,
 			title = title.trim(),
 			description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData(),
 			// final success/failure of the save
@@ -2220,10 +2275,11 @@ GeneralLib = {
 				
 			} else if (activity instanceof  ActivityDefs.GateActivity){
 				switch(activity.gateType) {
-					case 'sync'      : activityTypeID = 3; break;
-					case 'schedule'  : activityTypeID = 4; break;
+					case 'sync'       : activityTypeID = 3; break;
+					case 'schedule'   : activityTypeID = 4; break;
 					case 'permission' : activityTypeID = 5; break;
-					case 'condition' :
+					case 'system' 	  : activityTypeID = 9; systemGate = activity; break;
+					case 'condition'  :
 						activityTypeID = 14;
 							
 						if (activity.input) {
@@ -2544,6 +2600,57 @@ GeneralLib = {
 						});
 					});
 					
+					if (layout.liveEdit) {
+						// let backend know that system gate needs to be removed
+						$.ajax({
+							type  : 'POST',
+							async : false,
+							cache : false,
+							url : LAMS_URL + 'authoring/author.do',
+							data : {
+								'method' : 'finishLearningDesignEdit',
+								'learningDesignID' : layout.ld.learningDesignID,
+								'cancelled' : 'false'
+							},
+							success : function() {
+								// prepare for LD image generate
+								// remove system gate from the SVG
+								var fromActivity = null,
+									toActivity = null,
+									transitionUIID = null;
+								if (systemGate.transitions.from.length > 0 && systemGate.transitions.to.length > 0){
+									var toTransition = systemGate.transitions.to[0];
+									transitionUIID = toTransition.uiid;
+									toActivity = systemGate.transitions.from[0].toActivity;
+									fromActivity = toTransition.fromActivity;
+								}
+								
+								ActivityLib.removeActivity(systemGate, true);
+								if (fromActivity && toActivity) {
+									ActivityLib.addTransition(fromActivity, toActivity, null, transitionUIID);
+								}
+								
+								// draw all activities as writable
+								$.each(layout.activities, function(){
+									this.readOnly = false;
+									this.draw();
+								});
+								
+								// set as not modified so dialog will not prompt user on close
+								GeneralLib.setModified(false);
+								// create the updated LD image
+								GeneralLib.saveLearningDesignImage();
+								
+								// close the Live Edit dialog
+								alert('Changes were successfully applied.');
+								window.parent.closeDialog('dialogFlashlessAuthoring');
+							}
+						});
+						
+						// if it is Live Edit, exit
+						return;
+					}
+					
 					GeneralLib.saveLearningDesignImage();
 					
 					if (response.validation.length == 0) {
@@ -2627,7 +2734,7 @@ GeneralLib = {
 	      	  				  .css('opacity', 0.2);
 		}
 	},
-
+	
 	
 	/**
 	 * Displays sequence image in Open/Save dialog.
