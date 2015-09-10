@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.apache.commons.lang.StringEscapeUtils;
-
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -78,9 +77,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(status);
-	    ret.add(startDate != null ? convertDateToString(startDate, DEFAULT_DATE_FORMAT) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add((output != null) ? output.toString() : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    
@@ -90,6 +87,9 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    
+	} else if (view == GBGridView.LIST) {
+	    ret.add(rowName);
 	}
 
 	return ret;

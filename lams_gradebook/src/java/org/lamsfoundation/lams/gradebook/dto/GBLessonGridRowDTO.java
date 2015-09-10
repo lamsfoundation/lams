@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.gradebook.dto;
 import java.util.ArrayList;
 
 import org.apache.commons.lang.StringEscapeUtils;
-
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 
@@ -85,6 +84,9 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark)) : CELL_EMPTY);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    
+	//plain lesson list case
+	} else if (view == GBGridView.LIST) {
+	    ret.add(rowName);
 	}
 	return ret;
     }
