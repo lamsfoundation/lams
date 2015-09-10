@@ -57,7 +57,10 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + " index(compAct) = act";
 
     private final static String COUNT_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p where p.lesson.id = :lessonId";
-    private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
+    private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
+	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
+    private final static String LOAD_PROGRESS_BY_LESSON_AND_USER_IDS = "from LearnerProgress p "
+	    + " where p.lesson.id = :lessonId AND p.user.userId IN (:userIds) order by p.user.lastName, p.user.firstName, p.user.userId";    
     private final static String LOAD_NEXT_BATCH_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lesson.id = :lessonId "
 	    + " and (( p.user.lastName > :lastUserLastName)"
 	    + " or ( p.user.lastName = :lastUserLastName and p.user.firstName > :lastUserFirstName) "
@@ -103,9 +106,15 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	}
     
 	@Override
-	public List getLearnerProgressForLesson(final Long lessonId) {
-		return (List) getSession().createQuery(LOAD_PROGRESS_BY_LESSON).setLong("lessonId", lessonId).list();
+	public List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId) {
+		return (List<LearnerProgress>) getSession().createQuery(LOAD_PROGRESS_BY_LESSON).setLong("lessonId", lessonId).list();
 	}
+	    
+    @Override
+    public List getLearnerProgressForLesson(final Long lessonId, final List<Integer> userIds) {
+	return getSession().createQuery(LOAD_PROGRESS_BY_LESSON_AND_USER_IDS).setLong("lessonId", lessonId)
+		.setParameterList("userIds", userIds).list();
+    }
 
     @Override
     @SuppressWarnings("unchecked")

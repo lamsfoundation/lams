@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -138,7 +139,7 @@ public class GradebookAction extends LamsDispatchAction {
 
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
-	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {
+	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
 	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lessonID, userID);
 	} else if (view == GBGridView.MON_ACTIVITY) {
 	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID);
@@ -195,6 +196,7 @@ public class GradebookAction extends LamsDispatchAction {
 	// Get the user gradebook list from the db
 	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
+	int totalUsers = 0;
 	// if leesonID is specified show results based on lesson
 	if (lessonID != null) {
 	    if (!getSecurityService().isLessonMonitor(lessonID, user.getUserID(), "get gradebook", false)) {
@@ -203,8 +205,13 @@ public class GradebookAction extends LamsDispatchAction {
 	    }
 
 	    Lesson lesson = getLessonService().getLesson(lessonID);
-	    if ((view == GBGridView.MON_USER) || (view == GBGridView.MON_COURSE)) {
-		gradebookUserDTOs = getGradebookService().getGBUserRowsForLesson(lesson);
+	    //GBGridView.MON_USER - 1st table of gradebook lesson monitor
+	    //GBGridView.MON_COURSE - Subgrid of 1st table of gradebook course monitor 
+	    if (view == GBGridView.MON_USER || view == GBGridView.MON_COURSE) {
+		gradebookUserDTOs = getGradebookService().getGBUserRowsForLesson(lesson, page-1, rowLimit, sortBy, sortOrder, searchString);
+		totalUsers = lesson.getAllLearners().size();
+		
+	    // Subgrid of 2nd table of gradebook lesson monitor
 	    } else if (view == GBGridView.MON_ACTIVITY) {
 		String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
@@ -224,7 +231,17 @@ public class GradebookAction extends LamsDispatchAction {
 		Activity activity = getGradebookService().getActivityById(activityID);
 		if ((activity != null) && (activity instanceof ToolActivity)) {
 		    gradebookUserDTOs = getGradebookService().getGBUserRowsForActivity(lesson, (ToolActivity) activity,
-			    groupId);
+			    groupId, page-1, rowLimit, sortBy, sortOrder, searchString);
+		    
+		    //calculate totalUsers
+		    totalUsers = lesson.getAllLearners().size();
+		    if (groupId != null) {
+			Group group = (Group) getUserService().findById(Group.class, groupId);
+			if (group != null) {
+			    totalUsers = group.getUsers().size();
+			}
+		    }
+		    
 		} else {
 		    // return null and the grid will report an error
 		    GradebookAction.logger.error("No activity found for: " + activityID);
@@ -232,7 +249,8 @@ public class GradebookAction extends LamsDispatchAction {
 		}
 	    }
 
-	    // if organisationID is specified (but not lessonID) then show results for organisation
+		// 2nd table of gradebook course monitor 
+		// if organisationID is specified (but not lessonID) then show results for organisation
 	} else if (organisationID != null) {
 	    if (!getSecurityService().isGroupMonitor(organisationID, user.getUserID(), "get gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
@@ -240,15 +258,20 @@ public class GradebookAction extends LamsDispatchAction {
 	    }
 
 	    Organisation org = (Organisation) getUserService().findById(Organisation.class, organisationID);
-	    gradebookUserDTOs = getGradebookService().getGBUserRowsForOrganisation(org);
+	    gradebookUserDTOs = getGradebookService().getGBUserRowsForOrganisation(org, page-1, rowLimit, sortOrder, searchString);
+	    totalUsers = gradebookService.getCountUsersByOrganisation(organisationID, searchString);
+	    
 	} else {
 	    LamsDispatchAction.log.error("Missing parameters: either lessonID or organisationID should be specified.");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters");
 	    return null;
 	}
 
-	String ret = GradebookUtil.toGridXML(gradebookUserDTOs, view, sortBy, isSearch, searchField, searchOper,
-		searchString, sortOrder, rowLimit, page);
+	//calculate totalPages
+	int totalPages = new Double(Math.ceil(new Integer(totalUsers).doubleValue()
+		/ new Integer(rowLimit).doubleValue())).intValue();
+	String ret = GradebookUtil.toGridXML(gradebookUserDTOs, page, totalPages, view);
+	
 	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
 	return null;
     }
@@ -293,6 +316,14 @@ public class GradebookAction extends LamsDispatchAction {
 	    searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_ROW_NAME, true);
 	}
 
+	if (sortBy == null) {
+	    sortBy = GradebookConstants.PARAM_ID;
+	}
+	
+	if (sortOrder == null) {
+	    sortOrder = GradebookConstants.SORT_ASC;
+	}
+
 	Set<Lesson> lessons = organisation.getLessons();
 	if (lessons == null) {
 	    return null;
@@ -301,22 +332,36 @@ public class GradebookAction extends LamsDispatchAction {
 	User user;
 	User viewer = getRealUser();
 	if (view == GBGridView.MON_USER) {
+	    Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
+	    user = (User) getUserService().findById(User.class, userID);
+	} else {
+	    user = getRealUser();
+	}
+	
+	//permission check
+	if (view == GBGridView.MON_USER) {
 	    if (!getSecurityService().isGroupMonitor(courseID, viewer.getUserId(), "get course gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
 
-	    Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
-	    user = (User) getUserService().findById(User.class, userID);
-	} else {
+	} else if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {
 	    if (!getSecurityService().hasOrgRole(courseID, viewer.getUserId(),
-		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER },
-		    "get course gradebook for learner", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
+		    new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a group manager or admin in the organisation");
 		return null;
 	    }
-
-	    user = getRealUser();
+	
+	} else if (view == GBGridView.LRN_COURSE) {
+	    if (!getSecurityService().hasOrgRole(courseID, viewer.getUserId(),
+		    new String[] { Role.LEARNER },
+		    "get course gradebook for learner", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the organisation");
+		return null;
+	    }
+	    
+	} else {
+	    return null;
 	}
 
 	if ((organisation == null) || (user == null) || (viewer == null)) {
@@ -326,15 +371,18 @@ public class GradebookAction extends LamsDispatchAction {
 	    return null;
 	}
 	List<GBLessonGridRowDTO> gradebookLessonDTOs = getGradebookService().getGBLessonRows(organisation, user,
-		viewer, view);
-
-	if (sortBy == null) {
-	    sortBy = GradebookConstants.PARAM_ID;
+		viewer, view, page-1, rowLimit, sortBy, sortOrder, searchString);
+	
+	String ret;
+	if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {
+	    int totalPages = new Double(Math.ceil(new Integer(lessons.size()).doubleValue()
+		    / new Integer(rowLimit).doubleValue())).intValue();
+	    ret = GradebookUtil.toGridXML(gradebookLessonDTOs, page, totalPages, view);
+	    
+	} else {
+	    ret = GradebookUtil.toGridXML(gradebookLessonDTOs, view, sortBy, isSearch, searchField, searchOper,
+			searchString, sortOrder, rowLimit, page);
 	}
-
-	// String ret = GradebookUtil.toGridXML(gradebookLessonDTOs, page, totalPages, method);
-	String ret = GradebookUtil.toGridXML(gradebookLessonDTOs, view, sortBy, isSearch, searchField, searchOper,
-		searchString, sortOrder, rowLimit, page);
 
 	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
 	return null;

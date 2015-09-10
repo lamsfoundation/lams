@@ -68,7 +68,8 @@ public interface IGradebookService {
      * @param groupId
      * @return
      */
-    List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId);
+    List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId, int page,
+	    int size, String sortBy, String sortOrder, String searchString);
 
     /**
      * Gets the user rows and the user's entire lesson mark for all users in a lesson
@@ -77,6 +78,34 @@ public interface IGradebookService {
      * @return
      */
     List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson);
+    
+    /**
+     * Gets the user rows containing only users' names. Do proper paging on DB side.
+     * 
+     * @param lesson
+     * @param page
+     * @param size
+     * @param sortOrder
+     * @param searchString
+     * @return
+     */
+    List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
+    
+//    /**
+//     * Gets the user rows containing only users' names. Do proper paging on DB side.
+//     * 
+//     * @param lesson
+//     * @param page
+//     * @param size
+//     * @param sortOrder
+//     * @param searchString
+//     * @return
+//     */
+//    List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortOrder,
+//	    String searchString);
+    
+    int getCountUsersByLesson(Long lessonId, String searchString);
 
     /**
      * Gets the user rows for specified organisation
@@ -84,7 +113,10 @@ public interface IGradebookService {
      * @param organisation
      * @return
      */
-    ArrayList<GBUserGridRowDTO> getGBUserRowsForOrganisation(Organisation organisation);
+    ArrayList<GBUserGridRowDTO> getGBUserRowsForOrganisation(Organisation organisation, int page, int size,
+	    String sortOrder, String searchString);
+    
+    int getCountUsersByOrganisation(Integer orgId, String searchString);
 
     /**
      * Updates a user's lesson mark, this will make it desynchronised with the aggregated marks from the activities
@@ -146,7 +178,8 @@ public interface IGradebookService {
      * @param view
      * @return
      */
-    List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view);
+    List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view,
+	    int page, int size, String sortBy, String sortOrder, String searchString);
 
     /**
      * Gets a gradebook lesson mark/feedback for a given user and lesson
