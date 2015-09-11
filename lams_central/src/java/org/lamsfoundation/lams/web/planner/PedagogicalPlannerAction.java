@@ -292,8 +292,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    if (StringUtils.isBlank(copyMode)
 		    || PedagogicalPlannerAction.COPY_MODE_EDIT_CURRENT.equalsIgnoreCase(copyMode)) {
 		// make sure user has priviledges
-		if (!isEditor
-			|| ((node != null) && (node.getPermissions() != null) && ((node.getPermissions() & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY) == 0))) {
+		if (!isEditor || ((node != null) && (node.getPermissions() != null)
+			&& ((node.getPermissions() & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY) == 0))) {
 		    PedagogicalPlannerAction.log.debug("Unauthorised attempt to openExistingTemplate (original)");
 		    throw new UserAccessDeniedException();
 		}
@@ -301,11 +301,12 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
 		copyMode = PedagogicalPlannerAction.COPY_MODE_EDIT_CURRENT;
 	    } else if (PedagogicalPlannerAction.COPY_MODE_MAKE_COPY.equalsIgnoreCase(copyMode)) {
-		if (isEditor ? (node != null) && (node.getPermissions() != null)
-			&& ((node.getPermissions() & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_VIEW) == 0)
-			: (node != null)
-				&& (node.getPermissions() != null)
-				&& ((node.getPermissions() & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_COPY) == 0)) {
+		if (isEditor
+			? (node != null) && (node.getPermissions() != null)
+				&& ((node.getPermissions()
+					& PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_VIEW) == 0)
+			: (node != null) && (node.getPermissions() != null) && ((node.getPermissions()
+				& PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_COPY) == 0)) {
 		    PedagogicalPlannerAction.log.debug("Unauthorised attempt to openExistingTemplate (copy)");
 		    throw new UserAccessDeniedException();
 		}
@@ -316,8 +317,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    request.setAttribute(CentralConstants.PARAM_COPY_MODE, copyMode);
 	}
 	if (learningDesign == null) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("no.such.learningdesign.exist",
-		    new Object[] { learningDesignId }));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage("no.such.learningdesign.exist", new Object[] { learningDesignId }));
 	} else {
 	    errors = openTemplate(request, learningDesign);
 	}
@@ -370,8 +371,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	} catch (ServletException e) {
 	    PedagogicalPlannerAction.log.error(e, e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 	    return errors;
 	}
 
@@ -437,8 +438,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    originalDesign = getAuthoringService().getLearningDesign(originalDesignId);
 	}
 	if (originalDesign == null) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("no.such.learningdesign.exist",
-		    new Object[] { originalDesignId }));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage("no.such.learningdesign.exist", new Object[] { originalDesignId }));
 	    return null;
 	}
 	User user = getUser();
@@ -448,8 +449,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	String newDesignName = originalDesign.getTitle();
 	String customCSV = null;
 
-	return getAuthoringService().copyLearningDesign(originalDesign, copyType, user, targetFolder,
-		setOriginalDesign, newDesignName, customCSV);
+	return getAuthoringService().copyLearningDesign(originalDesign, copyType, user, targetFolder, setOriginalDesign,
+		newDesignName, customCSV);
     }
 
     /**
@@ -531,9 +532,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} else if (activity.isGroupingActivity()) {
 	    // grouping is managed by this action class;
 	    GroupingActivity groupingActivity = (GroupingActivity) activity;
-	    String pedagogicalPlannerUrl = WebUtil.appendParameterToURL(groupingActivity.getSystemTool()
-		    .getPedagogicalPlannerUrl(), AttributeNames.PARAM_TOOL_CONTENT_ID, groupingActivity
-		    .getCreateGrouping().getGroupingId().toString());
+	    String pedagogicalPlannerUrl = WebUtil.appendParameterToURL(
+		    groupingActivity.getSystemTool().getPedagogicalPlannerUrl(), AttributeNames.PARAM_TOOL_CONTENT_ID,
+		    groupingActivity.getCreateGrouping().getGroupingId().toString());
 	    addedDTO = new PedagogicalPlannerActivityDTO(true, pedagogicalPlannerUrl);
 	    addedDTO.setTitle(activity.getTitle());
 	    addedDTO.setToolIconUrl(PedagogicalPlannerAction.IMAGE_PATH_GROUPING);
@@ -697,8 +698,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	getMonitoringService().createPreviewClassForLesson(userDto.getUserID(), lesson.getLessonId());
 
 	getMonitoringService().startLesson(lesson.getLessonId(), userDto.getUserID());
-	String newPath = WebUtil.appendParameterToURL(mapping.findForward(PedagogicalPlannerAction.FORWARD_PREVIEW)
-		.getPath(), AttributeNames.PARAM_LESSON_ID, lesson.getLessonId().toString());
+	String newPath = WebUtil.appendParameterToURL(
+		mapping.findForward(PedagogicalPlannerAction.FORWARD_PREVIEW).getPath(), AttributeNames.PARAM_LESSON_ID,
+		lesson.getLessonId().toString());
 	newPath = WebUtil.appendParameterToURL(newPath, AttributeNames.PARAM_MODE, "preview");
 	return new ActionForward(newPath, true);
     }
@@ -776,8 +778,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    } catch (Exception e) {
 		PedagogicalPlannerAction.log.error(e, e);
 		ActionMessages errors = new ActionMessages();
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			PedagogicalPlannerAction.ERROR_KEY_FILTER_PARSE));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILTER_PARSE));
 		saveErrors(request, errors);
 	    }
 	}
@@ -828,8 +830,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		nodeForm.setPermissions(null);
 	    } else if (!importNode) {
 		// We fill the form with necessary data
-		nodeForm.setNodeType(node.getLearningDesignId() == null ? PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES
-			: PedagogicalPlannerSequenceNodeForm.NODE_TYPE_TEMPLATE);
+		nodeForm.setNodeType(
+			node.getLearningDesignId() == null ? PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES
+				: PedagogicalPlannerSequenceNodeForm.NODE_TYPE_TEMPLATE);
 		nodeForm.setRemoveTemplate(false);
 		nodeForm.setTitle(dto.getTitle());
 		nodeForm.setBriefDescription(dto.getBriefDescription());
@@ -922,13 +925,13 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    FileUtils.copyInputStreamToFile(inputStream, sourceFile);
 		} catch (Exception e) {
 		    PedagogicalPlannerAction.log.error(e, e);
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+		    errors.add(ActionMessages.GLOBAL_MESSAGE,
+			    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
 		}
 		if (!sourceFile.exists() || sourceFile.isDirectory()) {
 		    PedagogicalPlannerAction.log.error(PedagogicalPlannerAction.ERROR_NOT_PROPER_FILE);
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+		    errors.add(ActionMessages.GLOBAL_MESSAGE,
+			    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
 		}
 		if (errors.isEmpty()) {
 		    LearningDesign learningDesign = importLearningDesign(sourceFile, errors);
@@ -959,8 +962,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    UserDTO u = (UserDTO) s.getAttribute(AttributeNames.USER);
 		    getPedagogicalPlannerDAO().saveNodeRole(u.getUserID(), nodeUid, Role.ROLE_SYSADMIN);
 		} catch (Exception e) {
-		    PedagogicalPlannerAction.log.error("Error saving role for newly created root node: "
-			    + e.getMessage());
+		    PedagogicalPlannerAction.log
+			    .error("Error saving role for newly created root node: " + e.getMessage());
 		    e.printStackTrace();
 		}
 	    }
@@ -999,12 +1002,13 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @param form
      * @return
      */
-    private ActionMessages validateNodeForm(PedagogicalPlannerSequenceNode node, PedagogicalPlannerSequenceNodeForm form) {
+    private ActionMessages validateNodeForm(PedagogicalPlannerSequenceNode node,
+	    PedagogicalPlannerSequenceNodeForm form) {
 	ActionMessages errors = new ActionMessages();
 	// Title must not be blank
 	if (StringUtils.isEmpty(form.getTitle())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_NODE_TITLE_BLANK));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_NODE_TITLE_BLANK));
 	}
 	// Template must a proper file
 	if (PedagogicalPlannerSequenceNodeForm.NODE_TYPE_TEMPLATE.equals(form.getNodeType())
@@ -1029,16 +1033,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    boolean badExtension = false;
 	    if (fileName.length() >= 4) {
 		String extension = fileName.substring(fileName.length() - 4);
-		if (!(extension.equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_LAS) || extension
-			.equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_ZIP))) {
+		if (!(extension.equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_LAS)
+			|| extension.equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_ZIP))) {
 		    badExtension = true;
 		}
 	    } else {
 		badExtension = true;
 	    }
 	    if (badExtension) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			PedagogicalPlannerAction.ERROR_KEY_FILE_BAD_EXTENSION));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_BAD_EXTENSION));
 	    }
 	}
 	return errors;
@@ -1067,8 +1071,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	} else {
 	    ActionMessages errors = new ActionMessages();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_REMOVE_NODE_TREE));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_REMOVE_NODE_TREE));
 	    saveErrors(request, errors);
 	    PedagogicalPlannerAction.log.debug("Unauthorised attempt to removeSequenceNode");
 	}
@@ -1196,8 +1200,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    String nodeContentDir = FileUtil.getFullPath(secureDir, node.getContentFolderId());
 
 	    if (!FileUtil.isEmptyDirectory(nodeContentDir, true)) {
-		PedagogicalPlannerAction.log.debug("Create export node content target zip file. File name is "
-			+ targetZipFileName);
+		PedagogicalPlannerAction.log
+			.debug("Create export node content target zip file. File name is " + targetZipFileName);
 		ZipFileUtil.createZipFile(targetZipFileName, nodeContentDir, contentDir);
 	    } else {
 		PedagogicalPlannerAction.log.debug("No such directory (or empty directory): " + nodeContentDir);
@@ -1320,30 +1324,31 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
 	} catch (ImportToolContentException e) {
 	    PedagogicalPlannerAction.log.error(e, e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 
 	}
 
 	if (((learningDesignID == null) || (learningDesignID.longValue() == -1))
 		&& (learningDesignErrorMsgs.size() == 0)) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 	    return null;
 	}
 	if (learningDesignErrorMsgs.size() > 0) {
 	    for (String error : learningDesignErrorMsgs) {
 		PedagogicalPlannerAction.log.error(error);
 	    }
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 	    return null;
 	}
 	if (toolsErrorMsgs.size() > 0) {
 	    for (String error : toolsErrorMsgs) {
 		PedagogicalPlannerAction.log.error(error);
 	    }
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_TOOL_ERRORS));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_TOOL_ERRORS));
 	    return null;
 	}
 	return learningDesign;
@@ -1363,8 +1368,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	properties.put("name", name);
 	properties.put("parentWorkspaceFolder.workspaceFolderId", parentFolder.getWorkspaceFolderId());
 	properties.put("workspaceFolderType", workspaceFolderType);
-	List<WorkspaceFolder> workspaceFolderList = PedagogicalPlannerAction.userManagementService.findByProperties(
-		WorkspaceFolder.class, properties);
+	List<WorkspaceFolder> workspaceFolderList = PedagogicalPlannerAction.userManagementService
+		.findByProperties(WorkspaceFolder.class, properties);
 
 	WorkspaceFolder workspaceFolder = null;
 	if ((workspaceFolderList != null) && (workspaceFolderList.size() > 0)) {
@@ -1401,8 +1406,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @throws RepositoryCheckedException
      * @throws IOException
      */
-    private void exportSubnodeTemplates(PedagogicalPlannerSequenceNode node, File outputDir) throws IOException,
-	    RepositoryCheckedException, ExportToolContentException {
+    private void exportSubnodeTemplates(PedagogicalPlannerSequenceNode node, File outputDir)
+	    throws IOException, RepositoryCheckedException, ExportToolContentException {
 	if (node != null) {
 	    if (node.getLearningDesignId() == null) {
 		if (node.getSubnodes() != null) {
@@ -1414,7 +1419,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 		List<String> toolsErrorMsgs = new ArrayList<String>();
 		String exportedLdFilePath = getExportService().exportLearningDesign(node.getLearningDesignId(),
-			toolsErrorMsgs, 1, null);
+			toolsErrorMsgs);
 		if (!toolsErrorMsgs.isEmpty()) {
 		    StringBuffer errorMessages = new StringBuffer();
 		    for (String error : toolsErrorMsgs) {
@@ -1426,11 +1431,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 		File ldIdDir = new File(outputDir, node.getLearningDesignId().toString());
 		ldIdDir.mkdirs();
-		File targetFile = new File(ldIdDir, node.getLearningDesignTitle()
-			+ PedagogicalPlannerAction.FILE_EXTENSION_ZIP);
+		File targetFile = new File(ldIdDir,
+			node.getLearningDesignTitle() + PedagogicalPlannerAction.FILE_EXTENSION_ZIP);
 
-		PedagogicalPlannerAction.log.debug("Preparing for zipping the template file: "
-			+ node.getLearningDesignTitle());
+		PedagogicalPlannerAction.log
+			.debug("Preparing for zipping the template file: " + node.getLearningDesignTitle());
 		FileUtils.copyInputStreamToFile(inputStream, targetFile);
 	    }
 	}
@@ -1481,18 +1486,18 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @throws CorruptIndexException
      * @throws IOException
      */
-    private Set<Long> filterSubnodes(PedagogicalPlannerSequenceNode node, String filterText) throws ParseException,
-	    CorruptIndexException, IOException {
+    private Set<Long> filterSubnodes(PedagogicalPlannerSequenceNode node, String filterText)
+	    throws ParseException, CorruptIndexException, IOException {
 	Set<Long> matchingSubnodeUids = new LinkedHashSet<Long>();
 	if (!StringUtils.isEmpty(filterText)) {
 
 	    Set<Document> docs = extractSubnodeDocuments(node);
 	    if (!docs.isEmpty()) {
 		// Searching is performed in title, brief description and full description of the node.
-		MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[] {
-			PedagogicalPlannerAction.FIELD_NAME_TITLE,
-			PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION,
-			PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION },
+		MultiFieldQueryParser queryParser = new MultiFieldQueryParser(
+			new String[] { PedagogicalPlannerAction.FIELD_NAME_TITLE,
+				PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION,
+				PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION },
 			PedagogicalPlannerAction.luceneAnalyzer);
 
 		Query query = queryParser.parse(filterText);
@@ -1552,8 +1557,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    doc.add(fullDescField);
 		}
 
-		Field uidField = new StringField(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, subnode.getUid()
-			.toString(), Field.Store.YES);
+		Field uidField = new StringField(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID,
+			subnode.getUid().toString(), Field.Store.YES);
 		doc.add(uidField);
 		docs.add(doc);
 
@@ -1596,27 +1601,27 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    Grouping grouping = getAuthoringService().getGroupingById(plannerForm.getToolContentID());
 	    if (grouping.isRandomGrouping()) {
 		RandomGrouping randomGrouping = (RandomGrouping) grouping;
-		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
-			.parseInt(plannerForm.getNumberOfGroups());
+		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null
+			: Integer.parseInt(plannerForm.getNumberOfGroups());
 		randomGrouping.setNumberOfGroups(number);
 
-		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null : Integer.parseInt(plannerForm
-			.getLearnersPerGroup());
+		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null
+			: Integer.parseInt(plannerForm.getLearnersPerGroup());
 		randomGrouping.setLearnersPerGroup(number);
 	    } else if (grouping.isLearnerChoiceGrouping()) {
 		LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
-		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
-			.parseInt(plannerForm.getNumberOfGroups());
+		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null
+			: Integer.parseInt(plannerForm.getNumberOfGroups());
 		learnerChoiceGrouping.setNumberOfGroups(number);
 
-		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null : Integer.parseInt(plannerForm
-			.getLearnersPerGroup());
+		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null
+			: Integer.parseInt(plannerForm.getLearnersPerGroup());
 		learnerChoiceGrouping.setLearnersPerGroup(number);
 		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(plannerForm.getEqualGroupSizes());
 		learnerChoiceGrouping.setViewStudentsBeforeSelection(plannerForm.getViewStudentsBeforeSelection());
 	    } else {
-		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
-			.parseInt(plannerForm.getNumberOfGroups());
+		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null
+			: Integer.parseInt(plannerForm.getNumberOfGroups());
 		grouping.setMaxNumberOfGroups(number);
 	    }
 	} else {
@@ -1625,7 +1630,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_GROUPING);
     }
 
-    private List<PedagogicalPlannerSequenceNodeDTO> getRecentlyModifiedLearnindDesignsAsNodes() throws ServletException {
+    private List<PedagogicalPlannerSequenceNodeDTO> getRecentlyModifiedLearnindDesignsAsNodes()
+	    throws ServletException {
 	// Add the recently modified learning design list, if it's the root node with no filtering
 	User user = getUser();
 	// the list is sorted most-recently-edited-on-top (so by the timestamp descending)
@@ -1745,8 +1751,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			if (activity.isToolActivity()) {
 			    activity = getActivityDAO().getActivityByActivityId(activity.getActivityId());
 			    ToolActivity toolActivity = (ToolActivity) activity;
-			    PedagogicalPlannerActivityMetadata plannerMetadata = activitiesMetadata.get(toolActivity
-				    .getToolContentId());
+			    PedagogicalPlannerActivityMetadata plannerMetadata = activitiesMetadata
+				    .get(toolActivity.getToolContentId());
 			    if (plannerMetadata != null) {
 				PedagogicalPlannerActivityMetadata storedMetadata = toolActivity.getPlannerMetadata();
 				if (storedMetadata == null) {
@@ -1787,7 +1793,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	String zipFilePath = null;
 	boolean valid = false;
 	try {
-	    zipFilePath = getExportService().exportLearningDesign(learningDesignId, toolsErrorMsgs, 1, null);
+	    zipFilePath = getExportService().exportLearningDesign(learningDesignId, toolsErrorMsgs);
 	    if (toolsErrorMsgs.isEmpty()) {
 
 		// get only filename
@@ -1813,8 +1819,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    PedagogicalPlannerAction.log.error(e, e);
 	}
 	if (!valid) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_EXPORT_TEMPLATE));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_EXPORT_TEMPLATE));
 	    saveErrors(request, errors);
 	    for (String error : toolsErrorMsgs) {
 		PedagogicalPlannerAction.log.error(error);
@@ -1822,8 +1828,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
 	    errors = openTemplate(request, learningDesign);
 	    if (!errors.isEmpty()) {
-		throw new ServletException(getMessageService().getMessage(
-			PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+		throw new ServletException(getMessageService()
+			.getMessage(PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 	    }
 	    return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
 	}
@@ -1967,8 +1973,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private IExportToolContentService getExportService() {
 	if (PedagogicalPlannerAction.exportService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PedagogicalPlannerAction.exportService = (IExportToolContentService) ctx
 		    .getBean(CentralConstants.EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
 	}
@@ -1977,8 +1983,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private IAuthoringService getAuthoringService() {
 	if (PedagogicalPlannerAction.authoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PedagogicalPlannerAction.authoringService = (IAuthoringService) ctx
 		    .getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
 	}
@@ -1987,8 +1993,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private IMonitoringService getMonitoringService() {
 	if (PedagogicalPlannerAction.monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PedagogicalPlannerAction.monitoringService = (IMonitoringService) ctx
 		    .getBean(CentralConstants.MONITORING_SERVICE_BEAN_NAME);
 	}
@@ -1997,8 +2003,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private IUserManagementService getUserManagementService() {
 	if (PedagogicalPlannerAction.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PedagogicalPlannerAction.userManagementService = (IUserManagementService) ctx
 		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 	}
@@ -2007,8 +2013,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private MessageService getMessageService() {
 	if (PedagogicalPlannerAction.messageService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PedagogicalPlannerAction.messageService = (MessageService) ctx
 		    .getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
 	}
@@ -2017,8 +2023,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private PedagogicalPlannerDAO getPedagogicalPlannerDAO() {
 	if (PedagogicalPlannerAction.pedagogicalPlannerDAO == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PedagogicalPlannerAction.pedagogicalPlannerDAO = (PedagogicalPlannerDAO) wac
 		    .getBean("pedagogicalPlannerDAO");
 	}
@@ -2027,8 +2033,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private ActivityDAO getActivityDAO() {
 	if (PedagogicalPlannerAction.activityDAO == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PedagogicalPlannerAction.activityDAO = (ActivityDAO) wac.getBean("activityDAO");
 	}
 	return PedagogicalPlannerAction.activityDAO;

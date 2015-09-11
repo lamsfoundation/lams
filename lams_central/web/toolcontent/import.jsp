@@ -3,12 +3,13 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="title.import" /></title>
-		<!-- ********************  CSS ********************** -->
+		
 		<lams:css />
+		
 		<script type="text/javascript">
 			function closeWin(){
 				window.close();
@@ -20,8 +21,7 @@
 					alert(msg);
 					return (false);
 				} else {
-					var f = document.getElementById('importForm');
-				        f.submit();
+					document.getElementById('importForm').submit();
 				}
 			}
 			
@@ -40,9 +40,6 @@
 				<p>
 					&nbsp;
 				</p>
-				<p>
-					<fmt:message key="msg.import.file.format"/>
-				</p>
 				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data" id="importForm">
 					<p>
 						<fmt:message key="label.ld.zip.file" />
@@ -59,7 +56,5 @@
 			<div id="footer">
 			</div>
 			<!--closes footer-->
-
-
 	</body>
 </lams:html>

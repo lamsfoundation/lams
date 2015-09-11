@@ -34,8 +34,6 @@
 		<!-- Presence Chat -->
 		<include name="**/model/PresenceChat*.java" />
 		<include name="**/AuthenticationMethod*.java" />
-		<!-- Tool -->
-		<include name="**/ToolImportSupport.java" />
 		<!-- User Management -->
 		<include name="**/OrganisationGrouping.java" />
 		<include name="**/OrganisationGroup.java" />

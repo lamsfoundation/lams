@@ -11,9 +11,6 @@
 	<bean id="toolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	<bean id="toolImportSupportDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolImportSupportDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
 	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
