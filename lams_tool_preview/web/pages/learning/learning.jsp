@@ -31,6 +31,7 @@
 		var MAX_RATES = ${peerreview.maximumRates},
 		MIN_RATES = ${peerreview.minimumRates},
 		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.commentsMinWordsLimit},
+		MAX_RATINGS_FOR_ITEM = ${peerreview.maximumRatesPerUser},
 		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
@@ -47,6 +48,7 @@
 	
 	var YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
 	IS_DISABLED =  ${sessionMap.isDisabled};
+	
 	
 	$(document).ready(function(){
 		
@@ -204,10 +206,15 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
-		function refresh(){
+		function refresh(page){
 			document.location.href='<c:url value="/learning/start.do?mode=learner&toolSessionID=${toolSessionId}"/>';
 		}
 
+		function onRatingErrorCallback() {
+			alert('<fmt:message key="error.max.ratings.per.user"/>');
+			refresh();
+		}
+		
     </script>
 </lams:head>
 <body class="stripes">
