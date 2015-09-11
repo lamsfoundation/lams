@@ -1,5 +1,5 @@
 
-//Please, set up LAMS_URL, COUNT_RATED_ITEMS, COMMENTS_MIN_WORDS_LIMIT, MAX_RATES and MIN_RATES, 
+//Please, set up LAMS_URL, COUNT_RATED_ITEMS, COMMENTS_MIN_WORDS_LIMIT, MAX_RATES and MIN_RATES, MAX_RATINGS_FOR_ITEM,
 //COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL constants in parent document
 
 //constant indicating there is rting limits set up
@@ -7,24 +7,30 @@ var HAS_RATING_LIMITS;
 
 $(document).ready(function(){
 	HAS_RATING_LIMITS = MAX_RATES!=0 || MIN_RATES!=0;
-	
+
 	initializeJRating();
 	
 	//check minimum rates limit initially
 	if (MIN_RATES != 0) {
 		checkMinimumRatesLimit(COUNT_RATED_ITEMS);
 	}
+	
 });
 
-//initialize jRating and post comment button
+//initialize jRating and post comment button. Note: we need the quotes around undefined for the typeof !
 function initializeJRating() {
+
+	var maxRatingsForItem;
+	if ( typeof MAX_RATINGS_FOR_ITEM === "undefined" || MAX_RATINGS_FOR_ITEM === undefined )
+		maxRatingsForItem = "";
+	else 
+		maxRatingsForItem = MAX_RATINGS_FOR_ITEM;
 		
 	$(".rating-stars-new").filter($(".rating-stars")).jRating({
-		phpPath : LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS,
+		phpPath : LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS+"&maxRatingsForItem="+maxRatingsForItem,
 		rateMax : 5,
 		decimalLength : 1,
 		onSuccess : function(data, itemId){
-				
 			$("#user-rating-" + itemId).html(data.userRating);
 			$("#average-rating-" + itemId).html(data.averageRating);
 			$("#number-of-votes-" + itemId).html(data.numberOfVotes);
@@ -32,10 +38,9 @@ function initializeJRating() {
 			    
 			//handle rating limits if available
 			handleRatingLimits(data.countRatedItems);
-
 		},
 		onError : function(){
-		    jError('Error. Please, retry');
+ 			handleError();
 		}
 	});
 		
@@ -82,25 +87,31 @@ function initializeJRating() {
     		data: {
     			idBox: commentsCriteriaId + '-' + itemId, 
     			comment: comment,
-    			hasRatingLimits: HAS_RATING_LIMITS
+    			hasRatingLimits: HAS_RATING_LIMITS,
+    			maxRatingsForItem: MAX_RATINGS_FOR_ITEM
     		},
     		success: function(data, textStatus) {
-    				
-    			//add comment to HTML
-    			jQuery('<div/>', {
-    				'class': "rating-comment",
-    			    html: data.comment
-    			}).appendTo('#comments-area-' + itemId);
-    				
-    			//hide comments textarea and button
-    			$("#add-comment-area-" + itemId).hide();
-    			
-    			//handle rating limits if available
-    			if (HAS_RATING_LIMITS) {
-    				handleRatingLimits(data.countRatedItems);
-    			}
-    				
-    		}
+    			if ( data.error ) {
+    				handleError();
+    			} else {
+	   				//add comment to HTML
+   					jQuery('<div/>', {
+   						'class': "rating-comment",
+   						html: data.comment
+   					}).appendTo('#comments-area-' + itemId);
+   					
+ 	 				//hide comments textarea and button
+	   				$("#add-comment-area-" + itemId).hide();
+   			
+	   				//handle rating limits if available
+	  				if (HAS_RATING_LIMITS) {
+	   					handleRatingLimits(data.countRatedItems);
+	   				}
+	   			}
+    		},
+			onError : function(){
+ 				handleError();
+ 			}
     	});
     	//apply only once
     }).removeClass("add-comment-new");
@@ -139,4 +150,13 @@ function handleRatingLimits(countRatedItems) {
 	
 function checkMinimumRatesLimit(countRatedItems) {
 	$( "#learner-submit" ).toggle( countRatedItems >= MIN_RATES );
+}
+
+function handleError() {
+    //callback function
+    if (typeof onRatingErrorCallback === "function") { 
+    	onRatingErrorCallback();
+    } else {
+    	alert("Error saving rating. Please retry.");
+	}		
 }

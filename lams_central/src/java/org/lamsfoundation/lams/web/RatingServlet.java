@@ -25,7 +25,11 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,8 +41,11 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.RatingService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -75,37 +82,59 @@ public class RatingServlet extends HttpServlet {
 
 	// get rating value as either float or comment String
 	try {
-	    if (criteria.isCommentsEnabled()) {
-		String comment = WebUtil.readStrParam(request, "comment");
-		ratingService.commentItem(criteria, userId, itemId, comment);
-		JSONObject.put("comment", StringEscapeUtils.escapeCsv(comment));
-
-	    } else {
-		float rating = Float.parseFloat((String) request.getParameter("rate"));
-
-
-		ItemRatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
-
-		NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
-		numberFormat.setMaximumFractionDigits(1);
-		JSONObject.put("userRating", numberFormat.format(rating));
-		JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
-		JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
-	    }
+	    boolean doSave = true;
 	    
-
-	    boolean hasRatingLimits = WebUtil.readBooleanParam(request, "hasRatingLimits", false);
-
-	    // refresh countRatedItems in case there is rating limit set
-	    if (hasRatingLimits) {
-		// as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
-		LearnerItemRatingCriteria learnerItemRatingCriteria = (LearnerItemRatingCriteria) criteria;
-		Long toolContentId = learnerItemRatingCriteria.getToolContentId();
-
-		int countRatedItems = ratingService.getCountItemsRatedByUser(toolContentId, userId);
-		JSONObject.put("countRatedItems", countRatedItems);
+	    Long maxRatingsForItem = WebUtil.readLongParam(request, "maxRatingsForItem", true);
+	    log.debug("RatingServlet: Check Max rates for an item reached. Item "+itemId+" criteria id "+criteria.getRatingCriteriaId()+" maxRatingsForItem "+maxRatingsForItem);
+	    if ( maxRatingsForItem != null && maxRatingsForItem > 0) {
+		if ( ! ToolActivityRatingCriteria.class.isInstance(criteria) ) {
+		    log.error("Unable to enforce max ratings on a non ToolActivityRatingCritera class. Need tool content id to do the db lookup!");
+		} else {
+		    ToolActivityRatingCriteria toolCriteria = (ToolActivityRatingCriteria) criteria;
+		    List<Long> itemIds = new LinkedList<Long>();
+		    itemIds.add(itemId);
+		    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(toolCriteria.getToolContentId(), itemIds, userId.intValue());
+		    Long currentRatings = itemIdToRatedUsersCountMap.get(itemId);
+		    if ( currentRatings != null && maxRatingsForItem.compareTo(currentRatings) <= 0 ) {
+			JSONObject.put("error", true);
+			JSONObject.put("message", "Maximum number of ratings for this item has been reached. No more may be saved.");
+			log.debug("RatingServlet: Max rates for an item reached. Item "+itemId+" criteria id "+criteria.getRatingCriteriaId()+" count "+currentRatings);
+			doSave = false;
+		    }
+		}
 	    }
-	    
+
+	    if ( doSave ) {
+		if (criteria.isCommentsEnabled()) {
+		    String comment = WebUtil.readStrParam(request, "comment");
+		    ratingService.commentItem(criteria, userId, itemId, comment);
+		    JSONObject.put("comment", StringEscapeUtils.escapeCsv(comment));
+
+		} else {
+		    float rating = Float.parseFloat((String) request.getParameter("rate"));
+
+		    ItemRatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
+
+		    NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+		    numberFormat.setMaximumFractionDigits(1);
+		    JSONObject.put("userRating", numberFormat.format(rating));
+		    JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
+		    JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
+		}
+
+
+		boolean hasRatingLimits = WebUtil.readBooleanParam(request, "hasRatingLimits", false);
+
+		// refresh countRatedItems in case there is rating limit set
+		if (hasRatingLimits) {
+		    // as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
+		    LearnerItemRatingCriteria learnerItemRatingCriteria = (LearnerItemRatingCriteria) criteria;
+		    Long toolContentId = learnerItemRatingCriteria.getToolContentId();
+
+		    int countRatedItems = ratingService.getCountItemsRatedByUser(toolContentId, userId);
+		    JSONObject.put("countRatedItems", countRatedItems);
+		}
+	    }
 	} catch (JSONException e) {
 	    throw new ServletException(e);
 	}
