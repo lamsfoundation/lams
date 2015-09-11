@@ -341,7 +341,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     @Override
     public List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder, String searchString) {
 	
-	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* " +
  		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
  		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" WHERE lesson.lesson_id = :lessonId " +
@@ -351,7 +351,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		"ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 	
 	//when :sortBy='timeTaken'
-	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN = "SELECT DISTINCT user.* " +
  		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
  		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" LEFT OUTER JOIN lams_learner_progress progress " +
@@ -363,7 +363,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		"ORDER BY TIMEDIFF(progress.finish_date_time, progress.start_date_time) " + sortOrder;
 	
 	//when :sortBy='mark'
-	final String LOAD_LEARNERS_ORDERED_BY_MARK = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_MARK = "SELECT DISTINCT user.* " +
  		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
  		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" LEFT OUTER JOIN lams_gradebook_user_lesson gradebookUserLesson " +
@@ -375,7 +375,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		" ORDER BY gradebookUserLesson.mark " + sortOrder;
 	
 	//when :sortBy='feedback'
-	final String LOAD_LEARNERS_ORDERED_BY_FEEDBACK = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_FEEDBACK = "SELECT DISTINCT user.* " +
  		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
  		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" LEFT OUTER JOIN lams_gradebook_user_lesson gradebookUserLesson " +
@@ -412,7 +412,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     public List<User> getUsersByActivity(Long lessonId, Long activityId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	
-	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* " +
 		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
 		" WHERE lesson.lesson_id = :lessonId " +
@@ -422,7 +422,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		" ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 	
 	//when :sortBy='timeTaken'
-	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_ACTIVITY = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_ACTIVITY = "SELECT DISTINCT user.* " +
  		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" LEFT OUTER JOIN lams_learner_progress progress " + 
@@ -437,7 +437,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		"ORDER BY TIMEDIFF(completedActivityProgress.completed_date_time, completedActivityProgress.start_date_time) " + sortOrder;
 	
 	//when :sortBy='mark'
-	final String LOAD_LEARNERS_ORDERED_BY_MARK_ACTIVITY = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_MARK_ACTIVITY = "SELECT DISTINCT user.* " +
 		" FROM lams_lesson lesson, lams_group g, lams_user_group ug " +
  		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" LEFT OUTER JOIN lams_gradebook_user_activity gradebookUserActivity " +
@@ -475,7 +475,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     public List<User> getUsersByGroup(Long lessonId, Long activityId, Long groupId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	
-	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* " +
 		" FROM lams_user_group ug " +
 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
 		" WHERE ug.group_id=:groupId " +
@@ -484,7 +484,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		sortOrder;
 	
 	//when :sortBy='timeTaken'
-	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_GROUP = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_GROUP = "SELECT DISTINCT user.* " +
  		" FROM lams_user_group ug " +
 		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" LEFT OUTER JOIN lams_learner_progress progress " + 
@@ -497,7 +497,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		" ORDER BY TIMEDIFF(completedActivityProgress.completed_date_time, completedActivityProgress.start_date_time) " + sortOrder;
 	
 	//when :sortBy='mark'
-	final String LOAD_LEARNERS_ORDERED_BY_MARK_GROUP = "SELECT user.* " +
+	final String LOAD_LEARNERS_ORDERED_BY_MARK_GROUP = "SELECT DISTINCT user.* " +
  		" FROM lams_user_group ug " +
  		" INNER JOIN lams_user user ON ug.user_id=user.user_id " +
  		" LEFT OUTER JOIN lams_gradebook_user_activity gradebookUserActivity " +
