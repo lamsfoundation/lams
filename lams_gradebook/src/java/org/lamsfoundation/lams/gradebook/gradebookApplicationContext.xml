@@ -14,8 +14,8 @@
 		<property name="toolService"><ref bean="lamsCoreToolService"/></property> 	
 		<property name="lessonService"><ref bean="lessonService"/></property> 
 		<property name="userService"><ref bean="userManagementService"/></property>	
-		<property name="gradebookDAO"><ref bean="gradebookDAO"/></property> 	
-
+		<property name="gradebookDAO"><ref bean="gradebookDAO"/></property> 
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="messageService"><ref bean="gradebookMessageService"/></property>

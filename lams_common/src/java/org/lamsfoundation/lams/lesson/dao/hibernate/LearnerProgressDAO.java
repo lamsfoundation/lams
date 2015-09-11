@@ -46,6 +46,7 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     protected Logger log = Logger.getLogger(LearnerProgressDAO.class);
 
     private final static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
+    
     private final static String LOAD_PROGRESS_BY_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
     // +
     // "or activity in elements(p.previousActivity) or activity in elements(p.completedActivities)";
@@ -54,15 +55,22 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     private final static String COUNT_ATTEMPTED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.attemptedActivities attAct " + " where act.id = :activityId and "
 	    + " index(attAct) = act";
+    
     private final static String COUNT_COMPLETED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.completedActivities compAct " + " where act.id = :activityId and "
 	    + " index(compAct) = act";
 
     private final static String COUNT_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p where p.lesson.id = :lessonId";
+    
     private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
+    
     private final static String LOAD_PROGRESS_BY_LESSON_AND_USER_IDS = "from LearnerProgress p "
-	    + " where p.lesson.id = :lessonId AND p.user.userId IN (:userIds) order by p.user.lastName, p.user.firstName, p.user.userId";    
+	    + " where p.lesson.id = :lessonId AND p.user.userId IN (:userIds) order by p.user.lastName, p.user.firstName, p.user.userId";
+
+    private final String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
+	    + " progress.lesson.lessonId IN (:lessonIds)";
+    
     private final static String LOAD_NEXT_BATCH_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lesson.id = :lessonId "
 	    + " and (( p.user.lastName > :lastUserLastName)"
 	    + " or ( p.user.lastName = :lastUserLastName and p.user.firstName > :lastUserFirstName) "
@@ -142,6 +150,18 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 	    public Object doInHibernate(Session session) throws HibernateException {
 		return session.createQuery(LOAD_PROGRESS_BY_LESSON_AND_USER_IDS).setLong("lessonId", lessonId)
 			.setParameterList("userIds", userIds).list();
+	    }
+	});
+    }
+    
+    @Override
+    public List<LearnerProgress> getLearnerProgressForLessons(final List<Long> lessonIds) {
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(LOAD_PROGRESSES_BY_LESSON_LIST)
+			.setParameterList("lessonIds", lessonIds).list();
 	    }
 	});
     }
