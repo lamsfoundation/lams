@@ -325,13 +325,13 @@ var MenuLib = {
 	/**
 	 * Opens a pop up for exporting LD.
 	 */
-	exportLearningDesign : function(format){
+	exportLearningDesign : function(){
 		if (layout.modified || layout.activities.length == 0) {
 			return;
 		}
 		
 		$('iframe', layout.exportLDDialog)
-			.attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&format=' + format + '&learningDesignID='
+			.attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&learningDesignID='
 								  + layout.ld.learningDesignID);
 		layout.exportLDDialog.dialog('open');
 	},

@@ -319,9 +319,6 @@
 						<li id="exportLamsButton" class="exportSequenceButton"
 							title="Standard LAMS ZIP format"
 							onClick="javascript:MenuLib.exportLearningDesign(1)"><fmt:message key="authoring.fla.page.menu.export.lams" /></li>
-						<li id="exportImsButton" class="exportSequenceButton"
-							title="<fmt:message key='authoring.fla.page.menu.export.ims.tooltip' />"
-							onClick="javascript:MenuLib.exportLearningDesign(2)"><fmt:message key="authoring.fla.page.menu.export.ims" /></li>
 						<li id="exportPngButton" class="exportImageButton" onClick="javascript:MenuLib.exportPNG(true)"><fmt:message key="authoring.fla.page.menu.export.png" /></li>
 						<li id="exportSvgButton" class="exportImageButton" onClick="javascript:MenuLib.exportSVG(true)"><fmt:message key="authoring.fla.page.menu.export.svg" /></li>
 					</ul>
