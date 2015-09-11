@@ -27,15 +27,11 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.log4j.Logger;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.lamsfoundation.lams.util.ITransactionRetryService;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
@@ -49,7 +45,6 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
     private static final Logger log = Logger.getLogger(TransactionRetryInterceptor.class);
 
     private ITransactionRetryService transactionRetryService;
-    private SessionFactory sessionFactory;
 
     private static final int MAX_ATTEMPTS = 5;
 
@@ -91,11 +86,6 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 	attempt.increment();
 	if (attempt.intValue() <= TransactionRetryInterceptor.MAX_ATTEMPTS) {
 	    message.append(". Retrying.");
-
-	    // the exception could have closed the session; try to recreate it here
-	    Session session = SessionFactoryUtils.getSession(sessionFactory, true);
-	    // same as in CustomizedOpenSessionInViewFilter
-	    session.setFlushMode(FlushMode.AUTO);
 	} else {
 	    message.append(". Giving up.");
 	}
@@ -104,9 +94,5 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 
     public void setTransactionRetryService(ITransactionRetryService transactionRetryService) {
 	this.transactionRetryService = transactionRetryService;
-    }
-
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
     }
 }
