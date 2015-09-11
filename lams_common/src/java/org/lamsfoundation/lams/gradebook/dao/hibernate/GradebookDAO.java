@@ -598,4 +598,16 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 		.setLong("lessonId", lesson.getLessonId()).setParameterList("userIds", userIds).list();
 	return results;
     }
+    
+    @Override
+    public List<GradebookUserLesson> getGradebookUserLessons(List<Long> lessonIds) {
+	final String GET_GRADEBOOK_LEARNER_LESSONS_BY_LESSON_LIST = "FROM GradebookUserLesson ul WHERE "
+		+ " ul.lesson.lessonId IN (:lessonIds)";
+
+	List<GradebookUserLesson> gradebookUserLessons = getSession()
+		.createQuery(GET_GRADEBOOK_LEARNER_LESSONS_BY_LESSON_LIST).setParameterList("lessonIds", lessonIds)
+		.list();
+
+	return gradebookUserLessons;
+    }
 }

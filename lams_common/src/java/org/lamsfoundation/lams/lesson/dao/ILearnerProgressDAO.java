@@ -110,6 +110,14 @@ public interface ILearnerProgressDAO {
      * @return
      */
     List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId, final List<Integer> userIds);
+    
+    /**
+     * Get all the learner progresses for a lesson list.
+     * 
+     * @param lessonIds
+     * @return
+     */
+    List<LearnerProgress> getLearnerProgressForLessons(final List<Long> lessonIds);
 
     /**
      * Get all the users records where the user has attempted the given activity. Uses the progress records to determine
