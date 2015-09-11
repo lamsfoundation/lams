@@ -39,6 +39,7 @@
 	var MAX_RATES = 0,
 	MIN_RATES = 0,
 	COMMENTS_MIN_WORDS_LIMIT = 0,
+	MAX_RATINGS_FOR_ITEM = 0,
 	LAMS_URL = '',
 	COUNT_RATED_ITEMS = 0,
 	COMMENT_TEXTAREA_TIP_LABEL = '',
@@ -171,6 +172,8 @@
 		</h1>
 		<br>
 	</c:if>
+
+	<c:out value="${groupSummary}"/>
 	
 	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 	<div id="pager${groupSummary.sessionId}"></div> 

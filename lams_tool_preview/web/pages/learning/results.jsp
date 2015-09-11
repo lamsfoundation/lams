@@ -35,6 +35,7 @@
 		var MAX_RATES = ${peerreview.maximumRates},
 		MIN_RATES = ${peerreview.minimumRates},
 		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.commentsMinWordsLimit},
+		MAX_RATINGS_FOR_ITEM = ${peerreview.maximumRatesPerUser},
 		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
