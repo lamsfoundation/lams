@@ -164,6 +164,7 @@ public class ToolContentVersionFilter {
 		Document eledoc = eleBuilder.build(new StringReader(eleWriter.toString()));
 		Element eleRoot = eledoc.getRootElement();
 		eleRoot.setName(added.fieldname);
+		eleRoot.detach();
 		root.addContent(eleRoot);
 
 		ToolContentVersionFilter.log.debug("Field " + added.fieldname + " in class "
