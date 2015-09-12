@@ -622,7 +622,7 @@ var MenuLib = {
 					GeneralLib.openLearningDesign(currentLearningDesignID);
 					
 					// generate images of the imported LD
-					GeneralLib.saveLearningDesignImages();
+					GeneralLib.saveLearningDesignImage();
 				}
 			}, 1000);
 	},
