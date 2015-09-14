@@ -249,6 +249,24 @@ public class LamsToolService implements ILamsToolService {
 	return null;
     }
 
+    @Override
+    public Set<User> getUsersForActivity(Long toolSessionId) {
+	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
+	return session != null ? session.getLearners() : new HashSet<User>();
+    }
+
+    @Override
+    public Integer getCountUsersForActivity(Long toolSessionId) {
+
+	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
+	if ( session.getToolSessionTypeId() == ToolSession.GROUPED_TYPE ) {
+	    return toolSessionDAO.getCountUsersGrouped(toolSessionId);
+	} else {
+	    // expect it to be 0 or 1 
+	    return session.getLearners().size();
+	}
+    }
+
     /**
      * @return Returns the toolDAO.
      */

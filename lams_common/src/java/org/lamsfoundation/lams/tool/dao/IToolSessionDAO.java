@@ -76,4 +76,11 @@ public interface IToolSessionDAO
 	public List getToolSessionByActivity(final Activity activity);
 	
 	public void updateToolSession(ToolSession toolSession);
+	
+	/**
+	 * Get a count of all the possible users for an activity connected to a tool session, where 
+	 * it is a GroupedToolSession ie discriminator-value="1". Don't call on any other type of 
+	 * tool session.
+	 */
+	public Integer getCountUsersGrouped(final long toolSessionId);
 }
