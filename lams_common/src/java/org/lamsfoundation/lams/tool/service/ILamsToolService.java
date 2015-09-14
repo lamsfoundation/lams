@@ -99,4 +99,18 @@ public interface ILamsToolService {
      * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
+    
+    /**
+     * Get all the potential users for an Activity - they may or may not have joined the lesson.
+     * Works for both grouped, non-grouped and whole class activities.
+     * @param toolSessionId
+     * @return
+     */
+    Set<User> getUsersForActivity(Long toolSessionId);
+
+    /**
+     * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);
+     */ 
+    Integer getCountUsersForActivity(Long toolSessionId);
+
 }
