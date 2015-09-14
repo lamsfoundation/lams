@@ -47,6 +47,7 @@ import com.meterware.httpunit.Button;
 import com.meterware.httpunit.FormControl;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
+import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 
 /**
@@ -127,6 +128,9 @@ public class MockLearner extends MockUser implements Runnable {
     private static final Pattern SUBMIT_FILES_FINISH_PATTERN = Pattern
 	    .compile("/lams/tool/lasbmt11/learner\\.do\\?method=finish\\&sessionMapID=sessionMapID-\\d+");
 
+    private static final String PEER_REVIEW_SUBSTRING = "/lams/tool/laprev11/";
+    private static final String PEER_REVIEW_SHOW_RESULTS_SUBSTRING = "/lams/tool/laprev11/learning/showResults.do";
+    private static final String PEER_REVIEW_FINISH_SUBSTRING = "/lams/tool/laprev11/learning/finish.do";
     private static int joinLessonUserCount = 0;
     private static int topJoinLessonUserCount = 0;
     private boolean finished = false;
@@ -267,6 +271,8 @@ public class MockLearner extends MockUser implements Runnable {
 	    throw new RuntimeException(e);
 	} catch (SAXException e) {
 	    throw new RuntimeException(e);
+	} catch (InterruptedException e) {
+	    throw new RuntimeException(e);
 	} finally {
 	    ((LearnerTest) test).allDoneSignal.countDown();
 	}
@@ -348,7 +354,7 @@ public class MockLearner extends MockUser implements Runnable {
 	return null;
     }
 
-    private WebResponse handleActivity(WebResponse resp) throws SAXException, IOException {
+    private WebResponse handleActivity(WebResponse resp) throws SAXException, IOException, InterruptedException {
 	// MockLearner.log.debug(resp.getText());
 
 	WebResponse nextResp = null;
@@ -387,46 +393,52 @@ public class MockLearner extends MockUser implements Runnable {
 
 	do {
 	    index++;
-	    if (index >= forms.length) {
-		throw new TestHarnessException(username
-			+ " checked all forms on the page and does not know how to finish the activity");
-	    }
 	    form = forms[index];
 	    action = form.getAction();
-	} while ((action == null) || (action.trim().length() == 0));
+	} while ( index+1 < forms.length && ((action == null) || (action.trim().length() == 0)) );
 
-	// special behaviour for different flavours of activities
 	WebResponse nextResp = null;
-	while (action.startsWith(MockLearner.KNOCK_GATE_SUBSTRING)) {
-	    delay();
-	    MockLearner.log.debug(username + " knocking gate");
-	    nextResp = (WebResponse) new Call(wc, test, username + " knocks gate", form).execute();
-	    if (nextResp.getText().indexOf(MockLearner.KNOCK_GATE_SUBSTRING) == -1) {
-		return nextResp;
+	// special behaviour for different flavours of activities
+	if ( (action == null) || (action.trim().length() == 0) ) {
+	    if ( asText.contains(PEER_REVIEW_SUBSTRING) ) {
+		// Peer Review has only the pager form and not other forms!
+		return handleToolPeerReview(resp, asText);
+	    } else {
+		throw new TestHarnessException(username
+		+ " checked all forms on the page and does not know how to finish the activity");
 	    }
+	} else {
+	    while (action.startsWith(MockLearner.KNOCK_GATE_SUBSTRING)) {
+		delay();
+		MockLearner.log.debug(username + " knocking gate");
+		nextResp = (WebResponse) new Call(wc, test, username + " knocks gate", form).execute();
+		if (nextResp.getText().indexOf(MockLearner.KNOCK_GATE_SUBSTRING) == -1) {
+		    return nextResp;
+		}
+	    }
+	    if (asText.contains(MockLearner.TASK_FINISH_SUBSTRING)) {
+		return handleToolTaskList(resp);
+	    }
+	    if (action.startsWith(MockLearner.CHAT_FINISH_SUBSTRING)) {
+		handleToolChat(resp);
+	    } else if (action.contains(MockLearner.QA_TOOL_SUBSTRING)) {
+		// make QA look at "answerX__textarea" form fields rather than "answerX"
+		form.setAttribute("action", action + "&testHarness=true");
+	    } else if (action.contains(MockLearner.VIDEORECORDER_TOOL_STRING)) {
+		// the second form should be taken into consideration
+		form = forms[1];
+	    } else if (asText.contains(MockLearner.VOTE_LEARNER_FINISHED_BUTTON_STRING)) {
+		// this is normally done by Javascript in browser
+		form.setAttribute("action", action + "&dispatch=learnerFinished");
+	    } else if (asText.contains(MockLearner.VOTE_VIEW_ALL_RESULTS_BUTTON_STRING)) {
+		form.setAttribute("action", action + "&dispatch=viewAllResults");
+	    } else if (asText.contains(MockLearner.WIKI_EDIT_BUTTON_STRING)) {
+		form = handleToolWiki(form, action);
+	    } else if (asText.contains(MockLearner.ASSESSMENT_TOOL_SUBSTRING)) {
+		return handleToolAssessment(resp, form);
+	    } 
 	}
-	if (asText.contains(MockLearner.TASK_FINISH_SUBSTRING)) {
-	    return handleToolTaskList(resp);
-	}
-	if (action.startsWith(MockLearner.CHAT_FINISH_SUBSTRING)) {
-	    handleToolChat(resp);
-	} else if (action.contains(MockLearner.QA_TOOL_SUBSTRING)) {
-	    // make QA look at "answerX__textarea" form fields rather than "answerX"
-	    form.setAttribute("action", action + "&testHarness=true");
-	} else if (action.contains(MockLearner.VIDEORECORDER_TOOL_STRING)) {
-	    // the second form should be taken into consideration
-	    form = forms[1];
-	} else if (asText.contains(MockLearner.VOTE_LEARNER_FINISHED_BUTTON_STRING)) {
-	    // this is normally done by Javascript in browser
-	    form.setAttribute("action", action + "&dispatch=learnerFinished");
-	} else if (asText.contains(MockLearner.VOTE_VIEW_ALL_RESULTS_BUTTON_STRING)) {
-	    form.setAttribute("action", action + "&dispatch=viewAllResults");
-	} else if (asText.contains(MockLearner.WIKI_EDIT_BUTTON_STRING)) {
-	    form = handleToolWiki(form, action);
-	} else if (asText.contains(MockLearner.ASSESSMENT_TOOL_SUBSTRING)) {
-	    return handleToolAssessment(resp, form);
-	}
-
+	log.debug("Filling form fillFormArbitrarily");
 	nextResp = (WebResponse) new Call(wc, test, username + " submits tool form", fillFormArbitrarily(form))
 		.execute();
 
@@ -438,7 +450,7 @@ public class MockLearner extends MockUser implements Runnable {
 	return nextResp;
     }
 
-    private WebResponse handlePageWithoutForms(WebResponse resp) throws SAXException, IOException {
+    private WebResponse handlePageWithoutForms(WebResponse resp) throws SAXException, IOException, InterruptedException {
 	String asText = resp.getText();
 
 	if (asText.contains("submitAll")) {
@@ -479,11 +491,23 @@ public class MockLearner extends MockUser implements Runnable {
 	WebResponse nextResp = findAnAbsoluteURLOnPage(asText);
 	if (nextResp == null) {
 	    String url = MockLearner.findURLInLocationHref(resp, MockLearner.FINISH_SUBSTRING);
-	    if (url == null) {
-		throw new TestHarnessException("Unable to find a link to go to on page" + asText);
+	    if (url != null) {
+		nextResp = (WebResponse) new Call(wc, test, username + " forwarded to tool finish URL", url).execute();
+	    } else { 
+		// should this page refresh? such as for a Define Later? or the inital Peer Review page when the 
+		// users are being configured?
+		WebRequest req = resp.getRefreshRequest();
+		if ( req != null ) {
+		    int delay = resp.getRefreshDelay();
+		    MockLearner.log.debug(username+" waiting "+delay+"s for page refresh.");
+		    Thread.sleep(delay*1000);
+		    nextResp = wc.getResponse( req );
+		} else {
+		    throw new TestHarnessException("Unable to find a link to go to on page" + asText);
+		}
 	    }
-	    nextResp = (WebResponse) new Call(wc, test, username + " forwarded to tool finish URL", url).execute();
 	}
+
 	return nextResp;
     }
 
@@ -814,6 +838,35 @@ public class MockLearner extends MockUser implements Runnable {
 	return form;
     }
 
+    private WebResponse handleToolPeerReview(WebResponse resp, String asText) throws SAXException, IOException {
+	WebResponse replyResponse = null;
+
+	// Normally calls Javascript, will pull out the URL from the javascript instead.
+	int start = asText.indexOf(MockLearner.PEER_REVIEW_SHOW_RESULTS_SUBSTRING);
+	if ( start > 0 ) {
+	    int end = asText.indexOf("\';", start);
+	    String url = asText.substring(start, end);
+	    MockLearner.log.debug("Accessing the peer review rating screen using " + url);
+	    replyResponse = (WebResponse) new Call(wc, test, username + " applies ratings screen", url).execute();
+	} 
+
+	if (replyResponse == null) {
+	    MockLearner.log.debug(resp.getText());
+	    throw new TestHarnessException("Peer Review does not contain Show Results button or the call returned a null response");
+	}
+
+	start = asText.indexOf(MockLearner.PEER_REVIEW_FINISH_SUBSTRING);
+	if ( start > 0 ) {
+	    int end = asText.indexOf("\';", start);
+	    String url = asText.substring(start, end);
+	    MockLearner.log.debug("Ending peer review using url " + url);
+	    return (WebResponse) new Call(wc, test, username+" finishes Peer Review", url).execute();
+	} 
+
+	throw new TestHarnessException("Unable to finish the peer review. No finish link found.");
+
+    }
+
     private void joinLesson(String joinLessonURL, String lsId) {
 	delay();
 	String url = joinLessonURL.replace(MockLearner.LESSON_ID_PATTERN, lsId);
@@ -845,8 +898,9 @@ public class MockLearner extends MockUser implements Runnable {
      * @return void
      * @throws IOException
      * @throws SAXException
+     * @throws InterruptedException 
      */
-    private void progressThroughActivities(String lessonEntryURL, String lsId) throws SAXException, IOException {
+    private void progressThroughActivities(String lessonEntryURL, String lsId) throws SAXException, IOException, InterruptedException {
 	delay();
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " enters lesson", lessonEntryURL.replace(
 		MockLearner.LESSON_ID_PATTERN, lsId)).execute();
