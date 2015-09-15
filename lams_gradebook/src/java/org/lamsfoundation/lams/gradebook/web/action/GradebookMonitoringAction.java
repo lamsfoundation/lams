@@ -327,8 +327,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
-	if (!getSecurityService().isGroupMonitor(organisationID, user.getUserID(),
-		"export course gradebook spreadsheet", false)) {
+	if (!getSecurityService().hasOrgRole(organisationID, user.getUserID(),
+		new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook spreadsheet", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
