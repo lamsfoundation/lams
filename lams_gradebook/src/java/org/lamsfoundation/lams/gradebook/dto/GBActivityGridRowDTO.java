@@ -41,7 +41,6 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
     private String competences;
 
     // Properties for user view
-    private String output;
     private String activityUrl;
     private Date startDate;
 
@@ -135,14 +134,6 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	}
 	
 	return ret;
-    }
-
-    public String getOutput() {
-	return output;
-    }
-
-    public void setOutput(String output) {
-	this.output = output;
     }
 
     public String getCompetences() {

@@ -35,7 +35,6 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     
     // For activity view
     private Date startDate;
-    private String output;
     private String activityUrl;
     
     // For excel export
@@ -93,14 +92,6 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	}
 
 	return ret;
-    }
-
-    public String getOutput() {
-	return output;
-    }
-
-    public void setOutput(String output) {
-	this.output = output;
     }
 
     public String getActivityUrl() {

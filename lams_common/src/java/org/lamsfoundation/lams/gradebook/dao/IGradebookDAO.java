@@ -98,4 +98,6 @@ public interface IGradebookDAO extends IBaseDAO {
      * @return
      */
     List<GradebookUserLesson> getGradebookUserLessons(Lesson lesson, List<Integer> userIds);
+    
+    List<GradebookUserLesson> getGradebookUserLessons(List<Long> lessonIds);
 }
