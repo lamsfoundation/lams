@@ -173,8 +173,6 @@
 		<br>
 	</c:if>
 
-	<c:out value="${groupSummary}"/>
-	
 	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 	<div id="pager${groupSummary.sessionId}"></div> 
 	<br>
