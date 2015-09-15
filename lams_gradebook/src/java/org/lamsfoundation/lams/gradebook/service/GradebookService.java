@@ -1356,7 +1356,7 @@ public class GradebookService implements IGradebookService {
 	final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
-	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED) {
+	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED && learnerProgress.getCurrentActivity() != null) {
 		return "<img src='" + IMAGES_DIR + "/cog.png' title='"
 			+ StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle()) + "' />";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
