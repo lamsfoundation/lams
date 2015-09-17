@@ -33,16 +33,20 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.util.LineitemUtil;
 
 import blackboard.base.FormattedText;
+import blackboard.base.InitializationException;
 import blackboard.data.content.Content;
 import blackboard.data.content.CourseDocument;
 import blackboard.data.course.Course;
+import blackboard.data.user.User;
 import blackboard.persist.BbPersistenceManager;
 import blackboard.persist.Id;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbPersister;
+import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
+import blackboard.platform.context.ContextManagerFactory;
 import blackboard.platform.plugin.PlugInException;
 import blackboard.platform.plugin.PlugInUtil;
 import blackboard.portal.data.ExtraInfo;
@@ -60,13 +64,42 @@ public class StartLessonServlet extends HttpServlet {
     private static Logger logger = Logger.getLogger(StartLessonServlet.class);
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	process(request, response);
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	process(request, response);
+    }
+
+    protected void process(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	ContextManager ctxMgr = null;
 	Context ctx = null;
 	try {
-	    // get Blackboard context
+	    // In some instances of calling this servlet, the user is missing from the context. Try a few different ways to ensure we have the user!
+	    User user = null;
+
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
+	    if ( ctx != null ) {
+		user = ctx.getUser();
+	    }
+	    if ( user == null ) {
+		ctxMgr = ContextManagerFactory.getInstance();
+		ctx=ctxMgr.setContext(request);
+		if ( ctx != null ) {
+		    user = ctx.getUser();
+		}
+	    }
+	    if ( user == null ) {
+		ctx = ContextManagerFactory.getInstance().getContext();
+		if ( ctx !=null )
+		    user = ctx.getUser();
+	    }
+	    if ( user == null )
+		throw new RuntimeException("Unable to get user from context: cannot proceed to get Learning Designs");
+	    
+	    // we have a good context, now get on with the task.
 
 	    // Set the new LAMS Lesson Content Object
 	    CourseDocument bbContent = new blackboard.data.content.CourseDocument();
@@ -232,5 +265,32 @@ public class StartLessonServlet extends HttpServlet {
 	return value != null ? value.trim() : "";
     }
 
+    // In some instances of calling this servlet, the user is missing from the context. Try a few different ways to ensure we have the user!
+    private Context getContext(HttpServletRequest request) throws InitializationException, BbServiceException {
+
+	User user = null;
+
+	ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
+	Context ctx = ctxMgr.setContext(request);
+	if ( ctx != null ) {
+	    user = ctx.getUser();
+	}
+	if ( user == null ) {
+	    final ContextManager contextManagerViaFactory = ContextManagerFactory.getInstance();
+	    ctx=contextManagerViaFactory.setContext(request);
+	    if ( ctx != null ) {
+		user = ctx.getUser();
+	    }
+	}
+	if ( user == null ) {
+	    ctx = ContextManagerFactory.getInstance().getContext();
+	    if ( ctx !=null )
+		user = ctx.getUser();
+	}
+	if ( user != null )
+	    return ctx;
+	else 
+	    throw new RuntimeException("Unable to get user from context: cannot proceed to get Learning Designs");
+    }
 }
 

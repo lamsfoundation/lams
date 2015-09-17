@@ -32,10 +32,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.lamsfoundation.ld.integration.Constants;
 
 import blackboard.base.InitializationException;
+import blackboard.data.user.User;
 import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
+import blackboard.platform.context.ContextManagerFactory;
+import blackboard.platform.context.UserContext;
 
 /**
  * Makes a call to LAMS server to get learning designs and returns it.
@@ -45,7 +48,14 @@ public class LamsLearningDesignServlet extends HttpServlet {
     private static final long serialVersionUID = -351131323404991332L;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-	
+	process(request, response);
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+	process(request, response);
+    }
+
+    protected void process(HttpServletRequest request, HttpServletResponse response) {
 	String serverAddr = LamsSecurityUtil.getServerAddress();
 	String serverId = LamsSecurityUtil.getServerID();
 
@@ -75,10 +85,30 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	ContextManager ctxMgr = null;
 	Context ctx = null;
 	try {
-	    // get Blackboard context
+	    // In some instances of calling this servlet, the user is missing from the context. Try a few different ways to ensure we have the user!
+	    User user = null;
+
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
+	    if ( ctx != null ) {
+		user = ctx.getUser();
+	    }
+	    if ( user == null ) {
+		ctxMgr = ContextManagerFactory.getInstance();
+		ctx=ctxMgr.setContext(request);
+		if ( ctx != null ) {
+		    user = ctx.getUser();
+		}
+	    }
+	    if ( user == null ) {
+		ctx = ContextManagerFactory.getInstance().getContext();
+		if ( ctx !=null )
+		    user = ctx.getUser();
+	    }
+	    if ( user == null )
+		throw new RuntimeException("Unable to get user from context: cannot proceed to get Learning Designs");
 	    
+	    // we have a good context, now get on with the task.
 	    String method = usePaging ? "getPagedHomeLearningDesignsJSON" : "getLearningDesignsJSON";
 	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, courseId, folderId, method, type, search, page, size, sortName, sortDate);
 	    
@@ -98,5 +128,6 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	    }
 	}
     }
+    
 }
 

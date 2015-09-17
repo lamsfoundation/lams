@@ -45,7 +45,14 @@ public class LamsLearningDesignDeleteServlet extends HttpServlet {
     private static final long serialVersionUID = -351131323404991332L;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-	
+	process(request, response);
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+	process(request, response);
+    }
+
+    protected void process(HttpServletRequest request, HttpServletResponse response) {	
 	String serverAddr = LamsSecurityUtil.getServerAddress();
 	String serverId = LamsSecurityUtil.getServerID();
 

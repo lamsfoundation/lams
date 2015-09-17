@@ -46,6 +46,14 @@ public class RenderDesignImageServlet extends HttpServlet {
     private static final long serialVersionUID = -351131323404991332L;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
+	process(request, response);
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+	process(request, response);
+    }
+
+    public void process(HttpServletRequest request, HttpServletResponse response) {
 	
 	String strLearningDesignId = request.getParameter("sequence_id");
 	if ( strLearningDesignId != null ) {
