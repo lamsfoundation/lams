@@ -47,6 +47,8 @@ jboss			  hibernate-jbosscache2.jar             3.3.1.GA											 Red Hat
 
 jdom              jdom.jar 								0.7					   BSD/Apache style              Jason Hunter, Rolf Lear		  Java representation of an XML document                                                                                                     
 
+jlatexmath		  jlatexmath-1.0.3.jar                  1.0.3
+
 joid			  joid.jar								2.0					   Apache License 2.0			 								  Java Open ID library
 
 
