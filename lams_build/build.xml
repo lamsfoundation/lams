@@ -190,6 +190,7 @@
 				<include name="fckeditor/*.jar" />
 				<include name="jakarta-commons/*.jar" />
 				<include name="jdom/*.jar" />
+				<include name="jlatexmath/*.jar" />
 				<include name="mysql/*.jar" />
 				<include name="reload/*.jar" />
 				<include name="spring/*.jar" />

@@ -39,6 +39,7 @@
         <archive path="/lams_build/lib/xstream/xpp3-1.1.3.4d_b4_min.jar"/>
         <archive path="/lams_build/lib/flagstone/transform.jar"/>
         <archive path="/lams_build/lib/flagstone/translate.jar"/>
+        <archive path="/lams_build/lib/jlatexmath/jlatexmath-1.0.3.jar"/>
         <archive javadoc="http://www.lhelper.org/dev/lucene-2.4.0/docs/api/core/" path="/lams_build/lib/lucene/lucene-core-2.4.0.jar" source="/3rdParty_sources/lucene"/>
         <archive javadoc="http://www.lhelper.org/dev/lucene-2.4.0/docs/api/contrib-snowball/" path="/lams_build/lib/lucene/lucene-snowball-2.4.0.jar" source="/3rdParty_sources/lucene"/>
         <archive javadoc="http://www.jboss.org/file-access/default/members/jbosscache/freezone/docs/3.1.0.CR1/apidocs" path="/lams_build/lib/jboss/jbosscache-core.jar" source="/3rdParty_sources/jbosscache"/>
