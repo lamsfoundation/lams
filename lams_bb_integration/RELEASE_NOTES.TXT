@@ -106,5 +106,6 @@ Also supports calls to the LAMS server to use a dummy course to suit the templat
 * LDEV-3456: Adding further POST support.
 
 1.2.15 Release Fixes
+1.2.16 Release Fixes
 ====================
 * LDEV-3456: Adding new parameters to LAMSLearningDesign and StartLesson calls

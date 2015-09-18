@@ -50,8 +50,8 @@ import blackboard.portal.data.PortalExtraInfo;
 import blackboard.portal.servlet.PortalUtil;
 
 /**
- * Starts a lesson, returning the BB Content Id in JSON. Does exactly the same things (code is copied!) as start_lesson_proc.
- * Had tried wrapping the jsp but encountered too many problems.
+ * Starts a lesson, returning the BB Content Id in JSON. Based on start_lesson_proc but uses the username
+ * parameter as a basis for identifying the user. 
  * Return a server error rather than throw an exception as this will be consumed by AJAX call or the like. 
  */
 public class StartLessonServlet extends HttpServlet {
@@ -78,14 +78,6 @@ public class StartLessonServlet extends HttpServlet {
 
 	    // Set the new LAMS Lesson Content Object
 	    CourseDocument bbContent = new blackboard.data.content.CourseDocument();
-
-	    // Authorise current user for Course Control Panel (automatic redirect)
-	    try {
-		if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
-		    return;
-	    } catch (PlugInException e) {
-		throw new RuntimeException(e);
-	    }
 
 	    // Retrieve the Db persistence manager from the persistence service
 	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
@@ -226,6 +218,7 @@ public class StartLessonServlet extends HttpServlet {
 	    }
 	    
 	} catch (Exception e) {
+	    logger.error("Unable to start lesson "+e.getMessage(), e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
 	} finally {
 	    // make sure context is released
