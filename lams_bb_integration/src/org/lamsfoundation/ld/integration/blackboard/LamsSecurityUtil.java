@@ -33,7 +33,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -52,10 +51,13 @@ import org.w3c.dom.NamedNodeMap;
 
 import blackboard.base.BbList;
 import blackboard.data.course.CourseMembership;
+import blackboard.data.user.User;
 import blackboard.persist.BbPersistenceManager;
 import blackboard.persist.Id;
+import blackboard.persist.KeyNotFoundException;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseMembershipDbLoader;
+import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.portal.data.ExtraInfo;
@@ -128,7 +130,7 @@ public class LamsSecurityUtil {
 
 	// Even for authoring calls we still need a 'course' the user, role & organisation are all bound up together
 	// do to be authorised to use authoring you must be in an organisation.
-	String courseId = setupCourseId(ctx, null);
+	String courseId = setupCourseId(ctx, null, true);
 
 	String secretkey = LamsPluginUtil.getSecretKey();
 
@@ -227,13 +229,14 @@ public class LamsSecurityUtil {
      * @return a string containing the LAMS workspace tree in tigra format
      */
     public static String getLearningDesigns(Context ctx, String courseId, String folderId) {
-	return getLearningDesigns(ctx, courseId, folderId,"getLearningDesignsJSON",null,null,null,null,null,null);
+	return getLearningDesigns(ctx, null, courseId, folderId,"getLearningDesignsJSON",null,null,null,null,null,null);
     }
     
     /**
-     * Gets a list of learning designs & workspace folders for the current user from LAMS. 
+     * Gets a list of learning designs & workspace folders for the current user from LAMS or the user "usernameFromParam"
      * 
      * @param ctx  the blackboard context, contains session data
+     * @param usernameFromParam only used if there isn't a user in the context, due to how the servlet is called
      * @param courseId blackboard course id. We pass it as a parameter as ctx.getCourse().getCourseId() is null when called
      *            from LamsLearningDesignServlet.
      * @param folderId folderID in LAMS. It can be null and then LAMS returns default workspace folders.
@@ -244,12 +247,12 @@ public class LamsSecurityUtil {
      * @return a string containing the LAMS workspace tree in tigra format (method = getLearningDesignsJSON) or 
      *  a string containing the learning designs in JSON (method = getPagedHomeLearningDesignsJSON)
      */
-    public static String getLearningDesigns(Context ctx, String urlCourseId, String folderId, String method, String type,
+    public static String getLearningDesigns(Context ctx, String usernameFromParam, String urlCourseId, String folderId, String method, String type,
 	    String search, String page, String size, String sortName, String sortDate) {
 	
 	String serverAddr = getServerAddress();
 		
-	String courseId = setupCourseId(ctx, urlCourseId);
+	String courseId = setupCourseId(ctx, urlCourseId, true);
 	String serverId = getServerID();
 
 	// If lams.properties could not be read, throw exception
@@ -258,13 +261,18 @@ public class LamsSecurityUtil {
 	}
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
-	String username = ctx.getUser().getUserName();
-	String firstName = ctx.getUser().getGivenName();
-	String lastName = ctx.getUser().getFamilyName();
-	String email = ctx.getUser().getEmailAddress();
+
+	User user = ctx.getUser();
+	if ( user == null )
+	    user = loadUserFromDB(ctx, usernameFromParam);
+	
+	String username = user.getUserName();
+	String firstName = user.getGivenName();
+	String lastName = user.getFamilyName();
+	String email = user.getEmailAddress();
 	String hash = generateAuthenticationHash(timestamp, username, serverId);
 
-	String locale = ctx.getUser().getLocale();
+	String locale = user.getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 
@@ -340,6 +348,22 @@ public class LamsSecurityUtil {
 	return learningDesigns;
     }
 
+    private static User loadUserFromDB(Context ctx, String username) {
+	User user = null;
+	try {
+	    final UserDbLoader userDbLoader = UserDbLoader.Default.getInstance();
+	    user = userDbLoader.loadByUserName(username);
+	} catch (KeyNotFoundException e) {
+	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username+" Ctx "+ctx,e);
+	} catch (PersistenceException e) {
+	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username+" Ctx "+ctx,e);
+	}
+	if ( user == null ) {
+	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. Username "+username+" Ctx "+ctx);
+	}
+	return user;
+    }
+
     /**
      * Gets a list of learning designs & workspace folders for the current user from LAMS. 
      * 
@@ -351,7 +375,7 @@ public class LamsSecurityUtil {
      */
     public static String deleteLearningDesigns(Context ctx, String urlCourseId, Long ldId) {
 	
-	String courseId = setupCourseId(ctx, urlCourseId);
+	String courseId = setupCourseId(ctx, urlCourseId, false);
 
 	String serverAddr = getServerAddress();
 	String serverId = getServerID();
@@ -408,17 +432,17 @@ public class LamsSecurityUtil {
 	}
     }
 
-    private static String setupCourseId(Context ctx, String urlCourseId) {
+    private static String setupCourseId(Context ctx, String urlCourseId, boolean allowUserDummyCourse) {
 	// can we pull the alphanumeric course id from the context, rather than the on passed in from the URL? If neither exist, use the dummy Preview course.
 	String courseId = null;
 	if ( ctx.getCourse()!=null )
 	    courseId = ctx.getCourse().getCourseId();
-	if ( courseId == null )
-	    courseId = urlCourseId != null && urlCourseId.length() > 0 ? urlCourseId : DUMMY_COURSE;
+	if ( courseId == null && urlCourseId != null && urlCourseId.length() > 0)
+	    courseId = urlCourseId;
+	if ( courseId == null && allowUserDummyCourse )
+	    courseId = DUMMY_COURSE;
 	return courseId;
     }
-
- 
     /**
      * Starts lessons in lams through a LAMS webservice
      * 
@@ -434,27 +458,51 @@ public class LamsSecurityUtil {
      * @return the learning session id
      */
     public static Long startLesson(Context ctx, long ldId, String title, String desc, boolean isPreview) {
+	return startLesson(ctx, null, null, ldId, title, desc, isPreview);
+    }
+
+    /**
+     * Starts lessons in lams through a LAMS webservice using the username & courseId parameter, needed
+     * when there won't be a user / courseId in the context.
+     * 
+     * @param ctx
+     *            the blackboard contect, contains session data
+     * @param usernameFromParam
+     * 		  current user's username as a request parameter
+     * @param courseIdStr
+     * 		  courseId as a request parameter
+     * @param ldId
+     *            the learning design id for which you wish to start a lesson
+     * @param title
+     *            the title of the lesson
+     * @param desc
+     *            the description of the lesson 
+     *            
+     * @return the learning session id
+     */
+    public static Long startLesson(Context ctx, String usernameFromParam, String courseIdStr, long ldId, String title, String desc, boolean isPreview) {
 
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
-	String username = ctx.getUser().getUserName();
-	String locale = ctx.getUser().getLocale();
+	
+	User user = ctx.getUser();
+	if ( user == null ) 
+	    user = loadUserFromDB(ctx, usernameFromParam);
+
+	String username = user.getUserName();
+	String locale = user.getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 	String method = (isPreview) ? "preview" : "start";
 
-	// courseId aways needed to check roles
+	// courseId always needed to check roles
 	// if it is preview, then can use the DUMMY_COURSE
-	String courseId = null;
-	if ( isPreview ) 
-	    courseId = ctx.getCourse()!=null ? ctx.getCourse().getCourseId() : DUMMY_COURSE;
-	else 
-	    courseId = ctx.getCourse().getCourseId();
+	String courseId = setupCourseId(ctx, courseIdStr, isPreview);
 	
 	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
 	    logger.info("Unable to start lesson, one or more lams configuration properties or the course id is null");
-	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties or the course id is null");
+	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties or the course id is null. courseId="+courseId);
 	}
 
 	try {
