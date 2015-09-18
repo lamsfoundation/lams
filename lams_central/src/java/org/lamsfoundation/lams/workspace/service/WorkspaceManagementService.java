@@ -98,6 +98,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     protected IUserManagementService userMgmtService;
     protected MessageService messageService;
 
+    // To support integrations that need a type for the learning design, any designs that do not have a type field set, 
+    // return "default" in the type field. Also, the integrations can search for designs that do not have a type field
+    // set by setting type = default. This setup is done in the FolderContentDTO. See LDEV-3523
+    protected static final String DEFAULT_DESIGN_TYPE = "default";
+
     /**
      * i18n Message service
      * 
@@ -477,6 +482,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
 		result.append("folders", subfolderJSON);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
+		if ( folderContent.getDesignType() == null )
+		    folderContent.setDesignType(DEFAULT_DESIGN_TYPE);
 		if ( designType == null || designType.equals(folderContent.getDesignType())) {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", folderContent.getName());
@@ -531,7 +538,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", StringEscapeUtils.escapeHtml(design.getTitle()));
 		    learningDesignJSON.put("learningDesignId", design.getLearningDesignId());
-		    learningDesignJSON.putOpt("type", design.getDesignType());
+		    learningDesignJSON.putOpt("type", design.getDesignType() != null ? design.getDesignType() : DEFAULT_DESIGN_TYPE);
 		    learningDesignJSON.put("date", design.getLastModifiedDateTime());
 		    result.put(learningDesignJSON);
 		}
