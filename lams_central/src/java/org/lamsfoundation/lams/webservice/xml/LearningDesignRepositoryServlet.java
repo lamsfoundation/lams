@@ -352,8 +352,6 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
        			sortDate == null ? null : ( sortDate.equals("0") ? "DESC" : "ASC" ));
        		}
 
-       		log.debug("LearningDesignRepositoryServlet returning "+folderContentsJSON);
-       		
         	response.setContentType("application/json;charset=UTF-8");
         	response.getWriter().write(folderContentsJSON);
 
@@ -366,8 +364,6 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		log.debug("User "+userId+" "+username+" deleting learning design "+learningDesignId);
 		String wddxResponse = service.deleteResource(learningDesignId, FolderContentDTO.DESIGN, userId);
 		Hashtable table = (Hashtable) WDDXProcessor.deserialize(wddxResponse);
-
-		log.debug("Delete response "+wddxResponse);
 
 		Double messageTypeDouble = (Double) table.get("messageType");
 		int messageType = messageTypeDouble != null ? messageTypeDouble.intValue() : 0;

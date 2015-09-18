@@ -253,6 +253,10 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
 	    this.originalAuthor = originalAuthor;
 	}
 	
+	public void setDesignType(String designType) {
+		this.designType = designType;
+	}
+
 	private String formatLastModifiedDateTime(TimeZone tz) {
 		if(this.lastModifiedDateTime != null) {
 			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
