@@ -238,12 +238,14 @@
 									rows += '<td style="width:30%; min-width: 250px;" id="comments-area-' + itemId + '">';
 										
 										//show all comments needs to be shown
+										if (userData.comments) {
 											for (j = 0; j < userData.comments.length; j++){
 												var comment = userData.comments[j];
 												rows += '<div class="rating-comment">';
 												rows += 	comment;
 												rows += '</div>';
 											}
+										}
 									
 									rows += '</td>';
 								}
