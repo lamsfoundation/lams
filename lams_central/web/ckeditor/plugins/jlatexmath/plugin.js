@@ -10,4 +10,25 @@
 	                  	}
 	                 }
 	             );
-	             	             CKEDITOR.dialog.addIframe(	            	'Jlatexmath',	            	editor.lang.jlatexmath.DlgJlatexmathTitle,	                pluginPath + 'jlatexmath.jsp',	                450,	                260	             );	}});
+	             	             CKEDITOR.dialog.addIframe(	            	'Jlatexmath',	            	editor.lang.jlatexmath.DlgJlatexmathTitle,	                pluginPath + 'jlatexmath.jsp',	                450,	                260	             );
+	             
+	 			editor.on( 
+	 				'doubleclick', 
+	 				function(evt) {
+	 					var element = evt.data.element;
+	 					if (element && element.is('img')) {
+	 						
+	 						var sName = element.getAttribute('src').match( /jlatexmath\?formula(.*)/ );
+	 						if (sName!=null) {
+	 							evt.data.dialog = 'Jlatexmath';
+	 							
+	 							evt.cancelBubble = true; 
+	 							evt.returnValue = false; 
+	 						}
+	 					}
+	 				}, 
+	 				null, 
+	 				null, 
+	 				1
+	 			);
+	}});
