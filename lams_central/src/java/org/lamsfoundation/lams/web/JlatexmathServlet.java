@@ -23,9 +23,10 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.web;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
@@ -36,11 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.JLabel;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
@@ -61,21 +58,31 @@ public class JlatexmathServlet extends HttpServlet {
 	    return;
 	}
 	
+	Integer fontSize = WebUtil.readIntParam(request, "fontSize", true);
+	if (fontSize == null) {
+	    fontSize = 20;
+	}
+	
 	TeXFormula formula = new TeXFormula(formulaParam);
 	TeXIcon icon = formula.new TeXIconBuilder().setStyle(TeXConstants.STYLE_DISPLAY)
-		.setSize(40)
+		.setSize(fontSize)
 		.setWidth(TeXConstants.UNIT_PIXEL, 256f, TeXConstants.ALIGN_CENTER)
 		.setIsMaxWidth(true).setInterLineSpacing(TeXConstants.UNIT_PIXEL, 20f)
 		.build();
 	
 //	TeXFormula fomule = new TeXFormula(formula);
 //	TeXIcon ti = fomule.createTeXIcon(TeXConstants.STYLE_DISPLAY, 40);
-	BufferedImage b = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+	BufferedImage b = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+//	Color transparent = new Color(0, true);
+//	((Graphics2D)b.getGraphics()).setBackground(transparent);
+//	b.getGraphics().clearRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
+	
+	((Graphics2D)b.getGraphics()).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F));
 	icon.paintIcon(new JLabel(), b.getGraphics(), 0, 0);
 	
-	response.setContentType("image/jpeg");
+	response.setContentType("image/png");
 	OutputStream out = response.getOutputStream();
-	ImageIO.write(b, "jpg", out);
+	ImageIO.write(b, "png", out);
 	out.close();
     }
 
