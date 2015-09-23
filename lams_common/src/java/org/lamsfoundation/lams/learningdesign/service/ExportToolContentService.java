@@ -2261,6 +2261,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	ld.setLastModifiedDateTime(dto.getLastModifiedDateTime());
 	ld.setContentFolderID(dto.getContentFolderID());
+	
+	ld.setDesignType(dto.getDesignType());
 
 	// set learning design to transition.
 	for (Transition trans : transList) {
