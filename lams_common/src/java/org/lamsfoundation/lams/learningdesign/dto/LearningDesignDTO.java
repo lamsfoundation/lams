@@ -75,6 +75,7 @@ public class LearningDesignDTO extends BaseDTO {
     private Long licenseID;
     private Date lastModifiedDateTime;
     private String contentFolderID;
+    private String designType;
 
     /* Groupings Array which contain the groupings objects, which had been created by the grouping activities
      * in this learning design.
@@ -135,6 +136,8 @@ public class LearningDesignDTO extends BaseDTO {
 	this.licenseText = learningDesign.getLicenseText();
 
 	this.licenseID = learningDesign.getLicense() != null ? learningDesign.getLicense().getLicenseID() : null;
+	
+	this.designType = learningDesign.getDesignType();
 
 	this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
 	this.branchMappings = new ArrayList(); // data will be set up by populateGroupings
@@ -747,4 +750,14 @@ public class LearningDesignDTO extends BaseDTO {
     public void setAnnotations(ArrayList<LearningDesignAnnotation> annotations) {
 	this.annotations = annotations;
     }
+    
+    public String getDesignType() {
+        return designType;
+    }
+
+    public void setDesignType(String designType) {
+        this.designType = designType;
+    }
+
+ 
 }
