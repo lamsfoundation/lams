@@ -26,23 +26,24 @@ package org.lamsfoundation.lams.tool.assessment.util;
 import java.util.Comparator;
 
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
+import org.lamsfoundation.lams.util.AlphanumComparator;
 
 /**
- * AssessmentSessionComparator.
+ * AssessmentSession comparator.
  * 
  * @author Andrey Balan
  * 
  */
 public class AssessmentSessionComparator implements Comparator<AssessmentSession> {
 
-    public int compare(AssessmentSession o1, AssessmentSession o2) {
-	if ((o1 != null) && (o2 != null) & (o1.getSessionStartDate() != null) && (o2.getSessionStartDate() != null)) {
-	    return (o1.getSessionStartDate().getTime() - o2.getSessionStartDate().getTime()) > 0 ? 1 : -1;
-	} else if (o1 != null) {
-	    return 1;
-	} else {
-	    return -1;
-	}
+    private static AlphanumComparator alphanumComparator = new AlphanumComparator();
+
+    public int compare(AssessmentSession session1, AssessmentSession session2) {
+	
+	String session1Name = session1 != null ? session1.getSessionName() : "";
+	String session2Name = session2 != null ? session2.getSessionName() : "";
+	
+	return alphanumComparator.compare(session1Name, session2Name);
     }
 
 }
