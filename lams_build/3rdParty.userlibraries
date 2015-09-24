@@ -24,6 +24,7 @@
         <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>
         <archive path="/lams_build/lib/flagstone/transform.jar"/>
         <archive path="/lams_build/lib/flagstone/translate.jar"/>
+        <archive path="/lams_build/lib/jlatexmath/jlatexmath-1.0.3.jar"/>
         <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.0.jar" source="/3rdParty_sources/commons-httpclient"/>
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.1.31-bin.jar" source="/3rdParty_sources/mysql-connector"/>
