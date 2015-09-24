@@ -568,6 +568,16 @@
 		
 		
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/scilab/forge/jlatexmath/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jlatexmath">
+				<include name="jlatexmath-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/scilab/forge/jlatexmath/main/module.xml"
+			  file="lib/jlatexmath/jlatexmath.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
 		<copy todir="${server.home}/modules/system/layers/base/org/verisign/joid/main" overwrite="true" verbose="true">
 			<fileset dir="lib/joid">
 				<include name="joid.jar" />
