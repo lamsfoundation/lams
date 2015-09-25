@@ -26,77 +26,73 @@ package org.lamsfoundation.lams.tool.noticeboard.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 
 /**
  * @author mtruong
  * 
- * <p>Interface for the NoticeboardSession DAO, defines methods needed to access/modify
- * noticeboard users (learners of the noticeboard activity) </p>
+ *         <p>
+ *         Interface for the NoticeboardSession DAO, defines methods needed to access/modify noticeboard users (learners
+ *         of the noticeboard activity)
+ *         </p>
  */
-public interface INoticeboardUserDAO {
-    
-   
+public interface INoticeboardUserDAO extends IBaseDAO {
+
     /**
-	 * <p> Return the persistent instance of a NoticeboardUser
-	 * with the given user id <code>userId</code>,
-	 * returns null if not found.</p>
-	 * 
-	 * @param userId The id of a NoticeboardUser
-	 * @return the persistent instance of a NoticeboardUser or null if not found.
-	 */
-    public NoticeboardUser getNbUser(Long userId, Long toolSessionId);
-    
-    /**
-	 * <p> Return the persistent instance of a NoticeboardUser
-	 * who has the user id <code>userId</code> and tool session id
-	 * <code>sessionId</code>
-	 * returns null if not found.</p>
-	 * 
-	 * @param userId. The id of the learner
-	 * @param sessionId. The tool session id to which this user belongs to.
-	 * @return the persistent instance of a NoticeboardUser or null if not found.
-	 */
-    public NoticeboardUser getNbUserBySession(Long userId, Long sessionId);
-    
-    /**
-	 * <p>Persist the given persistent instance of NoticeboardUser.</p>
-	 * 
-	 * @param nbUser The instance of NoticeboardUser to persist.
-	 */
-    public void saveNbUser(NoticeboardUser nbUser);
-    
-    /**
-     * <p>Update the given persistent instance of NoticeboardUser.</p>
+     * <p>
+     * Return the persistent instance of a NoticeboardUser with the given user id <code>userId</code>, returns null if
+     * not found.
+     * </p>
      * 
-     * @param nbUser The instance of NoticeboardUser to persist.
+     * @param userId
+     *            The id of a NoticeboardUser
+     * @return the persistent instance of a NoticeboardUser or null if not found.
+     */
+    public NoticeboardUser getNbUser(Long userId, Long toolSessionId);
+
+    /**
+     * <p>
+     * Return the persistent instance of a NoticeboardUser who has the user id <code>userId</code> and tool session id
+     * <code>sessionId</code> returns null if not found.
+     * </p>
+     * 
+     * @param userId.
+     *            The id of the learner
+     * @param sessionId.
+     *            The tool session id to which this user belongs to.
+     * @return the persistent instance of a NoticeboardUser or null if not found.
+     */
+    public NoticeboardUser getNbUserBySession(Long userId, Long sessionId);
+
+    /**
+     * <p>
+     * Persist the given persistent instance of NoticeboardUser.
+     * </p>
+     * 
+     * @param nbUser
+     *            The instance of NoticeboardUser to persist.
+     */
+    public void saveNbUser(NoticeboardUser nbUser);
+
+    /**
+     * <p>
+     * Update the given persistent instance of NoticeboardUser.
+     * </p>
+     * 
+     * @param nbUser
+     *            The instance of NoticeboardUser to persist.
      */
     public void updateNbUser(NoticeboardUser nbUser);
-    
+
     /**
-     * <p>Delete the given instance of NoticeboardUser</p>
-     * 
-     * @param nbUser The instance of NoticeboardUser to delete. 
-     */
-    public void removeNbUser(NoticeboardUser nbUser);
-    
-    /**
-     * <p>Delete the given instance of NoticeboardUser with the
-     * given user id <code>userId</code>
-     * 
-     * @param userId The noticeboard user id.
-     */
-    public void removeNbUser(Long userId);
-    
-    /**
-     * Returns the number of users that are in this particular
-     * session.
+     * Returns the number of users that are in this particular session.
      * 
      * @param nbSession
      * @return the number of users that are in this session
      */
     public int getNumberOfUsers(NoticeboardSession nbSession);
-   
+
     public List getNbUsersBySession(Long sessionId);
 }

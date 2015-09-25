@@ -24,9 +24,6 @@
 
 package org.lamsfoundation.lams.tool.wookie.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -73,239 +70,206 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * An implementation of the IWookieService interface.
  * 
- * As a requirement, all LAMS tool's service bean must implement
- * ToolContentManager and ToolSessionManager.
+ * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class WookieService implements ToolSessionManager, ToolContentManager,
-		IWookieService, ToolContentImport102Manager {
+public class WookieService
+	implements ToolSessionManager, ToolContentManager, IWookieService, ToolContentImport102Manager {
 
     private static Logger logger = Logger.getLogger(WookieService.class.getName());
 
-	private IWookieDAO wookieDAO = null;
+    private IWookieDAO wookieDAO = null;
 
-	private IWookieSessionDAO wookieSessionDAO = null;
+    private IWookieSessionDAO wookieSessionDAO = null;
 
-	private IWookieUserDAO wookieUserDAO = null;
+    private IWookieUserDAO wookieUserDAO = null;
 
-	private ILearnerService learnerService;
+    private ILearnerService learnerService;
 
-	private ILamsToolService toolService;
+    private ILamsToolService toolService;
 
-	private IToolContentHandler wookieToolContentHandler = null;
+    private IToolContentHandler wookieToolContentHandler = null;
 
-	private IExportToolContentService exportContentService;
+    private IExportToolContentService exportContentService;
 
-	private ICoreNotebookService coreNotebookService;
+    private ICoreNotebookService coreNotebookService;
 
-	private WookieOutputFactory wookieOutputFactory;
+    private WookieOutputFactory wookieOutputFactory;
 
-	private IWookieConfigItemDAO wookieConfigItemDAO;
+    private IWookieConfigItemDAO wookieConfigItemDAO;
 
-	private MessageService messageService;
+    private MessageService messageService;
 
-	private IUserManagementService userManagementService;
+    private IUserManagementService userManagementService;
 
-	public WookieService() {
-		super();
+    public WookieService() {
+	super();
+    }
+
+    /* ************ Methods from ToolSessionManager ************* */
+
+    @Override
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
+	if (WookieService.logger.isDebugEnabled()) {
+	    WookieService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
-	/* ************ Methods from ToolSessionManager ************* */
-	
-	@Override
-	public void createToolSession(Long toolSessionId, String toolSessionName,
-			Long toolContentId) throws ToolException {
-		if (WookieService.logger.isDebugEnabled()) {
-			WookieService.logger.debug("entering method createToolSession:"
-					+ " toolSessionId = " + toolSessionId
-					+ " toolSessionName = " + toolSessionName
-					+ " toolContentId = " + toolContentId);
+	WookieSession session = new WookieSession();
+	session.setSessionId(toolSessionId);
+	session.setSessionName(toolSessionName);
+	// learner starts
+	// TODO need to also set other fields.
+	Wookie wookie = wookieDAO.getByContentId(toolContentId);
+	session.setWookie(wookie);
+
+	// Create a copy of the widget for the session
+	// Clone the wookie widget on the external server
+	String wookieUrl = getWookieURL();
+	try {
+	    String newSharedDataKey = toolSessionId.toString() + "_" + toolContentId.toString();
+
+	    if (wookieUrl != null) {
+
+		if ((wookie.getWidgetIdentifier() != null) && (wookie.getWidgetIdentifier() != "")) {
+
+		    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+		    WookieService.logger
+			    .debug("Creating a new clone for session of widget: " + toolContentId.toString());
+		    boolean success = WookieUtil.cloneWidget(wookieUrl, getWookieAPIKey(), wookie.getWidgetIdentifier(),
+			    toolContentId.toString(), newSharedDataKey, wookie.getCreateBy().toString());
+
+		    if (success) {
+			session.setWidgetSharedDataKey(newSharedDataKey);
+			session.setWidgetHeight(wookie.getWidgetHeight());
+			session.setWidgetWidth(wookie.getWidgetWidth());
+			session.setWidgetMaximise(wookie.getWidgetMaximise());
+			session.setWidgetIdentifier(wookie.getWidgetIdentifier());
+		    } else {
+			throw new WookieException("Failed to copy widget on wookie server, check log for details.");
+		    }
 		}
 
-		WookieSession session = new WookieSession();
-		session.setSessionId(toolSessionId);
-		session.setSessionName(toolSessionName);
-		// learner starts
-		// TODO need to also set other fields.
-		Wookie wookie = wookieDAO.getByContentId(toolContentId);
-		session.setWookie(wookie);
-
-		// Create a copy of the widget for the session
-		// Clone the wookie widget on the external server
-		String wookieUrl = getWookieURL();
-		try {
-			String newSharedDataKey = toolSessionId.toString() + "_"
-					+ toolContentId.toString();
-
-			if (wookieUrl != null) {
-
-				if (wookie.getWidgetIdentifier() != null
-						&& wookie.getWidgetIdentifier() != "") {
-
-					wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
-
-					logger.debug("Creating a new clone for session of widget: "
-							+ toolContentId.toString());
-					boolean success = WookieUtil.cloneWidget(wookieUrl,
-							getWookieAPIKey(), wookie.getWidgetIdentifier(),
-							toolContentId.toString(), newSharedDataKey, wookie
-									.getCreateBy().toString());
-
-					if (success) {
-						session.setWidgetSharedDataKey(newSharedDataKey);
-						session.setWidgetHeight(wookie.getWidgetHeight());
-						session.setWidgetWidth(wookie.getWidgetWidth());
-						session.setWidgetMaximise(wookie.getWidgetMaximise());
-						session.setWidgetIdentifier(wookie
-								.getWidgetIdentifier());
-					} else {
-						throw new WookieException(
-								"Failed to copy widget on wookie server, check log for details.");
-					}
-				}
-
-			} else {
-				throw new WookieException("Wookie url is not set");
-			}
-		} catch (Exception e) {
-			logger.error("Problem calling wookie server to clone instance", e);
-			throw new WookieException(
-					"Problem calling wookie server to clone instance", e);
-		}
-
-		wookieSessionDAO.saveOrUpdate(session);
+	    } else {
+		throw new WookieException("Wookie url is not set");
+	    }
+	} catch (Exception e) {
+	    WookieService.logger.error("Problem calling wookie server to clone instance", e);
+	    throw new WookieException("Problem calling wookie server to clone instance", e);
 	}
 
-	@Override
-	public String leaveToolSession(Long toolSessionId, Long learnerId)
-			throws DataMissingException, ToolException {
-		return learnerService.completeToolSession(toolSessionId, learnerId);
-	}
+	wookieSessionDAO.saveOrUpdate(session);
+    }
 
-	@Override
-	public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
-			throws DataMissingException, ToolException {
-		return null;
-	}
+    @Override
+    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
+	return learnerService.completeToolSession(toolSessionId, learnerId);
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public ToolSessionExportOutputData exportToolSession(List ToolSessionIds)
-			throws DataMissingException, ToolException {
-		return null;
-	}
+    @Override
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
+	return null;
+    }
 
-	@Override
-	public void removeToolSession(Long toolSessionId)
-			throws DataMissingException, ToolException {
-		wookieSessionDAO.deleteBySessionID(toolSessionId);
-		// TODO check if cascade worked
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public ToolSessionExportOutputData exportToolSession(List ToolSessionIds)
+	    throws DataMissingException, ToolException {
+	return null;
+    }
 
-	@Override
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
-			Long toolSessionId, Long learnerId) {
-		return getWookieOutputFactory().getToolOutput(names, this,
-				toolSessionId, learnerId);
-	}
+    @Override
+    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	wookieSessionDAO.deleteBySessionID(toolSessionId);
+	// TODO check if cascade worked
+    }
 
-	@Override
-	public ToolOutput getToolOutput(String name, Long toolSessionId,
-			Long learnerId) {
-		return getWookieOutputFactory().getToolOutput(name, this,
-				toolSessionId, learnerId);
-	}
-	
+    @Override
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
+	return getWookieOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
+    }
+
+    @Override
+    public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
+	return getWookieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	// no actions required
     }
 
-	/* ************ Methods from ToolContentManager ************************* */
+    /* ************ Methods from ToolContentManager ************************* */
 
-	public void copyToolContent(Long fromContentId, Long toContentId)
-			throws ToolException {
+    @Override
+    public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
-		if (WookieService.logger.isDebugEnabled()) {
-			WookieService.logger.debug("entering method copyToolContent:"
-					+ " fromContentId=" + fromContentId + " toContentId="
-					+ toContentId);
-		}
-
-		if (toContentId == null) {
-			String error = "Failed to copy tool content: toContentID is null";
-			throw new ToolException(error);
-		}
-
-		Wookie fromContent = null;
-		if (fromContentId != null) {
-			fromContent = wookieDAO.getByContentId(fromContentId);
-		}
-		if (fromContent == null) {
-			// create the fromContent using the default tool content
-			fromContent = getDefaultContent();
-		}
-		Wookie toContent = Wookie.newInstance(fromContent, toContentId);
-
-		// Clone the wookie widget on the external server
-		String wookieUrl = getWookieURL();
-		try {
-			if (wookieUrl != null) {
-				if (fromContent.getWidgetIdentifier() != null
-						&& fromContent.getWidgetIdentifier() != "") {
-					wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
-
-					logger
-							.debug("Creating a new clone for copycontent for widget: "
-									+ fromContentId.toString());
-					boolean success = WookieUtil.cloneWidget(wookieUrl,
-							getWookieAPIKey(), fromContent
-									.getWidgetIdentifier(), fromContentId
-									.toString(), toContentId.toString(),
-							fromContent.getCreateBy().toString());
-
-					if (success) {
-						toContent
-								.setWidgetHeight(fromContent.getWidgetHeight());
-						toContent.setWidgetWidth(fromContent.getWidgetWidth());
-						toContent.setWidgetAuthorUrl(fromContent
-								.getWidgetAuthorUrl());
-						toContent.setWidgetMaximise(fromContent
-								.getWidgetMaximise());
-						toContent.setWidgetIdentifier(fromContent
-								.getWidgetIdentifier());
-						toContent.setCreateBy(fromContent.getCreateBy());
-
-						// Need to add the author to the widget so authoring
-						// widget url is different in the copy
-						User user = (User) userManagementService.findById(
-								User.class, fromContent.getCreateBy());
-						String returnXML = WookieUtil.getWidget(wookieUrl,
-								getWookieAPIKey(), fromContent
-										.getWidgetIdentifier(), user
-										.getUserDTO(), toContentId.toString(),
-								true);
-
-						toContent.setWidgetAuthorUrl(WookieUtil
-								.getWidgetUrlFromXML(returnXML));
-
-					} else {
-						throw new WookieException(
-								"Failed to copy widget on wookie server, check log for details.");
-					}
-				}
-			} else {
-				throw new WookieException("Wookie url is not set");
-			}
-		} catch (Exception e) {
-			logger.error("Problem calling wookie server to clone instance", e);
-			throw new WookieException(
-					"Problem calling wookie server to clone instance", e);
-		}
-
-		wookieDAO.saveOrUpdate(toContent);
+	if (WookieService.logger.isDebugEnabled()) {
+	    WookieService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
+		    + " toContentId=" + toContentId);
 	}
-	
+
+	if (toContentId == null) {
+	    String error = "Failed to copy tool content: toContentID is null";
+	    throw new ToolException(error);
+	}
+
+	Wookie fromContent = null;
+	if (fromContentId != null) {
+	    fromContent = wookieDAO.getByContentId(fromContentId);
+	}
+	if (fromContent == null) {
+	    // create the fromContent using the default tool content
+	    fromContent = getDefaultContent();
+	}
+	Wookie toContent = Wookie.newInstance(fromContent, toContentId);
+
+	// Clone the wookie widget on the external server
+	String wookieUrl = getWookieURL();
+	try {
+	    if (wookieUrl != null) {
+		if ((fromContent.getWidgetIdentifier() != null) && (fromContent.getWidgetIdentifier() != "")) {
+		    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+		    WookieService.logger
+			    .debug("Creating a new clone for copycontent for widget: " + fromContentId.toString());
+		    boolean success = WookieUtil.cloneWidget(wookieUrl, getWookieAPIKey(),
+			    fromContent.getWidgetIdentifier(), fromContentId.toString(), toContentId.toString(),
+			    fromContent.getCreateBy().toString());
+
+		    if (success) {
+			toContent.setWidgetHeight(fromContent.getWidgetHeight());
+			toContent.setWidgetWidth(fromContent.getWidgetWidth());
+			toContent.setWidgetAuthorUrl(fromContent.getWidgetAuthorUrl());
+			toContent.setWidgetMaximise(fromContent.getWidgetMaximise());
+			toContent.setWidgetIdentifier(fromContent.getWidgetIdentifier());
+			toContent.setCreateBy(fromContent.getCreateBy());
+
+			// Need to add the author to the widget so authoring
+			// widget url is different in the copy
+			User user = (User) userManagementService.findById(User.class, fromContent.getCreateBy());
+			String returnXML = WookieUtil.getWidget(wookieUrl, getWookieAPIKey(),
+				fromContent.getWidgetIdentifier(), user.getUserDTO(), toContentId.toString(), true);
+
+			toContent.setWidgetAuthorUrl(WookieUtil.getWidgetUrlFromXML(returnXML));
+
+		    } else {
+			throw new WookieException("Failed to copy widget on wookie server, check log for details.");
+		    }
+		}
+	    } else {
+		throw new WookieException("Wookie url is not set");
+	    }
+	} catch (Exception e) {
+	    WookieService.logger.error("Problem calling wookie server to clone instance", e);
+	    throw new WookieException("Problem calling wookie server to clone instance", e);
+	}
+
+	wookieDAO.saveOrUpdate(toContent);
+    }
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Wookie wookie = wookieDAO.getByContentId(toolContentId);
@@ -317,20 +281,21 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
     }
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Resetting Wookie completion flag for user ID " + userId + " and toolContentId "
-		    + toolContentId);
+	if (WookieService.logger.isDebugEnabled()) {
+	    WookieService.logger.debug(
+		    "Resetting Wookie completion flag for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Wookie wookie = getWookieByContentId(toolContentId);
 	if (wookie == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    WookieService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -348,428 +313,425 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 
 	}
     }
-    
-    	@Override
-	public void exportToolContent(Long toolContentId, String rootPath)
-			throws DataMissingException, ToolException {
-		Wookie wookie = wookieDAO.getByContentId(toolContentId);
-		if (wookie == null) {
-			wookie = getDefaultContent();
+
+    @Override
+    public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+	Wookie wookie = wookieDAO.getByContentId(toolContentId);
+	if (wookie == null) {
+	    wookie = getDefaultContent();
+	}
+	if (wookie == null) {
+	    throw new DataMissingException("Unable to find default content for the wookie tool");
+	}
+
+	// set ResourceToolContentHandler as null to avoid copy file node in
+	// repository again.
+	wookie = Wookie.newInstance(wookie, toolContentId);
+	wookie.setWookieSessions(null);
+
+	try {
+	    exportContentService.exportToolContent(toolContentId, wookie, wookieToolContentHandler, rootPath);
+	} catch (ExportToolContentException e) {
+	    throw new ToolException(e);
+	}
+    }
+
+    @Override
+    public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
+	    String toVersion) throws ToolException {
+	try {
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(WookieContentVersionFilter.class);
+
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, wookieToolContentHandler,
+		    fromVersion, toVersion);
+	    if (!(toolPOJO instanceof Wookie)) {
+		throw new ImportToolContentException(
+			"Import Wookie tool content failed. Deserialized object is " + toolPOJO);
+	    }
+	    Wookie wookie = (Wookie) toolPOJO;
+
+	    // reset it to new toolContentId
+	    wookie.setToolContentId(toolContentId);
+	    wookie.setCreateBy(newUserUid);
+
+	    User user = (User) userManagementService.findById(User.class, newUserUid);
+
+	    // If the wookie has an identifier, it has been initiated. Make an
+	    // new instance using the identifier
+	    if (!StringUtils.isEmpty(wookie.getWidgetIdentifier()) && (user != null)) {
+		String wookieUrl = getWookieURL();
+		String wookieKey = getWookieAPIKey();
+		wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+		String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookie.getWidgetIdentifier(),
+			user.getUserDTO(), toolContentId.toString(), true);
+
+		WidgetData widgetData = WookieUtil.getWidgetDataFromXML(returnXML);
+		wookie.setWidgetAuthorUrl(widgetData.getUrl());
+		wookie.setWidgetIdentifier(wookie.getWidgetIdentifier());
+		wookie.setWidgetHeight(widgetData.getHeight());
+		wookie.setWidgetMaximise(widgetData.getMaximize());
+		wookie.setWidgetWidth(widgetData.getWidth());
+	    }
+
+	    wookieDAO.saveOrUpdate(wookie);
+	} catch (ImportToolContentException e) {
+	    throw new ToolException(e);
+	} catch (Exception e) {
+	    WookieService.logger.error("Error during import possibly because of file copy error", e);
+	    throw new ToolException(e);
+	}
+    }
+
+    @Override
+    public String getFileExtension(String fileName) {
+	String ext = "";
+	int i = fileName.lastIndexOf('.');
+	if ((i > 0) && (i < (fileName.length() - 1))) {
+	    ext += "." + fileName.substring(i + 1).toLowerCase();
+	}
+	return ext;
+    }
+
+    @Override
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
+	Wookie wookie = getWookieDAO().getByContentId(toolContentId);
+	if (wookie == null) {
+	    wookie = getDefaultContent();
+	}
+	return getWookieOutputFactory().getToolOutputDefinitions(wookie, definitionType);
+    }
+
+    @Override
+    public String getToolContentTitle(Long toolContentId) {
+	return getWookieByContentId(toolContentId).getTitle();
+    }
+
+    @Override
+    public boolean isContentEdited(Long toolContentId) {
+	return getWookieByContentId(toolContentId).isDefineLater();
+    }
+
+    @Override
+    public boolean isReadOnly(Long toolContentId) {
+	Wookie wookie = getWookieByContentId(toolContentId);
+
+	for (WookieSession session : wookie.getWookieSessions()) {
+	    for (WookieUser user : session.getWookieUsers()) {
+		if (user.isFinishedActivity()) {
+		    return true;
 		}
-		if (wookie == null) {
-			throw new DataMissingException(
-					"Unable to find default content for the wookie tool");
-		}
-
-		// set ResourceToolContentHandler as null to avoid copy file node in
-		// repository again.
-		wookie = Wookie.newInstance(wookie, toolContentId);
-		wookie.setWookieSessions(null);
-
-		try {
-			exportContentService.exportToolContent(toolContentId, wookie,
-					wookieToolContentHandler, rootPath);
-		} catch (ExportToolContentException e) {
-			throw new ToolException(e);
-		}
+	    }
 	}
 
-    	@Override
-	public void importToolContent(Long toolContentId, Integer newUserUid,
-			String toolContentPath, String fromVersion, String toVersion)
-			throws ToolException {
-		try {
-		    // register version filter class
-		    exportContentService.registerImportVersionFilterClass(WookieContentVersionFilter.class);
-		
-			Object toolPOJO = exportContentService.importToolContent(
-					toolContentPath, wookieToolContentHandler, fromVersion,
-					toVersion);
-			if (!(toolPOJO instanceof Wookie)) {
-				throw new ImportToolContentException(
-						"Import Wookie tool content failed. Deserialized object is "
-								+ toolPOJO);
-			}
-			Wookie wookie = (Wookie) toolPOJO;
+	return false;
+    }
 
-			// reset it to new toolContentId
-			wookie.setToolContentId(toolContentId);
-			wookie.setCreateBy(newUserUid);
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getWookieOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 
-			User user = (User) userManagementService.findById(User.class,
-					newUserUid);
+    /* ********** IWookieService Methods ********************************* */
 
-			// If the wookie has an identifier, it has been initiated. Make an
-			// new instance using the identifier
-			if (!StringUtils.isEmpty(wookie.getWidgetIdentifier())
-					&& user != null) {
-				String wookieUrl = getWookieURL();
-				String wookieKey = getWookieAPIKey();
-				wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+    @Override
+    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
+	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+    }
 
-				String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey,
-						wookie.getWidgetIdentifier(), user.getUserDTO(),
-						toolContentId.toString(), true);
+    @Override
+    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
+	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+	if ((list == null) || list.isEmpty()) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
 
-				WidgetData widgetData = WookieUtil
-						.getWidgetDataFromXML(returnXML);
-				wookie.setWidgetAuthorUrl(widgetData.getUrl());
-				wookie.setWidgetIdentifier(wookie.getWidgetIdentifier());
-				wookie.setWidgetHeight(widgetData.getHeight());
-				wookie.setWidgetMaximise(widgetData.getMaximize());
-				wookie.setWidgetWidth(widgetData.getWidth());
-			}
+    /**
+     * @param notebookEntry
+     */
+    @Override
+    public void updateEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
+    }
 
-			wookieDAO.saveOrUpdate(wookie);
-		} catch (ImportToolContentException e) {
-			throw new ToolException(e);
-		} catch (Exception e) {
-			WookieService.logger.error(
-					"Error during import possibly because of file copy error",
-					e);
-			throw new ToolException(e);
-		}
+    @Override
+    public Long getDefaultContentIdBySignature(String toolSignature) {
+	Long toolContentId = null;
+	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	if (toolContentId == null) {
+	    String error = "Could not retrieve default content id for this tool";
+	    WookieService.logger.error(error);
+	    throw new WookieException(error);
+	}
+	return toolContentId;
+    }
+
+    @Override
+    public Wookie getDefaultContent() {
+	Long defaultContentID = getDefaultContentIdBySignature(WookieConstants.TOOL_SIGNATURE);
+	Wookie defaultContent = getWookieByContentId(defaultContentID);
+	if (defaultContent == null) {
+	    String error = "Could not retrieve default content record for this tool";
+	    WookieService.logger.error(error);
+	    throw new WookieException(error);
+	}
+	return defaultContent;
+    }
+
+    @Override
+    public Wookie copyDefaultContent(Long newContentID) {
+
+	if (newContentID == null) {
+	    String error = "Cannot copy the Wookie tools default content: + " + "newContentID is null";
+	    WookieService.logger.error(error);
+	    throw new WookieException(error);
 	}
 
-    	@Override
-	public String getFileExtension(String fileName) {
-		String ext = "";
-		int i = fileName.lastIndexOf('.');
-		if (i > 0 && i < fileName.length() - 1) {
-			ext += "." + fileName.substring(i + 1).toLowerCase();
-		}
-		return ext;
+	Wookie defaultContent = getDefaultContent();
+	// create new wookie using the newContentID
+	Wookie newContent = new Wookie();
+	newContent = Wookie.newInstance(defaultContent, newContentID);
+	wookieDAO.saveOrUpdate(newContent);
+	return newContent;
+    }
+
+    @Override
+    public Wookie getWookieByContentId(Long toolContentID) {
+	Wookie wookie = wookieDAO.getByContentId(toolContentID);
+	if (wookie == null) {
+	    WookieService.logger.debug("Could not find the content with toolContentID:" + toolContentID);
+	}
+	return wookie;
+    }
+
+    @Override
+    public WookieSession getSessionBySessionId(Long toolSessionId) {
+	WookieSession wookieSession = wookieSessionDAO.getBySessionId(toolSessionId);
+	if (wookieSession == null) {
+	    WookieService.logger.debug("Could not find the wookie session with toolSessionID:" + toolSessionId);
+	}
+	return wookieSession;
+    }
+
+    @Override
+    public WookieUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
+	return wookieUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
+    }
+
+    public WookieUser getUserByLoginNameAndSessionId(String loginName, Long toolSessionId) {
+	return wookieUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
+    }
+
+    @Override
+    public WookieUser getUserByUID(Long uid) {
+	return wookieUserDAO.getByUID(uid);
+    }
+
+    @Override
+    public void saveOrUpdateWookie(Wookie wookie) {
+	wookieDAO.saveOrUpdate(wookie);
+    }
+
+    @Override
+    public void saveOrUpdateWookieSession(WookieSession wookieSession) {
+	wookieSessionDAO.saveOrUpdate(wookieSession);
+    }
+
+    @Override
+    public void saveOrUpdateWookieUser(WookieUser wookieUser) {
+	wookieUserDAO.saveOrUpdate(wookieUser);
+    }
+
+    @Override
+    public WookieUser createWookieUser(UserDTO user, WookieSession wookieSession) {
+	WookieUser wookieUser = new WookieUser(user, wookieSession);
+	saveOrUpdateWookieUser(wookieUser);
+	return wookieUser;
+    }
+
+    @Override
+    public WookieConfigItem getConfigItem(String key) {
+	return wookieConfigItemDAO.getConfigItemByKey(key);
+    }
+
+    @Override
+    public void saveOrUpdateWookieConfigItem(WookieConfigItem item) {
+	wookieConfigItemDAO.saveOrUpdate(item);
+    }
+
+    @Override
+    public String getWookieURL() {
+	String url = null;
+	WookieConfigItem urlItem = wookieConfigItemDAO.getConfigItemByKey(WookieConfigItem.KEY_WOOKIE_URL);
+	if (urlItem != null) {
+	    url = urlItem.getConfigValue();
+	}
+	return url;
+    }
+
+    @Override
+    public String getWookieAPIKey() {
+	String url = null;
+	WookieConfigItem apiItem = wookieConfigItemDAO.getConfigItemByKey(WookieConfigItem.KEY_API);
+	if (apiItem != null) {
+	    url = apiItem.getConfigValue();
+	}
+	return url;
+    }
+
+    @Override
+    public String getMessage(String key) {
+	return messageService.getMessage(key);
+    }
+
+    /*
+     * ===============Methods implemented from ToolContentImport102Manager
+     * ===============
+     */
+
+    /**
+     * Import the data for a 1.0.2 Wookie
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
+	Date now = new Date();
+	Wookie wookie = new Wookie();
+	wookie.setContentInUse(Boolean.FALSE);
+	wookie.setCreateBy(user.getUserID());
+	wookie.setCreateDate(now);
+	wookie.setDefineLater(Boolean.FALSE);
+	wookie.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
+	wookie.setLockOnFinished(Boolean.TRUE);
+	wookie.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+	wookie.setToolContentId(toolContentId);
+	wookie.setUpdateDate(now);
+	wookie.setReflectOnActivity(Boolean.FALSE);
+	wookieDAO.saveOrUpdate(wookie);
+    }
+
+    /**
+     * Set the description, throws away the title value as this is not supported in 2.0
+     */
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
+
+	WookieService.logger.warn(
+		"Setting the reflective field on a wookie. This doesn't make sense as the wookie is for reflection and we don't reflect on reflection!");
+	Wookie wookie = getWookieByContentId(toolContentId);
+	if (wookie == null) {
+	    throw new DataMissingException("Unable to set reflective data titled " + title
+		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
 	}
 
-    	@Override
-	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(
-			Long toolContentId, int definitionType) throws ToolException {
-		Wookie wookie = getWookieDAO().getByContentId(toolContentId);
-		if (wookie == null) {
-			wookie = getDefaultContent();
-		}
-		return getWookieOutputFactory().getToolOutputDefinitions(wookie,
-				definitionType);
-	}
-	    
-    	@Override
-        public String getToolContentTitle(Long toolContentId) {
-    		return getWookieByContentId(toolContentId).getTitle();
-        }
-        
-    	@Override
-        public boolean isContentEdited(Long toolContentId) {
-            return getWookieByContentId(toolContentId).isDefineLater();
-        }
+	wookie.setInstructions(description);
+    }
 
-    	@Override
-	@SuppressWarnings("unchecked")
-	public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-		return getWookieOutputFactory().getSupportedDefinitionClasses(
-				definitionType);
-	}
+    // =========================================================================================
+    /* ********** Used by Spring to "inject" the linked objects ************* */
 
-	/* ********** IWookieService Methods ********************************* */
+    public IWookieDAO getWookieDAO() {
+	return wookieDAO;
+    }
 
-    	@Override
-	public Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String entry) {
-		return coreNotebookService.createNotebookEntry(id, idType, signature,
-				userID, "", entry);
-	}
+    public void setWookieDAO(IWookieDAO wookieDAO) {
+	this.wookieDAO = wookieDAO;
+    }
 
-	public NotebookEntry getEntry(Long sessionId, Integer idType,
-			String signature, Integer userID) {
-		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId,
-				idType, signature, userID);
-		if (list == null || list.isEmpty()) {
-			return null;
-		} else {
-			return list.get(0);
-		}
-	}
+    public IToolContentHandler getWookieToolContentHandler() {
+	return wookieToolContentHandler;
+    }
 
-	/**
-	 * @param notebookEntry
-	 */
-	public void updateEntry(NotebookEntry notebookEntry) {
-		coreNotebookService.updateEntry(notebookEntry);
-	}
+    public void setWookieToolContentHandler(IToolContentHandler wookieToolContentHandler) {
+	this.wookieToolContentHandler = wookieToolContentHandler;
+    }
 
-	public Long getDefaultContentIdBySignature(String toolSignature) {
-		Long toolContentId = null;
-		toolContentId = new Long(toolService
-				.getToolDefaultContentIdBySignature(toolSignature));
-		if (toolContentId == null) {
-			String error = "Could not retrieve default content id for this tool";
-			WookieService.logger.error(error);
-			throw new WookieException(error);
-		}
-		return toolContentId;
-	}
+    public IWookieSessionDAO getWookieSessionDAO() {
+	return wookieSessionDAO;
+    }
 
-	public Wookie getDefaultContent() {
-		Long defaultContentID = getDefaultContentIdBySignature(WookieConstants.TOOL_SIGNATURE);
-		Wookie defaultContent = getWookieByContentId(defaultContentID);
-		if (defaultContent == null) {
-			String error = "Could not retrieve default content record for this tool";
-			WookieService.logger.error(error);
-			throw new WookieException(error);
-		}
-		return defaultContent;
-	}
+    public void setWookieSessionDAO(IWookieSessionDAO sessionDAO) {
+	wookieSessionDAO = sessionDAO;
+    }
 
-	public Wookie copyDefaultContent(Long newContentID) {
+    public ILamsToolService getToolService() {
+	return toolService;
+    }
 
-		if (newContentID == null) {
-			String error = "Cannot copy the Wookie tools default content: + "
-					+ "newContentID is null";
-			WookieService.logger.error(error);
-			throw new WookieException(error);
-		}
+    public void setToolService(ILamsToolService toolService) {
+	this.toolService = toolService;
+    }
 
-		Wookie defaultContent = getDefaultContent();
-		// create new wookie using the newContentID
-		Wookie newContent = new Wookie();
-		newContent = Wookie.newInstance(defaultContent, newContentID);
-		wookieDAO.saveOrUpdate(newContent);
-		return newContent;
-	}
+    public IWookieUserDAO getWookieUserDAO() {
+	return wookieUserDAO;
+    }
 
-	public Wookie getWookieByContentId(Long toolContentID) {
-		Wookie wookie = wookieDAO.getByContentId(toolContentID);
-		if (wookie == null) {
-			WookieService.logger
-					.debug("Could not find the content with toolContentID:"
-							+ toolContentID);
-		}
-		return wookie;
-	}
+    public void setWookieUserDAO(IWookieUserDAO userDAO) {
+	wookieUserDAO = userDAO;
+    }
 
-	public WookieSession getSessionBySessionId(Long toolSessionId) {
-		WookieSession wookieSession = wookieSessionDAO
-				.getBySessionId(toolSessionId);
-		if (wookieSession == null) {
-			WookieService.logger
-					.debug("Could not find the wookie session with toolSessionID:"
-							+ toolSessionId);
-		}
-		return wookieSession;
-	}
+    public ILearnerService getLearnerService() {
+	return learnerService;
+    }
 
-	public WookieUser getUserByUserIdAndSessionId(Long userId,
-			Long toolSessionId) {
-		return wookieUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
-	}
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
 
-	public WookieUser getUserByLoginNameAndSessionId(String loginName,
-			Long toolSessionId) {
-		return wookieUserDAO.getByLoginNameAndSessionId(loginName,
-				toolSessionId);
-	}
+    public IExportToolContentService getExportContentService() {
+	return exportContentService;
+    }
 
-	public WookieUser getUserByUID(Long uid) {
-		return wookieUserDAO.getByUID(uid);
-	}
+    public void setExportContentService(IExportToolContentService exportContentService) {
+	this.exportContentService = exportContentService;
+    }
 
-	public void saveOrUpdateWookie(Wookie wookie) {
-		wookieDAO.saveOrUpdate(wookie);
-	}
+    public ICoreNotebookService getCoreNotebookService() {
+	return coreNotebookService;
+    }
 
-	public void saveOrUpdateWookieSession(WookieSession wookieSession) {
-		wookieSessionDAO.saveOrUpdate(wookieSession);
-	}
+    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+	this.coreNotebookService = coreNotebookService;
+    }
 
-	public void saveOrUpdateWookieUser(WookieUser wookieUser) {
-		wookieUserDAO.saveOrUpdate(wookieUser);
-	}
+    public WookieOutputFactory getWookieOutputFactory() {
+	return wookieOutputFactory;
+    }
 
-	public WookieUser createWookieUser(UserDTO user, WookieSession wookieSession) {
-		WookieUser wookieUser = new WookieUser(user, wookieSession);
-		saveOrUpdateWookieUser(wookieUser);
-		return wookieUser;
-	}
+    public void setWookieOutputFactory(WookieOutputFactory wookieOutputFactory) {
+	this.wookieOutputFactory = wookieOutputFactory;
+    }
 
-	public WookieConfigItem getConfigItem(String key) {
-		return wookieConfigItemDAO.getConfigItemByKey(key);
-	}
+    public IWookieConfigItemDAO getWookieConfigItemDAO() {
+	return wookieConfigItemDAO;
+    }
 
-	public void saveOrUpdateWookieConfigItem(WookieConfigItem item) {
-		wookieConfigItemDAO.saveOrUpdate(item);
-	}
+    public void setWookieConfigItemDAO(IWookieConfigItemDAO wookieConfigItemDAO) {
+	this.wookieConfigItemDAO = wookieConfigItemDAO;
+    }
 
-	public String getWookieURL() {
-		String url = null;
-		WookieConfigItem urlItem = wookieConfigItemDAO
-				.getConfigItemByKey(WookieConfigItem.KEY_WOOKIE_URL);
-		if (urlItem != null) {
-			url = urlItem.getConfigValue();
-		}
-		return url;
-	}
+    public MessageService getMessageService() {
+	return messageService;
+    }
 
-	public String getWookieAPIKey() {
-		String url = null;
-		WookieConfigItem apiItem = wookieConfigItemDAO
-				.getConfigItemByKey(WookieConfigItem.KEY_API);
-		if (apiItem != null) {
-			url = apiItem.getConfigValue();
-		}
-		return url;
-	}
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
 
-	public String getMessage(String key) {
-		return messageService.getMessage(key);
-	}
+    public IUserManagementService getUserManagementService() {
+	return userManagementService;
+    }
 
-	/*
-	 * ===============Methods implemented from ToolContentImport102Manager
-	 * ===============
-	 */
-
-	/**
-	 * Import the data for a 1.0.2 Wookie
-	 */
-	@SuppressWarnings("unchecked")
-	public void import102ToolContent(Long toolContentId, UserDTO user,
-			Hashtable importValues) {
-		Date now = new Date();
-		Wookie wookie = new Wookie();
-		wookie.setContentInUse(Boolean.FALSE);
-		wookie.setCreateBy(user.getUserID());
-		wookie.setCreateDate(now);
-		wookie.setDefineLater(Boolean.FALSE);
-		wookie.setInstructions(WebUtil.convertNewlines((String) importValues
-				.get(ToolContentImport102Manager.CONTENT_BODY)));
-		wookie.setLockOnFinished(Boolean.TRUE);
-		wookie.setTitle((String) importValues
-				.get(ToolContentImport102Manager.CONTENT_TITLE));
-		wookie.setToolContentId(toolContentId);
-		wookie.setUpdateDate(now);
-		wookie.setReflectOnActivity(Boolean.FALSE);
-		wookieDAO.saveOrUpdate(wookie);
-	}
-
-	/**
-	 * Set the description, throws away the title value as this is not supported
-	 * in 2.0
-	 */
-	public void setReflectiveData(Long toolContentId, String title,
-			String description) throws ToolException, DataMissingException {
-
-		WookieService.logger
-				.warn("Setting the reflective field on a wookie. This doesn't make sense as the wookie is for reflection and we don't reflect on reflection!");
-		Wookie wookie = getWookieByContentId(toolContentId);
-		if (wookie == null) {
-			throw new DataMissingException(
-					"Unable to set reflective data titled " + title
-							+ " on activity toolContentId " + toolContentId
-							+ " as the tool content does not exist.");
-		}
-
-		wookie.setInstructions(description);
-	}
-
-	// =========================================================================================
-	/* ********** Used by Spring to "inject" the linked objects ************* */
-
-	public IWookieDAO getWookieDAO() {
-		return wookieDAO;
-	}
-
-	public void setWookieDAO(IWookieDAO wookieDAO) {
-		this.wookieDAO = wookieDAO;
-	}
-
-	public IToolContentHandler getWookieToolContentHandler() {
-		return wookieToolContentHandler;
-	}
-
-	public void setWookieToolContentHandler(
-			IToolContentHandler wookieToolContentHandler) {
-		this.wookieToolContentHandler = wookieToolContentHandler;
-	}
-
-	public IWookieSessionDAO getWookieSessionDAO() {
-		return wookieSessionDAO;
-	}
-
-	public void setWookieSessionDAO(IWookieSessionDAO sessionDAO) {
-		wookieSessionDAO = sessionDAO;
-	}
-
-	public ILamsToolService getToolService() {
-		return toolService;
-	}
-
-	public void setToolService(ILamsToolService toolService) {
-		this.toolService = toolService;
-	}
-
-	public IWookieUserDAO getWookieUserDAO() {
-		return wookieUserDAO;
-	}
-
-	public void setWookieUserDAO(IWookieUserDAO userDAO) {
-		wookieUserDAO = userDAO;
-	}
-
-	public ILearnerService getLearnerService() {
-		return learnerService;
-	}
-
-	public void setLearnerService(ILearnerService learnerService) {
-		this.learnerService = learnerService;
-	}
-
-	public IExportToolContentService getExportContentService() {
-		return exportContentService;
-	}
-
-	public void setExportContentService(
-			IExportToolContentService exportContentService) {
-		this.exportContentService = exportContentService;
-	}
-
-	public ICoreNotebookService getCoreNotebookService() {
-		return coreNotebookService;
-	}
-
-	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-		this.coreNotebookService = coreNotebookService;
-	}
-
-	public WookieOutputFactory getWookieOutputFactory() {
-		return wookieOutputFactory;
-	}
-
-	public void setWookieOutputFactory(WookieOutputFactory wookieOutputFactory) {
-		this.wookieOutputFactory = wookieOutputFactory;
-	}
-
-	public IWookieConfigItemDAO getWookieConfigItemDAO() {
-		return wookieConfigItemDAO;
-	}
-
-	public void setWookieConfigItemDAO(IWookieConfigItemDAO wookieConfigItemDAO) {
-		this.wookieConfigItemDAO = wookieConfigItemDAO;
-	}
-
-	public MessageService getMessageService() {
-		return messageService;
-	}
-
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
-	}
-
-	public IUserManagementService getUserManagementService() {
-		return userManagementService;
-	}
-
-	public void setUserManagementService(
-			IUserManagementService userManagementService) {
-		this.userManagementService = userManagementService;
-	}
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
+    }
 
 }

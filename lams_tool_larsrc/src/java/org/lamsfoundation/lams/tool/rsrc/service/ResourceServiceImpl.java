@@ -208,8 +208,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     /**
-     * This method verifies the credentials of the Share Resource Tool and gives it the <code>Ticket</code> to login
-     * and access the Content Repository.
+     * This method verifies the credentials of the Share Resource Tool and gives it the <code>Ticket</code> to login and
+     * access the Content Repository.
      * 
      * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
      * the tool needs to upload/download files from the content repository.
@@ -221,8 +221,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	ICredentials credentials = new SimpleCredentials(resourceToolContentHandler.getRepositoryUser(),
 		resourceToolContentHandler.getRepositoryId());
 	try {
-	    ITicket ticket = repositoryService.login(credentials, resourceToolContentHandler
-		    .getRepositoryWorkspaceName());
+	    ITicket ticket = repositoryService.login(credentials,
+		    resourceToolContentHandler.getRepositoryWorkspaceName());
 	    return ticket;
 	} catch (AccessDeniedException ae) {
 	    throw new ResourceApplicationException("Access Denied to repository." + ae.getMessage());
@@ -284,8 +284,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	try {
 	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
 	} catch (Exception e) {
-	    throw new ResourceApplicationException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
+	    throw new ResourceApplicationException(
+		    "Exception occured while deleting files from" + " the repository " + e.getMessage());
 	}
     }
 
@@ -401,8 +401,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	Resource res = resourceDao.getByContentId(contentId);
 	int miniView = res.getMiniViewResourceNumber();
 	// construct dto fields;
-	res.setMiniViewNumberStr(messageService.getMessage("label.learning.minimum.review", new Object[] { new Integer(
-		miniView) }));
+	res.setMiniViewNumberStr(
+		messageService.getMessage("label.learning.minimum.review", new Object[] { new Integer(miniView) }));
 	return res;
     }
 
@@ -511,7 +511,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	// get all sessions in a resource and retrieve all resource items under this session
 	// plus initial resource items by author creating (resItemList)
 	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
-	
+
 	for (ResourceSession session : sessionList) {
 	    // one new group for one session.
 	    GroupSummary group = new GroupSummary();
@@ -523,7 +523,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    items.addAll(resource.getResourceItems());
 	    // add this session's resource items
 	    items.addAll(session.getResourceItems());
-	    
+
 	    for (ResourceItem item : items) {
 		ItemSummary itemSummary = new ItemSummary(item);
 		// set viewNumber according visit log
@@ -532,7 +532,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		}
 		group.getItems().add(itemSummary);
 	    }
-	    
+
 	    groupList.add(group);
 	}
 
@@ -555,14 +555,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		if (entry != null) {
 		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified() : entry
-			    .getCreateDate();
+		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+			    : entry.getCreateDate();
 		    ref.setDate(postedDate);
 		    reflections.add(ref);
 		}
 
 	    }
-	    
+
 	}
 
 	return reflections;
@@ -576,8 +576,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    ResourceUser user = visit.getUser();
 	    user.setAccessDate(visit.getAccessDate());
 	    user.setCompleteDate(visit.getCompleteDate());
-	    Date timeTaken = (visit.getCompleteDate() != null && visit.getAccessDate() != null) ? 
-		    new Date(visit.getCompleteDate().getTime() - visit.getAccessDate().getTime()) : null;
+	    Date timeTaken = ((visit.getCompleteDate() != null) && (visit.getAccessDate() != null))
+		    ? new Date(visit.getCompleteDate().getTime() - visit.getAccessDate().getTime()) : null;
 	    user.setTimeTaken(timeTaken);
 	    userList.add(user);
 	}
@@ -615,7 +615,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -631,7 +631,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public ResourceUser getUser(Long uid) {
 	return (ResourceUser) resourceUserDao.getObject(ResourceUser.class, uid);
     }
-    
+
     @Override
     public void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser) {
 	String userName = resourceUser.getLastName() + " " + resourceUser.getFirstName();
@@ -676,7 +676,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      */
     private NodeKey processFile(FormFile file) throws UploadResourceFileException {
 	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
 		node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
@@ -722,8 +722,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		String packageDirectory = ZipFileUtil.expandZip(is, fileName);
 		String initFile = findWebsiteInitialItem(packageDirectory);
 		if (initFile == null) {
-		    throw new UploadResourceFileException(messageService
-			    .getMessage("error.msg.website.no.initial.file"));
+		    throw new UploadResourceFileException(
+			    messageService.getMessage("error.msg.website.no.initial.file"));
 		}
 		item.setInitialItem(initFile);
 		// upload package
@@ -748,8 +748,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setFileType(fileType);
 	    item.setFileName(fileName);
 	} catch (ZipFileUtilException e) {
-	    ResourceServiceImpl.log.error(messageService.getMessage("error.msg.zip.file.exception") + " : "
-		    + e.toString());
+	    ResourceServiceImpl.log
+		    .error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
 	    throw new UploadResourceFileException(messageService.getMessage("error.msg.zip.file.exception"));
 	} catch (FileNotFoundException e) {
 	    ResourceServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
@@ -765,7 +765,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    throw new UploadResourceFileException(messageService.getMessage("error.msg.ims.application"));
 	}
     }
-    
+
     /**
      * Find out default.htm/html or index.htm/html in the given directory folder
      * 
@@ -779,8 +779,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
 
 	File[] initFiles = file.listFiles(new FileFilter() {
+	    @Override
 	    public boolean accept(File pathname) {
-		if (pathname == null || pathname.getName() == null) {
+		if ((pathname == null) || (pathname.getName() == null)) {
 		    return false;
 		}
 		String name = pathname.getName();
@@ -791,7 +792,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		return false;
 	    }
 	});
-	if (initFiles != null && initFiles.length > 0) {
+	if ((initFiles != null) && (initFiles.length > 0)) {
 	    return initFiles[0].getName();
 	} else {
 	    return null;
@@ -802,20 +803,20 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
      * 
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     private String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
-    
+
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
@@ -852,7 +853,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(ResourceImportContentVersionFilter.class);
-	
+
 	    exportContentService.registerFileClassForImport(ResourceItem.class.getName(), "fileUuid", "fileVersionId",
 		    "fileName", "fileType", null, "initialItem");
 
@@ -935,12 +936,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    }
 	}
     }
-    
+
     @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getResourceByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Resource resource = resourceDao.getByContentId(toolContentId);
@@ -954,10 +955,22 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public boolean isContentEdited(Long toolContentId) {
 	return getResourceByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public boolean isReadOnly(Long toolContentId) {
+	List<ResourceSession> sessions = resourceSessionDao.getByContentId(toolContentId);
+	for (ResourceSession session : sessions) {
+	    if (!resourceUserDao.getBySessionID(session.getSessionId()).isEmpty()) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
+    @Override
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	Resource resource = resourceDao.getByContentId(toolContentId);
 	if (removeSessionData) {
 	    List list = resourceSessionDao.getByContentId(toolContentId);
@@ -973,13 +986,15 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (ResourceServiceImpl.log.isDebugEnabled()) {
+	    ResourceServiceImpl.log.debug(
+		    "Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Resource resource = resourceDao.getByContentId(toolContentId);
 	if (resource == null) {
-	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    ResourceServiceImpl.log
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -1014,7 +1029,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		if (entry != null) {
 		    resourceDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
-		
+
 		resourceUserDao.removeObject(ResourceUser.class, user.getUid());
 	    }
 	}
@@ -1055,13 +1070,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -1079,7 +1095,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getResourceOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -1098,8 +1114,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    toolContentObj.setContentInUse(Boolean.FALSE);
 	    toolContentObj.setCreated(now);
 	    toolContentObj.setDefineLater(Boolean.FALSE);
-	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
-		    .get(ToolContentImport102Manager.CONTENT_BODY)));
+	    toolContentObj.setInstructions(
+		    WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	    toolContentObj.setUpdated(now);
 	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    toolContentObj.setReflectInstructions(null);
@@ -1155,7 +1171,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 		    Vector instructions = (Vector) urlMap
 			    .get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
-		    if (instructions != null && instructions.size() > 0) {
+		    if ((instructions != null) && (instructions.size() > 0)) {
 			item.setItemInstructions(new HashSet());
 			Iterator insIter = instructions.iterator();
 			while (insIter.hasNext()) {
@@ -1200,10 +1216,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	} catch (WDDXProcessorConversionException e) {
 	    ResourceServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + toolContentObj.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
+		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
 	resourceDao.saveObject(toolContentObj);
@@ -1218,7 +1232,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	// the description column in 1.0.2 was longer than 255 chars, so truncate.
 	String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-	if (instructionText != null && instructionText.length() > 255) {
+	if ((instructionText != null) && (instructionText.length() > 255)) {
 	    if (ResourceServiceImpl.log.isDebugEnabled()) {
 		ResourceServiceImpl.log
 			.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
@@ -1235,8 +1249,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Resource toolContentObj = getResourceByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1248,10 +1263,11 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	toolContentObj.setReflectInstructions(description);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getResourceOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
@@ -1342,17 +1358,18 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public void setResourceOutputFactory(ResourceOutputFactory resourceOutputFactory) {
 	this.resourceOutputFactory = resourceOutputFactory;
     }
-    
+
     // ****************** REST methods *************************
 
-    /** Used by the Rest calls to create content. 
-     * Mandatory fields in toolContentJSON: title, instructions, resources, user fields firstName, lastName and loginName
-     * Resources must contain a JSONArray of JSONObject objects, which have the following mandatory fields: title, description, type.
-     * If there are instructions for a resource, the instructions are a JSONArray of Strings.
-     * There should be at least one resource object in the resources array.
+    /**
+     * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, resources,
+     * user fields firstName, lastName and loginName Resources must contain a JSONArray of JSONObject objects, which
+     * have the following mandatory fields: title, description, type. If there are instructions for a resource, the
+     * instructions are a JSONArray of Strings. There should be at least one resource object in the resources array.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	Date updateDate = new Date();
 
@@ -1366,9 +1383,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resource.setAllowAddUrls(JsonUtil.opt(toolContentJSON, "allowAddUrls", Boolean.FALSE));
 	resource.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	resource.setMiniViewResourceNumber(JsonUtil.opt(toolContentJSON, "minViewResourceNumber", 0));
-	resource.setNotifyTeachersOnAssigmentSumbit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
+	resource.setNotifyTeachersOnAssigmentSumbit(
+		JsonUtil.opt(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
 	resource.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	resource.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String)null));
+	resource.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
 	resource.setRunAuto(JsonUtil.opt(toolContentJSON, "runAuto", Boolean.FALSE));
 
 	resource.setContentInUse(false);
@@ -1380,20 +1398,19 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    resourceUser.setFirstName(toolContentJSON.getString("firstName"));
 	    resourceUser.setLastName(toolContentJSON.getString("lastName"));
 	    resourceUser.setLoginName(toolContentJSON.getString("loginName"));
-	 //   resourceUser.setResource(content);
+	    //   resourceUser.setResource(content);
 	}
 
 	resource.setCreatedBy(resourceUser);
 
-
 	// **************************** Handle topic *********************
 	JSONArray resources = toolContentJSON.getJSONArray("resources");
 	Set itemList = new LinkedHashSet();
-	for (int i=0; i<resources.length(); i++) {
+	for (int i = 0; i < resources.length(); i++) {
 	    JSONObject itemData = (JSONObject) resources.get(i);
 	    ResourceItem item = new ResourceItem();
 	    item.setTitle(itemData.getString("title"));
-	    item.setType((short)itemData.getInt("type"));
+	    item.setType((short) itemData.getInt("type"));
 	    item.setCreateBy(resourceUser);
 	    item.setCreateDate(updateDate);
 	    item.setComplete(false);
@@ -1401,20 +1418,20 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setHide(false);
 	    item.setOrderId(itemData.getInt(RestTags.DISPLAY_ORDER));
 
-	    item.setDescription(JsonUtil.opt(itemData, "description", (String)null));
-	    item.setFileName(JsonUtil.opt(itemData, "name", (String)null));
-	    item.setFileType(JsonUtil.opt(itemData, "fileType", (String)null));
+	    item.setDescription(JsonUtil.opt(itemData, "description", (String) null));
+	    item.setFileName(JsonUtil.opt(itemData, "name", (String) null));
+	    item.setFileType(JsonUtil.opt(itemData, "fileType", (String) null));
 	    item.setFileUuid(JsonUtil.optLong(itemData, "crUuid"));
 	    item.setFileVersionId(JsonUtil.optLong(itemData, "crVersionId"));
-	    item.setImsSchema(JsonUtil.opt(itemData, "imsSchema", (String)null));
-	    item.setOrganizationXml(JsonUtil.opt(itemData, "organizationXml", (String)null));
+	    item.setImsSchema(JsonUtil.opt(itemData, "imsSchema", (String) null));
+	    item.setOrganizationXml(JsonUtil.opt(itemData, "organizationXml", (String) null));
 	    item.setOpenUrlNewWindow(JsonUtil.opt(itemData, "openUrlNewWindow", Boolean.FALSE));
-	    item.setUrl(JsonUtil.opt(itemData, "url", (String)null));
+	    item.setUrl(JsonUtil.opt(itemData, "url", (String) null));
 
 	    JSONArray instructionStrings = itemData.getJSONArray("instructions");
-	    if ( instructionStrings != null && instructionStrings.length() > 0) {
+	    if ((instructionStrings != null) && (instructionStrings.length() > 0)) {
 		Set instructions = new LinkedHashSet();
-		for ( int j=0; j<instructionStrings.length(); j++) {
+		for (int j = 0; j < instructionStrings.length(); j++) {
 		    ResourceItemInstruction rii = new ResourceItemInstruction();
 		    rii.setDescription(instructionStrings.getString(j));
 		    rii.setSequenceId(j);
@@ -1424,14 +1441,16 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    }
 
 	    // TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
-	    if ( item.getFileName() != null || item.getFileUuid() != null ) 
-		throw new JSONException("Only URLS supported via REST interface currently - files and learning objects are not supported.");
-	    
+	    if ((item.getFileName() != null) || (item.getFileUuid() != null)) {
+		throw new JSONException(
+			"Only URLS supported via REST interface currently - files and learning objects are not supported.");
+	    }
+
 	    itemList.add(item);
 	}
-	
+
 	resource.setResourceItems(itemList);
-	
+
 	saveOrUpdateResource(resource);
 
     }

@@ -118,8 +118,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class McServicePOJO implements IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager,
-	McAppConstants {
+public class McServicePOJO implements IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
+	ToolRestManager, McAppConstants {
     private static Logger logger = Logger.getLogger(McServicePOJO.class.getName());
 
     private IMcContentDAO mcContentDAO;
@@ -144,10 +144,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     public McServicePOJO() {
     }
-    
+
     @Override
     public McQueUsr checkLeaderSelectToolForSessionLeader(McQueUsr user, Long toolSessionId) {
-	if (user == null || toolSessionId == null) {
+	if ((user == null) || (toolSessionId == null)) {
 	    return null;
 	}
 
@@ -159,12 +159,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
 	    if (leaderUserId != null) {
-		
+
 		leader = getMcUserBySession(leaderUserId, mcSession.getUid());
 
 		// create new user in a DB
 		if (leader == null) {
-		    logger.debug("creating new user with userId: " + leaderUserId);
+		    McServicePOJO.logger.debug("creating new user with userId: " + leaderUserId);
 		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
@@ -180,7 +180,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	return leader;
     }
-    
+
     @Override
     public void copyAnswersFromLeader(McQueUsr user, McQueUsr leader) {
 
@@ -190,7 +190,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	List<McUsrAttempt> leaderAttempts = this.getFinalizedUserAttempts(leader);
 	for (McUsrAttempt leaderAttempt : leaderAttempts) {
-	    
+
 	    McQueContent question = leaderAttempt.getMcQueContent();
 	    McUsrAttempt userAttempt = mcUsrAttemptDAO.getUserAttemptByQuestion(user.getUid(), question.getUid());
 
@@ -201,7 +201,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			leaderAttempt.isAttemptCorrect());
 		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
-	    // if it's been changed by the leader 
+		// if it's been changed by the leader 
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
 		userAttempt.setMcOptionsContent(leaderAttempt.getMcOptionsContent());
 		userAttempt.setAttemptTime(leaderAttempt.getAttemptTime());
@@ -219,7 +219,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    mcContentDAO.saveMcContent(mcContent);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is creating mc content: " + e.getMessage(), e);
+	    throw new McApplicationException("Exception occured when lams is creating mc content: " + e.getMessage(),
+		    e);
 	}
     }
 
@@ -231,7 +232,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    throw new McApplicationException("Exception occured when lams is loading mc content: " + e.getMessage(), e);
 	}
     }
-    
+
     @Override
     public void setDefineLater(String strToolContentID, boolean value) {
 
@@ -247,8 +248,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    mcQueContentDAO.updateMcQueContent(mcQueContent);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is updating mc que content: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is updating mc que content: " + e.getMessage(), e);
 	}
 
     }
@@ -259,8 +260,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is getting mc que content by display order: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is getting mc que content by display order: " + e.getMessage(), e);
 	}
     }
 
@@ -269,8 +270,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcQueContentDAO.getAllQuestionEntriesSorted(mcContentId);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is getting all question entries: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is getting all question entries: " + e.getMessage(), e);
 	}
     }
 
@@ -279,11 +280,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is updating mc que content: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is updating mc que content: " + e.getMessage(), e);
 	}
     }
-    
+
     @Override
     public McContent createQuestions(List<McQuestionDTO> questionDTOs, McContent content) {
 
@@ -334,15 +335,15 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		Long optionUid = optionDTO.getUid();
 		String optionText = optionDTO.getCandidateAnswer();
 		boolean isCorrectOption = "Correct".equals(optionDTO.getCorrect());
-		
+
 		//find persisted option if it exists
 		McOptsContent option = new McOptsContent();
-		for (McOptsContent oldOption: oldOptions) {
+		for (McOptsContent oldOption : oldOptions) {
 		    if (oldOption.getUid().equals(optionUid)) {
 			option = oldOption;
 		    }
 		}
-		
+
 		option.setDisplayOrder(displayOrderOption);
 		option.setCorrectOption(isCorrectOption);
 		option.setMcQueOptionText(optionText);
@@ -351,7 +352,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		newOptions.add(option);
 		displayOrderOption++;
 	    }
-	    
+
 	    question.setMcOptionsContents(newOptions);
 
 	    // updating the existing question content
@@ -360,14 +361,14 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
 	return content;
     }
-    
+
     @Override
     public void releaseQuestionsFromCache(McContent content) {
-	for (McQueContent question : (Set<McQueContent>)content.getMcQueContents()) {
+	for (McQueContent question : (Set<McQueContent>) content.getMcQueContents()) {
 	    mcQueContentDAO.releaseQuestionFromCache(question);
 	}
     }
-    
+
     @Override
     public McQueUsr createMcUser(Long toolSessionID) throws McApplicationException {
 	try {
@@ -380,7 +381,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	    McQueUsr user = new McQueUsr(userId, userName, fullName, mcSession, new TreeSet());
 	    mcUserDAO.saveMcUser(user);
-	    
+
 	    return user;
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is creating mc QueUsr: " + e.getMessage(), e);
@@ -410,8 +411,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcUserDAO.getMcUserByUID(uid);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is getting the mc QueUsr by uid."
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is getting the mc QueUsr by uid." + e.getMessage(), e);
 	}
     }
 
@@ -425,12 +426,13 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    Long questionUid = mcLearnerAnswersDTO.getQuestionUid();
 	    McQueContent question = this.getQuestionByUid(questionUid);
 	    if (question == null) {
-		throw new McApplicationException("Can't find question with specified question uid: " + mcLearnerAnswersDTO.getQuestionUid());
+		throw new McApplicationException(
+			"Can't find question with specified question uid: " + mcLearnerAnswersDTO.getQuestionUid());
 	    }
 
 	    McOptsContent answerOption = mcLearnerAnswersDTO.getAnswerOption();
 	    if (answerOption != null) {
-		    
+
 		Integer mark = mcLearnerAnswersDTO.getMark();
 		boolean passed = user.isMarkPassed(mark);
 		boolean isAttemptCorrect = new Boolean(mcLearnerAnswersDTO.getAttemptCorrect());
@@ -455,7 +457,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 		} else {
 		    // create new userAttempt
-		    userAttempt = new McUsrAttempt(attemptTime, question, user, answerOption, mark, passed, isAttemptCorrect);
+		    userAttempt = new McUsrAttempt(attemptTime, question, user, answerOption, mark, passed,
+			    isAttemptCorrect);
 
 		}
 
@@ -470,11 +473,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    mcUsrAttemptDAO.updateMcUsrAttempt(mcUsrAttempt);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is updating mc UsrAttempt: " + e.getMessage(), e);
+	    throw new McApplicationException("Exception occured when lams is updating mc UsrAttempt: " + e.getMessage(),
+		    e);
 	}
     }
-    
+
     @Override
     public List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user) {
 	List<McLearnerAnswersDTO> learnerAnswersDTOList = new LinkedList<McLearnerAnswersDTO>();
@@ -484,7 +487,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    McLearnerAnswersDTO learnerAnswersDTO = new McLearnerAnswersDTO();
 	    Set<McOptsContent> optionSet = question.getMcOptionsContents();
 	    List<McOptsContent> optionList = new LinkedList<McOptsContent>(optionSet);
-	    
+
 	    boolean randomize = mcContent.isRandomize();
 	    if (randomize) {
 		ArrayList<McOptsContent> shuffledList = new ArrayList<McOptsContent>(optionList);
@@ -501,17 +504,17 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	    learnerAnswersDTOList.add(learnerAnswersDTO);
 	}
-	
+
 	//populate answers
 	if (user != null) {
 
 	    for (McLearnerAnswersDTO learnerAnswersDTO : learnerAnswersDTOList) {
 		Long questionUid = learnerAnswersDTO.getQuestionUid();
-		
+
 		McUsrAttempt dbAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (dbAttempt != null) {
 		    Long selectedOptionUid = dbAttempt.getMcOptionsContent().getUid();
-		    
+
 		    //mark selected option as selected
 		    for (McOptsContent option : learnerAnswersDTO.getOptions()) {
 			if (selectedOptionUid.equals(option.getUid())) {
@@ -524,7 +527,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	return learnerAnswersDTOList;
     }
-    
+
     @Override
     public List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, boolean isFullAttemptDetailsRequired) {
 	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<McSessionMarkDTO>();
@@ -541,7 +544,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
-	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(new McStringComparator());
+	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(
+		    new McStringComparator());
 	    Long mapIndex = new Long(1);
 
 	    while (usersIterator.hasNext()) {
@@ -573,8 +577,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    long totalMark = 0;
 		    for (McUsrAttempt attempt : finalizedUserAttempts) {
 			Integer displayOrder = attempt.getMcQueContent().getDisplayOrder();
-			int arrayIndex = displayOrder != null && displayOrder.intValue() > 0 ? displayOrder.intValue() - 1
-				: 1;
+			int arrayIndex = (displayOrder != null) && (displayOrder.intValue() > 0)
+				? displayOrder.intValue() - 1 : 1;
 			if (userMarks[arrayIndex] == null) {
 
 			    // We get the mark for the attempt if the answer is correct and we don't allow
@@ -591,7 +595,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			    for (McOptsContent option : (Set<McOptsContent>) attempt.getMcQueContent()
 				    .getMcOptionsContents()) {
 				if (attempt.getMcOptionsContent().getUid().equals(option.getUid())) {
-				    answeredOptionLetter = String.valueOf((char) (optionCount + 'A' - 1));
+				    answeredOptionLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 				    break;
 				}
 				optionCount++;
@@ -631,19 +635,20 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
 		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
-			    + e.getMessage(), e);
+			    + e.getMessage(),
+		    e);
 	}
     }
 
     @Override
-    public McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId)
-	    throws McApplicationException {
+    public McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId) throws McApplicationException {
 	try {
 	    return mcUsrAttemptDAO.getUserAttemptByQuestion(queUsrUid, mcQueContentId);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
 		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
-			    + e.getMessage(), e);
+			    + e.getMessage(),
+		    e);
 	}
     }
 
@@ -652,8 +657,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcQueContentDAO.getQuestionsByContentUid(contentUid.longValue());
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is getting by uid  mc question content: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is getting by uid  mc question content: " + e.getMessage(), e);
 	}
     }
 
@@ -662,8 +667,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcQueContentDAO.refreshQuestionContent(mcContentId);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is refreshing  mc question content: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is refreshing  mc question content: " + e.getMessage(), e);
 	}
 
     }
@@ -673,8 +678,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    mcQueContentDAO.removeMcQueContent(mcQueContent);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is removing mc question content: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is removing mc question content: " + e.getMessage(), e);
 	}
     }
 
@@ -683,8 +688,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcOptionsContentDAO.getOptionDtos(mcQueContentId);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is populating candidate answers dto"
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is populating candidate answers dto" + e.getMessage(), e);
 	}
     }
 
@@ -693,8 +698,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcSessionDAO.getMcSessionById(mcSessionId);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is retrieving by id mc session : "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is retrieving by id mc session : " + e.getMessage(), e);
 	}
     }
 
@@ -703,8 +708,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    mcContentDAO.updateMcContent(mc);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is updating" + " the mc content: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is updating" + " the mc content: " + e.getMessage(), e);
 	}
     }
 
@@ -718,8 +723,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    return mcOptionsContentDAO.findMcOptionsContentByQueId(mcQueContentId);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is finding by que id" + " the mc options: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is finding by que id" + " the mc options: " + e.getMessage(), e);
 	}
     }
 
@@ -728,7 +733,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	if (uid == null) {
 	    return null;
 	}
-	
+
 	return mcQueContentDAO.findMcQuestionContentByUid(uid);
     }
 
@@ -737,37 +742,37 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	try {
 	    mcOptionsContentDAO.updateMcOptionsContent(mcOptsContent);
 	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is updating" + " the mc options content: "
-		    + e.getMessage(), e);
+	    throw new McApplicationException(
+		    "Exception occured when lams is updating" + " the mc options content: " + e.getMessage(), e);
 	}
     }
-    
+
     @Override
     public void changeUserAttemptMark(Long userAttemptUid, Integer newMark) {
 	if (newMark == null) {
 	    return;
 	}
-	
+
 	McUsrAttempt userAttempt = mcUsrAttemptDAO.getUserAttemptByUid(userAttemptUid);
 	Integer userId = userAttempt.getMcQueUsr().getQueUsrId().intValue();
 	Long userUid = userAttempt.getMcQueUsr().getUid();
-	Long toolSessionId = userAttempt.getMcQueUsr().getMcSession().getMcSessionId();	
+	Long toolSessionId = userAttempt.getMcQueUsr().getMcSession().getMcSessionId();
 	Integer oldMark = userAttempt.getMark();
 	int oldTotalMark = mcUsrAttemptDAO.getUserTotalMark(userUid);
-	
+
 	userAttempt.setMark(newMark);
 	mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
 	// propagade changes to Gradebook
-	int totalMark = (oldMark == null) ? oldTotalMark + newMark : oldTotalMark - oldMark + newMark;
+	int totalMark = (oldMark == null) ? oldTotalMark + newMark : (oldTotalMark - oldMark) + newMark;
 	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, false);
-	
+
 	//record mark change with audit service
-	auditService.logMarkChange(McAppConstants.MY_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(), userAttempt
-		.getMcQueUsr().getUsername(), "" + oldMark, "" + totalMark);
+	auditService.logMarkChange(McAppConstants.MY_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(),
+		userAttempt.getMcQueUsr().getUsername(), "" + oldMark, "" + totalMark);
 
     }
-    
+
     @Override
     public void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions,
 	    List<McQuestionDTO> questionDTOs, List<McQuestionDTO> deletedQuestions) {
@@ -775,11 +780,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	//create list of modified questions
 	List<McQuestionDTO> modifiedQuestions = new ArrayList<McQuestionDTO>();
 	//create list of modified question marks
-	List<McQuestionDTO> modifiedQuestionsMarksOnly= new ArrayList<McQuestionDTO>();
+	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<McQuestionDTO>();
 	for (McQueContent oldQuestion : oldQuestions) {
 	    for (McQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
-		    
+
 		    boolean isQuestionModified = false;
 		    boolean isQuestionMarkModified = false;
 
@@ -787,12 +792,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    if (!oldQuestion.getQuestion().equals(questionDTO.getQuestion())) {
 			isQuestionModified = true;
 		    }
-		    
+
 		    //mark is different
 		    if (oldQuestion.getMark().intValue() != (new Integer(questionDTO.getMark())).intValue()) {
 			isQuestionMarkModified = true;
 		    }
-		    
+
 		    //options are different
 		    Set<McOptsContent> oldOptions = oldQuestion.getMcOptionsContents();
 		    List<McOptionDTO> optionDTOs = questionDTO.getListCandidateAnswersDTO();
@@ -807,27 +812,27 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			    }
 			}
 		    }
-		    
+
 		    if (isQuestionModified) {
 			modifiedQuestions.add(questionDTO);
-			
+
 		    } else if (isQuestionMarkModified) {
 			modifiedQuestionsMarksOnly.add(questionDTO);
 		    }
 		}
-	    }    
+	    }
 	}
-	
+
 	Set<McSession> sessionList = content.getMcSessions();
 	for (McSession session : sessionList) {
 	    Long toolSessionId = session.getMcSessionId();
 	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
-	    
+
 	    for (McQueUsr user : sessionUsers) {
-		
+
 		final int oldTotalMark = mcUsrAttemptDAO.getUserTotalMark(user.getUid());
 		int newTotalMark = oldTotalMark;
-		
+
 		//get all finished user results
 		List<McUsrAttempt> userAttempts = getFinalizedUserAttempts(user);
 		Iterator<McUsrAttempt> iter = userAttempts.iterator();
@@ -837,20 +842,20 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    McQueContent question = userAttempt.getMcQueContent();
 
 		    boolean isRemoveQuestionResult = false;
-    		    
+
 		    // [+] if the question mark is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestionsMarksOnly) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
 			    Integer newQuestionMark = new Integer(modifiedQuestion.getMark());
 			    Integer oldQuestionMark = question.getMark();
-			    Integer newActualMark = userAttempt.getMark() * newQuestionMark / oldQuestionMark;
+			    Integer newActualMark = (userAttempt.getMark() * newQuestionMark) / oldQuestionMark;
 
 			    newTotalMark += newActualMark - userAttempt.getMark();
-			    
+
 			    // update question answer's mark
 			    userAttempt.setMark(newActualMark);
 			    mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
-			    
+
 			    break;
 			}
 
@@ -873,7 +878,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    }
 
 		    if (isRemoveQuestionResult) {
-			
+
 			Integer oldMark = userAttempt.getMark();
 			if (oldMark != null) {
 			    newTotalMark -= oldMark;
@@ -885,7 +890,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 		    // [+] doing nothing if the new question was added
 
-
 		}
 
 		// propagade new total mark to Gradebook if it was changed
@@ -896,13 +900,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	    }
 	}
-	
 
     }
-    
+
     @Override
     public byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException {
-	
+
 	Set<McQueContent> questions = mcContent.getMcQueContents();
 	int maxOptionsInQuestion = 0;
 	for (McQueContent question : questions) {
@@ -910,40 +913,40 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		maxOptionsInQuestion = question.getMcOptionsContents().size();
 	    }
 	}
-	
+
 	int totalNumberOfUsers = 0;
 	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
 	    totalNumberOfUsers += session.getMcQueUsers().size();
 	}
-	
+
 	List<McSessionMarkDTO> sessionMarkDTOs = this.buildGroupsMarkData(mcContent, true);
-	
+
 	// create an empty excel file
 	HSSFWorkbook wb = new HSSFWorkbook();
 	HSSFCellStyle greenColor = wb.createCellStyle();
 	greenColor.setFillForegroundColor(IndexedColors.GREEN.getIndex());
 	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
-	
+
 	// ======================================================= Report by question IRA page
 	// =======================================
-	
+
 	HSSFSheet sheet = wb.createSheet(messageService.getMessage("label.report.by.question"));
 
 	HSSFRow row;
 	HSSFCell cell;
 	int rowCount = 0;
-	
+
 	row = sheet.createRow(rowCount++);
 	int count = 0;
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.question"));
 	for (int optionCount = 0; optionCount < maxOptionsInQuestion; optionCount++) {
 	    cell = row.createCell(count++);
-	    cell.setCellValue(String.valueOf((char)(optionCount + 'A')));
+	    cell.setCellValue(String.valueOf((char) (optionCount + 'A')));
 	}
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.not.available"));
-	
+
 	for (McQueContent question : questions) {
 
 	    row = sheet.createRow(rowCount);
@@ -957,7 +960,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
 		int optionAttemptCount = mcUsrAttemptDAO.getAttemptsCountPerOption(option.getUid());
 		cell = row.createCell(count++);
-		int percentage = optionAttemptCount * 100 / totalNumberOfUsers;
+		int percentage = (optionAttemptCount * 100) / totalNumberOfUsers;
 		cell.setCellValue(percentage + "%");
 		totalPercentage += percentage;
 		if (option.isCorrectOption()) {
@@ -965,9 +968,9 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		}
 	    }
 	    cell = row.createCell(maxOptionsInQuestion + 1);
-	    cell.setCellValue(100 - totalPercentage + "%");
+	    cell.setCellValue((100 - totalPercentage) + "%");
 	}
-	
+
 	rowCount++;
 	row = sheet.createRow(rowCount++);
 	cell = row.createCell(0);
@@ -980,13 +983,13 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	cell.setCellStyle(greenColor);
 	cell = row.createCell(2);
 	cell.setCellStyle(greenColor);
-	
+
 	// ======================================================= Report by student IRA page
 	// =======================================
-	
+
 	sheet = wb.createSheet(messageService.getMessage("label.report.by.student"));
 	rowCount = 0;
-	
+
 	row = sheet.createRow(rowCount++);
 	count = 2;
 	for (int questionCount = 1; questionCount <= questions.size(); questionCount++) {
@@ -1010,7 +1013,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    int answerCount = 1;
 	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
 		if (option.isCorrectOption()) {
-		    correctAnswerLetter = String.valueOf((char) (answerCount + 'A' - 1));
+		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		    break;
 		}
 		answerCount++;
@@ -1019,14 +1022,14 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    cell.setCellValue(correctAnswerLetter);
 	    correctAnswers.add(correctAnswerLetter);
 	}
-	
+
 	row = sheet.createRow(rowCount++);
 	count = 0;
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("group.label"));
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.learner"));
-	
+
 	ArrayList<Integer> totalPercentList = new ArrayList<Integer>();
 	int[] numberOfCorrectAnswersPerQuestion = new int[questions.size()];
 	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
@@ -1037,10 +1040,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		count = 0;
 		cell = row.createCell(count++);
 		cell.setCellValue(sessionMarkDTO.getSessionName());
-		
+
 		cell = row.createCell(count++);
 		cell.setCellValue(userMark.getFullName());
-		
+
 		String[] answeredOptions = userMark.getAnsweredOptions();
 		int numberOfCorrectlyAnsweredByUser = 0;
 		for (int i = 0; i < answeredOptions.length; i++) {
@@ -1050,22 +1053,22 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    if (StringUtils.equals(answeredOption, correctAnswers.get(i))) {
 			cell.setCellStyle(greenColor);
 			numberOfCorrectlyAnsweredByUser++;
-			numberOfCorrectAnswersPerQuestion[count-3]++;
+			numberOfCorrectAnswersPerQuestion[count - 3]++;
 		    }
 		}
-		
+
 		cell = row.createCell(count++);
 		cell.setCellValue(new Long(userMark.getTotalMark()));
 
-		int totalPercents = numberOfCorrectlyAnsweredByUser * 100 / questions.size(); 
+		int totalPercents = (numberOfCorrectlyAnsweredByUser * 100) / questions.size();
 		totalPercentList.add(totalPercents);
 		cell = row.createCell(count++);
 		cell.setCellValue(totalPercents + "%");
 	    }
-	    
+
 	    rowCount++;
 	}
-	
+
 	//ave
 	row = sheet.createRow(rowCount++);
 	count = 1;
@@ -1073,7 +1076,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	cell.setCellValue(messageService.getMessage("label.ave"));
 	for (int numberOfCorrectAnswers : numberOfCorrectAnswersPerQuestion) {
 	    cell = row.createCell(count++);
-	    cell.setCellValue(numberOfCorrectAnswers * 100 / totalPercentList.size() + "%");
+	    cell.setCellValue(((numberOfCorrectAnswers * 100) / totalPercentList.size()) + "%");
 	}
 
 	//class mean
@@ -1091,7 +1094,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    cell = row.createCell(questions.size() + 3);
 	    cell.setCellValue(classMean + "%");
 	}
-	
+
 	// median
 	row = sheet.createRow(rowCount++);
 	cell = row.createCell(1);
@@ -1099,7 +1102,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	if (totalPercents.length != 0) {
 	    int median;
 	    int middle = totalPercents.length / 2;
-	    if (totalPercents.length % 2 == 1) {
+	    if ((totalPercents.length % 2) == 1) {
 		median = totalPercents[middle];
 	    } else {
 		median = (int) ((totalPercents[middle - 1] + totalPercents[middle]) / 2.0);
@@ -1120,22 +1123,22 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	cell.setCellStyle(greenColor);
 	cell = row.createCell(2);
 	cell.setCellStyle(greenColor);
-	
+
 	// ======================================================= Marks page
 	// =======================================
-	
+
 	sheet = wb.createSheet("Marks");
 
 	rowCount = 0;
 	count = 0;
-	
+
 	row = sheet.createRow(rowCount++);
 	for (McQueContent question : questions) {
 	    cell = row.createCell(2 + count++);
 	    cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark",
 		    new Object[] { count, question.getMark() }));
 	}
-	
+
 	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
 	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
 
@@ -1229,8 +1232,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 
 	if (toolContentId == null) {
 	    McServicePOJO.logger.error("toolContentId is null");
@@ -1251,7 +1254,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		Iterator sessionUsersIterator = mcSession.getMcQueUsers().iterator();
 		while (sessionUsersIterator.hasNext()) {
 		    McQueUsr mcQueUsr = (McQueUsr) sessionUsersIterator.next();
-		    
+
 		    mcUsrAttemptDAO.removeAllUserAttempts(mcQueUsr.getUid());
 		}
 	    }
@@ -1261,7 +1264,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    throw new ToolException("toolContentId is missing");
 	}
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	McContent mcContent = getMcContent(toolContentId);
@@ -1270,14 +1273,14 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
 	mcContent.setDefineLater(false);
 	mcContentDAO.saveMcContent(mcContent);
-    }    
+    }
 
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Multiple Choice attempts for user ID " + userId + " and toolContentId "
-		    + toolContentId);
+	if (McServicePOJO.logger.isDebugEnabled()) {
+	    McServicePOJO.logger.debug(
+		    "Removing Multiple Choice attempts for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	McContent content = mcContentDAO.findMcContentById(toolContentId);
@@ -1293,7 +1296,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			mcContentDAO.delete(entry);
 		    }
 
-		    if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+		    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 			session.setGroupLeader(null);
 		    }
 
@@ -1304,7 +1307,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    }
 	}
     }
-    
+
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	McContent toolContentObj = mcContentDAO.findMcContentById(toolContentId);
@@ -1333,11 +1336,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(McImportContentVersionFilter.class);
 
-	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, mcToolContentHandler,
-		    fromVersion, toVersion);
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, mcToolContentHandler, fromVersion,
+		    toVersion);
 	    if (!(toolPOJO instanceof McContent)) {
-		throw new ImportToolContentException("Import MC tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import MC tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    McContent toolContentObj = (McContent) toolPOJO;
 
@@ -1363,14 +1366,26 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     @Override
     public String getToolContentTitle(Long toolContentId) {
-	return  mcContentDAO.findMcContentById(toolContentId).getTitle();
+	return mcContentDAO.findMcContentById(toolContentId).getTitle();
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
-	return  mcContentDAO.findMcContentById(toolContentId).isDefineLater();
+	return mcContentDAO.findMcContentById(toolContentId).isDefineLater();
     }
-    
+
+    @Override
+    public boolean isReadOnly(Long toolContentId) {
+	McContent content = mcContentDAO.findMcContentById(toolContentId);
+	for (McSession session : (Set<McSession>) content.getMcSessions()) {
+	    if (!session.getMcQueUsers().isEmpty()) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
     /**
      * it is possible that the tool session id already exists in the tool sessions table as the users from the same
      * session are involved. existsSession(long toolSessionId)
@@ -1378,6 +1393,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * @param toolSessionId
      * @return boolean
      */
+    @Override
     public boolean existsSession(Long toolSessionId) {
 	McSession mcSession = getMcSessionById(toolSessionId);
 	return mcSession != null;
@@ -1474,13 +1490,14 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
 
     }
@@ -1494,7 +1511,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return mcOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
@@ -1521,7 +1538,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    McQueUsr groupLeader = session.getGroupLeader();
 
 	    // check if leader has submitted answers
-	    if (groupLeader != null && groupLeader.isResponseFinalised()) {
+	    if ((groupLeader != null) && groupLeader.isResponseFinalised()) {
 
 		// we need to make sure specified user has the same scratches as a leader
 		copyAnswersFromLeader(mcUser, groupLeader);
@@ -1531,17 +1548,20 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     }
 
+    @Override
     public IToolVO getToolBySignature(String toolSignature) throws McApplicationException {
 	IToolVO tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 
+    @Override
     public long getToolDefaultContentIdBySignature(String toolSignature) {
 	long contentId = 0;
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	return contentId;
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -1695,7 +1715,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
     }
-    
+
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
     }
@@ -1713,14 +1733,15 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     /**
      * Import the data for a 1.0.2 Chat
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	McContent toolContentObj = new McContent();
 	toolContentObj.setCreatedBy(user.getUserID().longValue());
 	toolContentObj.setCreationDate(now);
 	toolContentObj.setDefineLater(false);
-	toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	toolContentObj.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	toolContentObj.setReflect(false);
 	toolContentObj.setReflectionSubject(null);
 	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
@@ -1770,10 +1791,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	} catch (WDDXProcessorConversionException e) {
 	    McServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + toolContentObj.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
+		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
 	mcContentDAO.saveMcContent(toolContentObj);
@@ -1782,12 +1801,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     private void create102Question(Hashtable questionMap, McContent toolContentObj)
 	    throws WDDXProcessorConversionException {
 	McQueContent question = new McQueContent();
-	question.setDisplayOrder(WDDXProcessor.convertToInteger(questionMap,
-		ToolContentImport102Manager.CONTENT_Q_ORDER));
+	question.setDisplayOrder(
+		WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_Q_ORDER));
 
 	question.setFeedback((String) questionMap.get(ToolContentImport102Manager.CONTENT_Q_FEEDBACK));
-	question.setQuestion(WebUtil.convertNewlines((String) questionMap
-		.get(ToolContentImport102Manager.CONTENT_Q_QUESTION)));
+	question.setQuestion(
+		WebUtil.convertNewlines((String) questionMap.get(ToolContentImport102Manager.CONTENT_Q_QUESTION)));
 
 	// In 1.0.2 all questions are implicitly assumed to be 1 and be of equal weight
 	question.setMark(new Integer(1));
@@ -1800,10 +1819,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    while (candIterator.hasNext()) {
 		Hashtable candidate = (Hashtable) candIterator.next();
 		String optionText = (String) candidate.get(ToolContentImport102Manager.CONTENT_Q_ANSWER);
-		if (optionText != null && optionText.length() > 0) {
+		if ((optionText != null) && (optionText.length() > 0)) {
 		    // 1.0.2 has a display order but 2.0 doesn't ToolContentImport102Manager.CONTENT_Q_ORDER
 		    McOptsContent options = new McOptsContent();
-		    options.setCorrectOption(correctAnswer != null && correctAnswer.equals(optionText));
+		    options.setCorrectOption((correctAnswer != null) && correctAnswer.equals(optionText));
 		    options.setMcQueOptionText(optionText);
 		    options.setMcQueContent(question);
 		    question.getMcOptionsContents().add(options);
@@ -1815,19 +1834,19 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	question.setMcContent(toolContentObj);
 	question.setMcContentId(toolContentObj.getUid());
     }
-    
+
     @Override
     public List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID) {
 	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
 	if (userID == null) {
 	    // all users mode
-	    for (McSession mcSession : (Set<McSession>)mcContent.getMcSessions()) {
+	    for (McSession mcSession : (Set<McSession>) mcContent.getMcSessions()) {
 
-		for (McQueUsr user : (Set<McQueUsr>)mcSession.getMcQueUsers()) {
+		for (McQueUsr user : (Set<McQueUsr>) mcSession.getMcQueUsers()) {
 
 		    NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-				    .toString()));
+			    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.MY_SIGNATURE,
+			    new Integer(user.getQueUsrId().toString()));
 
 		    if (notebookEntry != null) {
 			ReflectionDTO reflectionDTO = new ReflectionDTO();
@@ -1849,8 +1868,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    McQueUsr user = (McQueUsr) userIter.next();
 		    if (user.getQueUsrId().equals(userID)) {
 			NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-					.toString()));
+				CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.MY_SIGNATURE,
+				new Integer(user.getQueUsrId().toString()));
 
 			if (notebookEntry != null) {
 			    ReflectionDTO reflectionDTO = new ReflectionDTO();
@@ -1871,8 +1890,9 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	McContent toolContentObj = null;
 	if (toolContentId != null) {
@@ -1887,20 +1907,23 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	toolContentObj.setReflectionSubject(description);
     }
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
 
 	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
 	}
     }
 
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
@@ -1950,21 +1973,25 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	this.messageService = messageService;
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getMcOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
     // ****************** REST methods *************************
 
-    /** Rest call to create a new Multiple Choice content. Required fields in toolContentJSON: "title", "instructions", "questions".
-     * The questions entry should be JSONArray containing JSON objects, which in turn must contain "questionText", "displayOrder" (Integer) and a JSONArray "answers".
-     * The answers entry should be JSONArray containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
+    /**
+     * Rest call to create a new Multiple Choice content. Required fields in toolContentJSON: "title", "instructions",
+     * "questions". The questions entry should be JSONArray containing JSON objects, which in turn must contain
+     * "questionText", "displayOrder" (Integer) and a JSONArray "answers". The answers entry should be JSONArray
+     * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
      * 
      * Retries are controlled by lockWhenFinished, which defaults to true (no retries).
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	McContent mcq = new McContent();
 	Date updateDate = new Date();
@@ -1977,11 +2004,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	mcq.setMcContentId(toolContentID);
 	mcq.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	mcq.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
-	
+
 	mcq.setRetries(JsonUtil.opt(toolContentJSON, "allowRetries", Boolean.FALSE));
-	mcq.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	mcq.setUseSelectLeaderToolOuput(
+		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	mcq.setReflect(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	mcq.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS,""));
+	mcq.setReflectionSubject(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
 	mcq.setQuestionsSequenced(JsonUtil.opt(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 	mcq.setRandomize(JsonUtil.opt(toolContentJSON, "randomize", Boolean.FALSE));
 	mcq.setShowReport(JsonUtil.opt(toolContentJSON, "showReport", Boolean.FALSE));
@@ -1990,23 +2018,21 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	mcq.setPrefixAnswersWithLetters(JsonUtil.opt(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.opt(toolContentJSON, "passMark", 0));
 	// submissionDeadline is set in monitoring
-	
+
 	createMc(mcq);
-	
+
 	// Questions
 	JSONArray questions = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for (int i=0; i<questions.length(); i++) {
+	for (int i = 0; i < questions.length(); i++) {
 	    JSONObject questionData = (JSONObject) questions.get(i);
-	    McQueContent question = new McQueContent(questionData.getString(RestTags.QUESTION_TEXT), questionData.getInt(RestTags.DISPLAY_ORDER), 1, "", 
-		    mcq, null, new HashSet<McOptsContent>());
+	    McQueContent question = new McQueContent(questionData.getString(RestTags.QUESTION_TEXT),
+		    questionData.getInt(RestTags.DISPLAY_ORDER), 1, "", mcq, null, new HashSet<McOptsContent>());
 
-	    JSONArray optionsData = (JSONArray) questionData.getJSONArray(RestTags.ANSWERS);
-	    for (int j=0; j<optionsData.length(); j++) {
+	    JSONArray optionsData = questionData.getJSONArray(RestTags.ANSWERS);
+	    for (int j = 0; j < optionsData.length(); j++) {
 		JSONObject optionData = (JSONObject) optionsData.get(j);
-		question.getMcOptionsContents().add(new McOptsContent(optionData.getInt(RestTags.DISPLAY_ORDER), 
-			optionData.getBoolean(RestTags.CORRECT), 
-			optionData.getString(RestTags.ANSWER_TEXT), 
-			question));
+		question.getMcOptionsContents().add(new McOptsContent(optionData.getInt(RestTags.DISPLAY_ORDER),
+			optionData.getBoolean(RestTags.CORRECT), optionData.getString(RestTags.ANSWER_TEXT), question));
 	    }
 	    saveOrUpdateMcQueContent(question);
 	}

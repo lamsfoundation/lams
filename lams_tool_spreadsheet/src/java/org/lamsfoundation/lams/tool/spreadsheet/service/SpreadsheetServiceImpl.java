@@ -97,8 +97,8 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * @author Andrey Balan
  * 
  */
-public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+public class SpreadsheetServiceImpl
+	implements ISpreadsheetService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
     private static Logger log = Logger.getLogger(SpreadsheetServiceImpl.class.getName());
     private SpreadsheetDAO spreadsheetDao;
     private SpreadsheetUserDAO spreadsheetUserDao;
@@ -510,7 +510,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(SpreadsheetImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, spreadsheetToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Spreadsheet)) {
@@ -571,7 +571,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public String getToolContentTitle(Long toolContentId) {
 	return getSpreadsheetByContentId(toolContentId).getTitle();
     }
-   
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
@@ -585,10 +585,22 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public boolean isContentEdited(Long toolContentId) {
 	return getSpreadsheetByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public boolean isReadOnly(Long toolContentId) {
+	List<SpreadsheetSession> sessions = spreadsheetSessionDao.getByContentId(toolContentId);
+	for (SpreadsheetSession session : sessions) {
+	    if (!spreadsheetUserDao.getBySessionID(session.getSessionId()).isEmpty()) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
+    @Override
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
 	if (removeSessionData) {
 	    List list = spreadsheetSessionDao.getByContentId(toolContentId);
@@ -614,8 +626,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    if (user != null) {
 		user.setSessionFinished(false);
 		if (user.getUserModifiedSpreadsheet() != null) {
-		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class, user
-			    .getUserModifiedSpreadsheet().getUid());
+		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class,
+			    user.getUserModifiedSpreadsheet().getUid());
 		}
 
 		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -623,7 +635,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		if (entry != null) {
 		    spreadsheetDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
-		
+
 		spreadsheetUserDao.removeObject(SpreadsheetUser.class, user.getUid());
 	    }
 	}
@@ -664,13 +676,14 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -688,7 +701,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -701,8 +714,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Spreadsheet toolContentObj = getSpreadsheetByContentId(toolContentId);
 	if (toolContentObj == null) {

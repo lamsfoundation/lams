@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
@@ -68,17 +67,14 @@ public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
     }
 
     public void createUsr(QaQueUsr usr) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().save(usr);
     }
 
     public void updateUsr(QaQueUsr usr) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().update(usr);
     }
 
     public void deleteQaQueUsr(QaQueUsr qaQueUsr) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().delete(qaQueUsr);
     }
 

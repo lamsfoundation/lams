@@ -23,7 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.service;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +32,12 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.GateUser;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -92,7 +97,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     /**
      * @param toolSessionDAO
-     *                The toolSessionDAO to set.
+     *            The toolSessionDAO to set.
      */
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
 	this.toolSessionDAO = toolSessionDAO;
@@ -108,16 +113,16 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     /**
      * @param contentIDGenerator
-     *                The contentIDGenerator to set.
+     *            The contentIDGenerator to set.
      */
     public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator) {
 	this.contentIDGenerator = contentIDGenerator;
     }
-    
+
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
 	this.toolContentDAO = toolContentDAO;
     }
-    
+
     /**
      * Set i18n MessageService
      */
@@ -177,8 +182,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	try {
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity.getTool());
 
-	    sessionManager.createToolSession(toolSession.getToolSessionId(), toolSession.getToolSessionName(), activity
-		    .getToolContentId());
+	    sessionManager.createToolSession(toolSession.getToolSessionId(), toolSession.getToolSessionName(),
+		    activity.getToolContentId());
 	} catch (NoSuchBeanDefinitionException e) {
 	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to create tool session. ToolActivity "
 		    + activity;
@@ -188,8 +193,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     }
 
     @Override
-    public Long notifyToolToCopyContent(ToolActivity toolActivity, String customCSV) throws DataMissingException,
-	    ToolException {
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, String customCSV)
+	    throws DataMissingException, ToolException {
 	Long toolcontentID = toolActivity.getToolContentId();
 	try {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
@@ -215,8 +220,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     }
 
     @Override
-    public Long notifyToolToCopyContent(Long toolContentId, String customCSV) throws DataMissingException,
-	    ToolException {
+    public Long notifyToolToCopyContent(Long toolContentId, String customCSV)
+	    throws DataMissingException, ToolException {
 	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
 	if (toolContent == null) {
 	    String error = "The toolContentID " + toolContentId
@@ -263,17 +268,82 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
-    
+
     @Override
-    public void notifyToolToDeleteLearnerContent(ToolActivity toolActivity, Integer userId) throws ToolException {
-	try {
+    public boolean removeLearnerContent(Activity activity, User learner) throws ToolException {
+	if (activity.isToolActivity()) {
+	    ToolActivity toolActivity = (ToolActivity) activity;
+	    try {
+		ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
+		contentManager.removeLearnerContent(toolActivity.getToolContentId(), learner.getUserId());
+	    } catch (NoSuchBeanDefinitionException e) {
+		String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete learner content. ToolActivity "
+			+ toolActivity;
+		LamsCoreToolService.log.error(message, e);
+		throw new ToolException(message, e);
+	    }
+	} else if (activity.isGroupingActivity()) {
+	    GroupingActivity groupingActivity = (GroupingActivity) activity;
+	    Grouping grouping = groupingActivity.getCreateGrouping();
+	    Group group = grouping.getGroupBy(learner);
+	    if (!group.isNull()) {
+		return group.getUsers().remove(learner);
+	    }
+	} else if (activity.isGateActivity()) {
+	    GateActivity gateActivity = (GateActivity) activity;
+	    Iterator<GateUser> gateUserIterator = gateActivity.getAllGateUsers().iterator();
+	    boolean removed = false;
+	    while (gateUserIterator.hasNext()) {
+		User user = gateUserIterator.next().getUser();
+		// there can be more than one entry (why?!), so do not "break"
+		if (learner.getUserId().equals(user.getUserId())) {
+		    removed = true;
+		    gateUserIterator.remove();
+		}
+	    }
+	    return removed;
+	}
+
+	return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean isActivityReadOnly(Activity activity) {
+	if (activity.isToolActivity()) {
+	    ToolActivity toolActivity = (ToolActivity) activity;
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
-	    contentManager.removeLearnerContent(toolActivity.getToolContentId(), userId);
-	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete learner content. ToolActivity "
-		    + toolActivity;
-	    LamsCoreToolService.log.error(message, e);
-	    throw new ToolException(message, e);
+	    return contentManager.isReadOnly(toolActivity.getToolContentId());
+	} else if (activity.isGroupingActivity()) {
+	    GroupingActivity groupingActivity = (GroupingActivity) activity;
+	    Grouping grouping = groupingActivity.getCreateGrouping();
+	    for (Group group : (Set<Group>) grouping.getGroups()) {
+		if (!group.getUsers().isEmpty()) {
+		    return true;
+		}
+	    }
+	    return false;
+	} else if (activity.isGateActivity()) {
+	    GateActivity gateActivity = (GateActivity) activity;
+	    return !gateActivity.getAllGateUsers().isEmpty();
+	}
+	
+	// just check the flag
+	return isActivityReadOnlyFlag(activity);
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean isActivityReadOnlyFlag(Activity activity) {
+	if (activity.isComplexActivity()) {
+	    for (Activity childActivity : (Set<Activity>) ((ComplexActivity) systemToolDAO.find(ComplexActivity.class,
+		    activity.getActivityId())).getActivities()) {
+		if (isActivityReadOnlyFlag(childActivity)) {
+		    return true;
+		}
+	    }
+	    return false;
+	} else {
+	    return activity.isActivityReadOnly();
 	}
     }
 
@@ -305,8 +375,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
-	    String message = "Tool "
-		    + tool.getToolDisplayName()
+	    String message = "Tool " + tool.getToolDisplayName()
 		    + " doesn't support the getToolOutputDefinitions(toolContentId) method so no output definitions can be accessed.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
@@ -369,8 +438,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
-	    String message = "Tool "
-		    + tool.getToolDisplayName()
+	    String message = "Tool " + tool.getToolDisplayName()
 		    + " doesn't support the getSupportedToolOutputDefinitionClasses(definitionType) method so no output definitions can be accessed.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
@@ -414,8 +482,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
-	    String message = "Tool "
-		    + tool.getToolDisplayName()
+	    String message = "Tool " + tool.getToolDisplayName()
 		    + " doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
@@ -447,8 +514,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
-	    String message = "Tool "
-		    + tool.getToolDisplayName()
+	    String message = "Tool " + tool.getToolDisplayName()
 		    + " doesn't support the forceCompleteUser(ToolSession toolSession, User learner) method so can't force complete learner.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
@@ -489,14 +555,13 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
-	    String message = "Tool "
-		    + tool.getToolDisplayName()
+	    String message = "Tool " + tool.getToolDisplayName()
 		    + " doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	}
     }
-    
+
     @Override
     public Long getActivityMaxPossibleMark(ToolActivity activity) {
 	SortedMap<String, ToolOutputDefinition> map = getOutputDefinitionsFromTool(activity.getToolContentId(),
@@ -507,7 +572,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	if (map != null) {
 	    for (String key : map.keySet()) {
 		ToolOutputDefinition definition = map.get(key);
-		if (actEvals != null && actEvals.size() > 0) {
+		if ((actEvals != null) && (actEvals.size() > 0)) {
 
 		    // get first evaluation
 		    ActivityEvaluation actEval = actEvals.iterator().next();
@@ -515,15 +580,15 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 		    if (actEval.getToolOutputDefinition().equals(key)) {
 
 			Object upperLimit = definition.getEndValue();
-			if (upperLimit != null && upperLimit instanceof Long) {
+			if ((upperLimit != null) && (upperLimit instanceof Long)) {
 			    return (Long) upperLimit;
 			}
 			break;
 		    }
 		} else {
-		    if (definition.isDefaultGradebookMark() != null && definition.isDefaultGradebookMark()) {
+		    if ((definition.isDefaultGradebookMark() != null) && definition.isDefaultGradebookMark()) {
 			Object upperLimit = definition.getEndValue();
-			if (upperLimit != null && upperLimit instanceof Long) {
+			if ((upperLimit != null) && (upperLimit instanceof Long)) {
 			    return (Long) upperLimit;
 			}
 			break;
@@ -552,8 +617,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
 
 	// call the tool to remove the session details
-	ToolSessionManager sessionManager = (ToolSessionManager) findToolService(toolSession.getToolActivity()
-		.getTool());
+	ToolSessionManager sessionManager = (ToolSessionManager) findToolService(
+		toolSession.getToolActivity().getTool());
 
 	try {
 	    sessionManager.removeToolSession(toolSession.getToolSessionId());
@@ -612,8 +677,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	} else if (activity.isSystemToolActivity()) {
 	    SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
 	    if (sysTool != null) {
-		return setupURLWithActivityLessonUserID(activity, lessonID, learner.getUserId(), sysTool
-			.getLearnerProgressUrl());
+		return setupURLWithActivityLessonUserID(activity, lessonID, learner.getUserId(),
+			sysTool.getLearnerProgressUrl());
 	    }
 	}
 	return null;
@@ -651,13 +716,13 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     @Override
     public String getToolAuthorURL(Long lessonID, ToolActivity activity, ToolAccessMode mode) {
 	String url = activity.getTool().getAuthorUrl();
-	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_TOOL_CONTENT_ID, activity.getToolContentId()
-		.toString());
+	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_TOOL_CONTENT_ID,
+		activity.getToolContentId().toString());
 	// should have used LessonService, but reusing existing tools is just easier
 	Lesson lesson = (Lesson) toolContentDAO.find(Lesson.class, lessonID);
-	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_CONTENT_FOLDER_ID, lesson.getLearningDesign()
-		.getContentFolderID());
-	
+	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		lesson.getLearningDesign().getContentFolderID());
+
 	url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_MODE, mode.toString());
 	return url;
     }
@@ -682,13 +747,14 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new LamsToolServiceException(error);
 	}
 
-	return WebUtil.appendParameterToURL(toolURL, AttributeNames.PARAM_TOOL_SESSION_ID, toolSession
-		.getToolSessionId().toString());
+	return WebUtil.appendParameterToURL(toolURL, AttributeNames.PARAM_TOOL_SESSION_ID,
+		toolSession.getToolSessionId().toString());
     }
 
-    private String setupURLWithActivityLessonUserID(Activity activity, Long lessonID, Integer userID, String learnerURL) {
+    private String setupURLWithActivityLessonUserID(Activity activity, Long lessonID, Integer userID,
+	    String learnerURL) {
 	String url = setupURLWithActivityLessonID(activity, lessonID, learnerURL);
-	if (url != null && userID != null) {
+	if ((url != null) && (userID != null)) {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_USER_ID, userID.toString());
 	}
 	return url;
@@ -696,11 +762,11 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     private String setupURLWithActivityLessonID(Activity activity, Long lessonID, String learnerURL) {
 	String url = learnerURL;
-	if (url != null && activity != null) {
-	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId()
-		    .toString());
+	if ((url != null) && (activity != null)) {
+	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID,
+		    activity.getActivityId().toString());
 	}
-	if (url != null && lessonID != null) {
+	if ((url != null) && (lessonID != null)) {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_LESSON_ID, lessonID.toString());
 	}
 	return url;
@@ -708,8 +774,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     @Override
     public String setupToolURLWithToolContent(ToolActivity activity, String toolURL) {
-	return WebUtil.appendParameterToURL(toolURL, AttributeNames.PARAM_TOOL_CONTENT_ID, activity.getToolContentId()
-		.toString());
+	return WebUtil.appendParameterToURL(toolURL, AttributeNames.PARAM_TOOL_CONTENT_ID,
+		activity.getToolContentId().toString());
     }
 
     @Override

@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
@@ -56,7 +55,6 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#CreateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
     public void createSession(QaSession session) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().save(session);
     }
 
@@ -64,7 +62,6 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#UpdateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
     public void UpdateQaSession(QaSession session) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().update(session);
     }
 
@@ -72,7 +69,6 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#deleteSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
     public void deleteQaSession(QaSession qaSession) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().delete(qaSession);
     }
 

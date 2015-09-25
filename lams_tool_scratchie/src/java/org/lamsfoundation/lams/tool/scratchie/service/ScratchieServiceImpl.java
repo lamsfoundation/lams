@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -90,9 +89,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
-import org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -207,7 +204,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     @Override
     public void releaseItemsFromCache(Scratchie scratchie) {
-	for (ScratchieItem item : (Set<ScratchieItem>) scratchie.getScratchieItems()) {
+	for (ScratchieItem item : scratchie.getScratchieItems()) {
 	    scratchieItemDao.releaseItemFromCache(item);
 	}
     }
@@ -1770,6 +1767,18 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
+    public boolean isReadOnly(Long toolContentId) {
+	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(toolContentId);
+	for (ScratchieSession session : sessions) {
+	    if (!scratchieUserDao.getBySessionID(session.getSessionId()).isEmpty()) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData)
 	    throws SessionDataExistsException, ToolException {
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
@@ -1784,9 +1793,11 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	scratchieDao.delete(scratchie);
     }
 
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (ScratchieServiceImpl.log.isDebugEnabled()) {
+	    ScratchieServiceImpl.log
+		    .debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(toolContentId);
@@ -1801,7 +1812,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    scratchieDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
 
-		if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+		if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 		    session.setGroupLeader(null);
 		}
 
@@ -2034,7 +2045,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    // set options
 	    Set<ScratchieAnswer> newAnswers = new LinkedHashSet<ScratchieAnswer>();
 
-	    JSONArray answersData = (JSONArray) questionData.getJSONArray(RestTags.ANSWERS);
+	    JSONArray answersData = questionData.getJSONArray(RestTags.ANSWERS);
 	    for (int j = 0; j < answersData.length(); j++) {
 		JSONObject answerData = (JSONObject) answersData.get(j);
 		ScratchieAnswer answer = new ScratchieAnswer();

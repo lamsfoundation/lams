@@ -35,100 +35,74 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @author mtruong
- * <p>Hibernate implementation for database access to Noticeboard users (learners) for the noticeboard tool.</p>
+ *         <p>
+ *         Hibernate implementation for database access to Noticeboard users (learners) for the noticeboard tool.
+ *         </p>
  */
 @Repository
 public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserDAO {
-    
-	private static final String FIND_NB_USER = "from " + NoticeboardUser.class.getName() + " as nb where nb.userId=?";
-	
-	private static final String FIND_NB_USER_BY_SESSION = "from " + NoticeboardUser.class.getName() + " as nb where nb.userId=? and nb.nbSession.nbSessionId=?";
-	
+    private static final String FIND_NB_USER_BY_SESSION = "from " + NoticeboardUser.class.getName()
+	    + " as nb where nb.userId=? and nb.nbSession.nbSessionId=?";
+
     private static final String COUNT_USERS_IN_SESSION = "select nu.userId from NoticeboardUser nu where nu.nbSession= :nbSession";
-   
-  
-	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByID(java.lang.Long) */
-	public NoticeboardUser getNbUser(Long userId, Long sessionId)
-	{
-	    String query = "from NoticeboardUser user where user.userId=? and user.nbSession.nbSessionId=?";
-	    Object[] values = new Object[2];
-	    values[0] = userId;
-	    values[1] = sessionId;
-	    List users = doFind(query,values);
-		if(users!=null && users.size() == 0)
-		{			
-			return null;
-		}
-		else
-		{
-			return (NoticeboardUser)users.get(0);
-		}
-	}
-	
-	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserBySession(java.lang.Long, java.lang.Long)*/
-	public NoticeboardUser getNbUserBySession(Long userId, Long sessionId)
-	{	
-		List usersReturned = getSessionFactory().getCurrentSession().createQuery(FIND_NB_USER_BY_SESSION)
-			.setLong(0,userId.longValue())
-			.setLong(1, sessionId.longValue())
-			.list();
-	
-		if(usersReturned != null && usersReturned.size() > 0){
-			NoticeboardUser nb = (NoticeboardUser) usersReturned.get(0);
-			return nb;
-		}
-		else
-			return null;
 
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByID(java.lang.Long)
+     */
+    public NoticeboardUser getNbUser(Long userId, Long sessionId) {
+	String query = "from NoticeboardUser user where user.userId=? and user.nbSession.nbSessionId=?";
+	Object[] values = new Object[2];
+	values[0] = userId;
+	values[1] = sessionId;
+	List users = doFind(query, values);
+	if (users != null && users.size() == 0) {
+	    return null;
+	} else {
+	    return (NoticeboardUser) users.get(0);
 	}
+    }
 
-	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#saveNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
-	public void saveNbUser(NoticeboardUser nbUser)
-    {
-    	this.getSession().save(nbUser);
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserBySession(java.lang.Long,
+     *      java.lang.Long)
+     */
+    public NoticeboardUser getNbUserBySession(Long userId, Long sessionId) {
+	List usersReturned = getSessionFactory().getCurrentSession().createQuery(FIND_NB_USER_BY_SESSION)
+		.setLong(0, userId.longValue()).setLong(1, sessionId.longValue()).list();
+
+	if (usersReturned != null && usersReturned.size() > 0) {
+	    NoticeboardUser nb = (NoticeboardUser) usersReturned.get(0);
+	    return nb;
+	} else
+	    return null;
+
     }
-	
-	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#updateNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
-    public void updateNbUser(NoticeboardUser nbUser)
-    {
-    	this.getSession().update(nbUser);
+
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#saveNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
+     */
+    public void saveNbUser(NoticeboardUser nbUser) {
+	this.getSession().save(nbUser);
     }
-    
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(java.lang.Long) */
-    public void removeNbUser(Long userId)
-    {
-		if ( userId != null) {
-			//String query = "from org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent as nb where nb.nbContentId=?";
-			List list = getSessionFactory().getCurrentSession().createQuery(FIND_NB_USER)
-				.setLong(0,userId.longValue())
-				.list();
-			
-			if(list != null && list.size() > 0){
-				NoticeboardUser nb = (NoticeboardUser) list.get(0);
-				getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
-				this.getSession().delete(nb);
-				this.getSession().flush();
-			}
-		}
-      
+
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#updateNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
+     */
+    public void updateNbUser(NoticeboardUser nbUser) {
+	this.getSession().update(nbUser);
     }
-    
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
-    public void removeNbUser(NoticeboardUser nbUser)
-    {
-    	removeNbUser(nbUser.getUserId());
+
+    /**
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNumberOfUsers((org.lamsfoundation.lams.
+     *      tool.noticeboard.NoticeboardSession)
+     */
+    public int getNumberOfUsers(NoticeboardSession nbSession) {
+	return (doFindByNamedParam(COUNT_USERS_IN_SESSION, new String[] { "nbSession" }, new Object[] { nbSession }))
+		.size();
     }
-    
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNumberOfUsers((org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
-    public int getNumberOfUsers(NoticeboardSession nbSession)
-    {
-        return (doFindByNamedParam(COUNT_USERS_IN_SESSION,
-        		new String[] {"nbSession"},
-        		new Object[] {nbSession})).size();
-    }
-    
+
     public List getNbUsersBySession(Long sessionId) {
-    	String query = "from NoticeboardUser user where user.nbSession.nbSessionId=?";
-	    return doFind(query,sessionId);
+	String query = "from NoticeboardUser user where user.nbSession.nbSessionId=?";
+	return doFind(query, sessionId);
     }
 }

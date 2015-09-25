@@ -788,9 +788,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		    x1 = activity.getXcoord() == null ? 0 : activity.getXcoord();
 		    y1 = activity.getYcoord() == null ? 0 : activity.getYcoord();
 		}
-		
+
 		if (toActivity.isBranchingActivity()) {
-		    BranchingActivity branchingActivity = (BranchingActivity) toActivity;
+		    // get real instance instead of lazy loaded proxy
+		    BranchingActivity branchingActivity = (BranchingActivity) activityDAO
+			    .getActivityByActivityId(toActivity.getActivityId());
 		    x2 = branchingActivity.getEndXcoord();
 		    y2 = branchingActivity.getEndYcoord();
 		} else {
