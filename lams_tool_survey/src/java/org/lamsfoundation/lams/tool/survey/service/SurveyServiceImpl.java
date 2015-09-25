@@ -47,7 +47,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -277,7 +276,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -358,7 +357,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	// initial a array to hold how many time chose has been done for a option or open text.
 	int numberAvailableOptions = options.size();
 	// for appendText and open Text Entry will be the last one of choose[] array.
-	if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+	if (answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)) {
 	    numberAvailableOptions++;
 	}
 
@@ -378,7 +377,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 		    }
 		}
 		// handle appendText or Open Text Entry
-		if ((answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+		if ((answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY))
 			&& !StringUtils.isBlank(answer.getAnswerText())) {
 		    choiceArray[numberAvailableOptions - 1]++;
 		    numberAnswers++;
@@ -391,14 +390,14 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    numberAnswers = 1;
 	}
 	for (SurveyOption option : options) {
-	    double percentage = (double) choiceArray[idx] / (double) numberAnswers * 100d;
+	    double percentage = ((double) choiceArray[idx] / (double) numberAnswers) * 100d;
 	    option.setResponse(percentage);
 	    option.setResponseFormatStr(new Long(Math.round(percentage)).toString());
 	    option.setResponseCount(choiceArray[idx]);
 	    idx++;
 	}
-	if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-	    double percentage = (double) choiceArray[idx] / (double) numberAnswers * 100d;
+	if (answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)) {
+	    double percentage = ((double) choiceArray[idx] / (double) numberAnswers) * 100d;
 	    answerDto.setOpenResponse(percentage);
 	    answerDto.setOpenResponseFormatStr(new Long(Math.round(percentage)).toString());
 	    answerDto.setOpenResponseCount(choiceArray[idx]);
@@ -464,7 +463,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportClassPortfolio(Long toolContentID) {
+    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportClassPortfolio(
+	    Long toolContentID) {
 
 	//construct sessionToUsers Map
 	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
@@ -493,19 +493,21 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportLearnerPortfolio(SurveyUser learner) {
+    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportLearnerPortfolio(
+	    SurveyUser learner) {
 
 	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
 	SurveySession session = learner.getSession();
 	sessionToUsersMap.put(session, Arrays.asList(learner));
-	
+
 	return getExportSummary(sessionToUsersMap);
     }
 
     /**
-     * Creates data for export methods. Suitable both for single/multiple users  
+     * Creates data for export methods. Suitable both for single/multiple users
      * 
-     * @param sessionToUsersMap map containing all session to users pairs that require data to be exported
+     * @param sessionToUsersMap
+     *            map containing all session to users pairs that require data to be exported
      * @return
      */
     private SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> getExportSummary(
@@ -585,6 +587,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return summary;
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -692,15 +695,15 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, surveyToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Survey)) {
-		throw new ImportToolContentException("Import survey tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import survey tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Survey toolContentObj = (Survey) toolPOJO;
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    SurveyUser user = surveyUserDao
-		    .getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
+	    SurveyUser user = surveyUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
+		    toolContentId);
 	    if (user == null) {
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
 		user = new SurveyUser(sysUser, toolContentObj);
@@ -784,8 +787,20 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public boolean isReadOnly(Long toolContentId) {
+	List<SurveySession> sessions = surveySessionDao.getByContentId(toolContentId);
+	for (SurveySession session : sessions) {
+	    if (!surveyUserDao.getBySessionID(session.getSessionId()).isEmpty()) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
+    @Override
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	Survey survey = surveyDao.getByContentId(toolContentId);
 	if (removeSessionData) {
 	    List list = surveySessionDao.getByContentId(toolContentId);
@@ -800,8 +815,9 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Survey answers for user ID " + userId + " and toolContentId " + toolContentId);
+	if (SurveyServiceImpl.log.isDebugEnabled()) {
+	    SurveyServiceImpl.log
+		    .debug("Removing Survey answers for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	List<SurveyAnswer> answers = surveyAnswerDao.getByToolContentIdAndUserId(toolContentId, userId.longValue());
@@ -848,13 +864,14 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -872,7 +889,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getSurveyOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -913,6 +930,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Survey toolContentObj = new Survey();
@@ -923,8 +941,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    toolContentObj.setContentInUse(Boolean.FALSE);
 	    toolContentObj.setCreated(now);
 	    toolContentObj.setDefineLater(Boolean.FALSE);
-	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
-		    .get(ToolContentImport102Manager.CONTENT_BODY)));
+	    toolContentObj.setInstructions(
+		    WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	    toolContentObj.setUpdated(now);
 
 	    Boolean isReusable = WDDXProcessor.convertToBoolean(importValues,
@@ -971,8 +989,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 			    ToolContentImport102Manager.CONTENT_SURVEY_ORDER);
 		    item.setSequenceId(order != null ? order.intValue() : dummySequenceNumber++);
 
-		    item.setDescription(WebUtil.convertNewlines((String) questionMap
-			    .get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION)));
+		    item.setDescription(WebUtil.convertNewlines(
+			    (String) questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION)));
 
 		    // completion message purposely not supported in 2.0, so value can be dropped.
 
@@ -985,7 +1003,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 		    item.setOptional(isOptional != null ? isOptional.booleanValue() : false);
 
 		    Vector candidates = (Vector) questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_CANDIDATES);
-		    if (candidates != null && candidates.size() > 0) {
+		    if ((candidates != null) && (candidates.size() > 0)) {
 			item.setOptions(new HashSet());
 			int dummyCandidateOrder = candidates.size(); // dummy number in case we can't convert
 			// question order
@@ -999,8 +1017,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
 			    SurveyOption option = new SurveyOption();
 			    option.setDescription(candidateText);
-			    option.setSequenceId(candidateOrder != null ? candidateOrder.intValue()
-				    : dummyCandidateOrder++);
+			    option.setSequenceId(
+				    candidateOrder != null ? candidateOrder.intValue() : dummyCandidateOrder++);
 			    item.getOptions().add(option);
 			}
 		    }
@@ -1012,10 +1030,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	} catch (WDDXProcessorConversionException e) {
 	    SurveyServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + toolContentObj.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
+		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
 	surveyDao.saveObject(toolContentObj);
@@ -1023,8 +1039,9 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Survey toolContentObj = getSurveyByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1119,7 +1136,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public void setSurveyOutputFactory(SurveyOutputFactory surveyOutputFactory) {
 	this.surveyOutputFactory = surveyOutputFactory;
     }
-    
+
     // ****************** REST methods *************************
 
     /**
@@ -1154,7 +1171,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	survey.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.TRUE));
 	survey.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 	survey.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	survey.setNotifyTeachersOnAnswerSumbit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnAnswerSumbit", Boolean.FALSE));
+	survey.setNotifyTeachersOnAnswerSumbit(
+		JsonUtil.opt(toolContentJSON, "notifyTeachersOnAnswerSumbit", Boolean.FALSE));
 	survey.setShowOnePage(JsonUtil.opt(toolContentJSON, "showOnePage", Boolean.TRUE));
 	survey.setShowOtherUsersAnswers(JsonUtil.opt(toolContentJSON, "showOtherUsersAnswers", Boolean.FALSE));
 

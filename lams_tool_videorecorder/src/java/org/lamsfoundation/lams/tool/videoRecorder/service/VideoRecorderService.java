@@ -24,30 +24,15 @@
 
 package org.lamsfoundation.lams.tool.videoRecorder.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -82,13 +67,11 @@ import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderConstants;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderException;
-import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * An implementation of the IVideoRecorderService interface.
@@ -96,8 +79,8 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class VideoRecorderService implements ToolSessionManager, ToolContentManager, IVideoRecorderService,
-	ToolContentImport102Manager {
+public class VideoRecorderService
+	implements ToolSessionManager, ToolContentManager, IVideoRecorderService, ToolContentImport102Manager {
 
     private static Logger logger = Logger.getLogger(VideoRecorderService.class.getName());
 
@@ -135,8 +118,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (VideoRecorderService.logger.isDebugEnabled()) {
-	    VideoRecorderService.logger.debug("entering method createToolSession:" + " toolSessionId = "
-		    + toolSessionId + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    VideoRecorderService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	VideoRecorderSession session = new VideoRecorderSession();
@@ -157,14 +140,15 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	// TODO Auto-generated method stub
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	// TODO Auto-generated method stub
 	return null;
     }
@@ -184,7 +168,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getVideoRecorderOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -229,7 +213,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	VideoRecorder toContent = VideoRecorder.newInstance(fromContent, toContentId);
 	videoRecorderDAO.saveOrUpdate(toContent);
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
@@ -241,22 +225,23 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	// TODO Auto-generated method stub
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Video Recorder contents for user ID " + userId + " and toolContentId "
-		    + toolContentId);
+	if (VideoRecorderService.logger.isDebugEnabled()) {
+	    VideoRecorderService.logger.debug(
+		    "Removing Video Recorder contents for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
 	if (videoRecorder == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    VideoRecorderService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -267,8 +252,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    List<VideoRecorderRating> ratings = videoRecorderRatingDAO.getRatingsByUserId(userId.longValue());
 	    videoRecorderRatingDAO.deleteAll(ratings);
 
-	    List<VideoRecorderRecording> recordings = videoRecorderRecordingDAO.getBySessionAndUserId(
-		    session.getSessionId(), userId.longValue());
+	    List<VideoRecorderRecording> recordings = videoRecorderRecordingDAO
+		    .getBySessionAndUserId(session.getSessionId(), userId.longValue());
 	    videoRecorderRecordingDAO.deleteAll(recordings);
 
 	    VideoRecorderUser user = videoRecorderUserDAO.getByUserIdAndSessionId(userId.longValue(),
@@ -285,7 +270,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    }
 	}
     }
-    
+
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
@@ -302,7 +287,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	videoRecorder.setToolContentId(null);
 	videoRecorder.setVideoRecorderSessions(null);
 
-	VideoRecorderRecording authorRecording = (VideoRecorderRecording) getFirstRecordingByToolContentId(toolContentId);
+	VideoRecorderRecording authorRecording = getFirstRecordingByToolContentId(toolContentId);
 	if (authorRecording != null) {
 	    authorRecording = (VideoRecorderRecording) authorRecording.clone();
 
@@ -327,7 +312,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(VideoRecorderImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, videoRecorderToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof VideoRecorder)) {
@@ -364,17 +349,31 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	}
 	return getVideoRecorderOutputFactory().getToolOutputDefinitions(videoRecorder, definitionType);
     }
-    
+
     @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getVideoRecorderByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getVideoRecorderByContentId(toolContentId).isDefineLater();
     }
-   
+
+    @Override
+    public boolean isReadOnly(Long toolContentId) {
+	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
+	for (VideoRecorderSession session : (Set<VideoRecorderSession>) videoRecorder.getVideoRecorderSessions()) {
+	    if (!videoRecorderCommentDAO.getCommentsByToolSessionId(session.getSessionId()).isEmpty()
+		    || !videoRecorderRatingDAO.getRatingsByToolSessionId(session.getSessionId()).isEmpty()
+		    || !videoRecorderRecordingDAO.getByToolSessionId(session.getSessionId()).isEmpty()) {
+		return true;
+	    }
+	}
+	
+	return false;
+    }
+
     /* ********** IVideoRecorderService Methods ********************************* */
 
     @Override
@@ -449,8 +448,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public VideoRecorderSession getSessionBySessionId(Long toolSessionId) {
 	VideoRecorderSession videoRecorderSession = videoRecorderSessionDAO.getBySessionId(toolSessionId);
 	if (videoRecorderSession == null) {
-	    VideoRecorderService.logger.debug("Could not find the videoRecorder session with toolSessionID:"
-		    + toolSessionId);
+	    VideoRecorderService.logger
+		    .debug("Could not find the videoRecorder session with toolSessionID:" + toolSessionId);
 	}
 	return videoRecorderSession;
     }
@@ -464,41 +463,50 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return videoRecorderUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public VideoRecorderUser getUserByUID(Long uid) {
 	return videoRecorderUserDAO.getByUID(uid);
     }
 
+    @Override
     public VideoRecorderRecording getRecordingById(Long recordingId) {
 	return videoRecorderRecordingDAO.getRecordingById(recordingId);
     }
 
+    @Override
     public void deleteVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording) {
 	videoRecorderRecordingDAO.delete(videoRecorderRecording);
 	return;
     }
 
+    @Override
     public VideoRecorderRating getRatingById(Long ratingId) {
 	return videoRecorderRatingDAO.getRatingById(ratingId);
     }
 
+    @Override
     public VideoRecorderComment getCommentById(Long commentId) {
 	return videoRecorderCommentDAO.getCommentById(commentId);
     }
 
+    @Override
     public Set<VideoRecorderRatingDTO> getRatingsByToolSessionId(Long toolSessionId) {
 	List<VideoRecorderRating> list = videoRecorderRatingDAO.getRatingsByToolSessionId(toolSessionId);
 	return VideoRecorderRatingDTO.getVideoRecorderRatingDTOs(list);
     }
 
+    @Override
     public List<VideoRecorderComment> getCommentsByUserId(Long userId) {
 	return videoRecorderCommentDAO.getCommentsByUserId(userId);
     }
 
+    @Override
     public Set<VideoRecorderCommentDTO> getCommentsByToolSessionId(Long toolSessionId) {
 	List<VideoRecorderComment> list = videoRecorderCommentDAO.getCommentsByToolSessionId(toolSessionId);
 	return VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(list);
     }
 
+    @Override
     public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId, Long toolContentId) {
 	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolSessionId(toolSessionId);
 	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
@@ -506,6 +514,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
 
+    @Override
     public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserUid(Long toolSessionId, Long userId,
 	    Long toolContentId) {
 	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getBySessionAndUserUid(toolSessionId, userId);
@@ -514,11 +523,13 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
 
+    @Override
     public List<VideoRecorderRecordingDTO> getRecordingsByToolContentId(Long toolContentId) {
 	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
 	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
 
+    @Override
     public VideoRecorderRecording getFirstRecordingByToolContentId(Long toolContentId) {
 	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
 	if (!list.isEmpty()) {
@@ -528,30 +539,37 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	}
     }
 
+    @Override
     public void saveOrUpdateVideoRecorder(VideoRecorder videoRecorder) {
 	videoRecorderDAO.saveOrUpdate(videoRecorder);
     }
 
+    @Override
     public void saveOrUpdateVideoRecorderSession(VideoRecorderSession videoRecorderSession) {
 	videoRecorderSessionDAO.saveOrUpdate(videoRecorderSession);
     }
 
+    @Override
     public void saveOrUpdateVideoRecorderUser(VideoRecorderUser videoRecorderUser) {
 	videoRecorderUserDAO.saveOrUpdate(videoRecorderUser);
     }
 
+    @Override
     public void saveOrUpdateVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording) {
 	videoRecorderRecordingDAO.saveOrUpdate(videoRecorderRecording);
     }
 
+    @Override
     public void saveOrUpdateVideoRecorderComment(VideoRecorderComment videoRecorderComment) {
 	videoRecorderCommentDAO.saveOrUpdate(videoRecorderComment);
     }
 
+    @Override
     public void saveOrUpdateVideoRecorderRating(VideoRecorderRating videoRecorderRating) {
 	videoRecorderRatingDAO.saveOrUpdate(videoRecorderRating);
     }
 
+    @Override
     public VideoRecorderUser createVideoRecorderUser(UserDTO user, VideoRecorderSession videoRecorderSession) {
 	VideoRecorderUser videoRecorderUser = new VideoRecorderUser(user, videoRecorderSession);
 	saveOrUpdateVideoRecorderUser(videoRecorderUser);
@@ -563,6 +581,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     /**
      * Import the data for a 1.0.2 VideoRecorder
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	VideoRecorder videoRecorder = new VideoRecorder();
@@ -570,8 +589,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	videoRecorder.setCreateBy(new Long(user.getUserID().longValue()));
 	videoRecorder.setCreateDate(now);
 	videoRecorder.setDefineLater(Boolean.FALSE);
-	videoRecorder.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	videoRecorder.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	videoRecorder.setLockOnFinished(Boolean.TRUE);
 	videoRecorder.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	videoRecorder.setToolContentId(toolContentId);
@@ -580,11 +599,12 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
-	VideoRecorderService.logger
-		.warn("Setting the reflective field on a videoRecorder. This doesn't make sense as the videoRecorder is for reflection and we don't reflect on reflection!");
+	VideoRecorderService.logger.warn(
+		"Setting the reflective field on a videoRecorder. This doesn't make sense as the videoRecorder is for reflection and we don't reflect on reflection!");
 	VideoRecorder videoRecorder = getVideoRecorderByContentId(toolContentId);
 	if (videoRecorder == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -701,6 +721,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	this.videoRecorderOutputFactory = videoRecorderOutputFactory;
     }
 
+    @Override
     public void releaseConditionsFromCache(VideoRecorder videoRecorder) {
 	if (videoRecorder.getConditions() != null) {
 	    for (VideoRecorderCondition condition : videoRecorder.getConditions()) {
@@ -709,24 +730,29 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	}
     }
 
+    @Override
     public void deleteCondition(VideoRecorderCondition condition) {
-	if (condition != null && condition.getConditionId() != null) {
+	if ((condition != null) && (condition.getConditionId() != null)) {
 	    videoRecorderDAO.delete(condition);
 	}
     }
 
+    @Override
     public Long getNbRecordings(Long userID, Long sessionId) {
 	return videoRecorderRecordingDAO.getNbRecordings(userID, sessionId);
     }
 
+    @Override
     public Long getNbComments(Long userID, Long sessionId) {
 	return videoRecorderCommentDAO.getNbComments(userID, sessionId);
     }
 
+    @Override
     public Long getNbRatings(Long userID, Long sessionId) {
 	return videoRecorderRatingDAO.getNbRatings(userID, sessionId);
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -734,6 +760,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     /**
      * @return String of xml with all needed language elements
      */
+    @Override
     public String getLanguageXML() {
 	ArrayList<String> languageCollection = new ArrayList<String>();
 	languageCollection.add(new String("button.ok"));
@@ -815,6 +842,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return languageOutput;
     }
 
+    @Override
     public String getLanguageXMLForFCK() {
 	ArrayList<String> languageCollection = new ArrayList<String>();
 	languageCollection.add(new String("button.ok"));
@@ -863,10 +891,12 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	return languageOutput;
     }
 
+    @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getVideoRecorderOutputFactory().getSupportedDefinitionClasses(definitionType);
     }

@@ -220,20 +220,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
     @Override
     public void removeUser(NoticeboardUser nbUser) {
-	NoticeboardSession session = nbUser.getNbSession();
-	session.getNbUsers().remove(nbUser);
-	nbUserDAO.removeNbUser(nbUser);
+	nbUserDAO.delete(nbUser);
     }
 
     @Override
     public void removeUser(Long nbUserId, Long toolSessionId) {
-	if (nbUserId == null) {
-	    throw new NbApplicationException("User ID is missing");
-	}
 	NoticeboardUser user = retrieveNoticeboardUser(nbUserId, toolSessionId);
-	NoticeboardSession session = user.getNbSession();
-	session.getNbUsers().remove(user);
-	nbUserDAO.removeNbUser(nbUserId);
+	nbUserDAO.delete(user);
     }
 
     @Override
@@ -306,7 +299,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    // default content
 	    {
 		// use default content id to grab contents
-		NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
+		NoticeboardContent defaultContent = retrieveNoticeboard(
+			getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
 
 		if (defaultContent != null) {
 		    NoticeboardContent newContent = NoticeboardContent.newInstance(defaultContent, toContentId);
@@ -335,8 +329,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
 	// if session data exist and removeSessionData=false, throw an exception
 	if (!nbContent.getNbSessions().isEmpty() && !removeSessionData) {
@@ -350,14 +344,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (NoticeboardServicePOJO.log.isDebugEnabled()) {
-	    NoticeboardServicePOJO.log.debug("Removing Noticeboard user for user ID " + userId + " and toolContentId "
-		    + toolContentId);
+	    NoticeboardServicePOJO.log
+		    .debug("Removing Noticeboard user for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	NoticeboardContent nbContent = nbContentDAO.findNbContentById(toolContentId);
 	if (nbContent == null) {
-	    NoticeboardServicePOJO.log.warn("Did not find activity with toolContentId: " + toolContentId
-		    + " to remove learner content");
+	    NoticeboardServicePOJO.log
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -370,7 +364,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		    nbContentDAO.delete(entry);
 		}
 
-		nbUserDAO.removeNbUser(user.getUid());
+		nbUserDAO.delete(user);
 	    }
 	}
     }
@@ -388,8 +382,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	return nbContent;
     }
 
-    private NoticeboardSession getAndCheckSessionIDandObject(Long toolSessionId) throws ToolException,
-	    DataMissingException {
+    private NoticeboardSession getAndCheckSessionIDandObject(Long toolSessionId)
+	    throws ToolException, DataMissingException {
 	if (toolSessionId == null) {
 	    throw new ToolException("Tool session ID is missing.");
 	}
@@ -434,8 +428,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(NoticeboardImportContentVersionFilter.class);
 
-	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, nbToolContentHandler,
-		    fromVersion, toVersion);
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, nbToolContentHandler, fromVersion,
+		    toVersion);
 	    if (!(toolPOJO instanceof NoticeboardContent)) {
 		throw new ImportToolContentException(
 			"Import Noteice board tool content failed. Deserialized object is " + toolPOJO);
@@ -467,6 +461,18 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     }
 
     @Override
+    public boolean isReadOnly(Long toolContentId) {
+	NoticeboardContent nbContent = nbContentDAO.findNbContentById(toolContentId);
+	for (NoticeboardSession session : nbContent.getNbSessions()) {
+	    if (!session.getNbUsers().isEmpty()) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if ((toolSessionId == null) || (toolContentId == null)) {
 	    String error = "Failed to create tool session. The tool session id or tool content id is invalid";
@@ -474,8 +480,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
 
 	NoticeboardContent nbContent = retrieveNoticeboard(toolContentId);
-	NoticeboardSession nbSession = new NoticeboardSession(toolSessionId, toolSessionName, nbContent, new Date(
-		System.currentTimeMillis()), NoticeboardSession.NOT_ATTEMPTED);
+	NoticeboardSession nbSession = new NoticeboardSession(toolSessionId, toolSessionName, nbContent,
+		new Date(System.currentTimeMillis()), NoticeboardSession.NOT_ATTEMPTED);
 
 	nbContent.getNbSessions().add(nbSession);
 	saveNoticeboard(nbContent);
@@ -489,18 +495,19 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws ToolException, DataMissingException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws ToolException, DataMissingException {
 	getAndCheckSessionIDandObject(toolSessionId);
 	throw new UnsupportedOperationException("not yet implemented");
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws ToolException,
-	    DataMissingException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws ToolException, DataMissingException {
 	Iterator<Long> i = toolSessionIds.iterator();
 	if (i.hasNext()) {
-	    Long id = (Long) i.next();
+	    Long id = i.next();
 	    getAndCheckSessionIDandObject(id);
 	}
 
@@ -522,7 +529,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -546,8 +553,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     }
 
     @Override
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	NoticeboardContent toolContentObj = retrieveNoticeboard(toolContentId);
 	if (toolContentObj == null) {
@@ -638,7 +645,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     // ****************** REST methods *************************
 
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 	Date updateDate = new Date();
 
 	NoticeboardContent noticeboard = new NoticeboardContent();
@@ -646,7 +654,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	noticeboard.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	noticeboard.setContent(toolContentJSON.getString("content"));
 	noticeboard.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	noticeboard.setReflectInstructions((String)JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
+	noticeboard.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 
 	noticeboard.setCreatorUserId(userID.longValue());
 	noticeboard.setDateCreated(updateDate);

@@ -85,7 +85,8 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class ChatService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, IChatService, ToolRestManager {
+public class ChatService
+	implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, IChatService, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(ChatService.class.getName());
 
@@ -114,6 +115,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     private Random generator = new Random();
 
     /* Methods from ToolSessionManager */
+    @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ChatService.logger.isDebugEnabled()) {
 	    ChatService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
@@ -170,14 +172,15 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	// TODO Auto-generated method stub
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	// TODO Auto-generated method stub
 	return null;
     }
@@ -197,7 +200,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getChatOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -229,7 +232,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	Chat toContent = Chat.newInstance(fromContent, toContentId);
 	chatDAO.saveOrUpdate(toContent);
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Chat chat = chatDAO.getByContentId(toolContentId);
@@ -240,19 +243,23 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	chatDAO.saveOrUpdate(chat);
     }
 
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    @Override
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	// TODO Auto-generated method stub
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Chat messages for user ID " + userId + " and toolContentId " + toolContentId);
+	if (ChatService.logger.isDebugEnabled()) {
+	    ChatService.logger
+		    .debug("Removing Chat messages for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 	Chat chat = chatDAO.getByContentId(toolContentId);
 	if (chat == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    ChatService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -280,7 +287,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
 	}
     }
-    
+
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
@@ -290,6 +297,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      *             if any other error occurs
      */
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Chat chat = chatDAO.getByContentId(toolContentId);
 	if (chat == null) {
@@ -316,17 +324,18 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * @throws ToolException
      *             if any other error occurs
      */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(ChatImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, chatToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Chat)) {
-		throw new ImportToolContentException("Import Chat tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Chat tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Chat chat = (Chat) toolPOJO;
 
@@ -348,6 +357,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Chat chat = getChatDAO().getByContentId(toolContentId);
@@ -359,15 +369,31 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return getChatOutputFactory().getToolOutputDefinitions(chat, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getChatByContentId(toolContentId).getTitle();
     }
-    
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getChatByContentId(toolContentId).isDefineLater();
     }
 
+    @Override
+    public boolean isReadOnly(Long toolContentId) {
+	Chat chat = chatDAO.getByContentId(toolContentId);
+	for (ChatSession session : (Set<ChatSession>) chat.getChatSessions()) {
+	    if (!session.getChatMessages().isEmpty()) {
+		// we don't remove users in removeLearnerContent(), just messages
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
     /* IChatService Methods */
+    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -379,6 +405,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return toolContentId;
     }
 
+    @Override
     public Chat getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(ChatConstants.TOOL_SIGNATURE);
 	Chat defaultContent = getChatByContentId(defaultContentID);
@@ -388,12 +415,13 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    throw new ChatException(error);
 	}
 	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions().add(
-		    getChatOutputFactory().createDefaultUserMessagesCondition(defaultContent));
+	    defaultContent.getConditions()
+		    .add(getChatOutputFactory().createDefaultUserMessagesCondition(defaultContent));
 	}
 	return defaultContent;
     }
 
+    @Override
     public Chat copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -410,6 +438,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return newContent;
     }
 
+    @Override
     public Chat getChatByContentId(Long toolContentID) {
 	Chat chat = chatDAO.getByContentId(toolContentID);
 	if (chat == null) {
@@ -418,6 +447,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chat;
     }
 
+    @Override
     public ChatSession getSessionBySessionId(Long toolSessionId) {
 	ChatSession chatSession = chatSessionDAO.getBySessionId(toolSessionId);
 	if (chatSession == null) {
@@ -426,23 +456,28 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatSession;
     }
 
+    @Override
     public List<ChatUser> getUsersActiveBySessionId(Long toolSessionId) {
 	Date oldestLastPresence = new Date(System.currentTimeMillis() - ChatConstants.PRESENCE_IDLE_TIMEOUT);
 	return chatUserDAO.getBySessionIdAndLastPresence(toolSessionId, oldestLastPresence);
     }
 
+    @Override
     public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return chatUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
 
+    @Override
     public ChatUser getUserByLoginNameAndSessionId(String loginName, Long toolSessionId) {
 	return chatUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public ChatUser getUserByUID(Long uid) {
 	return chatUserDAO.getByUID(uid);
     }
 
+    @Override
     public ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID) {
 	return chatUserDAO.getByNicknameAndSessionID(nickname, sessionID);
     }
@@ -450,6 +485,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     /**
      * Stores information when users with given UIDs were last seen in their Chat session.
      */
+    @Override
     public void updateUserPresence(Map<Long, Date> presence) {
 	for (Long userUid : presence.keySet()) {
 	    ChatUser chatUser = chatUserDAO.getByUID(userUid);
@@ -458,6 +494,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	}
     }
 
+    @Override
     public List<ChatMessage> getMessagesForUser(ChatUser chatUser) {
 	return chatMessageDAO.getForUser(chatUser);
     }
@@ -465,27 +502,33 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<ChatMessage> getMessagesSentByUser(Long userUid) {
 	return chatMessageDAO.getSentByUser(userUid);
     }
 
+    @Override
     public void saveOrUpdateChat(Chat chat) {
 	updateMessageFilters(chat);
 	chatDAO.saveOrUpdate(chat);
     }
 
+    @Override
     public void saveOrUpdateChatSession(ChatSession chatSession) {
 	chatSessionDAO.saveOrUpdate(chatSession);
     }
 
+    @Override
     public void saveOrUpdateChatUser(ChatUser chatUser) {
 	chatUserDAO.saveOrUpdate(chatUser);
     }
 
+    @Override
     public void saveOrUpdateChatMessage(ChatMessage chatMessage) {
 	chatMessageDAO.saveOrUpdate(chatMessage);
     }
 
+    @Override
     public synchronized ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
 	ChatUser chatUser = new ChatUser(user, chatSession);
 
@@ -515,6 +558,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return nickname;
     }
 
+    @Override
     public String filterMessage(String message, Chat chat) {
 	Pattern pattern = getFilterPattern(chat);
 
@@ -549,16 +593,19 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return pattern;
     }
 
+    @Override
     public ChatMessageFilter updateMessageFilters(Chat chat) {
 	ChatMessageFilter filter = new ChatMessageFilter(chat);
 	messageFilters.put(chat.getToolContentId(), filter);
 	return filter;
     }
 
+    @Override
     public ChatMessage getMessageByUID(Long messageUID) {
 	return chatMessageDAO.getByUID(messageUID);
     }
 
+    @Override
     public List getLastestMessages(ChatSession chatSession, int max) {
 	return chatMessageDAO.getLatest(chatSession, max);
     }
@@ -571,21 +618,24 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	this.auditService = auditService;
     }
 
+    @Override
     public void auditEditMessage(ChatMessage chatMessage, String messageBody) {
-	auditService.logChange(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(), chatMessage
-		.getFromUser().getLoginName(), chatMessage.getBody(), messageBody);
+	auditService.logChange(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(),
+		chatMessage.getFromUser().getLoginName(), chatMessage.getBody(), messageBody);
     }
 
+    @Override
     public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden) {
 	if (messageHidden) {
-	    auditService.logHideEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(), chatMessage
-		    .getFromUser().getLoginName(), chatMessage.toString());
+	    auditService.logHideEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(),
+		    chatMessage.getFromUser().getLoginName(), chatMessage.toString());
 	} else {
-	    auditService.logShowEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(), chatMessage
-		    .getFromUser().getLoginName(), chatMessage.toString());
+	    auditService.logShowEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(),
+		    chatMessage.getFromUser().getLoginName(), chatMessage.toString());
 	}
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -657,10 +707,12 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	this.exportContentService = exportContentService;
     }
 
+    @Override
     public Map<Long, Integer> getMessageCountBySession(Long chatUID) {
 	return chatMessageDAO.getCountBySession(chatUID);
     }
 
+    @Override
     public Map<Long, Integer> getMessageCountByFromUser(Long sessionUID) {
 	return chatMessageDAO.getCountByFromUser(sessionUID);
     }
@@ -673,10 +725,12 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	this.coreNotebookService = coreNotebookService;
     }
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
 
 	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
@@ -690,6 +744,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     /**
      * @param notebookEntry
      */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
@@ -701,6 +756,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     /**
      * Import the data for a 1.0.2 Chat
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Chat chat = new Chat();
@@ -710,8 +766,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	chat.setDefineLater(Boolean.FALSE);
 	chat.setFilterKeywords(null);
 	chat.setFilteringEnabled(Boolean.FALSE);
-	chat.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	chat.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	chat.setLockOnFinished(Boolean.FALSE);
 	chat.setReflectInstructions(null);
 	chat.setReflectOnActivity(Boolean.FALSE);
@@ -726,10 +782,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	} catch (WDDXProcessorConversionException e) {
 	    ChatService.logger.error("Unable to content for activity " + chat.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + chat.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	    throw new ToolException("Invalid import data format for activity " + chat.getTitle()
+		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
 	chatDAO.saveOrUpdate(chat);
@@ -738,8 +792,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     /**
      * Set the description, throws away the title value as this is not supported in 2.0
      */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Chat chat = getChatByContentId(toolContentId);
 	if (chat == null) {
@@ -759,6 +814,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	chatOutputFactory = notebookOutputFactory;
     }
 
+    @Override
     public String createConditionName(Collection<ChatCondition> existingConditions) {
 	String uniqueNumber = null;
 	do {
@@ -773,12 +829,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return getChatOutputFactory().buildUserMessagesConditionName(uniqueNumber);
     }
 
+    @Override
     public void deleteCondition(ChatCondition condition) {
 	if ((condition != null) && (condition.getConditionId() != null)) {
 	    chatDAO.delete(condition);
 	}
     }
 
+    @Override
     public void releaseConditionsFromCache(Chat chat) {
 	if (chat.getConditions() != null) {
 	    for (ChatCondition condition : chat.getConditions()) {
@@ -787,19 +845,21 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	}
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getChatOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
     // =========================================================================================
-    
+
     // ****************** REST methods *************************
 
-    /** Used by the Rest calls to create content. 
-     * Mandatory fields in toolContentJSON: title, instructions
-     * Optional fields reflectInstructions, lockWhenFinished, filterKeywords
+    /**
+     * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions Optional
+     * fields reflectInstructions, lockWhenFinished, filterKeywords
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	Chat content = new Chat();
 	Date updateDate = new Date();
@@ -809,15 +869,15 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	content.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	content.setCreateBy(userID.longValue());
-	
+
 	content.setContentInUse(false);
 	content.setDefineLater(false);
 	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	
+
 	String filterKeywords = JsonUtil.opt(toolContentJSON, "filterKeywords", null);
-	content.setFilteringEnabled(filterKeywords != null && filterKeywords.length()>0);
+	content.setFilteringEnabled((filterKeywords != null) && (filterKeywords.length() > 0));
 	content.setFilterKeywords(filterKeywords);
 	// submissionDeadline is set in monitoring
 

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
@@ -80,24 +79,20 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     }
 
     public void createQueContent(QaQueContent queContent) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().save(queContent);
     }
 
     public void saveOrUpdateQaQueContent(QaQueContent qaQuestion) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().saveOrUpdate(qaQuestion);
     }
 
     public void removeQueContent(long qaQueContentId) {
 	QaQueContent qaQuestion = (QaQueContent) getSession().load(QaQueContent.class,
 		new Long(qaQueContentId));
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().delete(qaQuestion);
     }
 
     public void removeQaQueContent(QaQueContent qaQuestion) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().delete(qaQuestion);
     }
 }

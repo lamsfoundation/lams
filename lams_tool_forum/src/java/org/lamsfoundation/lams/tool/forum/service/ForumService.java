@@ -126,7 +126,8 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * 
  * @version $Revision$
  */
-public class ForumService implements IForumService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager {
+public class ForumService
+	implements IForumService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager {
     private static final Logger log = Logger.getLogger(ForumService.class);
 
     // DAO variables
@@ -184,6 +185,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.auditService = auditService;
     }
 
+    @Override
     public IAuditService getAuditService() {
 	return auditService;
     }
@@ -200,15 +202,18 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.forumOutputFactory = forumOutputFactory;
     }
 
+    @Override
     public Forum updateForum(Forum forum) throws PersistenceException {
 	forumDao.saveOrUpdate(forum);
 	return forum;
     }
 
+    @Override
     public Forum getForum(Long forumUid) throws PersistenceException {
 	return forumDao.getById(forumUid);
     }
 
+    @Override
     public Forum getForumByContentId(Long contentID) throws PersistenceException {
 	return forumDao.getByContentId(contentID);
     }
@@ -218,11 +223,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	attachmentDao.delete(attachment);
     }
 
+    @Override
     public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
 	return createRootTopic(forumId, getSessionBySessionId(sessionId), message);
     }
 
-    public Message createRootTopic(Long forumId, ForumToolSession session, Message message) throws PersistenceException {
+    public Message createRootTopic(Long forumId, ForumToolSession session, Message message)
+	    throws PersistenceException {
 	// get Forum and ForumToolSesion
 	if (message.getForum() == null) {
 	    Forum forum = forumDao.getById(forumId);
@@ -262,6 +269,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return message;
     }
 
+    @Override
     public Message updateTopic(Message message) throws PersistenceException {
 
 	// update message
@@ -277,7 +285,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return message;
     }
 
-
+    @Override
     public List<MessageDTO> getMessageAsDTO(Long messageUid) throws PersistenceException {
 
 	MessageSeq msgSeq = messageSeqDao.getByMessageId(messageUid);
@@ -286,10 +294,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return msgDtoList;
     }
 
+    @Override
     public void updateContainedReport(Message message) {
 	messageDao.saveOrUpdate(message);
     }
 
+    @Override
     public Message updateMessageHideFlag(Long messageId, boolean hideFlag) {
 
 	Message message = getMessage(messageId);
@@ -318,10 +328,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return messageDao.getByIdForUpdate(messageUid);
     }
 
+    @Override
     public Message getMessage(Long messageUid) throws PersistenceException {
 	return messageDao.getById(messageUid);
     }
 
+    @Override
     public void deleteTopic(Long topicUid) throws PersistenceException {
 	Message topic = messageDao.getById(topicUid);
 
@@ -364,8 +376,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// get root topic and create record in MessageSeq table
 	MessageSeq parentSeq = messageSeqDao.getByTopicId(parent.getUid());
 	if (parentSeq == null) {
-	    ForumService.log.error("Message Sequence table is broken becuase topic " + parent
-		    + " can not get Sequence Record");
+	    ForumService.log
+		    .error("Message Sequence table is broken becuase topic " + parent + " can not get Sequence Record");
 	}
 	Message root = parentSeq.getRootMessage();
 	MessageSeq msgSeq = new MessageSeq();
@@ -373,11 +385,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	msgSeq.setMessageLevel((short) (parentSeq.getMessageLevel() + 1));
 	msgSeq.setRootMessage(root);
 	// look back up through the parents to find the thread top - will be level 1
-	if ( msgSeq.getMessageLevel() == 1 ) {
+	if (msgSeq.getMessageLevel() == 1) {
 	    msgSeq.setThreadMessage(replyMessage);
 	} else {
 	    MessageSeq threadSeq = parentSeq;
-	    while ( threadSeq.getMessageLevel() > 1 ) {
+	    while (threadSeq.getMessageLevel() > 1) {
 		threadSeq = messageSeqDao.getByTopicId(threadSeq.getMessage().getParent().getUid());
 	    }
 	    msgSeq.setThreadMessage(threadSeq.getMessage());
@@ -395,7 +407,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     @Override
     public Attachment uploadAttachment(FormFile uploadFile) throws PersistenceException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
 	    throw new ForumException("Could not find upload file: " + uploadFile);
 	}
 
@@ -421,65 +433,65 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return getSortedMessageDTO(map);
 
     }
-    
+
     @Override
-    public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize ) {
+    public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize) {
 
 	long lastThreadMessageUid = afterSequenceId != null ? afterSequenceId.longValue() : 0L;
 	long usePagingSize = pagingSize != null ? pagingSize.longValue() : ForumConstants.DEFAULT_PAGE_SIZE;
 	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
 
 	// first time through we need to include the top topic message (level 0)
-	if ( lastThreadMessageUid == 0 ) {
+	if (lastThreadMessageUid == 0) {
 	    MessageSeq msgSeq = messageSeqDao.getByTopicId(rootTopicId);
 	    map.put(msgSeq, msgSeq.getMessage());
 	}
 
 	long count = 0;
 	boolean foundEnough = false;
-	do { 
+	do {
 
-	    List msgSeqs =  messageSeqDao.getNextThreadByThreadId(rootTopicId, lastThreadMessageUid);
-	    if ( msgSeqs.size() == 0 ) {
+	    List msgSeqs = messageSeqDao.getNextThreadByThreadId(rootTopicId, lastThreadMessageUid);
+	    if (msgSeqs.size() == 0) {
 		// no more to come from db
 		foundEnough = true;
 	    } else {
 
 		Iterator iter = msgSeqs.iterator();
-		while ( iter.hasNext() ) {
-		    MessageSeq msgSeq = ( MessageSeq) iter.next();
-		    if ( msgSeq.getMessageLevel() == 1 ) {
+		while (iter.hasNext()) {
+		    MessageSeq msgSeq = (MessageSeq) iter.next();
+		    if (msgSeq.getMessageLevel() == 1) {
 			lastThreadMessageUid = msgSeq.getMessage().getUid().longValue();
 		    }
 		    map.put(msgSeq, msgSeq.getMessage());
 		    count++;
 		}
-		if ( usePagingSize >= 0 && count >= usePagingSize ) {
+		if ((usePagingSize >= 0) && (count >= usePagingSize)) {
 		    foundEnough = true;
 		}
-	    } 
-	} while ( ! foundEnough);
+	    }
+	} while (!foundEnough);
 
 	return getSortedMessageDTO(map);
     }
 
     @Override
-    public List getThread( Long threadId ) {
-	List msgSeqs =  messageSeqDao.getThreadByThreadId(threadId);
+    public List getThread(Long threadId) {
+	List msgSeqs = messageSeqDao.getThreadByThreadId(threadId);
 	SortedMap<MessageSeq, Message> map = new TreeMap<MessageSeq, Message>(new TopicComparator());
 	Iterator iter = msgSeqs.iterator();
-	while ( iter.hasNext() ) {
-	    MessageSeq msgSeq = ( MessageSeq) iter.next();
+	while (iter.hasNext()) {
+	    MessageSeq msgSeq = (MessageSeq) iter.next();
 	    map.put(msgSeq, msgSeq.getMessage());
-	};
+	}
+	;
 	return getSortedMessageDTO(map);
     }
-
 
     @Override
     public List<MessageDTO> getRootTopics(Long sessionId) {
 	ForumToolSession session = getSessionBySessionId(sessionId);
-	if (session == null || session.getForum() == null) {
+	if ((session == null) || (session.getForum() == null)) {
 	    ForumService.log.error("Failed on getting session by given sessionID:" + sessionId);
 	    throw new ForumException("Failed on getting session by given sessionID:" + sessionId);
 	}
@@ -515,12 +527,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public ForumUser getUserByUserAndSession(Long userId, Long sessionId) {
 	return forumUserDao.getByUserIdAndSessionId(userId, sessionId);
     }
-    
+
     @Override
     public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting) {
 	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting);
     }
-    
+
     @Override
     public int getCountUsersBySession(Long sessionId) {
 	return forumUserDao.getCountUsersBySession(sessionId);
@@ -539,7 +551,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public Long getRootTopicId(Long topicId) {
 	MessageSeq seq = messageSeqDao.getByTopicId(topicId);
-	if (seq == null || seq.getRootMessage() == null) {
+	if ((seq == null) || (seq.getRootMessage() == null)) {
 	    ForumService.log.error("A sequence information can not be found for topic ID:" + topicId);
 	    return null;
 	}
@@ -614,8 +626,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		    notificationMessageParameters[0] = msg.getSubject();
 		    notificationMessageParameters[1] = msg.getUpdated();
 		    notificationMessageParameters[2] = report.getMark();
-		    notificationMessage.append(getLocalisedMessage("event.mark.release.mark",
-			    notificationMessageParameters));
+		    notificationMessage
+			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
 		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
 		}
 	    }
@@ -652,7 +664,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	currentUser.setSessionFinished(true);
 	forumUserDao.save(currentUser);
     }
-    
+
     @Override
     public AverageRatingDTO rateMessage(Long messageId, Long userId, Long toolSessionID, float rating) {
 	ForumUser imageGalleryUser = getUserByUserAndSession(userId, toolSessionID);
@@ -670,12 +682,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	//to make available new changes be visible in jsp page
 	return messageRatingDao.getAverageRatingDTOByMessage(messageId);
     }
-    
+
     @Override
     public AverageRatingDTO getAverageRatingDTOByMessage(Long messageId) {
 	return messageRatingDao.getAverageRatingDTOByMessage(messageId);
     }
-    
+
     @Override
     public int getNumOfRatingsByUserAndForum(Long userUid, Long forumUid) {
 	return messageRatingDao.getNumOfRatingsByUserAndForum(userUid, forumUid);
@@ -715,7 +727,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return dto;
     }
 
-
     /**
      * Process an uploaded file.
      * 
@@ -727,7 +738,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      */
     private NodeKey processFile(FormFile file) {
 	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
 		node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
@@ -797,7 +808,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -808,12 +819,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
-    
+
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
@@ -822,6 +833,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     // ***************************************************************************************************************
     // ToolContentManager and ToolSessionManager methods
     // ***************************************************************************************************************
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the ForumFiles tool seession");
@@ -844,7 +856,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    while (iter.hasNext()) {
 		Message msg = (Message) iter.next();
 		// set this message forum Uid as toContent
-		if (!msg.getIsAuthored() || msg.getToolSession() != null) {
+		if (!msg.getIsAuthored() || (msg.getToolSession() != null)) {
 		    iter.remove();
 		    continue;
 		}
@@ -870,9 +882,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setDefineLater(false);
 	forum.setContentInUse(false);
     }
-    
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+
+    @Override
+    public void removeToolContent(Long toolContentId, boolean removeSessionData)
+	    throws SessionDataExistsException, ToolException {
 	Forum forum = forumDao.getByContentId(toolContentId);
 	if (removeSessionData) {
 	    List list = forumToolSessionDao.getByContentId(toolContentId);
@@ -885,10 +898,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forumDao.delete(forum);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Hiding or removing Forum messages for user ID " + userId + " and toolContentId " + toolContentId);
+	if (ForumService.log.isDebugEnabled()) {
+	    ForumService.log.debug(
+		    "Hiding or removing Forum messages for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 	List<ForumToolSession> sessionList = forumToolSessionDao.getByContentId(toolContentId);
 
@@ -961,7 +976,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Set<Message> items = toolContentObj.getMessages();
 	Set<Message> authorItems = new HashSet<Message>();
 	for (Message item : items) {
-	    if (item.getIsAuthored() && item.getToolSession() == null) {
+	    if (item.getIsAuthored() && (item.getToolSession() == null)) {
 		authorItems.add(item);
 		item.setCreatedBy(null);
 		item.setModifiedBy(null);
@@ -988,15 +1003,15 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(ForumImportContentVersionFilter.class);
-	    
+
 	    exportContentService.registerFileClassForImport(Attachment.class.getName(), "fileUuid", "fileVersionId",
 		    "fileName", "fileType", null, null);
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, forumToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Forum)) {
-		throw new ImportToolContentException("Import Forum tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Forum tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Forum toolContentObj = (Forum) toolPOJO;
 
@@ -1050,12 +1065,27 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public String getToolContentTitle(Long toolContentId) {
 	return getForumByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getForumByContentId(toolContentId).isDefineLater();
     }
-    
+
+    @Override
+    public boolean isReadOnly(Long toolContentId) {
+	for (ForumToolSession session : (List<ForumToolSession>) forumToolSessionDao.getByContentId(toolContentId)) {
+	    for (ForumUser user : (List<ForumUser>) forumUserDao.getBySessionId(session.getSessionId())) {
+		// we don't remove users in removeLearnerContent()
+		// we just remove or hide messages
+		if (!messageDao.getByUserAndSession(user.getUid(), session.getSessionId()).isEmpty()) {
+		    return true;
+		}
+	    }
+	}
+
+	return false;
+    }
+
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ForumToolSession session = new ForumToolSession();
@@ -1070,9 +1100,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	ForumService.log.debug("Clone tool content [" + forum.getContentId() + "] topics for session ["
 		+ session.getSessionId() + "]");
 	Set<Message> contentTopics = forum.getMessages();
-	if (contentTopics != null && contentTopics.size() > 0) {
+	if ((contentTopics != null) && (contentTopics.size() > 0)) {
 	    for (Message msg : contentTopics) {
-		if (msg.getIsAuthored() && msg.getToolSession() == null) {
+		if (msg.getIsAuthored() && (msg.getToolSession() == null)) {
 		    Message newMsg = Message.newInstance(msg);
 		    msg.getSessionClones().add(newMsg);
 		    createRootTopic(forum.getContentId(), session, newMsg);
@@ -1082,7 +1112,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	session.setStatus(ForumConstants.STATUS_CONTENT_COPYED);
 
 	forumToolSessionDao.saveOrUpdate(session);
-	if ( log.isDebugEnabled() ) {
+	if (ForumService.log.isDebugEnabled()) {
 	    ForumService.log.debug("tool session [" + session.getSessionId() + "] created.");
 	}
     }
@@ -1111,13 +1141,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -1137,7 +1168,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return forumOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -1153,7 +1184,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	Forum defaultContent = getDefaultForum();
 	if (defaultContent.getConditions().isEmpty()) {
-	    ForumCondition defaultCondition = getForumOutputFactory().createDefaultTopicDateToAnswersCondition(defaultContent);
+	    ForumCondition defaultCondition = getForumOutputFactory()
+		    .createDefaultTopicDateToAnswersCondition(defaultContent);
 	    if (defaultCondition != null) {
 		defaultContent.getConditions().add(defaultCondition);
 	    }
@@ -1174,6 +1206,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     /**
      * Import the data for a 1.0.2 Forum
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Forum toolContentObj = new Forum();
@@ -1192,8 +1225,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    toolContentObj.setContentInUse(Boolean.FALSE);
 	    toolContentObj.setCreated(now);
 	    toolContentObj.setDefineLater(Boolean.FALSE);
-	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
-		    .get(ToolContentImport102Manager.CONTENT_BODY)));
+	    toolContentObj.setInstructions(
+		    WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	    toolContentObj.setMaxCharacters(5000); // this is the default value
 	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    toolContentObj.setReflectInstructions(null);
@@ -1262,8 +1295,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		    message.setUpdated(msgDate);
 		    message.setLastReplyDate(msgDate);
 		    message.setSubject((String) messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-		    message.setBody(WebUtil.convertNewlines((String) messageMap
-			    .get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE)));
+		    message.setBody(WebUtil.convertNewlines(
+			    (String) messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE)));
 		    // ignore the old subject field - it wasn't updated by the old interface.
 		    message.setHideFlag(Boolean.FALSE);
 		    message.setIsAnonymous(Boolean.FALSE);
@@ -1276,10 +1309,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	} catch (WDDXProcessorConversionException e) {
 	    ForumService.log.error("Unable to content for activity " + toolContentObj.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + toolContentObj.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
+		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
     }
@@ -1287,8 +1318,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     /**
      * Set the description, throws away the title value as this is not supported in 2.0
      */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Forum toolContentObj = getForumByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1450,6 +1482,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.coreNotebookService = coreNotebookService;
     }
 
+    @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -1458,6 +1491,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.eventNotificationService = eventNotificationService;
     }
 
+    @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
@@ -1469,7 +1503,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
-    
+
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
@@ -1477,6 +1511,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     /**
      * {@inheritDoc}
      */
+    @Override
     public String createTextSearchConditionName(Collection<ForumCondition> existingConditions) {
 	String uniqueNumber = null;
 	do {
@@ -1498,6 +1533,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * @param userId
      * @return
      */
+    @Override
     public int getNewMessagesNum(Message message, Long userId) {
 	Timestamp timestamp = timestampDao.getTimestamp(message.getUid(), userId);
 	if (timestamp == null) {
@@ -1508,6 +1544,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
     }
 
+    @Override
     public void saveTimestamp(Long rootTopicId, ForumUser forumUser) {
 	Timestamp timestamp = timestampDao.getTimestamp(rootTopicId, forumUser.getUid());
 	if (timestamp != null) {
@@ -1521,6 +1558,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	timestampDao.saveOrUpdate(timestamp);
     }
 
+    @Override
     public void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message) {
 	Forum forum = getForum(forumId);
 	ForumUser postAuthor = message.getCreatedBy();
@@ -1532,7 +1570,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	if (forum.isNotifyLearnersOnForumPosting()) {
 	    List<User> learners = lessonService.getLearnersHaveAttemptedActivity(activity);
-	    if (learners != null && !learners.isEmpty()) {
+	    if ((learners != null) && !learners.isEmpty()) {
 		ArrayList<Integer> learnerIds = new ArrayList<Integer>();
 		for (User learner : learners) {
 		    learnerIds.add(learner.getUserId());
@@ -1553,19 +1591,21 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getForumOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     // ****************** REST methods *************************
 
-    /** Used by the Rest calls to create content. 
-     * Mandatory fields in toolContentJSON: title, instructions, topics.
+    /**
+     * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, topics.
      * Topics must contain a JSONArray of JSONObject objects, which have the following mandatory fields: subject, body
      * There will usually be at least one topic object in the Topics array but the array may be of zero length.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	Forum forum = new Forum();
 	Date updateDate = new Date();
@@ -1575,7 +1615,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setContentId(toolContentID);
 	forum.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	forum.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
-	
+
 	forum.setAllowAnonym(JsonUtil.opt(toolContentJSON, "allowAnonym", Boolean.FALSE));
 	forum.setAllowEdit(JsonUtil.opt(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default entry in the db
 	forum.setAllowNewTopic(JsonUtil.opt(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the default entry in the db
@@ -1593,58 +1633,62 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setMinCharacters(JsonUtil.opt(toolContentJSON, "minCharacters", 0));
 	forum.setMinimumRate(JsonUtil.opt(toolContentJSON, "minimumRate", 0));
 	forum.setMinimumReply(JsonUtil.opt(toolContentJSON, "minimumReply", 0));
-	forum.setNotifyLearnersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyLearnersOnForumPosting", Boolean.FALSE));
-	forum.setNotifyLearnersOnMarkRelease(JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
-	forum.setNotifyTeachersOnForumPosting(JsonUtil.opt(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
+	forum.setNotifyLearnersOnForumPosting(
+		JsonUtil.opt(toolContentJSON, "notifyLearnersOnForumPosting", Boolean.FALSE));
+	forum.setNotifyLearnersOnMarkRelease(
+		JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
+	forum.setNotifyTeachersOnForumPosting(
+		JsonUtil.opt(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
 	forum.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 	forum.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
-	
+
 	// *******************************Handle user*******************
 	// Code taken from AuthoringAction TODO 
-//	    String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	//	    String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	// check whether it is sysadmin:LDEV-906
-//	if (!StringUtils.equals(contentFolderID, "-1")) {
-		// try to get form system session
-//		HttpSession ss = SessionManager.getSession();
-		// get back login user DTO
-//		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	//	if (!StringUtils.equals(contentFolderID, "-1")) {
+	// try to get form system session
+	//		HttpSession ss = SessionManager.getSession();
+	// get back login user DTO
+	//		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	ForumUser forumUser = getUserByID(userID.longValue());
 	if (forumUser == null) {
-	    forumUser = new ForumUser(userID.longValue(), toolContentJSON.getString("firstName"), toolContentJSON.getString("lastName"),toolContentJSON.getString("loginName"));
-	    getForumUserDao().save(forumUser);	    
+	    forumUser = new ForumUser(userID.longValue(), toolContentJSON.getString("firstName"),
+		    toolContentJSON.getString("lastName"), toolContentJSON.getString("loginName"));
+	    getForumUserDao().save(forumUser);
 	}
 	forum.setCreatedBy(forumUser);
-	
-	updateForum(forum);    
+
+	updateForum(forum);
 
 	// **************************** Handle topic *********************
 	JSONArray topics = toolContentJSON.getJSONArray("topics");
-    	for (int i=0; i<topics.length(); i++) {
-    	    JSONObject msgData = (JSONObject) topics.get(i);
-    	    Message newMsg = new Message();
-    //	    newMsg.setAttachments(attachments); TODO
-    	    newMsg.setCreatedBy(forumUser);
-    	    newMsg.setCreated(updateDate);
-    	    newMsg.setModifiedBy(null);
-    	    newMsg.setUpdated(updateDate);
-    
-    	    newMsg.setSubject(msgData.getString("subject"));
-    	    newMsg.setBody(msgData.getString("body"));
-    	    newMsg.setForum(forum);
-    	    newMsg.setHideFlag(false);
-    	    // newMsg.setIsAnonymous(false); Does not appear on authoring interface
-    	    newMsg.setIsAuthored(true);
-    	    newMsg.setLastReplyDate(updateDate);
-    	    newMsg.setParent(null);
-    	    newMsg.setReplyNumber(0);
-    	    newMsg.setReport(null);
-    	    newMsg.setSequenceId(i);
-    //	    newMsg.setSessionClones(sessionClones); Used for updating in monitoring
-    	    newMsg.setToolSession(null);
-    	    createRootTopic(forum.getUid(), (ForumToolSession)null, newMsg);
-    	}
-	
+	for (int i = 0; i < topics.length(); i++) {
+	    JSONObject msgData = (JSONObject) topics.get(i);
+	    Message newMsg = new Message();
+	    //	    newMsg.setAttachments(attachments); TODO
+	    newMsg.setCreatedBy(forumUser);
+	    newMsg.setCreated(updateDate);
+	    newMsg.setModifiedBy(null);
+	    newMsg.setUpdated(updateDate);
+
+	    newMsg.setSubject(msgData.getString("subject"));
+	    newMsg.setBody(msgData.getString("body"));
+	    newMsg.setForum(forum);
+	    newMsg.setHideFlag(false);
+	    // newMsg.setIsAnonymous(false); Does not appear on authoring interface
+	    newMsg.setIsAuthored(true);
+	    newMsg.setLastReplyDate(updateDate);
+	    newMsg.setParent(null);
+	    newMsg.setReplyNumber(0);
+	    newMsg.setReport(null);
+	    newMsg.setSequenceId(i);
+	    //	    newMsg.setSessionClones(sessionClones); Used for updating in monitoring
+	    newMsg.setToolSession(null);
+	    createRootTopic(forum.getUid(), (ForumToolSession) null, newMsg);
+	}
+
 	// *******************************
 	// TODO - investigate
 	//forum.setConditions(conditions);

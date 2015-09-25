@@ -154,7 +154,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     @Override
     public QaQueUsr checkLeaderSelectToolForSessionLeader(QaQueUsr user, Long toolSessionId) {
-	if (user == null || toolSessionId == null) {
+	if ((user == null) || (toolSessionId == null)) {
 	    return null;
 	}
 
@@ -269,6 +269,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qaQuestionDAO.createQueContent(question);
     }
 
+    @Override
     public QaQueUsr createUser(Long toolSessionID, Integer userId) {
 	User user = (User) userManagementService.findById(User.class, userId);
 	String userName = user.getLogin();
@@ -530,7 +531,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	    fromContent = qaDAO.getQaByContentId(fromContentId.longValue());
 	}
-	if (fromContentId.equals(defaultContentId) && fromContent != null && fromContent.getConditions().isEmpty()) {
+	if (fromContentId.equals(defaultContentId) && (fromContent != null) && fromContent.getConditions().isEmpty()) {
 	    fromContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(fromContent));
 	}
 	QaContent toContent = QaContent.newInstance(fromContent, toContentId);
@@ -587,10 +588,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Q&A answers for user ID " + userId + " and toolContentId " + toolContentId);
+	if (QaServicePOJO.logger.isDebugEnabled()) {
+	    QaServicePOJO.logger
+		    .debug("Removing Q&A answers for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	QaContent content = qaDAO.getQaByContentId(toolContentId);
@@ -602,7 +605,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			qaUsrRespDAO.removeUserResponse(response);
 		    }
 
-		    if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+		    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 			session.setGroupLeader(null);
 		    }
 
@@ -881,7 +884,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	if (toolContentObj == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    toolContentObj = getQaContent(defaultToolContentId);
-	    if (toolContentObj != null && toolContentObj.getConditions().isEmpty()) {
+	    if ((toolContentObj != null) && toolContentObj.getConditions().isEmpty()) {
 		toolContentObj.getConditions()
 			.add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
 	    }
@@ -945,19 +948,33 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	if (qaContent == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    qaContent = getQaContent(defaultToolContentId);
-	    if (qaContent != null && qaContent.getConditions().isEmpty()) {
+	    if ((qaContent != null) && qaContent.getConditions().isEmpty()) {
 		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent));
 	    }
 	}
 	return getQaOutputFactory().getToolOutputDefinitions(qaContent, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return qaDAO.getQaByContentId(toolContentId).getTitle();
     }
 
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return qaDAO.getQaByContentId(toolContentId).isDefineLater();
+    }
+
+    @Override
+    public boolean isReadOnly(Long toolContentId) {
+	QaContent content = qaDAO.getQaByContentId(toolContentId);
+	for (QaSession session : (Set<QaSession>) content.getQaSessions()) {
+	    if (!session.getQaQueUsers().isEmpty()) {
+		return true;
+	    }
+	}
+
+	return false;
     }
 
     @Override
@@ -1071,6 +1088,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     /**
      * ToolSessionManager CONTRACT
      */
+    @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
 	    throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
@@ -1079,6 +1097,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     /**
      * ToolSessionManager CONTRACT
      */
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
 	    throws DataMissingException, ToolException {
 	throw new ToolException("not yet implemented");
@@ -1120,7 +1139,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    QaQueUsr groupLeader = session.getGroupLeader();
 
 	    // check if leader has submitted answers
-	    if (groupLeader != null && groupLeader.isResponseFinalized()) {
+	    if ((groupLeader != null) && groupLeader.isResponseFinalized()) {
 
 		// we need to make sure specified user has the same scratches as a leader
 		copyAnswersFromLeader(qaUser, groupLeader);
@@ -1130,11 +1149,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
+    @Override
     public IToolVO getToolBySignature(String toolSignature) {
 	IToolVO tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 
+    @Override
     public long getToolDefaultContentIdBySignature(String toolSignature) {
 	long contentId = 0;
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
@@ -1150,7 +1171,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
 
 	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -1221,6 +1242,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	this.qaToolContentHandler = qaToolContentHandler;
     }
 
+    @Override
     public IAuditService getAuditService() {
 	return auditService;
     }
@@ -1244,6 +1266,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     /**
      * Import the data for a 1.0.2 Chat
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	QaContent toolContentObj = new QaContent();
@@ -1339,6 +1362,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	this.messageService = messageService;
     }
 
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
@@ -1393,7 +1417,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     @Override
     public void deleteCondition(QaCondition condition) {
-	if (condition != null && condition.getConditionId() != null) {
+	if ((condition != null) && (condition.getConditionId() != null)) {
 	    qaDAO.deleteCondition(condition);
 	}
     }

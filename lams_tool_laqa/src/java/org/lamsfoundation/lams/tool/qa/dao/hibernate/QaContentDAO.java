@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -53,22 +52,18 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
     }
 
     public void updateQa(QaContent qa) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().update(qa);
     }
 
     public void saveQa(QaContent qa) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().save(qa);
     }
 
     public void saveOrUpdateQa(QaContent qa) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().saveOrUpdate(qa);
     }
 
     public void createQa(QaContent qa) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().save(qa);
     }
 
@@ -80,18 +75,15 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 	if (qaContentId != null) {
 	    String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent" + " where qa.qaContentId = ?";
 	    Object obj = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaContentId.longValue()).uniqueResult();
-	    getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	    getSession().delete(obj);
 	}
     }
 
     public void deleteQa(QaContent qaContent) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().delete(qaContent);
     }
 
     public void removeQaById(Long qaId) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	removeQa(qaId);
     }
 
@@ -101,7 +93,6 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 
     public void deleteCondition(QaCondition condition) {
 	if (condition != null && condition.getConditionId() != null) {
-	    getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	    getSession().delete(condition);
 	}
     }

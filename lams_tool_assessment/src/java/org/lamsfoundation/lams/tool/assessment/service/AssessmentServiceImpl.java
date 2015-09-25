@@ -1867,6 +1867,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return getAssessmentByContentId(toolContentId).isDefineLater();
     }
 
+    public boolean isReadOnly(Long toolContentId) {
+	for (AssessmentSession session : assessmentSessionDao.getByContentId(toolContentId)) {
+	    if (!session.getAssessmentUsers().isEmpty()) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**

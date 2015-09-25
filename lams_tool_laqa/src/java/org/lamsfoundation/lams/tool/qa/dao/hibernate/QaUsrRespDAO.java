@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
@@ -57,7 +56,6 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	    + " as r where r.qaQueUser.qaSession.qaSessionId=? and r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?";
 
     public void createUserResponse(QaUsrResp qaUsrResp) {
-    	getSession().setFlushMode(FlushMode.AUTO);
     	getSession().save(qaUsrResp);
     }
 
@@ -69,12 +67,10 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
      * @see org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO#updateUserResponse(org.lamsfoundation.lams.tool.qa.QaUsrResp)
      */
     public void updateUserResponse(QaUsrResp resp) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().update(resp);
     }
 
     public void removeUserResponse(QaUsrResp resp) {
-	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	getSession().delete(resp);
     }
 
