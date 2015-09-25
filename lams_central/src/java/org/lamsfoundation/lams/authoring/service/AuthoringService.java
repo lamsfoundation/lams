@@ -919,14 +919,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);
 
 	updateEvaluations(newActivities);
-
-	try {
-	    AuthoringService.copyLearningDesignImages(originalLearningDesign.getLearningDesignId(),
-		    newLearningDesign.getLearningDesignId());
-	} catch (IOException e) {
-	    log.error("Error while copying Learning Design " + originalLearningDesign.getLearningDesignId() + " image",
-		    e);
-	}
 	return newLearningDesign;
     }
 
@@ -2059,23 +2051,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	access.setUserId(userId);
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
-    }
-
-    /**
-     * Copies LD thumbnails, SVG and PNG.
-     */
-    private static void copyLearningDesignImages(long originalLearningDesignID, long newLearningDesignID)
-	    throws IOException {
-	for (String extension : AuthoringService.LD_IMAGE_EXTENSIONS) {
-	    String fullExtension = "." + extension;
-	    File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
-		    originalLearningDesignID + fullExtension);
-	    if (image.canRead()) {
-		FileUtils.copyFile(image,
-			new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID + fullExtension),
-			false);
-	    }
-	}
     }
 
     /**
