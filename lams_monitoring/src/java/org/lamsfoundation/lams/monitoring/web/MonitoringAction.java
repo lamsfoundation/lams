@@ -59,12 +59,12 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -1180,20 +1180,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
 
-	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
-	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
-	    JSONArray transitions = new JSONArray();
-	    for (Transition transition : (Set<Transition>) learningDesign.getTransitions()) {
-		JSONObject transitionJSON = new JSONObject();
-		transitionJSON.put("uiid", transition.getTransitionUIID());
-		transitionJSON.put("fromID", transition.getFromActivity().getActivityId());
-		transitionJSON.put("toID", transition.getToActivity().getActivityId());
-
-		transitions.put(transitionJSON);
-	    }
-	    responseJSON.put("transitions", transitions);
-	}
-
 	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
 	// remove "attention required" marker for hidden activities in Flash Authoring
 	if (contributeActivities != null) {
@@ -1221,6 +1207,71 @@ public class MonitoringAction extends LamsDispatchAction {
 	response.getWriter().write(responseJSON.toString());
 
 	return null;
+    }
+
+    /**
+     * Checks if activity A is before activity B in a sequence.
+     */
+    public ActionForward isActivityPreceding(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	long activityAid = WebUtil.readLongParam(request, "activityA");
+	long activityBid = WebUtil.readLongParam(request, "activityB");
+	boolean result = false;
+
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	Activity precedingActivity = monitoringService.getActivityById(activityBid);
+
+	// move back an look for activity A
+	while (!result && (precedingActivity != null)) {
+	    if (precedingActivity.getTransitionTo() != null) {
+		precedingActivity = precedingActivity.getTransitionTo().getFromActivity();
+	    } else if (precedingActivity.getParentActivity() != null) {
+		// this is a nested activity; move up
+		precedingActivity = precedingActivity.getParentActivity();
+		continue;
+	    } else {
+		precedingActivity = null;
+	    }
+
+	    if ((precedingActivity != null) && !precedingActivity.isSequenceActivity()) {
+		if (precedingActivity.getActivityId().equals(activityAid)) {
+		    // found it
+		    result = true;
+		} else if (precedingActivity.isComplexActivity()) {
+		    // check descendants of a complex activity
+		    ComplexActivity complexActivity = (ComplexActivity) monitoringService
+			    .getActivityById(precedingActivity.getActivityId());
+		    if (containsActivity(complexActivity, activityAid, monitoringService)) {
+			result = true;
+		    }
+		}
+	    }
+	}
+
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().write(Boolean.toString(result));
+	return null;
+    }
+
+    /**
+     * Checks if a complex activity or its descendats contain an activity with the given ID.
+     */
+    private boolean containsActivity(ComplexActivity complexActivity, long targetActivityId,
+	    IMonitoringService monitoringService) {
+	for (Activity childActivity : (Set<Activity>) complexActivity.getActivities()) {
+	    if (childActivity.getActivityId().equals(targetActivityId)) {
+		return true;
+	    }
+	    if (childActivity.isComplexActivity()) {
+		ComplexActivity childComplexActivity = (ComplexActivity) monitoringService
+			.getActivityById(childActivity.getActivityId());
+		if (containsActivity(childComplexActivity, targetActivityId, monitoringService)) {
+		    return true;
+		}
+	    }
+	}
+	return false;
     }
 
     public ActionForward releaseGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,

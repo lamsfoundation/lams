@@ -822,8 +822,7 @@ function updateSequenceTab() {
 		data : {
 			'method'    : 'getLessonProgress',
 			'lessonID'  : lessonId,
-			'branchingActivityID' : sequenceBranchingId,
-			'getTransitions' : sequenceCanvasFirstFetch
+			'branchingActivityID' : sequenceBranchingId
 		},		
 		success : function(response) {
 			if (sequenceCanvasFirstFetch) {
@@ -845,12 +844,6 @@ function updateSequenceTab() {
 					} else if (isFloating) {
 						activityGroup.attr('class', 'floating');
 					}
-				});
-				
-				// FLA transitions have uiid but no ids; needed for forceComplete()
-				$.each(response.transitions, function(index, transition){
-					$('g[uiid="' + transition.uiid + '"]', sequenceCanvas)
-						.attr('id', transition.fromID + '_to_' + transition.toID);
 				});
 				
 				originalSequenceCanvas = sequenceCanvas.html();
@@ -976,26 +969,29 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 	} else {
 		var targetActivityId = +targetActivity.attr('id');
 		if (currentActivityId != targetActivityId) {
+			var targetActivityName = targetActivity.attr('class') == 'gate' ? "Gate" : targetActivity.children('text').text(),
+				moveBackwards = false;
 			
-			var precedingActivityId = currentActivityId,
-				targetActivityName = targetActivity.attr('class') == 'gate' ? "Gate" : targetActivity.children('text').text();
-			
-			// find out if we are moving learner forward or backwards
-			while (precedingActivityId){
-				// find transition line and extract activity IDs from them
-				// it is Batik format adopted to new SVGs
-				var transitionLine = $('*[id$="to_' 
-						+ precedingActivityId + '"]:not([id^="arrow"])'
-						, sequenceCanvas);
-				precedingActivityId = transitionLine.length == 1 ? 
-						transitionLine.attr('id').split('_')[0] : null;
-				if (targetActivityId == precedingActivityId) {
-					break;
-				}
-			};
+			// check if target activity is before current activity
+			if (currentActivityId) {
+				$.ajax({
+					dataType : 'text',
+					url : LAMS_URL + 'monitoring/monitoring.do',
+					async : false,
+					cache : false,
+					data : {
+						'method'     	 : 'isActivityPreceding',
+						'activityA' 	 :  targetActivityId,
+						'activityB'		 :  currentActivityId
+					},
+					success : function(response) {
+						moveBackwards = response == 'true';
+					}
+				});
+			}
 			
 			// check if the target activity was found or we are moving the learner from end of lesson
-			if (!currentActivityId || precedingActivityId) {
+			if (moveBackwards) {
 				// move the learner backwards
 				$('#forceBackwardsDialog').text(LABELS.FORCE_COMPLETE_REMOVE_CONTENT
 							.replace('[0]', learnerName).replace('[1]', targetActivityName))
