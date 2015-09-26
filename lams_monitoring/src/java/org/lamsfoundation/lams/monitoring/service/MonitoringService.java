@@ -1419,7 +1419,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    learnerProgress.getAttemptedActivities().remove(activity);
 	    learnerProgress.getCompletedActivities().remove(activity);
 	    if (removeLearnerContent) {
-		resetReadOnly = removeLearnerContent(activity, learner, resetReadOnly);
+		// the iteration goes from the end of the sequence to the beginning
+		// once an activity reports it will not reset its read-only flag, no other activities will reset it
+		// Also target activity does not have it reset
+		resetReadOnly = removeLearnerContent(activity, learner,
+			resetReadOnly && !activity.equals(targetActivity));
 	    }
 	}
 
