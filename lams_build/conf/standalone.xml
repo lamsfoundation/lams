@@ -482,7 +482,6 @@
                 </host>
             </server>
             <servlet-container name="default" default-encoding="UTF-8">
-		<session-cookie http-only="true" secure="false"/>
                 <jsp-config/>
                 <websockets/>
             </servlet-container>
