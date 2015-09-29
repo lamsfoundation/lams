@@ -175,7 +175,14 @@ public class LoginRequestServlet extends HttpServlet {
 	    // but forward doesn't work, use this until a better method is found
 	    hses.setAttribute("extUser", login);
 	    hses.setAttribute(AttributeNames.USER, user.getUserDTO());
-	    response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
+	    
+	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
+	    String redirect = request.getParameter("redirectURL");
+	    if ( redirect != null && redirect.indexOf("ldtemplate") >= 0 ) {
+		response.sendRedirect("https://"+ request.getServerName() + ":" + request.getServerPort() + request.getContextPath() +"/j_security_check?j_username=" + login + "&j_password=" + pass);
+	    } else {
+		response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
+	    }
 	} catch (AuthenticationException e) {
 	    LoginRequestServlet.log.error("Authentication error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,

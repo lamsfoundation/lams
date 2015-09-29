@@ -124,8 +124,14 @@ public class LoginRequestDispatcher {
 
 	// get the location from an explicit parameter if it exists
 	String redirect = request.getParameter("redirectURL");
-	if ( redirect != null )
-	    return request.getContextPath() + "/" + redirect;
+	if ( redirect != null ) {
+	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
+	    if ( redirect.indexOf("ldtemplate") >= 0 ) {
+		return "https://"+ request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/" + redirect;
+	    } else {
+		return request.getContextPath() + "/" + redirect;
+	    }
+	}
 
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
