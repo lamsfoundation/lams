@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -1428,7 +1428,8 @@ GeneralLib = {
 		// soft means that data is manually reset, instead of simply reloading the page.
 		if (soft) {
 			layout.ld = {
-				'maxUIID' : 0
+				'maxUIID' : 0,
+				'designType' : null
 			};
 			layout.activities = [];
 			layout.regions = [];
@@ -1499,7 +1500,8 @@ GeneralLib = {
 					'folderID'		   : ld.workspaceFolderID,
 					'contentFolderID'  : ld.contentFolderID,
 					'title'			   : ld.title,
-					'maxUIID'		   : 0
+					'maxUIID'		   : 0,
+					'designType'	   : ld.designType
 				};
 				
 				if (!isReadOnlyMode) {
@@ -2490,6 +2492,7 @@ GeneralLib = {
 			'licenseText'   	 : $('#ldDescriptionLicenseSelect').val() == "0"
 								   || $('#ldDescriptionLicenseSelect option:selected').attr('url')
 								   ? null : $('#ldDescriptionLicenseText').val(),
+			'designType'		 : layout.ld.designType,
 			'activities'		 : activities,
 			'transitions'		 : transitions,
 			'groupings'			 : groupings,
