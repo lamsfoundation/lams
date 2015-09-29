@@ -179,7 +179,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
 	    String redirect = request.getParameter("redirectURL");
 	    if ( redirect != null && redirect.indexOf("ldtemplate") >= 0 ) {
-		response.sendRedirect("https://"+ request.getServerName() + ":" + request.getServerPort() + request.getContextPath() +"/j_security_check?j_username=" + login + "&j_password=" + pass);
+		response.sendRedirect("https://"+ request.getServerName() + request.getContextPath() +"/j_security_check?j_username=" + login + "&j_password=" + pass);
 	    } else {
 		response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
 	    }

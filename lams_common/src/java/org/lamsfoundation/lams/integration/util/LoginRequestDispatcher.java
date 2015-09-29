@@ -127,7 +127,7 @@ public class LoginRequestDispatcher {
 	if ( redirect != null ) {
 	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
 	    if ( redirect.indexOf("ldtemplate") >= 0 ) {
-		return "https://"+ request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/" + redirect;
+		return "https://"+ request.getServerName() + request.getContextPath() + "/" + redirect;
 	    } else {
 		return request.getContextPath() + "/" + redirect;
 	    }
