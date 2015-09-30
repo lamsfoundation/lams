@@ -212,9 +212,12 @@ public class OrgManageAction extends LamsDispatchAction {
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("id", organisation.getOrganisationId());
-	    responseRow.put("name", StringEscapeUtils.escapeHtml(organisation.getName()));
-	    responseRow.put("code", StringEscapeUtils.escapeHtml(organisation.getCode()));
-	    responseRow.put("description", StringEscapeUtils.escapeHtml(organisation.getDescription()));
+	    String orgName = organisation.getName() == null ? "" : organisation.getName(); 
+	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
+	    String orgCode = organisation.getCode() == null ? "" : organisation.getCode(); 
+	    responseRow.put("code", StringEscapeUtils.escapeHtml(orgCode));
+	    String orgDescription = organisation.getDescription() == null ? "" : organisation.getDescription(); 
+	    responseRow.put("description", StringEscapeUtils.escapeHtml(orgDescription));
 
 	    rows.put(responseRow);
 	}
