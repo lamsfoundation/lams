@@ -890,6 +890,8 @@ public class LearningAction extends Action {
 		    // HTML tags stripping
 		    if (question.isAllowRichEditor()) {
 			answer = WebUtil.removeHTMLtags(answer); // answer.replaceAll("/<\/?[a-z][^>]*>/gi", '');
+		    } else {
+			answer = answer.replaceAll("(?:<BR>)", " ");
 		    }
 		    
 		   int wordCount = (answer.length() == 0) ? 0 : answer.replaceAll("[\'\";:,\\.\\?\\-!]+", "").split("\\S+").length;//.match(/\S+/g) || []) ;
