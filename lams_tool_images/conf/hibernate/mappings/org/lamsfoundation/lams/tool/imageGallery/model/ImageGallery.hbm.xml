@@ -129,14 +129,6 @@
         />
 
         <property
-            name="allowCommentImages"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_comment_images"
-        />
-
-        <property
             name="allowShareImages"
             type="boolean"
             update="true"

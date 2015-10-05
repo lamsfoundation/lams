@@ -46,6 +46,11 @@
 						<th width="70px" style="padding-left:0px; text-align:center;">
 							<fmt:message key="label.monitoring.average.rating" />
 						</th>
+						<c:if test="${sessionMap.isCommentsEnabled}">
+							<th width="200px" style="padding-left:0px; text-align:center;">
+								<fmt:message key="label.monitoring.imagesummary.comments" />
+							</th>								
+						</c:if>
 					</c:when>
 					<c:when test="${sessionMap.imageGallery.allowVote}">
 						<th width="70px" style="padding-left:0px; text-align:center;">
@@ -107,9 +112,23 @@
 					<c:choose>
 						<c:when test="${sessionMap.imageGallery.allowRank}">
 							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
-								${summary.averageRating}
+								<lams:Rating itemRatingDto="${summary.itemRatingDto}" disabled="true" showComments="false"
+										isItemAuthoredByUser="true"
+										maxRates="0" 
+										countRatedItems="0" />
 							</td>
+							<c:if test="${sessionMap.isCommentsEnabled}">
+								<td style="vertical-align:middle; padding-left:0px; text-align:center;">
+									<c:forEach var="commentDto" items="${summary.itemRatingDto.commentDtos}">
+										<div class="rating-comment">
+											${commentDto.comment}
+										</div>
+									</c:forEach>								
+								</td>
+								
+							</c:if>
 						</c:when>
+						
 						<c:when test="${sessionMap.imageGallery.allowVote}">
 							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
 								${summary.numberOfVotes}
@@ -122,6 +141,7 @@
 							<c:when test="${summary.itemHide}">
 								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
 							</c:when>
+							
 							<c:otherwise>
 								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
 							</c:otherwise>
@@ -134,7 +154,7 @@
 		<tbody>
 	</table>
 	
-			<br>	
+	<br>	
 
 	<%-- Reflection list  --%>
 	<c:if test="${sessionMap.imageGallery.reflectOnActivity && not (empty sessionId)}">	

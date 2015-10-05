@@ -74,7 +74,6 @@ public class ImageGalleryForm extends ActionForm {
 	// if it is start page, all data read out from database or current session
 	// so need not reset checkbox to refresh value!
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    imageGallery.setAllowCommentImages(false);
 	    imageGallery.setAllowShareImages(false);
 	    imageGallery.setLockWhenFinished(false);
 	    imageGallery.setDefineLater(false);

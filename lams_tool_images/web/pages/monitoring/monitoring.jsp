@@ -12,19 +12,57 @@
 		<%@ include file="/common/tabbedheader.jsp" %>
 		
 		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 		<link href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet" >
+		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 		<style media="screen,projection" type="text/css">
 			.tablesorter {
 				margin: 15px 10px 5px;
 				width: 97%;
 			}
+			
+			.tablesorter tbody > tr:nth-child(odd) > td, .tablesorter tbody > tr:nth-child(odd) > th {
+			    background-color: #EBF2FA;
+			}
+			.tablesorter tbody > tr:nth-child(odd):hover > td, .tablesorter tbody > tr:nth-child(odd):hover > th {
+			    background-color: #bfbfbf;
+			}
+			.tablesorter tr:nth-child(odd):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-grey.png)!important;}
+			.tablesorter tr:nth-child(even):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-grey.png)!important;}
+			.tablesorter tr:nth-child(odd) .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-blue.png)!important;}
+			
+			h4 {
+				color:#0087e5; 
+				font-size:11px;
+				margin-top:10px;
+				margin-bottom:10px;
+				padding:0;
+			}
 		</style>
 		
+		<script type="text/javascript">
+			//var for jquery.jRating.js
+			var pathToImageFolder = "${lams}images/css/";
+		
+			//vars for rating.js
+			var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+			YOUR_RATING_LABEL = '',
+			IS_DISABLED =  true,
+			COMMENTS_MIN_WORDS_LIMIT = 0,
+			MAX_RATES = 0,
+			MIN_RATES = 0,
+			LAMS_URL = '${lams}',
+			COUNT_RATED_ITEMS = 0,
+			COMMENT_TEXTAREA_TIP_LABEL = '',
+			WARN_COMMENTS_IS_BLANK_LABEL = '',
+			WARN_MIN_NUMBER_WORDS_LABEL = '';
+		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>	
- 			
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script>
 			var initialTabId = "${initialTabId}";
 	
