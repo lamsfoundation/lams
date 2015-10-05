@@ -1,36 +1,118 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
-<script>
-	<!--
-	jQuery(document).ready(function() {
-		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, textExtraction:'complex'});
-		//sort table only in case there is a data inside (it's a tablesorter bug)
-		if (jQuery("table.tablesorter-admin tbody tr").length > 0) {
-			jQuery("table.tablesorter-admin").tablesorterPager({container: jQuery("#pager")});
-			$("table.tablesorter-admin").trigger("sorton", [[[1, 0]]]);
-		}
-	});
-	//-->
-</script>
-
+<link type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
 <style>
-table.infoDisplay {
-	margin-left:5px; padding-top:10px; width:100%;
-}
-p {
-	margin-left:5px;
-}
-.floatRight {
-	float:right;
-}
-.indentPad {
-	margin-left:5px; padding-top:10px;
-}
+	table.infoDisplay {
+		margin-left:5px; 
+		padding-top:10px; 
+		width:100%;
+	}
+	p {
+		margin-left:5px;
+	}
+	.floatRight {
+		float:right;
+	}
+	.indentPad {
+		margin-left:5px; 
+		padding-top:10px;
+	}
+	#tablesorter thead .disabled {
+		display: none
+	}
 </style>
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
+<script>
+	
+  	$(document).ready(function(){
+	    
+		$("#tablesorter").tablesorter({
+			theme: 'blue',
+			widgets: ["zebra", "filter"],
+			headers: { 0: { filter: false }, 2: { filter: false }, 3: { filter: false } },
+		    widgetOptions : {
+		        // include column filters
+		        filter_columnFilters: true,
+		        filter_placeholder: { search : 'Search...' },
+		      },
+		    widthFixed: true,
+		    sortInitialOrder: 'desc',
+            sortList: [[1]] 
+		});
+		
+		$("#tablesorter").each(function() {
+			$(this).tablesorterPager({
+				savePages: false,
+				ajaxUrl : "<c:url value='/orgmanage.do'/>?dispatch=getOrgs&type=${OrgManageForm.type}&page={page}&size={size}&{sortList:column}&parentOrgId=${OrgManageForm.parentId}&{filterList:fcol}",
+				ajaxProcessing: function (data, table) {
+			    	if (data && data.hasOwnProperty('rows')) {
+			    		var rows = [],
+			            json = {};
+			    		
+						for (i = 0; i < data.rows.length; i++){
+							var orgData = data.rows[i];
+							
+							rows += '<tr>';
+							
+							rows += '<td>';
+							rows += 	orgData["id"];
+							rows += '</td>';
+							
+							rows += '<td>';
+							rows += 	'<a id="' + orgData["id"] + '" href="orgmanage.do?org=' + orgData["id"] + '">';
+							rows += 		orgData["name"];
+							rows += 	'</a>';
+							rows += '</td>';
+							
+							rows += '<td>';
+							rows += 	orgData["code"];
+							rows += '</td>';
+
+							rows += '<td>';
+							rows += 	orgData["description"];
+							rows += '</td>';
+							
+							rows += '</tr>';
+						}
+			            
+						json.total = data.total_rows;
+						json.rows = $(rows);
+						return json;
+			            
+			    	}
+				},
+				// modify the url after all processing has been applied
+				customAjaxUrl: function(table, url) {
+				    // get current selection & add it to the url
+				    return url += '&stateId=' + $("#org-state-id").val();
+				},
+			    container: $(this).next("#pager"),
+			    output: '{startRow} to {endRow} ({totalRows})',// possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
+			    // css class names of pager arrows
+			    cssNext: '.tablesorter-next', // next page arrow
+				cssPrev: '.tablesorter-prev', // previous page arrow
+				cssFirst: '.tablesorter-first', // go to first page arrow
+				cssLast: '.tablesorter-last', // go to last page arrow
+				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
+				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
+				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
+				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
+				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+			})
+		});
+		
+		$( "#org-state-id" ).change(function() {
+			$('#tablesorter').trigger('pagerUpdate');
+		});
+  	})
+</script>
 
 <logic:equal name="OrgManageForm" property="type" value="1">
 	<h4>
@@ -61,11 +143,13 @@ p {
 	</form>
 	<html:form styleClass="indentPad" action="orgmanage.do" method="post">
 		<input type="hidden" name="org" value="<bean:write name="OrgManageForm" property="parentId"/>" />
-		<fmt:message key="label.show"/> <html:select property="stateId" onchange="document.OrgManageForm.submit();">
+		<fmt:message key="label.show"/> 
+		<html:select property="stateId" styleId="org-state-id">
 			<html:option value="1"><fmt:message key="organisation.state.ACTIVE"/></html:option>
 			<html:option value="2"><fmt:message key="organisation.state.HIDDEN"/></html:option>
 			<html:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></html:option>
-		</html:select> <fmt:message key="label.groups"/>:
+		</html:select> 
+		<fmt:message key="label.groups"/>:
 	</html:form>
 </logic:equal>
 
@@ -134,11 +218,13 @@ p {
 	</form>
 	<html:form styleClass="indentPad" action="orgmanage.do" method="post">
 		<input type="hidden" name="org" value="<bean:write name="OrgManageForm" property="parentId"/>" />
-		<fmt:message key="label.show"/> <html:select property="stateId" onchange="document.OrgManageForm.submit();">
+		<fmt:message key="label.show"/> 
+		<html:select property="stateId" styleId="org-state-id">
 			<html:option value="1"><fmt:message key="organisation.state.ACTIVE"/></html:option>
 			<html:option value="2"><fmt:message key="organisation.state.HIDDEN"/></html:option>
 			<html:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></html:option>
-		</html:select> <fmt:message key="label.subgroups"/>:
+		</html:select> 
+		<fmt:message key="label.subgroups"/>:
 	</html:form>
 </logic:equal>
 
@@ -180,9 +266,9 @@ p {
 	<form>
 	
 	<p>
-	<logic:equal name="editGroup" value="true">
-		<input class="button" type="button" value="<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
-	</logic:equal>
+		<logic:equal name="editGroup" value="true">
+			<input class="button" type="button" value="<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+		</logic:equal>
 	</p>
 	
 	<div class="floatRight">
@@ -191,62 +277,55 @@ p {
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
 	<% if (request.isUserInRole(Role.SYSADMIN)) { %>
-	<div class="floatRight">
-		<input class="button" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
-	</div>
-	<p style="padding-top:10px;">&nbsp;</p>
+		<div class="floatRight">
+			<input class="button" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
+		</div>
+		<p style="padding-top:10px;">&nbsp;</p>
 	<% } %>
 	
 	</form>
 </logic:equal>
 
-<c:if test="${not empty OrgManageForm.orgManageBeans}">
-<form>
-<table class=tablesorter-admin width=100%>
-	<thead>
-	<tr>
-		<th id="idsorter">Id</th>
-		<th><fmt:message key="admin.organisation.name"/></th>
-		<th><fmt:message key="admin.organisation.code"/></th>
-		<th><fmt:message key="admin.organisation.description"/></th>
-	</tr>
-	</thead>
-	<tbody>
-		<logic:iterate id="orgManageBean" name="OrgManageForm" property="orgManageBeans" indexId="idx">
-		<tr>
-			<td><bean:write name="orgManageBean" property="organisationId" /></td>
-			<td>
-				<a id="<bean:write name='orgManageBean' property='organisationId'/>" href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><bean:write name="orgManageBean" property="name" /></a>
-			</td>
-			<td>
-				<bean:write name="orgManageBean" property="code" />
-			</td>
-			<td>
-				<bean:write name="orgManageBean" property="description" />
-			</td>
-		</tr>
-		</logic:iterate>
-	</tbody>
-</table>
-</form>
+<c:if test="${OrgManageForm.type != 3}">
 
-<div id="pager" class="pager">
-	<form onsubmit="return false;">
-		<img src="<lams:LAMSURL/>/images/first.png" class="first"/>
-		<img src="<lams:LAMSURL/>/images/prev.png" class="prev">
-		<input type="text" class="pagedisplay"/>
-		<img src="<lams:LAMSURL/>/images/next.png" class="next">
-		<img src="<lams:LAMSURL/>/images/last.png" class="last">
-		<select class="pagesize">
-			<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
-			<option value="20">20</option>
-			<option value="30">30</option>
-			<option value="40">40</option>
-			<option value="50">50</option>
-			<option value="100">100</option>
-		</select>
-	</form>
-</div>
+	<table id="tablesorter">
+		<thead>
+			<tr>
+				<th width="3%" clas="filter-false">
+					Id
+				</th>
+				<th width="10%" align="center"> 
+					<fmt:message key="admin.organisation.name"/>
+				</th>
+				<th width="10%" align="center">
+					<fmt:message key="admin.organisation.code"/>
+				</th>
+				<th width="20%" align="center">
+					<fmt:message key="admin.organisation.description"/>
+				</th>
+			</tr>
+		</thead>
+			
+		<tbody>
+		</tbody>
+	</table>
+		
+	<!-- pager -->
+	<div id="pager">
+		<form>
+			<img class="tablesorter-first"/>
+			<img class="tablesorter-prev"/>
+			<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+			<img class="tablesorter-next"/>
+			<img class="tablesorter-last"/>
+			<select class="pagesize">
+				<option selected="selected" value="10">10</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+				<option value="40">40</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+			</select>
+		</form>
+	</div>
 </c:if>
-
-

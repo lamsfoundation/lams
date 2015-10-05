@@ -305,10 +305,6 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.searchByStringProperties(clazz, properties);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService
-     *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement. User, java.util.List<String>)
-     */
     @Override
     public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames) {
 	List<OrganisationDTO> list = new ArrayList<OrganisationDTO>();
@@ -325,11 +321,6 @@ public class UserManagementService implements IUserManagementService {
 	return OrganisationDTOFactory.createTree(list);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService
-     *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement. User, java.util.List<String>,
-     *      java.util.Integer)
-     */
     @Override
     public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId,
 	    List<Integer> restrictToClassIds) {
@@ -398,10 +389,6 @@ public class UserManagementService implements IUserManagementService {
 	return roleFound;
     }
 
-    /**
-     * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations. Will not
-     * return the organisation if there isn't any roles for this user.
-     */
     @Override
     public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId) {
 	if ((user != null) && (organisationId != null)) {
@@ -417,10 +404,6 @@ public class UserManagementService implements IUserManagementService {
 	return null;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getRolesForUserByOrganisation(org.lamsfoundation.lams.usermanagement.User,
-     *      java.lang.Integer)
-     */
     @Override
     public List<Role> getRolesForUserByOrganisation(User user, Integer orgId) {
 	List<Role> list = new ArrayList<Role>();
@@ -439,9 +422,6 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisation(int)
-     */
     @Override
     public List<User> getUsersFromOrganisation(Integer orgId) {
 	String query = "select uo.user from UserOrganisation uo" + " where uo.organisation.organisationId=" + orgId
@@ -449,10 +429,6 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.find(query);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
-     *      java.lang.String)
-     */
     @Override
     @SuppressWarnings("unchecked")
     public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall,
@@ -469,8 +445,8 @@ public class UserManagementService implements IUserManagementService {
 	// it's ugly to put query string here, but it is a convention of this class so let's stick to it for now
 	String query = "SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
 		+ organisationID + " AND r.role.name= '" + roleName + "'";
-	List<User> queryResult = baseDAO.find(query);
-
+	List<User> queryResult = (List<User>) baseDAO.find(query);
+	
 	for (User user : queryResult) {
 	    if (isFlashCall && !getUser) {
 		users.add(user.getUserFlashDTO());
@@ -480,7 +456,7 @@ public class UserManagementService implements IUserManagementService {
 		users.add(user.getUserDTO());
 	    }
 	}
-
+	
 	return users;
     }
 
@@ -508,6 +484,19 @@ public class UserManagementService implements IUserManagementService {
 	properties.put("organisationType.organisationTypeId", typeId);
 	properties.put("organisationState.organisationStateId", stateId);
 	return baseDAO.findByProperties(Organisation.class, properties);
+    }
+
+    @Override
+    public List<Organisation> getPagedCourses(final Integer parentOrgId, final Integer typeId, final Integer stateId,
+	    int page, int size, String sortBy, String sortOrder, String searchString) {
+	return organisationDAO.getPagedCourses(parentOrgId, typeId, stateId, page, size, sortBy, sortOrder,
+		searchString);
+    }
+
+    @Override
+    public int getCountCoursesByParentCourseAndTypeAndState(final Integer parentOrgId, final Integer typeId,
+	    final Integer stateId, String searchString) {
+	return organisationDAO.getCountCoursesByParentCourseAndTypeAndState(parentOrgId, typeId, stateId, searchString);
     }
 
     @Override
@@ -577,7 +566,7 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @SuppressWarnings("unchecked")
-    public Workspace createWorkspaceForOrganisation(String workspaceName, Integer userID, Date createDateTime) {
+    private Workspace createWorkspaceForOrganisation(String workspaceName, Integer userID, Date createDateTime) {
 
 	// this method is public so it can be accessed from the junit test
 
@@ -748,12 +737,6 @@ public class UserManagementService implements IUserManagementService {
 	return userManageBeans;
     }
 
-    /**
-     * Remove a user from the system completely. Only able to be done if they don't have any related learning designs,
-     * etc.
-     * 
-     * @param userId
-     */
     @Override
     public void removeUser(Integer userId) throws Exception {
 
@@ -850,12 +833,6 @@ public class UserManagementService implements IUserManagementService {
 	save(user);
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setRolesForUserOrganisation(org.lamsfoundation.lams.usermanagement.User,
-     *      java.lang.Integer, java.util.List)
-     */
     @Override
     public void setRolesForUserOrganisation(User user, Integer organisationId, List<String> rolesList) {
 
