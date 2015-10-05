@@ -23,6 +23,7 @@
 <%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="showComments" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
@@ -46,7 +47,10 @@
 <c:if test="${empty minNumberWordsLabel}">
 	<c:set var="minNumberWordsLabel" value="label.comment.minimum.number.words" scope="request"/>
 </c:if>
-<c:set var="isCommentsEnabled" value="${itemRatingDto.commentsEnabled}"/>
+<c:if test="${empty showComments}">
+	<c:set var="showComments" value="true" scope="request"/>
+</c:if>
+<c:set var="isCommentsEnabled" value="${itemRatingDto.commentsEnabled && showComments}"/>
 
 <%--Rating stars area---------------------------------------%>
 
