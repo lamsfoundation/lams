@@ -22,19 +22,20 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.struts.action.Action;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.OrgManageForm;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -44,36 +45,36 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @version
- *
  * <p>
  * <a href="OrgManageAction.java.html"><i>View Source</i></a>
  * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- * Created at 20:29:13 on 2006-6-5
- */
-
-/**
- * struts doclets
  * 
- * @struts:action path="/orgmanage" name="OrgManageForm" input=".orglist" scope="request" validate="false"
+ * @struts:action path="/orgmanage" parameter="dispatch" name="OrgManageForm" input=".orglist" scope="request" validate="false"
  *
  * @struts:action-forward name="orglist" path=".orglist"
  */
-public class OrgManageAction extends Action {
+public class OrgManageAction extends LamsDispatchAction {
+    
+    private static IUserManagementService userManagementService;
 
     @SuppressWarnings("unchecked")
     @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+	initServices();
+	
 	// Get organisation whose child organisations we will populate the OrgManageForm with
 	Integer orgId = WebUtil.readIntParam(request, "org", true);
 	if (orgId == null) {
@@ -87,7 +88,6 @@ public class OrgManageAction extends Action {
 	// get logged in user's id
 	Integer userId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 	ISecurityService securityService = AdminServiceProxy.getSecurityService(getServlet().getServletContext());
-	IUserManagementService userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
 
 	Organisation org = null;
 	boolean isRootOrganisation = false;
@@ -142,32 +142,6 @@ public class OrgManageAction extends Action {
 	    request.setAttribute("parentGroupName", pOrg.getName());
 	    request.setAttribute("parentGroupId", pOrg.getOrganisationId());
 	} else {
-	    List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
-	    // the organisation type of the children
-	    Integer typeId = (orgManageForm.getType().equals(OrganisationType.ROOT_TYPE) ? OrganisationType.COURSE_TYPE
-		    : OrganisationType.CLASS_TYPE);
-
-	    HashMap<String, Object> properties = new HashMap<String, Object>();
-	    properties.put("organisationType.organisationTypeId", typeId);
-	    properties.put("organisationState.organisationStateId", orgManageForm.getStateId());
-	    List<Organisation> organisations = userManagementService.findByProperties(Organisation.class, properties);
-
-	    for (Organisation organisation : organisations) {
-		Organisation parentOrg = (typeId.equals(OrganisationType.CLASS_TYPE))
-			? organisation.getParentOrganisation() : organisation;
-		// do not list this org if it is not a child of the requested parent
-		if (typeId.equals(OrganisationType.CLASS_TYPE) && !parentOrg.getOrganisationId().equals(orgId)) {
-		    continue;
-		}
-
-		OrgManageBean orgManageBean = new OrgManageBean();
-		BeanUtils.copyProperties(orgManageBean, organisation);
-		orgManageBean.setStatus(organisation.getOrganisationState().getDescription());
-		orgManageBean.setEditable(true);
-		orgManageBeans.add(orgManageBean);
-	    }
-	    Collections.sort(orgManageBeans);
-	    orgManageForm.setOrgManageBeans(orgManageBeans);
 	    request.setAttribute("OrgManageForm", orgManageForm);
 
 	    // display org info
@@ -180,5 +154,82 @@ public class OrgManageAction extends Action {
 	request.setAttribute("editGroup", true);
 	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 	return mapping.findForward("orglist");
+    }
+    
+    /**
+     * Returns list of organisations for .
+     */
+    public ActionForward getOrgs(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	initServices();
+	
+	Integer parentOrgId = WebUtil.readIntParam(request, "parentOrgId");
+	Integer stateId = WebUtil.readIntParam(request, "stateId");
+	Integer typeIdParam = WebUtil.readIntParam(request, "type");
+	// the organisation type of the children
+	Integer typeId = (typeIdParam.equals(OrganisationType.ROOT_TYPE) ? OrganisationType.COURSE_TYPE
+		: OrganisationType.CLASS_TYPE);
+	String searchString = WebUtil.readStrParam(request, "fcol[1]", true);
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
+	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
+	Integer isSort3 = WebUtil.readIntParam(request, "column[2]", true);
+	Integer isSort4 = WebUtil.readIntParam(request, "column[3]", true);
+
+	String sortBy = "";
+	String sortOrder = "";
+	if (isSort1 != null) {
+	    sortBy = "id";
+	    sortOrder = isSort1.equals(0) ? "ASC" : "DESC";
+
+	} else if (isSort2 != null) {
+	    sortBy = "name";
+	    sortOrder = isSort2.equals(0) ? "ASC" : "DESC";
+
+	} else if (isSort3 != null) {
+	    sortBy = "code";
+	    sortOrder = isSort3.equals(0) ? "ASC" : "DESC";
+	    
+	} else if (isSort4 != null) {
+	    sortBy = "description";
+	    sortOrder = isSort4.equals(0) ? "ASC" : "DESC";
+
+	}
+
+	List<Organisation> organisations = userManagementService.getPagedCourses(parentOrgId, typeId, stateId, page,
+		size, sortBy, sortOrder, searchString);
+
+	JSONObject responcedata = new JSONObject();
+	responcedata.put("total_rows", userManagementService.getCountCoursesByParentCourseAndTypeAndState(parentOrgId,
+		typeId, stateId, searchString));
+
+	JSONArray rows = new JSONArray();
+	for (Organisation organisation : organisations) {
+
+	    JSONObject responseRow = new JSONObject();
+	    responseRow.put("id", organisation.getOrganisationId());
+	    String orgName = organisation.getName() == null ? "" : organisation.getName(); 
+	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
+	    String orgCode = organisation.getCode() == null ? "" : organisation.getCode(); 
+	    responseRow.put("code", StringEscapeUtils.escapeHtml(orgCode));
+	    String orgDescription = organisation.getDescription() == null ? "" : organisation.getDescription(); 
+	    responseRow.put("description", StringEscapeUtils.escapeHtml(orgDescription));
+
+	    rows.put(responseRow);
+	}
+	responcedata.put("rows", rows);
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responcedata.toString()));
+	return null;
+    }
+    
+    private void initServices() {
+	if (userManagementService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServlet().getServletContext());
+	    userManagementService = (UserManagementService) ctx.getBean("userManagementService");
+	}
     }
 }

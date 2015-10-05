@@ -104,7 +104,6 @@
 		<img src="<lams:LAMSURL/>/images/next.png" class="next">
 		<img src="<lams:LAMSURL/>/images/last.png" class="last">
 		<select class="pagesize">
-		<option value="2">2</option>
 			<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
 			<option value="20">20</option>
 			<option value="30">30</option>
