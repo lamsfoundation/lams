@@ -71,19 +71,16 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
-import org.lamsfoundation.lams.tool.imageGallery.dao.ImageCommentDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryConfigItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemVisitDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGallerySessionDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryUserDAO;
-import org.lamsfoundation.lams.tool.imageGallery.dao.ImageRatingDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageVoteDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
@@ -91,9 +88,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemVisitLog;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
@@ -108,8 +103,8 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * @author Andrey Balan
  */
-public class ImageGalleryServiceImpl
-	implements IImageGalleryService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
+public class ImageGalleryServiceImpl implements IImageGalleryService, ToolContentManager, ToolSessionManager,
+	ToolContentImport102Manager {
 
     private final static String MEDIUM_FILENAME_PREFIX = "medium_";
 
@@ -120,10 +115,6 @@ public class ImageGalleryServiceImpl
     private ImageGalleryDAO imageGalleryDao;
 
     private ImageGalleryItemDAO imageGalleryItemDao;
-
-    private ImageCommentDAO imageCommentDao;
-
-    private ImageRatingDAO imageRatingDao;
 
     private ImageVoteDAO imageVoteDao;
 
@@ -155,7 +146,7 @@ public class ImageGalleryServiceImpl
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
-
+    
     private IRatingService ratingService;
 
     private IEventNotificationService eventNotificationService;
@@ -220,19 +211,18 @@ public class ImageGalleryServiceImpl
     public void saveOrUpdateImageGalleryItem(ImageGalleryItem image) {
 	imageGalleryItemDao.saveObject(image);
     }
-
+    
     @Override
     public void deleteImage(Long toolSessionId, Long imageUid) {
 	ImageGallery imageGallery = getImageGalleryBySessionId(toolSessionId);
 	ImageGalleryItem image = getImageGalleryItemByUid(imageUid);
-
+	
 	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
 	imageList.remove(image);
 	imageGallery.setImageGalleryItems(imageList);
 	saveOrUpdateImageGallery(imageGallery);
     }
 
-    @Override
     public ImageVote getImageVoteByImageAndUser(Long imageUid, Long userId) {
 	return imageVoteDao.getImageVoteByImageAndUser(imageUid, userId);
     }
@@ -245,21 +235,6 @@ public class ImageGalleryServiceImpl
     @Override
     public void saveOrUpdateImageVote(ImageVote vote) {
 	imageVoteDao.saveObject(vote);
-    }
-
-    @Override
-    public ImageComment getImageCommentByUid(Long commentUid) {
-	return imageCommentDao.getCommentByUid(commentUid);
-    }
-
-    @Override
-    public void saveImageComment(ImageComment comment) {
-	imageCommentDao.saveObject(comment);
-    }
-
-    @Override
-    public void deleteImageComment(Long uid) {
-	imageCommentDao.removeObject(ImageComment.class, uid);
     }
 
     @Override
@@ -359,7 +334,7 @@ public class ImageGalleryServiceImpl
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
+	if (list == null || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -370,7 +345,7 @@ public class ImageGalleryServiceImpl
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
-
+    
     @Override
     public ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId) {
 
@@ -380,30 +355,29 @@ public class ImageGalleryServiceImpl
 
 	return ratingCriteria;
     }
-
+    
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
     }
-
+    
     @Override
     public int getCountItemsRatedByUser(Long toolContentId, Integer userId) {
 	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
     }
-
+    
     @Override
     public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
 	List<RatingCriteria> ratingCriterias = ratingService.getCriteriasByToolContentId(toolContentId);
 	return ratingCriterias;
     }
-
+    
     @Override
-    public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias,
-	    Long toolContentId) {
+    public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId) {
 	ratingService.saveRatingCriterias(request, oldCriterias, toolContentId);
     }
-
+    
     @Override
     public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingService.isCommentsEnabled(toolContentId);
@@ -427,18 +401,42 @@ public class ImageGalleryServiceImpl
 	    // one new group for one session.
 	    group = new ArrayList<Summary>();
 	    Set<ImageGalleryItem> groupImages = getImagesForGroup(imageGallery, session.getSessionId());
+		
+	    List<ItemRatingDTO> itemRatingDtos = null;
+	    if (imageGallery.isAllowRank()) {
+		// create itemIds list
+		List<Long> itemIds = new LinkedList<Long>();
+		for (ImageGalleryItem image : groupImages) {
+		    itemIds.add(image.getUid());
+		}
+		final Long USER_ID = -1L;
+		final boolean IS_COMMENTS_BY_OTHER_USERS_REQUIRED = true;
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO calculate average ratings based on one session data
+		itemRatingDtos = getRatingCriteriaDtos(contentId, itemIds,
+			IS_COMMENTS_BY_OTHER_USERS_REQUIRED, USER_ID);
+	    }
 
 	    for (ImageGalleryItem image : groupImages) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), image);
+		Summary summary = new Summary(session.getSessionId(), session.getSessionName(), image);
 
-		int numberOfVotes = imageVoteDao.getNumImageVotesByImageUid(image.getUid(), session.getSessionId());
-		sum.setNumberOfVotes(numberOfVotes);
+		if (imageGallery.isAllowVote()) {
+		    int numberOfVotes = imageVoteDao.getNumImageVotesByImageUid(image.getUid(), session.getSessionId());
+		    summary.setNumberOfVotes(numberOfVotes);
+		}
 
-		Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
-		sum.setNumberRatings(((Long) ratingForGroup[0]).intValue());
-		sum.setAverageRating(((Float) ratingForGroup[1]).floatValue());
+		if (imageGallery.isAllowRank()) {
+		    // find corresponding itemRatingDto
+		    ItemRatingDTO itemRatingDto = null;
+		    for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
+			if (itemRatingDtoIter.getItemId().equals(image.getUid())) {
+			    itemRatingDto = itemRatingDtoIter;
+			    break;
+			}
+		    }
+		    summary.setItemRatingDto(itemRatingDto);
+		}
 
-		group.add(sum);
+		group.add(summary);
 	    }
 	    // if there is no any item available, then just put session name into Summary
 	    if (group.size() == 0) {
@@ -455,6 +453,7 @@ public class ImageGalleryServiceImpl
 	List<List<UserImageContributionDTO>> imageSummary = new ArrayList<List<UserImageContributionDTO>>();
 	List<UserImageContributionDTO> group = new ArrayList<UserImageContributionDTO>();
 	ImageGalleryItem image = imageGalleryItemDao.getByUid(imageUid);
+	ImageGallery imageGallery = getImageGalleryByContentId(contentId);
 
 	List<ImageGallerySession> sessionList;
 	if (image.isCreateByAuthor()) {
@@ -467,12 +466,37 @@ public class ImageGalleryServiceImpl
 	for (ImageGallerySession session : sessionList) {
 	    // one new group for one session.
 	    group = new ArrayList<UserImageContributionDTO>();
-	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
+//	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
 
 	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(session.getSessionId());
 	    for (ImageGalleryUser user : users) {
-		UserImageContributionDTO userContribution = createUserContribution(image, user, session,
-			ratingForGroup);
+		
+		//create UserContribution
+		UserImageContributionDTO userContribution = new UserImageContributionDTO(session.getSessionName(), user);
+		
+		if (imageGallery.isAllowVote()) {
+		    int numberOfVotesForImage = imageVoteDao.getNumImageVotesByImageUid(image.getUid(),
+			    session.getSessionId());
+		    userContribution.setNumberOfVotesForImage(numberOfVotesForImage);
+
+		    boolean isVotedForThisImage = false;
+		    ImageVote imageVote = imageVoteDao.getImageVoteByImageAndUser(image.getUid(), user.getUserId());
+		    if (imageVote != null && imageVote.isVoted()) {
+			isVotedForThisImage = true;
+		    }
+		    userContribution.setVotedForThisImage(isVotedForThisImage);
+		}
+
+		if (imageGallery.isAllowRank()) {
+		    // userContribution.setNumberRatings(((Long) ratingForGroup[0]).intValue());
+		    // userContribution.setAverageRating(((Float) ratingForGroup[1]).floatValue());
+
+//		    ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(image.getUid(), user.getUserId());
+//		    if (rating != null) {
+//			userContribution.setRating(rating.getRating());
+//		    }
+		}
+		
 		group.add(userContribution);
 	    }
 
@@ -538,10 +562,10 @@ public class ImageGalleryServiceImpl
 
 	    List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
 
-	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
-	    UserImageContributionDTO userContribution = createUserContribution(image, user, session, ratingForGroup);
-	    userContribution.setImage(image);
-	    userContributionList.add(userContribution);
+//	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
+//	    UserImageContributionDTO userContribution = createUserContribution(image, user, session, ratingForGroup);
+//	    userContribution.setImage(image);
+//	    userContributionList.add(userContribution);
 	    imageList.add(userContributionList);
 	}
 
@@ -561,16 +585,16 @@ public class ImageGalleryServiceImpl
 	    dbImages.addAll(imageGallery.getImageGalleryItems());
 	    for (ImageGalleryItem image : dbImages) {
 		List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
-		Object[] ratingForGroup = getRatingForGroup(image.getUid(), imageSession.getSessionId());
+//		Object[] ratingForGroup = getRatingForGroup(image.getUid(), imageSession.getSessionId());
 
-		List<ImageGalleryUser> userList = imageGalleryUserDao.getBySessionID(imageSession.getSessionId());
-		for (ImageGalleryUser user : userList) {
-		    UserImageContributionDTO userContribution = createUserContribution(image, user, imageSession,
-			    ratingForGroup);
-		    userContribution.setImage(image);
-		    userContributionList.add(userContribution);
-		}
-		imageList.add(userContributionList);
+//		List<ImageGalleryUser> userList = imageGalleryUserDao.getBySessionID(imageSession.getSessionId());
+//		for (ImageGalleryUser user : userList) {
+//		    UserImageContributionDTO userContribution = createUserContribution(image, user, imageSession,
+//			    ratingForGroup);
+//		    userContribution.setImage(image);
+//		    userContributionList.add(userContribution);
+//		}
+//		imageList.add(userContributionList);
 
 	    }
 
@@ -593,8 +617,7 @@ public class ImageGalleryServiceImpl
 
 	    String fileName = file.getFileName();
 
-	    ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(
-		    ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
+	    ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
 	    int mediumImageDimensions = Integer.parseInt(mediumImageDimensionsKey.getConfigValue());
 
 	    // Read the original image from the repository
@@ -609,8 +632,7 @@ public class ImageGalleryServiceImpl
 		    file.getContentType());
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
 
-	    ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(
-		    ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
+	    ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
 	    int thumbnailImageDimensions = Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue());
 
 	    // Read the original image from the repository
@@ -626,17 +648,17 @@ public class ImageGalleryServiceImpl
 	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
 
 	} catch (RepositoryCheckedException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.repository.checked.exception") + ":" + e.toString());
-	    throw new UploadImageGalleryFileException(
-		    messageService.getMessage("error.msg.repository.checked.exception"));
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.repository.checked.exception") + ":"
+		    + e.toString());
+	    throw new UploadImageGalleryFileException(messageService
+		    .getMessage("error.msg.repository.checked.exception"));
 	} catch (NumberFormatException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.number.format.exception") + ":" + e.toString());
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.number.format.exception") + ":"
+		    + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.number.format.exception"));
 	} catch (IOException e) {
-	    ImageGalleryServiceImpl.log
-		    .error(messageService.getMessage("error.msg.io.exception.resizing") + ":" + e.toString());
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.io.exception.resizing") + ":"
+		    + e.toString());
 	    throw new ImageGalleryException(messageService.getMessage("error.msg.io.exception.resizing"));
 	}
     }
@@ -707,14 +729,6 @@ public class ImageGalleryServiceImpl
 	this.imageGalleryItemDao = imageGalleryItemDao;
     }
 
-    public void setImageCommentDao(ImageCommentDAO imageCommentDao) {
-	this.imageCommentDao = imageCommentDao;
-    }
-
-    public void setImageRatingDao(ImageRatingDAO imageRatingDao) {
-	this.imageRatingDao = imageRatingDao;
-    }
-
     public void setImageVoteDao(ImageVoteDAO imageVoteDao) {
 	this.imageVoteDao = imageVoteDao;
     }
@@ -773,8 +787,7 @@ public class ImageGalleryServiceImpl
 	toolContentObj = ImageGallery.newInstance(toolContentObj, toolContentId);
 	Set<ImageGalleryItem> images = toolContentObj.getImageGalleryItems();
 	for (ImageGalleryItem image : images) {
-	    image.setComments(null);
-
+	    
 	    //convert file extension to lower case
 	    String fileName = image.getFileName();
 	    String[] fileNameParts = fileName.split("\\.");
@@ -818,15 +831,15 @@ public class ImageGalleryServiceImpl
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(ImageGalleryImportContentVersionFilter.class);
-
+		
 	    exportContentService.registerFileClassForImport(ImageGalleryAttachment.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, null);
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, imageGalleryToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof ImageGallery)) {
-		throw new ImportToolContentException(
-			"Import ImageGallery tool content failed. Deserialized object is " + toolPOJO);
+		throw new ImportToolContentException("Import ImageGallery tool content failed. Deserialized object is "
+			+ toolPOJO);
 	    }
 	    ImageGallery toolContentObj = (ImageGallery) toolPOJO;
 
@@ -900,7 +913,6 @@ public class ImageGalleryServiceImpl
 	    while (iter.hasNext()) {
 		ImageGalleryItem item = (ImageGalleryItem) iter.next();
 		if (item.isCreateByAuthor()) {
-		    item.getComments().clear();
 		    imageGalleryUserDao.saveObject(item.getCreateBy());
 		    imageGalleryItemDao.saveObject(item);
 		} else {
@@ -908,7 +920,7 @@ public class ImageGalleryServiceImpl
 		}
 	    }
 	}
-
+	
 	imageGalleryDao.saveObject(toContent);
     }
 
@@ -916,7 +928,7 @@ public class ImageGalleryServiceImpl
     public String getToolContentTitle(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).getTitle();
     }
-
+    
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
@@ -930,21 +942,10 @@ public class ImageGalleryServiceImpl
     public boolean isContentEdited(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).isDefineLater();
     }
-
+    
     @Override
-    public boolean isReadOnly(Long toolContentId) {
-	for (ImageGallerySession session : imageGallerySessionDao.getByContentId(toolContentId)) {
-	    if (!imageGalleryUserDao.getBySessionID(session.getSessionId()).isEmpty()) {
-		return true;
-	    }
-	}
-
-	return false;
-    }
-
-    @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
+	    ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
 	if (removeSessionData) {
 	    List list = imageGallerySessionDao.getByContentId(toolContentId);
@@ -960,38 +961,22 @@ public class ImageGalleryServiceImpl
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (ImageGalleryServiceImpl.log.isDebugEnabled()) {
-	    ImageGalleryServiceImpl.log.debug(
-		    "Removing Image Gallery content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Image Gallery content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 	ImageGallery gallery = imageGalleryDao.getByContentId(toolContentId);
 	if (gallery == null) {
-	    ImageGalleryServiceImpl.log
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
-
+	
 	Iterator<ImageGalleryItem> itemIterator = gallery.getImageGalleryItems().iterator();
 	while (itemIterator.hasNext()) {
 	    ImageGalleryItem item = itemIterator.next();
 
-	    Iterator<ImageComment> commentIterator = item.getComments().iterator();
-	    while (commentIterator.hasNext()) {
-		ImageComment comment = commentIterator.next();
-		if (comment.getCreateBy().getUserId().equals(userId.longValue())) {
-		    imageCommentDao.removeObject(ImageComment.class, comment.getUid());
-		    commentIterator.remove();
-		}
-	    }
-
 	    ImageVote vote = imageVoteDao.getImageVoteByImageAndUser(item.getUid(), userId.longValue());
 	    if (vote != null) {
 		imageVoteDao.removeObject(ImageVote.class, vote.getUid());
-	    }
-
-	    ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(item.getUid(), userId.longValue());
-	    if (rating != null) {
-		imageRatingDao.removeObject(ImageRating.class, rating.getUid());
 	    }
 
 	    if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
@@ -1014,21 +999,19 @@ public class ImageGalleryServiceImpl
 	    }
 	}
 
-	for (ImageGallerySession session : imageGallerySessionDao.getByContentId(toolContentId)) {
-	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndSessionID(userId.longValue(),
-		    session.getSessionId());
-	    if (user != null) {
-		NotebookEntry entry = getEntry(user.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ImageGalleryConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    imageGalleryDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
-
-		imageGalleryUserDao.removeObject(ImageGalleryUser.class, user.getUid());
+	ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
+	if (user != null) {
+	    NotebookEntry entry = getEntry(user.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ImageGalleryConstants.TOOL_SIGNATURE, userId);
+	    if (entry != null) {
+		imageGalleryDao.removeObject(NotebookEntry.class, entry.getUid());
 	    }
-	}
-    }
 
+	    imageGalleryUserDao.removeObject(ImageGalleryUser.class, user.getUid());
+	}
+
+    }
+    
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ImageGallerySession session = new ImageGallerySession();
@@ -1064,14 +1047,13 @@ public class ImageGalleryServiceImpl
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
-	    throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
-	    throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
+	    ToolException {
 	return null;
     }
 
@@ -1089,7 +1071,7 @@ public class ImageGalleryServiceImpl
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return imageGalleryOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-
+    
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
@@ -1100,14 +1082,12 @@ public class ImageGalleryServiceImpl
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
-    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
+	    DataMissingException {
 
 	ImageGallery toolContentObj = getImageGalleryByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1194,29 +1174,6 @@ public class ImageGalleryServiceImpl
 	return images;
     }
 
-    @Override
-    @Deprecated
-    public Object[] getRatingForGroup(Long imageUid, Long sessionId) {
-	List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
-	Long numberRatings = new Long(0);
-	Float averageRating = new Float(0);
-	List<ImageRating> ratings = imageRatingDao.getImageRatingsByImageUid(imageUid);
-	for (ImageRating rating : ratings) {
-	    for (ImageGalleryUser user : users) {
-		if (rating.getCreateBy().getUserId().equals(user.getUserId())) {
-		    numberRatings++;
-		    averageRating += rating.getRating();
-		}
-	    }
-	}
-
-	if (!numberRatings.equals(new Long(0))) {
-	    averageRating = averageRating / numberRatings;
-	}
-
-	return new Object[] { numberRatings, averageRating };
-    }
-
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -1243,40 +1200,6 @@ public class ImageGalleryServiceImpl
 	return contentId;
     }
 
-    private UserImageContributionDTO createUserContribution(ImageGalleryItem image, ImageGalleryUser user,
-	    ImageGallerySession session, Object[] ratingForGroup) {
-	UserImageContributionDTO userContribution = new UserImageContributionDTO(session.getSessionName(), user);
-
-	int numberOfVotesForImage = imageVoteDao.getNumImageVotesByImageUid(image.getUid(), session.getSessionId());
-	userContribution.setNumberOfVotesForImage(numberOfVotesForImage);
-	userContribution.setNumberRatings(((Long) ratingForGroup[0]).intValue());
-	userContribution.setAverageRating(((Float) ratingForGroup[1]).floatValue());
-
-	ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(image.getUid(), user.getUserId());
-	if (rating != null) {
-	    userContribution.setRating(rating.getRating());
-	}
-
-	boolean isVotedForThisImage = false;
-	ImageVote imageVote = imageVoteDao.getImageVoteByImageAndUser(image.getUid(), user.getUserId());
-	if ((imageVote != null) && imageVote.isVoted()) {
-	    isVotedForThisImage = true;
-	}
-	userContribution.setVotedForThisImage(isVotedForThisImage);
-
-	Set<ImageComment> dbComments = image.getComments();
-	TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
-	for (ImageComment comment : dbComments) {
-	    if (comment.getCreateBy().getUserId().equals(user.getUserId())) {
-		comments.add(comment);
-	    }
-	}
-	userContribution.setComments(comments);
-
-	return userContribution;
-    }
-
-    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getImageGalleryOutputFactory().getSupportedDefinitionClasses(definitionType);
     }

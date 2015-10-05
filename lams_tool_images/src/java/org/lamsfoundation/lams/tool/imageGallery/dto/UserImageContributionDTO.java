@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.imageGallery.dto;
 
 import java.util.Set;
 
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
  
@@ -44,15 +43,10 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 public class UserImageContributionDTO {
 
     private String sessionName;
-    private float averageRating;
-    private int numberRatings;  
     private int numberOfVotesForImage;
     
     private ImageGalleryUser user;
-    private int rating;
     private boolean isVotedForThisImage;
-    
-    private Set<ImageComment> comments;
     
     //only for export needs
     private ImageGalleryItem image;
@@ -81,44 +75,6 @@ public class UserImageContributionDTO {
     }
     
     /**
-     * Returns image average rating.
-     * 
-     * @return image average rating
-     */
-    public float getAverageRating() {
-	return averageRating;
-    }
-
-    /**
-     * Sets image average rating.
-     * 
-     * @param averageRating
-     *                image average rating
-     */
-    public void setAverageRating(float averageRating) {
-	this.averageRating = averageRating;
-    }
-    
-    /**
-     * Returns image sequence number.
-     * 
-     * @return image sequence number
-     */
-    public int getNumberRatings() {
-	return numberRatings;
-    }
-
-    /**
-     * Sets image number of rates.
-     * 
-     * @param numberRates
-     *                image number of rates
-     */
-    public void setNumberRatings(int numberRatings) {
-	this.numberRatings = numberRatings;
-    }
-    
-    /**
      * Returns image number of votes.
      * 
      * @return image sequence number
@@ -144,14 +100,6 @@ public class UserImageContributionDTO {
     public void setUser(ImageGalleryUser user) {
 	this.user = user;
     }
-
-    public int getRating() {
-	return rating;
-    }
-
-    public void setRating(int rating) {
-	this.rating = rating;
-    }
     
     public boolean isVotedForThisImage() {
 	return isVotedForThisImage;
@@ -160,14 +108,6 @@ public class UserImageContributionDTO {
     public void setVotedForThisImage(boolean isVotedForThisImage) {
 	this.isVotedForThisImage = isVotedForThisImage;
     }    
-
-    public Set<ImageComment> getComments() {
-	return comments;
-    }
-
-    public void setComments(Set<ImageComment> comments) {
-	this.comments = comments;
-    }
     
     public ImageGalleryItem getImage() {
 	return image;

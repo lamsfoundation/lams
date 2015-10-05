@@ -373,7 +373,7 @@ public class AuthoringAction extends Action {
 	    ImageGalleryItem delAtt = (ImageGalleryItem) iter.next();
 	    iter.remove();
 	}
-
+	
 	// **********************************************
 	// finally persist imageGalleryPO again
 	service.saveOrUpdateImageGallery(imageGalleryPO);

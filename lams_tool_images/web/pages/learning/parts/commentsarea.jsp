@@ -19,14 +19,16 @@
 		var pathToImageFolder = "${lams}images/css/";
 		
 		//vars for rating.js
-		var MAX_RATES = ${imageGallery.maximumRates},
+		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.commentsMinWordsLimit},
+		MAX_RATES = ${imageGallery.maximumRates},
 		MIN_RATES = ${imageGallery.minimumRates},
-		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.itemRatingDto.commentsMinWordsLimit},
 		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
-		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.itemRatingDto.commentsMinWordsLimit}"/></fmt:message>';
+		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message>';
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 </c:if>
@@ -54,6 +56,14 @@
 </script>
 
 <c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">
+
+	<c:if test="${sessionMap.isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
+		<div class="info rating-info">
+			<fmt:message key="label.minimum.number.words">
+				<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
+			</fmt:message>
+		</div>
+	</c:if>
 
 	<%--Ranking area---------------------------------------%>
 	

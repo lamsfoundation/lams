@@ -25,17 +25,18 @@ package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
@@ -94,7 +95,6 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	// tool output cache
 	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
 	if (names == null) {
-	    ImageGalleryUser user = imageGalleryService.getUserByIDAndSession(learnerId, toolSessionId);
 	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, getToolOutput(
 		    ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, imageGalleryService,
 		    toolSessionId, learnerId));
@@ -137,7 +137,7 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 		if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED)) {
 		    return getNumUploadedImages(user, session);
 		} else if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS)) {
-		    return getNumComments(user, session);
+		    return getNumComments(imageGalleryService, user, session);
 		} else if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES)) {
 		    return getNumVotes(user, session, imageGalleryService);
 		} else if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS)) {
@@ -193,29 +193,38 @@ public class ImageGalleryOutputFactory extends OutputFactory {
     /**
      * Get the number of images for a specific user. Will always return a ToolOutput object.
      */
-    private ToolOutput getNumComments(ImageGalleryUser user, ImageGallerySession session) {
+    private ToolOutput getNumComments(IImageGalleryService imageGalleryService, ImageGalleryUser user,
+	    ImageGallerySession session) {
 	ImageGallery imageGallery = session.getImageGallery();
+	Long contentId = imageGallery.getContentId();
+	
+	Set<ImageGalleryItem> allImages = imageGallery.getImageGalleryItems();
+	List<Long> itemIds = new LinkedList<Long>();
+	for (ImageGalleryItem image : allImages) {
+	    itemIds.add(image.getUid());
+	}
 
 	int countComments = 0;
 	if (user != null) {
-	    Set<ImageGalleryItem> allImages = imageGallery.getImageGalleryItems();
+	    boolean isCommentsByOtherUsersRequired = false;
+	    List<ItemRatingDTO> RatingCriteriaDtos = imageGalleryService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, user.getUserId());
+	    
 	    Iterator<ImageGalleryItem> it = allImages.iterator();
 	    while (it.hasNext()) {
 		ImageGalleryItem image = it.next();
-		Set<ImageComment> imageComments = image.getComments();
-		for (ImageComment comment : imageComments) {
-		    if (user.getUserId().equals(comment.getCreateBy().getUserId())) {
-			countComments++;
-		    }
-		}
+//		Set<ImageComment> imageComments = image.getComments();
+//		for (ImageComment comment : imageComments) {
+//		    if (user.getUserId().equals(comment.getCreateBy().getUserId())) {
+//			countComments++;
+//		    }
+//		}
 	    }
 	} else {
-	    Set<ImageGalleryItem> allImages = imageGallery.getImageGalleryItems();
 	    for (ImageGalleryItem image : allImages) {
-		Set<ImageComment> imageComments = image.getComments();
-		for (ImageComment comment : imageComments) {
-		    countComments++;
-		}
+//		Set<ImageComment> imageComments = image.getComments();
+//		for (ImageComment comment : imageComments) {
+//		    countComments++;
+//		}
 	    }
 	}
 
@@ -228,7 +237,6 @@ public class ImageGalleryOutputFactory extends OutputFactory {
      */
     private ToolOutput getNumVotes(ImageGalleryUser user, ImageGallerySession session,
 	    IImageGalleryService imageGalleryService) {
-	ImageGallery imageGallery = session.getImageGallery();
 
 	int countVotes = 0;
 	if (user != null) {
