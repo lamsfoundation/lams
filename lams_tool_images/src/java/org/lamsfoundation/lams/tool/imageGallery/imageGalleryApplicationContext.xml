@@ -28,16 +28,6 @@
             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
-    <bean id="laimagImageCommentDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageCommentDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>   
-    <bean id="laimagImageRatingDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageRatingDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
     <bean id="laimagImageVoteDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageVoteDAOHibernate">
         <property name="sessionFactory">
             <ref bean="coreSessionFactory"/>
@@ -65,9 +55,8 @@
         <property name="sessionFactory">
             <ref bean="coreSessionFactory"/>
         </property>
-    </bean>    
-
-
+    </bean>
+    
     <!-- Managers -->
 	<bean id="laimagImageGalleryToolContentHandler" class="org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler">
 	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
@@ -79,13 +68,7 @@
         </property>
         <property name="imageGalleryItemDao">
             <ref bean="laimagImageGalleryItemDao"/>
-        </property>
-        <property name="imageCommentDao">
-            <ref bean="laimagImageCommentDao"/>
-        </property>
-        <property name="imageRatingDao">
-            <ref bean="laimagImageRatingDao"/>
-        </property>       
+        </property>     
         <property name="imageVoteDao">
             <ref bean="laimagImageVoteDao"/>
         </property>          
@@ -126,7 +109,6 @@
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		<property name="ratingService"><ref bean="ratingService"/></property>
 		<property name="imageGalleryOutputFactory"><ref bean="imageGalleryOutputFactory"/></property> 
-				
     </bean>
 
     <bean id="laimagImageGalleryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

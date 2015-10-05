@@ -42,7 +42,6 @@ public class ImageGalleryConstants {
     public static final String PARAM_IMAGE_INDEX = "imageIndex";
     public static final String PARAM_IMAGE_UID = "imageUid";
     public static final String PARAM_TITLE = "title";
-    public static final String PARAM_COMMENTS = "comments";
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
     public static final String PARAM_IS_VOTED = "isVoted";
     public static final String PARAM_IS_AUTHOR = "isAuthor";
@@ -69,20 +68,17 @@ public class ImageGalleryConstants {
     public static final String ATTR_TITLE = "title";
     public static final String ATTR_INSTRUCTIONS = "instructions";
     public static final String ATTR_USER_FINISHED = "userFinished";
-    public static final String ATTR_COMMENT_UID = "commentUid";
-    public static final String ATTR_COMMENT = "comment";
     public static final String ATTR_CURRENT_IMAGE_UID = "currentImageUid";
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
     public static final String ATTR_MEDIUM_IMAGE_DIMENSIONS = "mediumImageDimensions";
     public static final String ATTR_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
     public static final String ATTR_RATING_DTOS = "ratingDtos";
-    
+
     // error message keys
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT_FOR = "error.resource.image.not.alowed.format.for";
     public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
-    public static final String ERROR_MSG_COMMENT_BLANK = "error.resource.image.comment.blank";
     public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
     public static final String ERROR_MSG_REQUIRED_FIELDS_MISSING = "error.required.fields.missing";
     public static final String ERROR_MSG_ENTERED_VALUES_NOT_INTEGERS = "error.entered.values.not.integers";
@@ -93,7 +89,8 @@ public class ImageGalleryConstants {
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
     public static final String ATTR_REFLECT_LIST = "reflectList";
     public static final String ATTR_USER_UID = "userUid";
-    
+    public static final String ATTR_IS_COMMENTS_ENABLED = "isCommentsEnabled";
+
     public static final String DEFUALT_PROTOCOL_REFIX = "http://";
     public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 }

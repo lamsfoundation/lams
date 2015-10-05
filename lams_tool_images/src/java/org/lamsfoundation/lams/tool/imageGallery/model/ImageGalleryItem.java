@@ -76,9 +76,6 @@ public class ImageGalleryItem implements Cloneable {
     private String fileName;
 
     private String fileType;
-    
-    //Set of user comments
-    private Set comments;
 
     // *************** NON Persist Fields  ********************
     private String attachmentLocalUrl;
@@ -92,14 +89,6 @@ public class ImageGalleryItem implements Cloneable {
     private String titleEscaped;
 
     private String descriptionEscaped;
-    
-    /**
-     * Default contruction method.
-     * 
-     */
-    public ImageGalleryItem() {
-	comments = new HashSet();
-    }  
 
     @Override
     public Object clone() {
@@ -112,19 +101,6 @@ public class ImageGalleryItem implements Cloneable {
 	    if (this.createBy != null) {
 		image.setCreateBy((ImageGalleryUser) this.createBy.clone());
 	    }
-
-	    // clone set of ImageComment
-	    if (comments != null) {
-		Iterator iter = comments.iterator();
-		Set set = new HashSet();
-		while (iter.hasNext()) {
-		    ImageComment comment = (ImageComment) iter.next();
-		    ImageComment newComment = (ImageComment) comment.clone();
-		    // just clone old file without duplicate it in repository
-		    set.add(newComment);
-		}
-		image.comments = set;
-	    }	
 
 	} catch (CloneNotSupportedException e) {
 	    ImageGalleryItem.log.error("When clone " + ImageGalleryItem.class + " failed");
@@ -369,21 +345,6 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setFileName(String name) {
 	this.fileName = name;
-    }
-
-    /**
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date asc"
-     * @hibernate.collection-key column="imageGallery_item_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.imageGallery.model.ImageComment"
-     * 
-     * @return a set of Comments to this Image.
-     */
-    public Set getComments() {
-	return comments;
-    }
-
-    public void setComments(Set comments) {
-	this.comments = comments;
     }
     
     // *************** NON Persist Fields ********************

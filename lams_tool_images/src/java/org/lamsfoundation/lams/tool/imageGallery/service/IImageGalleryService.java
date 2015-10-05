@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
@@ -124,15 +123,6 @@ public interface IImageGalleryService extends ToolRatingManager {
      * @return
      */
     Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId);
-
-    /**
-     * Calculates average rating and number of rating for the current group.
-     * 
-     * @param imageUid
-     * @param sessionId
-     * @return Object[] {numberRatings, averageRating}
-     */
-    Object[] getRatingForGroup(Long imageUid, Long sessionId);
     
     ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
 
@@ -169,28 +159,6 @@ public interface IImageGalleryService extends ToolRatingManager {
      * @return
      */
     ImageGallery getImageGalleryBySessionId(Long sessionId);
-
-    /**
-     * Get imageComment by the given uid.
-     * 
-     * @param commentUid
-     * @return
-     */
-    ImageComment getImageCommentByUid(Long commentUid);
-
-    /**
-     * Updates imageComment by the given uid.
-     * 
-     * @param comment
-     */
-    void saveImageComment(ImageComment comment);
-
-    /**
-     * Delete imageComment by the given uid.
-     * 
-     * @param commentUid
-     */
-    void deleteImageComment(Long uid);
 
     /**
      * Get imageGallery toolSession by toolSessionId

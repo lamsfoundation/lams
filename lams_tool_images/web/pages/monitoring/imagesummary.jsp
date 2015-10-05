@@ -12,16 +12,28 @@
 		<c:set var="imageGallery" value="${sessionMap.imageGallery}" />		
 		
 		<%@ include file="/common/header.jsp"%>
+		<link href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 		
 		<script type="text/javascript">
-			function deleteComment(commentUid) {
-				var	deletionConfirmed = confirm("<fmt:message key="warning.msg.monitoring.do.you.want.to.delete"></fmt:message>");
-
-				if (deletionConfirmed) {
-					window.location.href = "<c:url value='/monitoring/removeComment.do'/>?sessionMapID=${sessionMapID}&commentUid=" + commentUid;
-				}
-			}
+			//var for jquery.jRating.js
+			var pathToImageFolder = "${lams}images/css/";
+		
+			//vars for rating.js
+			var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+			YOUR_RATING_LABEL = '',
+			IS_DISABLED =  true,
+			COMMENTS_MIN_WORDS_LIMIT = 0,
+			MAX_RATES = 0,
+			MIN_RATES = 0,
+			LAMS_URL = '${lams}',
+			COUNT_RATED_ITEMS = 0,
+			COMMENT_TEXTAREA_TIP_LABEL = '',
+			WARN_COMMENTS_IS_BLANK_LABEL = '',
+			WARN_MIN_NUMBER_WORDS_LABEL = '';
 		</script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	</lams:head>
 	
 	<body class="stripes">
@@ -57,63 +69,43 @@
 			</html:form>			
 			<br>
 			
-			<c:forEach var="groupSummary" items="${imageSummary}">
-				<h1><fmt:message key="monitoring.label.group" /> ${groupSummary[0].sessionName}	</h1>
-				
-				<c:choose>
-					<c:when test="${imageGallery.allowRank == true}">
-						<ul>							
-							<li>
-								<fmt:message key="label.monitoring.number.rated" />: ${groupSummary[0].numberRatings}
-							</li>				
-							<li>
-								<fmt:message key="label.monitoring.average.rating" />: ${groupSummary[0].averageRating}
-							</li>
-						</ul>
-						<br>
-					</c:when>
-					<c:when test="${imageGallery.allowVote == true}">
-						<ul>
-							<li>
-								<fmt:message key="label.monitoring.number.votes" />: ${groupSummary[0].numberOfVotesForImage}
-							</li>
-						</ul>
-						<br>						
-					</c:when>
-				</c:choose>			
-				
-				<table cellpadding="0" class="alternative-color" >
+			<c:if test="${imageGallery.allowRank}">
+				<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true"
+						isItemAuthoredByUser="true"
+						maxRates="0" 
+						countRatedItems="0" />
+			</c:if>
 			
-					<tr>
-						<th width="150px">
-							<fmt:message key="label.monitoring.imagesummary.user" />
-						</th>
-						<c:if test="${imageGallery.allowVote}">				
+			<c:if test="${imageGallery.allowVote}">
+			
+				<c:forEach var="groupSummary" items="${imageSummary}">
+					<h1><fmt:message key="monitoring.label.group" /> ${groupSummary[0].sessionName}	</h1>
+				
+					<ul>
+						<li>
+							<fmt:message key="label.monitoring.number.votes" />: ${groupSummary[0].numberOfVotesForImage}
+						</li>
+					</ul>
+					<br>
+				
+					<table cellpadding="0" class="alternative-color" >
+				
+						<tr>
+							<th width="150px">
+								<fmt:message key="label.monitoring.imagesummary.user" />
+							</th>			
 							<th style="padding-left:0px; text-align:center; width: 100px;">
 								<fmt:message key="label.monitoring.imagesummary.voted.for.this.image" />
 							</th>
-						</c:if>
-						<c:if test="${imageGallery.allowRank}">					
-							<th style="padding-left:0px; text-align:center; width: 100px;">
-								<fmt:message key="label.monitoring.imagesummary.rating" />
-							</th>
-						</c:if>						
-						<c:if test="${imageGallery.allowCommentImages}">
-							<th >
-								<fmt:message key="label.monitoring.imagesummary.comments" />
-							</th>
-						</c:if>			
-					</tr>
+						</tr>
 				
-				
-					<c:forEach var="userImageContribution" items="${groupSummary}">
-					
-						<tr>
-							<td>
-								<c:out value="${userImageContribution.user.firstName} ${userImageContribution.user.lastName}" escapeXml="true"/>
-							</td>
-							
-							<c:if test="${imageGallery.allowVote}">								
+						<c:forEach var="userImageContribution" items="${groupSummary}">
+						
+							<tr>
+								<td>
+									<c:out value="${userImageContribution.user.firstName} ${userImageContribution.user.lastName}" escapeXml="true"/>
+								</td>
+													
 								<td style="padding-left:0px; text-align:center;">
 									<c:choose>
 										<c:when test="${userImageContribution.votedForThisImage}">
@@ -125,46 +117,13 @@
 										</c:otherwise>
 									</c:choose>
 								</td>
-							</c:if>
-							
-							<c:if test="${imageGallery.allowRank}">								
-								<td style="padding-left:0px; text-align:center;">
-									${userImageContribution.rating}
-								</td>
-							</c:if>
-										
-							<c:if test="${imageGallery.allowCommentImages}">
-								<td>
 								
-									<ul>
-										<c:forEach var="comment" items="${userImageContribution.comments}">
-											<li>
-												<c:out value="${comment.comment}" escapeXml="false" />
-												
-												<c:set var="editCommentUrl" >
-													<c:url value='/monitoring/editComment.do'/>?sessionMapID=${sessionMapID}&commentUid=${comment.uid}&TB_iframe=true&height=300&width=300
-												</c:set>		
-												<a href="${editCommentUrl}" class="thickbox" style="margin-left: 20px;"> 
-													<img src="<html:rewrite page='/includes/images/edit.gif'/>" 
-															title="<fmt:message key="label.authoring.basic.resource.edit" />" style="border-style: none;"/>
-												</a>
-		
-												<a href="#" style="margin-left: 15px;" id="removeCommentLink" onclick="deleteComment(${comment.uid});" >
-													<img src="<html:rewrite page='/includes/images/cross.gif'/>" 												 
-															title="<fmt:message key="label.authoring.basic.resource.delete" />" style="border-style: none;"/>												
-												</a>
-											</li>
-										</c:forEach>
-									</ul>
-									
-								</td>
-							</c:if>
-								
-						</tr>
-					</c:forEach>
-				</table>
-			
-			</c:forEach>
+							</tr>
+						</c:forEach>
+					</table>
+				
+				</c:forEach>
+			</c:if>
 			<br>
 			
 			<lams:ImgButtonWrapper>
