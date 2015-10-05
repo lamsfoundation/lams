@@ -64,16 +64,6 @@
 	</label>
 </p>
 
-<!-- 
-<p>
-	<html:checkbox property="imageGallery.allowCommentImages" styleClass="noBorder" styleId="allowCommentImages">
-	</html:checkbox>
-	<label for="allowCommentImages">
-		<fmt:message key="label.authoring.advance.allow.learner.comment.images" />
-	</label>
-</p>
- -->
-
 <p>
 	<html:checkbox property="allowRatingsOrVote" styleClass="noBorder" styleId="allowRatingsOrVote"
 		onclick="allowRatingsOrVoteClicked();"
@@ -118,11 +108,9 @@
 </p>
 
 <p>
-	<html:textarea property="imageGallery.reflectInstructions"
-		styleId="reflectInstructions" cols="30" rows="3" />
+	<html:textarea property="imageGallery.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
 </p>
 <script type="text/javascript">
-<!--
 //automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflectInstructions");
 	var rao = document.getElementById("reflectOn");
@@ -137,5 +125,4 @@
 	}
 
 	ra.onkeyup=turnOnRefect;
-//-->
 </script>

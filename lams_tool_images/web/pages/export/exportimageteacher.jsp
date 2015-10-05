@@ -111,26 +111,6 @@
 							</c:choose>
 						</td>
 					</c:if>
-									
-					<c:if test="${imageGallery.allowRank}">								
-						<td style="padding-left:0px; text-align:center;">
-							${userContribution.rating}
-						</td>
-					</c:if>
-												
-					<c:if test="${imageGallery.allowCommentImages}">
-						<td>
-										
-							<ul>
-								<c:forEach var="comment" items="${userContribution.comments}">
-									<li>
-										<c:out value="${comment.comment}" escapeXml="false" />
-									</li>
-								</c:forEach>
-							</ul>
-											
-						</td>
-					</c:if>
 										
 				</tr>
 										

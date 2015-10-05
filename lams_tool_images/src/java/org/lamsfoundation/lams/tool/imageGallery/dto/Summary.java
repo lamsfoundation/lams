@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.dto;
 
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 
 /**
@@ -54,8 +55,7 @@ public class Summary {
     private String itemTitle;
     private String username;
     private int numberOfVotes;
-    private float averageRating;
-    private int numberRatings;    
+    private ItemRatingDTO itemRatingDto;
 
     // following is used for export portfolio programs:
     private Long fileUuid;
@@ -200,41 +200,17 @@ public class Summary {
     }  
     
     /**
-     * Returns image average rating.
-     * 
-     * @return image average rating
+     * @return itemRatingDto
      */
-    public float getAverageRating() {
-	return averageRating;
+    public ItemRatingDTO getItemRatingDto() {
+	return itemRatingDto;
     }
 
     /**
-     * Sets image average rating.
-     * 
-     * @param averageRating
-     *                image average rating
+     * @param itemRatingDto
      */
-    public void setAverageRating(float averageRating) {
-	this.averageRating = averageRating;
-    }
-    
-    /**
-     * Returns image sequence number.
-     * 
-     * @return image sequence number
-     */
-    public int getNumberRatings() {
-	return numberRatings;
-    }
-
-    /**
-     * Sets image number of rates.
-     * 
-     * @param numberRates
-     *                image number of rates
-     */
-    public void setNumberRatings(int numberRatings) {
-	this.numberRatings = numberRatings;
+    public void setItemRatingDto(ItemRatingDTO itemRatingDto) {
+	this.itemRatingDto = itemRatingDto;
     }
 
     public Long getFileUuid() {

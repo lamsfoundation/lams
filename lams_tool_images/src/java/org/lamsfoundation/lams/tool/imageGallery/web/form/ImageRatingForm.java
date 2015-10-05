@@ -35,8 +35,7 @@ public class ImageRatingForm extends ActionForm {
 
     private static final long serialVersionUID = -8962161058929959289L;
 
-    private String sessionMapID;    
-    private String rating;
+    private String sessionMapID;
     private boolean vote;
     
     public String getSessionMapID() {
@@ -45,14 +44,6 @@ public class ImageRatingForm extends ActionForm {
 
     public void setSessionMapID(String sessionMapID) {
 	this.sessionMapID = sessionMapID;
-    }     
-    
-    public String getRating() {
-	return rating;
-    }
-
-    public void setRating(String rating) {
-	this.rating = rating;
     }
     
     public boolean getVote() {

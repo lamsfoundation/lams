@@ -164,14 +164,6 @@
 			parameter="loadImageData">
 			<forward name="success" path="/pages/learning/parts/commentsarea.jsp" />
 		</action>
-		<action path="/learning/addNewComment"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
-			parameter="addNewComment"
-			name="imageCommentForm" 
-			scope="request" 
-			validate="false">			
-			<forward name="success" path="/pages/learning/parts/commentsarea.jsp" />
-		</action>
 		<action path="/learning/vote"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
 			parameter="vote"
@@ -256,29 +248,7 @@
 			scope="request" 
 			validate="false">
 			<forward name="success" path="/pages/monitoring/start.jsp" />
-		</action>
-		<action path="/monitoring/editComment"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="editComment"
-			name="imageCommentForm" 
-			scope="request" 
-			validate="false">
-			<forward name="success" path="/pages/monitoring/parts/editcomment.jsp" />
-		</action>
-		<action path="/monitoring/saveComment"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="saveComment"
-			name="imageCommentForm" 
-			scope="request" 
-			validate="false">
-			<forward name="comment" path="/pages/monitoring/parts/editcomment.jsp" />
-			<forward name="success" path="/pages/monitoring/startimagesummary.jsp" />
-		</action>
-		<action path="/monitoring/removeComment"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="removeComment">
-			<forward name="success" path="/pages/monitoring/startimagesummary.jsp" />
-		</action>				
+		</action>			
 		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
 			parameter="listuser" >

@@ -55,9 +55,7 @@ public class ImageGallery implements Cloneable {
     // advance
 
     private boolean allowVote;
-
-    private boolean allowCommentImages;
-
+    
     private boolean allowShareImages;
 
     private boolean lockWhenFinished;
@@ -365,17 +363,6 @@ public class ImageGallery implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isAllowCommentImages() {
-	return allowCommentImages;
-    }
-
-    public void setAllowCommentImages(boolean allowCommentImages) {
-	this.allowCommentImages = allowCommentImages;
     }
 
     /**
