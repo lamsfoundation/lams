@@ -88,7 +88,7 @@ function initializeJRating() {
     			idBox: commentsCriteriaId + '-' + itemId, 
     			comment: comment,
     			hasRatingLimits: HAS_RATING_LIMITS,
-    			maxRatingsForItem: MAX_RATINGS_FOR_ITEM
+    			maxRatingsForItem: maxRatingsForItem
     		},
     		success: function(data, textStatus) {
     			if ( data.error ) {
