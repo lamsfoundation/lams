@@ -53,18 +53,8 @@
 				jQuery(".min-words-limit-enabled").each(function() {
 					
 					var questionId = (${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}) ? "" : $(this).data("sequence-id");
-					var isCkeditor = $(this).data("is-ckeditor");
-					
-					var value;
-					var instance;
-					if (isCkeditor) {
-						instance = CKEDITOR.instances["answer" + questionId];
-					    value = CKEDITOR.instances["answer" + questionId].getData();
-					    
-					} else {
-						instance = $("#answer"+ questionId);
-						value =  $("#answer"+ questionId).val();
-					}
+					var instance = $("#answer"+ questionId);
+					var value =  $("#answer"+ questionId).val();
 					
 					var numberEnteredWords = getNumberOfWords(value); 
 					
