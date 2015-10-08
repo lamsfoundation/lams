@@ -56,8 +56,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request"
- *                name="monitoringForm" validate="false"
+ * @struts.action path="/monitoring" parameter="dispatch" scope="request" name="monitoringForm" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * 
@@ -66,154 +65,147 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class MonitoringAction extends LamsDispatchAction {
 
-	private static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static Logger log = Logger.getLogger(MonitoringAction.class);
 
-	public IScribeService scribeService;
+    public IScribeService scribeService;
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		log.info("excuting monitoring action");
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	log.info("excuting monitoring action");
 
-		Long toolContentID = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
-		String contentFolderID = WebUtil.readStrParam(request,
-				AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		MonitoringForm monForm = (MonitoringForm)form;
-		monForm.setContentFolderID(contentFolderID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	MonitoringForm monForm = (MonitoringForm) form;
+	monForm.setContentFolderID(contentFolderID);
 
-		monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
-		
-		// set up scribeService
-		if (scribeService == null) {
-			scribeService = ScribeServiceProxy.getScribeService(this.getServlet()
-					.getServletContext());
-		}
-		Scribe scribe = scribeService.getScribeByContentId(toolContentID);
-			
-		ScribeDTO scribeDTO = setupScribeDTO(scribe);
-		boolean isGroupedActivity = scribeService.isGroupedActivity(toolContentID);
-		request.setAttribute("isGroupedActivity", isGroupedActivity);
-		request.setAttribute("monitoringDTO", scribeDTO);
-		request.setAttribute("contentFolderID", contentFolderID);
-		
-		return mapping.findForward("success");
+	monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+
+	// set up scribeService
+	if (scribeService == null) {
+	    scribeService = ScribeServiceProxy.getScribeService(this.getServlet().getServletContext());
 	}
-	
-	public ActionForward openNotebook(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		
-		Long uid = WebUtil.readLongParam(request, "uid", false);
-		
-		ScribeUser scribeUser = scribeService.getUserByUID(uid);
-		NotebookEntry notebookEntry = scribeService.getEntry(scribeUser.getScribeSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue());
-		
-		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-		scribeUserDTO.setNotebookEntry(notebookEntry.getEntry());
-		
-		request.setAttribute("scribeUserDTO", scribeUserDTO);
-		
-		return mapping.findForward("notebook");
-	}
+	Scribe scribe = scribeService.getScribeByContentId(toolContentID);
 
-	public ActionForward appointScribe(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		
-		MonitoringForm monForm = (MonitoringForm)form;
-		
-		ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
-		ScribeUser user = scribeService.getUserByUID(monForm.getAppointedScribeUID());
-		
-		session.setAppointedScribe(user);
-		scribeService.saveOrUpdateScribeSession(session);
-		
-		ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
-		
-		request.setAttribute("monitoringDTO", scribeDTO);
-		request.setAttribute("contentFolderID", monForm.getContentFolderID());
-		
-		monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
-		
-		return mapping.findForward("success");
-	}
-	
-	
-	public ActionForward forceCompleteActivity(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+	ScribeDTO scribeDTO = setupScribeDTO(scribe);
+	boolean isGroupedActivity = scribeService.isGroupedActivity(toolContentID);
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+	request.setAttribute("monitoringDTO", scribeDTO);
+	request.setAttribute("contentFolderID", contentFolderID);
 
-		MonitoringForm monForm = (MonitoringForm)form;
+	return mapping.findForward("success");
+    }
 
-		ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
-		session.setForceComplete(true);
-		scribeService.saveOrUpdateScribeSession(session);
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-		ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
-		request.setAttribute("monitoringDTO", scribeDTO);
-		request.setAttribute("contentFolderID", monForm.getContentFolderID());
-		
-		return mapping.findForward("success");
-	}
-	/* Private Methods */
+	Long uid = WebUtil.readLongParam(request, "uid", false);
 
-	private ScribeDTO setupScribeDTO(Scribe scribe) {
-		ScribeDTO scribeDTO = new ScribeDTO(scribe);
+	ScribeUser scribeUser = scribeService.getUserByUID(uid);
+	NotebookEntry notebookEntry = scribeService.getEntry(scribeUser.getScribeSession().getSessionId(),
+		CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue());
 
-		for (Iterator sessIter = scribe.getScribeSessions().iterator(); sessIter
-				.hasNext();) {
-			ScribeSession session = (ScribeSession) sessIter.next();
+	ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
+	scribeUserDTO.setNotebookEntry(notebookEntry.getEntry());
 
-			ScribeSessionDTO sessionDTO = new ScribeSessionDTO(session);
-			int numberOfVotes = 0;
-			
-			for (Iterator userIter = session.getScribeUsers().iterator(); userIter
-					.hasNext();) {
-				ScribeUser user = (ScribeUser) userIter.next();
-				ScribeUserDTO userDTO = new ScribeUserDTO(user);
-								
-				// get the notebook entry.
-				NotebookEntry notebookEntry = scribeService.getEntry(session.getSessionId(),
-						CoreNotebookConstants.NOTEBOOK_TOOL,
-						ScribeConstants.TOOL_SIGNATURE, user.getUserId()
-								.intValue());
-				if (notebookEntry != null) {
-					userDTO.finishedReflection = true;
-				} else {
-					userDTO.finishedReflection = false;
-				}
-				
-				if (user.isReportApproved()) {
-					numberOfVotes++;
-				}
-				
-				sessionDTO.getUserDTOs().add(userDTO);
-			}
-			int numberOfLearners = session.getScribeUsers().size();
-			
-			sessionDTO.setNumberOfVotes(numberOfVotes);
-			sessionDTO.setNumberOfLearners(numberOfLearners);
-			sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners));
-			scribeDTO.getSessionDTOs().add(sessionDTO);
-		}
-		
-		return scribeDTO;
-		
-	}
-	
-	private ScribeUser getCurrentUser(Long toolSessionID) {
-		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
-				AttributeNames.USER);
+	request.setAttribute("scribeUserDTO", scribeUserDTO);
 
-		// attempt to retrieve user using userId and toolSessionID
-		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(new Long(
-				user.getUserID().intValue()), toolSessionID);
+	return mapping.findForward("notebook");
+    }
 
-		if (scribeUser == null) {
-			ScribeSession scribeSession = scribeService
-					.getSessionBySessionId(toolSessionID);
-			scribeUser = scribeService.createScribeUser(user, scribeSession);
+    public ActionForward appointScribe(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	MonitoringForm monForm = (MonitoringForm) form;
+
+	ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
+	ScribeUser user = scribeService.getUserByUID(monForm.getAppointedScribeUID());
+
+	session.setAppointedScribe(user);
+	scribeService.saveOrUpdateScribeSession(session);
+
+	ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
+	boolean isGroupedActivity = scribeService.isGroupedActivity(session.getScribe().getToolContentId());
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+	request.setAttribute("monitoringDTO", scribeDTO);
+	request.setAttribute("contentFolderID", monForm.getContentFolderID());
+
+	monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+
+	return mapping.findForward("success");
+    }
+
+    public ActionForward forceCompleteActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	MonitoringForm monForm = (MonitoringForm) form;
+
+	ScribeSession session = scribeService.getSessionBySessionId(monForm.getToolSessionID());
+	session.setForceComplete(true);
+	scribeService.saveOrUpdateScribeSession(session);
+
+	ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
+	request.setAttribute("monitoringDTO", scribeDTO);
+	request.setAttribute("contentFolderID", monForm.getContentFolderID());
+
+	return mapping.findForward("success");
+    }
+
+    /* Private Methods */
+
+    private ScribeDTO setupScribeDTO(Scribe scribe) {
+	ScribeDTO scribeDTO = new ScribeDTO(scribe);
+
+	for (Iterator sessIter = scribe.getScribeSessions().iterator(); sessIter.hasNext();) {
+	    ScribeSession session = (ScribeSession) sessIter.next();
+
+	    ScribeSessionDTO sessionDTO = new ScribeSessionDTO(session);
+	    int numberOfVotes = 0;
+
+	    for (Iterator userIter = session.getScribeUsers().iterator(); userIter.hasNext();) {
+		ScribeUser user = (ScribeUser) userIter.next();
+		ScribeUserDTO userDTO = new ScribeUserDTO(user);
+
+		// get the notebook entry.
+		NotebookEntry notebookEntry = scribeService.getEntry(session.getSessionId(),
+			CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, user.getUserId()
+				.intValue());
+		if (notebookEntry != null) {
+		    userDTO.finishedReflection = true;
+		} else {
+		    userDTO.finishedReflection = false;
 		}
 
-		return scribeUser;
+		if (user.isReportApproved()) {
+		    numberOfVotes++;
+		}
+
+		sessionDTO.getUserDTOs().add(userDTO);
+	    }
+	    int numberOfLearners = session.getScribeUsers().size();
+
+	    sessionDTO.setNumberOfVotes(numberOfVotes);
+	    sessionDTO.setNumberOfLearners(numberOfLearners);
+	    sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners));
+	    scribeDTO.getSessionDTOs().add(sessionDTO);
 	}
+
+	return scribeDTO;
+
+    }
+
+    private ScribeUser getCurrentUser(Long toolSessionID) {
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	// attempt to retrieve user using userId and toolSessionID
+	ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionID);
+
+	if (scribeUser == null) {
+	    ScribeSession scribeSession = scribeService.getSessionBySessionId(toolSessionID);
+	    scribeUser = scribeService.createScribeUser(user, scribeSession);
+	}
+
+	return scribeUser;
+    }
 }

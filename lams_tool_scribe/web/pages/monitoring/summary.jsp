@@ -31,7 +31,7 @@
 	</c:if>
 
 	<c:choose>
-		<c:when test="${not empty session.userDTOs}">
+		<c:when test="${not empty session.userDTOs and (not dto.autoSelectScribe or session.appointedScribe != null)}">
 			<html:form action="/monitoring">
 	
 				<html:hidden property="toolSessionID" value="${session.sessionID}" />
@@ -50,7 +50,7 @@
 				</html:select>
 	
 				<html:submit styleClass="button">
-					<fmt:message key="button.submit" />
+					<fmt:message key="button.select" />
 				</html:submit>
 	
 			</html:form>
