@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -886,18 +887,12 @@ public class LearningAction extends Action {
 			&& (question.getMinWordsLimit() > 0)) {
 
 		    String answer = new String(question.getAnswerString());
-		    
-		    // HTML tags stripping
-		    if (question.isAllowRichEditor()) {
-			answer = WebUtil.removeHTMLtags(answer); // answer.replaceAll("/<\/?[a-z][^>]*>/gi", '');
-		    } else {
-			answer = answer.replaceAll("(?:<BR>)", " ");
-		    }
-		    
-		   int wordCount = (answer.length() == 0) ? 0 : answer.replaceAll("[\'\";:,\\.\\?\\-!]+", "").split("\\S+").length;//.match(/\S+/g) || []) ;
+
+		    boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(answer,
+			    question.getMinWordsLimit(), question.isAllowRichEditor());
 
 		    // check min words limit is reached
-		    if (wordCount < question.getMinWordsLimit()) {
+		    if (!isMinWordsLimitReached) {
 			isAllQuestionsReachedMinWordsLimit = false;
 			break;
 		    }
