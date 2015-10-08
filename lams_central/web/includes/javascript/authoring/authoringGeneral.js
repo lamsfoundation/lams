@@ -1754,22 +1754,6 @@ GeneralLib = {
 						activity = this.activity;
 					
 					if (activity) {
-						if (activityData.applyGrouping) {
-							$.each(layout.activities, function(){
-								if (this instanceof ActivityDefs.GroupingActivity
-										&& this.groupingID == activityData.groupingID) {
-									// add reference and redraw the grouped activity
-									if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
-										activity.branchingActivity.grouping = this;
-									} else {
-										activity.grouping = this;
-										activity.draw();
-									}
-									return false;
-								}
-							});
-						}
-						
 						if (layout.floatingActivity && layout.floatingActivity.id == activityData.parentActivityID) {
 							// add a Tool Activity as a Floating Activity element
 							if (!layout.floatingActivity.childActivities) {
@@ -1805,6 +1789,35 @@ GeneralLib = {
 								}
 							});
 						}
+					}
+				});
+				
+				// apply existing groupings 
+				$.each(ld.activities, function(){
+					var activityData = this,
+						activity = this.activity;
+					
+					if (activity && activityData.applyGrouping) {
+						$.each(layout.activities, function(){
+							if (this instanceof ActivityDefs.GroupingActivity
+									&& this.groupingID == activityData.groupingID) {
+								var grouping = this;
+								// add reference and redraw the grouped activity
+								if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+									activity.branchingActivity.grouping = grouping;
+								} else if (activity instanceof ActivityDefs.ParallelActivity) {
+									$.each(activity.childActivities, function(){
+										this.grouping = grouping;
+									});
+									activity.grouping = grouping;
+									activity.draw();
+								} else {
+									activity.grouping = grouping;
+									activity.draw();
+								}
+								return false;
+							}
+						});
 					}
 				});
 				
