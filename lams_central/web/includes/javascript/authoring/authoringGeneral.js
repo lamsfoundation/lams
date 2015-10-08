@@ -1609,6 +1609,8 @@ GeneralLib = {
 									activityData.xCoord,
 									activityData.yCoord,
 									activityData.activityTitle);
+							// for later reference
+							activityData.activity = activity;
 							break;
 							
 						// Optional Activity
@@ -1753,17 +1755,15 @@ GeneralLib = {
 					
 					if (activity) {
 						if (activityData.applyGrouping) {
-							var groupedActivity = activityData.activity;
-							
 							$.each(layout.activities, function(){
 								if (this instanceof ActivityDefs.GroupingActivity
 										&& this.groupingID == activityData.groupingID) {
 									// add reference and redraw the grouped activity
-									if (groupedActivity instanceof ActivityDefs.BranchingEdgeActivity) {
-										groupedActivity.branchingActivity.grouping = this;
+									if (activity instanceof ActivityDefs.BranchingEdgeActivity) {
+										activity.branchingActivity.grouping = this;
 									} else {
-										groupedActivity.grouping = this;
-										groupedActivity.draw();
+										activity.grouping = this;
+										activity.draw();
 									}
 									return false;
 								}
