@@ -1,9 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="dto" value="${requestScope.monitoringDTO}" />
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
-<!--
-function confirmForceComplete() {
+	function confirmForceComplete() {
 		var message = "<fmt:message key='message.confirmForceComplete'/>";
 		if (confirm(message)) {
 			return true;			
@@ -11,15 +11,14 @@ function confirmForceComplete() {
 			return false;
 		}
 	}
-//-->
 </script>
 
-<c:set var="dto" value="${requestScope.monitoringDTO}" />
+<h1>
+	<c:out value="${monitoringDTO.title}" escapeXml="true"/>
+</h1>
 
-
-<h1><c:out value="${monitoringDTO.title}" escapeXml="true"/></h1>
 <div class="instructions space-top">
-<c:out value="${monitoringDTO.instructions}" escapeXml="false"/>
+	<c:out value="${monitoringDTO.instructions}" escapeXml="false"/>
 </div>
 
 <br/>
@@ -32,81 +31,74 @@ function confirmForceComplete() {
 	</c:if>
 
 	<c:choose>
-		<c:when
-			test="${(not dto.autoSelectScribe) and  session.appointedScribe eq null}">
-
-			<c:choose>
-				<c:when test="${not empty session.userDTOs}">
-					<html:form action="/monitoring">
-
-						<html:hidden property="toolSessionID" value="${session.sessionID}" />
-						<html:hidden property="dispatch" value="appointScribe" />
-						<html:hidden property="contentFolderID" />
-						<html:hidden property="currentTab" styleId="currentTab" />
-
-						<fmt:message key="heading.selectScribe" />
-
-						<html:select property="appointedScribeUID"
-							style="min-width: 150px;">
-							<c:forEach var="user" items="${session.userDTOs}">
-								<html:option value="${user.uid}">
-												${user.firstName} ${user.lastName}
-											</html:option>
-							</c:forEach>
-						</html:select>
-
-						<html:submit styleClass="button">
-							<fmt:message key="button.submit" />
-						</html:submit>
-
-					</html:form>
-				</c:when>
-
-				<c:otherwise>
-					<p>
-						<fmt:message key="message.noLearners" />
-					</p>
-				</c:otherwise>
-			</c:choose>
+		<c:when test="${not empty session.userDTOs and (not dto.autoSelectScribe or session.appointedScribe != null)}">
+			<html:form action="/monitoring">
+	
+				<html:hidden property="toolSessionID" value="${session.sessionID}" />
+				<html:hidden property="dispatch" value="appointScribe" />
+				<html:hidden property="contentFolderID" />
+				<html:hidden property="currentTab" styleId="currentTab" />
+	
+				<fmt:message key="heading.selectScribe" />
+	
+				<html:select property="appointedScribeUID" style="min-width: 150px;">
+					<c:forEach var="user" items="${session.userDTOs}">
+						<html:option value="${user.uid}">
+							${user.firstName} ${user.lastName}
+						</html:option>
+					</c:forEach>
+				</html:select>
+	
+				<html:submit styleClass="button">
+					<fmt:message key="button.select" />
+				</html:submit>
+	
+			</html:form>
+			<br>
 		</c:when>
-
+	
 		<c:otherwise>
-			<b>
-				<fmt:message key="heading.appointedScribe" />: <c:out value="${session.appointedScribe}" escapeXml="true"/>
-			</b>
-
-			<c:set var="scribeSessionDTO" value="${session}" scope="request">
-			</c:set>
-
-			<div class="field-name">
-				<fmt:message key="heading.report" />
-			</div>
-			<hr />
-			<c:forEach var="report" items="${session.reportDTOs}">
-				<p>
-					<c:out value="${report.headingDTO.headingText}" escapeXml="false" />
-				</p>
-				<p>
-					<lams:out value="${report.entryText}" escapeHtml="true"/>
-				</p>
-				<hr />
-			</c:forEach>
-
-			<%@include file="/pages/parts/voteDisplay.jsp"%>
-
-			<c:if test="${session.forceComplete eq false}">
-				<html:form action="monitoring" onsubmit="return confirmForceComplete();">
-					<html:hidden property="dispatch" value="forceCompleteActivity" />
-					<html:hidden property="toolSessionID" value="${session.sessionID}" />
-					<html:hidden property="contentFolderID" />
-					<html:submit styleClass="button">
-						<fmt:message key="button.forceComplete" />
-					</html:submit>
-				</html:form>
-			</c:if>
-
+			<p>
+				<fmt:message key="message.noLearners" />
+			</p>
 		</c:otherwise>
 	</c:choose>
+
+	<c:if test="${session.appointedScribe != null}">
+		<b>
+			<fmt:message key="heading.appointedScribe" />: <c:out value="${session.appointedScribe}" escapeXml="true"/>
+		</b>
+
+		<c:set var="scribeSessionDTO" value="${session}" scope="request"/>
+
+		<div class="field-name">
+			<fmt:message key="heading.report" />
+		</div>
+		<hr />
+		<c:forEach var="report" items="${session.reportDTOs}">
+			<p>
+				<c:out value="${report.headingDTO.headingText}" escapeXml="false" />
+			</p>
+			<p>
+				<lams:out value="${report.entryText}" escapeHtml="true"/>
+			</p>
+			<hr />
+		</c:forEach>
+
+		<%@include file="/pages/parts/voteDisplay.jsp"%>
+
+		<c:if test="${session.forceComplete eq false}">
+			<html:form action="monitoring" onsubmit="return confirmForceComplete();">
+				<html:hidden property="dispatch" value="forceCompleteActivity" />
+				<html:hidden property="toolSessionID" value="${session.sessionID}" />
+				<html:hidden property="contentFolderID" />
+				<html:submit styleClass="button">
+					<fmt:message key="button.forceComplete" />
+				</html:submit>
+			</html:form>
+		</c:if>
+
+	</c:if>
 
 	<c:if test="${dto.reflectOnActivity}">
 		<div class="field-name">
@@ -166,8 +158,6 @@ function confirmForceComplete() {
 		</html:submit>
 	</p>
 </html:form>
-
-
 
 <h1>
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />

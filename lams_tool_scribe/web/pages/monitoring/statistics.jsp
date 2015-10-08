@@ -1,7 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
-
 
 <table cellspacing="0" class="alternative-color">
 	<tr>
