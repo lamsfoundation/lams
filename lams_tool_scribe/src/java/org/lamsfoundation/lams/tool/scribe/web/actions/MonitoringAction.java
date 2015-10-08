@@ -132,6 +132,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute("monitoringDTO", scribeDTO);
 		request.setAttribute("contentFolderID", monForm.getContentFolderID());
 		
+		monForm.setCurrentTab(WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
+		
 		return mapping.findForward("success");
 	}
 	
