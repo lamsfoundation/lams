@@ -543,6 +543,9 @@ var PropertyDefs = {
 									.data('grouping');
 				if (newGroupingValue != activity.grouping) {
 					activity.grouping = newGroupingValue;
+					$.each(activity.childActivities, function(){
+						this.grouping = newGroupingValue;
+					});
 					redrawNeeded = true;
 				}
 				
@@ -621,17 +624,16 @@ var PropertyDefs = {
 	 */
 	toolProperties : function() {
 		var activity = this,
-			content = activity.propertiesContent,
-			allowsGrouping = !this.parentActivity || !(this.parentActivity instanceof ActivityDefs.ParallelActivity);
+			content = activity.propertiesContent;
 		
 		if (!content) {
 			// first run, create the content
 			content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
 													.show().data('parentObject', activity);
 			$('.propertiesContentFieldTitle', content).val(activity.title);
-			if (!allowsGrouping) {
-				// parts of Parallel Activity can not be grouped
-				$('.propertiesContentFieldGrouping', content).closest('tr').remove();
+			if (activity.parentActivity && (activity.parentActivity instanceof ActivityDefs.ParallelActivity)) {
+				// parts of Parallel Activity are grouped as the parent activity
+				$('.propertiesContentFieldGrouping', content).attr('disabled', 'disabled');
 			}
 
 			if (activity.outputDefinitions) {
@@ -680,9 +682,7 @@ var PropertyDefs = {
 			});
 		}
 		
-		if (allowsGrouping){
-			PropertyLib.fillGroupingDropdown(activity, activity.grouping);
-		}
+		PropertyLib.fillGroupingDropdown(activity, activity.grouping);
 	},
 
 	
