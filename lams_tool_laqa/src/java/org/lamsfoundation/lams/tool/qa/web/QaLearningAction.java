@@ -75,6 +75,7 @@ import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -151,40 +152,34 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 		String answerParamName = "answer" + questionIndex + (isTestHarness ? "__textarea" : "");
 		String answer = request.getParameter(answerParamName);
-		// String answerPresentable = QaUtils.replaceNewLines(answer);
 
 		Integer questionIndexInteger = new Integer(questionIndex);
 		mapAnswers.put(questionIndexInteger.toString(), answer);
 		mapAnswersPresentable.put(questionIndexInteger.toString(), answer);
+		
+		//validate
+		ActionMessages newErrors = validateQuestionAnswer(answer, questionIndexInteger, generalLearnerFlowDTO);
+		errors.add(newErrors);
 
-		Map<Integer, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
-		QaQuestionDTO dto = questionMap.get(questionIndexInteger);
-		if (dto.isRequired() && isEmpty(answer)) {
-		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexInteger));
-		    forwardName = QaAppConstants.LOAD_LEARNER;
-		} else {
-		    // store
+		// store
+		if (errors.isEmpty()) {
 		    QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(
 			    questionIndex));
 		}
 	    }
-	    saveErrors(request, errors);
 
 	} else {
-	    mapAnswers = storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, true);
+	    Object[] results = storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, true);
+	    mapAnswers = (Map<String, String>) results[0];
+	    errors = (ActionMessages) results[1];
 
 	    mapAnswersPresentable = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
 	    mapAnswersPresentable = QaLearningAction.removeNewLinesMap(mapAnswersPresentable);
-
-	    // only need to check the final question as the others will have been checked when the user clicked next.
-	    Map<Integer, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
-	    int numQuestions = questionMap.size();
-	    Integer finalQuestionIndex = new Integer(numQuestions);
-	    QaQuestionDTO dto = questionMap.get(finalQuestionIndex);
-	    if (dto.isRequired() && isEmpty(mapAnswersPresentable.get(finalQuestionIndex.toString()))) {
-		errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", finalQuestionIndex));
-		forwardName = QaAppConstants.LOAD_LEARNER;
-	    }
+	}
+	
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    forwardName = QaAppConstants.LOAD_LEARNER;
 	}
 	
 	//in case noReeditAllowed finalize response so user can't refresh the page and post answers again
@@ -572,7 +567,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
      * @param getNextQuestion
      * @return
      */
-    private Map storeSequentialAnswer(ActionForm form, HttpServletRequest request,
+    private Object[] storeSequentialAnswer(ActionForm form, HttpServletRequest request,
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion) {
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
 	String httpSessionID = qaLearningForm.getHttpSessionID();
@@ -580,7 +575,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 
-	Map mapAnswers = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
+	Map<String, String> mapAnswers = (Map<String, String>) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
 	if (mapAnswers == null) {
 	    mapAnswers = new TreeMap(new QaComparator());
 	}
@@ -595,22 +590,19 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	int nextQuestionOffset = getNextQuestion ? 1 : -1;
 
-	// is this question required and are they trying to go to the next question?
-	// if so, check if the answer is blank and generate an error if it is blank.
-	Map<Integer, QaQuestionDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
-	QaQuestionDTO dto = questionContentMap.get(new Integer(currentQuestionIndex));
-	boolean isRequiredQuestionMissed = dto.isRequired() && isEmpty(newAnswer);
-	if (getNextQuestion && isRequiredQuestionMissed) {
-	    ActionMessages errors = new ActionMessages();
-	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", currentQuestionIndex));
-	    saveErrors(request, errors);
-	    nextQuestionOffset = 0;
+	// validation only if trying to go to the next question
+	ActionMessages errors = new ActionMessages();
+	if (getNextQuestion) {
+	    errors = validateQuestionAnswer(newAnswer, new Integer(currentQuestionIndex), generalLearnerFlowDTO);
 	}
 
 	// store
-	if (!isRequiredQuestionMissed) {
+	if (errors.isEmpty()) {
 	    QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, qaLearningForm.getToolSessionID(),
 		    new Long(currentQuestionIndex));
+	} else {
+	    saveErrors(request, errors);
+	    nextQuestionOffset = 0;
 	}
 
 	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
@@ -651,7 +643,29 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	return mapSequentialAnswers;
+	return new Object[]{mapSequentialAnswers, errors};
+    }
+    
+    private ActionMessages validateQuestionAnswer(String newAnswer, Integer questionIndex,
+	    GeneralLearnerFlowDTO generalLearnerFlowDTO) {
+	ActionMessages errors = new ActionMessages();
+	
+	Map<Integer, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+	QaQuestionDTO dto = questionMap.get(questionIndex);
+
+	// if so, check if the answer is blank and generate an error if it is blank.
+	boolean isRequiredQuestionMissed = dto.isRequired() && isEmpty(newAnswer);
+	if (isRequiredQuestionMissed) {
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndex));
+	} 
+
+	boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(newAnswer, dto.getMinWordsLimit(),
+		Boolean.parseBoolean(generalLearnerFlowDTO.getAllowRichEditor()));
+	if (!isMinWordsLimitReached) {
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("label.minimum.number.words", ": " + dto.getMinWordsLimit()));
+	}
+	
+	return errors;
     }
 
     /**

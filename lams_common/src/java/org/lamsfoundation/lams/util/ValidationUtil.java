@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Utility methods for String validation.
  */
@@ -108,5 +110,34 @@ public class ValidationUtil {
 
 	Matcher m = pattern.matcher(input.trim());
 	return m.matches();
+    }
+    
+    /**
+     * Checks whether min words limit is reached
+     * 
+     * @param text
+     * @param minWordsLimit
+     * @param isDerivedFromCKEditor whether the text was acquired from CKEditor
+     * @return
+     */
+    public static boolean isMinWordsLimitReached(String text, int minWordsLimit, boolean isDerivedFromCKEditor) {
+	
+	if (minWordsLimit <= 0) {
+	    return true;
+	} else if (StringUtils.isBlank(text)) {
+	    return false;
+	}
+
+	// HTML tags stripping
+	if (isDerivedFromCKEditor) {
+	    text = WebUtil.removeHTMLtags(text); // text.replaceAll("/<\/?[a-z][^>]*>/gi", '');
+	} else {
+	    text = text.replaceAll("(?:<BR>)", " ");
+	}
+	    
+	int wordCount = (text.length() == 0) ? 0 : text.replaceAll("[\'\";:,\\.\\?\\-!]+", "").trim().split("\\S+").length;//.match(/\S+/g) || []) ;
+
+	// check min words limit is reached
+	return (wordCount >= minWordsLimit);
     }
 }
