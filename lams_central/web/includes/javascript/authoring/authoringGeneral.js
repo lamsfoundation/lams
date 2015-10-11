@@ -781,6 +781,11 @@ GeneralInitLib = {
      		]),
 			             			
 			'open' : function(){
+				// calculate initial height of the table and maximum height of LD list
+				var documentHeight = +$(document).height();
+				$('table', this).css('height', documentHeight - 120 + 'px');
+				$('#ldStoreDialogTree', this).css('max-height', documentHeight - 285 + 'px');
+				
 				GeneralLib.showLearningDesignThumbnail();
 				
 				$('#leftDialogButtonContainer').remove();
