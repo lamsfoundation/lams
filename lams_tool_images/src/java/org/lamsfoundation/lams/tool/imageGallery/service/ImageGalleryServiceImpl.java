@@ -944,6 +944,17 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
     
     @Override
+    public boolean isReadOnly(Long toolContentId) {
+	for (ImageGallerySession session : imageGallerySessionDao.getByContentId(toolContentId)) {
+	    if (!imageGalleryUserDao.getBySessionID(session.getSessionId()).isEmpty()) {
+		return true;
+	    }
+	}
+	
+	return false;
+    }
+    
+    @Override
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
