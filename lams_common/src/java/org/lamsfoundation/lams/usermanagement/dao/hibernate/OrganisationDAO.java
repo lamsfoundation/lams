@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author jliew
