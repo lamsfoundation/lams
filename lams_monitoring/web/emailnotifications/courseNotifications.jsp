@@ -97,6 +97,7 @@
 			
 			jQuery("#lessonsTable").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 			   	colNames:['Id', '<fmt:message key="email.notifications.lesson.name"/>'],
 			   	colModel:[
 					{name:'id2',index:'id2', width:35, sorttype:"int"},

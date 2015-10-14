@@ -19,12 +19,12 @@
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 
   	    <script>
-  	    	<!-- 
 	  	  	$(document).ready(function(){
 	  			<c:forEach var="summary" items="${summaryList}" varStatus="status">
 		  			
 	  				jQuery("#session${summary.sessionId}").jqGrid({
 	  					datatype: "local",
+	  					rowNum: 10000,
 	  					height: 'auto',
 	  					width: 500,
 	  					shrinkToFit: true,
@@ -63,9 +63,7 @@
     		function refreshSummaryPage()  {
         		self.parent.tb_remove();
     		}
-  			-->
   		</script>
-		
 		
 	</lams:head>
 	

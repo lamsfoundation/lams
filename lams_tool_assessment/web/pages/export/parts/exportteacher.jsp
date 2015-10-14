@@ -25,6 +25,7 @@
 	  			
 	  				jQuery("#list${summary.sessionId}").jqGrid({
 	  					datatype: "local",
+	  					rowNum: 10000,
 	  					height: 'auto',
 	  					width: 630,
 	  					shrinkToFit: false,
@@ -78,6 +79,7 @@
 			  			
 		  				jQuery("#session${questionSummary.question.uid}_${session.sessionId}").jqGrid({
 		  					datatype: "local",
+		  					rowNum: 10000,
 		  					height: 'auto',
 		  					width: 500,
 		  					shrinkToFit: true,

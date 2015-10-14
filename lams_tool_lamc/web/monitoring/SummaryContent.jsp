@@ -39,6 +39,7 @@
 		
 			jQuery("#group${sessionMarkDto.sessionId}").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 				height: 'auto',
 				width: 630,
 				shrinkToFit: ${isShrinkToFit},
@@ -87,6 +88,7 @@
 	        var oldValue = 0;
 			jQuery("#userSummary${sessionMarkDto.sessionId}").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 				gridstate:"hidden",
 				//hiddengrid:true,
 				height: 110,

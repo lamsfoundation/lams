@@ -34,6 +34,7 @@
 		  			
 	  				jQuery("#session${session.sessionId}").jqGrid({
 	  					datatype: "local",
+	  					rowNum: 10000,
 	  					height: 'auto',
 	  					autowidth: true,
 	  					shrinkToFit: false,

@@ -95,11 +95,11 @@
 					   
 					jQuery("#"+subgridTableId).jqGrid({
 						datatype: "json",
+						loadonce:true,
+						rowNum: 10000,
 						url: "<c:url value='/monitoring/getSubgridData.do'/>?sessionMapID=${sessionMapID}&userID=" + userId,
 						height: "100%",
-						rowNum: 10000,
 						autowidth:true,
-						loadonce:true,
 						grouping:true,	
 						groupingView : {
 							groupField : ['criteriaId'],
