@@ -95,12 +95,20 @@ public class MonitoringAction extends WikiPageAction {
 	if (wikiService == null) {
 	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
 	}
-
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
+	Wiki wiki;
+	//toolContentID is null in case request comes from WikiPageAction.revertPage()
+	if (toolContentID == null) {
+	    Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	    WikiSession session = wikiService.getSessionBySessionId(toolSessionID);
+	    wiki = session.getWiki();
+	    toolContentID = wiki.getToolContentId();
+	    
+	} else {
+	    wiki = wikiService.getWikiByContentId(toolContentID);
+	}
 
 	if (wiki == null) {
 	    throw new WikiException("Could not find wiki with content id: " + toolContentID);
