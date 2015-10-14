@@ -379,7 +379,7 @@ function showSearchLessonDialog(orgID){
 
 function showFlashlessAuthoringDialog(){
 	showDialog('dialogFlashlessAuthoring', {
-		'height' : 865,
+		'height' : $(window).height() - 10,
 		'width' : 1280,
 		'title' : 'Authoring',
 		'beforeClose' : function(){
