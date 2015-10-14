@@ -24,6 +24,7 @@
 	  			
 	  				jQuery("#user${question.uid}").jqGrid({
 	  					datatype: "local",
+	  					rowNum: 10000,
 	  					height: 'auto',
 	  					width: 500,
 	  					shrinkToFit: true,

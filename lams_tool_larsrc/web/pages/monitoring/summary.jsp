@@ -27,6 +27,7 @@
 		
 			jQuery("#group${groupSummary.sessionId}").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
@@ -61,9 +62,9 @@
 					jQuery("#"+subgridTableId).jqGrid({
 						datatype: "json",
 						loadonce: true,
+						rowNum: 10000,
 						url: "<c:url value='/monitoring/getSubgridData.do'/>?itemUid=" + itemUid + '&toolSessionID=' + sessionId,
 						height: "100%",
-						rowNum: 10000,
 						autowidth:true,
 						colNames: [
 						   '',
