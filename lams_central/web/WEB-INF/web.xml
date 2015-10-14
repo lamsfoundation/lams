@@ -745,6 +745,9 @@
 			<url-pattern>/services/getServerTime</url-pattern>
 			<url-pattern>/services/Register/*</url-pattern>
 			<url-pattern>/ForgotPasswordRequest</url-pattern>
+			<url-pattern>/forgotPassword.jsp</url-pattern>
+			<url-pattern>/forgotPasswordChange.jsp</url-pattern>
+			<url-pattern>/forgotPasswordProc.jsp</url-pattern>			
 			<url-pattern>/signup/*</url-pattern>
 			<url-pattern>/rest/*</url-pattern> 
 			<!-- Static resources -->
