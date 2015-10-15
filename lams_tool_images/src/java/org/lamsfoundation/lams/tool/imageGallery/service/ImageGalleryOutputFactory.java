@@ -32,6 +32,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -203,28 +204,29 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	for (ImageGalleryItem image : allImages) {
 	    itemIds.add(image.getUid());
 	}
+	
+	boolean isCommentsEnabled = imageGalleryService.isCommentsEnabled(contentId);
 
 	int countComments = 0;
-	if (user != null) {
-	    boolean isCommentsByOtherUsersRequired = false;
-	    List<ItemRatingDTO> RatingCriteriaDtos = imageGalleryService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, user.getUserId());
-	    
-	    Iterator<ImageGalleryItem> it = allImages.iterator();
-	    while (it.hasNext()) {
-		ImageGalleryItem image = it.next();
-//		Set<ImageComment> imageComments = image.getComments();
-//		for (ImageComment comment : imageComments) {
-//		    if (user.getUserId().equals(comment.getCreateBy().getUserId())) {
-//			countComments++;
-//		    }
-//		}
-	    }
-	} else {
-	    for (ImageGalleryItem image : allImages) {
-//		Set<ImageComment> imageComments = image.getComments();
-//		for (ImageComment comment : imageComments) {
-//		    countComments++;
-//		}
+	if (isCommentsEnabled) {
+
+	    boolean isCommentsByOtherUsersRequired = user == null;
+	    Long userId = user == null ? -1L : user.getUserId();
+	    List<ItemRatingDTO> ratingCriteriaDtos = imageGalleryService.getRatingCriteriaDtos(contentId, itemIds,
+		    isCommentsByOtherUsersRequired, userId);
+
+	    if (user != null) {
+		for (ItemRatingDTO ratingCriteriaDto : ratingCriteriaDtos) {
+		    boolean isUserCommentedOnThisImage = ratingCriteriaDto.getCommentPostedByUser() != null;
+		    if (isUserCommentedOnThisImage) {
+			countComments++;
+		    }
+		}
+
+	    } else {
+		for (ItemRatingDTO ratingCriteriaDto : ratingCriteriaDtos) {
+		    countComments += ratingCriteriaDto.getCommentDtos().size();
+		}
 	    }
 	}
 
