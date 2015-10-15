@@ -10,7 +10,6 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 
-
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <c:if test="${isImageSelected}">
@@ -57,20 +56,13 @@
 
 <c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">
 
-	<c:if test="${sessionMap.isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
-		<div class="info rating-info">
-			<fmt:message key="label.minimum.number.words">
-				<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
-			</fmt:message>
-		</div>
-	</c:if>
-
 	<%--Ranking area---------------------------------------%>
 	
 	<c:if test="${imageGallery.allowRank && isImageSelected}">
 		
 		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
-				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}" />
+				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}"
+				minNumberWordsLabel="label.minimum.number.words" />
 		<br><br>
 	</c:if>
 
