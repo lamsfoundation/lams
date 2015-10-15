@@ -310,46 +310,38 @@
 </html:form>
 
 <script type="text/javascript">
-<!--
+
 	var wikiLinkArray = new Array();
 	populateWikiLinkArray();
-	function populateWikiLinkArray()
-	{
+	function populateWikiLinkArray() {
 		<c:forEach var="wikiPage" items="${wikiPages}">
 			wikiLinkArray[wikiLinkArray.length] = '${wikiPage.javaScriptTitle}';
 		</c:forEach>
 		document.getElementById("wikiLinks").value = wikiLinkArray.toString();
 	}
 	
-	function doEditOrAdd(dispatch)
-	{
+	function doEditOrAdd(dispatch) {
 		var title="";
-		if(dispatch == "editPage")
-		{
+		if(dispatch == "editPage") {
 			title = document.getElementById("title").value;
 		}
-		else
-		{
+		else {
 			title = document.getElementById("newPageTitle").value;
 		}
 		
 		var i;
 		
-		if (title == null || trim(title).length == 0)
-		{
+		if (title == null || trim(title).length == 0) {
 			alert("<fmt:message key='label.wiki.add.title.required'></fmt:message>");
 			return;
 		}
 		
-		for (i=0; i<wikiLinkArray.length; i++)
-		{
-			if(dispatch == "editPage" && wikiLinkArray[i] == '${currentWikiPage.javaScriptTitle}')
-			{
+		for (i=0; i<wikiLinkArray.length; i++) {
+			if(dispatch == "editPage" && wikiLinkArray[i] == '${currentWikiPage.javaScriptTitle}') {
 				continue;
 			}
 			
-			if (trim(title) == wikiLinkArray[i])
-			{
+			if (trim(title) == wikiLinkArray[i]) {
 				alert("<fmt:message key='label.wiki.add.title.exists'><fmt:param>" + title + "</fmt:param></fmt:message>");
 				return;
 			}
@@ -360,26 +352,18 @@
 		submitWiki(dispatch);
 	}
 	
-	function submitWiki(dispatch)
-	{
+	function submitWiki(dispatch) {
 		document.getElementById("dispatch").value=dispatch;
 		replaceJavascriptTokenAndSubmit("monitoringForm");
 	}
 	
-	CKEDITOR.on('instanceCreated',function (editorInstance) 
-	{ 	
+	CKEDITOR.on('instanceCreated',function (editorInstance) { 	
 		editorInstance.wikiLinkArray = wikiLinkArray;
 	});
 	
-	function refreshPage()
-	{
+	function refreshPage() {
 		var url = "<lams:WebAppURL/>/monitoring.do?dispatch=showWiki&toolSessionID=${sessionDTO.sessionID}&currentWikiPageId=${currentWikiPage.uid}&contentFolderID=${contentFolderID}"
 		window.location=url;
 	}
 	
--->
 </script>
-
-
-
-
