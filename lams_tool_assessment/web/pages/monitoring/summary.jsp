@@ -10,6 +10,7 @@
 		
 			jQuery("#list${summary.sessionId}").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 				height: 'auto',
 				width: 630,
 				
@@ -69,6 +70,7 @@
 	        var oldValue = 0;
 			jQuery("#userSummary${summary.sessionId}").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 				gridstate:"hidden",
 				//hiddengrid:true,
 				height: 180,

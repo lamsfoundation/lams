@@ -43,6 +43,7 @@
 			<c:forEach var="burningQuestionDto" items="${burningQuestionDtos}" varStatus="i">
 				jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid({
 					datatype: "local",
+					rowNum: 10000,
 					height: 'auto',
 					autowidth: true,
 					shrinkToFit: false,
@@ -74,6 +75,7 @@
 			<!-- Display reflection entries -->
 			jQuery("#reflections").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
