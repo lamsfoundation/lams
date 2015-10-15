@@ -440,6 +440,13 @@
 			org.lamsfoundation.lams.web.RatingServlet
 		</servlet-class>
 	</servlet>
+	
+	<servlet>
+    	<servlet-name>GetServerTimeServlet</servlet-name>
+    	<servlet-class>
+    		org.lamsfoundation.lams.webservice.GetServerTimeServlet
+    	</servlet-class>
+	</servlet>
 
 	<servlet>
 		<servlet-name>LearningDesignRestServlet</servlet-name>
@@ -524,6 +531,11 @@
 	<servlet-mapping>
 		<servlet-name>RatingServlet</servlet-name>
 		<url-pattern>/servlet/rateItem</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>GetServerTimeServlet</servlet-name>
+		<url-pattern>/services/getServerTime</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
