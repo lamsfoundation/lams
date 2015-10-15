@@ -16,12 +16,12 @@
  		<script type="text/javascript" src="./includes/jquery.jqGrid.locale-en.js"></script>
  		<script type="text/javascript" src="./includes/jquery.jqGrid.js"></script>
  		<script type="text/javascript">
-		<!--	
 		$(document).ready(function(){
 			<c:forEach var="summary" items="${summaryList}" varStatus="status">
 			
 				jQuery("#list${summary.sessionId}").jqGrid({
 					datatype: "local",
+					rowNum: 10000,
 					height: 'auto',
 					width: 900,
 					shrinkToFit: true,
@@ -56,7 +56,6 @@
 		        </c:forEach>
 		   </c:forEach>
 		});
-		-->		
 </script>
 
 </lams:head>

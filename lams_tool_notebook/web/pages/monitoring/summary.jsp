@@ -93,6 +93,7 @@
 		
 			jQuery("#group${sessionId}").jqGrid({
 				datatype: "local",
+				rowNum: 10000,
 				height: 'auto',
 				width: 780,
 				
