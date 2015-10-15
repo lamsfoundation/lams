@@ -169,7 +169,7 @@
 				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
 				      // the filterList to the url into an "fcol" array.
 				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
-					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val(),
+					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
