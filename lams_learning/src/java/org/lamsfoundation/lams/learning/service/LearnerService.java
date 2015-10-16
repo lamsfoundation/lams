@@ -655,10 +655,7 @@ public class LearnerService implements ICoreLearnerService {
 	    activity = getActivity(activity.getActivityId());
 	    nextLearnerProgress = calculateProgress(activity, learnerId, progress);
 
-	    ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(progress.getUser(), activity);
-	    if ((activity instanceof ToolActivity) && (toolSession != null)) {
-		sendDataToGradebook((ToolActivity) activity, toolSession, progress);
-	    }
+	    updateGradebookMark(activity, progress);
 	}
 	// }
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId, activity.getLearningDesign()
@@ -678,42 +675,46 @@ public class LearnerService implements ICoreLearnerService {
 	return completeActivity(learnerId, activity, currentProgress);
     }
 
-    private void sendDataToGradebook(ToolActivity toolActivity, ToolSession toolSession, LearnerProgress progress) {
-
+    @Override
+    public void updateGradebookMark(Activity activity, LearnerProgress progress) {
 	User learner = progress.getUser();
 	Lesson lesson = progress.getLesson();
-	if ((toolActivity != null) && (toolSession != null) && (learner != null) && (lesson != null)) {
-	    if ((toolActivity.getActivityEvaluations() != null) && (toolActivity.getActivityEvaluations().size() > 0)) {
+	ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(learner, activity);
 
-		// Getting the first activity evaluation
-		ActivityEvaluation eval = toolActivity.getActivityEvaluations().iterator().next();
+	if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
+		|| (activity == null) || !(activity instanceof ToolActivity)
+		|| (((ToolActivity) activity).getActivityEvaluations() == null)
+		|| ((ToolActivity) activity).getActivityEvaluations().isEmpty()) {
+	    return;
+	}
+	ToolActivity toolActivity = (ToolActivity) activity;
 
-		try {
-		    ToolOutput toolOutput = lamsCoreToolService.getOutputFromTool(eval.getToolOutputDefinition(),
-			    toolSession, learner.getUserId());
+	// Getting the first activity evaluation
+	ActivityEvaluation eval = toolActivity.getActivityEvaluations().iterator().next();
 
-		    if (toolOutput != null) {
-			ToolOutputValue outputVal = toolOutput.getValue();
-			if (outputVal != null) {
-			    Double outputDouble = outputVal.getDouble();
+	try {
+	    ToolOutput toolOutput = lamsCoreToolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
+		    learner.getUserId());
 
-			    GradebookUserActivity gradebookUserActivity = gradebookService.getGradebookUserActivity(
-				    toolActivity.getActivityId(), learner.getUserId());
+	    if (toolOutput != null) {
+		ToolOutputValue outputVal = toolOutput.getValue();
+		if (outputVal != null) {
+		    Double outputDouble = outputVal.getDouble();
 
-			    // Only set the mark if it hasnt previously been set by a teacher
-			    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
-				gradebookService.updateUserActivityGradebookMark(lesson, learner, toolActivity,
-					outputDouble, false, false);
-			    }
-			}
+		    GradebookUserActivity gradebookUserActivity = gradebookService.getGradebookUserActivity(
+			    toolActivity.getActivityId(), learner.getUserId());
+
+		    // Only set the mark if it hasnt previously been set by a teacher
+		    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
+			gradebookService.updateUserActivityGradebookMark(lesson, learner, toolActivity, outputDouble,
+				false, false);
 		    }
-
-		} catch (ToolException e) {
-		    LearnerService.log.debug("Runtime exception when attempted to get outputs for activity: "
-			    + toolActivity.getActivityId(), e);
 		}
 	    }
 
+	} catch (ToolException e) {
+	    LearnerService.log.debug(
+		    "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
 	}
     }
 
