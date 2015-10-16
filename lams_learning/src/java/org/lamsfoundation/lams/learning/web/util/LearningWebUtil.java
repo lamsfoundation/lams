@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -50,7 +51,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -223,6 +223,10 @@ public class LearningWebUtil {
 	if (currentActivity == null) {
 	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
 	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
+
+	    // recalculate activity mark and pass it to gradebook
+	    learnerService.updateGradebookMark(currentActivity, progress);
+	    
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	} else {
 	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);

@@ -180,6 +180,14 @@ public interface ICoreLearnerService extends ILearnerService {
      * @return the updated learner progress
      */
     public LearnerProgress completeActivity(Integer learnerId, Activity activity, LearnerProgress progress);
+    
+    /**
+     * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.  
+     * 
+     * @param toolActivity
+     * @param progress
+     */
+    void updateGradebookMark(Activity activity, LearnerProgress progress);
 
     /**
      * Same as LearnerProgress completeActivity(Integer learnerId,Activity activity,LearnerProgress progress) except
