@@ -54,6 +54,7 @@ import org.xml.sax.SAXException;
 import blackboard.base.BbList;
 import blackboard.data.content.Content;
 import blackboard.data.content.CourseDocument;
+import blackboard.data.course.Course;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.gradebook.Lineitem;
 import blackboard.data.gradebook.Score;
@@ -62,7 +63,9 @@ import blackboard.persist.Container;
 import blackboard.persist.Id;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbLoader;
+import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
+import blackboard.persist.gradebook.LineitemDbLoader;
 import blackboard.persist.gradebook.ScoreDbLoader;
 import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.platform.BbServiceManager;
@@ -94,6 +97,7 @@ public class GradebookSyncServlet extends HttpServlet {
 	    // get Blackboard context
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    Context ctx = ctxMgr.setContext(request);
+	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
 
 	    // get Parameter values
 	    String lamsLessonIdParam = request.getParameter(Constants.PARAM_LESSON_ID);
@@ -115,24 +119,50 @@ public class GradebookSyncServlet extends HttpServlet {
 		}
 	    }
 	    
-	    // exit method as it was created in version prior to 1.2.1 and thus don't have lineitem
+	    // check whether the lesson was created by Chen Rui's BB and has gradebook feature on
+	    Lineitem lineitem = null;
 	    if (bbContentId == null) {
-		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		response.getWriter().write("Can't syncronize lesson as it was created in version prior to 1.2.1 and thus don't have lineitem.");
-		return;
-	    }
+		CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
+		LineitemDbLoader liLoader = LineitemDbLoader.Default.getInstance();
+		
+		BbList coursesBBList = cLoader.loadByUserId(ctx.getUserId());
+		Course[] courses = (Course[]) coursesBBList.toArray(new Course[0]);
+		boolean isChenRuiGradebookOn = false;
+		for (int i = 0; i < courses.length; i++) {
+		    BbList lineitemsBBList = liLoader.loadByCourseId(courses[i].getId());
+		    Lineitem[] lineitems = (Lineitem[]) lineitemsBBList.toArray(new Lineitem[0]);
+		    for (int j = 0; j < lineitems.length; j++) {
+			if (lineitems[j].getAssessmentId() != null
+				&& lineitems[j].getAssessmentId().equals(lamsLessonIdParam)) {
+			    lineitem = lineitems[j];
+			    isChenRuiGradebookOn = true;
+			    break;
+			}
+		    }
+		}
+		
+		//  was created in version prior to 1.2.1 OR possibly Chen Rui's BB gradecenter option is OFF
+		if (!isChenRuiGradebookOn) {
+		    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		    response.getWriter()
+			    .write("Can't syncronize lesson as it was created in version prior to 1.2.1 and thus don't have lineitem.");
+		    return;
+		}
+		
+            // check isGradecenter option is ON
+	    } else {
+		Container bbContainer = bbPm.getContainer();
+		Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, bbContentId);
+		ContentDbLoader contentDbLoader = (ContentDbLoader) bbPm.getLoader(ContentDbLoader.TYPE);
+		Content bbContent = (Content) contentDbLoader.loadById(contentId);
+		// check isGradecenter option is ON
+		if (!bbContent.getIsDescribed()) {// (isDescribed field is used for storing isGradecenter parameter)
+		    response.setStatus(HttpServletResponse.SC_ACCEPTED);
+		    response.getWriter().write("Can't syncronize lesson as it's gradecenter option is OFF.");
+		    return;
+		}
 
-	    // check isGradecenter option is ON
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
-	    Container bbContainer = bbPm.getContainer();
-	    Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, bbContentId);
-	    ContentDbLoader contentDbLoader = (ContentDbLoader) bbPm.getLoader(ContentDbLoader.TYPE);
-	    Content bbContent = (Content) contentDbLoader.loadById(contentId);
-	    // check isGradecenter option is ON
-	    if (!bbContent.getIsDescribed()) {// (isDescribed field is used for storing isGradecenter parameter)
-		response.setStatus(HttpServletResponse.SC_ACCEPTED);
-		response.getWriter().write("Can't syncronize lesson as it's gradecenter option is OFF.");
-		return;
+		lineitem = LineitemUtil.getLineitem(bbContentId, ctx.getUserId(), lamsLessonIdParam);
 	    }
 
 	    String username = ctx.getUser().getUserName();
@@ -172,8 +202,7 @@ public class GradebookSyncServlet extends HttpServlet {
 	    Node lesson = document.getDocumentElement().getFirstChild();
 	    Long lessonMaxPossibleMark = new Long(lesson.getAttributes().getNamedItem("lessonMaxPossibleMark").getNodeValue());
 	    NodeList learnerResults = lesson.getChildNodes();
-
-	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, ctx.getUserId(), lamsLessonIdParam);
+	    
 	    //in order to reduce DB queries we get scores and courseMemberships all at once
 	    BbList<Score> dbScores = scoreLoader.loadByLineitemId(lineitem.getId());
 	    BbList<CourseMembership> courseMemberships = courseMemLoader.loadByCourseId(lineitem.getCourseId(), null, true);
