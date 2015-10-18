@@ -109,3 +109,8 @@ Also supports calls to the LAMS server to use a dummy course to suit the templat
 1.2.16 Release Fixes
 ====================
 * LDEV-3456: Adding new parameters to LAMSLearningDesign and StartLesson calls
+
+1.2.17 Release Fixes
+====================
+* LDEV-3510: Previous releases were opening lessons in a new window due to a change made for LDEV-3510. 
+Now reverted back to previous behaviour with lesson loading in the same tab.
