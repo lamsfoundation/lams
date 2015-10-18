@@ -135,8 +135,6 @@
         bbContent.setRenderType(Content.RenderType.URL);
         bbContent.setBody(description);
         
-        bbContent.setLaunchInNewWindow(true);
-        
         //  LDEV-3510 LAMS Lessons were always at the top and could not be moved. 
         bbContent.setPosition(0);
 
