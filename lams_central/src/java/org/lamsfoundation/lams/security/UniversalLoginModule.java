@@ -20,18 +20,9 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
 package org.lamsfoundation.lams.security;
 
-/**
- * UniversalLoginModule is LAMS's own implementation of login module based on
- * JBoss 3.0.*, 3.2.* and possibly higher versions.
- * 
- * It's named "universal" as currently it supports WebAuth, LDAP and database
- * based authentication mechanisms.
- * 
- */
-
+import java.io.IOException;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.sql.Connection;
@@ -39,15 +30,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
@@ -58,8 +56,8 @@ import org.lamsfoundation.lams.usermanagement.AuthenticationMethodType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
@@ -70,189 +68,344 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class UniversalLoginModule extends UsernamePasswordLoginModule {
-
+/**
+ * Covers all LAMS authentication.
+ */
+public class UniversalLoginModule implements LoginModule {
     private static Logger log = Logger.getLogger(UniversalLoginModule.class);
 
-    public UniversalLoginModule() {
+    private Subject subject;
+    private CallbackHandler callbackHandler;
+    /**
+     * Flag indicating if the login 1st phase succeeded.
+     */
+    private boolean loginOK;
+    private Principal identity;
+    private char[] credential;
+    private String dsJndiName;
+
+    private static IThemeService themeService;
+    private static IUserManagementService userManagementService;
+
+    private static final String ROLES_QUERY = "SELECT DISTINCT r.name,'Roles' FROM lams_user u "
+	    + "LEFT OUTER JOIN lams_user_organisation uo USING(user_id) "
+	    + "LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id) "
+	    + "LEFT OUTER JOIN lams_role r USING (role_id) " + "WHERE u.login=?";
+
+    /**
+     * Method to commit the authentication process (phase 2).
+     */
+    @Override
+    public boolean commit() throws LoginException {
+	if (loginOK == false) {
+	    return false;
+	}
+
+	/*
+	If the login method completed successfully as indicated by
+	loginOK == true, this method adds the identity value to the subject's principals set. It also adds the members of
+	each Group returned by getRoleSets() to the subject's principals Set.
+	 */
+	Set<Principal> principals = subject.getPrincipals();
+	principals.add(identity);
+	for (Group group : getRoleSets()) {
+	    String name = group.getName();
+	    Group subjectGroup = createGroup(name, principals);
+	    // Copy the group members to the Subject group
+	    Enumeration<? extends Principal> members = group.members();
+	    while (members.hasMoreElements()) {
+		Principal role = members.nextElement();
+		subjectGroup.addMember(role);
+	    }
+	}
+
+	UniversalLoginModule.log.info("User logged in: " + getUserName());
+	return true;
     }
 
-    protected String dsJndiName;
-
-    protected String rolesQuery;
-
-    protected String principalsQuery;
-
-    private IThemeService themeService;
-    private UserManagementService service;
-
+    /**
+     * Method to abort the authentication process (phase 2).
+     * 
+     * @return true alaways
+     */
     @Override
-    public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
-	super.initialize(subject, callbackHandler, sharedState, options);
-	dsJndiName = (String) options.get("dsJndiName");
-	principalsQuery = (String) options.get("principalsQuery");
-	rolesQuery = (String) options.get("rolesQuery");
+    public boolean abort() throws LoginException {
+	UniversalLoginModule.log.info("Abort log in for user: " + getUserName());
+	return true;
     }
 
+    /**
+     * Remove the user identity and roles added to the Subject during commit.
+     * 
+     * @return true always.
+     */
     @Override
-    protected boolean validatePassword(String inputPassword, String expectedPassword) {
-	boolean isValid = false;
-	if (inputPassword != null) {
-	    // empty password not allowed
-	    if (inputPassword.length() == 0) {
-		return false;
+    public boolean logout() throws LoginException {
+	UniversalLoginModule.log.info("User logged out: " + getUserName());
+	// Remove the user identity
+	Set<Principal> principals = subject.getPrincipals();
+	principals.remove(identity);
+	return true;
+    }
+
+    /**
+     * Find or create a Group with the given name. Subclasses should use this method to locate the 'Roles' group or
+     * create additional types of groups.
+     * 
+     * @return A named Group from the principals set.
+     */
+    private Group createGroup(String name, Set<Principal> principals) {
+	Group roles = null;
+	for (Principal principal : principals) {
+	    if (principal instanceof Group) {
+		Group grp = (Group) principal;
+		if (grp.getName().equals(name)) {
+		    roles = grp;
+		    break;
+		}
+	    }
+	}
+
+	// If we did not find a group create one
+	if (roles == null) {
+	    roles = new SimpleGroup(name);
+	    principals.add(roles);
+	}
+	return roles;
+    }
+
+    /**
+     * Perform the authentication of the username and password.
+     */
+    @Override
+    public boolean login() throws LoginException {
+	loginOK = false;
+	String[] info = getUsernameAndPassword();
+	String userName = info[0];
+	String password = info[1];
+
+	UniversalLoginModule.log.info("Authenticate user: " + userName);
+
+	if (identity == null) {
+	    try {
+		identity = new SimplePrincipal(userName);
+	    } catch (Exception e) {
+		throw new LoginException("Failed to create principal: " + e.getMessage());
 	    }
 
-	    try {
-		String username = getUsername();
-		UniversalLoginModule.log.debug("===> authenticating user: " + username);
-
-		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
-			.getServletContext());
-
-		if (service == null) {
-		    service = (UserManagementService) ctx.getBean("userManagementService");
+	    if (!validatePassword(password)) {
+		if (UniversalLoginModule.log.isDebugEnabled()) {
+		    UniversalLoginModule.log.debug("Bad password for user " + userName);
 		}
-		User user = service.getUserByLogin(username);
+		throw new FailedLoginException("Incorrect password");
+	    }
+	}
 
-		if (themeService == null) {
-		    themeService = (IThemeService) ctx.getBean("themeService");
-		}
+	loginOK = true;
+	if (UniversalLoginModule.log.isDebugEnabled()) {
+	    UniversalLoginModule.log.debug("User authenticated: " + identity);
+	}
+	return true;
+    }
 
-		// LDAP user provisioning
-		if (user == null) {
-		    // provision a new user by checking ldap server
-		    if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_PROVISIONING_ENABLED)) {
-			LdapService ldapService;
-			try {
-			    ldapService = (LdapService) ctx.getBean("ldapService");
-			} catch (NoSuchBeanDefinitionException e) {
-			    // LDEV-1937
-			    UniversalLoginModule.log
-				    .error("NoSuchBeanDefinitionException while getting ldapService bean, will try another method...",
-					    e);
-			    ApplicationContext context = new ClassPathXmlApplicationContext(
-				    "org/lamsfoundation/lams/usermanagement/ldapContext.xml");
-			    ldapService = (LdapService) context.getBean("ldapService");
-			}
-			UniversalLoginModule.log
-				.debug("===> LDAP provisioning is enabled, checking username against LDAP server...");
-			LDAPAuthenticator ldap = new LDAPAuthenticator();
-			isValid = ldap.authenticate(username, inputPassword);
-			if (isValid) { // create a new user
-			    UniversalLoginModule.log.info("===> Creating new user for LDAP username: " + username);
-			    if (ldapService.createLDAPUser(ldap.getAttrs())) {
-				user = service.getUserByLogin(username);
-				if (!ldapService.addLDAPUser(ldap.getAttrs(), user.getUserId())) {
-				    UniversalLoginModule.log.error("===> Couldn't add LDAP user: " + username
-					    + " to organisation.");
-				}
-			    } else {
-				UniversalLoginModule.log.error("===> Couldn't create new user for LDAP username: "
-					+ username);
-				return false;
-			    }
-			} else { // didn't authenticate successfully with
-				 // ldap
-			    return false;
-			}
-		    } else {
-			return false;
-		    }
-		}
+    /**
+     * Return user name from existing identity.
+     */
+    private String getUserName() {
+	return identity == null ? null : identity.getName();
+    }
 
-		// allow sysadmin to login as another user; in this case, the
-		// LAMS shared session
-		// will be present, allowing the following check to work
-		if (service.isUserSysAdmin()) {
-		    isValid = true;
-		}
+    /**
+     * Called by login() to acquire the username and password strings for authentication. This method does no validation
+     * of either.
+     * 
+     * @return String[], [0] = username, [1] = password
+     */
+    private String[] getUsernameAndPassword() throws LoginException {
+	if (callbackHandler == null) {
+	    throw new LoginException("No CallbackHandler available to collect authentication information");
+	}
+	NameCallback nc = new NameCallback("User name: ", "guest");
+	PasswordCallback pc = new PasswordCallback("Password: ", false);
+	Callback[] callbacks = { nc, pc };
+	String username = null;
+	String password = null;
+	try {
+	    callbackHandler.handle(callbacks);
+	    username = nc.getName();
+	    char[] tmpPassword = pc.getPassword();
+	    if (tmpPassword != null) {
+		credential = new char[tmpPassword.length];
+		System.arraycopy(tmpPassword, 0, credential, 0, tmpPassword.length);
+		pc.clearPassword();
+		password = new String(credential);
+	    }
+	} catch (IOException ioe) {
+	    throw new LoginException(ioe.toString());
+	} catch (UnsupportedCallbackException uce) {
+	    throw new LoginException("CallbackHandler does not support: " + uce.getCallback());
+	}
+	return new String[] { username, password };
+    }
 
-		// perform password checking according to user's authentication
-		// method
-		if (!isValid) {
-		    String type = user.getAuthenticationMethod().getAuthenticationMethodType().getDescription();
-		    UniversalLoginModule.log.debug("===> authentication type: " + type);
-		    if (AuthenticationMethodType.LDAP.equals(type)) {
-			LDAPAuthenticator authenticator = new LDAPAuthenticator();
-			isValid = authenticator.authenticate(username, inputPassword);
-			// if ldap user profile has updated, udpate user object
-			// for dto below
-			user = service.getUserByLogin(username);
-		    } else if (AuthenticationMethodType.LAMS.equals(type)) {
-			DatabaseAuthenticator authenticator = new DatabaseAuthenticator(dsJndiName, principalsQuery);
-			// if the password is not encrypted when sent from the
-			// jsp (e.g. when it is passed
-			// unencrypted to say, ldap) then encrypt it here when
-			// authenticating against local db
-			if (!Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER)) {
-			    // try the passed in password first,
-			    // LoginRequestServlet always passes in encrypted
-			    // passwords
-			    isValid = authenticator.authenticate(username, inputPassword);
-			    if (!isValid) {
-				inputPassword = HashUtil.sha1(inputPassword);
-			    }
-			    isValid = authenticator.authenticate(username, inputPassword);
-			} else {
-			    isValid = authenticator.authenticate(username, inputPassword);
-			}
-		    } else {
-			UniversalLoginModule.log.error("===> Unexpected authentication type: " + type);
-			return false;
-		    }
-		}
+    @Override
+    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
+	    Map<String, ?> options) {
+	this.subject = subject;
+	this.callbackHandler = callbackHandler;
 
-		// disabled users can't login;
-		// check after authentication to give non-db authentication
-		// methods
-		// a chance to update disabled flag
-		if (user.getDisabledFlag()) {
-		    UniversalLoginModule.log.debug("===> user is disabled.");
+	dsJndiName = (String) options.get("dsJndiName");
+    }
+
+    private boolean validatePassword(String inputPassword) {
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getWebApplicationContext(SessionManager.getServletContext());
+	if (UniversalLoginModule.userManagementService == null) {
+	    UniversalLoginModule.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
+	    UniversalLoginModule.themeService = (IThemeService) ctx.getBean("themeService");
+	}
+
+	// allow sysadmin to login as another user; in this case, the LAMS shared session will be present,
+	// allowing the following check to work
+	if (UniversalLoginModule.userManagementService.isUserSysAdmin()) {
+	    return true;
+	}
+
+	// empty password not allowed
+	if ((inputPassword == null) || (inputPassword.length() == 0)) {
+	    return false;
+	}
+
+	boolean isValid = false;
+
+	try {
+	    String userName = getUserName();
+	    if (UniversalLoginModule.log.isDebugEnabled()) {
+		UniversalLoginModule.log.debug("Authenticating user " + userName + ".");
+	    }
+
+	    User user = UniversalLoginModule.userManagementService.getUserByLogin(userName);
+
+	    // LDAP user provisioning
+	    if (user == null) {
+		if (!Configuration.getAsBoolean(ConfigurationKeys.LDAP_PROVISIONING_ENABLED)) {
 		    return false;
 		}
 
-		// if login is valid, register userDTO into session.
-		if (isValid) {
-		    UserDTO userDTO = user.getUserDTO();
+		// provision a new user by checking LDAP server
+		LdapService ldapService = null;
+		try {
+		    ldapService = (LdapService) ctx.getBean("ldapService");
+		} catch (NoSuchBeanDefinitionException e) {
+		    // LDEV-1937
+		    UniversalLoginModule.log.warn("No ldapService bean found, trying another method to fetch it.", e);
+		    @SuppressWarnings("resource")
+		    ApplicationContext context = new ClassPathXmlApplicationContext(
+			    "org/lamsfoundation/lams/usermanagement/ldapContext.xml");
+		    ldapService = (LdapService) context.getBean("ldapService");
+		}
 
-		    // If the user's css theme has been deleted, use the default
-		    // as fallback
-		    CSSThemeBriefDTO userCSSTheme = userDTO.getHtmlTheme();
-		    if (userCSSTheme != null) {
-			boolean themeExists = false;
-			for (Theme theme : themeService.getAllCSSThemes()) {
-			    if (userCSSTheme.getId().equals(theme.getThemeId())) {
-				themeExists = true;
-				break;
-			    }
-			}
+		if (UniversalLoginModule.log.isDebugEnabled()) {
+		    UniversalLoginModule.log
+			    .debug("LDAP provisioning is enabled, checking user " + userName + " against LDAP server.");
+		}
+		LDAPAuthenticator ldap = new LDAPAuthenticator(UniversalLoginModule.userManagementService);
+		isValid = ldap.authenticate(userName, inputPassword);
+		if (!isValid) {
+		    return false;
+		}
 
-			if (!themeExists) {
-			    userDTO.setHtmlTheme(new CSSThemeBriefDTO(themeService.getDefaultCSSTheme()));
+		// create a new user
+		UniversalLoginModule.log.info("Creating new user using LDAP: " + userName);
+		if (ldapService.createLDAPUser(ldap.getAttrs())) {
+		    user = UniversalLoginModule.userManagementService.getUserByLogin(userName);
+		    if (!ldapService.addLDAPUser(ldap.getAttrs(), user.getUserId())) {
+			UniversalLoginModule.log.error("Could not add LDAP user " + userName + " to organisation.");
+		    }
+		} else {
+		    UniversalLoginModule.log.error("Could not create new user for LDAP user: " + userName);
+		    return false;
+		}
+	    }
+
+	    // perform password checking according to user's authentication method
+	    if (!isValid) {
+		String type = user.getAuthenticationMethod().getAuthenticationMethodType().getDescription();
+		UniversalLoginModule.log.debug("Authentication type: " + type);
+		if (AuthenticationMethodType.LDAP.equals(type)) {
+		    LDAPAuthenticator authenticator = new LDAPAuthenticator(UniversalLoginModule.userManagementService);
+		    isValid = authenticator.authenticate(userName, inputPassword);
+		    // if LDAP user profile has updated, udpate user object for dto below
+		    user = UniversalLoginModule.userManagementService.getUserByLogin(userName);
+
+		} else if (AuthenticationMethodType.LAMS.equals(type)) {
+		    DatabaseAuthenticator authenticator = new DatabaseAuthenticator(dsJndiName);
+		    isValid = authenticator.authenticate(userName, inputPassword);
+		    // if the password is not encrypted when sent from the
+		    // jsp (e.g. when it is passed
+		    // unencrypted to say, ldap) then encrypt it here when
+		    // authenticating against local db
+		    if (!isValid && !Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER)) {
+			inputPassword = HashUtil.sha1(inputPassword);
+			isValid = authenticator.authenticate(userName, inputPassword);
+		    }
+
+		} else {
+		    UniversalLoginModule.log.error("Unexpected authentication type: " + type);
+		    return false;
+		}
+	    }
+
+	    // disabled users can't login;
+	    // check after authentication to give non-db authentication methods
+	    // a chance to update disabled flag
+	    if (user.getDisabledFlag()) {
+		UniversalLoginModule.log.debug("User is disabled: " + user.getLogin());
+		return false;
+	    }
+
+	    // if login is valid, register userDTO into session.
+	    if (isValid) {
+		UserDTO userDTO = user.getUserDTO();
+
+		// If the user's css theme has been deleted, use the default
+		// as fallback
+		CSSThemeBriefDTO userCSSTheme = userDTO.getHtmlTheme();
+		if (userCSSTheme != null) {
+		    boolean themeExists = false;
+		    for (Theme theme : UniversalLoginModule.themeService.getAllCSSThemes()) {
+			if (userCSSTheme.getId().equals(theme.getThemeId())) {
+			    themeExists = true;
+			    break;
 			}
 		    }
 
-		    // If the user's flash theme has been deleted, use the
-		    // default as fallback
-		    CSSThemeBriefDTO userFlashTheme = userDTO.getFlashTheme();
-		    if (userFlashTheme != null) {
-			boolean themeExists = false;
-			for (Theme theme : themeService.getAllFlashThemes()) {
-			    if (userFlashTheme.getId().equals(theme.getThemeId())) {
-				themeExists = true;
-				break;
-			    }
-			}
-
-			if (!themeExists) {
-			    userDTO.setFlashTheme(new CSSThemeBriefDTO(themeService.getDefaultFlashTheme()));
-			}
+		    if (!themeExists) {
+			userDTO.setHtmlTheme(
+				new CSSThemeBriefDTO(UniversalLoginModule.themeService.getDefaultCSSTheme()));
 		    }
 		}
-	    } catch (Exception e) {
-		UniversalLoginModule.log.error("Error while validating password", e);
+
+		// If the user's flash theme has been deleted, use the default as fallback
+		CSSThemeBriefDTO userFlashTheme = userDTO.getFlashTheme();
+		if (userFlashTheme != null) {
+		    boolean themeExists = false;
+		    for (Theme theme : UniversalLoginModule.themeService.getAllFlashThemes()) {
+			if (userFlashTheme.getId().equals(theme.getThemeId())) {
+			    themeExists = true;
+			    break;
+			}
+		    }
+
+		    if (!themeExists) {
+			userDTO.setFlashTheme(
+				new CSSThemeBriefDTO(UniversalLoginModule.themeService.getDefaultFlashTheme()));
+		    }
+		}
 	    }
+	} catch (Exception e) {
+	    UniversalLoginModule.log.error("Error while validating password", e);
+	    return false;
 	}
 	return isValid;
     }
@@ -263,11 +416,10 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
      * 
      * @return Group[] containing the sets of roles
      */
-    @Override
-    protected Group[] getRoleSets() throws LoginException {
-	String username = getUsername();
+    private Group[] getRoleSets() throws LoginException {
+	String userName = getUserName();
+	Map<String, Group> setsMap = new HashMap<String, Group>();
 	Connection conn = null;
-	HashMap setsMap = new HashMap();
 	PreparedStatement ps = null;
 	ResultSet rs = null;
 
@@ -276,27 +428,13 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 	    InitialContext ctx = new InitialContext();
 	    DataSource ds = (DataSource) ctx.lookup(this.dsJndiName);
 
-	    // log.debug("===> getRoleSets() called: " + dsJndiName + ": " +
-	    // rolesQuery);
 	    conn = ds.getConnection();
 	    // Get the user role names
-	    ps = conn.prepareStatement(this.rolesQuery);
-	    try {
-		ps.setString(1, username);
-	    } catch (ArrayIndexOutOfBoundsException ignore) {
-		// The query may not have any parameters so just try it
-	    }
+	    ps = conn.prepareStatement(UniversalLoginModule.ROLES_QUERY);
+	    ps.setString(1, userName);
 	    rs = ps.executeQuery();
 	    if (rs.next() == false) {
-		if (getUnauthenticatedIdentity() == null) {
-		    throw new FailedLoginException("No matching username found in Roles");
-		}
-		/*
-		 * We are running with an unauthenticatedIdentity so create an
-		 * empty Roles set and return.
-		 */
-		Group[] roleSets = { new SimpleGroup("Roles") };
-		return roleSets;
+		throw new FailedLoginException("No matching user name found in roles: " + userName);
 	    }
 
 	    ArrayList<String> groupMembers = new ArrayList<String>();
@@ -306,60 +444,62 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 		if ((groupName == null) || (groupName.length() == 0)) {
 		    groupName = "Roles";
 		}
-		Group group = (Group) setsMap.get(groupName);
+		Group group = setsMap.get(groupName);
 		if (group == null) {
 		    group = new SimpleGroup(groupName);
 		    setsMap.put(groupName, group);
 		}
 
 		try {
-		    Principal p;
+		    Principal p = null;
 		    // Assign minimal role if user has none
 		    if (name == null) {
 			name = Role.LEARNER;
-			UniversalLoginModule.log.info("===> Found no roles");
+			UniversalLoginModule.log.info("Found no roles for user: " + userName + ", assigning: " + name);
 		    }
-		    p = super.createIdentity(name);
+		    p = new SimplePrincipal(name);
 		    if (!groupMembers.contains(name)) {
-			UniversalLoginModule.log.info("===> Assign user to role " + p.getName());
+			UniversalLoginModule.log.info("Assign user: " + userName + " to role " + p.getName());
 			group.addMember(p);
 			groupMembers.add(name);
 		    }
 		    if (name.equals(Role.SYSADMIN)) {
-			p = super.createIdentity(Role.AUTHOR);
-			UniversalLoginModule.log.info("===> Found " + name);
+			p = new SimplePrincipal(Role.AUTHOR);
+			UniversalLoginModule.log.info("Found role " + name);
 			if (!groupMembers.contains(Role.AUTHOR)) {
-			    UniversalLoginModule.log.info("===> Assign user to role " + Role.AUTHOR);
+			    UniversalLoginModule.log.info("Assign user: " + userName + " to role " + Role.AUTHOR);
 			    group.addMember(p);
 			    groupMembers.add(Role.AUTHOR);
 			}
 		    }
 		} catch (Exception e) {
-		    UniversalLoginModule.log.debug("===> Failed to create principal: " + name, e);
+		    UniversalLoginModule.log.info("Failed to create principal: " + name + " for user: " + userName, e);
 		}
 	    } while (rs.next());
-	} catch (NamingException ex) {
-	    throw new LoginException(ex.toString(true));
-	} catch (SQLException ex) {
-	    super.log.error("SQL failure", ex);
-	    throw new LoginException(ex.toString());
+	} catch (NamingException e) {
+	    throw new LoginException(e.toString(true));
+	} catch (SQLException e) {
+	    throw new LoginException(e.toString());
 	} finally {
 	    if (rs != null) {
 		try {
 		    rs.close();
 		} catch (SQLException e) {
+		    UniversalLoginModule.log.error(e);
 		}
 	    }
 	    if (ps != null) {
 		try {
 		    ps.close();
 		} catch (SQLException e) {
+		    UniversalLoginModule.log.error(e);
 		}
 	    }
 	    if (conn != null) {
 		try {
 		    conn.close();
-		} catch (Exception ex) {
+		} catch (Exception e) {
+		    UniversalLoginModule.log.error(e);
 		}
 	    }
 	}
@@ -368,16 +508,4 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 	setsMap.values().toArray(roleSets);
 	return roleSets;
     }
-
-    /**
-     * Overriden to return an empty password string as typically one cannot obtain a user's password. We also override
-     * the validatePassword so this is ok.
-     * 
-     * @return and empty password String
-     */
-    @Override
-    protected String getUsersPassword() throws LoginException {
-	return "";
-    }
-
 }

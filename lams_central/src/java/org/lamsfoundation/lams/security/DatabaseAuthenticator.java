@@ -32,89 +32,78 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 
+/**
+ * Validates user password against an entry in the LAMS database.
+ */
+public class DatabaseAuthenticator {
+    private static Logger log = Logger.getLogger(DatabaseAuthenticator.class);
 
-public class DatabaseAuthenticator
-{
-	private String dsJndiName;
-	private String principalsQuery;
-	
-	public DatabaseAuthenticator(String dsJndiName, String principalsQuery) {
-		this.dsJndiName = dsJndiName;
-		this.principalsQuery = principalsQuery;
+    private String dsJndiName;
+    private static final String PRINCIPAL_QUERY = "SELECT password FROM lams_user WHERE login=?";
+
+    public DatabaseAuthenticator(String dsJndiName) {
+	this.dsJndiName = dsJndiName;
+    }
+
+    public boolean authenticate(String username, String inputPassword) {
+	if ((inputPassword == null) || (inputPassword.trim().length() == 0)) {
+	    return false;
 	}
 
-	public boolean authenticate( String username, String inputPassword )
-	{
-		boolean isValid = false;
-		if ( (inputPassword == null ) && (inputPassword.trim().length()==0) )
-			return isValid;
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+	boolean isValid = false;
 
-		String databasePassword = null;      
-		try
-		{
-		   InitialContext ctx = new InitialContext();
-		   DataSource ds = (DataSource) ctx.lookup(dsJndiName);
-		   conn = ds.getConnection();
-		   // Get the password
-		   ps = conn.prepareStatement(principalsQuery);
-		   ps.setString(1, username);
-		   rs = ps.executeQuery();
-		   if( rs.next() == false )
-		   		isValid = false;
-         
-		   databasePassword = rs.getString(1);
-		   if ( inputPassword.equals(databasePassword.trim()) )
-		   		isValid = true;
-		   
-		}
-		catch(NamingException ex)
-		{
-			System.out.println(ex);
-		}
-		catch(SQLException ex)
-		{
-			System.out.println(ex);
-		}
-		finally
-		{
-		   if (rs != null)
-		   {
-			  try
-			  {
-				 rs.close();
-			  }
-			  catch(SQLException e)
-			  {}
-		   }
-		   if( ps != null )
-		   {
-			  try
-			  {
-				 ps.close();
-			  }
-			  catch(SQLException e)
-			  {}
-		   }
-		   if( conn != null )
-		   {
-			  try
-			  {
-				 conn.close();
-			  }
-			  catch (SQLException ex)
-			  {}
-		   }
-		}
-		return isValid;
+	Connection conn = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
 
+	String databasePassword = null;
+	try {
+	    InitialContext ctx = new InitialContext();
+	    DataSource ds = (DataSource) ctx.lookup(dsJndiName);
+	    conn = ds.getConnection();
+	    // Get the password
+	    ps = conn.prepareStatement(PRINCIPAL_QUERY);
+	    ps.setString(1, username);
+	    rs = ps.executeQuery();
+	    if (rs.next() == false) {
+		isValid = false;
+	    }
+
+	    databasePassword = rs.getString(1);
+	    if (inputPassword.equals(databasePassword.trim())) {
+		isValid = true;
+	    }
+
+	} catch (NamingException e) {
+	    DatabaseAuthenticator.log.error(e);
+	} catch (SQLException e) {
+	    DatabaseAuthenticator.log.error(e);
+	} finally {
+	    if (rs != null) {
+		try {
+		    rs.close();
+		} catch (SQLException e) {
+		    DatabaseAuthenticator.log.error(e);
+		}
+	    }
+	    if (ps != null) {
+		try {
+		    ps.close();
+		} catch (SQLException e) {
+		    DatabaseAuthenticator.log.error(e);
+		}
+	    }
+	    if (conn != null) {
+		try {
+		    conn.close();
+		} catch (SQLException e) {
+		    DatabaseAuthenticator.log.error(e);
+		}
+	    }
 	}
 
+	return isValid;
+    }
 }
-
-
-
-
