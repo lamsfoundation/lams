@@ -447,14 +447,6 @@
                     <authentication>
                         <login-module code="org.lamsfoundation.lams.security.UniversalLoginModule" flag="required">
                             <module-option name="dsJndiName" value="java:jboss/datasources/lams-ds"/>
-                            <module-option name="principalsQuery" value="SELECT password FROM lams_user WHERE login=?"/>
-                            <module-option name="rolesQuery" value="
-				             	SELECT DISTINCT  r.name,'Roles' FROM
-				             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
-				             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
-				             	LEFT OUTER JOIN lams_role r USING (role_id)
-				             	WHERE u.login=?"
-				             />
                         </login-module>
                     </authentication>
                 </security-domain>

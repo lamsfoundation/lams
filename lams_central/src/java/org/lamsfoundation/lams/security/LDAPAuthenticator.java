@@ -38,60 +38,41 @@ import javax.naming.ldap.InitialLdapContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.service.LdapService;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.ILdapService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+
+/**
+ * Validates user password against an entry in a LDAP database.
+ */
 public class LDAPAuthenticator {
 
     private static Logger log = Logger.getLogger(LDAPAuthenticator.class);
 
-    private static UserManagementService service;
-
-    private static LdapService ldapService;
+    private static IUserManagementService userManagementService;
+    private static ILdapService ldapService;
 
     private static final String INITIAL_CONTEXT_FACTORY_VALUE = "com.sun.jndi.ldap.LdapCtxFactory";
 
     private Attributes attrs = null;
 
-    public LDAPAuthenticator() {
-    }
-
-    private UserManagementService getService() {
-	if (LDAPAuthenticator.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
-		    .getServletContext());
-	    LDAPAuthenticator.service = (UserManagementService) ctx.getBean("userManagementService");
+    public LDAPAuthenticator(IUserManagementService userManagementService) {
+	if (LDAPAuthenticator.userManagementService == null) {
+	    LDAPAuthenticator.userManagementService = userManagementService;
 	}
-	return LDAPAuthenticator.service;
-    }
-
-    private LdapService getLdapService() {
 	if (LDAPAuthenticator.ldapService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
-		    .getServletContext());
-	    LDAPAuthenticator.ldapService = (LdapService) ctx.getBean("ldapService");
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    LDAPAuthenticator.ldapService = (ILdapService) ctx.getBean("ldapService");
 	}
-	return LDAPAuthenticator.ldapService;
     }
 
-    public Attributes getAttrs() {
-	return attrs;
-    }
-
-    public void setAttrs(Attributes attrs) {
-	this.attrs = attrs;
-    }
-
-    public boolean authenticate(String username, String inputPassword) {
-	return authentication(username, inputPassword);
-    }
-
-    private boolean authentication(String username, Object credential) {
+    public boolean authenticate(String userName, String credential) {
 	Properties env = new Properties();
 
 	// setup initial connection to search for user's dn
@@ -126,36 +107,35 @@ public class LDAPAuthenticator {
 	    // search for the user's cn
 	    String filter = Configuration.get(ConfigurationKeys.LDAP_SEARCH_FILTER);
 	    String baseDN = Configuration.get(ConfigurationKeys.LDAP_BASE_DN);
-	    Object[] filterArgs = { username };
+	    Object[] filterArgs = { userName };
 	    NamingEnumeration<SearchResult> results = ctx.search(baseDN, filter, filterArgs, ctrl);
 	    while (results.hasMore()) {
 		SearchResult result = results.next();
 		if (LDAPAuthenticator.log.isDebugEnabled()) {
-		    LDAPAuthenticator.log.debug("===> found matching object...");
-		    LDAPAuthenticator.log.debug("name: " + result.getName());
-		    LDAPAuthenticator.log.debug("namespace name: " + result.getNameInNamespace());
+		    LDAPAuthenticator.log.debug("Found matching object. Name: " + result.getName() + ". Namespace: "
+			    + result.getNameInNamespace());
 		}
 		Attributes attrs = result.getAttributes();
 		Attribute attr = attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR));
-		login = getLdapService().getSingleAttributeString(attr);
+		login = LDAPAuthenticator.ldapService.getSingleAttributeString(attr);
 		if (attr != null) {
 		    Object attrValue = attr.get();
 		    if (attrValue != null) {
 			login = attrValue.toString();
 		    }
 		}
-		if (StringUtils.equals(login, username)) {
+		if (StringUtils.equals(login, userName)) {
 		    // now we can try to authenticate
 		    dn = result.getNameInNamespace();
-		    setAttrs(attrs);
+		    this.attrs = attrs;
 		    ctx.close();
 		    break;
 		}
 	    }
 	    if (StringUtils.isBlank(login)) {
-		LDAPAuthenticator.log.error("===> No LDAP user found with username: " + username
+		LDAPAuthenticator.log.error("No LDAP user found with name: " + userName
 			+ ". This could mean that the the login attribute is incorrect,"
-			+ " the user doesn't exist, or that an initial bind user is required.");
+			+ " the user does not exist, or that an initial bind user is required.");
 		return false;
 	    }
 
@@ -165,57 +145,60 @@ public class LDAPAuthenticator {
 	    ctx = new InitialLdapContext(env, null);
 
 	    // if no exception, success
-	    LDAPAuthenticator.log.debug("===> LDAP context created using DN: " + dn);
+	    LDAPAuthenticator.log.debug("LDAP context created using DN: " + dn);
 	    isValid = true;
 
 	    // start checking whether we need to update user depending on its
 	    // attributes
 	    if (LDAPAuthenticator.log.isDebugEnabled()) {
-		NamingEnumeration enumAttrs = this.attrs.getAll();
+		NamingEnumeration<? extends Attribute> enumAttrs = this.attrs.getAll();
 		while (enumAttrs.hasMoreElements()) {
 		    LDAPAuthenticator.log.debug(enumAttrs.next());
 		}
 	    }
 
 	    // check user is disabled in ldap
-	    if (getLdapService().getDisabledBoolean(this.attrs)) {
-		LDAPAuthenticator.log.debug("===> User is disabled in LDAP.");
-		User user = getService().getUserByLogin(username);
+	    if (LDAPAuthenticator.ldapService.getDisabledBoolean(this.attrs)) {
+		LDAPAuthenticator.log.info("User " + userName + "is disabled in LDAP.");
+		User user = LDAPAuthenticator.userManagementService.getUserByLogin(userName);
 		if (user != null) {
-		    getService().disableUser(user.getUserId());
+		    LDAPAuthenticator.userManagementService.disableUser(user.getUserId());
 		}
 		return false;
 	    }
 
 	    if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_UPDATE_ON_LOGIN)) {
-		User user = getService().getUserByLogin(username);
+		User user = LDAPAuthenticator.userManagementService.getUserByLogin(userName);
 		if (user != null) {
 		    // update user's attributes and org membership
-		    getLdapService().updateLDAPUser(user, this.attrs);
-		    getLdapService().addLDAPUser(this.attrs, user.getUserId());
+		    LDAPAuthenticator.ldapService.updateLDAPUser(user, this.attrs);
+		    LDAPAuthenticator.ldapService.addLDAPUser(this.attrs, user.getUserId());
 		}
 	    }
 
 	    return true;
 	} catch (AuthenticationNotSupportedException e) {
-	    LDAPAuthenticator.log.error("===> Authentication mechanism not supported.  Check your "
+	    LDAPAuthenticator.log.error("Authentication mechanism not supported. Check your "
 		    + ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION + " parameter: "
 		    + Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
 	} catch (AuthenticationException e) {
-	    LDAPAuthenticator.log.info("===> Incorrect username (" + dn + ") or password. " + e.getMessage());
+	    LDAPAuthenticator.log.info("Incorrect username (" + dn + ") or password. " + e.getMessage());
 	} catch (Exception e) {
-	    LDAPAuthenticator.log.error("===> LDAP exception: " + e, e);
+	    LDAPAuthenticator.log.error("LDAP exception", e);
 	} finally {
 	    try {
 		if (ctx != null) {
 		    ctx.close();
 		}
 	    } catch (Exception e) {
-		LDAPAuthenticator.log.error("===> gettting problem when closing context. Exception: " + e);
+		LDAPAuthenticator.log.error("Exception when closing context.", e);
 	    }
 	}
 
 	return isValid;
     }
 
+    public Attributes getAttrs() {
+	return attrs;
+    }
 }
