@@ -26,7 +26,7 @@
 	<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
-		
+
 		//vars for rating.js
 		var MAX_RATES = ${peerreview.maximumRates},
 		MIN_RATES = ${peerreview.minimumRates},
@@ -75,7 +75,7 @@
 			    		var rows = [],
 			            json = {},
 						countRatedItems = data.countRatedItems;
-			    		
+
 			    		if (data.rows.length == 0) {
 			    			$(".tablesorter,.pager").hide();
 			    			$("#no-users-info").show();
@@ -103,7 +103,19 @@
 							
 							rows += '<td style="width:150px;">';
 							rows += 	'<div class="rating-stars-holder">';
-								
+
+							// if the user has left a comment or done a rating in a batch of ratings, we need to keep all related ratings open.
+							var hasStartedRating = false;
+							for (j = 0; !hasStartedRating && j < userData.criteriaDtos.length; j++){
+								hasStartedRating = userData.criteriaDtos[j].userRating != "";
+								if ( hasStartedRating) {
+									idsBeingRated.push(itemId); // idsBeingRated defined in rating.js
+								}
+							}
+							hasStartedRating = hasStartedRating || ${isCommentsEnabled} && userData["commentPostedByUser"] != "";
+							
+							var isDisabled = IS_DISABLED || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES) && ! hasStartedRating || isMaximumRatesPerUserReached;
+							
 							for (j = 0; j < userData.criteriaDtos.length; j++){
 								var criteriaDto = userData.criteriaDtos[j];
 								var objectId = criteriaDto["ratingCriteriaId"] + "-" + itemId;
@@ -112,11 +124,12 @@
 								var userRating = criteriaDto.userRating;
 								var isCriteriaNotRatedByUser = userRating == "";
 								var averageRatingDisplayed = (!isCriteriaNotRatedByUser) ? averageRating : 0;
-								var isDisabled = IS_DISABLED || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES) || isMaximumRatesPerUserReached;
 								var ratingStarsClass = (isDisabled || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
 							
 								rows += '<h4>';
 								rows += 	 criteriaDto.title;
+								rows += '&nbsp'; rows += itemId;
+								rows += '&nbsp'; rows += objectId;
 								rows += '</h4>';
 										
 								rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
@@ -214,7 +227,7 @@
 			alert('<fmt:message key="error.max.ratings.per.user"/>');
 			refresh();
 		}
-		
+
     </script>
 </lams:head>
 <body class="stripes">
