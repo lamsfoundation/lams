@@ -5,6 +5,11 @@
 //constant indicating there is rting limits set up
 var HAS_RATING_LIMITS;
 
+// Which ones are being rated by the current user? Needed to control what is disabled when the max number of ratings is reached
+// when there is a "set" of criteria for each user e.g. one or more criteria and/or a comment.
+// Only needed when MAX_RATES > 0
+var idsBeingRated = []; 	
+
 $(document).ready(function(){
 	HAS_RATING_LIMITS = MAX_RATES!=0 || MIN_RATES!=0;
 
@@ -37,7 +42,7 @@ function initializeJRating() {
 			$("#rating-stars-caption-" + itemId).css("visibility", "visible");
 			    
 			//handle rating limits if available
-			handleRatingLimits(data.countRatedItems);
+			handleRatingLimits(data.countRatedItems, itemId);
 		},
 		onError : function(){
  			handleError();
@@ -105,7 +110,7 @@ function initializeJRating() {
    			
 	   				//handle rating limits if available
 	  				if (HAS_RATING_LIMITS) {
-	   					handleRatingLimits(data.countRatedItems);
+	   					handleRatingLimits(data.countRatedItems, itemId);
 	   				}
 	   			}
     		},
@@ -117,34 +122,57 @@ function initializeJRating() {
     }).removeClass("add-comment-new");
 }
 
-function handleRatingLimits(countRatedItems) {
+// If the call is from a rating then it is ratingCriteriaId-itemId format string, otherwise a comment 
+// only returns itemId as a number. Pull a string version of itemId of this. 
+function getItemIdFromObjectId(objectId) {
+	var str = String(objectId);
+	var i = str.indexOf('-');
+	if ( i >= 0 ) 
+		return str.substr(i+1);
+	else 
+		return str;
+}
+
+function handleRatingLimits(countRatedItems, objectId) {
 		
     if (HAS_RATING_LIMITS) {
 
     	//update info box
     	$("#count-rated-items").html(countRatedItems);
-	    	
+
 	    //callback function
-	    if (typeof onRatingSuccessCallback === "function") { 
+ 	    if (typeof onRatingSuccessCallback === "function") { 
 	        // safe to use the function
-	    	onRatingSuccessCallback(countRatedItems);
+ 	    	onRatingSuccessCallback(countRatedItems, objectId);
 	    }
 		    
-	    //handle max rates limit
+    	//handle max rates limit
 	    if (MAX_RATES != 0) {
+		 
+			// add the latest itemId to idsBeingRated *before* doing the disabling or this one will be disabled
+			var newItemId = getItemIdFromObjectId(objectId);
+			if ( idsBeingRated.indexOf(newItemId) == -1 ) 
+ 		    	idsBeingRated.push(newItemId)
 		    	
-	    	//disable rating feature in case MAX_RATES limit reached
+	    	//disable rating features in case MAX_RATES limit reached *except for the ones user is already rating*
 	    	if (countRatedItems >= MAX_RATES) {
 		    	$(".rating-stars").each(function() {
-		    		$(this).unbind().css('cursor','default').addClass('jDisabled');
-		    	});			    		
+		    		if ( ! $(this).hasClass('jDisabled') ) {
+		    			var itemId = getItemIdFromObjectId($(this).attr('data-id'));
+		    			if ( idsBeingRated.indexOf(itemId) == -1 ) {
+			        		$(this).unbind().css('cursor','default').addClass('jDisabled');
+			        		$('#add-comment-area-' + itemId).children().remove();
+			        	}
+			        }
+		    	});	
 	    	}
 	    }
-		    
+			    
 	    //handle min rates limit
 	    if (MIN_RATES != 0) {
-	    	checkMinimumRatesLimit(countRatedItems)
+	    	checkMinimumRatesLimit(countRatedItems);
 	    }
+	    
     }
 }
 	
