@@ -101,7 +101,7 @@ public class SsoHandler implements ServletExtension {
 			// do the logging in UniversalLoginModule or cache
 			handler.handleRequest(exchange);
 
-			if (login.equals(request.getRemoteUser())) {
+			if (login != null && login.equals(request.getRemoteUser())) {
 			    session.setAttribute(AttributeNames.USER, userDTO);
 			}
 
