@@ -34,6 +34,7 @@ import java.security.AccessController;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
@@ -80,9 +81,16 @@ public class SsoHandler implements ServletExtension {
 			// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
 			String redirectURL = request.getParameter("redirectURL");
 			if (!StringUtils.isBlank(redirectURL)) {
+			    // prevent XSS attack
+			    if (redirectURL.contains("<")) {
+				HttpServletResponse response = (HttpServletResponse) context.getServletResponse();
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+					"redirectURL parameter contains HTML tags");
+				return;
+			    }
 			    SsoHandler.handleRedirectBack(context, redirectURL);
 			}
-			
+
 			/* Fetch UserDTO before completing request so putting it later in session is done ASAP
 			 * Response is sent in another thread and if UserDTO is not present in session when browser completes redirect,
 			 * it results in error. Winning this race is the easiest option.
