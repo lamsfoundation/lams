@@ -128,8 +128,6 @@
 							
 								rows += '<h4>';
 								rows += 	 criteriaDto.title;
-								rows += '&nbsp'; rows += itemId;
-								rows += '&nbsp'; rows += objectId;
 								rows += '</h4>';
 										
 								rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
