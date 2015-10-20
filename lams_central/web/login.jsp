@@ -39,6 +39,7 @@ j_security_login_page
 			<script type="text/javascript">
 				function submitForm() {
 					var password = $('#j_password').val();
+						
 					if (${encrypt}) {
 						$('#j_password').val(hex_sha1(password));
 					}
@@ -114,7 +115,7 @@ j_security_login_page
 								</div>
 							</c:if>
 							
-							<input type="hidden" name="redirectURL" value='${param.redirectURL}'/>
+							<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
 							
 							<p class="first">
 								<fmt:message key="label.username" />
@@ -193,7 +194,7 @@ j_security_login_page
 				<form style="display: none" method="POST" action="j_security_check">
 					<input type="hidden" name="j_username" value="${login}" />
 					<input type="hidden" name="j_password" value="${password}" />
-					<input type="hidden" name="redirectURL" value="${param.redirectURL }" />
+					<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
 				</form>
 			</div>
 			<div id="footer">
