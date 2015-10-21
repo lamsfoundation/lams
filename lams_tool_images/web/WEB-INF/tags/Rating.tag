@@ -52,16 +52,32 @@
 </c:if>
 <c:set var="isCommentsEnabled" value="${itemRatingDto.commentsEnabled && showComments}"/>
 
+<c:if test="${isCommentsEnabled}">
+	<c:set var="userId"><lams:user property="userID" /></c:set>
+	<c:forEach var="comment" items="${itemRatingDto.commentDtos}">
+		<c:if test="${comment.userId == userId}">
+			<c:set var="commentLeftByUser" value="${comment}"/>
+		</c:if>
+	</c:forEach>
+</c:if>
+
 <%--Rating stars area---------------------------------------%>
 
 <div class="extra-controls-inner">
 <div class="rating-stars-holder">
+
+	<c:set var="hasStartedRating" value="false"/>
+	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}">
+		<c:set var="hasStartedRating" value='${hasStartedRating || criteriaDto.userRating != ""}'/>
+	</c:forEach>
+	<c:set var="hasStartedRating" value='${hasStartedRating || not empty commentLeftByUser}'/>
+	
 	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}" varStatus="status">
 		<c:set var="objectId" value="${criteriaDto.ratingCriteria.ratingCriteriaId}-${itemRatingDto.itemId}"/>
 		<c:set var="isCriteriaNotRatedByUser" value='${criteriaDto.userRating == ""}'/>
 	
 		<c:choose>
-			<c:when test='${disabled || isItemAuthoredByUser || (maxRates > 0) && (countRatedItems >= maxRates) || !isCriteriaNotRatedByUser}'>
+			<c:when test='${disabled || isItemAuthoredByUser || (maxRates > 0) && (countRatedItems >= maxRates)  && !hasStartedRating || !isCriteriaNotRatedByUser}'>
 				<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
 			</c:when>
 			<c:otherwise>
@@ -133,13 +149,6 @@
 <c:if test="${isCommentsEnabled}">
 	<div id="comments-area-${itemRatingDto.itemId}">
 	
-		<c:set var="userId"><lams:user property="userID" /></c:set>
-		<c:forEach var="comment" items="${itemRatingDto.commentDtos}">
-			<c:if test="${comment.userId == userId}">
-				<c:set var="commentLeftByUser" value="${comment}"/>
-			</c:if>
-		</c:forEach>
-		
 		<c:choose>
 			<c:when test='${isItemAuthoredByUser}'>
 				<c:forEach var="comment" items="${itemRatingDto.commentDtos}">
@@ -155,7 +164,7 @@
 				</div>
 			</c:when>
 			
-			<c:when test='${not disabled}'>
+			<c:when test='${not ( disabled || (maxRates > 0) && (countRatedItems >= maxRates) && !hasStartedRating )}'>
 				<div id="add-comment-area-${itemRatingDto.itemId}">
 			
 					<!-- Rating limits info -->
