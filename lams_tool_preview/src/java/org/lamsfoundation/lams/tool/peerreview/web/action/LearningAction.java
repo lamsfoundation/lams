@@ -433,7 +433,7 @@ public class LearningAction extends Action {
 	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
 		JSONObject criteriasRow = new JSONObject();
 		criteriasRow.put("ratingCriteriaId", criteriaDto.getRatingCriteria().getRatingCriteriaId());
-		criteriasRow.put("title", StringEscapeUtils.escapeCsv(criteriaDto.getRatingCriteria().getTitle()));
+		criteriasRow.put("title", StringEscapeUtils.escapeHtml(criteriaDto.getRatingCriteria().getTitle()));
 		criteriasRow.put("averageRating", criteriaDto.getAverageRating());
 		criteriasRow.put("numberOfVotes", criteriaDto.getNumberOfVotes());
 		criteriasRow.put("userRating", criteriaDto.getUserRating());
