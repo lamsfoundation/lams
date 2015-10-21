@@ -255,7 +255,7 @@ $(document).ready(function() {
 					
 					<td class="criteria-info">
 						<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
-						<input type="text" name="criteriaTitle${criteria.orderId}" value="${criteria.title}">
+						<input type="text" name="criteriaTitle${criteria.orderId}" value="${fn:escapeXml(criteria.title)}">
 					</td>
 					
 					<td width="40px">
