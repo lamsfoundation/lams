@@ -118,11 +118,25 @@
 								
 								rows += '</td>';
 								
+								var usesRatings = false;
+								var hasStartedRating = false;
+
+	
 								if (${generalLearnerFlowDTO.allowRateAnswers == 'true'}) {
 									rows += '<td style="width:150px;">';
 									
 									if (userData["visible"] == 'true') {
 										rows += '<div class="rating-stars-holder">';
+										
+										// if the user has left a comment or done a rating in a batch of ratings, we need to keep all related ratings open.
+										usesRatings = true;
+										for (j = 0; !hasStartedRating && j < userData.criteriaDtos.length; j++){
+											hasStartedRating = userData.criteriaDtos[j].userRating != "";
+											if ( hasStartedRating) {
+												idsBeingRated.push(itemId); // idsBeingRated defined in rating.js
+											}
+										}
+										hasStartedRating = hasStartedRating || ${isCommentsEnabled} && userData["commentPostedByUser"] != "";
 										
 										for (j = 0; j < userData.criteriaDtos.length; j++){
 											var criteriaDto = userData.criteriaDtos[j];
@@ -132,7 +146,7 @@
 											var userRating = criteriaDto.userRating;
 											var isCriteriaNotRatedByUser = userRating == "";
 											var averageRatingDisplayed = (isItemAuthoredByUser || !isCriteriaNotRatedByUser) ? averageRating : 0;
-											var ratingStarsClass = (IS_DISABLED ||isItemAuthoredByUser || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES) || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
+											var ratingStarsClass = (IS_DISABLED ||isItemAuthoredByUser || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES)  && ! hasStartedRating || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
 								
 											rows += '<h4>';
 											rows += 	 criteriaDto.title;
@@ -188,7 +202,7 @@
 											rows += '</div>';
 											
 										//show comments textarea and a submit button
-										} else if (!IS_DISABLED) {
+										} else if (! (IS_DISABLED || usesRatings && MAX_RATES>0 && countRatedItems >= MAX_RATES && !hasStartedRating)) {
 											rows += '<div id="add-comment-area-' + itemId + '">';											
 											rows +=		'<textarea name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
 											
