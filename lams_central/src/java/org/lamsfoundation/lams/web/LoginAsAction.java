@@ -30,6 +30,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -73,7 +74,8 @@ public class LoginAsAction extends Action {
 
 		    // login.jsp knows what to do with these
 		    request.setAttribute("login", login);
-		    request.setAttribute("password", user.getPassword());
+		    // notify the login module that the user has been authenticated correctly
+		    UniversalLoginModule.setAuthenticationToken(login);
 		    // redirect to login page
 		    return (new ActionForward("/login.jsp?redirectURL=/lams/index.jsp"));
 		}

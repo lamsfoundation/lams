@@ -24,38 +24,68 @@ package org.lamsfoundation.lams.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import org.apache.commons.codec.binary.Hex;
 
 /**
- * @version
- *
- * <p>
- * <a href="HashUtil.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- * Created at 16:25:56 on 20/06/2006
+ * Utilities for hashing passwords.
+ * 
+ * @author Fei Yang, Marcin Cieslak
  */
 public class HashUtil {
 
-    public static String sha1(String plaintext){
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA1");
-	        return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
-		}
+    private static final SecureRandom secureRandom = new SecureRandom();
+
+    public static final int SALT_BYTE_LENGTH = 32;
+    public static final int SALT_HEX_LENGTH = HashUtil.SALT_BYTE_LENGTH * 2;
+    public static final int SHA1_HEX_LENGTH = 40;
+    public static final int SHA256_HEX_LENGTH = 64;
+
+    public static String sha1(String plaintext) {
+	try {
+	    MessageDigest md = MessageDigest.getInstance("SHA-1");
+	    return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+	} catch (NoSuchAlgorithmException e) {
+	    throw new RuntimeException(e);
+	}
     }
 
-    public static String md5(String plaintext){
-        try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
-		}       
+    public static String sha256(String plaintext) {
+	try {
+	    MessageDigest md = MessageDigest.getInstance("SHA-256");
+	    return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+	} catch (NoSuchAlgorithmException e) {
+	    throw new RuntimeException(e);
+	}
     }
-    
+
+    public static String sha256(String password, String salt) {
+	try {
+	    MessageDigest md = MessageDigest.getInstance("SHA-256");
+	    String plaintext = salt + password;
+	    return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+	} catch (NoSuchAlgorithmException e) {
+	    throw new RuntimeException(e);
+	}
+    }
+
+    public static String md5(String plaintext) {
+	try {
+	    MessageDigest md = MessageDigest.getInstance("MD5");
+	    return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+	} catch (NoSuchAlgorithmException e) {
+	    throw new RuntimeException(e);
+	}
+    }
+
+    public static String salt() {
+	return HashUtil.salt(HashUtil.SALT_BYTE_LENGTH);
+    }
+
+    public static String salt(int length) {
+	byte[] salt = new byte[length];
+	HashUtil.secureRandom.nextBytes(salt);
+	return Hex.encodeHexString(salt);
+    }
 }

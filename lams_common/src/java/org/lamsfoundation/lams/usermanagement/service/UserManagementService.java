@@ -109,8 +109,8 @@ public class UserManagementService implements IUserManagementService {
 
     private IAuditService getAuditService() {
 	if (UserManagementService.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
 	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return UserManagementService.auditService;
@@ -356,7 +356,8 @@ public class UserManagementService implements IUserManagementService {
 		    // now, process any children of this org
 		    Organisation childOrganisation = userOrganisation.getOrganisation();
 		    if (org.getChildOrganisations().size() > 0) {
-			getChildOrganisations(user, childOrganisation, restrictToRoleNames, restrictToClassIds, dtolist);
+			getChildOrganisations(user, childOrganisation, restrictToRoleNames, restrictToClassIds,
+				dtolist);
 		    }
 		}
 	    }
@@ -395,8 +396,8 @@ public class UserManagementService implements IUserManagementService {
 	    Map<String, Object> map = new HashMap<String, Object>();
 	    map.put("user.userId", user.getUserId());
 	    map.put("organisation.organisationId", organisationId);
-	    UserOrganisation userOrganisation = (UserOrganisation) baseDAO
-		    .findByProperties(UserOrganisation.class, map).get(0);
+	    UserOrganisation userOrganisation = (UserOrganisation) baseDAO.findByProperties(UserOrganisation.class, map)
+		    .get(0);
 	    OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
 	    addRolesToDTO(null, userOrganisation, dto);
 	    return dto;
@@ -445,8 +446,8 @@ public class UserManagementService implements IUserManagementService {
 	// it's ugly to put query string here, but it is a convention of this class so let's stick to it for now
 	String query = "SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
 		+ organisationID + " AND r.role.name= '" + roleName + "'";
-	List<User> queryResult = (List<User>) baseDAO.find(query);
-	
+	List<User> queryResult = baseDAO.find(query);
+
 	for (User user : queryResult) {
 	    if (isFlashCall && !getUser) {
 		users.add(user.getUserFlashDTO());
@@ -456,14 +457,15 @@ public class UserManagementService implements IUserManagementService {
 		users.add(user.getUserDTO());
 	    }
 	}
-	
+
 	return users;
     }
 
     @Override
     public Organisation getRootOrganisation() {
-	return (Organisation) baseDAO.findByProperty(Organisation.class, "organisationType.organisationTypeId",
-		OrganisationType.ROOT_TYPE).get(0);
+	return (Organisation) baseDAO
+		.findByProperty(Organisation.class, "organisationType.organisationTypeId", OrganisationType.ROOT_TYPE)
+		.get(0);
     }
 
     @Override
@@ -537,7 +539,9 @@ public class UserManagementService implements IUserManagementService {
     public void updatePassword(String login, String password) {
 	try {
 	    User user = getUserByLogin(login);
-	    user.setPassword(HashUtil.sha1(password));
+	    String salt = HashUtil.salt();
+	    user.setSalt(salt);
+	    user.setPassword(HashUtil.sha256(password, salt));
 	    baseDAO.update(user);
 	} catch (Exception e) {
 	    log.debug(e);
@@ -628,8 +632,8 @@ public class UserManagementService implements IUserManagementService {
 		    User user = (User) findById(User.class, m.getUserID());
 		    UserOrganisation uo = new UserOrganisation(user, organisation);
 		    log.debug("adding course manager: " + user.getUserId() + " as staff");
-		    UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) findById(Role.class,
-			    Role.ROLE_MONITOR));
+		    UserOrganisationRole uor = new UserOrganisationRole(uo,
+			    (Role) findById(Role.class, Role.ROLE_MONITOR));
 		    HashSet uors = new HashSet();
 		    uors.add(uor);
 		    uo.setUserOrganisationRoles(uors);

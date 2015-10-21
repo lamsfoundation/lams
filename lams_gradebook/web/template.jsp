@@ -11,7 +11,6 @@
 	<html:base/>
 	<title><fmt:message><tiles:getAsString name="titleKey"/></fmt:message></title>
 	<lams:css style="core"/>
-	<script language="JavaScript" type="text/JavaScript" src="<html:rewrite page='/includes/javascript/sha1.js'/>"></script>
 	<script language="JavaScript" type="text/JavaScript" src="<html:rewrite page='/includes/javascript/changeStyle.js'/>"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>

@@ -67,6 +67,7 @@ public class PasswordChangeAction extends Action {
      *            The HTTP response we are creating
      * 
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// -- isCancelled?
@@ -88,31 +89,35 @@ public class PasswordChangeAction extends Action {
 		String password = passwordChangeForm.getPassword();
 		String passwordConfirm = passwordChangeForm.getPasswordConfirm();
 
-		if (loggedInUser == null || !loggedInUser.equals(login)) {
+		if ((loggedInUser == null) || !loggedInUser.equals(login)) {
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.authorisation"));
 		} else {
 		    // WebApplicationContext ctx =
 		    // WebApplicationContextUtils.getWebApplicationContext(request.getSession(true).getServletContext());
-		    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServlet()
-			    .getServletContext());
+		    WebApplicationContext ctx = WebApplicationContextUtils
+			    .getWebApplicationContext(getServlet().getServletContext());
 		    UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 
 		    User user = service.getUserByLogin(login);
-		    if (!user.getPassword().equals(HashUtil.sha1(oldPassword))) {
+		    String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH
+			    ? HashUtil.sha1(oldPassword) : HashUtil.sha256(oldPassword, user.getSalt());
+
+		    if (!user.getPassword().equals(passwordHash)) {
 			errors.add("oldPassword", new ActionMessage("error.oldpassword.mismatch"));
-			log.debug("old pass wrong");
+			PasswordChangeAction.log.debug("old pass wrong");
 		    }
 		    if (!password.equals(passwordConfirm)) {
 			errors.add("password", new ActionMessage("error.newpassword.mismatch"));
-			log.debug("new pass wrong");
+			PasswordChangeAction.log.debug("new pass wrong");
 		    }
-		    if (password == null || password.length() == 0) {
+		    if ((password == null) || (password.length() == 0)) {
 			errors.add("password", new ActionMessage("error.password.empty"));
-			log.debug("new password cannot be empty");
+			PasswordChangeAction.log.debug("new password cannot be empty");
 		    }
 		    if (errors.isEmpty()) {
-			// service.updatePassword(login, HashUtil.sha1(password));
-			user.setPassword(HashUtil.sha1(password));
+			String salt = HashUtil.salt();
+			user.setSalt(salt);
+			user.setPassword(HashUtil.sha256(password, salt));
 			user.setChangePassword(false);
 			service.save(user);
 
@@ -127,7 +132,7 @@ public class PasswordChangeAction extends Action {
 		}
 
 	    } catch (Exception e) {
-		log.error("Exception occured ", e);
+		PasswordChangeAction.log.error("Exception occured ", e);
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(e.getMessage()));
 	    }
 

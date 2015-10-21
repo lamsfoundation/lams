@@ -47,7 +47,7 @@ public class ConfigurationKeys {
     public static String LAMS_EAR_DIR = "EARDir";
 
     public static String SMTP_SERVER = "SMTPServer";
-    
+
     public static String USE_INTERNAL_SMTP_SERVER = "InternalSMTPServer";
 
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
@@ -128,7 +128,7 @@ public class ConfigurationKeys {
     public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
 
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
-    
+
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
 
     public static String LDAP_PROVISIONING_ENABLED = "LDAPProvisioningEnabled";
@@ -140,9 +140,9 @@ public class ConfigurationKeys {
     public static String LDAP_SEARCH_FILTER = "LDAPSearchFilter";
 
     public static String LDAP_BASE_DN = "LDAPBaseDN";
-    
+
     public static String LDAP_BIND_USER_DN = "LDAPBindUserDN";
-    
+
     public static String LDAP_BIND_USER_PASSWORD = "LDAPBindUserPassword";
 
     public static String LDAP_SECURITY_PROTOCOL = "LDAPSecurityProtocol";
@@ -205,8 +205,6 @@ public class ConfigurationKeys {
 
     public static String LDAP_ONLY_ONE_ORG = "LDAPOnlyOneOrg";
 
-    public static String LDAP_ENCRYPT_PASSWORD_FROM_BROWSER = "LDAPEncryptPasswordFromBrowser";
-
     public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
 
     /**
@@ -231,17 +229,17 @@ public class ConfigurationKeys {
     public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
 
     public static String GMAP_KEY = "GmapKey";
-        
+
     public static String RED5_SERVER_URL = "Red5ServerUrl";
-    
+
     public static String RED5_RECORDINGS_URL = "Red5RecordingsUrl";
-    
+
     public static String SMTP_AUTH_USER = "SMTPUser";
-    
+
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
-    
+
     public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
-    
+
     public static String PROFILE_PARTIAL_EDIT_ENABLE = "ProfilePartialEditEnable";
 
     public static String KALTURA_SERVER = "KalturaServer";
@@ -253,25 +251,25 @@ public class ConfigurationKeys {
     public static String KALTURA_USER_SECRET = "KalturaUserSecret";
 
     public static String KALTURA_KCW_UI_CONF_ID = "KalturaKCWUiConfId";
-    
+
     public static String KALTURA_KDP_UI_CONF_ID = "KalturaKDPUiConfId";
-    
+
     public static String USER_VALIDATION_REQUIRED_USERNAME = "UserValidationUsername";
-    
+
     public static String USER_VALIDATION_REQUIRED_FIRST_LAST_NAME = "UserValidationFirstLastName";
-    
+
     public static String USER_VALIDATION_REQUIRED_EMAIL = "UserValidationEmail";
 
     // LDEV-2747
     public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";
-    
+
     // LDEV-2889
     public static String LEARNER_COLLAPSIBLE_PROGRESS_PANEL = "LearnerCollapsProgressPanel";
-    
+
     // CNG-26 Add to lams_configuration and set to false
     // if you don't want imported LD to have _<timestamp>_<seq_number> appended
     public static String SUFFIX_IMPORTED_LD = "SuffixImportedLD";
-    
+
     // LDEV-3254
     public static String CONFIGURATION_CACHE_REFRESH_INTERVAL = "ConfigCacheRefresInterval";
 }

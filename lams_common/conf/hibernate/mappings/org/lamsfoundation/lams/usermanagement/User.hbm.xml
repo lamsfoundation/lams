@@ -62,13 +62,27 @@
         type="java.lang.String"
         column="password"
         not-null="true"
-        length="50"
+        length="64"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="password"
-            length="50"
+            length="64"
             not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="salt"
+        type="java.lang.String"
+        column="salt"
+        not-null="false"
+        length="64"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="salt"
+            length="64"
+            not-null="false"
         </meta>    
     </property>
     <property

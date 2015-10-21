@@ -46,10 +46,11 @@ public interface IIntegrationService {
 
     ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
 	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix)
-	    throws UserInfoValidationException;
+		    throws UserInfoValidationException;
 
     ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
-	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method) throws UserInfoValidationException;
+	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
+		    throws UserInfoValidationException;
 
     ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
 	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean isTeacher,
@@ -59,7 +60,8 @@ public interface IIntegrationService {
 	    throws UserInfoFetchException, UserInfoValidationException;
 
     /**
-     * compatibility method to support existing integrations. It does callback call to integrated server to get user details.
+     * compatibility method to support existing integrations. It does callback call to integrated server to get user
+     * details.
      * 
      * @param serverMap
      * @param extUsername
@@ -69,7 +71,7 @@ public interface IIntegrationService {
      */
     ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
 	    throws UserInfoFetchException, UserInfoValidationException;
-    
+
     /**
      * Returns ExtUserUseridMap from DB, and null if it doesn't exist
      * 
@@ -77,8 +79,8 @@ public interface IIntegrationService {
      * @param userId
      * @return
      */
-   // ExtUserUseridMap getExtUserUseridMapByUserId(ExtServerOrgMap serverMap, Integer userId);
-    
+    // ExtUserUseridMap getExtUserUseridMapByUserId(ExtServerOrgMap serverMap, Integer userId);
+
     List<ExtUserUseridMap> getExtUserUseridMapByServerMap(ExtServerOrgMap serverMap);
 
     /**
@@ -94,9 +96,10 @@ public interface IIntegrationService {
     ExtServerOrgMap getExtServerOrgMap(Integer sid);
 
     ExtServerOrgMap getExtServerOrgMap(String serverId);
-    
+
     /**
-     * Returns ExtCourseClassMap. If ExtCourseClassMap doesn't existent - returns null and does not create a new ExtCourseClassMap.
+     * Returns ExtCourseClassMap. If ExtCourseClassMap doesn't existent - returns null and does not create a new
+     * ExtCourseClassMap.
      * 
      * @param extServerOrgMapId
      * @param extCourseId
@@ -113,16 +116,17 @@ public interface IIntegrationService {
      * @param country
      * @param email
      * @param prefix
-     * @param isUpdateUserDetails whether user details should be updated with provided parameters
+     * @param isUpdateUserDetails
+     *            whether user details should be updated with provided parameters
      * @return
      * @throws UserInfoValidationException
      */
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String firstName,
 	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
-	    throws UserInfoValidationException;
+		    throws UserInfoValidationException;
 
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
-	    String firstName, String lastName, String email) throws UserInfoValidationException;
+	    String salt, String firstName, String lastName, String email) throws UserInfoValidationException;
 
     List getAllExtServerOrgMaps();
 
