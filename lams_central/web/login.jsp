@@ -11,7 +11,6 @@
 --%>
 <c:if test="${empty requestScope.login}">
 	<c:set var="login" value="${sessionScope.login}" />
-	<c:set var="password" value="${sessionScope.password}" />
 </c:if>
 
 <!DOCTYPE html>
@@ -26,23 +25,15 @@ j_security_login_page
  --%>
 <c:choose>
 	<c:when test="${empty login}">
-		<%-- If credentials came from attributes, no need for encrypting --%>
-		<c:set var="encrypt"><%= Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER) %></c:set>
 		<lams:head>
 			<title><fmt:message key="title.login.window" /></title>
 			<lams:css style="core" />
 			<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 			<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 			<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/browser_detect.js"></script>
-			<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/sha1.js"></script>
 			<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 			<script type="text/javascript">
 				function submitForm() {
-					var password = $('#j_password').val();
-						
-					if (${encrypt}) {
-						$('#j_password').val(hex_sha1(password));
-					}
 					$('#loginForm').submit();
 				}
 		
@@ -108,7 +99,7 @@ j_security_login_page
 						<h2>
 							<fmt:message key="button.login" />
 						</h2>
-						<form action="j_security_check" method="post" name="loginForm" id="loginForm">
+						<form action="j_security_check" method="POST" name="loginForm" id="loginForm">
 							<c:if test="${!empty param.failed}">
 								<div class="warning-login">
 									<fmt:message key="error.login" />
@@ -193,7 +184,7 @@ j_security_login_page
 				
 				<form style="display: none" method="POST" action="j_security_check">
 					<input type="hidden" name="j_username" value="${login}" />
-					<input type="hidden" name="j_password" value="${password}" />
+					<input type="hidden" name="j_password" value="" />
 					<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
 				</form>
 			</div>

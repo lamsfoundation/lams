@@ -41,7 +41,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
@@ -62,8 +61,6 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -92,13 +89,13 @@ public class IntegrationService implements IIntegrationService {
     @Override
     public ExtServerOrgMap getExtServerOrgMap(String serverId) {
 	List list = service.findByProperty(ExtServerOrgMap.class, "serverid", serverId);
-	if (list == null || list.size() == 0) {
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (ExtServerOrgMap) list.get(0);
 	}
     }
-    
+
     @Override
     public ExtCourseClassMap getExtCourseClassMap(Integer extServerOrgMapId, String extCourseId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
@@ -106,14 +103,15 @@ public class IntegrationService implements IIntegrationService {
 	properties.put("extServerOrgMap.sid", extServerOrgMapId);
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
 
-	if (list == null || list.size() == 0) {
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
-	    return (ExtCourseClassMap) list.get(0);
+	    return list.get(0);
 	}
     }
 
     // wrapper method for compatibility with original integration modules
+    @Override
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method,
 	    Boolean prefix) throws UserInfoValidationException {
@@ -136,60 +134,61 @@ public class IntegrationService implements IIntegrationService {
     }
 
     // wrapper method for compatibility with original integration modules
+    @Override
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
-	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method) throws UserInfoValidationException {
+	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
+		    throws UserInfoValidationException {
 	return getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode, prettyCourseName,
 		method, true);
     }
 
     // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
+    @Override
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId,
 	    Boolean isTeacher, Boolean prefix) throws UserInfoValidationException {
 	Organisation org;
 	User user = userMap.getUser();
-	
+
 	ExtCourseClassMap extCourseClassMap = getExtCourseClassMap(serverMap.getSid(), extCourseId);
 	if (extCourseClassMap == null) {
 	    //create new ExtCourseClassMap
-	    
-	    org = createOrganisation(serverMap, user, extCourseId, extCourseName, countryIsoCode,
-		    langIsoCode, parentOrgId, prefix);
+
+	    org = createOrganisation(serverMap, user, extCourseId, extCourseName, countryIsoCode, langIsoCode,
+		    parentOrgId, prefix);
 	    extCourseClassMap = new ExtCourseClassMap();
 	    extCourseClassMap.setCourseid(extCourseId);
 	    extCourseClassMap.setExtServerOrgMap(serverMap);
 	    extCourseClassMap.setOrganisation(org);
 	    service.save(extCourseClassMap);
-	    
+
 	} else {
 	    org = extCourseClassMap.getOrganisation();
 
 	    // update external course name if if has changed
 	    String requestedCourseName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
-	    if (extCourseName != null && !org.getName().equals(requestedCourseName)) {
+	    if ((extCourseName != null) && !org.getName().equals(requestedCourseName)) {
 
 		// validate org name
 		if (!ValidationUtil.isOrgNameValid(requestedCourseName)) {
-		    throw new UserInfoValidationException(
-			    "Can't create organisation due to validation error: "
-				    + "organisation name cannot contain any of these characters < > ^ * @ % $. External server:"
-				    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:"
-				    + requestedCourseName);
+		    throw new UserInfoValidationException("Can't create organisation due to validation error: "
+			    + "organisation name cannot contain any of these characters < > ^ * @ % $. External server:"
+			    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:" + requestedCourseName);
 		}
 
 		org.setName(requestedCourseName);
 		service.updateOrganisationandWorkspaceNames(org);
 	    }
 	}
-	
+
 	updateUserRoles(user, org, isTeacher);
-	
+
 	return extCourseClassMap;
     }
 
     private void updateUserRoles(User user, Organisation org, Boolean isTeacher) {
-	
+
 	//create UserOrganisation if it doesn't exist
 	UserOrganisation uo = service.getUserOrganisation(user.getUserId(), org.getOrganisationId());
 	if (uo == null) {
@@ -198,7 +197,7 @@ public class IntegrationService implements IIntegrationService {
 	    user.addUserOrganisation(uo);
 	    service.save(user);
 	}
-	
+
 	Integer[] roles;
 	if (isTeacher) {
 	    roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
@@ -214,7 +213,8 @@ public class IntegrationService implements IIntegrationService {
 	    }
 	}
     }
-    
+
+    @Override
     public List<ExtUserUseridMap> getExtUserUseridMapByServerMap(ExtServerOrgMap serverMap) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
@@ -226,11 +226,12 @@ public class IntegrationService implements IIntegrationService {
     public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
 	    throws UserInfoFetchException, UserInfoValidationException {
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
-	
+
 	if (extUserUseridMap == null) {
 	    String[] userData = getUserDataFromExtServer(serverMap, extUsername);
-	    String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
-	    return createExtUserUseridMap(serverMap, extUsername, password, userData, prefix);
+	    String salt = HashUtil.salt();
+	    String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
+	    return createExtUserUseridMap(serverMap, extUsername, password, salt, userData, prefix);
 	} else {
 	    return extUserUseridMap;
 	}
@@ -248,43 +249,44 @@ public class IntegrationService implements IIntegrationService {
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
 	properties.put("extUsername", extUsername);
 	List<ExtUserUseridMap> list = service.findByProperties(ExtUserUseridMap.class, properties);
-	
-	if (list == null || list.size() == 0) {
+
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
-	    return (ExtUserUseridMap) list.get(0);
+	    return list.get(0);
 	}
     }
 
     @Override
     public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
-	    String firstName, String lastName, String email) throws UserInfoValidationException {
+	    String salt, String firstName, String lastName, String email) throws UserInfoValidationException {
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
-	
+
 	if (extUserUseridMap == null) {
 	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
-	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email,
-		    defaultLangCountry[1], defaultLangCountry[0] };
-	    return createExtUserUseridMap(serverMap, extUsername, password, userData, false);
+	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, defaultLangCountry[1],
+		    defaultLangCountry[0] };
+	    return createExtUserUseridMap(serverMap, extUsername, password, salt, userData, false);
 	} else {
 	    return extUserUseridMap;
 	}
     }
 
     @Override
-    public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername,
-	    String firstName, String lastName, String language, String country, String email, boolean prefix,
-	    boolean isUpdateUserDetails) throws UserInfoValidationException {
-	
+    public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String firstName,
+	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
+		    throws UserInfoValidationException {
+
 	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
-	
+
 	//create new one if it doesn't exist yet 
 	if (extUserUseridMap == null) {
 	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, country, language };
-	    String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
-	    return createExtUserUseridMap(serverMap, extUsername, password, userData, prefix);
-	    
-	//update user details if it's required
+	    String salt = HashUtil.salt();
+	    String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
+	    return createExtUserUseridMap(serverMap, extUsername, password, salt, userData, prefix);
+
+	    //update user details if it's required
 	} else if (isUpdateUserDetails) {
 
 	    User user = extUserUseridMap.getUser();
@@ -307,27 +309,28 @@ public class IntegrationService implements IIntegrationService {
 			+ "Email format is invalid. External server:" + serverMap.getServerid() + ", Username:"
 			+ user.getLogin() + ", firstName:" + firstName + ", lastName:" + lastName);
 	    }
-	    
+
 	    user.setFirstName(firstName);
 	    user.setLastName(lastName);
 	    user.setEmail(email);
 	    user.setModifiedDate(new Date());
 	    user.setLocale(LanguageUtil.getSupportedLocale(language, country));
 	    service.save(user);
-	    
+
 	    return extUserUseridMap;
-	    
-	//simply return existing one
+
+	    //simply return existing one
 	} else {
 	    return extUserUseridMap;
 	}
     }
 
     private Organisation createOrganisation(ExtServerOrgMap serverMap, User user, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix) throws UserInfoValidationException {
-	
+	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
+		    throws UserInfoValidationException {
+
 	Organisation org = new Organisation();
-	
+
 	// org name validation
 	String orgName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
 	if (StringUtils.isNotBlank(orgName) && !ValidationUtil.isOrgNameValid(orgName)) {
@@ -336,10 +339,10 @@ public class IntegrationService implements IIntegrationService {
 		    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:" + orgName);
 	}
 	org.setName(orgName);
-	
+
 	org.setDescription(extCourseId);
-	org.setOrganisationState((OrganisationState) service
-		.findById(OrganisationState.class, OrganisationState.ACTIVE));
+	org.setOrganisationState(
+		(OrganisationState) service.findById(OrganisationState.class, OrganisationState.ACTIVE));
 	org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 
 	// determine whether org will be a group or subgroup
@@ -347,35 +350,35 @@ public class IntegrationService implements IIntegrationService {
 	if (parent != null) {
 	    org.setParentOrganisation(parent);
 	    if (!parent.getOrganisationId().equals(service.getRootOrganisation().getOrganisationId())) {
-		org.setOrganisationType((OrganisationType) service.findById(OrganisationType.class,
-			OrganisationType.CLASS_TYPE));
+		org.setOrganisationType(
+			(OrganisationType) service.findById(OrganisationType.class, OrganisationType.CLASS_TYPE));
 	    } else {
-		org.setOrganisationType((OrganisationType) service.findById(OrganisationType.class,
-			OrganisationType.COURSE_TYPE));
+		org.setOrganisationType(
+			(OrganisationType) service.findById(OrganisationType.class, OrganisationType.COURSE_TYPE));
 	    }
 	} else {
 	    // default
 	    org.setParentOrganisation(service.getRootOrganisation());
-	    org.setOrganisationType((OrganisationType) service.findById(OrganisationType.class,
-		    OrganisationType.COURSE_TYPE));
+	    org.setOrganisationType(
+		    (OrganisationType) service.findById(OrganisationType.class, OrganisationType.COURSE_TYPE));
 	}
 	return service.saveOrganisation(org, user.getUserId());
     }
 
     // flexible method to specify username and password
     private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
-	    String[] userData, boolean prefix) throws UserInfoValidationException {
-	
+	    String salt, String[] userData, boolean prefix) throws UserInfoValidationException {
+
 	String login = prefix ? buildName(serverMap.getPrefix(), extUsername) : extUsername;
 	String firstName = userData[1];
 	String lastName = userData[2];
 	String email = userData[11];
-	
+
 	// login validation
 	if (StringUtils.isBlank(login)) {
-	    throw new UserInfoValidationException("Can't create user due to validation error: "
-		    + "Username cannot be blank. External server:" + serverMap.getServerid() + ", firstName:"
-		    + firstName + ", lastName:" + lastName);
+	    throw new UserInfoValidationException(
+		    "Can't create user due to validation error: " + "Username cannot be blank. External server:"
+			    + serverMap.getServerid() + ", firstName:" + firstName + ", lastName:" + lastName);
 	} else if (!ValidationUtil.isUserNameValid(login)) {
 	    throw new UserInfoValidationException("Can't create user due to validation error: "
 		    + "Username can only contain alphanumeric characters and no spaces. External server:"
@@ -402,10 +405,11 @@ public class IntegrationService implements IIntegrationService {
 		    + "Email format is invalid. External server:" + serverMap.getServerid() + ", Username:" + login
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
-	
+
 	User user = new User();
 	user.setLogin(login);
 	user.setPassword(password);
+	user.setSalt(salt);
 	user.setTitle(userData[0]);
 	user.setFirstName(userData[1]);
 	user.setLastName(userData[2]);
@@ -418,8 +422,8 @@ public class IntegrationService implements IIntegrationService {
 	user.setMobilePhone(userData[9]);
 	user.setFax(userData[10]);
 	user.setEmail(userData[11]);
-	user.setAuthenticationMethod((AuthenticationMethod) service.findById(AuthenticationMethod.class,
-		AuthenticationMethod.DB));
+	user.setAuthenticationMethod(
+		(AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.DB));
 	user.setCreateDate(new Date());
 	user.setDisabledFlag(false);
 	user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
@@ -450,17 +454,19 @@ public class IntegrationService implements IIntegrationService {
 	    // set the values for the parameters
 	    userDataCallbackUrl = userDataCallbackUrl.replaceAll("%username%", encodedExtUsername)
 		    .replaceAll("%timestamp%", timestamp).replaceAll("%hash%", hash);
-	    log.debug(userDataCallbackUrl);
+	    IntegrationService.log.debug(userDataCallbackUrl);
 	    URL url = new URL(userDataCallbackUrl);
 	    URLConnection conn = url.openConnection();
-	    if (!(conn instanceof HttpURLConnection))
+	    if (!(conn instanceof HttpURLConnection)) {
 		throw new UserInfoFetchException("Fail to fetch user data from external server:"
 			+ serverMap.getServerid() + "- Invalid connection type");
+	    }
 
 	    HttpURLConnection httpConn = (HttpURLConnection) conn;
-	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK)
+	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 		throw new UserInfoFetchException("Fail to fetch user data from external server:"
 			+ serverMap.getServerid() + " - Unexpected return HTTP Status:" + httpConn.getResponseCode());
+	    }
 
 	    InputStream is = url.openConnection().getInputStream();
 	    BufferedReader isReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -473,17 +479,18 @@ public class IntegrationService implements IIntegrationService {
 	    return CSVUtil.parse(str);
 
 	} catch (MalformedURLException e) {
-	    log.error(e);
+	    IntegrationService.log.error(e);
 	    throw new UserInfoFetchException(e);
 	} catch (IOException e) {
-	    log.error(e);
+	    IntegrationService.log.error(e);
 	    throw new UserInfoFetchException(e);
 	} catch (ParseException e) {
-	    log.error(e);
+	    IntegrationService.log.error(e);
 	    throw new UserInfoFetchException(e);
 	}
     }
 
+    @Override
     public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp) {
 	String serverId = serverMap.getServerid();
 	String serverKey = serverMap.getServerkey();
@@ -496,43 +503,50 @@ public class IntegrationService implements IIntegrationService {
 	return prefix + '_' + name;
     }
 
+    @Override
     public List getAllExtServerOrgMaps() {
 	return service.findAll(ExtServerOrgMap.class);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<ExtServerToolAdapterMap> getMappedServers(String toolSig) {
 
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("tool.toolSignature", toolSig);
-	return (List<ExtServerToolAdapterMap>) service.findByProperties(ExtServerToolAdapterMap.class, properties);
+	return service.findByProperties(ExtServerToolAdapterMap.class, properties);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public ExtServerToolAdapterMap getMappedServer(String serverId, String toolSig) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("tool.toolSignature", toolSig);
 	properties.put("extServer.serverid", serverId);
 	List ret = service.findByProperties(ExtServerToolAdapterMap.class, properties);
-	if (ret != null && ret.size() > 0) {
+	if ((ret != null) && (ret.size() > 0)) {
 	    return (ExtServerToolAdapterMap) ret.get(0);
 	} else {
 	    return null;
 	}
     }
 
+    @Override
     public void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map) {
 	service.save(map);
     }
 
+    @Override
     public void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map) {
 	service.delete(map);
     }
 
+    @Override
     public void saveExtServerOrgMap(ExtServerOrgMap map) {
 	service.save(map);
     }
 
+    @Override
     public ExtServerOrgMap getExtServerOrgMap(Integer sid) {
 	return (ExtServerOrgMap) service.findById(ExtServerOrgMap.class, sid);
     }
@@ -544,6 +558,7 @@ public class IntegrationService implements IIntegrationService {
 	service.save(map);
     }
 
+    @Override
     public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
 	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
 	// "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
@@ -554,7 +569,8 @@ public class IntegrationService implements IIntegrationService {
 	    Long lessonId = lesson.getLessonId();
 	    ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
 	    // checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
-	    if (extServerLesson != null && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+	    if ((extServerLesson != null)
+		    && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
 		ExtServerOrgMap serverMap = extServerLesson.getExtServer();
 
 		ExtUserUseridMap extUserUseridMap = getExtUserUseridMapByUserId(serverMap, user.getUserId());
@@ -571,7 +587,7 @@ public class IntegrationService implements IIntegrationService {
 		    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
 			    .replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
 			    .replaceAll("%hash%", hash);
-		    log.debug(lessonFinishCallbackUrl);
+		    IntegrationService.log.debug(lessonFinishCallbackUrl);
 		}
 	    }
 	}
@@ -581,7 +597,7 @@ public class IntegrationService implements IIntegrationService {
 
     private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
 	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
-	if (list == null || list.size() == 0) {
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (ExtServerLessonMap) list.get(0);
@@ -593,7 +609,7 @@ public class IntegrationService implements IIntegrationService {
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
 	properties.put("user.userId", userId);
 	List list = service.findByProperties(ExtUserUseridMap.class, properties);
-	if (list == null || list.size() == 0) {
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (ExtUserUseridMap) list.get(0);

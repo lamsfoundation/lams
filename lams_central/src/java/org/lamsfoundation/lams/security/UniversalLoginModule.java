@@ -34,6 +34,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -48,6 +49,7 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
@@ -60,7 +62,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -82,11 +83,15 @@ public class UniversalLoginModule implements LoginModule {
     private boolean loginOK;
     private Principal identity;
     private char[] credential;
-    private String dsJndiName;
 
+    private static String dsJndiName;
+    private static final Map<String, Long> internalAuthenticationTokens = new TreeMap<String, Long>();
+
+    private static DatabaseAuthenticator databaseAuthenticator;
     private static IThemeService themeService;
     private static IUserManagementService userManagementService;
 
+    private static final long INTERNAL_AUTHENTICATION_TIMEOUT = 10 * 1000;
     private static final String ROLES_QUERY = "SELECT DISTINCT r.name,'Roles' FROM lams_user u "
 	    + "LEFT OUTER JOIN lams_user_organisation uo USING(user_id) "
 	    + "LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id) "
@@ -195,7 +200,7 @@ public class UniversalLoginModule implements LoginModule {
 
 	    if (!validatePassword(password)) {
 		if (UniversalLoginModule.log.isDebugEnabled()) {
-		    UniversalLoginModule.log.debug("Bad password for user " + userName);
+		    UniversalLoginModule.log.debug("Bad password for user: " + userName);
 		}
 		throw new FailedLoginException("Incorrect password");
 	    }
@@ -254,7 +259,9 @@ public class UniversalLoginModule implements LoginModule {
 	this.subject = subject;
 	this.callbackHandler = callbackHandler;
 
-	dsJndiName = (String) options.get("dsJndiName");
+	if (UniversalLoginModule.dsJndiName == null) {
+	    UniversalLoginModule.dsJndiName = (String) options.get("dsJndiName");
+	}
     }
 
     private boolean validatePassword(String inputPassword) {
@@ -271,18 +278,21 @@ public class UniversalLoginModule implements LoginModule {
 	    return true;
 	}
 
+	String userName = getUserName();
+
 	// empty password not allowed
-	if ((inputPassword == null) || (inputPassword.length() == 0)) {
-	    return false;
+	if (StringUtils.isBlank(inputPassword)) {
+	    // check for internal authentication made by LoginRequestServlet or LoginAsAction
+	    Long internalAuthenticationTime = UniversalLoginModule.internalAuthenticationTokens.get(userName);
+	    UniversalLoginModule.internalAuthenticationTokens.remove(userName);
+	    // internal authentication is valid for 10 seconds
+	    return (internalAuthenticationTime != null) && ((System.currentTimeMillis()
+		    - internalAuthenticationTime) < UniversalLoginModule.INTERNAL_AUTHENTICATION_TIMEOUT);
 	}
 
 	boolean isValid = false;
 
 	try {
-	    String userName = getUserName();
-	    if (UniversalLoginModule.log.isDebugEnabled()) {
-		UniversalLoginModule.log.debug("Authenticating user " + userName + ".");
-	    }
 
 	    User user = UniversalLoginModule.userManagementService.getUserByLogin(userName);
 
@@ -331,25 +341,18 @@ public class UniversalLoginModule implements LoginModule {
 	    // perform password checking according to user's authentication method
 	    if (!isValid) {
 		String type = user.getAuthenticationMethod().getAuthenticationMethodType().getDescription();
-		UniversalLoginModule.log.debug("Authentication type: " + type);
 		if (AuthenticationMethodType.LDAP.equals(type)) {
 		    LDAPAuthenticator authenticator = new LDAPAuthenticator(UniversalLoginModule.userManagementService);
 		    isValid = authenticator.authenticate(userName, inputPassword);
 		    // if LDAP user profile has updated, udpate user object for dto below
 		    user = UniversalLoginModule.userManagementService.getUserByLogin(userName);
-
 		} else if (AuthenticationMethodType.LAMS.equals(type)) {
-		    DatabaseAuthenticator authenticator = new DatabaseAuthenticator(dsJndiName);
-		    isValid = authenticator.authenticate(userName, inputPassword);
-		    // if the password is not encrypted when sent from the
-		    // jsp (e.g. when it is passed
-		    // unencrypted to say, ldap) then encrypt it here when
-		    // authenticating against local db
-		    if (!isValid && !Configuration.getAsBoolean(ConfigurationKeys.LDAP_ENCRYPT_PASSWORD_FROM_BROWSER)) {
-			inputPassword = HashUtil.sha1(inputPassword);
-			isValid = authenticator.authenticate(userName, inputPassword);
+		    // check password in LAMS DB
+		    if (UniversalLoginModule.databaseAuthenticator == null) {
+			UniversalLoginModule.databaseAuthenticator = new DatabaseAuthenticator(
+				UniversalLoginModule.dsJndiName);
 		    }
-
+		    isValid = UniversalLoginModule.databaseAuthenticator.authenticate(userName, inputPassword);
 		} else {
 		    UniversalLoginModule.log.error("Unexpected authentication type: " + type);
 		    return false;
@@ -426,7 +429,7 @@ public class UniversalLoginModule implements LoginModule {
 	try {
 
 	    InitialContext ctx = new InitialContext();
-	    DataSource ds = (DataSource) ctx.lookup(this.dsJndiName);
+	    DataSource ds = (DataSource) ctx.lookup(UniversalLoginModule.dsJndiName);
 
 	    conn = ds.getConnection();
 	    // Get the user role names
@@ -507,5 +510,12 @@ public class UniversalLoginModule implements LoginModule {
 	Group[] roleSets = new Group[setsMap.size()];
 	setsMap.values().toArray(roleSets);
 	return roleSets;
+    }
+
+    /**
+     * Allows other LAMS modules to confirm user authentication before WildFly proper authentication commences.
+     */
+    public static void setAuthenticationToken(String userName) {
+	UniversalLoginModule.internalAuthenticationTokens.put(userName, System.currentTimeMillis());
     }
 }

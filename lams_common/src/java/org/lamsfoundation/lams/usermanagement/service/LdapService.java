@@ -82,6 +82,7 @@ public class LdapService implements ILdapService {
 	this.service = service;
     }
 
+    @Override
     public void updateLDAPUser(User user, Attributes attrs) {
 	HashMap<String, String> map = getLDAPUserAttributes(attrs);
 	user.setLogin(map.get("login"));
@@ -107,7 +108,7 @@ public class LdapService implements ILdapService {
     // tries to match ldap attribute to a locale, otherwise returns server
     // default
     private SupportedLocale getLocale(String attribute) {
-	if (attribute != null && attribute.trim().length() > 0) {
+	if ((attribute != null) && (attribute.trim().length() > 0)) {
 	    int index = attribute.indexOf("_");
 	    if (index > 0) {
 		String language = attribute.substring(0, index);
@@ -120,11 +121,12 @@ public class LdapService implements ILdapService {
 	return LanguageUtil.getDefaultLocale();
     }
 
+    @Override
     public boolean createLDAPUser(Attributes attrs) {
 	User user = new User();
 	try {
 	    HashMap<String, String> map = getLDAPUserAttributes(attrs);
-	    if (map.get("login") != null && map.get("login").trim().length() > 0) {
+	    if ((map.get("login") != null) && (map.get("login").trim().length() > 0)) {
 		if (log.isDebugEnabled()) {
 		    log.debug("===> using LDAP attributes: " + map.get("login") + "," + map.get("fname") + ","
 			    + map.get("lname") + "," + map.get("email") + "," + map.get("address1") + ","
@@ -134,7 +136,9 @@ public class LdapService implements ILdapService {
 			    + map.get("mobile") + "," + map.get("locale"));
 		}
 		user.setLogin(map.get("login"));
-		user.setPassword(HashUtil.sha1(RandomPasswordGenerator.nextPassword(10)));
+		String salt = HashUtil.salt();
+		user.setSalt(salt);
+		user.setPassword(HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt));
 		user.setFirstName(map.get("fname"));
 		user.setLastName(map.get("lname"));
 		user.setEmail(map.get("email"));
@@ -149,8 +153,8 @@ public class LdapService implements ILdapService {
 		user.setEveningPhone(map.get("eveningphone"));
 		user.setFax(map.get("fax"));
 		user.setMobilePhone(map.get("mobile"));
-		user.setAuthenticationMethod((AuthenticationMethod) service.findById(AuthenticationMethod.class,
-			AuthenticationMethod.LDAP));
+		user.setAuthenticationMethod(
+			(AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.LDAP));
 		user.setFlashTheme(service.getDefaultFlashTheme());
 		user.setHtmlTheme(service.getDefaultHtmlTheme());
 		user.setDisabledFlag(getDisabledBoolean(attrs));
@@ -175,88 +179,89 @@ public class LdapService implements ILdapService {
 	HashMap<String, String> map = new HashMap<String, String>();
 	try {
 	    map.put("login", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR))));
-	    map.put("fname", getSingleAttributeString(attrs.get(Configuration
-		    .get(ConfigurationKeys.LDAP_FIRST_NAME_ATTR))));
-	    map.put("lname", getSingleAttributeString(attrs.get(Configuration
-		    .get(ConfigurationKeys.LDAP_LAST_NAME_ATTR))));
+	    map.put("fname",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_FIRST_NAME_ATTR))));
+	    map.put("lname",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LAST_NAME_ATTR))));
 	    map.put("email", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_EMAIL_ATTR))));
-	    map.put("address1", getSingleAttributeString(attrs
-		    .get(Configuration.get(ConfigurationKeys.LDAP_ADDR1_ATTR))));
-	    map.put("address2", getSingleAttributeString(attrs
-		    .get(Configuration.get(ConfigurationKeys.LDAP_ADDR2_ATTR))));
-	    map.put("address3", getSingleAttributeString(attrs
-		    .get(Configuration.get(ConfigurationKeys.LDAP_ADDR3_ATTR))));
+	    map.put("address1",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ADDR1_ATTR))));
+	    map.put("address2",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ADDR2_ATTR))));
+	    map.put("address3",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ADDR3_ATTR))));
 	    map.put("city", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_CITY_ATTR))));
 	    map.put("state", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_STATE_ATTR))));
-	    map.put("postcode", getSingleAttributeString(attrs.get(Configuration
-		    .get(ConfigurationKeys.LDAP_POSTCODE_ATTR))));
-	    map.put("country", getSingleAttributeString(attrs.get(Configuration
-		    .get(ConfigurationKeys.LDAP_COUNTRY_ATTR))));
-	    map.put("dayphone", getSingleAttributeString(attrs.get(Configuration
-		    .get(ConfigurationKeys.LDAP_DAY_PHONE_ATTR))));
-	    map.put("eveningphone", getSingleAttributeString(attrs.get(Configuration
-		    .get(ConfigurationKeys.LDAP_EVENING_PHONE_ATTR))));
+	    map.put("postcode",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_POSTCODE_ATTR))));
+	    map.put("country",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_COUNTRY_ATTR))));
+	    map.put("dayphone",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_DAY_PHONE_ATTR))));
+	    map.put("eveningphone",
+		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_EVENING_PHONE_ATTR))));
 	    map.put("fax", getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_FAX_ATTR))));
 	    map.put("mobile",
 		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_MOBILE_ATTR))));
 	    map.put("locale",
 		    getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOCALE_ATTR))));
-	    map.put("disabled", getSingleAttributeString(attrs.get(getLdapAttr(Configuration
-		    .get(ConfigurationKeys.LDAP_DISABLED_ATTR)))));
+	    map.put("disabled", getSingleAttributeString(
+		    attrs.get(getLdapAttr(Configuration.get(ConfigurationKeys.LDAP_DISABLED_ATTR)))));
 	} catch (Exception e) {
 	    log.error("===> Exception occurred while getting LDAP user attributes: ", e);
 	}
 
 	// field validation; trim values before they get to database
-	if (map.get("login") != null && map.get("login").trim().length() > 255) {
+	if ((map.get("login") != null) && (map.get("login").trim().length() > 255)) {
 	    map.put("login", map.get("login").substring(0, 255));
 	}
-	if (map.get("fname") != null && map.get("fname").trim().length() > 128) {
+	if ((map.get("fname") != null) && (map.get("fname").trim().length() > 128)) {
 	    map.put("fname", map.get("fname").substring(0, 128));
 	}
-	if (map.get("lname") != null && map.get("lname").trim().length() > 128) {
+	if ((map.get("lname") != null) && (map.get("lname").trim().length() > 128)) {
 	    map.put("lname", map.get("lname").substring(0, 128));
 	}
-	if (map.get("email") != null && map.get("email").trim().length() > 128) {
+	if ((map.get("email") != null) && (map.get("email").trim().length() > 128)) {
 	    map.put("email", map.get("email").substring(0, 128));
 	}
-	if (map.get("address1") != null && map.get("address1").trim().length() > 64) {
+	if ((map.get("address1") != null) && (map.get("address1").trim().length() > 64)) {
 	    map.put("address1", map.get("address1").substring(0, 64));
 	}
-	if (map.get("address2") != null && map.get("address2").trim().length() > 64) {
+	if ((map.get("address2") != null) && (map.get("address2").trim().length() > 64)) {
 	    map.put("address2", map.get("address2").substring(0, 64));
 	}
-	if (map.get("address3") != null && map.get("address3").trim().length() > 64) {
+	if ((map.get("address3") != null) && (map.get("address3").trim().length() > 64)) {
 	    map.put("address3", map.get("address3").substring(0, 64));
 	}
-	if (map.get("city") != null && map.get("city").trim().length() > 64) {
+	if ((map.get("city") != null) && (map.get("city").trim().length() > 64)) {
 	    map.put("city", map.get("city").substring(0, 64));
 	}
-	if (map.get("state") != null && map.get("state").trim().length() > 64) {
+	if ((map.get("state") != null) && (map.get("state").trim().length() > 64)) {
 	    map.put("state", map.get("state").substring(0, 64));
 	}
-	if (map.get("postcode") != null && map.get("postcode").trim().length() > 10) {
+	if ((map.get("postcode") != null) && (map.get("postcode").trim().length() > 10)) {
 	    map.put("postcode", map.get("postcode").substring(0, 10));
 	}
-	if (map.get("country") != null && map.get("country").trim().length() > 64) {
+	if ((map.get("country") != null) && (map.get("country").trim().length() > 64)) {
 	    map.put("country", map.get("country").substring(0, 64));
 	}
-	if (map.get("dayphone") != null && map.get("dayphone").trim().length() > 64) {
+	if ((map.get("dayphone") != null) && (map.get("dayphone").trim().length() > 64)) {
 	    map.put("dayphone", map.get("dayphone").substring(0, 64));
 	}
-	if (map.get("eveningphone") != null && map.get("eveningphone").trim().length() > 64) {
+	if ((map.get("eveningphone") != null) && (map.get("eveningphone").trim().length() > 64)) {
 	    map.put("eveningphone", map.get("eveningphone").substring(0, 64));
 	}
-	if (map.get("fax") != null && map.get("fax").trim().length() > 64) {
+	if ((map.get("fax") != null) && (map.get("fax").trim().length() > 64)) {
 	    map.put("fax", map.get("fax").substring(0, 64));
 	}
-	if (map.get("mobile") != null && map.get("mobile").trim().length() > 64) {
+	if ((map.get("mobile") != null) && (map.get("mobile").trim().length() > 64)) {
 	    map.put("mobile", map.get("mobile").substring(0, 64));
 	}
 
 	return map;
     }
 
+    @Override
     public String getLdapAttr(String ldapAttr) {
 	if (ldapAttr != null) {
 	    return (ldapAttr.startsWith("!") ? ldapAttr.substring(1) : ldapAttr);
@@ -277,6 +282,7 @@ public class LdapService implements ILdapService {
 	return null;
     }
 
+    @Override
     public boolean getDisabledBoolean(Attributes attrs) {
 	String ldapDisabledAttrStr = Configuration.get(ConfigurationKeys.LDAP_DISABLED_ATTR);
 	if (ldapDisabledAttrStr.startsWith("!")) {
@@ -295,6 +301,7 @@ public class LdapService implements ILdapService {
 
     }
 
+    @Override
     public boolean addLDAPUser(Attributes attrs, Integer userId) {
 	User user = (User) service.findById(User.class, userId);
 	// get ldap attributes for lams org and roles
@@ -305,51 +312,51 @@ public class LdapService implements ILdapService {
 	String orgField = Configuration.get(ConfigurationKeys.LDAP_ORG_FIELD);
 
 	boolean isAddingUserSuccessful = true;
-	if (ldapOrgs != null && ldapRoles != null && orgField != null) {
+	if ((ldapOrgs != null) && (ldapRoles != null) && (orgField != null)) {
 	    // get list of possible matching organisations
-		for (String ldapOrg : ldapOrgs) {
-		    log.debug("Looking for organisation to add ldap user to...");
-		    List orgList = (List) service.findByProperty(Organisation.class, orgField, ldapOrg);
-		    if (orgList != null && !orgList.isEmpty()) {
-			Organisation org = null;
+	    for (String ldapOrg : ldapOrgs) {
+		log.debug("Looking for organisation to add ldap user to...");
+		List orgList = service.findByProperty(Organisation.class, orgField, ldapOrg);
+		if ((orgList != null) && !orgList.isEmpty()) {
+		    Organisation org = null;
+		    if (orgList.size() == 1) {
+			org = (Organisation) orgList.get(0);
+		    } else if (orgList.size() > 1) {
+			// if there are multiple orgs, select the one that is
+			// active, if there is one
+			HashMap<String, Object> properties = new HashMap<String, Object>();
+			properties.put(orgField, ldapOrg);
+			properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
+			orgList = service.findByProperties(Organisation.class, properties);
 			if (orgList.size() == 1) {
 			    org = (Organisation) orgList.get(0);
-			} else if (orgList.size() > 1) {
-			    // if there are multiple orgs, select the one that is
-			    // active, if there is one
-			    HashMap<String, Object> properties = new HashMap<String, Object>();
-			    properties.put(orgField, ldapOrg);
-			    properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
-			    orgList = (List) service.findByProperties(Organisation.class, properties);
-			    if (orgList.size() == 1) {
-				org = (Organisation) orgList.get(0);
-			    } else {
-				log.warn("More than one LAMS organisation found with the " + orgField + ": " + ldapOrg);
-				isAddingUserSuccessful = false;
-				break;
-			    }
-			}
-			
-			// now convert the roles to lams roles and add the user to the org
-			List<String> roleIds = getRoleIds(ldapRoles);
-			if (roleIds != null && !roleIds.isEmpty()) {
-			    service.setRolesForUserOrganisation(user, org.getOrganisationId(), roleIds);
 			} else {
-			    log.warn("Couldn't map any roles from attribute: "
-				    + Configuration.get(ConfigurationKeys.LDAP_ROLES_ATTR));
+			    log.warn("More than one LAMS organisation found with the " + orgField + ": " + ldapOrg);
 			    isAddingUserSuccessful = false;
-			}
-			
-			// if the user is a member of any other groups, remove them
-			if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_ONLY_ONE_ORG)) {
-			    service.removeUserFromOtherGroups(userId, org.getOrganisationId());
 			    break;
-			}			
+			}
+		    }
+
+		    // now convert the roles to lams roles and add the user to the org
+		    List<String> roleIds = getRoleIds(ldapRoles);
+		    if ((roleIds != null) && !roleIds.isEmpty()) {
+			service.setRolesForUserOrganisation(user, org.getOrganisationId(), roleIds);
 		    } else {
-			log.warn("No LAMS organisations found with the " + orgField + ": " + ldapOrg);
+			log.warn("Couldn't map any roles from attribute: "
+				+ Configuration.get(ConfigurationKeys.LDAP_ROLES_ATTR));
 			isAddingUserSuccessful = false;
 		    }
+
+		    // if the user is a member of any other groups, remove them
+		    if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_ONLY_ONE_ORG)) {
+			service.removeUserFromOtherGroups(userId, org.getOrganisationId());
+			break;
+		    }
+		} else {
+		    log.warn("No LAMS organisations found with the " + orgField + ": " + ldapOrg);
+		    isAddingUserSuccessful = false;
 		}
+	    }
 	}
 	return isAddingUserSuccessful;
     }
@@ -386,7 +393,7 @@ public class LdapService implements ILdapService {
     }
 
     private boolean isRoleInList(String list, String role) {
-	if (list != null && role != null) {
+	if ((list != null) && (role != null)) {
 	    String[] array = list.split(";");
 	    for (String s : array) {
 		if (role.contains(s)) {
@@ -418,6 +425,7 @@ public class LdapService implements ILdapService {
     }
 
     // get the single (string) value of an ldap attribute
+    @Override
     public String getSingleAttributeString(Attribute attr) {
 	try {
 	    if (attr != null) {
@@ -432,12 +440,13 @@ public class LdapService implements ILdapService {
 	return null;
     }
 
+    @Override
     public BulkUpdateResultDTO bulkUpdate() {
 	// setup ldap context
 	Properties env = new Properties();
 	env.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-	env.setProperty(Context.SECURITY_AUTHENTICATION, Configuration
-		.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
+	env.setProperty(Context.SECURITY_AUTHENTICATION,
+		Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
 	// make java ldap provider return 10 results at a time instead of
 	// default 1
 	env.setProperty(Context.BATCHSIZE, "10");
@@ -446,7 +455,7 @@ public class LdapService implements ILdapService {
 	if (StringUtils.equals("ssl", securityProtocol)) {
 	    env.setProperty(Context.SECURITY_PROTOCOL, securityProtocol);
 	}
-	
+
 	// setup initial bind user credentials if configured
 	if (StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.LDAP_BIND_USER_DN))) {
 	    env.setProperty(Context.SECURITY_PRINCIPAL, Configuration.get(ConfigurationKeys.LDAP_BIND_USER_DN));
@@ -504,39 +513,40 @@ public class LdapService implements ILdapService {
 		NamingEnumeration<SearchResult> results = ctx.search(baseDN, filter, ctrl);
 		while (results.hasMore()) {
 		    try {
-                        SearchResult result = results.next();
-                        Attributes attrs = result.getAttributes();
+			SearchResult result = results.next();
+			Attributes attrs = result.getAttributes();
 
-                        // add or update this user to LAMS
-                        boolean disabled = getDisabledBoolean(attrs);
-                        String login = getSingleAttributeString(attrs.get(Configuration
-                                .get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
-                        if (login != null && login.trim().length() > 0) {
-                            int code = bulkUpdateLDAPUser(login, attrs, disabled);
-                            switch (code) {
-                            case BULK_UPDATE_CREATED:
-                                createdUsers++;
-                                break;
-                            case BULK_UPDATE_UPDATED:
-                                updatedUsers++;
-                                break;
-                            case BULK_UPDATE_DISABLED:
-                                disabledUsers++;
-                                break;
-                            }
-                        } else {
-                            log.error("Couldn't find login attribute for user using attribute name: "
-                                            + Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)
-                                            + ".  Dumping attributes...");
-                            NamingEnumeration enumAttrs = attrs.getAll();
-                            while (enumAttrs.hasMoreElements()) {
-                                log.error(enumAttrs.next());
-                            }
-                        }
-                    } catch (Exception e) {
-                        // continue processing
-                        messages.add("Error processing context result number " + contextResults + ": " + e.getMessage());
-                    }
+			// add or update this user to LAMS
+			boolean disabled = getDisabledBoolean(attrs);
+			String login = getSingleAttributeString(
+				attrs.get(Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
+			if ((login != null) && (login.trim().length() > 0)) {
+			    int code = bulkUpdateLDAPUser(login, attrs, disabled);
+			    switch (code) {
+			    case BULK_UPDATE_CREATED:
+				createdUsers++;
+				break;
+			    case BULK_UPDATE_UPDATED:
+				updatedUsers++;
+				break;
+			    case BULK_UPDATE_DISABLED:
+				disabledUsers++;
+				break;
+			    }
+			} else {
+			    log.error("Couldn't find login attribute for user using attribute name: "
+				    + Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)
+				    + ".  Dumping attributes...");
+			    NamingEnumeration enumAttrs = attrs.getAll();
+			    while (enumAttrs.hasMoreElements()) {
+				log.error(enumAttrs.next());
+			    }
+			}
+		    } catch (Exception e) {
+			// continue processing
+			messages.add(
+				"Error processing context result number " + contextResults + ": " + e.getMessage());
+		    }
 
 		    contextResults++;
 		}
@@ -544,8 +554,8 @@ public class LdapService implements ILdapService {
 		cookie = getPagedResponseCookie(ctx.getResponseControls());
 
 		// set response cookie to continue paged result
-		ctx.setRequestControls(new Control[] { new PagedResultsControl(pageSize, cookie,
-				Control.NONCRITICAL) });
+		ctx.setRequestControls(
+			new Control[] { new PagedResultsControl(pageSize, cookie, Control.NONCRITICAL) });
 	    } while (cookie != null);
 	    log.info("Ldap context " + baseDN + " returned " + contextResults + " users.");
 	    ctx.close();
@@ -580,13 +590,13 @@ public class LdapService implements ILdapService {
 		log.info("Creating new user for LDAP username: " + login);
 		if (createLDAPUser(attrs)) {
 		    user = getService().getUserByLogin(login);
-		    returnCode = BULK_UPDATE_CREATED;
+		    returnCode = LdapService.BULK_UPDATE_CREATED;
 		} else {
 		    log.error("Couldn't create new user for LDAP username: " + login);
 		}
 	    } else {
 		updateLDAPUser(user, attrs);
-		returnCode = BULK_UPDATE_UPDATED;
+		returnCode = LdapService.BULK_UPDATE_UPDATED;
 	    }
 	    if (!addLDAPUser(attrs, user.getUserId())) {
 		log.error("Couldn't add LDAP user: " + login + " to organisation.");
@@ -595,7 +605,7 @@ public class LdapService implements ILdapService {
 	    // remove user from groups and set disabled flag
 	    if (user != null) {
 		getService().disableUser(user.getUserId());
-		returnCode = BULK_UPDATE_DISABLED;
+		returnCode = LdapService.BULK_UPDATE_DISABLED;
 	    }
 	}
 	return returnCode;

@@ -25,8 +25,6 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +41,6 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -90,8 +87,8 @@ public class UserSaveAction extends Action {
 	Boolean passwordChanged = true;
 	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class,
 		(Integer) userForm.get("localeId"));
-	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service.findById(
-		AuthenticationMethod.class, (Integer) userForm.get("authenticationMethodId"));
+	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service
+		.findById(AuthenticationMethod.class, (Integer) userForm.get("authenticationMethodId"));
 	UserSaveAction.log.debug("locale: " + locale);
 	UserSaveAction.log.debug("authenticationMethod:" + authenticationMethod);
 
@@ -122,9 +119,8 @@ public class UserSaveAction extends Action {
 		if ((user != null) && StringUtils.equals(user.getLogin(), login)) {
 		    // login exists - it's the user's current login
 		} else {
-		    errors.add("login",
-			    new ActionMessage("error.login.unique", "(" + login + ", ID: " + existingUser.getUserId()
-				    + ")"));
+		    errors.add("login", new ActionMessage("error.login.unique",
+			    "(" + login + ", ID: " + existingUser.getUserId() + ")"));
 		}
 	    }
 	}
@@ -140,7 +136,7 @@ public class UserSaveAction extends Action {
 		errors.add("password", new ActionMessage("error.password.required"));
 	    }
 	}
-	
+
 	//first name validation
 	String firstName = (userForm.get("firstName") == null) ? null : (String) userForm.get("firstName");
 	if (StringUtils.isBlank(firstName)) {
@@ -148,7 +144,7 @@ public class UserSaveAction extends Action {
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
 	}
-	
+
 	//last name validation
 	String lastName = (userForm.get("lastName") == null) ? null : (String) userForm.get("lastName");
 	if (StringUtils.isBlank(lastName)) {
@@ -156,7 +152,7 @@ public class UserSaveAction extends Action {
 	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
 	}
-	
+
 	//user email validation
 	String userEmail = (userForm.get("email") == null) ? null : (String) userForm.get("email");
 	if (StringUtils.isBlank(userEmail)) {
@@ -171,7 +167,10 @@ public class UserSaveAction extends Action {
 		// hash the new password if necessary, and audit the fact
 		if (passwordChanged) {
 		    UserSaveAction.service.auditPasswordChanged(user, AdminConstants.MODULE_NAME);
-		    userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
+		    String salt = HashUtil.salt();
+		    String passwordHash = HashUtil.sha256((String) userForm.get("password"), salt);
+		    userForm.set("salt", salt);
+		    userForm.set("password", passwordHash);
 		} else {
 		    userForm.set("password", user.getPassword());
 		}
@@ -190,7 +189,10 @@ public class UserSaveAction extends Action {
 		UserSaveAction.service.save(user);
 	    } else { // create user
 		user = new User();
-		userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
+		String salt = HashUtil.salt();
+		String passwordHash = HashUtil.sha256((String) userForm.get("password"), salt);
+		userForm.set("salt", salt);
+		userForm.set("password", passwordHash);
 		BeanUtils.copyProperties(user, userForm);
 		UserSaveAction.log.debug("creating user... new login: " + user.getLogin());
 		if (errors.isEmpty()) {
@@ -200,8 +202,9 @@ public class UserSaveAction extends Action {
 		    user.setHtmlTheme(UserSaveAction.service.getDefaultHtmlTheme());
 		    user.setDisabledFlag(false);
 		    user.setCreateDate(new Date());
-		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service.findByProperty(
-			    AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database").get(0));
+		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service
+			    .findByProperty(AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database")
+			    .get(0));
 		    user.setUserId(null);
 		    user.setLocale(locale);
 

@@ -74,411 +74,414 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class ImportService implements IImportService {
 
-	private static Logger log = Logger.getLogger(ImportService.class);
-	public IUserManagementService service;
-	public MessageService messageService;
-	public IAuditService auditService;
-	
-	public IUserManagementService getService() {
-		return service;
-	}
+    private static Logger log = Logger.getLogger(ImportService.class);
+    public IUserManagementService service;
+    public MessageService messageService;
+    public IAuditService auditService;
 
-	public void setService(IUserManagementService service) {
-		this.service = service;
-	}
-	
-	public MessageService getMessageService() {
-		return messageService;
-	}
+    public IUserManagementService getService() {
+	return service;
+    }
 
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
-	}
-	
-	public IAuditService getAuditService() {
-		return auditService;
-	}
+    public void setService(IUserManagementService service) {
+	this.service = service;
+    }
 
-	public void setAuditService(IAuditService auditService) {
-		this.auditService = auditService;
-	}
-	
-	// spreadsheet column indexes for user spreadsheet
-	private static final short LOGIN = 0;
-	private static final short PASSWORD = 1;
-	private static final short TITLE = 2;
-	private static final short FIRST_NAME = 3;
-	private static final short LAST_NAME = 4;
-	private static final short AUTH_METHOD = 5;
-	private static final short EMAIL = 6;
-	private static final short FLASH_THEME = 7;
-	private static final short HTML_THEME = 8;
-	private static final short LOCALE = 9;
-	private static final short ADDRESS1 = 10;
-	private static final short ADDRESS2 = 11;
-	private static final short ADDRESS3 = 12;
-	private static final short CITY = 13;
-	private static final short STATE = 14;
-	private static final short POSTCODE = 15;
-	private static final short COUNTRY = 16;
-	private static final short DAY_PHONE = 17;
-	private static final short EVE_PHONE = 18;
-	private static final short MOB_PHONE = 19;
-	private static final short FAX = 20;
-	
-	// spreadsheet column indexes for userorgrole spreadsheet
-	private static final short ORGANISATION = 1;
-	private static final short ROLES = 2;
-	
-	// spreadsheet column indexes for groups spreadsheet
-	private static final short NAME = 0;
-	private static final short CODE = 1;
-	private static final short DESCRIPTION = 2;
-	private static final short LOCALE_ID = 3;
-	private static final short ORGANISATION_STATE = 4;
-	private static final short ADMIN_ADD_NEW_USERS = 5;
-	private static final short ADMIN_BROWSE_ALL_USERS = 6;
-	private static final short ADMIN_CHANGE_STATUS = 7;
-	
-	// class-wide variables
-	ArrayList<ArrayList> results = new ArrayList<ArrayList>();
-	ArrayList<String> rowResult = new ArrayList<String>();
-	private boolean emptyRow;
-	private boolean hasError;
-	private Organisation parentOrg;
+    public MessageService getMessageService() {
+	return messageService;
+    }
 
-	private HSSFSheet getSheet(FormFile fileItem) throws IOException {
-		POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
-		HSSFWorkbook wb = new HSSFWorkbook(fs);
-		return wb.getSheetAt(0);
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public IAuditService getAuditService() {
+	return auditService;
+    }
+
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
+    }
+
+    // spreadsheet column indexes for user spreadsheet
+    private static final short LOGIN = 0;
+    private static final short PASSWORD = 1;
+    private static final short TITLE = 2;
+    private static final short FIRST_NAME = 3;
+    private static final short LAST_NAME = 4;
+    private static final short AUTH_METHOD = 5;
+    private static final short EMAIL = 6;
+    private static final short FLASH_THEME = 7;
+    private static final short HTML_THEME = 8;
+    private static final short LOCALE = 9;
+    private static final short ADDRESS1 = 10;
+    private static final short ADDRESS2 = 11;
+    private static final short ADDRESS3 = 12;
+    private static final short CITY = 13;
+    private static final short STATE = 14;
+    private static final short POSTCODE = 15;
+    private static final short COUNTRY = 16;
+    private static final short DAY_PHONE = 17;
+    private static final short EVE_PHONE = 18;
+    private static final short MOB_PHONE = 19;
+    private static final short FAX = 20;
+
+    // spreadsheet column indexes for userorgrole spreadsheet
+    private static final short ORGANISATION = 1;
+    private static final short ROLES = 2;
+
+    // spreadsheet column indexes for groups spreadsheet
+    private static final short NAME = 0;
+    private static final short CODE = 1;
+    private static final short DESCRIPTION = 2;
+    private static final short LOCALE_ID = 3;
+    private static final short ORGANISATION_STATE = 4;
+    private static final short ADMIN_ADD_NEW_USERS = 5;
+    private static final short ADMIN_BROWSE_ALL_USERS = 6;
+    private static final short ADMIN_CHANGE_STATUS = 7;
+
+    // class-wide variables
+    ArrayList<ArrayList> results = new ArrayList<ArrayList>();
+    ArrayList<String> rowResult = new ArrayList<String>();
+    private boolean emptyRow;
+    private boolean hasError;
+    private Organisation parentOrg;
+
+    private HSSFSheet getSheet(FormFile fileItem) throws IOException {
+	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
+	HSSFWorkbook wb = new HSSFWorkbook(fs);
+	return wb.getSheetAt(0);
+    }
+
+    public boolean isUserSpreadsheet(FormFile fileItem) throws IOException {
+	HSSFSheet sheet = getSheet(fileItem);
+	HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
+	String string = parseStringCell(row.getCell(PASSWORD));
+	return (StringUtils.equals(string, "* password")) ? true : false;
+    }
+
+    public boolean isRolesSpreadsheet(FormFile fileItem) throws IOException {
+	HSSFSheet sheet = getSheet(fileItem);
+	HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
+	String string = parseStringCell(row.getCell(ORGANISATION));
+	return (StringUtils.equals(string, "* organisation")) ? true : false;
+    }
+
+    public List parseSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
+	if (isUserSpreadsheet(fileItem)) {
+	    return parseUserSpreadsheet(fileItem, sessionId);
+	} else if (isRolesSpreadsheet(fileItem)) {
+	    return parseRolesSpreadsheet(fileItem, sessionId);
 	}
-	
-	public boolean isUserSpreadsheet(FormFile fileItem) throws IOException {
-		HSSFSheet sheet = getSheet(fileItem);
-		HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
-		String string = parseStringCell(row.getCell(PASSWORD));
-		return (StringUtils.equals(string, "* password")) ? true : false;
-	}
-	
-	public boolean isRolesSpreadsheet(FormFile fileItem) throws IOException {
-		HSSFSheet sheet = getSheet(fileItem);
-		HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
-		String string = parseStringCell(row.getCell(ORGANISATION));
-		return (StringUtils.equals(string, "* organisation")) ? true : false;
-	}
-	
-	public List parseSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
-		if (isUserSpreadsheet(fileItem)) {
-			return parseUserSpreadsheet(fileItem, sessionId);
-		} else if (isRolesSpreadsheet(fileItem)) {
-			return parseRolesSpreadsheet(fileItem, sessionId);
-		}
-		return new ArrayList();
-	}
-	
-	// returns x size list where x is number of orgs.
-	// each item in the list lists the id, name, and parent's id of that org; otherwise
-	// the items in the list are error messages.
-	public List parseGroupSpreadsheet(FormFile fileItem) throws IOException {
-		results = new ArrayList<ArrayList>();
+	return new ArrayList();
+    }
+
+    // returns x size list where x is number of orgs.
+    // each item in the list lists the id, name, and parent's id of that org; otherwise
+    // the items in the list are error messages.
+    public List parseGroupSpreadsheet(FormFile fileItem) throws IOException {
+	results = new ArrayList<ArrayList>();
+	parentOrg = service.getRootOrganisation();
+	HSSFSheet sheet = getSheet(fileItem);
+	int startRow = sheet.getFirstRowNum();
+	int endRow = sheet.getLastRowNum();
+
+	log.debug("Parsing spreadsheet rows " + startRow + " through " + endRow);
+
+	HSSFRow row;
+	Organisation org = null;
+	int successful = 0;
+	for (int i = startRow + 1; i < endRow + 1; i++) {
+	    emptyRow = true;
+	    hasError = false;
+	    rowResult = new ArrayList<String>();
+	    row = sheet.getRow(i);
+	    if (row != null) {
+		org = parseGroup(row, i);
+	    }
+
+	    // an empty row signifies a new group
+	    if (emptyRow) {
+		log.debug("Row " + i + " is empty.");
 		parentOrg = service.getRootOrganisation();
-		HSSFSheet sheet = getSheet(fileItem);
-		int startRow = sheet.getFirstRowNum();
-		int endRow = sheet.getLastRowNum();
-		
-		log.debug("Parsing spreadsheet rows "+startRow+" through "+endRow);
-		
-		HSSFRow row;
-		Organisation org = null;
-		int successful = 0;
-		for (int i = startRow + 1; i < endRow + 1; i++) {
-			emptyRow = true;
-			hasError = false;
-			rowResult = new ArrayList<String>();
-			row = sheet.getRow(i);
-			if (row != null) {
-				org = parseGroup(row, i);
-			}
-			
-			// an empty row signifies a new group
-			if (emptyRow) {
-				log.debug("Row "+i+" is empty.");
-				parentOrg = service.getRootOrganisation();
-				continue;
-			}
-			if (hasError) {
-				log.debug("Row "+i+" has an error which has been sent to the browser.");
-				results.add(rowResult);
-				continue;
-			} else {
-				org = service.saveOrganisation(org, getCurrentUserId());
-				successful++;
-				rowResult.add(org.getOrganisationId().toString());
-				rowResult.add(org.getName());
-				rowResult.add(org.getParentOrganisation().getOrganisationId().toString());
-				rowResult.add(org.getOrganisationType().getOrganisationTypeId().toString());
-				writeOrgAuditLog(org);
-				// if we just added a group, then the rows under it become it's subgroups
-				if (parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
-					parentOrg = org;
-				}
-				results.add(rowResult);
-			}
+		continue;
+	    }
+	    if (hasError) {
+		log.debug("Row " + i + " has an error which has been sent to the browser.");
+		results.add(rowResult);
+		continue;
+	    } else {
+		org = service.saveOrganisation(org, getCurrentUserId());
+		successful++;
+		rowResult.add(org.getOrganisationId().toString());
+		rowResult.add(org.getName());
+		rowResult.add(org.getParentOrganisation().getOrganisationId().toString());
+		rowResult.add(org.getOrganisationType().getOrganisationTypeId().toString());
+		writeOrgAuditLog(org);
+		// if we just added a group, then the rows under it become it's subgroups
+		if (parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
+		    parentOrg = org;
 		}
-		log.debug("Found "+results.size()+" orgs in spreadsheet.");
-		writeSuccessAuditLog(successful, null, "audit.successful.organisation.import");
-		return results;
+		results.add(rowResult);
+	    }
 	}
-	
-	private Integer getCurrentUserId() {
+	log.debug("Found " + results.size() + " orgs in spreadsheet.");
+	writeSuccessAuditLog(successful, null, "audit.successful.organisation.import");
+	return results;
+    }
+
+    private Integer getCurrentUserId() {
+	try {
+	    UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	    return user.getUserID();
+	} catch (Exception e) {
+	    log.error(e);
+	}
+	return null;
+    }
+
+    private Organisation parseGroup(HSSFRow row, int rowIndex) {
+	Organisation org = new Organisation();
+	String[] args = new String[1];
+
+	String name = parseStringCell(row.getCell(NAME));
+
+	//validate organisation name
+	if (StringUtils.isBlank(name)) {
+	    rowResult.add(messageService.getMessage("error.name.required"));
+	    hasError = true;
+	    return null;
+
+	} else if (!ValidationUtil.isOrgNameValid(name)) {
+	    rowResult.add(messageService.getMessage("error.name.invalid.characters"));
+	    hasError = true;
+	    return null;
+	}
+
+	org.setName(name);
+	org.setCode(parseStringCell(row.getCell(CODE)));
+	org.setDescription(parseStringCell(row.getCell(DESCRIPTION)));
+
+	String localeId = parseStringCell(row.getCell(LOCALE_ID));
+	SupportedLocale locale = getLocale(localeId);
+	if (locale == null) {
+	    args[0] = "(" + localeId + ")";
+	    rowResult.add(messageService.getMessage("error.locale.invalid", args));
+	    hasError = true;
+	} else {
+	    org.setLocale(locale);
+	}
+
+	String orgStateText = parseStringCell(row.getCell(ORGANISATION_STATE));
+	OrganisationState orgState = getOrganisationState(orgStateText);
+	org.setOrganisationState(orgState);
+
+	org.setOrganisationType((OrganisationType) service.findById(OrganisationType.class,
+		parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)
+			? OrganisationType.COURSE_TYPE : OrganisationType.CLASS_TYPE));
+
+	org.setParentOrganisation(parentOrg);
+	org.setCourseAdminCanAddNewUsers(parseBooleanCell(row.getCell(ADMIN_ADD_NEW_USERS)));
+	org.setCourseAdminCanBrowseAllUsers(parseBooleanCell(row.getCell(ADMIN_BROWSE_ALL_USERS)));
+	org.setCourseAdminCanChangeStatusOfCourse(parseBooleanCell(row.getCell(ADMIN_CHANGE_STATUS)));
+
+	return (hasError ? null : org);
+    }
+
+    private boolean isIntegratedUser(List<String> integPrefixes, String login) {
+	int underscore = login.indexOf('_');
+	if (underscore >= 0) {
+	    if (integPrefixes.contains(login.substring(0, underscore))) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
+    public int getNumRows(FormFile fileItem) throws IOException {
+	HSSFSheet sheet = getSheet(fileItem);
+	int startRow = sheet.getFirstRowNum();
+	int endRow = sheet.getLastRowNum();
+	return endRow - startRow;
+    }
+
+    public List parseUserSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
+	results = new ArrayList<ArrayList>();
+	HSSFSheet sheet = getSheet(fileItem);
+	int startRow = sheet.getFirstRowNum();
+	int endRow = sheet.getLastRowNum();
+
+	setupImportStatus(sessionId, endRow - startRow);
+	UserDTO userDTO = (UserDTO) SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
+
+	log.debug("Parsing spreadsheet rows " + startRow + " through " + endRow);
+
+	HSSFRow row;
+	User user = null;
+	int successful = 0;
+	for (int i = startRow + 1; i < endRow + 1; i++) {
+	    emptyRow = true;
+	    hasError = false;
+	    rowResult = new ArrayList<String>();
+	    row = sheet.getRow(i);
+	    user = parseUser(row, i);
+
+	    if (emptyRow) {
+		log.debug("Row " + i + " is empty.");
+		break;
+	    }
+	    if (hasError) {
+		log.debug("Row " + i + " has an error which has been sent to the browser.");
+		results.add(rowResult);
+		writeErrorsAuditLog(i + 1, rowResult, userDTO);
+		updateImportStatus(sessionId, results.size());
+		continue;
+	    } else {
 		try {
-			UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-			return user.getUserID();
+		    service.save(user);
+		    successful++;
+		    writeAuditLog(user, userDTO);
+		    log.debug("Row " + i + " saved user: " + user.getLogin());
 		} catch (Exception e) {
-			log.error(e);
+		    log.debug(e);
+		    rowResult.add(messageService.getMessage("error.fail.add"));
 		}
-		return null;
+		if (rowResult.size() > 0) {
+		    if (log.isDebugEnabled())
+			log.debug("Row " + i + " has " + rowResult.size() + " messages.");
+		    writeErrorsAuditLog(i + 1, rowResult, userDTO);
+		}
+		results.add(rowResult);
+		updateImportStatus(sessionId, results.size());
+	    }
 	}
-	
-	private Organisation parseGroup(HSSFRow row, int rowIndex) {
-		Organisation org = new Organisation();
-		String[] args = new String[1];
-		
-		String name = parseStringCell(row.getCell(NAME));
-		
-		//validate organisation name
-		if (StringUtils.isBlank(name)) {
-		    rowResult.add(messageService.getMessage("error.name.required"));
-		    hasError = true;
-		    return null;
-		    
-		} else if (!ValidationUtil.isOrgNameValid(name)) {
-		    rowResult.add(messageService.getMessage("error.name.invalid.characters"));
-		    hasError = true;
-		    return null;
-		}
-		
-		org.setName(name);
-		org.setCode(parseStringCell(row.getCell(CODE)));
-		org.setDescription(parseStringCell(row.getCell(DESCRIPTION)));
-		
-		String localeId = parseStringCell(row.getCell(LOCALE_ID));
-		SupportedLocale locale = getLocale(localeId);
-		if (locale==null) {
-			args[0] = "("+localeId+")";
-			rowResult.add(messageService.getMessage("error.locale.invalid", args));
-			hasError = true;
-		} else {
-			org.setLocale(locale);
-		}
-		
-		String orgStateText = parseStringCell(row.getCell(ORGANISATION_STATE));
-		OrganisationState orgState = getOrganisationState(orgStateText);
-		org.setOrganisationState(orgState);
+	log.debug("Found " + results.size() + " users in spreadsheet.");
+	writeSuccessAuditLog(successful, userDTO, "audit.successful.user.import");
+	return results;
+    }
 
-		org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,
-				parentOrg.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)
-				? OrganisationType.COURSE_TYPE : OrganisationType.CLASS_TYPE));
+    // use session vars to update browser with import progress so page
+    // won't timeout
+    private void setupImportStatus(String sessionId, int importTotal) {
+	HttpSession ss = SessionManager.getSession(sessionId);
+	ss.setAttribute(STATUS_IMPORT_TOTAL, importTotal);
+	ss.setAttribute(STATUS_IMPORTED, 0);
+    }
 
-		org.setParentOrganisation(parentOrg);
-		org.setCourseAdminCanAddNewUsers(parseBooleanCell(row.getCell(ADMIN_ADD_NEW_USERS)));
-		org.setCourseAdminCanBrowseAllUsers(parseBooleanCell(row.getCell(ADMIN_BROWSE_ALL_USERS)));
-		org.setCourseAdminCanChangeStatusOfCourse(parseBooleanCell(row.getCell(ADMIN_CHANGE_STATUS)));
-		
-		return (hasError ? null : org);
-	}
-	
-	private boolean isIntegratedUser(List<String> integPrefixes, String login) {
-		int underscore = login.indexOf('_');
-		if (underscore >= 0) {
-			if (integPrefixes.contains(login.substring(0, underscore))) {
-				return true;
-			}
+    private void updateImportStatus(String sessionId, int imported) {
+	HttpSession ss = SessionManager.getSession(sessionId);
+	ss.removeAttribute(STATUS_IMPORTED);
+	ss.setAttribute(STATUS_IMPORTED, imported);
+    }
+
+    public List parseRolesSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
+	results = new ArrayList<ArrayList>();
+	HSSFSheet sheet = getSheet(fileItem);
+	int startRow = sheet.getFirstRowNum();
+	int endRow = sheet.getLastRowNum();
+
+	log.debug("Parsing spreadsheet rows " + startRow + " through " + endRow);
+
+	setupImportStatus(sessionId, endRow - startRow);
+	UserDTO userDTO = (UserDTO) SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
+
+	HSSFRow row;
+	List<String> roles;
+	int successful = 0;
+	for (int i = startRow + 1; i < endRow + 1; i++) {
+	    emptyRow = true;
+	    hasError = false;
+	    rowResult = new ArrayList<String>();
+	    row = sheet.getRow(i);
+
+	    String login = parseStringCell(row.getCell(LOGIN));
+	    String orgId = parseStringCell(row.getCell(ORGANISATION));
+	    roles = parseRolesCell(row.getCell(ROLES));
+
+	    if (emptyRow) {
+		log.debug("Row " + i + " is empty.");
+		break;
+	    }
+	    if (hasError) {
+		log.debug("Row " + i + " has an error which has been sent to the browser.");
+		results.add(rowResult);
+		writeErrorsAuditLog(i + 1, rowResult, userDTO);
+		updateImportStatus(sessionId, results.size());
+		continue;
+	    } else {
+		try {
+		    saveUserRoles(isSysadmin(sessionId), login, orgId, roles, row);
+		    successful++;
+		} catch (Exception e) {
+		    log.error("Unable to assign roles to user: " + login, e);
+		    rowResult.add(messageService.getMessage("error.fail.add"));
 		}
-		return false;
-	}
-	
-	public int getNumRows(FormFile fileItem) throws IOException {
-		HSSFSheet sheet = getSheet(fileItem);
-		int startRow = sheet.getFirstRowNum();
-		int endRow = sheet.getLastRowNum();
-		return endRow - startRow;
-	}
-	
-	public List parseUserSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
-		results = new ArrayList<ArrayList>();
-		HSSFSheet sheet = getSheet(fileItem);
-		int startRow = sheet.getFirstRowNum();
-		int endRow = sheet.getLastRowNum();
-		
-		setupImportStatus(sessionId, endRow-startRow);
-		UserDTO userDTO = (UserDTO)SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
-		
-		log.debug("Parsing spreadsheet rows "+startRow+" through "+endRow);
-		
-		HSSFRow row;
-		User user = null;
-		int successful = 0;
-		for (int i = startRow + 1; i < endRow + 1; i++) {
-			emptyRow = true;
-			hasError = false;
-			rowResult = new ArrayList<String>();
-			row = sheet.getRow(i);
-			user = parseUser(row, i);
-			
-			if (emptyRow) {
-				log.debug("Row "+i+" is empty.");
-				break;
-			}
-			if (hasError) {
-				log.debug("Row "+i+" has an error which has been sent to the browser.");
-				results.add(rowResult);
-				writeErrorsAuditLog(i+1, rowResult, userDTO);
-				updateImportStatus(sessionId, results.size());
-				continue;
-			} else {
-				try {
-					service.save(user);
-					successful++;
-					writeAuditLog(user, userDTO);
-					log.debug("Row "+i+" saved user: "+user.getLogin());
-				} catch (Exception e) {
-					log.debug(e);
-					rowResult.add(messageService.getMessage("error.fail.add"));
-				}
-				if (rowResult.size() > 0) {
-					if (log.isDebugEnabled()) log.debug("Row "+i+" has "+rowResult.size() + " messages.");
-					writeErrorsAuditLog(i+1, rowResult, userDTO);
-				}
-				results.add(rowResult);
-				updateImportStatus(sessionId, results.size());
-			}
+		if (rowResult.size() > 0) {
+		    if (log.isDebugEnabled())
+			log.debug("Row " + i + " has " + rowResult.size() + " messages.");
+		    writeErrorsAuditLog(i + 1, rowResult, userDTO);
 		}
-		log.debug("Found "+results.size()+" users in spreadsheet.");
-		writeSuccessAuditLog(successful, userDTO, "audit.successful.user.import");
-		return results;
+		results.add(rowResult);
+		updateImportStatus(sessionId, results.size());
+	    }
 	}
-	
-	// use session vars to update browser with import progress so page
-	// won't timeout
-	private void setupImportStatus(String sessionId, int importTotal) {
-		HttpSession ss = SessionManager.getSession(sessionId);
-		ss.setAttribute(STATUS_IMPORT_TOTAL, importTotal);
-		ss.setAttribute(STATUS_IMPORTED, 0);
+	log.debug("Found " + results.size() + " users in spreadsheet.");
+	writeSuccessAuditLog(successful, userDTO, "audit.successful.role.import");
+	return results;
+    }
+
+    private void setError(String message, String arg) {
+	if (StringUtils.isBlank(arg)) {
+	    rowResult.add(messageService.getMessage(message));
+	} else {
+	    String[] args = new String[1];
+	    args[0] = arg;
+	    rowResult.add(messageService.getMessage(message, args));
 	}
-	
-	private void updateImportStatus(String sessionId, int imported) {
-		HttpSession ss = SessionManager.getSession(sessionId);
-		ss.removeAttribute(STATUS_IMPORTED);
-		ss.setAttribute(STATUS_IMPORTED, imported);
+	hasError = true;
+    }
+
+    // used when importing in a separate thread that doesn't have the user's DTO in session
+    private boolean isSysadmin(String sessionId) {
+	UserDTO userDTO = (UserDTO) SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
+	return service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(),
+		Role.SYSADMIN);
+    }
+
+    /*
+     * user must already exist
+     */
+    private void saveUserRoles(boolean isSysadmin, String login, String orgId, List<String> roles, HSSFRow row) {
+	User user = null;
+	if (StringUtils.isNotBlank(login)) {
+	    user = service.getUserByLogin(login);
+	} else if (StringUtils.isBlank(login)) {
+	    setError("error.login.required", "");
 	}
-	
-	public List parseRolesSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
-		results = new ArrayList<ArrayList>();
-		HSSFSheet sheet = getSheet(fileItem);
-		int startRow = sheet.getFirstRowNum();
-		int endRow = sheet.getLastRowNum();
-		
-		log.debug("Parsing spreadsheet rows "+startRow+" through "+endRow);
-		
-		setupImportStatus(sessionId, endRow-startRow);
-		UserDTO userDTO = (UserDTO)SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
-		
-		HSSFRow row;
-		List<String> roles;
-		int successful = 0;
-		for (int i = startRow + 1; i < endRow + 1; i++) {
-			emptyRow = true;
-			hasError = false;
-			rowResult = new ArrayList<String>();
-			row = sheet.getRow(i);
-			
-			String login = parseStringCell(row.getCell(LOGIN));
-			String orgId = parseStringCell(row.getCell(ORGANISATION));
-			roles = parseRolesCell(row.getCell(ROLES));
-			
-			if (emptyRow) {
-				log.debug("Row "+i+" is empty.");
-				break;
-			}
-			if (hasError) {
-				log.debug("Row "+i+" has an error which has been sent to the browser.");
-				results.add(rowResult);
-				writeErrorsAuditLog(i+1, rowResult, userDTO);
-				updateImportStatus(sessionId, results.size());
-				continue;
-			} else {
-				try {
-					saveUserRoles(isSysadmin(sessionId), login, orgId, roles, row);
-					successful++;
-				} catch (Exception e) {
-					log.error("Unable to assign roles to user: "+login, e);
-					rowResult.add(messageService.getMessage("error.fail.add"));
-				}
-				if (rowResult.size() > 0) {
-					if (log.isDebugEnabled()) log.debug("Row "+i+" has "+rowResult.size() + " messages.");
-					writeErrorsAuditLog(i+1, rowResult, userDTO);
-				}
-				results.add(rowResult);
-				updateImportStatus(sessionId, results.size());
-			}
-		}
-		log.debug("Found "+results.size()+" users in spreadsheet.");
-		writeSuccessAuditLog(successful, userDTO, "audit.successful.role.import");
-		return results;
+	if (user == null) {
+	    setError("error.user.does.not.exist", "(" + login + ")");
 	}
-	
-	private void setError(String message, String arg) {
-		if (StringUtils.isBlank(arg)) {
-			rowResult.add(messageService.getMessage(message));
-		} else {
-			String[] args = new String[1];
-			args[0] = arg;
-			rowResult.add(messageService.getMessage(message, args));
-		}
-		hasError = true;
+
+	Organisation org = null;
+	if (StringUtils.isNotBlank(orgId)) {
+	    org = (Organisation) service.findById(Organisation.class, new Integer(orgId));
 	}
-	
-	// used when importing in a separate thread that doesn't have the user's DTO in session
-	private boolean isSysadmin(String sessionId) {
-		UserDTO userDTO = (UserDTO)SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
-		return service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(), Role.SYSADMIN);
+	if (StringUtils.isBlank(orgId) || org == null) {
+	    setError("error.org.invalid", "(" + orgId + ")");
+	} else {
+	    if (roles == null || !checkValidRoles(roles, isSysadmin, org.getOrganisationType())) {
+		setError("error.roles.invalid", "(" + parseStringCell(row.getCell(ROLES)) + ")");
+	    }
 	}
-	
-	/*
-	 * user must already exist
-	 */
-	private void saveUserRoles(boolean isSysadmin, String login, String orgId, List<String> roles, HSSFRow row) {
-		User user = null;
-		if (StringUtils.isNotBlank(login)) {
-			user = service.getUserByLogin(login);
-		} else if (StringUtils.isBlank(login)) {
-			setError("error.login.required", "");
-		}
-		if (user==null) {
-			setError("error.user.does.not.exist", "("+login+")");
-		}
-		
-		Organisation org = null;
-		if (StringUtils.isNotBlank(orgId)) {
-			org = (Organisation)service.findById(Organisation.class, new Integer(orgId));
-		}
-		if (StringUtils.isBlank(orgId) || org==null){
-			setError("error.org.invalid", "("+orgId+")");
-		} else {
-			if (roles==null || !checkValidRoles(roles, isSysadmin, org.getOrganisationType())) {
-				setError("error.roles.invalid", "("+parseStringCell(row.getCell(ROLES))+")");
-			}
-		}
-		
-		if (!hasError) {
-			service.setRolesForUserOrganisation(user, org.getOrganisationId(), roles);
-			if (log.isDebugEnabled()) {
-				log.debug("added: "+login+" to: "+org.getName()+" with roles: "+roles);
-			}
-		}
+
+	if (!hasError) {
+	    service.setRolesForUserOrganisation(user, org.getOrganisationId(), roles);
+	    if (log.isDebugEnabled()) {
+		log.debug("added: " + login + " to: " + org.getName() + " with roles: " + roles);
+	    }
 	}
-	
+    }
+
     /*
      * gathers error messages for each cell as required, unless it's the login field in which case, flags whole row as
      * empty.
@@ -493,12 +496,12 @@ public class ImportService implements IImportService {
 	    rowResult.add(messageService.getMessage("error.login.required"));
 	    hasError = true;
 	    return null;
-	    
+
 	} else if (!ValidationUtil.isUserNameValid(login)) {
 	    rowResult.add(messageService.getMessage("error.username.invalid.characters"));
 	    hasError = true;
 	    return null;
-	    
+
 	} else if (service.getUserByLogin(login) != null) {
 	    args[0] = "(" + login + ")";
 	    rowResult.add(messageService.getMessage("error.login.unique", args));
@@ -507,13 +510,15 @@ public class ImportService implements IImportService {
 	}
 	user.setLogin(login);
 
-	String password = HashUtil.sha1(parseStringCell(row.getCell(PASSWORD)));
+	String password = parseStringCell(row.getCell(PASSWORD));
 	// password validation
 	if (StringUtils.isBlank(password)) {
 	    rowResult.add(messageService.getMessage("error.password.required"));
 	    hasError = true;
 	    return null;
 	}
+	String salt = HashUtil.salt();
+	password = HashUtil.sha256(password, salt);
 	user.setPassword(password);
 
 	user.setTitle(parseStringCell(row.getCell(TITLE)));
@@ -523,11 +528,11 @@ public class ImportService implements IImportService {
 	if (StringUtils.isBlank(firstName)) {
 	    rowResult.add(messageService.getMessage("error.firstname.required"));
 	    hasError = true;
-	
+
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    rowResult.add(messageService.getMessage("error.firstname.invalid.characters"));
-	    hasError = true;	    
-	    
+	    hasError = true;
+
 	} else {
 	    user.setFirstName(firstName);
 	}
@@ -537,11 +542,11 @@ public class ImportService implements IImportService {
 	if (StringUtils.isBlank(lastName)) {
 	    rowResult.add(messageService.getMessage("error.lastname.required"));
 	    hasError = true;
-	    
+
 	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
 	    rowResult.add(messageService.getMessage("error.lastname.invalid.characters"));
 	    hasError = true;
-	    
+
 	} else {
 	    user.setLastName(lastName);
 	}
@@ -553,7 +558,7 @@ public class ImportService implements IImportService {
 	    args[0] = "(" + authMethodName + ")";
 	    rowResult.add(messageService.getMessage("error.authmethod.invalid", args));
 	    hasError = true;
-	    
+
 	} else {
 	    user.setAuthenticationMethod(authMethod);
 	}
@@ -563,11 +568,11 @@ public class ImportService implements IImportService {
 	if (StringUtils.isBlank(email)) {
 	    rowResult.add(messageService.getMessage("error.email.required"));
 	    hasError = true;
-	    
+
 	} else if (!ValidationUtil.isEmailValid(email)) {
 	    rowResult.add(messageService.getMessage("error.valid.email.required"));
 	    hasError = true;
-	    
+
 	} else {
 	    user.setEmail(email);
 	}
@@ -621,237 +626,236 @@ public class ImportService implements IImportService {
 
 	return (hasError ? null : user);
     }
-	
-	/*
-	 * the methods below return legible data from individual cells
-	 */
-	private boolean parseBooleanCell(HSSFCell cell){
-		if (cell!=null) {
-			String value;
-			try {
-				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-				if (cell.getStringCellValue()!= null) {
-					if (cell.getStringCellValue().trim().length()!= 0) {
-						emptyRow = false;
-					}
-				} else {
-					return false;
-				}
-				value = cell.getStringCellValue().trim();
-			} catch(Exception e) {
-				cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-				double d = cell.getNumericCellValue();
-				emptyRow = false;
-				value = new Long(new Double(d).longValue()).toString();
-			}
-			if (StringUtils.equals(value, "1") || StringUtils.equalsIgnoreCase(value, "true")) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private String parseStringCell(HSSFCell cell){
-		if (cell!=null) {
-			try {
-				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-				if (cell.getStringCellValue()!= null) {
-					if (cell.getStringCellValue().trim().length()!= 0) {
-						emptyRow = false;
-					}
-				} else {
-					return null;
-				}
-				// log.debug("string cell value: '"+cell.getStringCellValue().trim()+"'");
-				return cell.getStringCellValue().trim();
-			} catch(Exception e) {
-				cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-				double d = cell.getNumericCellValue();
-				emptyRow = false;
-				// log.debug("numeric cell value: '"+d+"'");
-				return (new Long(new Double(d).longValue()).toString());
-			}
-		}
-		return null;
-	}
-	
-	private AuthenticationMethod getAuthMethod(String authMethodName){
-		List list;
-		if (authMethodName==null || authMethodName=="") {
-			return (AuthenticationMethod)service.findById(AuthenticationMethod.class, AuthenticationMethod.DB);
+
+    /*
+     * the methods below return legible data from individual cells
+     */
+    private boolean parseBooleanCell(HSSFCell cell) {
+	if (cell != null) {
+	    String value;
+	    try {
+		cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+		if (cell.getStringCellValue() != null) {
+		    if (cell.getStringCellValue().trim().length() != 0) {
+			emptyRow = false;
+		    }
 		} else {
-			try {
-				Integer authMethodId = new Integer(authMethodName);
-				return (AuthenticationMethod)service.findById(AuthenticationMethod.class, authMethodId);
-			} catch (NumberFormatException e) {
-				list = service.findByProperty(AuthenticationMethod.class, "authenticationMethodName", authMethodName);
-				return ( list==null || list.isEmpty() ? null : (AuthenticationMethod)list.get(0));
-			}
+		    return false;
 		}
-	}
-	
-	private List<String> parseRolesCell(HSSFCell cell)
-	{
-		String roleDescription = "";
-		if (cell!=null) {
-			try {
-				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-				if (cell.getStringCellValue()!= null || cell.getStringCellValue().trim().length()!= 0) {
-					emptyRow = false;
-				} else {
-					log.debug("Couldn't find any roles in spreadsheet column index " + ROLES);
-					return null;
-				}
-				roleDescription = cell.getStringCellValue().trim();
-			} catch(Exception e) {
-				log.error("Caught exception when reading roles in spreadsheet: " + e.getMessage());
-				return null;
-			}
-			List<String> roles = new ArrayList<String>();
-			int fromIndex = 0;
-			int index = roleDescription.indexOf(SEPARATOR, fromIndex);
-			while (index != -1) {
-				String role = addRoleId(roleDescription, fromIndex, index);
-				log.debug("Found role: "+role);
-				if (role==null) {
-					return null;
-				} else {
-					roles.add(role);
-				}
-				fromIndex = index + 1;
-				index = roleDescription.indexOf(SEPARATOR, fromIndex);
-			}
-			String role = addRoleId(roleDescription, fromIndex, roleDescription.length());
-			log.debug("Found last role: "+role);
-			if (role==null) {
-				return null;
-			} else {
-				roles.add(role);
-			}
-			return roles;
-		}
-		return null;
-	}
-	
-	// return id of role name in given role description
-	private String addRoleId(String roleDescription, int fromIndex, int index) {
-		List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, index));
-		Role role = (list==null || list.isEmpty() ? null : (Role)list.get(0));
-		if (role!=null) {
-			return role.getRoleId().toString();
-		} else {
-			return null;		// if we can't translate the name to a role, return null
-		}
-	}
-	
-	// return false if a role shouldn't be assigned in given org type
-	private boolean checkValidRoles(List<String> idList, boolean isSysadmin, OrganisationType orgType) {
-		// convert list of id's into list of Roles
-		List<Role> roleList = new ArrayList<Role>();
-		for (String id : idList) {
-			Role role = (Role)service.findById(Role.class, Integer.parseInt(id));
-			if (role!=null) {
-				roleList.add(role);
-			} else {
-				return false;
-			}
-		}
-		
-		// check they are valid
-		List<Role> validRoles = service.filterRoles(roleList, isSysadmin, orgType);
-		for (Role r : roleList) {
-			if (!validRoles.contains(r)) {
-				return false;
-			}
-		}
+		value = cell.getStringCellValue().trim();
+	    } catch (Exception e) {
+		cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+		double d = cell.getNumericCellValue();
+		emptyRow = false;
+		value = new Long(new Double(d).longValue()).toString();
+	    }
+	    if (StringUtils.equals(value, "1") || StringUtils.equalsIgnoreCase(value, "true")) {
 		return true;
+	    }
+	}
+	return false;
+    }
+
+    private String parseStringCell(HSSFCell cell) {
+	if (cell != null) {
+	    try {
+		cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+		if (cell.getStringCellValue() != null) {
+		    if (cell.getStringCellValue().trim().length() != 0) {
+			emptyRow = false;
+		    }
+		} else {
+		    return null;
+		}
+		// log.debug("string cell value: '"+cell.getStringCellValue().trim()+"'");
+		return cell.getStringCellValue().trim();
+	    } catch (Exception e) {
+		cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+		double d = cell.getNumericCellValue();
+		emptyRow = false;
+		// log.debug("numeric cell value: '"+d+"'");
+		return (new Long(new Double(d).longValue()).toString());
+	    }
+	}
+	return null;
+    }
+
+    private AuthenticationMethod getAuthMethod(String authMethodName) {
+	List list;
+	if (authMethodName == null || authMethodName == "") {
+	    return (AuthenticationMethod) service.findById(AuthenticationMethod.class, AuthenticationMethod.DB);
+	} else {
+	    try {
+		Integer authMethodId = new Integer(authMethodName);
+		return (AuthenticationMethod) service.findById(AuthenticationMethod.class, authMethodId);
+	    } catch (NumberFormatException e) {
+		list = service.findByProperty(AuthenticationMethod.class, "authenticationMethodName", authMethodName);
+		return (list == null || list.isEmpty() ? null : (AuthenticationMethod) list.get(0));
+	    }
+	}
+    }
+
+    private List<String> parseRolesCell(HSSFCell cell) {
+	String roleDescription = "";
+	if (cell != null) {
+	    try {
+		cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+		if (cell.getStringCellValue() != null || cell.getStringCellValue().trim().length() != 0) {
+		    emptyRow = false;
+		} else {
+		    log.debug("Couldn't find any roles in spreadsheet column index " + ROLES);
+		    return null;
+		}
+		roleDescription = cell.getStringCellValue().trim();
+	    } catch (Exception e) {
+		log.error("Caught exception when reading roles in spreadsheet: " + e.getMessage());
+		return null;
+	    }
+	    List<String> roles = new ArrayList<String>();
+	    int fromIndex = 0;
+	    int index = roleDescription.indexOf(SEPARATOR, fromIndex);
+	    while (index != -1) {
+		String role = addRoleId(roleDescription, fromIndex, index);
+		log.debug("Found role: " + role);
+		if (role == null) {
+		    return null;
+		} else {
+		    roles.add(role);
+		}
+		fromIndex = index + 1;
+		index = roleDescription.indexOf(SEPARATOR, fromIndex);
+	    }
+	    String role = addRoleId(roleDescription, fromIndex, roleDescription.length());
+	    log.debug("Found last role: " + role);
+	    if (role == null) {
+		return null;
+	    } else {
+		roles.add(role);
+	    }
+	    return roles;
+	}
+	return null;
+    }
+
+    // return id of role name in given role description
+    private String addRoleId(String roleDescription, int fromIndex, int index) {
+	List list = service.findByProperty(Role.class, "name", roleDescription.substring(fromIndex, index));
+	Role role = (list == null || list.isEmpty() ? null : (Role) list.get(0));
+	if (role != null) {
+	    return role.getRoleId().toString();
+	} else {
+	    return null; // if we can't translate the name to a role, return null
+	}
+    }
+
+    // return false if a role shouldn't be assigned in given org type
+    private boolean checkValidRoles(List<String> idList, boolean isSysadmin, OrganisationType orgType) {
+	// convert list of id's into list of Roles
+	List<Role> roleList = new ArrayList<Role>();
+	for (String id : idList) {
+	    Role role = (Role) service.findById(Role.class, Integer.parseInt(id));
+	    if (role != null) {
+		roleList.add(role);
+	    } else {
+		return false;
+	    }
 	}
 
-	// set Theme to default flash theme if cell is empty
-	private Theme getFlashTheme(String flashId){
-		if (flashId==null || flashId=="") {
-			return service.getDefaultFlashTheme();
-		} else {
-			try {
-				return (Theme)service.findById(Theme.class, new Long(flashId));
-			} catch (Exception e) {
-				return null;
-			}
-		}
+	// check they are valid
+	List<Role> validRoles = service.filterRoles(roleList, isSysadmin, orgType);
+	for (Role r : roleList) {
+	    if (!validRoles.contains(r)) {
+		return false;
+	    }
 	}
-	
-	// set Theme to default html theme if cell is empty
-	private Theme getHtmlTheme(String htmlId){
-		if (htmlId==null || htmlId=="") {
-			return service.getDefaultHtmlTheme();
-		} else {
-			try {
-				return (Theme)service.findById(Theme.class, new Long(htmlId));
-			} catch (Exception e) {
-				return null;
-			}
-		}
+	return true;
+    }
+
+    // set Theme to default flash theme if cell is empty
+    private Theme getFlashTheme(String flashId) {
+	if (flashId == null || flashId == "") {
+	    return service.getDefaultFlashTheme();
+	} else {
+	    try {
+		return (Theme) service.findById(Theme.class, new Long(flashId));
+	    } catch (Exception e) {
+		return null;
+	    }
 	}
-	
-	// set locale to default system locale if cell is empty
-	private SupportedLocale getLocale(String localeId){
-		if (localeId==null || localeId=="") {
-			return LanguageUtil.getDefaultLocale();
-		} else {
-			try {
-				return (SupportedLocale)service.findById(SupportedLocale.class, new Integer(localeId));
-			} catch (Exception e) {
-				return null;
-			}
-		}
+    }
+
+    // set Theme to default html theme if cell is empty
+    private Theme getHtmlTheme(String htmlId) {
+	if (htmlId == null || htmlId == "") {
+	    return service.getDefaultHtmlTheme();
+	} else {
+	    try {
+		return (Theme) service.findById(Theme.class, new Long(htmlId));
+	    } catch (Exception e) {
+		return null;
+	    }
 	}
-	
-	// set organisation state to active if cell is empty
-	private OrganisationState getOrganisationState(String orgStateText) {
-		if (StringUtils.equals(orgStateText, "hidden")) {
-			return (OrganisationState)service.findById(OrganisationState.class, OrganisationState.HIDDEN);
-		} else if (StringUtils.equals(orgStateText, "archived")) {
-			return (OrganisationState)service.findById(OrganisationState.class, OrganisationState.ARCHIVED);
-		} else {
-			return (OrganisationState)service.findById(OrganisationState.class, OrganisationState.ACTIVE);
-		}
+    }
+
+    // set locale to default system locale if cell is empty
+    private SupportedLocale getLocale(String localeId) {
+	if (localeId == null || localeId == "") {
+	    return LanguageUtil.getDefaultLocale();
+	} else {
+	    try {
+		return (SupportedLocale) service.findById(SupportedLocale.class, new Integer(localeId));
+	    } catch (Exception e) {
+		return null;
+	    }
 	}
-	
-	private void writeAuditLog(User user, UserDTO userDTO) {
-		String[] args = new String[2];
-		args[0] = user.getLogin()+"("+user.getUserId()+")";
-		args[1] = user.getFullName();
-		String message = messageService.getMessage("audit.user.create", args);
-		auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
+    }
+
+    // set organisation state to active if cell is empty
+    private OrganisationState getOrganisationState(String orgStateText) {
+	if (StringUtils.equals(orgStateText, "hidden")) {
+	    return (OrganisationState) service.findById(OrganisationState.class, OrganisationState.HIDDEN);
+	} else if (StringUtils.equals(orgStateText, "archived")) {
+	    return (OrganisationState) service.findById(OrganisationState.class, OrganisationState.ARCHIVED);
+	} else {
+	    return (OrganisationState) service.findById(OrganisationState.class, OrganisationState.ACTIVE);
 	}
-	
-	private void writeOrgAuditLog(Organisation org) {
-		String[] args = new String[2];
-		args[0] = org.getName()+"("+org.getOrganisationId()+")";
-		args[1] = org.getOrganisationType().getName();
-		String message = messageService.getMessage("audit.organisation.create", args);
-		auditService.log(AdminConstants.MODULE_NAME, message);
+    }
+
+    private void writeAuditLog(User user, UserDTO userDTO) {
+	String[] args = new String[2];
+	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
+	args[1] = user.getFullName();
+	String message = messageService.getMessage("audit.user.create", args);
+	auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
+    }
+
+    private void writeOrgAuditLog(Organisation org) {
+	String[] args = new String[2];
+	args[0] = org.getName() + "(" + org.getOrganisationId() + ")";
+	args[1] = org.getOrganisationType().getName();
+	String message = messageService.getMessage("audit.organisation.create", args);
+	auditService.log(AdminConstants.MODULE_NAME, message);
+    }
+
+    private void writeErrorsAuditLog(int row, List<String> list, UserDTO userDTO) {
+	for (String s : list) {
+	    writeErrorAuditLog(row, s, userDTO);
 	}
-	
-	private void writeErrorsAuditLog(int row, List<String> list, UserDTO userDTO) {
-		for (String s : list) {
-			writeErrorAuditLog(row, s, userDTO);
-		}
+    }
+
+    private void writeErrorAuditLog(int row, String error, UserDTO userDTO) {
+	String[] args = { Integer.toString(row), error };
+	String message = messageService.getMessage("audit.spreadsheet.error", args);
+	auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
+    }
+
+    private void writeSuccessAuditLog(int successful, UserDTO userDTO, String key) {
+	String[] args = { Integer.toString(successful) };
+	String message = messageService.getMessage(key, args);
+	if (userDTO == null) {
+	    auditService.log(AdminConstants.MODULE_NAME, message);
+	} else {
+	    auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
 	}
-	
-	private void writeErrorAuditLog(int row, String error, UserDTO userDTO) {
-		String[] args = { Integer.toString(row), error };
-		String message = messageService.getMessage("audit.spreadsheet.error", args);
-		auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
-	}
-	
-	private void writeSuccessAuditLog(int successful, UserDTO userDTO, String key) {
-		String[] args = { Integer.toString(successful) };
-		String message = messageService.getMessage(key, args);
-		if (userDTO == null) {
-			auditService.log(AdminConstants.MODULE_NAME, message);
-		} else {
-			auditService.log(userDTO, AdminConstants.MODULE_NAME, message);
-		}
-	}
+    }
 }

@@ -28,8 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @struts:action path="/signup/signup" name="SignupForm" scope="request"
- *                validate="false" parameter="method"
+ * @struts:action path="/signup/signup" name="SignupForm" scope="request" validate="false" parameter="method"
  * 
  * @struts:action-forward name="signup" path=".signup"
  * @struts:action-forward name="index" path="/"
@@ -41,24 +40,25 @@ public class SignupAction extends Action {
 
     private static Logger log = Logger.getLogger(SignupAction.class);
     private static ISignupService signupService = null;
-    
+
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	if (signupService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    signupService = (ISignupService) wac.getBean("signupService");
+	if (SignupAction.signupService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    SignupAction.signupService = (ISignupService) wac.getBean("signupService");
 	}
 
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);
-	if (signupForm.get("submitted") == null || !((Boolean) signupForm.get("submitted"))) {
+	if ((signupForm.get("submitted") == null) || !((Boolean) signupForm.get("submitted"))) {
 
 	    String context = WebUtil.readStrParam(request, "context", true);
 	    SignupOrganisation signupOrganisation = null;
 	    if (StringUtils.isNotBlank(context)) {
-		signupOrganisation = signupService.getSignupOrganisation(context);
+		signupOrganisation = SignupAction.signupService.getSignupOrganisation(context);
 		request.setAttribute("signupOrganisation", signupOrganisation);
 	    }
 
@@ -66,7 +66,7 @@ public class SignupAction extends Action {
 		request.setAttribute("messageKey", "No such signup page exists");
 		return mapping.findForward("message");
 	    }
-	    
+
 	    // no context and unsubmitted form means it's the initial request
 	    return mapping.findForward("signup");
 	} else if (StringUtils.equals(method, "register")) {
@@ -75,7 +75,7 @@ public class SignupAction extends Action {
 	    return signIn(mapping, form, request, response);
 	}
     }
-    
+
     private ActionForward signUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -95,8 +95,10 @@ public class SignupAction extends Action {
 		user.setFirstName(signupForm.getString("firstName"));
 		user.setLastName(signupForm.getString("lastName"));
 		user.setEmail(signupForm.getString("email"));
-		user.setPassword(HashUtil.sha1(signupForm.getString("password")));
-		signupService.signupUser(user, signupForm.getString("context"));
+		String salt = HashUtil.salt();
+		user.setSalt(salt);
+		user.setPassword(HashUtil.sha256(signupForm.getString("password"), salt));
+		SignupAction.signupService.signupUser(user, signupForm.getString("context"));
 
 		// send email
 		try {
@@ -113,20 +115,20 @@ public class SignupAction extends Action {
 
 		    Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
 		} catch (Exception e) {
-		    log.error(e.getMessage(), e);
+		    SignupAction.log.error(e.getMessage(), e);
 		    request.setAttribute("error", e.getMessage());
 		}
 
 		return mapping.findForward("success");
 	    }
 	} catch (Exception e) {
-	    log.error(e.getMessage(), e);
+	    SignupAction.log.error(e.getMessage(), e);
 	    request.setAttribute("error", e.getMessage());
 	}
 
 	return mapping.findForward("index");
     }
-    
+
     private ActionForward signIn(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -140,23 +142,24 @@ public class SignupAction extends Action {
 		return mapping.findForward("signup");
 	    } else {
 		String login = signupForm.getString("usernameTab2");
-		String password = HashUtil.sha1(signupForm.getString("passwordTab2"));
+		String password = signupForm.getString("passwordTab2");
 		String context = signupForm.getString("context");
-		signupService.signinUser(login, context);
+		SignupAction.signupService.signinUser(login, context);
 
 		String redirectUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-		
+
 		//check if user is logged in already
-		if (SessionManager.getSession() == null || SessionManager.getSession().getAttribute(AttributeNames.USER) == null) {
+		if ((SessionManager.getSession() == null)
+			|| (SessionManager.getSession().getAttribute(AttributeNames.USER) == null)) {
 		    redirectUrl += "/j_security_check?" + Constants.FORM_USERNAME + "=" + login + "&"
-			    + Constants.FORM_PASSWORD + "=" + password;		    
+			    + Constants.FORM_PASSWORD + "=" + password;
 		}
-		
+
 		response.sendRedirect(redirectUrl);
 		return null;
 	    }
 	} catch (Exception e) {
-	    log.error(e.getMessage(), e);
+	    SignupAction.log.error(e.getMessage(), e);
 	    request.setAttribute("error", e.getMessage());
 	}
 
@@ -165,15 +168,15 @@ public class SignupAction extends Action {
 
     private ActionMessages validateSignup(DynaActionForm signupForm) {
 	ActionMessages errors = new ActionMessages();
-	
+
 	// user name validation
 	String userName = (signupForm.get("username") == null) ? null : (String) signupForm.get("username");
 	if (StringUtils.isBlank(userName)) {
 	    errors.add("username", new ActionMessage("error.username.blank"));
 	} else if (!ValidationUtil.isUserNameValid(userName)) {
 	    errors.add("username", new ActionMessage("error.username.invalid.characters"));
-	    log.info("username has invalid characters: "+ userName);
-	} else if (signupService.usernameExists(userName)) {
+	    SignupAction.log.info("username has invalid characters: " + userName);
+	} else if (SignupAction.signupService.usernameExists(userName)) {
 	    errors.add("username", new ActionMessage("error.username.exists"));
 	}
 
@@ -183,16 +186,16 @@ public class SignupAction extends Action {
 	    errors.add("firstName", new ActionMessage("error.first.name.blank"));
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
-	    log.info("firstname has invalid characters: "+ firstName);
+	    SignupAction.log.info("firstname has invalid characters: " + firstName);
 	}
-	
+
 	//last name validation
 	String lastName = (signupForm.get("lastName") == null) ? null : (String) signupForm.get("lastName");
 	if (StringUtils.isBlank(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.last.name.blank"));
 	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
-	    log.info("lastName has invalid characters: "+ lastName);
+	    SignupAction.log.info("lastName has invalid characters: " + lastName);
 	}
 
 	//password validation
@@ -201,7 +204,7 @@ public class SignupAction extends Action {
 	} else if (!StringUtils.equals(signupForm.getString("password"), signupForm.getString("confirmPassword"))) {
 	    errors.add("password", new ActionMessage("error.passwords.unequal"));
 	}
-	
+
 	//user email validation
 	String userEmail = (signupForm.get("email") == null) ? null : (String) signupForm.get("email");
 	if (StringUtils.isBlank(userEmail)) {
@@ -211,15 +214,15 @@ public class SignupAction extends Action {
 	} else if (!StringUtils.equals(userEmail, signupForm.getString("confirmEmail"))) {
 	    errors.add("email", new ActionMessage("error.emails.unequal"));
 	}
-	
+
 	// courseKey validation
-	if (!signupService.courseKeyIsValid(signupForm.getString("context"),
+	if (!SignupAction.signupService.courseKeyIsValid(signupForm.getString("context"),
 		signupForm.getString("courseKey"))) {
 	    errors.add("courseKey", new ActionMessage("error.course.key.invalid"));
 	}
 	return errors;
     }
-    
+
     private ActionMessages validateSignin(DynaActionForm signupForm) {
 	ActionMessages errors = new ActionMessages();
 	if (StringUtils.isBlank(signupForm.getString("usernameTab2"))) {
@@ -228,21 +231,24 @@ public class SignupAction extends Action {
 	if (StringUtils.isBlank(signupForm.getString("passwordTab2"))) {
 	    errors.add("passwordTab2", new ActionMessage("error.password.blank"));
 	}
-	if (!signupService.courseKeyIsValid(signupForm.getString("context"),
+	if (!SignupAction.signupService.courseKeyIsValid(signupForm.getString("context"),
 		signupForm.getString("courseKeyTab2"))) {
 	    errors.add("courseKeyTab2", new ActionMessage("error.course.key.invalid"));
 	}
-	
+
 	if (errors.isEmpty()) {
 	    String login = signupForm.getString("usernameTab2");
-	    String password = HashUtil.sha1(signupForm.getString("passwordTab2"));
-	    User user = signupService.getUserByLogin(login);
-	    
-	    if ((user == null) || !user.getPassword().equals(password)) {
-		errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect", "<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
+	    String password = signupForm.getString("passwordTab2");
+	    User user = SignupAction.signupService.getUserByLogin(login);
+	    String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH ? HashUtil.sha1(password)
+		    : HashUtil.sha256(password, user.getSalt());
+
+	    if ((user == null) || !user.getPassword().equals(passwordHash)) {
+		errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect",
+			"<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
 	    }
 	}
-	
+
 	return errors;
     }
 }

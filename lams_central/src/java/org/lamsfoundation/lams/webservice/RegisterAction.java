@@ -103,8 +103,8 @@ public class RegisterAction extends HttpServlet {
 
     private static MessageService messageService = null;
 
-    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	if (method.equals("addUserToGroupLessons")) {
@@ -126,37 +126,37 @@ public class RegisterAction extends HttpServlet {
      *             if an error occured
      */
     public void init() throws ServletException {
-	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("learnerProgressDAO");
+	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerProgressDAO");
 
-	integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("integrationService");
+	integrationService = (IntegrationService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 
-	lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("lessonService");
+	lessonService = (ILessonService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
 
-	learnerService = (ICoreLearnerService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("learnerService");
+	learnerService = (ICoreLearnerService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerService");
 
 	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext())
 		.getBean("groupUserDAO");
 
-	userManagementService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("userManagementService");
+	userManagementService = (IUserManagementService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
 
 	eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("eventNotificationService");
 
-	messageService = (MessageService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+	messageService = (MessageService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext())
+		.getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
     }
 
     /**
      * Add user to group lessons.
      * 
-     * External server call must follow the next format:
-     * http://<<yourlamsserver>>/lams/central/Register.do?method=addUserToGroupLessons
-     * &serverId=%serverId%&datetime=%datetime%
+     * External server call must follow the next format: http://<
+     * <yourlamsserver>>/lams/central/Register.do?method=addUserToGroupLessons &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&firstName=
      * %firstName%&lastName=%lastName%&email=%email&isJoinLesson=%isJoinLesson%
      * &isEmailParticipant=%isEmailParticipant%&isEmailCoordinator=%isEmailCoordinator%
@@ -231,7 +231,8 @@ public class RegisterAction extends HttpServlet {
 
 	    // create new password
 	    String password = RandomPasswordGenerator.nextPassword(8);
-	    String hashedPassword = HashUtil.sha1(password);
+	    String salt = HashUtil.salt();
+	    String passwordHash = HashUtil.sha256(password, salt);
 
 	    // check whether we need to use a prefix for users
 	    if ("1".equals(usePrefix)) {
@@ -241,7 +242,7 @@ public class RegisterAction extends HttpServlet {
 
 	    // get user from the DB if exists, create it otherwise
 	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username,
-		    hashedPassword, firstName, lastName, email);
+		    passwordHash, salt, firstName, lastName, email);
 	    User user = userMap.getUser();
 
 	    HashSet<Lesson> lessonsToJoin = new HashSet<Lesson>();
@@ -273,8 +274,8 @@ public class RegisterAction extends HttpServlet {
 	    for (Lesson lesson : lessonsToJoin) {
 		boolean isAdded = lessonService.addLearner(lesson.getLessonId(), user.getUserId());
 		if (isAdded) {
-		    logger.debug("Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName()
-			    + " as a learner");
+		    logger.debug(
+			    "Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName() + " as a learner");
 		}
 	    }
 
@@ -285,8 +286,8 @@ public class RegisterAction extends HttpServlet {
 		    LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(user.getUserId(),
 			    lesson.getLessonId());
 		    if (learnerProgress == null) {
-			logger.debug("The learner:" + user.getLogin() + " is joining the lesson:"
-				+ lesson.getLessonId());
+			logger.debug(
+				"The learner:" + user.getLogin() + " is joining the lesson:" + lesson.getLessonId());
 			learnerService.joinLesson(user.getUserId(), lesson.getLessonId());
 		    } else {// don't join to lessons which user is a part of already but make sure time limit is reset
 			resetUserTimeLimit(lesson, user);
@@ -317,10 +318,11 @@ public class RegisterAction extends HttpServlet {
 
 		String registeredUserName = firstName + " " + lastName + " (" + username + ")";
 		eventNotificationService.sendMessage(null, coordinator.getUserId(),
-			IEventNotificationService.DELIVERY_METHOD_MAIL, messageService
-				.getMessage("notify.coordinator.register.user.email.subject"), messageService
-				.getMessage("notify.coordinator.register.user.email.body",
-					new Object[] { registeredUserName }), isHtmlFormat);
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
+			messageService.getMessage("notify.coordinator.register.user.email.subject"),
+			messageService.getMessage("notify.coordinator.register.user.email.body",
+				new Object[] { registeredUserName }),
+			isHtmlFormat);
 	    }
 
 	    writeAJAXOKResponse(response);
@@ -334,9 +336,8 @@ public class RegisterAction extends HttpServlet {
     /**
      * Remove user from group lessons.
      * 
-     * External server call must follow the next format:
-     * http://<<yourlamsserver>>/lams/central/Register.do?method=removeUserFromGroup
-     * &serverId=%serverId%&datetime=%datetime%
+     * External server call must follow the next format: http://<
+     * <yourlamsserver>>/lams/central/Register.do?method=removeUserFromGroup &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&isRemoveFromAllCourses=%isRemoveFromAllCourses%
      * 
      * Here are the parameters explanation:
@@ -436,9 +437,9 @@ public class RegisterAction extends HttpServlet {
      * Resets user's time limit for all lessons in a group with scheduledToCloseForIndividuals setting on. In case
      * lesson's time limit is not individual it does nothing.
      * 
-     * External server call must follow the next format:
-     * http://<<yourlamsserver>>/lams/central/Register.do?method=resetUserTimeLimit
-     * &serverId=%serverId%&datetime=%datetime% &hashValue=%hashValue%&courseId=%courseId%&username=%username%
+     * External server call must follow the next format: http://<
+     * <yourlamsserver>>/lams/central/Register.do?method=resetUserTimeLimit &serverId=%serverId%&datetime=%datetime%
+     * &hashValue=%hashValue%&courseId=%courseId%&username=%username%
      * 
      * Here are the parameters explanation:
      * 

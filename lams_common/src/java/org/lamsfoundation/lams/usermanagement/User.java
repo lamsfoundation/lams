@@ -50,9 +50,14 @@ public class User implements Serializable, Comparable {
     private String login;
 
     /**
-     * persistent field ] TODO needs to be removed for security reason
+     * persistent field
      */
     private String password;
+
+    /**
+     * persistent field
+     */
+    private String salt;
 
     /** nullable persistent field */
     private String title;
@@ -198,8 +203,16 @@ public class User implements Serializable, Comparable {
 	return password;
     }
 
+    public String getSalt() {
+	return salt;
+    }
+
     public void setPassword(String password) {
 	this.password = password;
+    }
+
+    public void setSalt(String salt) {
+	this.salt = salt;
     }
 
     public String getTitle() {
@@ -485,7 +498,7 @@ public class User implements Serializable, Comparable {
 		// TimeZone.getTimeZone("Australia/Sydney"),
 		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, lamsCommunityToken,
 		lamsCommunityUsername, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not
-										   // set
+		// set
 		tutorialPages, (firstLogin == null ? true : false) // assume no firstLogin value means they haven't
 								   // logged in
 	);
