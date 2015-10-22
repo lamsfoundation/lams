@@ -1095,8 +1095,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     /**
-     * Verifies external server. Also it has a WSDL analog
-     * <code>org.lamsfoundation.lams.webservice.VerificationServiceSoapBindingImpl</code>
+     * Verifies external server.
      * 
      * @param serverId
      * @param datetime
