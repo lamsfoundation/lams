@@ -25,30 +25,31 @@ package org.lamsfoundation.lams.tool.peerreview.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewSessionDAO;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 
 
-public class PeerreviewSessionDAOHibernate extends BaseDAOHibernate implements PeerreviewSessionDAO{
+public class PeerreviewSessionDAOHibernate extends LAMSBaseDAO implements PeerreviewSessionDAO{
 	
 	private static final String FIND_BY_SESSION_ID = "from " + PeerreviewSession.class.getName() + " as p where p.sessionId=?";
 	private static final String FIND_BY_CONTENT_ID = "from " + PeerreviewSession.class.getName() + " as p where p.peerreview.contentId=?";
 	
 	public PeerreviewSession getSessionBySessionId(Long sessionId) {
-		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		List list = find(FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.size() == 0)
 			return null;
 		return (PeerreviewSession) list.get(0);
 	}
 	public List<PeerreviewSession> getByContentId(Long toolContentId) {
-		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+		return find(FIND_BY_CONTENT_ID,toolContentId);
 	}
 	
 	public void delete(PeerreviewSession session) {
-		this.getHibernateTemplate().delete(session);
+		delete(session);
 	}
 	public void deleteBySessionId(Long toolSessionId) {
-		this.removeObject(PeerreviewSession.class,toolSessionId);
+		removeObject(PeerreviewSession.class,toolSessionId);
 	}
 
 }

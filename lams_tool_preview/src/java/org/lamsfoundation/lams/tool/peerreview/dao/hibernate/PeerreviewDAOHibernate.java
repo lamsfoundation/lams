@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.peerreview.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewDAO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 
@@ -34,11 +35,11 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
  * 
  * @version $Revision$
  */
-public class PeerreviewDAOHibernate extends BaseDAOHibernate implements PeerreviewDAO{
+public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO{
 	private static final String GET_RESOURCE_BY_CONTENTID = "from "+Peerreview.class.getName()+" as r where r.contentId=?";
 	
 	public Peerreview getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		List list = find(GET_RESOURCE_BY_CONTENTID,contentId);
 		if(list.size() > 0)
 			return (Peerreview) list.get(0);
 		else
@@ -50,7 +51,7 @@ public class PeerreviewDAOHibernate extends BaseDAOHibernate implements Peerrevi
 	}
 
 	public void delete(Peerreview peerreview) {
-		this.getHibernateTemplate().delete(peerreview);
+		delete(peerreview);
 	}
 
 }

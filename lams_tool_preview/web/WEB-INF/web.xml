@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
- <display-name>Peer Review</display-name>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+	version="3.1">
+<display-name>Peer Review</display-name>
 <description>
 	Peer Review tool
 </description>
@@ -9,11 +11,6 @@
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
 	<param-value>org.lamsfoundation.lams.tool.peerreview.ApplicationResources</param-value>
 </context-param>
-
-<context-param>
-    <param-name>contextClass</param-name>
-    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
-</context-param> 
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value>classpath:/org/lamsfoundation/lams/tool/peerreview/dbupdates/autopatchContext.xml</param-value>
@@ -27,22 +24,10 @@
 	<param-value>context.central</param-value>
 </context-param>
 
-<listener>
-	<listener-class>
-		org.springframework.web.context.ContextLoaderListener
-	</listener-class>
-</listener>	
-
-<listener>
-	<listener-class>
-		org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
-	</listener-class>
-</listener>
-
 <filter>
 	<filter-name>hibernateFilter</filter-name>
 	<filter-class>
-		org.springframework.orm.hibernate3.support.OpenSessionInViewFilter
+		org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter
 	</filter-class>
 	<init-param>
 		<param-name>sessionFactoryBeanName</param-name>
@@ -80,45 +65,40 @@
 	<url-pattern>/*</url-pattern>
 </filter-mapping>
 
-    <!--
-    To use non XDoclet listeners, create a listeners.xml file that
-    contains the additional listeners and place it in your
-    project's merge dir.
-    -->
+<listener>
+	<listener-class>
+		org.springframework.web.context.ContextLoaderListener
+	</listener-class>
+</listener>	
 
-<servlet>
+	<servlet>
 		<servlet-name>exportPortfolio</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.tool.peerreview.web.servlet.ExportServlet</servlet-class>
-</servlet>
+	</servlet>
 
-<servlet>
-		<servlet-name>completeItem</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.peerreview.web.servlet.CompleteItemServlet</servlet-class>
-</servlet>
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/struts-config.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>999</param-value>
+		</init-param>
+		<init-param>
+			<param-name>detail</param-name>
+			<param-value>2</param-value>
+		</init-param>
+		<init-param>
+			<param-name>validate</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
-<servlet>
-    <servlet-name>action</servlet-name>
-    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-    <init-param>
-      <param-name>config</param-name>
-      <param-value>/WEB-INF/struts-config.xml</param-value>
-    </init-param>
-    <init-param>
-      <param-name>debug</param-name>
-      <param-value>999</param-value>
-    </init-param>
-    <init-param>
-      <param-name>detail</param-name>
-      <param-value>1</param-value>
-    </init-param>
-    <init-param>
-      <param-name>validate</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <load-on-startup>2</load-on-startup>
-</servlet>
-
-<servlet>
+	<servlet>
 		<servlet-name>Connector</servlet-name>
 		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
 		<init-param>
@@ -130,31 +110,31 @@
 			<param-value>false</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
-</servlet>
+	</servlet>
 
-	<!--  The download servlet, reused from the content repository jar -->
+	<!-- The download servlet, reused from the content repository jar -->
 	<servlet>
 		<description>Instructions Download</description>
 		<display-name>Instructions Download</display-name>
 		<servlet-name>download</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
-	    <init-param>
-	      <param-name>toolContentHandlerBeanName</param-name>
-	      <param-value>peerreviewToolContentHandler</param-value>
-	    </init-param>
-	    <load-on-startup>3</load-on-startup>
+		<init-param>
+			<param-name>toolContentHandlerBeanName</param-name>
+			<param-value>forumToolContentHandler</param-value>
+		</init-param>
+		<load-on-startup>3</load-on-startup>
 	</servlet>
 
-  <servlet-mapping>
-	<servlet-name>action</servlet-name>
-    <url-pattern>*.do</url-pattern>
-	</servlet-mapping>
-	
 	<servlet-mapping>
-	    <servlet-name>Connector</servlet-name>
-	    <url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
-	
+
+	<servlet-mapping>
+		<servlet-name>Connector</servlet-name>
+		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	</servlet-mapping>
+
 	<servlet-mapping>
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download/*</url-pattern>
@@ -165,73 +145,92 @@
 		<url-pattern>/exportPortfolio</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-	    <servlet-name>completeItem</servlet-name>
-	    <url-pattern>/learning/completeItem</url-pattern>
-	</servlet-mapping>
-	
-  	<jsp-config>
-		<!--  ======================================================== -->	
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
+
+	<jsp-config>
+
+		<!-- ======================================================== -->
 		<!-- Struts Tag Library Descriptors -->
-		<!--  ======================================================== -->	
+		<!-- ======================================================== -->
 		<taglib>
-		    <taglib-uri>tags-bean</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
+			<taglib-uri>tags-bean</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-html</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
+			<taglib-uri>tags-html</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-logic</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
+			<taglib-uri>tags-logic</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-tiles</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
-		</taglib>
-				
-		<taglib>
-		    <taglib-uri>tags-bean-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
+			<taglib-uri>tags-tiles</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-html-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld</taglib-location>
+			<taglib-uri>tags-bean-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-logic-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld</taglib-location>
+			<taglib-uri>tags-html-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-tiles-el</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld</taglib-location>
+			<taglib-uri>tags-logic-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld</taglib-location>
 		</taglib>
-		<!--  ======================================================== -->	
-		<!--  JSTL 1.2 Tag Library 									   -->
-		<!--  ======================================================== -->	
-		  <taglib>
-		    <taglib-uri>tags-fmt</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
-		  </taglib>
-		  <taglib>
-		    <taglib-uri>tags-core</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
-		  </taglib>
-		  <taglib>
-		    <taglib-uri>tags-function</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
-		  </taglib>
-		  <taglib>
-		    <taglib-uri>tags-xml</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
-		  </taglib>
-		<!--  ======================================================== -->	
-		<!--   Customized Tag Library -->
-		<!--  ======================================================== -->	
 		<taglib>
-		   <taglib-uri>tags-lams</taglib-uri>
-		   <taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+			<taglib-uri>tags-tiles-el</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-fmt</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-core</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-function</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-xml</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-permittedTaglibs</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-scriptfree</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- Customized Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-lams</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
 		</taglib>
 
 	</jsp-config>
@@ -307,27 +306,14 @@
 		<role-name>SYSADMIN</role-name>
 	</security-role>
 	
-	<!--  Login Configuration -->
-  	<login-config>
-   		<auth-method>FORM</auth-method>
+	<!-- Login Configuration -->
+	<login-config>
+		<auth-method>FORM</auth-method>
 		<realm-name>LAMS</realm-name>
-   		<form-login-config>
-    		<form-login-page>/login.jsp</form-login-page>
-			<form-error-page>/login.jsp?failed=y</form-error-page>    		
-   		</form-login-config>
-   	</login-config>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp?failed=y</form-error-page>
+		</form-login-config>
+	</login-config>
    	
-    <error-page>
-        <error-code>500</error-code>
-        <location>/error.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>403</error-code>
-        <location>/403.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>404</error-code>
-        <location>/404.jsp</location>
-    </error-page>
-    
-</web-app>
+ </web-app>
