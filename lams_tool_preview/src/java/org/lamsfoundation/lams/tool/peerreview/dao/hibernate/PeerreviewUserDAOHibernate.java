@@ -25,11 +25,12 @@ package org.lamsfoundation.lams.tool.peerreview.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewUserDAO;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 
-public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements PeerreviewUserDAO {
+public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements PeerreviewUserDAO {
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "FROM " + PeerreviewUser.class.getName()
 	    + " AS u WHERE u.userId =? AND u.peerreview.contentId=?";
@@ -51,7 +52,7 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
 
     @Override
     public PeerreviewUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List list = find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (PeerreviewUser) list.get(0);
@@ -59,7 +60,7 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
 
     @Override
     public PeerreviewUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List list = find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (PeerreviewUser) list.get(0);
@@ -67,23 +68,23 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
 
     @Override
     public List<PeerreviewUser> getBySessionID(Long sessionId) {
-	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+	return find(FIND_BY_SESSION_ID, sessionId);
     }
     
     @Override
     public List<Long> getUserIdsBySessionID(Long sessionId) {
-	return this.getHibernateTemplate().find(GET_USERIDS_BY_SESSION_ID, sessionId);
+	return find(GET_USERIDS_BY_SESSION_ID, sessionId);
     }
 
     @Override
     public List<PeerreviewUser> getByContentId(Long toolContentId) {
-	return this.getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
+	return find(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override
     public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 
-	List list = getHibernateTemplate().find(GET_COUNT_USERS_FOR_SESSION,
+	List list = find(GET_COUNT_USERS_FOR_SESSION,
 		new Object[] { toolSessionId, excludeUserId });
 	if (list == null || list.size() == 0) {
 	    return 0;

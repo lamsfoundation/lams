@@ -76,7 +76,6 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.tool.service.LamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -517,6 +516,23 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getPeerreviewByContentId(toolContentId).isDefineLater();
+    }
+
+    @Override
+    public boolean isReadOnly(Long toolContentId) {
+	List<PeerreviewSession> list = peerreviewSessionDao.getByContentId(toolContentId);
+	Iterator<PeerreviewSession> iter = list.iterator();
+	while (iter.hasNext()) {
+	    PeerreviewSession session = (PeerreviewSession) iter.next();
+	    if ( peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L) == 0) {
+		log.debug("Peer Review isReadOnly called. Returning true. Count of users for session id "+session.getSessionId()+" is "+peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L));
+		return true;
+	    } else {
+		log.debug("Peer Review isReadOnly called. Count of users for session id "+session.getSessionId()+" is 0");
+	    }
+	}
+	log.debug("Peer Review isReadOnly called. Returning false.");
+	return false;
     }
 
     @Override

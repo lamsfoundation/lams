@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
-
-	<bean id="peerreviewMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   
+    <bean id="peerreviewMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.peerreview.ApplicationResources</value></property>
@@ -38,16 +39,16 @@
 	
     <bean id="peerreviewManagerTarget" class="org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl">
         <property name="peerreviewDao">
-            <ref local="peerreviewDao"/>
+            <ref bean="peerreviewDao"/>
         </property>
         <property name="peerreviewUserDao">
-            <ref local="peerreviewUserDao"/>
+            <ref bean="peerreviewUserDao"/>
         </property>
         <property name="peerreviewSessionDao">
-            <ref local="peerreviewSessionDao"/>
+            <ref bean="peerreviewSessionDao"/>
         </property>
         <property name="peerreviewToolContentHandler">
-            <ref local="peerreviewToolContentHandler"/>
+            <ref bean="peerreviewToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -68,13 +69,13 @@
 
     <bean id="peerreviewService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="postInterceptors">
+		<property name="preInterceptors">
 			<list>		
 				<ref bean="transactionRetryInterceptor" /> 
 			</list>
 		</property>
 		<property name="target">
-            <ref local="peerreviewManagerTarget"/>
+            <ref bean="peerreviewManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>
@@ -99,3 +100,4 @@
         </property>
     </bean>
 </beans>
+
