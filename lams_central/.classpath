@@ -38,5 +38,6 @@
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/servlet/main/undertow-servlet-1.1.8.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/core/main/undertow-core-1.1.8.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jdom/main/jdom-1.1.2.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jdom"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/picketbox/main/picketbox-4.0.21.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

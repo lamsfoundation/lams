@@ -23,17 +23,25 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.web;
 
+import java.security.Principal;
 import java.util.Locale;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.servlet.jsp.jstl.core.Config;
 
+import org.apache.log4j.Logger;
+import org.jboss.security.CacheableManager;
+import org.lamsfoundation.lams.security.SimplePrincipal;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Listens for creation of HTTP sessions. Sets inactive timeout and default locale.
@@ -41,6 +49,9 @@ import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 public class SessionListener implements HttpSessionListener {
     private static int timeout; //in seconds
+    private static CacheableManager<?, Principal> authenticationManager;
+
+    private static Logger log = Logger.getLogger(SessionListener.class);
 
     static {
 	SessionListener.timeout = Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME);
@@ -59,15 +70,34 @@ public class SessionListener implements HttpSessionListener {
 	//LocaleFilter class. But this part code can cope with login.jsp Locale.
 	if (session != null) {
 	    String defaults[] = LanguageUtil.getDefaultLangCountry();
-	    Locale preferredLocale = new Locale(defaults[0] == null ? "" : defaults[0], defaults[1] == null ? ""
-		    : defaults[1]);
+	    Locale preferredLocale = new Locale(defaults[0] == null ? "" : defaults[0],
+		    defaults[1] == null ? "" : defaults[1]);
 	    session.setAttribute(LocaleFilter.PREFERRED_LOCALE_KEY, preferredLocale);
 	    Config.set(session, Config.FMT_LOCALE, preferredLocale);
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void sessionDestroyed(HttpSessionEvent se) {
-	//nothing to do
+    public void sessionDestroyed(HttpSessionEvent sessionEvent) {
+	if (SessionListener.authenticationManager == null) {
+	    try {
+		InitialContext initialContext = new InitialContext();
+		SessionListener.authenticationManager = (CacheableManager<?, Principal>) initialContext
+			.lookup("java:jboss/jaas/lams/authenticationMgr");
+	    } catch (NamingException e) {
+		SessionListener.log.error("Error while getting authentication manager.", e);
+	    }
+	}
+
+	// clear the authentication cache when the session is invalidated
+	HttpSession session = sessionEvent.getSession();
+	if (session != null) {
+	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
+	    if (userDTO != null) {
+		Principal principal = new SimplePrincipal(userDTO.getLogin());
+		SessionListener.authenticationManager.flushCache(principal);
+	    }
+	}
     }
 }
