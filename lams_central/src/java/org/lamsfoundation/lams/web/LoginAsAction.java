@@ -30,6 +30,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -74,8 +75,10 @@ public class LoginAsAction extends Action {
 
 		    // login.jsp knows what to do with these
 		    request.setAttribute("login", login);
+		    String token = "#" + RandomPasswordGenerator.nextPassword(10);
+		    request.setAttribute("password", token);
 		    // notify the login module that the user has been authenticated correctly
-		    UniversalLoginModule.setAuthenticationToken(login);
+		    UniversalLoginModule.setAuthenticationToken(token);
 		    // redirect to login page
 		    return (new ActionForward("/login.jsp?redirectURL=/lams/index.jsp"));
 		}

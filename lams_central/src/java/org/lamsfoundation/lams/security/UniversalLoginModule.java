@@ -275,6 +275,9 @@ public class UniversalLoginModule implements LoginModule {
 	// allow sysadmin to login as another user; in this case, the LAMS shared session will be present,
 	// allowing the following check to work
 	if (UniversalLoginModule.userManagementService.isUserSysAdmin()) {
+	    if (UniversalLoginModule.log.isDebugEnabled()) {
+		UniversalLoginModule.log.debug("Authenticated sysadmin");
+	    }
 	    return true;
 	}
 
@@ -282,9 +285,19 @@ public class UniversalLoginModule implements LoginModule {
 
 	// empty password not allowed
 	if (StringUtils.isBlank(inputPassword)) {
-	    // check for internal authentication made by LoginRequestServlet or LoginAsAction
-	    Long internalAuthenticationTime = UniversalLoginModule.internalAuthenticationTokens.get(userName);
-	    UniversalLoginModule.internalAuthenticationTokens.remove(userName);
+	    if (UniversalLoginModule.log.isDebugEnabled()) {
+		UniversalLoginModule.log.debug("Entered password is blank for user: " + userName);
+	    }
+	    return false;
+	}
+
+	// check for internal authentication made by LoginRequestServlet or LoginAsAction
+	if (inputPassword.startsWith("#")) {
+	    if (UniversalLoginModule.log.isDebugEnabled()) {
+		UniversalLoginModule.log.debug("Authenticating internally user: " + userName);
+	    }
+	    Long internalAuthenticationTime = UniversalLoginModule.internalAuthenticationTokens.get(inputPassword);
+	    UniversalLoginModule.internalAuthenticationTokens.remove(inputPassword);
 	    // internal authentication is valid for 10 seconds
 	    return (internalAuthenticationTime != null) && ((System.currentTimeMillis()
 		    - internalAuthenticationTime) < UniversalLoginModule.INTERNAL_AUTHENTICATION_TIMEOUT);
@@ -293,9 +306,7 @@ public class UniversalLoginModule implements LoginModule {
 	boolean isValid = false;
 
 	try {
-
 	    User user = UniversalLoginModule.userManagementService.getUserByLogin(userName);
-
 	    // LDAP user provisioning
 	    if (user == null) {
 		if (!Configuration.getAsBoolean(ConfigurationKeys.LDAP_PROVISIONING_ENABLED)) {
@@ -515,7 +526,7 @@ public class UniversalLoginModule implements LoginModule {
     /**
      * Allows other LAMS modules to confirm user authentication before WildFly proper authentication commences.
      */
-    public static void setAuthenticationToken(String userName) {
-	UniversalLoginModule.internalAuthenticationTokens.put(userName, System.currentTimeMillis());
+    public static void setAuthenticationToken(String token) {
+	UniversalLoginModule.internalAuthenticationTokens.put(token, System.currentTimeMillis());
     }
 }
