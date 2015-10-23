@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.security.UniversalLoginModule;
@@ -158,8 +159,10 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    // login.jsp knows what to do with these
 	    hses.setAttribute("login", login);
+	    String token = "#" + RandomPasswordGenerator.nextPassword(10);
+	    hses.setAttribute("password", token);
 	    // notify the login module that the user has been authenticated correctly
-	    UniversalLoginModule.setAuthenticationToken(login);
+	    UniversalLoginModule.setAuthenticationToken(token);
 
 	    response.sendRedirect("login.jsp?redirectURL=" + redirectURL);
 	} catch (AuthenticationException e) {

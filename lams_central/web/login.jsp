@@ -11,6 +11,7 @@
 --%>
 <c:if test="${empty requestScope.login}">
 	<c:set var="login" value="${sessionScope.login}" />
+	<c:set var="password" value="${sessionScope.password}" />
 </c:if>
 
 <!DOCTYPE html>
@@ -184,7 +185,7 @@ j_security_login_page
 				
 				<form style="display: none" method="POST" action="j_security_check">
 					<input type="hidden" name="j_username" value="${login}" />
-					<input type="hidden" name="j_password" value="" />
+					<input type="hidden" name="j_password" value="${password}" />
 					<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
 				</form>
 			</div>
