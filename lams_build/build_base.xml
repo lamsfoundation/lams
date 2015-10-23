@@ -34,6 +34,7 @@
 			<include name="javax/transaction/api/main/jboss-transaction-*.jar" />
 			<include name="org/javassist/main/javassist-*.jar" />
 			<include name="org/hibernate/main/hibernate-core-*.jar" />
+			<include name="org/picketbox/main/picketbox-*.jar" />
 			<include name="org/jboss/logging/main/jboss-logging-*.jar" />
 			<include name="org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-*.jar" />
 			<include name="org/jboss/logmanager/main/jboss-logmanager-*.jar" />
