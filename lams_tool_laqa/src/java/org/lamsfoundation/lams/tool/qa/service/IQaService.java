@@ -109,9 +109,9 @@ public interface IQaService extends ToolRatingManager {
     List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
     
     List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
-	    int page, int size, int sorting);
+	    int page, int size, int sorting, String searchString);
     
-    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId);
+    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId, String searchString);
     
     /**
      * Creates or updates response with answer submitted by user.
@@ -344,5 +344,6 @@ public interface IQaService extends ToolRatingManager {
      * @param sessionId
      */
     void notifyTeachersOnResponseSubmit(Long sessionId);
+
 
 }

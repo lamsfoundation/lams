@@ -1043,6 +1043,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
+	String searchString = request.getParameter("fcol[0]");
+	log.debug("filter value "+searchString);
 	
 	int sorting = QaAppConstants.SORT_BY_NO;
 	if (isSort1 != null && isSort1.equals(0)) {
@@ -1052,12 +1054,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	}
 	
 	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaSessionId, questionUid, userId, page, size,
-		sorting);
+		sorting, searchString);
 	
 	JSONObject responcedata = new JSONObject();
 	JSONArray rows = new JSONArray();
 
-	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, userId));
+	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, userId, searchString));
 	
 	//handle rating criterias
 	List<ItemRatingDTO> itemRatingDtos = null;
