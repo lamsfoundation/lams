@@ -540,3 +540,8 @@ text-align:left;
 .align-left{
 text-align:right;
 }
+
+/* jQuery tablesorter/pager/filter defaults */
+.tablesorter .disabled {
+	display: none
+}

@@ -1736,3 +1736,8 @@ div.delete-arrow {
 .ui-dialog .ui-dialog-titlebar-buttonpane a {
 	margin-right: 3px;
 }
+
+/* jQuery tablesorter/pager/filter defaults */
+.tablesorter .disabled {
+	display: none
+}

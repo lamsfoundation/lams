@@ -612,3 +612,8 @@ text-align:left;
 	color: #222222 !important;
 	background-color: #D0E5F5;"
 }
+
+/* jQuery tablesorter/pager/filter defaults */
+.tablesorter .disabled {
+	display: none
+}

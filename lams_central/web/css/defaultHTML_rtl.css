@@ -1702,3 +1702,8 @@ ul.more-actions-list li {
         border-right:1px solid #d2d2d2;
         border-bottom: 0px;
 }
+
+/* jQuery tablesorter/pager/filter defaults */
+.tablesorter .disabled {
+	display: none
+}

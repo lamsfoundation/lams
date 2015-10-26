@@ -218,3 +218,8 @@ label.error {
 #qaAnswers {padding-top: 20px; padding-bottom: 20px;}
 #qaQuestionsSequential{padding-top: 30px; padding-bottom: 0px;}
 .finishButtonDiv {text-align: right; margin: 5px 13px;}
+
+/* jQuery tablesorter/pager/filter defaults */
+.tablesorter .disabled {
+	display: none
+}
