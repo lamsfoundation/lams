@@ -45,7 +45,7 @@ function drawChart(type, chartID, url){
 				  .attr('x', 20)
 				  .attr('y', index * 30 + 11)
 				  .attr('text-anchor', 'start')
-				  .text(d.name + ' (' + d.value + ' %)');
+				  .text(d.name + ' (' + Math.round(+d.value) + ' %)');
 		});
 		
 		// draw proper chart
