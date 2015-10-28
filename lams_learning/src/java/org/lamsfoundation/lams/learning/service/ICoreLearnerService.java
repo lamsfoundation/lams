@@ -243,12 +243,6 @@ public interface ICoreLearnerService extends ILearnerService {
     public List getActiveLearnersByLesson(long lessonId);
 
     /**
-     * Returns a count of all the active learners by lesson id. More efficient than calling
-     * getActiveLearnersByLesson(lessonId).size()
-     */
-    public Integer getCountActiveLearnersByLesson(long lessonId);
-
-    /**
      * Perform grouping for the learners who have started the lesson, based on the grouping activity.
      * 
      * @param lessonId

@@ -316,25 +316,11 @@ public interface ILessonService {
     List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
     /**
-     * Get the list of users who have completed an activity. This is based on the progress engine records. This will
-     * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
-     * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
-     */
-    List<User> getLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException;
-
-    /**
      * Gets the count of the users who have attempted an activity. This is based on the progress engine records. This
      * will work on all activities, including ones that don't have any tool sessions, i.e. system activities such as
      * branching.
      */
     Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
-
-    /**
-     * Gets the count of the users who have completed an activity. This is based on the progress engine records. This
-     * will work on all activities, including ones that don't have any tool sessions, i.e. system activities such as
-     * branching.
-     */
-    Integer getCountLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException;
 
     /**
      * Returns map of lessons in an organisation for a particular learner or staff user.

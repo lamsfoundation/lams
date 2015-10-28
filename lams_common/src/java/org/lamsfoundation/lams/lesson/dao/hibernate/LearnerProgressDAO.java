@@ -23,10 +23,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+import java.math.BigInteger;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -46,36 +49,43 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     protected Logger log = Logger.getLogger(LearnerProgressDAO.class);
 
     private final static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
-    
-    private final static String LOAD_PROGRESS_BY_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
-    // +
-    // "or activity in elements(p.previousActivity) or activity in elements(p.completedActivities)";
+
+    private final static String LOAD_PROGRESS_REFFERING_TO_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
+
     private final static String LOAD_COMPLETED_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lessonComplete > 0 and p.lesson.id = :lessonId";
+
+    private final static String LOAD_LATEST_COMPLETED_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lessonComplete > 0 and p.lesson.id = :lessonId ORDER BY p.finishDate DESC";
+
+    private final static String COUNT_COMPLETED_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p "
+	    + " where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
     private final static String COUNT_ATTEMPTED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.attemptedActivities attAct " + " where act.id = :activityId and "
 	    + " index(attAct) = act";
-    
+
     private final static String COUNT_COMPLETED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.completedActivities compAct " + " where act.id = :activityId and "
 	    + " index(compAct) = act";
 
-    private final static String COUNT_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p where p.lesson.id = :lessonId";
-    
+    private final static String COUNT_CURRENT_ACTIVITY = "select count(*) from LearnerProgress prog WHERE "
+	    + " prog.currentActivity = :activity";
+
     private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
-    
+
     private final static String LOAD_PROGRESS_BY_LESSON_AND_USER_IDS = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId AND p.user.userId IN (:userIds) order by p.user.lastName, p.user.firstName, p.user.userId";
 
-    private final String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
+    private final static String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
 	    + " progress.lesson.lessonId IN (:lessonIds)";
-    
-    private final static String LOAD_NEXT_BATCH_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lesson.id = :lessonId "
-	    + " and (( p.user.lastName > :lastUserLastName)"
-	    + " or ( p.user.lastName = :lastUserLastName and p.user.firstName > :lastUserFirstName) "
-	    + " or ( p.user.lastName = :lastUserLastName and p.user.firstName = :lastUserFirstName and p.user.userId > :lastUserId))"
-	    + " order by p.user.lastName, p.user.firstName, p.user.userId";
+
+    private final static String LOAD_LATEST_PROGRESS_BY_ACTIVITY = "SELECT prog.learner_progress_id FROM lams_learner_progress AS prog "
+	    + "JOIN lams_progress_attempted AS att USING (learner_progress_id) "
+	    + "WHERE prog.current_activity_id = :activityId AND att.activity_id = :activityId "
+	    + "ORDER BY att.start_date_time DESC";
+
+    private final static String LOAD_PROGRESS_BY_ACTIVITY = "FROM LearnerProgress p WHERE "
+	    + " p.currentActivity.id = :activityId";
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
@@ -97,9 +107,10 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
 	return (LearnerProgress) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_PROGRESS_BY_LEARNER).setInteger("learnerId", learnerId)
-			.setLong("lessonId", lessonId).uniqueResult();
+		return session.createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_LEARNER)
+			.setInteger("learnerId", learnerId).setLong("lessonId", lessonId).uniqueResult();
 	    }
 	});
     }
@@ -109,58 +120,135 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 	this.getHibernateTemplate().update(learnerProgress);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List getLearnerProgressReferringToActivity(final Activity activity) {
+    public List<LearnerProgress> getLearnerProgressReferringToActivity(final Activity activity) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
-	return (List) hibernateTemplate.execute(new HibernateCallback() {
+	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_PROGRESS_BY_ACTIVITY).setEntity("activity", activity).list();
+		return session.createQuery(LearnerProgressDAO.LOAD_PROGRESS_REFFERING_TO_ACTIVITY)
+			.setEntity("activity", activity).list();
 	    }
 	});
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List getCompletedLearnerProgressForLesson(final Long lessonId) {
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+    public List<LearnerProgress> getLearnerProgressLatestByActivity(final Long activityId, final Integer limit) {
+	final HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
-	return (List) hibernateTemplate.execute(new HibernateCallback() {
+	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_COMPLETED_PROGRESS_BY_LESSON).setLong("lessonId", lessonId).list();
+		Query query = session.createSQLQuery(LearnerProgressDAO.LOAD_LATEST_PROGRESS_BY_ACTIVITY)
+			.setLong("activityId", activityId);
+		if (limit != null) {
+		    query.setMaxResults(limit);
+		}
+		// first query fetches only progress IDs
+		List<BigInteger> result = query.list();
+		// fetch Learner progress objects and return them
+		List<LearnerProgress> learnerProgresses = new LinkedList<LearnerProgress>();
+		for (BigInteger learnerProgressId : result) {
+		    learnerProgresses.add((LearnerProgress) hibernateTemplate.get(LearnerProgress.class,
+			    learnerProgressId.longValue()));
+		}
+		return learnerProgresses;
 	    }
 	});
     }
-    
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<LearnerProgress> getLearnerProgressByActivity(final Long activityId, final Integer limit,
+	    final Integer offset) {
+	final HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_ACTIVITY).setLong("activityId",
+			activityId);
+		if (limit != null) {
+		    query.setMaxResults(limit);
+		}
+		if (offset != null) {
+		    query.setFirstResult(offset);
+		}
+		return query.list();
+	    }
+	});
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<LearnerProgress> getCompletedLearnerProgressLatestForLesson(final Long lessonId, final Integer limit) {
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createQuery(LearnerProgressDAO.LOAD_LATEST_COMPLETED_PROGRESS_BY_LESSON)
+			.setLong("lessonId", lessonId);
+		if (limit != null) {
+		    query.setMaxResults(limit);
+		}
+		return query.list();
+	    }
+	});
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<LearnerProgress> getCompletedLearnerProgressForLesson(final Long lessonId) {
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(LearnerProgressDAO.LOAD_COMPLETED_PROGRESS_BY_LESSON)
+			.setLong("lessonId", lessonId).list();
+	    }
+	});
+    }
+
     @Override
     public List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
 	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_PROGRESS_BY_LESSON).setLong("lessonId", lessonId).list();
+		return session.createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_LESSON).setLong("lessonId", lessonId)
+			.list();
 	    }
 	});
     }
-    
+
     @Override
     public List getLearnerProgressForLesson(final Long lessonId, final List<Integer> userIds) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
 	return (List) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_PROGRESS_BY_LESSON_AND_USER_IDS).setLong("lessonId", lessonId)
-			.setParameterList("userIds", userIds).list();
+		return session.createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_LESSON_AND_USER_IDS)
+			.setLong("lessonId", lessonId).setParameterList("userIds", userIds).list();
 	    }
 	});
     }
-    
+
+    @SuppressWarnings("unchecked")
     @Override
     public List<LearnerProgress> getLearnerProgressForLessons(final List<Long> lessonIds) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
 	return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.createQuery(LOAD_PROGRESSES_BY_LESSON_LIST)
+		return session.createQuery(LearnerProgressDAO.LOAD_PROGRESSES_BY_LESSON_LIST)
 			.setParameterList("lessonIds", lessonIds).list();
 	    }
 	});
@@ -173,6 +261,7 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	learners = (List<User>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
 		return session.getNamedQuery("usersAttemptedActivity")
 			.setLong("activityId", activity.getActivityId().longValue()).list();
@@ -186,8 +275,9 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     public Integer getNumUsersAttemptedActivity(final Activity activity) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	Integer attempted = (Integer) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Object value = session.createQuery(COUNT_ATTEMPTED_ACTIVITY)
+		Object value = session.createQuery(LearnerProgressDAO.COUNT_ATTEMPTED_ACTIVITY)
 			.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
 		return new Integer(((Number) value).intValue());
 	    }
@@ -196,27 +286,12 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<User> getLearnersHaveCompletedActivity(final Activity activity) {
-	List<User> learners = null;
-
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	learners = (List<User>) hibernateTemplate.execute(new HibernateCallback() {
-	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.getNamedQuery("usersCompletedActivity")
-			.setLong("activityId", activity.getActivityId().longValue()).list();
-	    }
-	});
-
-	return learners;
-    }
-
-    @Override
     public Integer getNumUsersCompletedActivity(final Activity activity) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Object value = session.createQuery(COUNT_COMPLETED_ACTIVITY)
+		Object value = session.createQuery(LearnerProgressDAO.COUNT_COMPLETED_ACTIVITY)
 			.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
 		return new Integer(((Number) value).intValue());
 	    }
@@ -224,42 +299,28 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     }
 
     @Override
-    public Integer getNumAllLearnerProgress(final Long lessonId) {
+    public Integer getNumUsersCompletedLesson(final Long lessonId) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Object value = session.createQuery(COUNT_PROGRESS_BY_LESSON).setLong("lessonId", lessonId.longValue())
-			.uniqueResult();
-		return new Integer(((Number) value).intValue());
+		Object value = session.createQuery(LearnerProgressDAO.COUNT_COMPLETED_PROGRESS_BY_LESSON)
+			.setLong("lessonId", lessonId).uniqueResult();
+		return ((Number) value).intValue();
 	    }
 	});
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<LearnerProgress> getBatchLearnerProgress(final Long lessonId, final User lastUser, final int batchSize) {
+    public Integer getNumUsersCurrentActivity(final Activity activity) {
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	
-	if (lastUser == null) {
-	    return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
-		public Object doInHibernate(Session session) throws HibernateException {
-		    return session.createQuery(LOAD_PROGRESS_BY_LESSON)
-			    .setLong("lessonId", lessonId.longValue())
-			    .setMaxResults(batchSize).list();
-		}
-	    });
-	    
-	} else {
-	    return (List<LearnerProgress>) hibernateTemplate.execute(new HibernateCallback() {
-		public Object doInHibernate(Session session) throws HibernateException {
-		    return session.createQuery(LOAD_NEXT_BATCH_PROGRESS_BY_LESSON)
-			    .setLong("lessonId", lessonId.longValue())
-			    .setString("lastUserLastName", lastUser.getLastName())
-			    .setString("lastUserFirstName", lastUser.getFirstName())
-			    .setInteger("lastUserId", lastUser.getUserId().intValue()).setMaxResults(batchSize).list();
-		}
-	    });
-	}
+	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Object value = session.createQuery(LearnerProgressDAO.COUNT_CURRENT_ACTIVITY)
+			.setEntity("activity", activity).uniqueResult();
+		return ((Number) value).intValue();
+	    }
+	});
     }
-
 }
