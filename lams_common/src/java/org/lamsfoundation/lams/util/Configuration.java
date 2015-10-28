@@ -126,14 +126,6 @@ public class Configuration implements InitializingBean {
 		Iterator<ConfigurationItem> itemIterator = itemList.iterator();
 		while (itemIterator.hasNext()) {
 		    ConfigurationItem item = itemIterator.next();
-
-		    // init ssl truststore path and password
-		    if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PATH)) {
-			Configuration.setSystemProperty(item.getKey(), item.getValue());
-		    } else if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PASSWORD)) {
-			Configuration.setSystemProperty(item.getKey(), item.getValue());
-		    }
-
 		    itemMap.put(item.getKey(), item);
 		}
 	    }
@@ -283,11 +275,6 @@ public class Configuration implements InitializingBean {
     }
 
     public void persistUpdate() {
-	// update ssl truststore path and password
-	Configuration.setSystemProperty(ConfigurationKeys.TRUSTSTORE_PATH,
-		Configuration.get(ConfigurationKeys.TRUSTSTORE_PATH));
-	Configuration.setSystemProperty(ConfigurationKeys.TRUSTSTORE_PASSWORD,
-		Configuration.get(ConfigurationKeys.TRUSTSTORE_PASSWORD));
 	updatePublicFolderName();
 	Configuration.configurationDAO.insertOrUpdateAll(Configuration.items.values());
     }
