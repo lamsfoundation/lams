@@ -997,14 +997,6 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getCountActiveLessonLearners(long)
-     */
-    @Override
-    public Integer getCountActiveLearnersByLesson(long lessonId) {
-	return lessonService.getCountActiveLessonLearners(lessonId);
-    }
-
-    /**
      * Get the lesson for this activity. If the activity is not part of a lesson (ie is from an authoring design then it
      * will return null.
      */

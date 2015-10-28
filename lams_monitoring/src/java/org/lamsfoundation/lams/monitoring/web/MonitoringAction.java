@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -88,7 +89,6 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -139,6 +139,9 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final String ERROR = "error";
     private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
 
+    private static final Integer LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
+    private static final Integer LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
+
     private static IAuditService auditService;
 
     private static ITimezoneService timezoneService;
@@ -147,32 +150,34 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static ISecurityService securityService;
 
+    private static IMonitoringService monitoringService;
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return user != null ? user.getUserID() : null;
     }
 
-    private FlashMessage handleException(Exception e, String methodKey, IMonitoringService monitoringService) {
+    private FlashMessage handleException(Exception e, String methodKey) {
 	LamsDispatchAction.log.error("Exception thrown " + methodKey, e);
 	MonitoringAction.auditService = getAuditService();
 	MonitoringAction.auditService.log(MonitoringAction.class.getName() + ":" + methodKey, e.toString());
 
 	if (e instanceof UserAccessDeniedException) {
 	    return new FlashMessage(methodKey,
-		    monitoringService.getMessageService().getMessage("error.user.noprivilege"), FlashMessage.ERROR);
+		    getMonitoringService().getMessageService().getMessage("error.user.noprivilege"),
+		    FlashMessage.ERROR);
 	} else {
 	    String[] msg = new String[1];
 	    msg[0] = e.getMessage();
 	    return new FlashMessage(methodKey,
-		    monitoringService.getMessageService().getMessage("error.system.error", msg),
+		    getMonitoringService().getMessageService().getMessage("error.system.error", msg),
 		    FlashMessage.CRITICAL_ERROR);
 	}
     }
 
-    private FlashMessage handleCriticalError(String methodKey, String messageKey,
-	    IMonitoringService monitoringService) {
-	String message = monitoringService.getMessageService().getMessage(messageKey);
+    private FlashMessage handleCriticalError(String methodKey, String messageKey) {
+	String message = getMonitoringService().getMessageService().getMessage(messageKey);
 	LamsDispatchAction.log.error("Error occured " + methodKey + " error ");
 	MonitoringAction.auditService = getAuditService();
 	MonitoringAction.auditService.log(MonitoringAction.class.getName() + ":" + methodKey, message);
@@ -200,9 +205,6 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward initializeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-
 	String title = WebUtil.readStrParam(request, "lessonName");
 	if (title == null) {
 	    title = "lesson";
@@ -223,11 +225,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
-	    newLesson = monitoringService.initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
+	    newLesson = getMonitoringService().initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
 		    learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
 	} else {
 	    try {
-		newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(),
+		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
 			customCSV, false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
 			liveEditEnabled, false, learnerRestart, null, null);
 	    } catch (SecurityException e) {
@@ -263,11 +265,9 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward startLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    monitoringService.startLesson(lessonId, getUserId());
+	    getMonitoringService().startLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
@@ -284,8 +284,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	IUserManagementService userManagementService = MonitoringServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
 
@@ -297,7 +295,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	List<User> staff = parseUserList(request, "monitors", allUsers);
 
 	try {
-	    monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
+	    getMonitoringService().createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
 		    staffGroupName, staff, userID);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
@@ -341,9 +339,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividual", false);
 	Integer timeLimitIndividual = timeLimitEnable && timeLimitIndividualField ? timeLimitDays : null;
 	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
-
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 
 	IUserManagementService userManagementService = MonitoringServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
@@ -393,11 +388,12 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    Lesson lesson = null;
 	    try {
-		lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId, organisationId,
-			userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
-			enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
+		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
+			organisationId, userId, null, introEnable, introImage, portfolioEnable, presenceEnable,
+			imEnable, enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual,
+			precedingLessonId);
 
-		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
+		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
 	    } catch (SecurityException e) {
 		try {
@@ -414,15 +410,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    if (!startMonitor) {
 		try {
 		    if (schedulingDatetime == null) {
-			monitoringService.startLesson(lesson.getLessonId(), userId);
+			getMonitoringService().startLesson(lesson.getLessonId(), userId);
 		    } else {
 			// if lesson should start in few days, set it here
-			monitoringService.startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
+			getMonitoringService().startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
 		    }
 
 		    // if lesson should finish in few days, set it here
 		    if (timeLimitLesson != null) {
-			monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
+			getMonitoringService().finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
 		    }
 		} catch (SecurityException e) {
 		    try {
@@ -441,13 +437,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward startOnScheduleLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ParseException, IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
 	Date startDate = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr);
 	try {
-	    monitoringService.startLessonOnSchedule(lessonId, startDate, getUserId());
+	    getMonitoringService().startLessonOnSchedule(lessonId, startDate, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -476,13 +470,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward archiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    monitoringService.unsuspendLesson(lessonId, getUserId());
+	    getMonitoringService().unsuspendLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
-	    monitoringService.archiveLesson(lessonId, getUserId());
+	    getMonitoringService().archiveLesson(lessonId, getUserId());
 	}
 	return null;
     }
@@ -508,11 +500,9 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward unarchiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    monitoringService.unarchiveLesson(lessonId, getUserId());
+	    getMonitoringService().unarchiveLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -534,11 +524,9 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward suspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    monitoringService.suspendLesson(lessonId, getUserId());
+	    getMonitoringService().suspendLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -559,11 +547,9 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward unsuspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    monitoringService.unsuspendLesson(lessonId, getUserId());
+	    getMonitoringService().unsuspendLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -592,21 +578,20 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	JSONObject jsonObject = new JSONObject();
 
 	try {
 	    // if this method throws an Exception, there will be no removeLesson=true in the JSON reply
-	    monitoringService.removeLesson(lessonId, getUserId());
+	    getMonitoringService().removeLesson(lessonId, getUserId());
 	    jsonObject.put("removeLesson", true);
 
 	} catch (Exception e) {
 	    String[] msg = new String[1];
 	    msg[0] = e.getMessage();
-	    jsonObject.put("removeLesson", monitoringService.getMessageService().getMessage("error.system.error", msg));
+	    jsonObject.put("removeLesson",
+		    getMonitoringService().getMessageService().getMessage("error.system.error", msg));
 	}
 
 	response.setContentType("application/json;charset=utf-8");
@@ -632,9 +617,6 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	getAuditService();
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-
 	// get parameters
 	Long activityId = null;
 	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
@@ -654,7 +636,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	String message = null;
 	try {
-	    message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId,
+	    message = getMonitoringService().forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId,
 		    removeLearnerContent);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -669,7 +651,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
 	Object[] args = new Object[] { learnerId, activityId, lessonId };
-	String auditMessage = monitoringService.getMessageService().getMessage(messageKey, args);
+	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
 	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();
@@ -680,13 +662,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLessonLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    wddxPacket = monitoringService.getLessonLearners(lessonID, getUserId());
+	    wddxPacket = getMonitoringService().getLessonLearners(lessonID, getUserId());
 	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLessonLearners", monitoringService).serializeMessage();
+	    wddxPacket = handleException(e, "getLessonLearners").serializeMessage();
 	}
 	PrintWriter writer = response.getWriter();
 	writer.println(wddxPacket);
@@ -744,6 +724,47 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
+     * Gets users in JSON format who are at the given activity at the moment or finished the given lesson.
+     */
+    public ActionForward getCurrentLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	JSONArray responseJSON = new JSONArray();
+	// if activity ID is provided, lesson ID is ignored
+	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
+	if (activityId == null) {
+	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	    List<User> learners = getMonitoringService().getUsersCompletedLesson(lessonId);
+	    for (User learner : learners) {
+		responseJSON.put(WebUtil.userToJSON(learner));
+	    }
+	} else {
+	    boolean flaFormat = WebUtil.readBooleanParam(request, "flaFormat", true);
+	    Activity activity = getMonitoringService().getActivityById(activityId);
+	    List<LearnerProgress> learnerProgresses = getMonitoringService().getLearnerProgressByActivity(activityId,
+		    null, null);
+	    for (LearnerProgress learnerProgress : learnerProgresses) {
+		responseJSON.put(WebUtil.userToJSON(learnerProgress.getUser()));
+	    }
+
+	    // for the Flas format of LD SVGs, children activities are hidden and the parent activity shows all learners
+	    if (!flaFormat && (activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity())) {
+		Set<Activity> descendants = getDescendants((ComplexActivity) activity);
+		for (Activity descendat : descendants) {
+		    learnerProgresses = getMonitoringService().getLearnerProgressByActivity(descendat.getActivityId(),
+			    null, null);
+		    for (LearnerProgress learnerProgress : learnerProgresses) {
+			responseJSON.put(WebUtil.userToJSON(learnerProgress.getUser()));
+		    }
+		}
+	    }
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responseJSON.toString());
+	return null;
+    }
+
+    /**
      * Adds/removes learners and monitors to/from lesson class.
      */
     public ActionForward updateLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -777,13 +798,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLessonStaff(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    wddxPacket = monitoringService.getLessonStaff(lessonID, getUserId());
+	    wddxPacket = getMonitoringService().getLessonStaff(lessonID, getUserId());
 	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLessonStaff", monitoringService).serializeMessage();
+	    wddxPacket = handleException(e, "getLessonStaff").serializeMessage();
 	}
 	PrintWriter writer = response.getWriter();
 	writer.println(wddxPacket);
@@ -793,14 +812,12 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLearningDesignDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	    getSecurityService().isLessonMonitor(lessonID, getUserId(), "get learning design details", true);
-	    wddxPacket = monitoringService.getLearningDesignDetails(lessonID);
+	    wddxPacket = getMonitoringService().getLearningDesignDetails(lessonID);
 	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLearningDesignDetails", monitoringService).serializeMessage();
+	    wddxPacket = handleException(e, "getLearningDesignDetails").serializeMessage();
 	}
 	PrintWriter writer = response.getWriter();
 	writer.println(wddxPacket);
@@ -810,9 +827,7 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getDictionaryXML(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-	MessageService messageService = monitoringService.getMessageService();
+	MessageService messageService = getMonitoringService().getMessageService();
 
 	String module = WebUtil.readStrParam(request, "module", false);
 
@@ -866,13 +881,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLearnerActivityURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, LamsToolServiceException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	Integer learnerUserID = new Integer(WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID));
 	Long activityID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID));
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	try {
-	    String url = monitoringService.getLearnerActivityURL(lessonID, activityID, learnerUserID, getUserId());
+	    String url = getMonitoringService().getLearnerActivityURL(lessonID, activityID, learnerUserID, getUserId());
 	    return redirectToURL(mapping, response, url);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -883,13 +896,12 @@ public class MonitoringAction extends LamsDispatchAction {
     /** Calls the server to bring up the activity's monitoring page. Assumes destination is a new window */
     public ActionForward getActivityMonitorURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, LamsToolServiceException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
 	try {
-	    String url = monitoringService.getActivityMonitorURL(lessonID, activityID, contentFolderID, getUserId());
+	    String url = getMonitoringService().getActivityMonitorURL(lessonID, activityID, contentFolderID,
+		    getUserId());
 	    return redirectToURL(mapping, response, url);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -899,16 +911,14 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward moveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	String wddxPacket = null;
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	    Integer userID = getUserId();
 	    Integer targetWorkspaceFolderID = new Integer(WebUtil.readIntParam(request, "folderID"));
-	    wddxPacket = monitoringService.moveLesson(lessonID, targetWorkspaceFolderID, userID);
+	    wddxPacket = getMonitoringService().moveLesson(lessonID, targetWorkspaceFolderID, userID);
 	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "moveLesson", monitoringService);
+	    FlashMessage flashMessage = handleException(e, "moveLesson");
 	    wddxPacket = flashMessage.serializeMessage();
 	}
 	PrintWriter writer = response.getWriter();
@@ -1084,101 +1094,173 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long branchingActivityId = WebUtil.readLongParam(request, "branchingActivityID", true);
 
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-	LessonDetailsDTO lessonDetails = lesson.getLessonDetails();
-	String contentFolderId = lessonDetails.getContentFolderID();
-
-	// few details for each activity
-	Map<Long, JSONObject> activitiesMap = new TreeMap<Long, JSONObject>();
 	LearningDesign learningDesign = lesson.getLearningDesign();
-	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
-	    if ((branchingActivityId == null) || MonitoringAction.isBranchingChild(branchingActivityId, activity)) {
-		Long activityId = activity.getActivityId();
-		JSONObject activityJSON = new JSONObject();
-		activityJSON.put("id", activityId);
-		activityJSON.put("uiid", activity.getActivityUIID());
-		activityJSON.put("title", activity.getTitle());
+	String contentFolderId = learningDesign.getContentFolderID();
 
-		int activityType = activity.getActivityTypeId();
-		activityJSON.put("type", activityType);
-		Activity parentActivity = activity.getParentActivity();
-		if (activity.isBranchingActivity() && (((BranchingActivity) activity).getXcoord() == null)) {
-		    // old branching is just a rectangle like Tool
-		    // new branching has start and finish points, it's exploded
-		    activityJSON.put("flaFormat", true);
-		    activityJSON.put("x",
-			    MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartXcoord()));
-		    activityJSON.put("y",
-			    MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartYcoord()));
-		} else if (activity.isOptionsWithSequencesActivity()
-			&& (((OptionsWithSequencesActivity) activity).getXcoord() == null)) {
-		    // old optional sequences is just a long rectangle
-		    // new optional sequences has start and finish points, it's exploded
-		    activityJSON.put("flaFormat", true);
-		    activityJSON.put("x", MonitoringAction
-			    .getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartXcoord()));
-		    activityJSON.put("y", MonitoringAction
-			    .getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartYcoord()));
-		} else if ((parentActivity != null)
-			&& ((Activity.OPTIONS_ACTIVITY_TYPE == parentActivity.getActivityTypeId())
-				|| (Activity.PARALLEL_ACTIVITY_TYPE == parentActivity.getActivityTypeId())
-				|| (Activity.FLOATING_ACTIVITY_TYPE == parentActivity.getActivityTypeId()))) {
-		    // Optional Activity children had coordinates relative to parent
-		    activityJSON.put("x", MonitoringAction.getActivityCoordinate(parentActivity.getXcoord())
-			    + MonitoringAction.getActivityCoordinate(activity.getXcoord()));
-		    activityJSON.put("y", MonitoringAction.getActivityCoordinate(parentActivity.getYcoord())
-			    + MonitoringAction.getActivityCoordinate(activity.getYcoord()));
-		} else {
-		    activityJSON.put("x", MonitoringAction.getActivityCoordinate(activity.getXcoord()));
-		    activityJSON.put("y", MonitoringAction.getActivityCoordinate(activity.getYcoord()));
-		}
-
-		String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
-			monitorUserId);
-		if (monitorUrl != null) {
-		    // whole activity monitor URL
-		    activityJSON.put("url", monitorUrl);
-		}
-
-		activitiesMap.put(activityId, activityJSON);
-	    }
-	}
-
+	// find out if the LD SVG is in new Flashless (exploded) format 
 	JSONObject responseJSON = new JSONObject();
-	for (LearnerProgress learnerProgress : (Set<LearnerProgress>) lesson.getLearnerProgresses()) {
-	    User learner = learnerProgress.getUser();
-	    if (learnerProgress.isComplete()) {
-		JSONObject learnerJSON = WebUtil.userToJSON(learner);
-		// no more details are needed for learners who completed the lesson
-		responseJSON.append("completedLearners", learnerJSON);
+	boolean flaFormat = false;
+	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+	    if ((activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity())
+		    && (((ComplexActivity) activity).getXcoord() == null)) {
+		// if a single activity is in FLA format, all of them are
+		flaFormat = true;
+		break;
+	    }
+	}
+	responseJSON.put("flaFormat", flaFormat);
+
+	Set<Activity> activities = new HashSet<Activity>();
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
+	Map<Long, Set<Activity>> parentToChildren = new TreeMap<Long, Set<Activity>>();
+	// filter activities that are interesting for further processing
+	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+	    if (activity.isSequenceActivity()) {
+		// skip sequence activities as they are just for grouping
+		continue;
+	    }
+
+	    if (flaFormat) {
+		// in FLA format everything is exploded so there are no hidden child activities
+		activities.add(activity);
+		continue;
+	    }
+
+	    Activity parentActivity = activity.getParentActivity();
+	    Activity parentParentActivity = parentActivity == null ? null : parentActivity.getParentActivity();
+	    if (parentParentActivity == null) {
+		activities.add(activity);
+		continue;
+	    }
+
+	    if (!parentParentActivity.isOptionsWithSequencesActivity() && (!parentParentActivity.isBranchingActivity()
+		    || parentParentActivity.getActivityId().equals(branchingActivityId))) {
+		activities.add(activity);
 	    } else {
-		Activity currentActivity = learnerProgress.getCurrentActivity();
-		if ((currentActivity != null) && ((branchingActivityId == null)
-			|| MonitoringAction.isBranchingChild(branchingActivityId, currentActivity))) {
-		    JSONObject learnerJSON = WebUtil.userToJSON(learner);
+		// branching and options with sequences in Flash format have hidden activities
+		// map the children to their parent for further processing
+		Set<Activity> children = parentToChildren.get(parentParentActivity.getActivityId());
+		if (children == null) {
+		    children = new HashSet<Activity>();
+		    parentToChildren.put(parentParentActivity.getActivityId(), children);
+		}
+		children.add(activity);
 
-		    // assign learners to child activity or parent branching/options with sequences?
-		    Activity parentActivity = currentActivity.getParentActivity();
-		    Long targetActivityId = (branchingActivityId != null) || (parentActivity == null)
-			    || (parentActivity.getParentActivity() == null)
-			    || !(parentActivity.getParentActivity().isBranchingActivity()
-				    || parentActivity.getParentActivity().isOptionsWithSequencesActivity())
-					    ? currentActivity.getActivityId()
-					    : parentActivity.getParentActivity().getActivityId();
-
-		    JSONObject targetActivityJSON = activitiesMap.get(targetActivityId);
-		    if (Boolean.TRUE.equals(JsonUtil.opt(targetActivityJSON, "flaFormat"))) {
-			// for new format, we always set learners to child activity, not parent
-			targetActivityJSON = activitiesMap.get(currentActivity.getActivityId());
+		// skip hidden contribute activities
+		if (contributeActivities != null) {
+		    Iterator<ContributeActivityDTO> contributeActivityIterator = contributeActivities.iterator();
+		    while (contributeActivityIterator.hasNext()) {
+			if (activity.getActivityId().equals(contributeActivityIterator.next().getActivityID())) {
+			    contributeActivityIterator.remove();
+			}
 		    }
-		    targetActivityJSON.append("learners", learnerJSON);
 		}
 	    }
 	}
 
-	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
-	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
+	if (contributeActivities != null) {
+	    Gson gson = new GsonBuilder().create();
+	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
+	}
+
+	JSONArray activitiesJSON = new JSONArray();
+	for (Activity activity : activities) {
+	    Long activityId = activity.getActivityId();
+	    JSONObject activityJSON = new JSONObject();
+	    activityJSON.put("id", activityId);
+	    activityJSON.put("uiid", activity.getActivityUIID());
+	    activityJSON.put("title", activity.getTitle());
+	    activityJSON.put("type", activity.getActivityTypeId());
+
+	    Activity parentActivity = activity.getParentActivity();
+	    if (activity.isBranchingActivity() && (((BranchingActivity) activity).getXcoord() == null)) {
+		// old branching is just a rectangle like Tool
+		// new branching has start and finish points, it's exploded
+		activityJSON.put("x",
+			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartXcoord()));
+		activityJSON.put("y",
+			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartYcoord()));
+	    } else if (activity.isOptionsWithSequencesActivity()
+		    && (((OptionsWithSequencesActivity) activity).getXcoord() == null)) {
+		// old optional sequences is just a long rectangle
+		// new optional sequences has start and finish points, it's exploded
+		activityJSON.put("x", MonitoringAction
+			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartXcoord()));
+		activityJSON.put("y", MonitoringAction
+			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartYcoord()));
+	    } else if ((parentActivity != null) && (parentActivity.isOptionsActivity()
+		    || parentActivity.isParallelActivity() || parentActivity.isFloatingActivity())) {
+		// Optional Activity children had coordinates relative to parent
+		activityJSON.put("x", MonitoringAction.getActivityCoordinate(parentActivity.getXcoord())
+			+ MonitoringAction.getActivityCoordinate(activity.getXcoord()));
+		activityJSON.put("y", MonitoringAction.getActivityCoordinate(parentActivity.getYcoord())
+			+ MonitoringAction.getActivityCoordinate(activity.getYcoord()));
+	    } else {
+		activityJSON.put("x", MonitoringAction.getActivityCoordinate(activity.getXcoord()));
+		activityJSON.put("y", MonitoringAction.getActivityCoordinate(activity.getYcoord()));
+	    }
+
+	    String monitorUrl = getMonitoringService().getActivityMonitorURL(lessonId, activityId, contentFolderId,
+		    monitorUserId);
+	    if (monitorUrl != null) {
+		// whole activity monitor URL
+		activityJSON.put("url", monitorUrl);
+	    }
+
+	    // find few latest users and count of all users for each activity
+	    int learnerCount = 0;
+	    if (activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity()) {
+		// go through hidden children of complex activities and take them into account
+		learnerCount += getMonitoringService().getCountLearnerProgressCurrentActivity(activity);
+		Set<Activity> children = parentToChildren.get(activityId);
+		if (children != null) {
+		    for (Activity child : children) {
+			learnerCount += getMonitoringService().getCountLearnerProgressCurrentActivity(child);
+		    }
+		}
+	    } else {
+		List<LearnerProgress> latestLearnerProgress = getMonitoringService().getLearnerProgressLatest(
+			activity.getActivityId(), MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT);
+		if (latestLearnerProgress.size() < MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT) {
+		    // if there are less learners than the limit, we already know the size
+		    learnerCount = latestLearnerProgress.size();
+		} else {
+		    learnerCount = getMonitoringService().getCountLearnerProgressCurrentActivity(activity);
+		}
+
+		// parse learners into JSON format
+		if (!latestLearnerProgress.isEmpty()) {
+		    JSONArray learnersJSON = new JSONArray();
+		    for (LearnerProgress learnerProgress : latestLearnerProgress) {
+			User learner = learnerProgress.getUser();
+			learnersJSON.put(WebUtil.userToJSON(learner));
+		    }
+
+		    activityJSON.put("learners", learnersJSON);
+		}
+	    }
+	    activityJSON.put("learnerCount", learnerCount);
+
+	    activitiesJSON.put(activityJSON);
+	}
+	responseJSON.put("activities", activitiesJSON);
+
+	// find learners who completed the lesson
+	List<LearnerProgress> completedLearners = getMonitoringService().getCompletedLearnerProgressLatest(lessonId,
+		MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT);
+	for (LearnerProgress learner : completedLearners) {
+	    JSONObject learnerJSON = WebUtil.userToJSON(learner.getUser());
+	    // no more details are needed for learners who completed the lesson
+	    responseJSON.append("completedLearners", learnerJSON);
+	}
+	Integer completedLearnerCount = null;
+	if (completedLearners.size() < MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT) {
+	    completedLearnerCount = completedLearners.size();
+	} else {
+	    completedLearnerCount = getMonitoringService().getCountLearnerProgressCompletedLesson(lessonId);
+	}
+	responseJSON.put("completedLearnerCount", completedLearnerCount);
+	responseJSON.put("numberPossibleLearners", lesson.getAllLearners().size());
 
 	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
 	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
@@ -1194,45 +1276,21 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseJSON.put("transitions", transitions);
 	}
 
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
-	// remove "attention required" marker for hidden activities in Flash Authoring
-	if (contributeActivities != null) {
-	    Iterator<ContributeActivityDTO> activityIterator = contributeActivities.iterator();
-	    while (activityIterator.hasNext()) {
-		ContributeActivityDTO contributeActivityDTO = activityIterator.next();
-		Activity contributeActivity = monitoringService.getActivityById(contributeActivityDTO.getActivityID());
-		Activity topParentActivity = contributeActivity.getParentActivity() == null ? null
-			: contributeActivity.getParentActivity().getParentActivity();
-
-		if ((branchingActivityId == null) && (topParentActivity != null)
-			&& (topParentActivity.isBranchingActivity()
-				|| topParentActivity.isOptionsWithSequencesActivity())) {
-		    JSONObject topContributeActivityJSON = activitiesMap.get(topParentActivity.getActivityId());
-		    if (!Boolean.TRUE.equals(JsonUtil.opt(topContributeActivityJSON, "flaFormat"))) {
-			activityIterator.remove();
-		    }
-		}
-	    }
-	    Gson gson = new GsonBuilder().create();
-	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
-	}
-
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 
 	return null;
+
     }
 
     public ActionForward releaseGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	String wddxPacket = null;
 	try {
 	    Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
-	    wddxPacket = monitoringService.releaseGate(activityID);
+	    wddxPacket = getMonitoringService().releaseGate(activityID);
 	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "releaseGate", monitoringService);
+	    FlashMessage flashMessage = handleException(e, "releaseGate");
 	    wddxPacket = flashMessage.serializeMessage();
 	}
 	PrintWriter writer = response.getWriter();
@@ -1242,8 +1300,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward startPreviewLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	FlashMessage flashMessage = null;
 
 	try {
@@ -1257,8 +1313,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	     */
 
 	    try {
-		monitoringService.createPreviewClassForLesson(userID, lessonID);
-		monitoringService.startLesson(lessonID, getUserId());
+		getMonitoringService().createPreviewClassForLesson(userID, lessonID);
+		getMonitoringService().startLesson(lessonID, getUserId());
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
@@ -1266,7 +1322,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    flashMessage = new FlashMessage("startPreviewSession", new Long(lessonID));
 	} catch (Exception e) {
-	    flashMessage = handleException(e, "startPreviewSession", monitoringService);
+	    flashMessage = handleException(e, "startPreviewSession");
 	}
 
 	PrintWriter writer = response.getWriter();
@@ -1328,6 +1384,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	return MonitoringAction.lessonService;
     }
 
+    private IMonitoringService getMonitoringService() {
+	if (MonitoringAction.monitoringService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    MonitoringAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
+	}
+	return MonitoringAction.monitoringService;
+    }
+
     private ISecurityService getSecurityService() {
 	if (MonitoringAction.securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
@@ -1343,13 +1408,11 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward learnerExportPortfolioAvailable(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean learnerExportPortfolioAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
 	try {
-	    monitoringService.setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
+	    getMonitoringService().setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -1362,18 +1425,16 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward presenceAvailable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
 
 	try {
-	    monitoringService.setPresenceAvailable(lessonID, userID, presenceAvailable);
+	    getMonitoringService().setPresenceAvailable(lessonID, userID, presenceAvailable);
 
 	    if (!presenceAvailable) {
-		monitoringService.setPresenceImAvailable(lessonID, userID, false);
+		getMonitoringService().setPresenceImAvailable(lessonID, userID, false);
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -1387,14 +1448,12 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward presenceImAvailable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
 
 	try {
-	    monitoringService.setPresenceImAvailable(lessonID, userID, presenceImAvailable);
+	    getMonitoringService().setPresenceImAvailable(lessonID, userID, presenceImAvailable);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -1404,10 +1463,6 @@ public class MonitoringAction extends LamsDispatchAction {
     /** Open Time Chart display */
     public ActionForward viewTimeChart(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-
 	try {
 
 	    long lessonID = WebUtil.readLongParam(request, "lessonID");
@@ -1454,26 +1509,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	return result;
     }
 
-    private static boolean isBranchingChild(Long branchingActivityId, Activity activity) {
-	if ((branchingActivityId == null) || (activity == null)) {
-	    return false;
-	}
-
-	Activity parentActivity = activity.getParentActivity();
-	while (parentActivity != null) {
-	    if (parentActivity.isBranchingActivity()) {
-		return parentActivity.getActivityId().equals(branchingActivityId);
-	    }
-	    parentActivity = parentActivity.getParentActivity();
-	}
-	return false;
-    }
-
     @SuppressWarnings("unchecked")
     private List<ContributeActivityDTO> getContributeActivities(Long lessonId, boolean skipCompletedBranching) {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
+	List<ContributeActivityDTO> contributeActivities = getMonitoringService().getAllContributeActivityDTO(lessonId);
 	Lesson lesson = getLessonService().getLesson(lessonId);
 
 	if (contributeActivities != null) {
@@ -1489,7 +1527,7 @@ public class MonitoringAction extends LamsDispatchAction {
 			if (skipCompletedBranching
 				&& ContributionTypes.CHOSEN_BRANCHING.equals(contributeEntry.getContributionType())) {
 			    Set<User> learners = new HashSet<User>(lesson.getLessonClass().getLearners());
-			    ChosenBranchingActivity branching = (ChosenBranchingActivity) monitoringService
+			    ChosenBranchingActivity branching = (ChosenBranchingActivity) getMonitoringService()
 				    .getActivityById(contributeActivity.getActivityID());
 			    for (SequenceActivity branch : (Set<SequenceActivity>) branching.getActivities()) {
 				Group group = branch.getSoleGroupForBranch();
@@ -1517,5 +1555,22 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static int getActivityCoordinate(Integer coord) {
 	return (coord == null) || (coord < 0) ? ObjectExtractor.DEFAULT_COORD : coord;
+    }
+
+    /**
+     * Gets all children and their childre etc. of the given complex activity. 
+     */
+    @SuppressWarnings("unchecked")
+    private Set<Activity> getDescendants(ComplexActivity complexActivity) {
+	Set<Activity> result = new HashSet<Activity>();
+	for (Activity child : (Set<Activity>) complexActivity.getActivities()) {
+	    child = getMonitoringService().getActivityById(child.getActivityId());
+	    if (child.isComplexActivity()) {
+		result.addAll(getDescendants((ComplexActivity) child));
+	    } else {
+		result.add(child);
+	    }
+	}
+	return result;
     }
 }
