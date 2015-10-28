@@ -77,7 +77,6 @@
         lazy="extra"
         cascade="none"
         table="lams_user_group"
-        batch-size="20"
     >
         <key>
             <column name="group_id" />
