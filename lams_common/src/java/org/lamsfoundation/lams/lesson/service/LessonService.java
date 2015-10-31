@@ -122,6 +122,11 @@ public class LessonService implements ILessonService {
     }
 
     @Override
+    public Integer getCountLessonLearners(Long lessonId) {
+	return lessonDAO.getCountLearnerByLesson(lessonId);
+    }
+
+    @Override
     public LessonDetailsDTO getLessonDetails(Long lessonId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LessonDetailsDTO dto = null;
@@ -308,13 +313,14 @@ public class LessonService implements ILessonService {
     public boolean addLearner(Long lessonId, Integer userId) throws LessonServiceException {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	if (lesson == null) {
-	    throw new LessonServiceException("Lesson " + lessonId + " does not exist. Unable to add learner to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson " + lessonId + " does not exist. Unable to add learner to lesson.");
 	}
 
 	LessonClass lessonClass = lesson.getLessonClass();
 	if (lessonClass == null) {
-	    throw new LessonServiceException("Lesson class for " + lessonId
-		    + " does not exist. Unable to add learner to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson class for " + lessonId + " does not exist. Unable to add learner to lesson.");
 	}
 
 	// initialise the lesson group, or we get a lazy loading error when logging in
@@ -338,12 +344,13 @@ public class LessonService implements ILessonService {
 
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	if (lesson == null) {
-	    throw new LessonServiceException("Lesson " + lessonId + " does not exist. Unable to add learner to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson " + lessonId + " does not exist. Unable to add learner to lesson.");
 	}
 	LessonClass lessonClass = lesson.getLessonClass();
 	if (lessonClass == null) {
-	    throw new LessonServiceException("Lesson class for " + lessonId
-		    + " does not exist. Unable to add learner to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson class for " + lessonId + " does not exist. Unable to add learner to lesson.");
 	}
 
 	// initialise the lesson group, or we might get a lazy loading error in the future
@@ -381,8 +388,8 @@ public class LessonService implements ILessonService {
 	int numberOfLearners = lessonClass.setLearners(users);
 	lessonClassDAO.updateLessonClass(lessonClass);
 	if (LessonService.log.isDebugEnabled()) {
-	    LessonService.log.debug("Set " + numberOfLearners + " learners in lessonClass "
-		    + lessonClass.getGroupingId());
+	    LessonService.log
+		    .debug("Set " + numberOfLearners + " learners in lessonClass " + lessonClass.getGroupingId());
 	}
     }
 
@@ -390,15 +397,15 @@ public class LessonService implements ILessonService {
     public boolean addStaffMember(Long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	if (lesson == null) {
-	    throw new LessonServiceException("Lesson " + lessonId
-		    + " does not exist. Unable to add staff member to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson " + lessonId + " does not exist. Unable to add staff member to lesson.");
 	}
 
 	LessonClass lessonClass = lesson.getLessonClass();
 
 	if (lessonClass == null) {
-	    throw new LessonServiceException("Lesson class for " + lessonId
-		    + " does not exist. Unable to add staff member to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson class for " + lessonId + " does not exist. Unable to add staff member to lesson.");
 	}
 
 	lessonDAO.initialize(lessonClass.getStaffGroup());
@@ -416,12 +423,13 @@ public class LessonService implements ILessonService {
 
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	if (lesson == null) {
-	    throw new LessonServiceException("Lesson " + lessonId + " does not exist. Unable to add learner to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson " + lessonId + " does not exist. Unable to add learner to lesson.");
 	}
 	LessonClass lessonClass = lesson.getLessonClass();
 	if (lessonClass == null) {
-	    throw new LessonServiceException("Lesson class for " + lessonId
-		    + " does not exist. Unable to add learner to lesson.");
+	    throw new LessonServiceException(
+		    "Lesson class for " + lessonId + " does not exist. Unable to add learner to lesson.");
 	}
 
 	// initialise the lesson group, or we might get a lazy loading error in the future
@@ -446,8 +454,8 @@ public class LessonService implements ILessonService {
 	    lessonClassDAO.updateLessonClass(lessonClass);
 	}
 	if (LessonService.log.isDebugEnabled()) {
-	    LessonService.log.debug("Added " + numAdded + " staff members to lessonClass "
-		    + lessonClass.getGroupingId());
+	    LessonService.log
+		    .debug("Added " + numAdded + " staff members to lessonClass " + lessonClass.getGroupingId());
 	}
     }
 
@@ -458,8 +466,8 @@ public class LessonService implements ILessonService {
 	int numberOfStaff = lessonClass.setStaffMembers(users);
 	lessonClassDAO.updateLessonClass(lessonClass);
 	if (LessonService.log.isDebugEnabled()) {
-	    LessonService.log.debug("Set " + numberOfStaff + " staff members in lessonClass "
-		    + lessonClass.getGroupingId());
+	    LessonService.log
+		    .debug("Set " + numberOfStaff + " staff members in lessonClass " + lessonClass.getGroupingId());
 	}
     }
 
@@ -561,18 +569,8 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public List<User> getLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException {
-	return learnerProgressDAO.getLearnersHaveCompletedActivity(activity);
-    }
-
-    @Override
     public Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
 	return learnerProgressDAO.getNumUsersAttemptedActivity(activity);
-    }
-
-    @Override
-    public Integer getCountLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException {
-	return learnerProgressDAO.getNumUsersCompletedActivity(activity);
     }
 
     @Override
@@ -591,8 +589,8 @@ public class LessonService implements ILessonService {
 		Boolean lessonCompleted = (Boolean) tuple[4];
 		lessonCompleted = lessonCompleted == null ? false : lessonCompleted.booleanValue();
 		Boolean enableLessonNotifications = (Boolean) tuple[5];
-		enableLessonNotifications = enableLessonNotifications == null ? false : enableLessonNotifications
-			.booleanValue();
+		enableLessonNotifications = enableLessonNotifications == null ? false
+			: enableLessonNotifications.booleanValue();
 		Boolean dependent = (Boolean) tuple[6];
 		dependent = dependent == null ? false : dependent.booleanValue();
 		Boolean scheduledFinish = (Boolean) tuple[7];

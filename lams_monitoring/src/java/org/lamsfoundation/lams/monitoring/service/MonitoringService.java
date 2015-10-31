@@ -1666,7 +1666,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      *            specified lesson
      * @return
      */
-    private List<User> getUsersCompletedLesson(Long lessonId) {
+    @Override
+    public List<User> getUsersCompletedLesson(Long lessonId) {
 	List<User> usersCompletedLesson = new LinkedList<User>();
 
 	List<LearnerProgress> completedLearnerProgresses = learnerProgressDAO
@@ -2350,6 +2351,32 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId) {
 	return learnerService.getProgress(learnerId, lessonId);
+    }
+
+    @Override
+
+    public List<User> getLearnersLatestByActivity(Long activityId, Integer limit, Integer offset) {
+	return learnerProgressDAO.getLearnersLatestByActivity(activityId, limit, offset);
+    }
+
+    @Override
+    public List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset) {
+	return learnerProgressDAO.getLearnersByActivities(activityIds, limit, offset);
+    }
+
+    @Override
+    public List<User> getLearnersLatestCompleted(Long lessonId, Integer limit, Integer offset) {
+	return learnerProgressDAO.getLearnersLatestCompletedForLesson(lessonId, limit, offset);
+    }
+
+    @Override
+    public Integer getCountLearnersCurrentActivity(Activity activity) {
+	return learnerProgressDAO.getNumUsersCurrentActivity(activity);
+    }
+
+    @Override
+    public Integer getCountLearnersCompletedLesson(Long lessonId) {
+	return learnerProgressDAO.getNumUsersCompletedLesson(lessonId);
     }
 
     @Override
