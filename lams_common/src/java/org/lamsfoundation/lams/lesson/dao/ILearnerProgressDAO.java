@@ -84,22 +84,22 @@ public interface ILearnerProgressDAO {
      * @param activity
      * @return List<LearnerProgress>
      */
-    List getLearnerProgressReferringToActivity(Activity activity);
+    List<LearnerProgress> getLearnerProgressReferringToActivity(Activity activity);
 
     /**
-     * Get progress for learners who most recently entered the activity. 
+     * Get learners who most recently entered the activity.
      */
-    List<LearnerProgress> getLearnerProgressLatestByActivity(Long activityId, Integer limit);
+    List<User> getLearnersLatestByActivity(Long activityId, Integer limit, Integer offset);
 
     /**
-     * Get progress for learners who are at the activity at the moment.
+     * Get learners who are at the given activities at the moment.
      */
-    List<LearnerProgress> getLearnerProgressByActivity(Long activityId, Integer limit, Integer offset);
+    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset);
 
     /**
-     * Get progress for learners who most recently finished the lesson.
+     * Get learners who most recently finished the lesson.
      */
-    List<LearnerProgress> getCompletedLearnerProgressLatestForLesson(Long lessonId, Integer limit);
+    List<User> getLearnersLatestCompletedForLesson(Long lessonId, Integer limit, Integer offset);
 
     /**
      * Get all the learner progress records for a lesson where the progress is marked as completed.
@@ -107,7 +107,7 @@ public interface ILearnerProgressDAO {
      * @param lessonId
      * @return List<LearnerProgress>
      */
-    List getCompletedLearnerProgressForLesson(Long lessonId);
+    List<LearnerProgress> getCompletedLearnerProgressForLesson(Long lessonId);
 
     /**
      * Get all the learner progress records for a lesson.

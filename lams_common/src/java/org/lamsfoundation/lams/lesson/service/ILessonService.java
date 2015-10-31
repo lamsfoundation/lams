@@ -62,17 +62,22 @@ import org.lamsfoundation.lams.usermanagement.User;
 public interface ILessonService {
 
     /** Get all the learners who have started the lesson. They may not be currently online. */
-    abstract List getActiveLessonLearners(Long lessonId);
+    List getActiveLessonLearners(Long lessonId);
 
     /**
      * Get all the learners who have started the lesson and are part of a given group. They may not be currently online.
      */
-    abstract List getActiveLessonLearnersByGroup(Long lessonId, Long groupId);
+    List getActiveLessonLearnersByGroup(Long lessonId, Long groupId);
 
     /**
      * Get the count of all the learners who have started the lesson. They may not be currently online.
      */
     Integer getCountActiveLessonLearners(Long lessonId);
+
+    /**
+     * Get the count of all the learners who are a part of the lesson class.
+     */
+    Integer getCountLessonLearners(Long lessonId);
 
     /**
      * Get the lesson details for the LAMS client. Suitable for the monitoring client. Contains a count of the total
@@ -82,7 +87,7 @@ public interface ILessonService {
      * @param lessonId
      * @return lesson details
      */
-    abstract LessonDetailsDTO getLessonDetails(Long lessonId);
+    LessonDetailsDTO getLessonDetails(Long lessonId);
 
     /**
      * Get the lesson object.
@@ -90,7 +95,7 @@ public interface ILessonService {
      * @param lessonId
      * @return lesson details
      */
-    abstract Lesson getLesson(Long lessonId);
+    Lesson getLesson(Long lessonId);
 
     /**
      * Get the lesson details for the LAMS client. Suitable for the learner client. Contains a reduced number of fields
@@ -99,7 +104,7 @@ public interface ILessonService {
      * @param lessonId
      * @return lesson details
      */
-    abstract LessonDTO getLessonData(Long lessonId);
+    LessonDTO getLessonData(Long lessonId);
 
     /**
      * If the supplied learner is not already in a group, then perform grouping for the learners who have started the
@@ -343,7 +348,7 @@ public interface ILessonService {
      * @param organisationId
      * @return list of lessons
      */
-    abstract List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
+    List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
 
     /**
      * Return list of organisation's non-removed lessons.
@@ -373,7 +378,6 @@ public interface ILessonService {
      * @return learner's progress
      */
     List<LearnerProgress> getUserProgressForLesson(Long lessonId);
-    
 
     /**
      * Gets list of lessons which are originally based on the given learning design id.
