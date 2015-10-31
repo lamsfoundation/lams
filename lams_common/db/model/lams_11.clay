@@ -3807,59 +3807,6 @@ It will be used for the IMS LD import/export.</column-description>
 </foreign-key-list>
 <index-list/>
 </table>
-<table alias="" name="lams_lesson_learner" remarks="" uid="7725df:115cb718d5c:-7b67">
-<table-description/>
-<table-figure-bounds height="-1" width="-1" x="278" y="408"/>
-<column-list>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="lesson_id" remarks="" uid="7725df:115cb718d5c:-7b65">
-<column-description/>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="user_id" remarks="" uid="7725df:115cb718d5c:-7b64">
-<column-description/>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-</column-list>
-<primary-key alias="" name="PK_LAMS_LESSON_LEARNER" remarks="" uid="7725df:115cb718d5c:-7b66">
-<primary-key-description/>
-</primary-key>
-<unique-key-list/>
-<foreign-key-list>
-<foreign-key alias="" name="FK_lams_lesson_learner_1" on-delete="" on-update="" referenced-key="PK_LAMS_LESSON" referenced-table="lams_lesson" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="7725df:115cb718d5c:-7a5c">
-<foreign-key-description/>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="lesson_id" referenced-key-column-name="lesson_id"/>
-</foreign-key>
-<foreign-key alias="" name="FK_lams_lesson_learner_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_user" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="7725df:115cb718d5c:-7a5b">
-<foreign-key-description/>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="user_id" referenced-key-column-name="user_id"/>
-</foreign-key>
-</foreign-key-list>
-<index-list/>
-</table>
 <table alias="" name="lams_tool_session_type" remarks="" uid="7725df:115cb718d5c:-7b63">
 <table-description/>
 <table-figure-bounds height="-1" width="-1" x="1265" y="628"/>
