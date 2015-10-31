@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
@@ -70,8 +69,9 @@ public interface IMonitoringService {
      * Create new lesson according to the learning design specified by the user. This involves following major steps:
      * </P>
      * 
-     * <li>1. Make a runtime copy of static learning design defined in authoring</li> <li>2. Go through all the tool
-     * activities defined in the learning design, create a runtime copy of all tool's content.</li>
+     * <li>1. Make a runtime copy of static learning design defined in authoring</li>
+     * <li>2. Go through all the tool activities defined in the learning design, create a runtime copy of all tool's
+     * content.</li>
      * 
      * <P>
      * As a runtime design, it is not copied into any folder.
@@ -162,7 +162,7 @@ public interface IMonitoringService {
      */
     Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userID)
-	    throws UserAccessDeniedException;
+		    throws UserAccessDeniedException;
 
     /**
      * Start the specified the lesson. It must be created before calling this service.
@@ -188,8 +188,9 @@ public interface IMonitoringService {
      * Runs the system scheduler to start the scheduling for opening gate and closing gate. It invlovs a couple of steps
      * to start the scheduler:
      * </p>
-     * <li>1. Initialize the resource needed by scheduling job by setting them into the job data map.</li> <li>2. Create
-     * customized triggers for the scheduling.</li> <li>3. start the scheduling job</li>
+     * <li>1. Initialize the resource needed by scheduling job by setting them into the job data map.</li>
+     * <li>2. Create customized triggers for the scheduling.</li>
+     * <li>3. start the scheduling job</li>
      * 
      * @param scheduleGate
      *            the gate that needs to be scheduled.
@@ -200,7 +201,8 @@ public interface IMonitoringService {
      *            the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
      * @returns An updated gate, that should be saved by the calling code.
      */
-    ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime, String lessonName);
+    ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
+	    String lessonName);
 
     /**
      * Start a lesson on scheduled datetime.
@@ -679,6 +681,31 @@ public interface IMonitoringService {
     LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
 
     /**
+     * Get learners who most recently entered finished the lesson.
+     */
+    List<User> getLearnersLatestCompleted(Long lessonId, Integer limit, Integer offset);
+
+    /**
+     * Get learners who most recently entered the activity.
+     */
+    List<User> getLearnersLatestByActivity(Long activityId, Integer limit, Integer offset);
+
+    /**
+     * Get learners who are at the given activities at the moment.
+     */
+    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset);
+
+    /**
+     * Get number of learners who are at the given activity at the moment.
+     */
+    Integer getCountLearnersCurrentActivity(Activity activity);
+
+    /**
+     * Get number of learners who finished the given lesson.
+     */
+    Integer getCountLearnersCompletedLesson(Long lessonId);
+
+    /**
      * Set a groups name
      */
     void setGroupName(Long groupID, String name);
@@ -701,4 +728,9 @@ public interface IMonitoringService {
      */
     int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
+
+    /**
+     * Get list of users who completed the given lesson.
+     */
+    List<User> getUsersCompletedLesson(Long lessonId);
 }

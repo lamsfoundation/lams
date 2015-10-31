@@ -54,7 +54,7 @@ public interface ILearnerProgressDAO {
      *            the lesson for which the progress data applies
      * @return the user's progress data
      */
-    LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Long lessonId);
+    LearnerProgress getLearnerProgressByLearner(Integer learnerId, Long lessonId);
 
     /**
      * Saves or Updates learner progress data.
@@ -84,7 +84,22 @@ public interface ILearnerProgressDAO {
      * @param activity
      * @return List<LearnerProgress>
      */
-    List getLearnerProgressReferringToActivity(final Activity activity);
+    List<LearnerProgress> getLearnerProgressReferringToActivity(Activity activity);
+
+    /**
+     * Get learners who most recently entered the activity.
+     */
+    List<User> getLearnersLatestByActivity(Long activityId, Integer limit, Integer offset);
+
+    /**
+     * Get learners who are at the given activities at the moment.
+     */
+    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset);
+
+    /**
+     * Get learners who most recently finished the lesson.
+     */
+    List<User> getLearnersLatestCompletedForLesson(Long lessonId, Integer limit, Integer offset);
 
     /**
      * Get all the learner progress records for a lesson where the progress is marked as completed.
@@ -92,32 +107,33 @@ public interface ILearnerProgressDAO {
      * @param lessonId
      * @return List<LearnerProgress>
      */
-    List getCompletedLearnerProgressForLesson(final Long lessonId);
-    
+    List<LearnerProgress> getCompletedLearnerProgressForLesson(Long lessonId);
+
     /**
      * Get all the learner progress records for a lesson.
      * 
      * @param lessonId
      * @return
      */
-    List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId);
-    
+    List<LearnerProgress> getLearnerProgressForLesson(Long lessonId);
+
     /**
      * Get all the learner progress records for a lesson restricted by list of these user ids.
      * 
      * @param lessonId
-     * @param userIds return progresses for only these users
+     * @param userIds
+     *            return progresses for only these users
      * @return
      */
-    List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId, final List<Integer> userIds);
-    
+    List<LearnerProgress> getLearnerProgressForLesson(Long lessonId, List<Integer> userIds);
+
     /**
      * Get all the learner progresses for a lesson list.
      * 
      * @param lessonIds
      * @return
      */
-    List<LearnerProgress> getLearnerProgressForLessons(final List<Long> lessonIds);
+    List<LearnerProgress> getLearnerProgressForLessons(List<Long> lessonIds);
 
     /**
      * Get all the users records where the user has attempted the given activity. Uses the progress records to determine
@@ -126,16 +142,7 @@ public interface ILearnerProgressDAO {
      * @param activityId
      * @return List<User>
      */
-    List<User> getLearnersHaveAttemptedActivity(final Activity activity);
-
-    /**
-     * Get all the users records where the user has completed the given activity. Uses the progress records to determine
-     * the users.
-     * 
-     * @param activityId
-     * @return List<User>
-     */
-    List<User> getLearnersHaveCompletedActivity(final Activity activity);
+    List<User> getLearnersHaveAttemptedActivity(Activity activity);
 
     /**
      * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have
@@ -144,7 +151,7 @@ public interface ILearnerProgressDAO {
      * @param activityId
      * @return List<User>
      */
-    Integer getNumUsersAttemptedActivity(final Activity activity);
+    Integer getNumUsersAttemptedActivity(Activity activity);
 
     /**
      * Count of the number of users that have completed an activity. Useful for activities that don't have tool
@@ -153,24 +160,15 @@ public interface ILearnerProgressDAO {
      * @param activityId
      * @return List<User>
      */
-    Integer getNumUsersCompletedActivity(final Activity activity);
+    Integer getNumUsersCompletedActivity(Activity activity);
 
     /**
-     * Get the count of all learner progress records for an lesson without loading the records.
-     * 
-     * @return Number of learner progress records for this lesson
+     * Get number of learners who finished the given lesson.
      */
-    Integer getNumAllLearnerProgress(final Long lessonId);
+    Integer getNumUsersCompletedLesson(Long lessonId);
 
     /**
-     * Get a batch of learner progress records (size batchSize) for an lesson, sorted by surname and the first name.
-     * Start at the beginning of the table if no previousUserId is given, otherwise get the batch after lastUserId.
-     * 
-     * @param lessonId
-     * @param lastUserId
-     * @param batchSize
-     * @return List<LearnerProgress>
+     * Get number of learners who are at the given activity at the moment.
      */
-    List<LearnerProgress> getBatchLearnerProgress(final Long lessonId, final User lastUser, final int batchSize);
-
+    Integer getNumUsersCurrentActivity(Activity activity);
 }
