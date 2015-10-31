@@ -28,7 +28,6 @@ DROP TABLE IF EXISTS lams_learning_design;
 DROP TABLE IF EXISTS lams_learning_transition;
 DROP TABLE IF EXISTS lams_learning_library;
 DROP TABLE IF EXISTS lams_lesson;
-DROP TABLE IF EXISTS lams_lesson_learner;
 DROP TABLE IF EXISTS lams_lesson_state;
 DROP TABLE IF EXISTS lams_license;
 DROP TABLE IF EXISTS lams_log_event;

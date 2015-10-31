@@ -852,17 +852,6 @@ CREATE TABLE lams_activity_learners (
                   REFERENCES lams_learning_activity (activity_id)
 )ENGINE=InnoDB;
 
-CREATE TABLE lams_lesson_learner (
-       lesson_id BIGINT(20) NOT NULL
-     , user_id BIGINT(20) NOT NULL
-     , INDEX (lesson_id)
-     , CONSTRAINT FK_lams_lesson_learner_1 FOREIGN KEY (lesson_id)
-                  REFERENCES lams_lesson (lesson_id)
-     , INDEX (user_id)
-     , CONSTRAINT FK_lams_lesson_learner_2 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id)
-)ENGINE=InnoDB;
-
 CREATE TABLE lams_cr_workspace_credential (
        wc_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
      , workspace_id BIGINT(20) UNSIGNED NOT NULL
