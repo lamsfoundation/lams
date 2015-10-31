@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
@@ -681,32 +680,30 @@ public interface IMonitoringService {
     /** Get the record of the learner's progress for a particular lesson */
     LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
 
-    
     /**
-     * Get progress for learners who most recently entered finished the lesson.
+     * Get learners who most recently entered finished the lesson.
      */
-    List<LearnerProgress> getCompletedLearnerProgressLatest(Long lessonId, Integer limit);
-    
-    /**
-     * Get progress for learners who most recently entered the activity. 
-     */
-    List<LearnerProgress> getLearnerProgressLatest(Long activityId, Integer limit);
+    List<User> getLearnersLatestCompleted(Long lessonId, Integer limit, Integer offset);
 
-    
     /**
-     * Get progress for learners who are at the given activity at the moment.
+     * Get learners who most recently entered the activity.
      */
-    List<LearnerProgress> getLearnerProgressByActivity(Long activityId, Integer limit, Integer offset);
+    List<User> getLearnersLatestByActivity(Long activityId, Integer limit, Integer offset);
+
+    /**
+     * Get learners who are at the given activities at the moment.
+     */
+    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset);
 
     /**
      * Get number of learners who are at the given activity at the moment.
      */
-    Integer getCountLearnerProgressCurrentActivity(Activity activity);
-    
+    Integer getCountLearnersCurrentActivity(Activity activity);
+
     /**
      * Get number of learners who finished the given lesson.
      */
-    Integer getCountLearnerProgressCompletedLesson(Long lessonId);
+    Integer getCountLearnersCompletedLesson(Long lessonId);
 
     /**
      * Set a groups name
@@ -731,7 +728,7 @@ public interface IMonitoringService {
      */
     int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
-    
+
     /**
      * Get list of users who completed the given lesson.
      */

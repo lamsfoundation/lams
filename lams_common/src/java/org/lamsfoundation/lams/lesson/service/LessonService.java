@@ -122,6 +122,11 @@ public class LessonService implements ILessonService {
     }
 
     @Override
+    public Integer getCountLessonLearners(Long lessonId) {
+	return lessonDAO.getCountLearnerByLesson(lessonId);
+    }
+
+    @Override
     public LessonDetailsDTO getLessonDetails(Long lessonId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LessonDetailsDTO dto = null;

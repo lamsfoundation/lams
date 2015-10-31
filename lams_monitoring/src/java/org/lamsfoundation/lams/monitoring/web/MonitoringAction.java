@@ -41,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -740,22 +741,22 @@ public class MonitoringAction extends LamsDispatchAction {
 	} else {
 	    boolean flaFormat = WebUtil.readBooleanParam(request, "flaFormat", true);
 	    Activity activity = getMonitoringService().getActivityById(activityId);
-	    List<LearnerProgress> learnerProgresses = getMonitoringService().getLearnerProgressByActivity(activityId,
-		    null, null);
-	    for (LearnerProgress learnerProgress : learnerProgresses) {
-		responseJSON.put(WebUtil.userToJSON(learnerProgress.getUser()));
-	    }
+	    Set<Long> activities = new TreeSet<Long>();
+	    activities.add(activityId);
 
-	    // for the Flas format of LD SVGs, children activities are hidden and the parent activity shows all learners
+	    // for the Flash format of LD SVGs, children activities are hidden
+	    // and the parent activity shows all learners
 	    if (!flaFormat && (activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity())) {
 		Set<Activity> descendants = getDescendants((ComplexActivity) activity);
 		for (Activity descendat : descendants) {
-		    learnerProgresses = getMonitoringService().getLearnerProgressByActivity(descendat.getActivityId(),
-			    null, null);
-		    for (LearnerProgress learnerProgress : learnerProgresses) {
-			responseJSON.put(WebUtil.userToJSON(learnerProgress.getUser()));
-		    }
+		    activities.add(descendat.getActivityId());
 		}
+	    }
+
+	    List<User> learners = getMonitoringService().getLearnersByActivities(activities.toArray(new Long[] {}),
+		    null, null);
+	    for (User learner : learners) {
+		responseJSON.put(WebUtil.userToJSON(learner));
 	    }
 	}
 
@@ -1050,14 +1051,14 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	JSONObject responseJSON = new JSONObject();
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	LessonDetailsDTO lessonDetails = lesson.getLessonDetails();
-	String contentFolderId = lessonDetails.getContentFolderID();
+	LearningDesign learningDesign = lesson.getLearningDesign();
+	String contentFolderId = learningDesign.getContentFolderID();
 
 	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 
-	responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, lessonDetails.getLearningDesignID());
-	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
-	responseJSON.put("lessonStateID", lessonDetails.getLessonStateID());
+	responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesign.getLearningDesignId());
+	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId));
+	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
@@ -1097,7 +1098,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	LearningDesign learningDesign = lesson.getLearningDesign();
 	String contentFolderId = learningDesign.getContentFolderID();
 
-	// find out if the LD SVG is in new Flashless (exploded) format 
+	// find out if the LD SVG is in new Flashless (exploded) format
 	JSONObject responseJSON = new JSONObject();
 	boolean flaFormat = false;
 	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
@@ -1211,28 +1212,27 @@ public class MonitoringAction extends LamsDispatchAction {
 	    int learnerCount = 0;
 	    if (activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity()) {
 		// go through hidden children of complex activities and take them into account
-		learnerCount += getMonitoringService().getCountLearnerProgressCurrentActivity(activity);
+		learnerCount += getMonitoringService().getCountLearnersCurrentActivity(activity);
 		Set<Activity> children = parentToChildren.get(activityId);
 		if (children != null) {
 		    for (Activity child : children) {
-			learnerCount += getMonitoringService().getCountLearnerProgressCurrentActivity(child);
+			learnerCount += getMonitoringService().getCountLearnersCurrentActivity(child);
 		    }
 		}
 	    } else {
-		List<LearnerProgress> latestLearnerProgress = getMonitoringService().getLearnerProgressLatest(
-			activity.getActivityId(), MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT);
-		if (latestLearnerProgress.size() < MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT) {
+		List<User> latestLearners = getMonitoringService().getLearnersLatestByActivity(activity.getActivityId(),
+			MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT, null);
+		if (latestLearners.size() < MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT) {
 		    // if there are less learners than the limit, we already know the size
-		    learnerCount = latestLearnerProgress.size();
+		    learnerCount = latestLearners.size();
 		} else {
-		    learnerCount = getMonitoringService().getCountLearnerProgressCurrentActivity(activity);
+		    learnerCount = getMonitoringService().getCountLearnersCurrentActivity(activity);
 		}
 
 		// parse learners into JSON format
-		if (!latestLearnerProgress.isEmpty()) {
+		if (!latestLearners.isEmpty()) {
 		    JSONArray learnersJSON = new JSONArray();
-		    for (LearnerProgress learnerProgress : latestLearnerProgress) {
-			User learner = learnerProgress.getUser();
+		    for (User learner : latestLearners) {
 			learnersJSON.put(WebUtil.userToJSON(learner));
 		    }
 
@@ -1246,10 +1246,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("activities", activitiesJSON);
 
 	// find learners who completed the lesson
-	List<LearnerProgress> completedLearners = getMonitoringService().getCompletedLearnerProgressLatest(lessonId,
-		MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT);
-	for (LearnerProgress learner : completedLearners) {
-	    JSONObject learnerJSON = WebUtil.userToJSON(learner.getUser());
+	List<User> completedLearners = getMonitoringService().getLearnersLatestCompleted(lessonId,
+		MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT, null);
+	for (User learner : completedLearners) {
+	    JSONObject learnerJSON = WebUtil.userToJSON(learner);
 	    // no more details are needed for learners who completed the lesson
 	    responseJSON.append("completedLearners", learnerJSON);
 	}
@@ -1257,10 +1257,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	if (completedLearners.size() < MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT) {
 	    completedLearnerCount = completedLearners.size();
 	} else {
-	    completedLearnerCount = getMonitoringService().getCountLearnerProgressCompletedLesson(lessonId);
+	    completedLearnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
 	}
 	responseJSON.put("completedLearnerCount", completedLearnerCount);
-	responseJSON.put("numberPossibleLearners", lesson.getAllLearners().size());
+	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId));
 
 	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
 	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
@@ -1558,7 +1558,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Gets all children and their childre etc. of the given complex activity. 
+     * Gets all children and their childre etc. of the given complex activity.
      */
     @SuppressWarnings("unchecked")
     private Set<Activity> getDescendants(ComplexActivity complexActivity) {
