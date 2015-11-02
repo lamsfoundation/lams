@@ -1042,18 +1042,18 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	//paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
-	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
+	Integer sortByUser = WebUtil.readIntParam(request, "column[0]", true);
+	Integer sortByRating = WebUtil.readIntParam(request, "column[1]", true);
 	String searchString = request.getParameter("fcol[0]");
-	log.debug("filter value "+searchString);
 	
 	int sorting = QaAppConstants.SORT_BY_NO;
-	if (isSort1 != null && isSort1.equals(0)) {
-	    sorting = QaAppConstants.SORT_BY_ANSWER_ASC;
-	} else if (isSort1 != null && isSort1.equals(1)) {
-	    sorting = QaAppConstants.SORT_BY_ANSWER_DESC;
+	if (sortByUser != null ) {
+	    sorting = sortByUser.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC;
+	} else if ( sortByRating != null ) {
+	    sorting = sortByRating.equals(0) ? QaAppConstants.SORT_BY_RATING_ASC : QaAppConstants.SORT_BY_RATING_DESC;
 	}
-	
-	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaSessionId, questionUid, userId, page, size,
+
+	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaContentId, qaSessionId, questionUid, userId, page, size,
 		sorting, searchString);
 	
 	JSONObject responcedata = new JSONObject();
@@ -1061,7 +1061,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, userId, searchString));
 	
-	//handle rating criterias
+	// handle rating criterias - even though we may have searched on ratings earlier we can't use the average ratings
+	// calculated as they may have been averages over more than one criteria. 
 	List<ItemRatingDTO> itemRatingDtos = null;
 	if (isAllowRateAnswers && !responses.isEmpty()) {
 	    //create itemIds list
