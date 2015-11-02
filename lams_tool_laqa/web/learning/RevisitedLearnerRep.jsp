@@ -60,9 +60,6 @@
 			    widthFixed: true,
 			    widgets: ['zebra'],
 		        headers: { 
-		            1: { 
-		                sorter: false 
-		            }, 
 		            2: {
 		                sorter: false 
 		            } 

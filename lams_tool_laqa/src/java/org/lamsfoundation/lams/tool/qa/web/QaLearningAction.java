@@ -1042,15 +1042,19 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	//paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
-	Integer sortByUser = WebUtil.readIntParam(request, "column[0]", true);
-	Integer sortByRating = WebUtil.readIntParam(request, "column[1]", true);
+	Integer sortByCol1 = WebUtil.readIntParam(request, "column[0]", true);
+	Integer sortByCol2 = WebUtil.readIntParam(request, "column[1]", true);
 	String searchString = request.getParameter("fcol[0]");
 	
 	int sorting = QaAppConstants.SORT_BY_NO;
-	if (sortByUser != null ) {
-	    sorting = sortByUser.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC;
-	} else if ( sortByRating != null ) {
-	    sorting = sortByRating.equals(0) ? QaAppConstants.SORT_BY_RATING_ASC : QaAppConstants.SORT_BY_RATING_DESC;
+	if (sortByCol1 != null ) {
+	    if ( isMonitoring )
+		sorting = sortByCol1.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC;
+	    else 
+		sorting = sortByCol1.equals(0) ? QaAppConstants.SORT_BY_ANSWER_ASC : QaAppConstants.SORT_BY_ANSWER_DESC;
+		
+	} else if ( sortByCol2 != null ) {
+	    sorting = sortByCol2.equals(0) ? QaAppConstants.SORT_BY_RATING_ASC : QaAppConstants.SORT_BY_RATING_DESC;
 	}
 
 	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaContentId, qaSessionId, questionUid, userId, page, size,
