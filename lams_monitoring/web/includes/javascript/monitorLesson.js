@@ -2,6 +2,8 @@
 // copy of lesson/branching SVG so it does no need to be fetched every time
 // HTML with SVG of the lesson
 var originalSequenceCanvas = null,
+// is the LD SVG in Flashless format or the old, Flash format
+	flaFormat = false,
 // DIV container for lesson/branching SVG
 // it gets accessed so many times it's worth to cache it here
 	sequenceCanvas = null,
@@ -826,6 +828,9 @@ function updateSequenceTab() {
 		},		
 		success : function(response) {
 			if (sequenceCanvasFirstFetch) {
+				// once Flashless SVG format is detected, it applies for all activities
+				flaFormat = response.flaFormat;
+				
 				// FLA activities have uiids but no ids, set it here
 				$.each(response.activities, function(activityIndex, activity){
 					$('g[uiid="' + activity.uiid + '"]', sequenceCanvas).attr('id', activity.id);
@@ -856,7 +861,7 @@ function updateSequenceTab() {
 				reloadSVG = false;
 			$.each(response.activities, function(index, activity){
 				// are there any learners in this or any activity?
-				learnerCount += activity.learners ? activity.learners.length : 0;
+				learnerCount += activity.learnerCount;
 				if (response.contributeActivities) {
 					$.each(response.contributeActivities, function(){
 						if (activity.id == this.activityID) {
@@ -876,16 +881,15 @@ function updateSequenceTab() {
 				sequenceCanvas.html(sequenceCanvas.html());
 			}
 			
-			var completedLearners = response.completedLearners,
-				learnerTotalCount = learnerCount + (completedLearners ? completedLearners.length : 0 );
+			var learnerTotalCount = learnerCount + response.completedLearnerCount;
 			$('#learnersStartedPossibleCell').text(learnerTotalCount + ' / ' + response.numberPossibleLearners);
-			addCompletedLearnerIcons(completedLearners, learnerTotalCount);
+			addCompletedLearnerIcons(response.completedLearners, response.completedLearnerCount, learnerTotalCount);
 			
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
 				
 				var isBranching = [10,11,12,13].indexOf(activity.type) > -1;
-				if (activity.url || (isBranching && !activity.flaFormat)) {
+				if (activity.url || (isBranching && !flaFormat)) {
 					var activityGroup = $('g[id="' + activity.id + '"]'),
 						dblClickFunction = 
 							// different behaviour for regular/branching activities
@@ -1048,7 +1052,7 @@ function forceCompleteExecute(learnerId, activityId, removeContent) {
  * Draw user and attention icons on top of activities.
  */
 function addActivityIcons(activity) {
-	if (!activity.learners && !activity.requiresAttention) {
+	if (activity.learnerCount == 0 && !activity.requiresAttention) {
 		return;
 	}
 	
@@ -1061,12 +1065,11 @@ function addActivityIcons(activity) {
 	// add group of users icon
 	var appendTarget = $('svg', sequenceCanvas)[0],
 		// branching and gates require extra adjustments
-		isNewBranching =  [10,11,12,13].indexOf(activity.type) > -1 && activity.flaFormat,
+		isNewBranching =  [10,11,12,13].indexOf(activity.type) > -1 && flaFormat,
 		isGate = [3,4,5,14].indexOf(activity.type) > -1;
 	
-	if (activity.learners){
-		var	groupTitle = activity.learners.length + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
-			// if icons do not fit in shape anymore, show a group icon
+	if (activity.learnerCount > 0){
+		var	groupTitle = activity.learnerCount + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
 			element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'learnerGroup',
 			'x'          : isNewBranching ? coord.x + 2  : (isGate ? coord.x + 10 : coord.x2 - 18),
@@ -1086,18 +1089,15 @@ function addActivityIcons(activity) {
 			'font-family': 'Verdana',
 			'font-size'  : 8,
 			'style'		 : 'cursor : pointer'
-		}, activity.learners.length, appendTarget);
+		}, activity.learnerCount, appendTarget);
 		appendXMLElement('title', null, groupTitle, element);
 	
-		var actTooltip = LABELS.LEARNER_GROUP_LIST_TITLE;
+		if (activity.learners) {
 		// draw single icons for the first few learners;
 		// don't do it for gate and optional activities, and new branching/optional sequences format
-		if ([3,4,5,7,13,14].indexOf(activity.type) == -1 && !activity.flaFormat) {
+			if ([3,4,5,7,13,14].indexOf(activity.type) == -1 && !flaFormat) {
 			$.each(activity.learners, function(learnerIndex, learner){
 				var learnerDisplayName = getLearnerDisplayName(learner);
-				actTooltip += '\n' + learnerDisplayName;
-				
-				if (learnerIndex < 7) {
 					element = appendXMLElement('image', {
 						'id'         : 'act' + activity.id + 'learner' + learner.id,
 						'x'          : coord.x + learnerIndex*15 + 1,
@@ -1109,11 +1109,9 @@ function addActivityIcons(activity) {
 						'style'		 : 'cursor : pointer'
 					}, null, appendTarget);
 					appendXMLElement('title', null, learnerDisplayName, element);
-				}
-			});
+				});
+			}
 		}
-		
-		appendXMLElement('title', null, actTooltip, appendTarget);
 	} 
 
 	if (activity.requiresAttention) {
@@ -1135,7 +1133,7 @@ function addActivityIcons(activity) {
  * After SVG refresh, add click/dblclick/drag handlers to icons.
  */
 function addActivityIconsHandlers(activity) {
-	if (!activity.learners && !activity.requiresAttention) {
+	if (activity.learnerCount == 0 && !activity.requiresAttention) {
 		return;
 	}
 
@@ -1177,12 +1175,14 @@ function addActivityIconsHandlers(activity) {
 				});
 			}
 		});
+	}
 		
+	if (activity.learnerCount > 0){
 		var learnerGroup = $('*[id^="act' + activity.id + 'learnerGroup"]', sequenceCanvas);
 		dblTap(learnerGroup, function(event){
 			 // double click on learner group icon to see list of learners
 			event.stopPropagation();
-			showLearnerGroupDialog(activity.id, activity.title, activity.learners, true, usersViewable);
+			showLearnerGroupDialog(activity.id, activity.title, null, true, usersViewable, false);
 		});
 	}
 	
@@ -1199,21 +1199,17 @@ function addActivityIconsHandlers(activity) {
 /**
  * Add learner icons in "finished lesson" bar.
  */
-function addCompletedLearnerIcons(learners, learnerTotalCount) {
+function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	var iconsContainer = $('#completedLearnersContainer');
-	var completedLearnerCount = (learners ? learners.length : 0 );
 	// show (current/total) label
 	$('<span />').attr({
-		'title' : LABELS.LEARNER_FINISHED_COUNT
-			.replace('[0]', completedLearnerCount).replace('[1]', learnerTotalCount)
-	}).text('(' + completedLearnerCount + '/' + learnerTotalCount + ')')
+						'title' : LABELS.LEARNER_FINISHED_COUNT.replace('[0]', learnerCount).replace('[1]', learnerTotalCount)
+			   }).text('(' + learnerCount + '/' + learnerTotalCount + ')')
 	  .appendTo(iconsContainer);
 	
 	if (learners) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
-			// maximum 55 icons in the bar
-			if (learnerIndex < 55) {
 				// make an icon for each learner
 				$('<img />').attr({
 					'src' : LAMS_URL + 'images/icons/user.png',
@@ -1240,7 +1236,6 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 					}
 				})
 				.appendTo(iconsContainer);
-			}
 		});
 		
 		// show a group icon
@@ -1250,7 +1245,7 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 		}).css('cursor', 'pointer').appendTo(iconsContainer);
 		
 		dblTap(groupIcon, function(){
-			showLearnerGroupDialog(null, LABELS.LEARNER_FINISHED_DIALOG_TITLE, learners, true, false);
+			showLearnerGroupDialog(null, LABELS.LEARNER_FINISHED_DIALOG_TITLE, null, true, false, false);
 		});
 	}
 }
@@ -1279,7 +1274,7 @@ function getActivityCoordinates(activity){
 	}
 	
 	// special processing for new format of branching and optional sequences
-	if ([10,11,12,13].indexOf(activity.type) > -1 && activity.flaFormat) {
+	if ([10,11,12,13].indexOf(activity.type) > -1 && flaFormat) {
 		return {
 			'x'  : activity.x,
 			'y'  : activity.y
@@ -1448,7 +1443,8 @@ function openLiveEdit(){
 				if (response) {
 					alert(response);
 				} else {
-					window.parent.showFlashlessAuthoringDialog(ldId, 'editonfly');
+					openPopUp(LAMS_URL + 'home.do?method=author&layout=editonfly&learningDesignID=' + ldId,
+							'LiveEdit', 600, 800, false);
 					closeMonitorLessonDialog();
 				}
 			}
@@ -1778,10 +1774,28 @@ function closeMonitorLessonDialog(refresh) {
  * Show a dialog with user list and optional Force Complete and View Learner buttons.
  */
 function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceComplete, allowView, allowEmail) {
-	var learnerGroupList = $('#learnerGroupList').empty();
-	var learnerGroupDialog = $('#learnerGroupDialog');
+	var learnerGroupList = $('#learnerGroupList').empty(),
+		learnerGroupDialog = $('#learnerGroupDialog');
 	
-	if (learners) {
+	if (!learners) {
+		$.ajax({
+			dataType : 'json',
+			url : LAMS_URL + 'monitoring/monitoring.do',
+			cache : false,
+			async : false,
+			data : {
+				'method'     : 'getCurrentLearners',
+				'lessonID'   : lessonId,
+				// activity ID can be null; if it is not, lesson ID is ignored
+				'activityID' : activityId,
+				'flaFormat'  : flaFormat
+			},
+			success : function(response) {
+				learners = response;
+			}
+		});
+	}
+	
 		$.each(learners, function(learnerIndex, learner) {
 			var viewUrl = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
             				       + learner.id + '&activityID=' + activityId + '&lessonID=' + lessonId,
@@ -1811,7 +1825,6 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 				}
 			}
 		});
-	}
 	
 	// show buttons depending on parameters
 	$('button#learnerGroupDialogForceCompleteButton')
