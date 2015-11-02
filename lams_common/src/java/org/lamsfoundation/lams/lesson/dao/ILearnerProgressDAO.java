@@ -102,6 +102,14 @@ public interface ILearnerProgressDAO {
     List<User> getLearnersLatestCompletedForLesson(Long lessonId, Integer limit, Integer offset);
 
     /**
+     * Get learners whose first name, last name or login match any of the tokens from search phrase. Sorts either by
+     * name or, if orderByCompletion is set, by most progressed first. Used mainly by Learners tab in Monitoring
+     * interface.
+     */
+    List<User> getLearnersByLesson(Long lessonId, String searchPhrase, boolean orderByCompletion, Integer limit,
+	    Integer offset);
+
+    /**
      * Get all the learner progress records for a lesson where the progress is marked as completed.
      * 
      * @param lessonId
@@ -161,6 +169,11 @@ public interface ILearnerProgressDAO {
      * @return List<User>
      */
     Integer getNumUsersCompletedActivity(Activity activity);
+
+    /**
+     * Get number of learners whose first name, last name or login match any of the tokens from search phrase.
+     */
+    Integer getNumUsersByLesson(Long lessonId, String searchPhrase);
 
     /**
      * Get number of learners who finished the given lesson.
