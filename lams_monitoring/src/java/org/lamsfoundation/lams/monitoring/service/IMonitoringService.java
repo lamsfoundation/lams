@@ -686,6 +686,14 @@ public interface IMonitoringService {
     List<User> getLearnersLatestCompleted(Long lessonId, Integer limit, Integer offset);
 
     /**
+     * Get learners whose first name, last name or login match any of the tokens from search phrase. Sorts either by
+     * name or, if orderByCompletion is set, by most progressed first. Used mainly by Learners tab in Monitoring
+     * interface.
+     */
+    List<User> getLearnersFromProgress(Long lessonId, String searchPhrase, boolean orderByCompletion, Integer limit,
+	    Integer offset);
+
+    /**
      * Get learners who most recently entered the activity.
      */
     List<User> getLearnersLatestByActivity(Long activityId, Integer limit, Integer offset);
@@ -694,6 +702,11 @@ public interface IMonitoringService {
      * Get learners who are at the given activities at the moment.
      */
     List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset);
+
+    /**
+     * Get number of learners whose first name, last name or login match any of the tokens from search phrase.
+     */
+    Integer getCountLearnersFromProgress(Long lessonId, String searchPhrase);
 
     /**
      * Get number of learners who are at the given activity at the moment.
