@@ -23,10 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
-import java.math.BigInteger;
-import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -80,13 +79,16 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     private final static String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
 	    + " progress.lesson.lessonId IN (:lessonIds)";
 
-    private final static String LOAD_LEARNERS_LATEST_BY_ACTIVITY = "SELECT prog.user_id FROM lams_learner_progress AS prog "
+    private final static String LOAD_LEARNERS_LATEST_BY_ACTIVITY = "SELECT u.* FROM lams_learner_progress AS prog "
 	    + "JOIN lams_progress_attempted AS att USING (learner_progress_id) "
+	    + "JOIN lams_user AS u USING (user_id) "
 	    + "WHERE prog.current_activity_id = :activityId AND att.activity_id = :activityId "
 	    + "ORDER BY att.start_date_time DESC";
 
     private final static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + " p.currentActivity.id IN (:activityIds)";
+
+    private final static String LOAD_LEARNERS_BY_LESSON = "FROM LearnerProgress prog WHERE prog.lesson.id = :lessonId";
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
@@ -144,21 +146,14 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
 		Query query = session.createSQLQuery(LearnerProgressDAO.LOAD_LEARNERS_LATEST_BY_ACTIVITY)
-			.setLong("activityId", activityId);
+			.addEntity(User.class).setLong("activityId", activityId);
 		if (limit != null) {
 		    query.setMaxResults(limit);
 		}
 		if (offset != null) {
 		    query.setFirstResult(offset);
 		}
-		// first query fetches only progress IDs
-		List<BigInteger> result = query.list();
-		// fetch user objects and return them
-		List<User> learners = new LinkedList<User>();
-		for (BigInteger userId : result) {
-		    learners.add((User) hibernateTemplate.get(User.class, userId.intValue()));
-		}
-		return learners;
+		return query.list();
 	    }
 	});
     }
@@ -204,6 +199,50 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 		return query.list();
 	    }
 	});
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<User> getLearnersByLesson(final Long lessonId, String searchPhrase, boolean orderByCompletion,
+	    final Integer limit, final Integer offset) {
+	final String queryText = LearnerProgressDAO.buildLearnersByLessonQuery(false, searchPhrase, orderByCompletion);
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+	return (List<User>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createQuery(queryText).setLong("lessonId", lessonId);
+		if (limit != null) {
+		    query.setMaxResults(limit);
+		}
+		if (offset != null) {
+		    query.setFirstResult(offset);
+		}
+		return query.list();
+	    }
+	});
+    }
+
+    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase, Boolean orderByCompletion) {
+	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "prog.user ")
+		.append(LearnerProgressDAO.LOAD_LEARNERS_BY_LESSON);
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (prog.user.firstName LIKE '%").append(token)
+			.append("%' OR prog.user.lastName LIKE '%").append(token)
+			.append("%' OR prog.user.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	if (!count && orderByCompletion != null) {
+	    queryText.append(" ORDER BY");
+	    if (orderByCompletion) {
+		queryText.append(" prog.lessonComplete DESC, prog.completedActivities.size DESC,");
+	    }
+	    queryText.append(" prog.user.firstName ASC, prog.user.lastName ASC");
+	}
+	return queryText.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -302,6 +341,19 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 		Object value = session.createQuery(LearnerProgressDAO.COUNT_COMPLETED_ACTIVITY)
 			.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
 		return new Integer(((Number) value).intValue());
+	    }
+	});
+    }
+
+    @Override
+    public Integer getNumUsersByLesson(final Long lessonId, String searchPhrase) {
+	final String queryText = buildLearnersByLessonQuery(true, searchPhrase, null);
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Object value = session.createQuery(queryText).setLong("lessonId", lessonId.longValue()).uniqueResult();
+		return ((Number) value).intValue();
 	    }
 	});
     }
