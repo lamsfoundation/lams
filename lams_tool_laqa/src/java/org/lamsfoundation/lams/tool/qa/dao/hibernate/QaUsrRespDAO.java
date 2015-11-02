@@ -127,6 +127,12 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	case QaAppConstants.SORT_BY_NO:
 	    sortingOrder = "qaUsrResp.attemptTime";
 	    break;
+	case QaAppConstants.SORT_BY_ANSWER_ASC:
+	    sortingOrder = "answer ASC";
+	    break;
+	case QaAppConstants.SORT_BY_ANSWER_DESC:
+	    sortingOrder = "answer DESC";
+	    break;
 	case QaAppConstants.SORT_BY_USERNAME_ASC:
 	    sortingOrder = "qaUsrResp.qaQueUser.fullname ASC";
 	    break;
