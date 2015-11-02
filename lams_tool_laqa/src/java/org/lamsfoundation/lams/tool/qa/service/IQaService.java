@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -108,9 +107,9 @@ public interface IQaService extends ToolRatingManager {
     
     List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
     
-    List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+    List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId, final Long excludeUserId,
 	    int page, int size, int sorting, String searchString);
-    
+
     int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId, String searchString);
     
     /**

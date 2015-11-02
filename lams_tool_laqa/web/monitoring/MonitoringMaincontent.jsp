@@ -150,7 +150,7 @@
 				theme: 'blue',
 			    widthFixed: true,
 				widgets: ["zebra", "filter"],
-				headers: { 1: { filter: false, sorter: false }, 2: { filter: false, sorter: false } },
+				headers: { 1: { filter: false }, 2: { filter: false, sorter: false } },
 			    widgetOptions : {
 			        // include column filters
 			        filter_columnFilters: true,

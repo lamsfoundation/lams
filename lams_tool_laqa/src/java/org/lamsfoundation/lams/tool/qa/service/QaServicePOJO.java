@@ -307,11 +307,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     @Override
-    public List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId,
+    public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId,
 	    final Long excludeUserId, int page, int size, int sorting, String searchString) {
-	return qaUsrRespDAO.getResponsesForTablesorter(qaSessionId, questionId, excludeUserId, page, size, sorting, searchString);
+	return qaUsrRespDAO.getResponsesForTablesorter(toolContentId, qaSessionId, questionId, excludeUserId, page, size, sorting, searchString);
     }
 
+    private String createRatingKey(Long qaSessionId, final Long questionId) {
+	return qaSessionId + "-" + questionId;
+    }
     @Override
     public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId,
 	    final Long excludeUserId, String searchString) {

@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
+import org.hibernate.Query;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
-import org.lamsfoundation.lams.tool.qa.web.QaLearningAction;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -51,6 +51,23 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    + " AND qaUsrResp.qaQueUser.fullname LIKE CONCAT('%', :searchString, '%') "
 	    + " order by ";
 
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING = "select resp.*, avg(rating.rating) avg_rating"
+	    + " from tl_laqa11_usr_resp resp"
+	    + " inner join tl_laqa11_que_usr usr"
+	    + " on resp.qa_que_content_id = :questionId and resp.que_usr_id = usr.uid "
+	    + " and usr.que_usr_id!=:excludeUserId "
+	    + " inner join tl_laqa11_session sess "
+	    + " on usr.qa_session_id = sess.uid and sess.qa_session_id = :qaSessionId "
+	    + " and usr.fullname LIKE CONCAT('%', :searchString, '%')"
+	    + " left join ("
+	    + " 	select rat.item_id, rat.rating from lams_rating rat"
+	    + "         inner join lams_rating_criteria crit"
+	    + " 	on rat.rating_criteria_id = crit.rating_criteria_id and crit.tool_content_id = :toolContentId"
+	    + " 	) rating"
+	    + " on rating.item_id = resp.response_id"
+	    + " group by response_id"
+	    + " order by";
+	    
     private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
 
@@ -102,29 +119,51 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     }
 
     @Override
-    public List<QaUsrResp> getResponsesForTablesorter(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+    public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId, final Long excludeUserId,
 	    int page, int size, int sorting, String searchString) {
-	String sortingOrder = "";
+	String sortingOrder = " resp.attempt_time"; // default if we get an unexpected sort order
+	boolean useAverageRatingSort = false;
 	switch (sorting) {
 	case QaAppConstants.SORT_BY_NO:
 	    sortingOrder = "qaUsrResp.attemptTime";
 	    break;
-	case QaAppConstants.SORT_BY_ANSWER_ASC:
+	case QaAppConstants.SORT_BY_USERNAME_ASC:
 	    sortingOrder = "qaUsrResp.qaQueUser.fullname ASC";
 	    break;
-	case QaAppConstants.SORT_BY_ANSWER_DESC:
+	case QaAppConstants.SORT_BY_USERNAME_DESC:
 	    sortingOrder = "qaUsrResp.qaQueUser.fullname DESC";
+	    break;
+	case QaAppConstants.SORT_BY_RATING_ASC:
+	    sortingOrder = " avg_rating ASC";
+	    useAverageRatingSort = true;
+	    break;
+	case QaAppConstants.SORT_BY_RATING_DESC:
+	    sortingOrder = " avg_rating DESC";
+	    useAverageRatingSort = true;
 	    break;
 	}
 
-	String filter = searchString != null ? searchString.trim() : "";
-	// TODO parse out special chars
-	return getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH + sortingOrder)
-		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue())
-		.setLong("excludeUserId", excludeUserId.longValue()).setString("searchString",filter)
-		.setFirstResult(page * size).setMaxResults(size)
-		.list();
+	Query query = null;
 	
+	if ( useAverageRatingSort ) {
+	    query = getSession()
+		    .createSQLQuery(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING+sortingOrder).addEntity(QaUsrResp.class)
+		    .setLong("toolContentId", toolContentId.longValue());
+	} else {
+	    query = getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH+sortingOrder);
+	}
+	
+	query.setLong("questionId", questionId.longValue());
+	query.setLong("qaSessionId", qaSessionId.longValue());
+	query.setLong("excludeUserId", excludeUserId.longValue());
+
+	// support for custom search from a toolbar
+	searchString = searchString == null ? "" : searchString;
+	query.setString("searchString", searchString);
+
+	query.setFirstResult(page * size);
+	query.setMaxResults(size);
+	return query.list();
     }
 
     @Override
