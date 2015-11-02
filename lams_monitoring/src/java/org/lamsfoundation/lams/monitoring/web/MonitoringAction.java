@@ -1283,6 +1283,71 @@ public class MonitoringAction extends LamsDispatchAction {
 
     }
 
+    /**
+     * Checks if activity A is before activity B in a sequence.
+     */
+    public ActionForward isActivityPreceding(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	long activityAid = WebUtil.readLongParam(request, "activityA");
+	long activityBid = WebUtil.readLongParam(request, "activityB");
+	boolean result = false;
+
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	Activity precedingActivity = monitoringService.getActivityById(activityBid);
+
+	// move back an look for activity A
+	while (!result && (precedingActivity != null)) {
+	    if (precedingActivity.getTransitionTo() != null) {
+		precedingActivity = precedingActivity.getTransitionTo().getFromActivity();
+	    } else if (precedingActivity.getParentActivity() != null) {
+		// this is a nested activity; move up
+		precedingActivity = precedingActivity.getParentActivity();
+		continue;
+	    } else {
+		precedingActivity = null;
+	    }
+
+	    if ((precedingActivity != null) && !precedingActivity.isSequenceActivity()) {
+		if (precedingActivity.getActivityId().equals(activityAid)) {
+		    // found it
+		    result = true;
+		} else if (precedingActivity.isComplexActivity()) {
+		    // check descendants of a complex activity
+		    ComplexActivity complexActivity = (ComplexActivity) monitoringService
+			    .getActivityById(precedingActivity.getActivityId());
+		    if (containsActivity(complexActivity, activityAid, monitoringService)) {
+			result = true;
+		    }
+		}
+	    }
+	}
+
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().write(Boolean.toString(result));
+	return null;
+    }
+
+    /**
+     * Checks if a complex activity or its descendats contain an activity with the given ID.
+     */
+    private boolean containsActivity(ComplexActivity complexActivity, long targetActivityId,
+	    IMonitoringService monitoringService) {
+	for (Activity childActivity : (Set<Activity>) complexActivity.getActivities()) {
+	    if (childActivity.getActivityId().equals(targetActivityId)) {
+		return true;
+	    }
+	    if (childActivity.isComplexActivity()) {
+		ComplexActivity childComplexActivity = (ComplexActivity) monitoringService
+			.getActivityById(childActivity.getActivityId());
+		if (containsActivity(childComplexActivity, targetActivityId, monitoringService)) {
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
+
     public ActionForward releaseGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket = null;
