@@ -23,10 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
-import java.math.BigInteger;
-import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -46,44 +45,47 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     protected Logger log = Logger.getLogger(LearnerProgressDAO.class);
 
-    private final static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
+    private static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
 
-    private final static String LOAD_PROGRESS_REFFERING_TO_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
+    private static String LOAD_PROGRESS_REFFERING_TO_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
 
-    private final static String LOAD_COMPLETED_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lessonComplete > 0 and p.lesson.id = :lessonId";
+    private static String LOAD_COMPLETED_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
-    private final static String LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON = "SELECT p.user FROM LearnerProgress p WHERE "
+    private static String LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + "p.lessonComplete > 0 and p.lesson.id = :lessonId ORDER BY p.finishDate DESC";
 
-    private final static String COUNT_COMPLETED_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p "
+    private static String COUNT_COMPLETED_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p "
 	    + " where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
-    private final static String COUNT_ATTEMPTED_ACTIVITY = "select count(*) from LearnerProgress prog, "
+    private static String COUNT_ATTEMPTED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.attemptedActivities attAct " + " where act.id = :activityId and "
 	    + " index(attAct) = act";
-    private final static String COUNT_COMPLETED_ACTIVITY = "select count(*) from LearnerProgress prog, "
+    private static String COUNT_COMPLETED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.completedActivities compAct " + " where act.id = :activityId and "
 	    + " index(compAct) = act";
 
-    private final static String COUNT_CURRENT_ACTIVITY = "select count(*) from LearnerProgress prog WHERE "
+    private static String COUNT_CURRENT_ACTIVITY = "select count(*) from LearnerProgress prog WHERE "
 	    + " prog.currentActivity = :activity";
 
-    private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
+    private static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
 
-    private final static String LOAD_PROGRESS_BY_LESSON_AND_USER_IDS = "from LearnerProgress p "
+    private static String LOAD_PROGRESS_BY_LESSON_AND_USER_IDS = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId AND p.user.userId IN (:userIds) order by p.user.lastName, p.user.firstName, p.user.userId";
 
-    private final static String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
+    private static String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
 	    + " progress.lesson.lessonId IN (:lessonIds)";
 
-    private final static String LOAD_LEARNERS_LATEST_BY_ACTIVITY = "SELECT prog.user_id FROM lams_learner_progress AS prog "
+    private static String LOAD_LEARNERS_LATEST_BY_ACTIVITY = "SELECT u.* FROM lams_learner_progress AS prog "
 	    + "JOIN lams_progress_attempted AS att USING (learner_progress_id) "
+	    + "JOIN lams_user AS u USING (user_id) "
 	    + "WHERE prog.current_activity_id = :activityId AND att.activity_id = :activityId "
 	    + "ORDER BY att.start_date_time DESC";
 
-    private final static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT p.user FROM LearnerProgress p WHERE "
+    private static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + " p.currentActivity.id IN (:activityIds)";
+
+    private static String LOAD_LEARNERS_BY_LESSON = "FROM LearnerProgress prog WHERE prog.lesson.id = :lessonId";
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
@@ -101,7 +103,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     }
 
     @Override
-    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Long lessonId) {
+    public LearnerProgress getLearnerProgressByLearner(Integer learnerId, Long lessonId) {
 
 	return (LearnerProgress) getSession().createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_LEARNER)
 		.setInteger("learnerId", learnerId).setLong("lessonId", lessonId).uniqueResult();
@@ -114,35 +116,28 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LearnerProgress> getLearnerProgressReferringToActivity(final Activity activity) {
+    public List<LearnerProgress> getLearnerProgressReferringToActivity(Activity activity) {
 	return getSession().createQuery(LearnerProgressDAO.LOAD_PROGRESS_REFFERING_TO_ACTIVITY)
 		.setEntity("activity", activity).list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<User> getLearnersLatestByActivity(final Long activityId, final Integer limit, final Integer offset) {
+    public List<User> getLearnersLatestByActivity(Long activityId, Integer limit, Integer offset) {
 	Query query = getSession().createSQLQuery(LearnerProgressDAO.LOAD_LEARNERS_LATEST_BY_ACTIVITY)
-		.setLong("activityId", activityId);
+		.addEntity(User.class).setLong("activityId", activityId);
 	if (limit != null) {
 	    query.setMaxResults(limit);
 	}
 	if (offset != null) {
 	    query.setFirstResult(offset);
 	}
-	// first query fetches only progress IDs
-	List<BigInteger> result = query.list();
-	// fetch user objects and return them
-	List<User> learners = new LinkedList<User>();
-	for (BigInteger userId : result) {
-	    learners.add((User) getSession().get(User.class, userId.intValue()));
-	}
-	return learners;
+	return query.list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<User> getLearnersByActivities(final Long[] activityIds, final Integer limit, final Integer offset) {
+    public List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset) {
 	Query query = getSession().createQuery(LearnerProgressDAO.LOAD_LEARNERS_BY_ACTIVITIES)
 		.setParameterList("activityIds", activityIds);
 	if (limit != null) {
@@ -156,8 +151,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<User> getLearnersLatestCompletedForLesson(final Long lessonId, final Integer limit,
-	    final Integer offset) {
+    public List<User> getLearnersLatestCompletedForLesson(Long lessonId, Integer limit, Integer offset) {
 	Query query = getSession().createQuery(LearnerProgressDAO.LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON)
 		.setLong("lessonId", lessonId);
 	if (limit != null) {
@@ -171,35 +165,72 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LearnerProgress> getCompletedLearnerProgressForLesson(final Long lessonId) {
+    public List<User> getLearnersByLesson(Long lessonId, String searchPhrase, boolean orderByCompletion, Integer limit,
+	    Integer offset) {
+	String queryText = LearnerProgressDAO.buildLearnersByLessonQuery(false, searchPhrase, orderByCompletion);
+
+	Query query = getSession().createQuery(queryText).setLong("lessonId", lessonId);
+	if (limit != null) {
+	    query.setMaxResults(limit);
+	}
+	if (offset != null) {
+	    query.setFirstResult(offset);
+	}
+	return query.list();
+    }
+
+    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase, Boolean orderByCompletion) {
+	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "prog.user ")
+		.append(LearnerProgressDAO.LOAD_LEARNERS_BY_LESSON);
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (prog.user.firstName LIKE '%").append(token)
+			.append("%' OR prog.user.lastName LIKE '%").append(token)
+			.append("%' OR prog.user.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	if (!count && (orderByCompletion != null)) {
+	    queryText.append(" ORDER BY");
+	    if (orderByCompletion) {
+		queryText.append(" prog.lessonComplete DESC, prog.completedActivities.size DESC,");
+	    }
+	    queryText.append(" prog.user.firstName ASC, prog.user.lastName ASC");
+	}
+	return queryText.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<LearnerProgress> getCompletedLearnerProgressForLesson(Long lessonId) {
 	return getSession().createQuery(LearnerProgressDAO.LOAD_COMPLETED_PROGRESS_BY_LESSON)
 		.setLong("lessonId", lessonId).list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId) {
+    public List<LearnerProgress> getLearnerProgressForLesson(Long lessonId) {
 	return getSession().createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_LESSON).setLong("lessonId", lessonId)
 		.list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LearnerProgress> getLearnerProgressForLesson(final Long lessonId, final List<Integer> userIds) {
+    public List<LearnerProgress> getLearnerProgressForLesson(Long lessonId, List<Integer> userIds) {
 	return getSession().createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_LESSON_AND_USER_IDS)
 		.setLong("lessonId", lessonId).setParameterList("userIds", userIds).list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LearnerProgress> getLearnerProgressForLessons(final List<Long> lessonIds) {
+    public List<LearnerProgress> getLearnerProgressForLessons(List<Long> lessonIds) {
 	return getSession().createQuery(LearnerProgressDAO.LOAD_PROGRESSES_BY_LESSON_LIST)
 		.setParameterList("lessonIds", lessonIds).list();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<User> getLearnersHaveAttemptedActivity(final Activity activity) {
+    public List<User> getLearnersHaveAttemptedActivity(Activity activity) {
 	List<User> learners = getSession().getNamedQuery("usersAttemptedActivity")
 		.setLong("activityId", activity.getActivityId().longValue()).list();
 
@@ -207,7 +238,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     }
 
     @Override
-    public Integer getNumUsersAttemptedActivity(final Activity activity) {
+    public Integer getNumUsersAttemptedActivity(Activity activity) {
 	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_ATTEMPTED_ACTIVITY)
 		.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
 	Integer attempted = new Integer(((Number) value).intValue());
@@ -215,21 +246,28 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     }
 
     @Override
-    public Integer getNumUsersCompletedActivity(final Activity activity) {
+    public Integer getNumUsersCompletedActivity(Activity activity) {
 	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_COMPLETED_ACTIVITY)
 		.setLong("activityId", activity.getActivityId().longValue()).uniqueResult();
 	return new Integer(((Number) value).intValue());
     }
 
     @Override
-    public Integer getNumUsersCompletedLesson(final Long lessonId) {
+    public Integer getNumUsersByLesson(Long lessonId, String searchPhrase) {
+	String queryText = LearnerProgressDAO.buildLearnersByLessonQuery(true, searchPhrase, null);
+	Object value = getSession().createQuery(queryText).setLong("lessonId", lessonId.longValue()).uniqueResult();
+	return ((Number) value).intValue();
+    }
+
+    @Override
+    public Integer getNumUsersCompletedLesson(Long lessonId) {
 	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_COMPLETED_PROGRESS_BY_LESSON)
 		.setLong("lessonId", lessonId).uniqueResult();
 	return ((Number) value).intValue();
     }
 
     @Override
-    public Integer getNumUsersCurrentActivity(final Activity activity) {
+    public Integer getNumUsersCurrentActivity(Activity activity) {
 	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_CURRENT_ACTIVITY)
 		.setEntity("activity", activity).uniqueResult();
 	return ((Number) value).intValue();

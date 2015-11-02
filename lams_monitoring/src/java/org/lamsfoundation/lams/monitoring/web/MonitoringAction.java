@@ -31,11 +31,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,7 +46,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -68,12 +65,9 @@ import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.lesson.util.LearnerProgressComparator;
-import org.lamsfoundation.lams.lesson.util.LearnerProgressNameComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -976,7 +970,6 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Gets users whose progress bars will be displayed in Learner tab in Monitor.
      */
-    @SuppressWarnings("unchecked")
     public ActionForward getLearnerProgressPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -985,51 +978,19 @@ public class MonitoringAction extends LamsDispatchAction {
 	if (pageNumber == null) {
 	    pageNumber = 1;
 	}
+	// are the learners sorted by the most completed first?
 	boolean isProgressSorted = WebUtil.readBooleanParam(request, "isProgressSorted", false);
 
+	List<User> learners = getMonitoringService().getLearnersFromProgress(lessonId, searchPhrase, isProgressSorted,
+		10, (pageNumber - 1) * 10);
 	JSONObject responseJSON = new JSONObject();
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	List<LearnerProgress> learnerProgresses = new ArrayList<LearnerProgress>(lesson.getLearnerProgresses());
-	// sort either by user's name or his progress
-	Collections.sort(learnerProgresses,
-		isProgressSorted ? new LearnerProgressComparator() : new LearnerProgressNameComparator());
-
-	if (!StringUtils.isBlank(searchPhrase)) {
-	    // get only users whose names match the given phrase
-	    Set<LearnerProgress> searchResult = new LinkedHashSet<LearnerProgress>();
-
-	    // check if there are several search phrases in the query
-	    String[] searchPhrases = searchPhrase.split(";");
-	    for (int searchPhraseIndex = 0; searchPhraseIndex < searchPhrases.length; searchPhraseIndex++) {
-		searchPhrases[searchPhraseIndex] = searchPhrases[searchPhraseIndex].trim().toLowerCase();
-	    }
-
-	    for (LearnerProgress learnerProgress : learnerProgresses) {
-		User learner = learnerProgress.getUser();
-		StringBuilder learnerDisplayName = new StringBuilder(learner.getFirstName().toLowerCase()).append(" ")
-			.append(learner.getLastName().toLowerCase()).append(" ")
-			.append(learner.getLogin().toLowerCase());
-		for (String searchPhrasePiece : searchPhrases) {
-		    if (!StringUtils.isBlank(searchPhrasePiece)
-			    && (learnerDisplayName.indexOf(searchPhrasePiece) != -1)) {
-			searchResult.add(learnerProgress);
-		    }
-		}
-	    }
-
-	    learnerProgresses.clear();
-	    learnerProgresses.addAll(searchResult);
+	for (User learner : learners) {
+	    responseJSON.append("learners", WebUtil.userToJSON(learner));
 	}
 
-	// batch size is 10
-	int toIndex = Math.min(pageNumber * 10, learnerProgresses.size());
-	int fromIndex = Math.min((pageNumber - 1) * 10, Math.max(toIndex - 10, 0));
-	// get just the requested chunk
-	for (LearnerProgress learnerProgress : learnerProgresses.subList(fromIndex, toIndex)) {
-	    responseJSON.append("learners", WebUtil.userToJSON(learnerProgress.getUser()));
-	}
-
-	responseJSON.put("numberActiveLearners", learnerProgresses.size());
+	// get all possible learners matching the given phrase, if any; used for max page number
+	responseJSON.put("numberActiveLearners",
+		getMonitoringService().getCountLearnersFromProgress(lessonId, searchPhrase));
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON.toString());
 	return null;
