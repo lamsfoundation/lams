@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.rating.dao.hibernate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
 	    + "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
     
-    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS = "SELECT r.itemId, r.learner.userId, r.comment "
+    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS = "SELECT r.itemId, r.learner.userId, r.comment, CONCAT(r.learner.firstName, ' ', r.learner.lastName), r.postedDate "
 	    + "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId IN (:itemIds)";
     
@@ -109,7 +110,15 @@ public class RatingCommentDAO extends BaseDAO implements IRatingCommentDAO {
 	    Long userId = ((Integer) result[1]).longValue();
 	    String comment = (String) result[2];
 	    
-	    RatingCommentDTO commentDto = new RatingCommentDTO(itemId, userId, comment);
+	    //in case username and postedDate is also fetched from DB
+	    String userName = "";
+	    Date postedDate = null;
+	    if (result.length > 3) {
+		userName = (String) result[3];
+		postedDate = (Date) result[4];
+	    }
+	    
+	    RatingCommentDTO commentDto = new RatingCommentDTO(itemId, userId, userName, comment, postedDate);
 	    commentDtos.add(commentDto);
 	}
 	

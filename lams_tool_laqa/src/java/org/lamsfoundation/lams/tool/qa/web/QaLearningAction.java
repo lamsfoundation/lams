@@ -1083,7 +1083,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    int countRatedQuestions = qaService.getCountItemsRatedByUser(qaContentId, userId.intValue());
 	    responcedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	}
-	
+
+	DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
 	for (QaUsrResp response : responses) {
 	    QaQueUsr user = response.getQaQueUser();
 	    //JSONArray cell=new JSONArray();
@@ -1098,7 +1099,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    // format attemptTime
 	    Date attemptTime = response.getAttemptTime();
 	    attemptTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone, attemptTime);
-	    DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
 	    responseRow.put("attemptTime", dateFormatter.format(attemptTime));
 	    
 	    if (isAllowRateAnswers) {
@@ -1133,9 +1133,22 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		String commentPostedByUser = itemRatingDto.getCommentPostedByUser() == null ? "" : itemRatingDto.getCommentPostedByUser().getComment();
 		responseRow.put("commentPostedByUser", commentPostedByUser);
 		if (itemRatingDto.getCommentDtos() != null) {
+		    
 		    JSONArray comments = new JSONArray();
 		    for (RatingCommentDTO commentDto : itemRatingDto.getCommentDtos()) {
-			comments.put(StringEscapeUtils.escapeCsv(commentDto.getComment()));
+			JSONObject comment = new JSONObject();
+			comment.put("comment", StringEscapeUtils.escapeCsv(commentDto.getComment()));
+			
+			if (isMonitoring) {
+			    // format attemptTime
+			    Date postedDate = commentDto.getPostedDate();
+			    postedDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, postedDate);
+			    comment.put("postedDate", dateFormatter.format(postedDate));
+			    
+			    comment.put("userFullName", StringEscapeUtils.escapeCsv(commentDto.getUserFullName()));
+			}
+			
+			comments.put(comment);
 		    }
 		    responseRow.put("comments", comments);
 		}

@@ -38,6 +38,10 @@
 				margin-bottom:10px;
 				padding:0;
 			}
+			.rating-comment-posted-by {
+				color: #47BC23;
+			}
+			
 		</style>
 		
 		<script type="text/javascript">

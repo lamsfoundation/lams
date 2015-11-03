@@ -117,11 +117,16 @@
 										maxRates="0" 
 										countRatedItems="0" />
 							</td>
+							
 							<c:if test="${sessionMap.isCommentsEnabled}">
 								<td style="vertical-align:middle; padding-left:0px; text-align:center;">
 									<c:forEach var="commentDto" items="${summary.itemRatingDto.commentDtos}">
 										<div class="rating-comment">
 											${commentDto.comment}
+											
+											<div class="rating-comment-posted-by">
+												<fmt:message key="label.posted.by"><fmt:param>${commentDto.userFullName}</fmt:param><fmt:param><lams:Date value="${commentDto.postedDate}"/></fmt:param></fmt:message>
+											</div>
 										</div>
 									</c:forEach>								
 								</td>
