@@ -67,10 +67,9 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    + " where organisation.organisationId=? and lessonStateId <= 6";
     private final static String LESSON_BY_SESSION_ID = "select lesson from Lesson lesson, ToolSession session where "
 	    + "session.lesson=lesson and session.toolSessionId=:toolSessionID";
-    private final static String COUNT_LEARNERS_CLASS = "SELECT COUNT(*) FROM lams_lesson AS lesson "
-	    + "JOIN lams_grouping AS grouping ON lesson.class_grouping_id = grouping.grouping_id "
-	    + "JOIN lams_group AS gr USING (grouping_id) JOIN lams_user_group AS ug USING (group_id) "
-	    + "WHERE lesson_id = :lessonId";
+    private final static String COUNT_LEARNERS_CLASS = "SELECT COUNT(*) FROM Lesson AS lesson "
+	    + "INNER JOIN lesson.lessonClass AS lessonClass INNER JOIN lessonClass.groups AS groups "
+	    + "INNER JOIN groups.users AS users" + " WHERE lesson.id = :lessonId";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -220,8 +219,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.createSQLQuery(LessonDAO.COUNT_LEARNERS_CLASS);
-		query.setLong("lessonId", lessonId);
+		Query query = session.createQuery(LessonDAO.COUNT_LEARNERS_CLASS).setLong("lessonId", lessonId);
 		Object value = query.uniqueResult();
 		return ((Number) value).intValue();
 	    }
