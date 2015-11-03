@@ -138,6 +138,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
@@ -148,15 +149,14 @@
 			$(".tablesorter").tablesorter({
 				theme: 'blue',
 			    widthFixed: true,
-			    widgets: ['zebra'],
-		        headers: { 
-		            1: { 
-		                sorter: false 
-		            }, 
-		            2: {
-		                sorter: false 
-		            } 
-		        } 
+				widgets: ["zebra", "filter"],
+				headers: { 1: { filter: false }, 2: { filter: false, sorter: false } },
+			    widgetOptions : {
+			        // include column filters
+			        filter_columnFilters: true,
+		    	    filter_placeholder: { search : '<fmt:message key="label.search"/>' },
+		    	    filter_searchDelay: 700
+		      	}
 			});
 			
 			$(".tablesorter").each(function() {
@@ -169,7 +169,7 @@
 				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
 				      // the filterList to the url into an "fcol" array.
 				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
-					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
+					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&{filterList:fcol}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],
