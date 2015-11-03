@@ -166,6 +166,7 @@
 			initTabs();
 			initLessonTab();
 			initSequenceTab();
+			initLearnersTab();
 			refreshMonitor();
 		});
 	</script>
@@ -447,13 +448,7 @@
 				</td>
 				<td id="learnersSearchPhraseCell" class="learnersHeaderCell">
 					<fmt:message key='learners.search.phrase' /><br />
-					<input id="learnersSearchPhrase"
-					       title="<fmt:message key='learners.search.phrase.tooltip' />"
-					/>
-					<img src="<lams:LAMSURL/>images/css/accept.png"
-					     onClick="javascript:learnersRunSearchPhrase()"
-					     title="<fmt:message key='learners.search.phrase.go.tooltip' />"
-					/>
+					<input id="learnersSearchPhrase" />
 					<img src="<lams:LAMSURL/>images/css/delete.png"
 						 onClick="javascript:learnersClearSearchPhrase()"
 						 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
