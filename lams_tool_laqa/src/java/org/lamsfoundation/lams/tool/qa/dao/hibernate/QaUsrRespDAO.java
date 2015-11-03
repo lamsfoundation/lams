@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -38,8 +37,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     
-    private static Logger logger = Logger.getLogger(QaUsrRespDAO.class.getName());
-
     private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION = "from qaUsrResp in class QaUsrResp "
 	    + " where qaUsrResp.qaQueUser.queUsrId=:queUsrId and qaUsrResp.qaQuestion.uid=:questionId";
 
@@ -51,22 +48,22 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    + " AND qaUsrResp.qaQueUser.fullname LIKE CONCAT('%', :searchString, '%') "
 	    + " order by ";
 
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING = "select resp.*, avg(rating.rating) avg_rating"
-	    + " from tl_laqa11_usr_resp resp"
-	    + " inner join tl_laqa11_que_usr usr"
-	    + " on resp.qa_que_content_id = :questionId and resp.que_usr_id = usr.uid "
-	    + " and usr.que_usr_id!=:excludeUserId "
-	    + " inner join tl_laqa11_session sess "
-	    + " on usr.qa_session_id = sess.uid and sess.qa_session_id = :qaSessionId "
-	    + " and usr.fullname LIKE CONCAT('%', :searchString, '%')"
-	    + " left join ("
-	    + " 	select rat.item_id, rat.rating from lams_rating rat"
-	    + "         inner join lams_rating_criteria crit"
-	    + " 	on rat.rating_criteria_id = crit.rating_criteria_id and crit.tool_content_id = :toolContentId"
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING = "SELECT resp.*, AVG(rating.rating) avg_rating"
+	    + " FROM tl_laqa11_usr_resp resp"
+	    + " JOIN tl_laqa11_que_usr usr"
+	    + " ON resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
+	    + " AND usr.que_usr_id!=:excludeUserId "
+	    + " JOIN tl_laqa11_session sess "
+	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId "
+	    + " AND usr.fullname LIKE CONCAT('%', :searchString, '%')"
+	    + " LEFT JOIN ("
+	    + " 	SELECT rat.item_id, rat.rating FROM lams_rating rat"
+	    + "         JOIN lams_rating_criteria crit"
+	    + " 	ON rat.rating_criteria_id = crit.rating_criteria_id AND crit.tool_content_id = :toolContentId"
 	    + " 	) rating"
-	    + " on rating.item_id = resp.response_id"
-	    + " group by response_id"
-	    + " order by";
+	    + " ON rating.item_id = resp.response_id"
+	    + " GROUP BY response_id"
+	    + " ORDER BY ";
 	    
     private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
@@ -118,10 +115,11 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue()).list();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId, final Long excludeUserId,
 	    int page, int size, int sorting, String searchString) {
-	String sortingOrder = " resp.attempt_time"; // default if we get an unexpected sort order
+	String sortingOrder;
 	boolean useAverageRatingSort = false;
 	switch (sorting) {
 	case QaAppConstants.SORT_BY_NO:
@@ -147,6 +145,8 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    sortingOrder = " avg_rating DESC";
 	    useAverageRatingSort = true;
 	    break;
+	default: 
+	    sortingOrder = " resp.attempt_time"; // default if we get an unexpected sort order    
 	}
 
 	Query query = null;
