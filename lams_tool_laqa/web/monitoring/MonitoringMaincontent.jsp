@@ -144,6 +144,8 @@
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
 	
+		var POSTED_BY_LABEL = '<fmt:message key="label.posted.by"><fmt:param>{0}</fmt:param><fmt:param>{1}</fmt:param></fmt:message>';
+	
 	  	$(document).ready(function(){
 		    
 			$(".tablesorter").tablesorter({
@@ -241,8 +243,14 @@
 										if (userData.comments) {
 											for (j = 0; j < userData.comments.length; j++){
 												var comment = userData.comments[j];
+												
+												var postedBy = POSTED_BY_LABEL.replace("{0}", comment.userFullName).replace("{1}", comment.postedDate);
+												
 												rows += '<div class="rating-comment">';
-												rows += 	comment;
+												rows += 	comment.comment;
+												rows += 	'<div class="rating-comment-posted-by">';
+												rows += 		postedBy;
+												rows += 	'</div>';
 												rows += '</div>';
 											}
 										}

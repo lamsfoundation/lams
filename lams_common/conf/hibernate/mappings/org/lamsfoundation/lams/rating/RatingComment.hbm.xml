@@ -63,6 +63,15 @@
             insert="true"
             column="comment"
         />
+        
+		<property 
+			name="postedDate" 
+			type="java.sql.Timestamp" 
+			column="posted_date" 
+			not-null="true" 
+			length="19">    
+		</property>
+        
 
         <!--
             To add non XDoclet property mappings, create a file named
