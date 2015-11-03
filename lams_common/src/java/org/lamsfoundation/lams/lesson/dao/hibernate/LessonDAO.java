@@ -65,10 +65,9 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + " where organisation.organisationId=? and lessonStateId <= 6";
     private final static String LESSON_BY_SESSION_ID = "select lesson from Lesson lesson, ToolSession session where "
 	    + "session.lesson=lesson and session.toolSessionId=:toolSessionID";
-    private final static String COUNT_LEARNERS_CLASS = "SELECT COUNT(*) FROM lams_lesson AS lesson "
-	    + "JOIN lams_grouping AS grouping ON lesson.class_grouping_id = grouping.grouping_id "
-	    + "JOIN lams_group AS gr USING (grouping_id) JOIN lams_user_group AS ug USING (group_id) "
-	    + "WHERE lesson_id = :lessonId";
+    private final static String COUNT_LEARNERS_CLASS = "SELECT COUNT(*) FROM Lesson AS lesson "
+	    + "INNER JOIN lesson.lessonClass AS lessonClass INNER JOIN lessonClass.groups AS groups "
+	    + "INNER JOIN groups.users AS users" + " WHERE lesson.id = :lessonId";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -169,8 +168,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     @Override
     public Integer getCountLearnerByLesson(final long lessonId) {
-	Query query = getSession().createSQLQuery(LessonDAO.COUNT_LEARNERS_CLASS);
-	query.setLong("lessonId", lessonId);
+	Query query = getSession().createQuery(LessonDAO.COUNT_LEARNERS_CLASS).setLong("lessonId", lessonId);
 	Object value = query.uniqueResult();
 	return ((Number) value).intValue();
     }

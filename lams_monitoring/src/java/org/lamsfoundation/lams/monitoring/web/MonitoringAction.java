@@ -1241,7 +1241,31 @@ public class MonitoringAction extends LamsDispatchAction {
 	response.getWriter().write(responseJSON.toString());
 
 	return null;
+    }
 
+    /**
+     * Gives suggestions when a Monitor searches for a Learner in Learners tab.
+     */
+    public ActionForward autocompleteMonitoringLearners(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	String searchPhrase = request.getParameter("term");
+
+	List<User> learners = getMonitoringService().getLearnersFromProgress(lessonId, searchPhrase, false, 10, null);
+	JSONArray responseJSON = new JSONArray();
+	for (User learner : learners) {
+	    JSONObject learnerJSON = new JSONObject();
+	    String fullName = learner.getFirstName() + " " + learner.getLastName() + " ";
+	    // it looks better with the braces
+	    learnerJSON.put("label", fullName + "(" + learner.getLogin() + ")");
+	    // it requires no braces for proper search
+	    learnerJSON.put("value", fullName + learner.getLogin());
+	    responseJSON.put(learnerJSON);
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(responseJSON);
+	return null;
     }
 
     /**

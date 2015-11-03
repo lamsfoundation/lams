@@ -29,8 +29,6 @@ var originalSequenceCanvas = null,
 	numberActiveLearners = 0,
 // page in Learners tab
 	learnerProgressCurrentPageNumber = 1,
-// search phrase in Learners tab
-	learnersSearchPhrase = null,
 
 //auto refresh all tabs every 30 seconds
 	autoRefreshInterval = 30 * 1000,
@@ -1502,6 +1500,28 @@ function resizeSequenceCanvas(width, height){
 //********** LEARNERS TAB FUNCTIONS **********
 
 /**
+ * Inits Learners tab widgets.
+ */
+function initLearnersTab() {
+	// search for users with the term the Monitor entered
+	$("#learnersSearchPhrase").autocomplete( {
+		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocompleteMonitoringLearners&lessonID=" + lessonId,
+		'delay'  : 700,
+		'select' : function(event, ui){
+			loadLearnerProgressPage(1, ui.item.value);
+		}
+	})
+	// run the real search when the Monitor presses Enter
+	.keypress(function(e){
+		if (e.which == 13) {
+			$(this).autocomplete("close");
+			loadLearnerProgressPage(1);
+		}
+	});
+}
+
+
+/**
  * Handler for shift page numbers bar.
  */
 function learnersPageShift(increment){
@@ -1555,9 +1575,9 @@ function shiftLearnerProgressPageHeader(startIndex, endIndex) {
  * After page change, refresh values in the control bar.
  */
 function updateLearnerProgressHeader(pageNumber) {
-	var controlRow = $('#tabLearnerControlTable tr');
-	if (numberActiveLearners < 10 
-			&& (!learnersSearchPhrase || learnersSearchPhrase == '')) {
+	var controlRow = $('#tabLearnerControlTable tr'),
+		learnersSearchPhrase = $('#learnersSearchPhrase').val();
+	if (numberActiveLearners < 10 && (!learnersSearchPhrase || learnersSearchPhrase.trim() == '')) {
 		// do not show the bar at all
 		$('.learnersHeaderCell', controlRow).hide();
 		return;
@@ -1589,7 +1609,7 @@ function updateLearnerProgressHeader(pageNumber) {
 /**
  * Load the give page of learners' progress.
  */
-function loadLearnerProgressPage(pageNumber){
+function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 	// prevent double refresh at the same time
 	if (learnersRefreshInProgress) {
 		return;
@@ -1612,12 +1632,6 @@ function loadLearnerProgressPage(pageNumber){
 		}
 
 		learnerProgressCellsTemplate +=
-		/* + <a class="button" title="'
-		+ LABELS.TIME_CHART_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
-		+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
-		+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
-		+ LABELS.TIME_CHART 
-		+ '</a>'*/
 			'<a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'
 		+ LABELS.EMAIL_BUTTON
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
@@ -1629,6 +1643,11 @@ function loadLearnerProgressPage(pageNumber){
 	var isProgressSorted = $('#orderByCompletionCheckbox:checked').length > 0;
 	// either go to the given page or refresh the current one
 	pageNumber = pageNumber || learnerProgressCurrentPageNumber;
+	// either get the phrase for the parameter or check what was entered in the box
+	learnersSearchPhrase = learnersSearchPhrase || $('#learnersSearchPhrase').val();
+	if (learnersSearchPhrase && learnersSearchPhrase.trim() == ''){
+		learnersSearchPhrase = null;
+	}
 	
 	$.ajax({
 		dataType : 'json',
@@ -1692,36 +1711,11 @@ function updateLearnersTab(){
 
 
 /**
- * Run search for the phrase which user provided in text field.
- */
-function learnersRunSearchPhrase(){
-	var searchPhraseField = $('#learnersSearchPhrase');
-	learnersSearchPhrase = searchPhraseField.val();
-	if (learnersSearchPhrase && learnersSearchPhrase.trim() != '') {
-		var pageNumber = parseInt(learnersSearchPhrase);
-		// must be a positive integer
-		if (isNaN(pageNumber) || !isFinite(pageNumber) || pageNumber < 0){
-			// if it was not a number, run a normal search
-			loadLearnerProgressPage(1);
-		} else {
-			// it was a number, reset the field and go to the given page
-			learnersSearchPhrase = null;
-			searchPhraseField.val(null);
-			loadLearnerProgressPage(pageNumber);
-		}
-	} else {
-		learnersSearchPhrase = null;
-	}
-}
-
-
-/**
  * Clears previous run search for phrase.
  */
 function learnersClearSearchPhrase(){
-	learnersSearchPhrase = null;
-	$('#learnersSearchPhrase').val(null);
-	loadLearnerProgressPage(1);
+	$('#learnersSearchPhrase').val('').autocomplete("close");
+	loadLearnerProgressPage(1, '');
 }
 
 //********** COMMON FUNCTIONS **********
