@@ -65,7 +65,7 @@ CKEDITOR.config.templates = CKEDITOR.basePath + '../www/htmltemplates.xml';
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'kaltura,wikilink,jlatexmath,paint,movieplayer,iframe,lineutils,widget,oembed';
+CKEDITOR.config.extraPlugins = 'kaltura,wikilink,jlatexmath,paint,iframe,lineutils,widget,oembed';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
