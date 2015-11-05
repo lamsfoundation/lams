@@ -11,6 +11,8 @@ var originalSequenceCanvas = null,
 	sequenceBranchingId = null,
 // info box show timeout
 	sequenceInfoTimeout = 10000,
+// which learner was selected in the search box
+	sequenceSearchedLearner = null,
 // how learners in pop up lists are currently sorted
 	sortOrderAsc = {
 		learnerGroup : false,
@@ -638,8 +640,8 @@ function initSequenceTab(){
 			            		// make sure there is only one selected learner
 			            		if (selectedLearner.length == 1) {
 			            			// go to "force complete" mode, similar to draggin user to an activity
-			            			var activityId = $(this).dialog('option', 'activityId');
-			            			var dropArea = sequenceCanvas.add('#completedLearnersContainer');
+			            			var activityId = $(this).dialog('option', 'activityId'),
+			            				dropArea = sequenceCanvas.add('#completedLearnersContainer');
 			            			dropArea.css('cursor', 'url('
 			            					+ LAMS_URL + 'images/icons/user.png),pointer')
 			            				.one('click', function(event) {
@@ -755,6 +757,20 @@ function initSequenceTab(){
 		             }
 		]
 	});
+	
+	// search for users with the term the Monitor entered
+	$("#sequenceSearchPhrase").autocomplete( {
+		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocompleteMonitoringLearners&lessonID=" + lessonId,
+		'delay'  : 700,
+		'select' : function(event, ui){
+			// put the learner first name, last name and login into the box
+			$(this).val(ui.item.label);
+			// mark the learner's ID and make him highlighted after the refresh
+			sequenceSearchedLearner = ui.item.value;
+			updateSequenceTab();
+			return false;
+		}
+	});
 }
 	
 
@@ -823,7 +839,8 @@ function updateSequenceTab() {
 			'method'    : 'getLessonProgress',
 			'lessonID'  : lessonId,
 			'branchingActivityID' : sequenceBranchingId,
-			'getTransitions' : sequenceCanvasFirstFetch
+			'getTransitions' : sequenceCanvasFirstFetch,
+			'searchedLearnerId' : sequenceSearchedLearner
 		},		
 		success : function(response) {
 			if (sequenceCanvasFirstFetch) {
@@ -909,7 +926,7 @@ function updateSequenceTab() {
 					activityGroup.css('cursor', 'pointer');
 					dblTap(activityGroup, dblClickFunction);
 				}
-			});	
+			});
 			
 			sequenceRefreshInProgress = false;
 		}
@@ -1107,7 +1124,8 @@ function addActivityIcons(activity) {
 							'y'          : coord.y,
 							'height'     : 16,
 							'width'      : 16,
-							'xlink:href' : LAMS_URL + 'images/icons/user.png',
+							'xlink:href' : LAMS_URL + 'images/icons/' 
+										   + (learner.id == sequenceSearchedLearner ? 'user_online.png' : 'user.png'),
 							'style'		 : 'cursor : pointer'
 						}, null, appendTarget);
 					appendXMLElement('title', null, learnerDisplayName, element);
@@ -1176,6 +1194,13 @@ function addActivityIconsHandlers(activity) {
 					openPopUp(url, "LearnActivity", 600, 800, true);
 				});
 			}
+			
+			if (learner.id == sequenceSearchedLearner){
+				// do it here instead of addActivityIcons()
+				// as in that method the icons are added to the document yet
+				// and they have no offset for calculations
+				highlightSearchedLearner(learnerIcon);
+			}
 		});
 	}
 	
@@ -1213,10 +1238,12 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
 			// make an icon for each learner
-			$('<img />').attr({
-				'src' : LAMS_URL + 'images/icons/user.png',
+			var icon = $('<img />').attr({
+				'src' : LAMS_URL + 'images/icons/' 
+				   		+ (learner.id == sequenceSearchedLearner ? 'user_online.png' : 'user.png'),
+				'style'		 : 'cursor : pointer',
 				'title'      : getLearnerDisplayName(learner)
-			}).css('cursor', 'pointer')
+			})
 			// drag learners to force complete activities
 			  .draggable({
 				'appendTo'    : '#tabSequence',
@@ -1238,6 +1265,10 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 				}
 			})
 			.appendTo(iconsContainer);
+			
+			if (learner.id == sequenceSearchedLearner){
+				highlightSearchedLearner(icon);
+			}
 		});
 		
 		// show a group icon
@@ -1310,6 +1341,50 @@ function getActivityCoordinates(activity){
 			}
 		}
 	}
+}
+
+
+/**
+ * Shows where the searched learner is.
+ */
+function highlightSearchedLearner(icon) {
+	// show the "clear" button
+	$('#sequenceSearchPhraseClear').css('visibility', 'visible');
+	
+	var highlighter = $('#sequenceSearchedLearnerHighlighter').offset({
+			'top'  : icon.offset().top - 25,
+			'left' : icon.offset().left - 4
+		});
+	
+	// blink only after the search, not after subsequent refreshes
+	if (!highlighter.is(':visible')) {
+		highlighter.show();
+		toggleInterval = setInterval(function(){
+			highlighter.toggle();
+		}, 500);
+		
+		setTimeout(function(){
+			clearInterval(toggleInterval);
+			// make sure that search box was not cleared during blinking
+			if (sequenceSearchedLearner) {
+				highlighter.show();
+			} else {
+				highlighter.hide();
+			}
+		}, 3000);
+	}
+}
+
+
+/**
+ * Cancels the performed search.
+ */
+function sequenceClearSearchPhrase(){
+	$('#sequenceSearchPhrase').val('');
+	$('#sequenceSearchPhraseClear').css('visibility', 'hidden');
+	$('#sequenceSearchedLearnerHighlighter').hide();
+	sequenceSearchedLearner = null;
+	updateSequenceTab();
 }
 
 
@@ -1502,6 +1577,7 @@ function resizeSequenceCanvas(width, height){
 		});
 }
 
+
 //********** LEARNERS TAB FUNCTIONS **********
 
 /**
@@ -1513,7 +1589,10 @@ function initLearnersTab() {
 		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocompleteMonitoringLearners&lessonID=" + lessonId,
 		'delay'  : 700,
 		'select' : function(event, ui){
-			loadLearnerProgressPage(1, ui.item.value);
+		    // learner's ID in ui.item.value is not used here
+			$(this).val(ui.item.label);
+			loadLearnerProgressPage(1, ui.item.label);
+			return false;
 		}
 	})
 	// run the real search when the Monitor presses Enter
@@ -1648,7 +1727,6 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 	var isProgressSorted = $('#orderByCompletionCheckbox:checked').length > 0;
 	// either go to the given page or refresh the current one
 	pageNumber = pageNumber || learnerProgressCurrentPageNumber;
-	// either get the phrase for the parameter or check what was entered in the box
 	learnersSearchPhrase = learnersSearchPhrase || $('#learnersSearchPhrase').val();
 	if (learnersSearchPhrase && learnersSearchPhrase.trim() == ''){
 		learnersSearchPhrase = null;
@@ -1697,7 +1775,6 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 
 }
 
-
 /**
  * Refreshes the existing progress bars. 
  */
@@ -1713,6 +1790,7 @@ function updateLearnersTab(){
 	}
 	learnersRefreshInProgress = false;
 }
+
 
 /**
  * Clears previous run search for phrase.
