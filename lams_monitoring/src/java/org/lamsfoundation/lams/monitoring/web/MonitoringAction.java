@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -65,6 +66,7 @@ import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -1054,6 +1056,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    return null;
 	}
 	Long branchingActivityId = WebUtil.readLongParam(request, "branchingActivityID", true);
+	Integer searchedLearnerId = WebUtil.readIntParam(request, "searchedLearnerId", true);
 
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
@@ -1125,6 +1128,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
 	}
 
+	// check if the searched learner has started the lesson
+	LearnerProgress searchedLearnerProgress = null;
+	if (searchedLearnerId != null) {
+	    searchedLearnerProgress = getLessonService().getUserProgressForLesson(searchedLearnerId, lessonId);
+	}
+
 	JSONArray activitiesJSON = new JSONArray();
 	for (Activity activity : activities) {
 	    Long activityId = activity.getActivityId();
@@ -1190,6 +1199,14 @@ public class MonitoringAction extends LamsDispatchAction {
 		    learnerCount = getMonitoringService().getCountLearnersCurrentActivity(activity);
 		}
 
+		if ((searchedLearnerProgress != null) && (searchedLearnerProgress.getCurrentActivity() != null)
+			&& activity.getActivityId()
+				.equals(searchedLearnerProgress.getCurrentActivity().getActivityId())) {
+		    // put the searched learner in front
+		    latestLearners = MonitoringAction.insertSearchedLearner(searchedLearnerProgress.getUser(),
+			    latestLearners, MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT);
+		}
+
 		// parse learners into JSON format
 		if (!latestLearners.isEmpty()) {
 		    JSONArray learnersJSON = new JSONArray();
@@ -1209,11 +1226,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	// find learners who completed the lesson
 	List<User> completedLearners = getMonitoringService().getLearnersLatestCompleted(lessonId,
 		MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT, null);
-	for (User learner : completedLearners) {
-	    JSONObject learnerJSON = WebUtil.userToJSON(learner);
-	    // no more details are needed for learners who completed the lesson
-	    responseJSON.append("completedLearners", learnerJSON);
-	}
 	Integer completedLearnerCount = null;
 	if (completedLearners.size() < MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT) {
 	    completedLearnerCount = completedLearners.size();
@@ -1221,6 +1233,18 @@ public class MonitoringAction extends LamsDispatchAction {
 	    completedLearnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
 	}
 	responseJSON.put("completedLearnerCount", completedLearnerCount);
+
+	if ((searchedLearnerProgress != null) && searchedLearnerProgress.isComplete()) {
+	    // put the searched learner in front
+	    completedLearners = MonitoringAction.insertSearchedLearner(searchedLearnerProgress.getUser(),
+		    completedLearners, MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT);
+	}
+	for (User learner : completedLearners) {
+	    JSONObject learnerJSON = WebUtil.userToJSON(learner);
+	    // no more details are needed for learners who completed the lesson
+	    responseJSON.append("completedLearners", learnerJSON);
+	}
+
 	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId));
 
 	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
@@ -1244,7 +1268,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Gives suggestions when a Monitor searches for a Learner in Learners tab.
+     * Gives suggestions when a Monitor searches for a Learner in Sequence and Learners tabs.
      */
     public ActionForward autocompleteMonitoringLearners(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1255,11 +1279,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	JSONArray responseJSON = new JSONArray();
 	for (User learner : learners) {
 	    JSONObject learnerJSON = new JSONObject();
-	    String fullName = learner.getFirstName() + " " + learner.getLastName() + " ";
-	    // it looks better with the braces
-	    learnerJSON.put("label", fullName + "(" + learner.getLogin() + ")");
-	    // it requires no braces for proper search
-	    learnerJSON.put("value", fullName + learner.getLogin());
+	    learnerJSON.put("label", learner.getFirstName() + " " + learner.getLastName() + " " + learner.getLogin());
+	    learnerJSON.put("value", learner.getUserId());
+
 	    responseJSON.put(learnerJSON);
 	}
 
@@ -1622,5 +1644,19 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 	return result;
+    }
+
+    
+    /**
+     * Puts the searched learner in front of other learners in the list. 
+     */
+    private static List<User> insertSearchedLearner(User searchedLearner, List<User> latestLearners, int limit) {
+	latestLearners.remove(searchedLearner);
+	LinkedList<User> updatedLatestLearners = new LinkedList<User>(latestLearners);
+	updatedLatestLearners.addFirst(searchedLearner);
+	if (updatedLatestLearners.size() > limit) {
+	    updatedLatestLearners.removeLast();
+	}
+	return updatedLatestLearners;
     }
 }
