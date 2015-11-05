@@ -411,10 +411,10 @@
 				<fmt:message key="button.refresh"/>
 			</a>
 			<c:if test="${enableExportPortfolio}">
-			<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
-			   href="#"
-			   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
-					<fmt:message key="button.export"/>
+				<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
+				   href="#"
+				   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
+						<fmt:message key="button.export"/>
 				</a>
 			</c:if>
 			<c:if test="${enableLiveEdit && lesson.liveEditEnabled}">
@@ -430,6 +430,13 @@
 			  onClick="javascript:closeBranchingSequence()">
 				<fmt:message key='button.close.branching'/>
 			</a>
+			<img id="sequenceSearchPhraseClear"
+				 src="<lams:LAMSURL/>images/css/delete.png"
+				 onClick="javascript:sequenceClearSearchPhrase()"
+				 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
+			/>
+			<input id="sequenceSearchPhrase" />
+			<span id="sequenceSearchPhraseLabel"><fmt:message key='search.learner.textbox' /></span>
 		</div>
 		<div id="sequenceCanvas"></div>
 		<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
@@ -437,6 +444,8 @@
 		</div>
 		<img id="sequenceCanvasLoading"
 		     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+		<img id="sequenceSearchedLearnerHighlighter"
+		     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
 	</div>
 	
 	<div id="tabLearners">
@@ -447,7 +456,7 @@
 					<span id="learnersPageCounter" />
 				</td>
 				<td id="learnersSearchPhraseCell" class="learnersHeaderCell">
-					<fmt:message key='learners.search.phrase' /><br />
+					<fmt:message key='search.learner.textbox' /><br />
 					<input id="learnersSearchPhrase" />
 					<img src="<lams:LAMSURL/>images/css/delete.png"
 						 onClick="javascript:learnersClearSearchPhrase()"

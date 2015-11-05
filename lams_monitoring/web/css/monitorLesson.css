@@ -191,6 +191,28 @@ img#sequenceCanvasLoading {
 	display: none;
 }
 
+.topButtonsContainer #sequenceSearchPhrase {
+	float: right;
+	margin: 6px 5px 5px 0;
+}
+
+.topButtonsContainer #sequenceSearchPhraseLabel {
+	float: right;
+	margin: 9px 7px 5px 0;
+}
+
+.topButtonsContainer #sequenceSearchPhraseClear {
+	float: right;
+	cursor: pointer;
+	margin: 9px 25px 5px 0;
+	visibility: hidden;
+}
+
+img#sequenceSearchedLearnerHighlighter {
+	position: absolute;
+	display: none;
+}
+
 div#completedLearnersContainer {
 	padding: 4px 0px 3px 5px;
 	border-top: thin dotted #2E6E9E;
