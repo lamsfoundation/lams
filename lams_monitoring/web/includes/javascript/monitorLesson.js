@@ -1125,7 +1125,7 @@ function addActivityIcons(activity) {
 							'height'     : 16,
 							'width'      : 16,
 							'xlink:href' : LAMS_URL + 'images/icons/' 
-										   + (learner.id == sequenceSearchedLearner ? 'user_online.png' : 'user.png'),
+										   + (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
 							'style'		 : 'cursor : pointer'
 						}, null, appendTarget);
 					appendXMLElement('title', null, learnerDisplayName, element);
@@ -1240,7 +1240,7 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 			// make an icon for each learner
 			var icon = $('<img />').attr({
 				'src' : LAMS_URL + 'images/icons/' 
-				   		+ (learner.id == sequenceSearchedLearner ? 'user_online.png' : 'user.png'),
+				   		+ (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
 				'style'		 : 'cursor : pointer',
 				'title'      : getLearnerDisplayName(learner)
 			})
@@ -1351,21 +1351,24 @@ function highlightSearchedLearner(icon) {
 	// show the "clear" button
 	$('#sequenceSearchPhraseClear').css('visibility', 'visible');
 	
-	var highlighter = $('#sequenceSearchedLearnerHighlighter').offset({
+	
+	var highlighter = $('#sequenceSearchedLearnerHighlighter'),
+		isVisible = highlighter.is(':visible');
+	
+	highlighter.show().offset({
 			'top'  : icon.offset().top - 25,
 			'left' : icon.offset().left - 4
 		});
 	
 	// blink only after the search, not after subsequent refreshes
-	if (!highlighter.is(':visible')) {
-		highlighter.show();
+	if (!isVisible) {
 		toggleInterval = setInterval(function(){
 			highlighter.toggle();
 		}, 500);
 		
 		setTimeout(function(){
 			clearInterval(toggleInterval);
-			// make sure that search box was not cleared during blinking
+			//if the search box was cleared during blinking, act accordingly
 			if (sequenceSearchedLearner) {
 				highlighter.show();
 			} else {
