@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -43,38 +45,11 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION = "from qaUsrResp in class QaUsrResp "
 	    + " where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId and qaUsrResp.qaQuestion.uid=:questionId";
 
-    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH = "from qaUsrResp in class QaUsrResp "
-	    + " where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId "
-	    + " AND qaUsrResp.qaQueUser.fullname LIKE CONCAT('%', :searchString, '%') "
-	    + " order by ";
-
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING = "SELECT resp.*, AVG(rating.rating) avg_rating"
-	    + " FROM tl_laqa11_usr_resp resp"
-	    + " JOIN tl_laqa11_que_usr usr"
-	    + " ON resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
-	    + " AND usr.que_usr_id!=:excludeUserId "
-	    + " JOIN tl_laqa11_session sess "
-	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId "
-	    + " AND usr.fullname LIKE CONCAT('%', :searchString, '%')"
-	    + " LEFT JOIN ("
-	    + " 	SELECT rat.item_id, rat.rating FROM lams_rating rat"
-	    + "         JOIN lams_rating_criteria crit"
-	    + " 	ON rat.rating_criteria_id = crit.rating_criteria_id AND crit.tool_content_id = :toolContentId"
-	    + " 	) rating"
-	    + " ON rating.item_id = resp.response_id"
-	    + " GROUP BY response_id"
-	    + " ORDER BY ";
-	    
     private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qaQuestion.displayOrder asc";
 
     private static final String GET_COUNT_RESPONSES_BY_QACONTENT = "SELECT COUNT(*) from " + QaUsrResp.class.getName()
 	    + " as r where r.qaQuestion.qaContent.qaContentId=?";
-
-    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH = "SELECT COUNT(*) from "
-	    + QaUsrResp.class.getName()
-	    + " as r where r.qaQueUser.qaSession.qaSessionId=? and r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?"
-	    + " and r.qaQueUser.fullname LIKE CONCAT('%', ?, '%') ";
 
     public void createUserResponse(QaUsrResp qaUsrResp) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
@@ -115,6 +90,46 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue()).list();
     }
 
+    private String buildNameSearch(String searchString, String userRef) {
+ 	String filteredSearchString = null;
+ 	if (!StringUtils.isBlank(searchString)) {
+ 	    StringBuilder searchStringBuilder = new StringBuilder("");
+ 	    String[] tokens = searchString.trim().split("\\s+");
+	    for (String token : tokens) {
+		String escToken = StringEscapeUtils.escapeSql(token);
+ 		searchStringBuilder.append(" AND ("+userRef+".fullname LIKE '%").append(escToken)
+ 			.append("%' OR "+userRef+".username LIKE '%").append(escToken).append("%') ");
+ 	    }
+ 	    filteredSearchString = searchStringBuilder.toString();
+ 	}
+ 	return filteredSearchString;
+     } 
+
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING1 = 
+	"SELECT resp.*, AVG(rating.rating) avg_rating"
+	    + " FROM tl_laqa11_usr_resp resp"
+	    + " JOIN tl_laqa11_que_usr usr"
+	    + " ON resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
+	    + " AND usr.que_usr_id!=:excludeUserId "
+	    + " JOIN tl_laqa11_session sess "
+	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId ";
+    
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING2 =    
+	      " LEFT JOIN ("
+	    + " 	SELECT rat.item_id, rat.rating FROM lams_rating rat"
+	    + "         JOIN lams_rating_criteria crit"
+	    + " 	ON rat.rating_criteria_id = crit.rating_criteria_id AND crit.tool_content_id = :toolContentId"
+	    + " 	) rating"
+	    + " ON rating.item_id = resp.response_id"
+	    + " GROUP BY response_id"
+	    + " ORDER BY ";
+	    
+
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH1 = "from qaUsrResp in class QaUsrResp "
+	    + " where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId ";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2 = " order by ";
+
+
     @SuppressWarnings("unchecked")
     @Override
     public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId, final Long excludeUserId,
@@ -151,24 +166,37 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 
 	Query query = null;
 	
+	// Build the query based on the type of sorting, pasting the username/fullname lookup in the middle of the SQL/HQL if searchString exists
+	// One query is SQL, so uses the user reference "usr", the other uses HQL so it uses "qaUsrResp.qaQueUser" to reference the username/fullname.
 	if ( useAverageRatingSort ) {
-	    query = getSession()
-		    .createSQLQuery(SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING+sortingOrder).addEntity(QaUsrResp.class)
+
+	    String filteredSearchString = buildNameSearch(searchString, "usr");
+	    String queryText = SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING1
+		    + ( filteredSearchString != null ? filteredSearchString : "" )
+		    + SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING2
+		    +sortingOrder;
+
+	    query = getSession().createSQLQuery(queryText).addEntity(QaUsrResp.class)
 		    .setLong("toolContentId", toolContentId.longValue());
+
 	} else {
-	    query = getSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH+sortingOrder);
+	    String filteredSearchString = buildNameSearch(searchString, "qaUsrResp.qaQueUser");
+	    String queryText = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH1
+		    + ( filteredSearchString != null ? filteredSearchString : "" )
+		    + LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2
+		    +sortingOrder;
+
+	    query = getSession().createQuery(queryText);
 	}
-	
+
+	// now set all the common parts of the query and return the value.
 	query.setLong("questionId", questionId.longValue());
 	query.setLong("qaSessionId", qaSessionId.longValue());
 	query.setLong("excludeUserId", excludeUserId.longValue());
 
-	// support for custom search from a toolbar
-	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
-
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
+	
 	return query.list();
     }
 
@@ -188,11 +216,19 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	return ((Number) list.get(0)).intValue();
     }
 
+    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH = "SELECT COUNT(*) from "
+	    + QaUsrResp.class.getName()
+	    + " as r where r.qaQueUser.qaSession.qaSessionId=? and r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?";
+    
     public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId, String searchString) {
 
-	String filter = searchString != null ? searchString.trim() : "";
-	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH,
-			new Object[] { qaSessionId, questionId, excludeUserId, filter });
+	String filteredSearchString = buildNameSearch(searchString, "r.qaQueUser");
+	String queryText = GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH;
+	if ( filteredSearchString != null )
+	    queryText += filteredSearchString;
+
+	List list = getHibernateTemplate().find(queryText,
+			new Object[] { qaSessionId, questionId, excludeUserId});
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
