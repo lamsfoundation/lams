@@ -271,8 +271,8 @@ ActivityDraw = {
 	branching : function(x, y) {
 		if (x == undefined || y == undefined) {
 			// just redraw the activity
-			x = this.items.getBBox().x;
-			y = this.items.getBBox().y;
+			x = this.items.shape.getBBox().x;
+			y = this.items.shape.getBBox().y;
 		}
 		
 		if (this.items) {
@@ -1057,7 +1057,8 @@ ActivityLib = {
 		if (!(activity instanceof ActivityDefs.OptionalActivity || activity instanceof ActivityDefs.FloatingActivity)) {
 			// check if it was removed from an Optional or Floating Activity
 			if (activity.parentActivity && activity.parentActivity instanceof DecorationDefs.Container) {
-				var childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
+				var existingChildActivities = activity.parentActivity.childActivities,
+					childActivities = DecorationLib.getChildActivities(activity.parentActivity.items.shape);
 				if ($.inArray(activity, childActivities) == -1) {
 					activity.parentActivity.draw();
 					ActivityLib.redrawTransitions(activity.parentActivity);
@@ -1087,7 +1088,6 @@ ActivityLib = {
 					return false;
 				}
 				
-				if ($.inArray(activity, container.childActivities) == -1) {
 					$.each(activity.transitions.from, function(){
 						ActivityLib.removeTransition(this);
 					});
@@ -1098,12 +1098,16 @@ ActivityLib = {
 					// for properties dialog to reload
 					ActivityLib.removeSelectEffect(container);
 					
-					container.childActivities.push(activity);
+				// check if the activity is already detected by the container
+				// if not, add it manually
+				var childActivities = DecorationLib.getChildActivities(container.items.shape);
+				if ($.inArray(activity, container.childActivities) == -1) {
+					childActivities.push(activity);
+				}
 					container.draw(null, null, null, null, childActivities);
 					ActivityLib.redrawTransitions(container);
 				}
 			}
-		}
 		
 		ActivityLib.redrawTransitions(activity);
 		
@@ -1366,7 +1370,7 @@ ActivityLib = {
 		
 		// remove child activities
 		if (activity instanceof DecorationDefs.Container) {
-			$.each(activity.childActivities, function(){
+			$.each(activity.childActivities.slice(), function(){
 				ActivityLib.removeActivity(this);
 			});
 		}
