@@ -517,13 +517,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
     
     @Override
-    public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting) {
-	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting);
+    public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
+	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString);
     }
     
     @Override
-    public int getCountUsersBySession(Long sessionId) {
-	return forumUserDao.getCountUsersBySession(sessionId);
+    public int getCountUsersBySession(Long sessionId, String searchString) {
+	return forumUserDao.getCountUsersBySession(sessionId, searchString);
     }
 
     @Override

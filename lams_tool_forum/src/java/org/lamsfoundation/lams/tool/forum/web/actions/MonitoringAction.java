@@ -255,7 +255,8 @@ public class MonitoringAction extends Action {
 	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
 	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
 	Integer isSort3 = WebUtil.readIntParam(request, "column[2]", true);
-
+	String searchString = request.getParameter("fcol[0]"); 
+	
 	int sorting = ForumConstants.SORT_BY_NO;
 	if ((isSort1 != null) && isSort1.equals(0)) {
 	    sorting = ForumConstants.SORT_BY_USER_NAME_ASC;
@@ -286,12 +287,12 @@ public class MonitoringAction extends Action {
 	}
 	Map<ForumUser, List<MessageDTO>> topicsByUser = currentSessionDto.getTopicsByUser();
 
-	List<ForumUser> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting);
+	List<ForumUser> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString);
 
 	JSONArray rows = new JSONArray();
 
 	JSONObject responcedata = new JSONObject();
-	responcedata.put("total_rows", forumService.getCountUsersBySession(sessionId));
+	responcedata.put("total_rows", forumService.getCountUsersBySession(sessionId, searchString));
 
 	for (ForumUser user : users) {
 
