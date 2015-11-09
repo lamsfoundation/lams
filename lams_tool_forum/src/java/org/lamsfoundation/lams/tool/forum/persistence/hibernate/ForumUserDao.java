@@ -27,6 +27,9 @@ package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.IForumUserDAO;
@@ -45,17 +48,6 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 
     private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + ForumUser.class.getName() + " as f "
 	    + " where f.session.sessionId=?";
-
-    private static final String SQL_QUERY_FIND_BY_SESSION_AND_QUESTION_LIMIT = "from user in class ForumUser "
-	    + "where user.session.sessionId=:sessionId order by ";
-
-    private static final String SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS = "SELECT user FROM "
-	    + Message.class.getName() + " as message " + " RIGHT JOIN message.createdBy as user "
-	    + " WHERE user.session.sessionId=:sessionId GROUP BY user.userId ORDER BY ";
-
-    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION = "SELECT COUNT(*) from "
-	    + ForumUser.class.getName() + " as user where user.session.sessionId=?";
-
 
    @Override
     public List getBySessionId(Long sessionID) {
@@ -93,7 +85,8 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
     }
     
     @Override
-    public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting) {
+    @SuppressWarnings("unchecked")
+    public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
 	String sortingOrder = "";
 	switch (sorting) {
 	case ForumConstants.SORT_BY_NO:
@@ -119,38 +112,66 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 	    break;
 	}
 
+	String filteredSearchString = buildNameSearch(searchString);
+
+	String queryText = null;
 	if (sorting == ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC
-		|| sorting == ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC) {
-
-	    List list = getSession().createQuery(SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS + sortingOrder)
-		    .setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size).list();
-	    return list;
-
-	} else if (sorting == ForumConstants.SORT_BY_LAST_POSTING_ASC
+		|| sorting == ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC
+		|| sorting == ForumConstants.SORT_BY_LAST_POSTING_ASC
 		|| sorting == ForumConstants.SORT_BY_LAST_POSTING_DESC) {
 
-	    List list = getSession().createQuery(SQL_QUERY_FIND_BY_SESSION_LIMIT_ORDER_BY_NUM_POSTS + sortingOrder)
-		    .setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size).list();
-
-	    return list;
+	    queryText = "SELECT user FROM "
+		    + Message.class.getName() + " as message " + " RIGHT JOIN message.createdBy as user "
+		    + " WHERE user.session.sessionId=:sessionId "
+		    + ( filteredSearchString != null ? filteredSearchString : "" )
+		    + " GROUP BY user.userId ORDER BY " + sortingOrder;
 
 	} else {
 
-	    return getSession().createQuery(SQL_QUERY_FIND_BY_SESSION_AND_QUESTION_LIMIT + sortingOrder)
-		    .setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size).list();
+	    queryText = "from user in class ForumUser "
+		    + "where user.session.sessionId=:sessionId " 
+		    + ( filteredSearchString != null ? filteredSearchString : "" )
+		    + " ORDER BY " + sortingOrder;
 	}
-    }
+	
+	Query query = getSession().createQuery(queryText).setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+	return query.list();
 
-    @Override
-    public int getCountUsersBySession(final Long sessionId) {
-	List list = this.doFind(GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION,
-		new Object[] { sessionId });
+    }
+    
+    private String buildNameSearch(String searchString) {
+	String filteredSearchString = null;
+	if (!StringUtils.isBlank(searchString)) {
+	    StringBuilder searchStringBuilder = new StringBuilder("");
+	    String[] tokens = searchString.trim().split("\\s+");
+	    for (String token : tokens) {
+		String escToken = StringEscapeUtils.escapeSql(token);
+		searchStringBuilder.append(" AND (user.firstName LIKE '%").append(escToken)
+			.append("%' OR user.lastName LIKE '%").append(escToken)
+			.append("%' OR user.loginName LIKE '%").append(escToken).append("%')");
+	    }
+	    filteredSearchString = searchStringBuilder.toString();
+	}
+	return filteredSearchString;
+    } 
+
+    @SuppressWarnings("rawtypes")
+    public int getCountUsersBySession(final Long sessionId, String searchString) {
+
+	String filteredSearchString = buildNameSearch(searchString);
+	String queryText = "SELECT COUNT(*) from " 
+		+ ForumUser.class.getName() 
+		+ " as user where user.session.sessionId=:sessionId ";
+	if ( filteredSearchString != null ) 
+	    queryText += filteredSearchString;
+
+	List list = getSession().createQuery(queryText).setLong("sessionId", sessionId.longValue()).list();
+
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
 	return ((Number) list.get(0)).intValue();
     }
-
     @Override
     public void delete(ForumUser user) {
 	this.delete(user);

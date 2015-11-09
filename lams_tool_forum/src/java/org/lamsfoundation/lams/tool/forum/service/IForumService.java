@@ -85,9 +85,9 @@ public interface IForumService {
      */
     Forum getForumByContentId(Long contentID) throws PersistenceException;
     
-    List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting);
+    List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
     
-    int getCountUsersBySession(Long sessionId);
+    int getCountUsersBySession(Long sessionId, String searchString);
 
     // ************************************************************************************
     // Topic Method
