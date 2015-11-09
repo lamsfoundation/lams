@@ -45,47 +45,60 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     protected Logger log = Logger.getLogger(LearnerProgressDAO.class);
 
-    private static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
+    private final static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
 
-    private static String LOAD_PROGRESS_REFFERING_TO_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
+    private final static String LOAD_PROGRESS_REFFERING_TO_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
 
-    private static String LOAD_COMPLETED_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lessonComplete > 0 and p.lesson.id = :lessonId";
+    private final static String LOAD_COMPLETED_PROGRESS_BY_LESSON = "from LearnerProgress p where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
-    private static String LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON = "SELECT p.user FROM LearnerProgress p WHERE "
+    private final static String LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + "p.lessonComplete > 0 and p.lesson.id = :lessonId ORDER BY p.finishDate DESC";
 
-    private static String COUNT_COMPLETED_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p "
+    private final static String COUNT_COMPLETED_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p "
 	    + " where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
-    private static String COUNT_ATTEMPTED_ACTIVITY = "select count(*) from LearnerProgress prog, "
+    private final static String COUNT_ATTEMPTED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.attemptedActivities attAct " + " where act.id = :activityId and "
 	    + " index(attAct) = act";
-    private static String COUNT_COMPLETED_ACTIVITY = "select count(*) from LearnerProgress prog, "
+
+    private final static String COUNT_COMPLETED_ACTIVITY = "select count(*) from LearnerProgress prog, "
 	    + " Activity act join prog.completedActivities compAct " + " where act.id = :activityId and "
 	    + " index(compAct) = act";
 
-    private static String COUNT_CURRENT_ACTIVITY = "select count(*) from LearnerProgress prog WHERE "
+    private final static String COUNT_CURRENT_ACTIVITY = "select count(*) from LearnerProgress prog WHERE "
 	    + " prog.currentActivity = :activity";
 
-    private static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
+    private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
 
-    private static String LOAD_PROGRESS_BY_LESSON_AND_USER_IDS = "from LearnerProgress p "
+    private final static String LOAD_PROGRESS_BY_LESSON_AND_USER_IDS = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId AND p.user.userId IN (:userIds) order by p.user.lastName, p.user.firstName, p.user.userId";
 
-    private static String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
+    private final static String LOAD_PROGRESSES_BY_LESSON_LIST = "FROM LearnerProgress progress WHERE "
 	    + " progress.lesson.lessonId IN (:lessonIds)";
 
-    private static String LOAD_LEARNERS_LATEST_BY_ACTIVITY = "SELECT u.* FROM lams_learner_progress AS prog "
+    private final static String LOAD_LEARNERS_LATEST_BY_ACTIVITY = "SELECT u.* FROM lams_learner_progress AS prog "
 	    + "JOIN lams_progress_attempted AS att USING (learner_progress_id) "
 	    + "JOIN lams_user AS u USING (user_id) "
 	    + "WHERE prog.current_activity_id = :activityId AND att.activity_id = :activityId "
 	    + "ORDER BY att.start_date_time DESC";
 
-    private static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT p.user FROM LearnerProgress p WHERE "
+    private final static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + " p.currentActivity.id IN (:activityIds)";
 
-    private static String LOAD_LEARNERS_BY_LESSON = "FROM LearnerProgress prog WHERE prog.lesson.id = :lessonId";
+    private final static String COUNT_LEARNERS_BY_LESSON = "COUNT(*) FROM LearnerProgress prog WHERE prog.lesson.id = :lessonId";
+    private final static String COUNT_LEARNERS_BY_LESSON_ORDER_CLAUSE = " ORDER BY prog.user.firstName ASC, prog.user.lastName ASC, prog.user.login ASC";
+
+    // find Learners for the given Lesson first, then see if they have Progress, i.e. started the lesson
+    private final static String LOAD_LEARNERS_BY_MOST_PROGRESS = "SELECT u.*, COUNT(comp.activity_id) AS comp_count FROM lams_lesson AS lesson "
+	    + "JOIN lams_grouping AS grouping ON lesson.class_grouping_id = grouping.grouping_id "
+	    + "JOIN lams_group AS g USING (grouping_id) JOIN lams_user_group AS ug USING (group_id) "
+	    + "JOIN lams_user AS u ON ug.user_id = u.user_id "
+	    + "LEFT JOIN lams_learner_progress AS prog ON prog.lesson_id = lesson.lesson_id AND prog.user_id = u.user_id "
+	    + "LEFT JOIN lams_progress_completed AS comp USING (learner_progress_id) "
+	    + "WHERE lesson.lesson_id = :lessonId AND g.group_name NOT LIKE '%Staff%'";
+    private final static String LOAD_LEARNERS_BY_MOST_PROGRESS_ORDER_CLAUSE = " GROUP BY u.user_id "
+	    + "ORDER BY prog.lesson_completed_flag DESC, comp_count DESC, u.first_name ASC, u.last_name ASC, u.login ASC";
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
@@ -165,11 +178,20 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<User> getLearnersByLesson(Long lessonId, String searchPhrase, boolean orderByCompletion, Integer limit,
-	    Integer offset) {
-	String queryText = LearnerProgressDAO.buildLearnersByLessonQuery(false, searchPhrase, orderByCompletion);
+    public List<User> getLearnersByMostProgress(Long lessonId, String searchPhrase, Integer limit, Integer offset) {
+	StringBuilder queryText = new StringBuilder(LearnerProgressDAO.LOAD_LEARNERS_BY_MOST_PROGRESS);
+	// find the search phrase parts in any of name parts of the user
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (u.firstName LIKE '%").append(token).append("%' OR u.lastName LIKE '%")
+			.append(token).append("%' OR u.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	queryText.append(LearnerProgressDAO.LOAD_LEARNERS_BY_MOST_PROGRESS_ORDER_CLAUSE);
 
-	Query query = getSession().createQuery(queryText).setLong("lessonId", lessonId);
+	Query query = getSession().createSQLQuery(queryText.toString()).addEntity(User.class).setLong("lessonId",
+		lessonId);
 	if (limit != null) {
 	    query.setMaxResults(limit);
 	}
@@ -177,27 +199,6 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    query.setFirstResult(offset);
 	}
 	return query.list();
-    }
-
-    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase, Boolean orderByCompletion) {
-	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "prog.user ")
-		.append(LearnerProgressDAO.LOAD_LEARNERS_BY_LESSON);
-	if (!StringUtils.isBlank(searchPhrase)) {
-	    String[] tokens = searchPhrase.trim().split("\\s+");
-	    for (String token : tokens) {
-		queryText.append(" AND (prog.user.firstName LIKE '%").append(token)
-			.append("%' OR prog.user.lastName LIKE '%").append(token)
-			.append("%' OR prog.user.login LIKE '%").append(token).append("%')");
-	    }
-	}
-	if (!count && (orderByCompletion != null)) {
-	    queryText.append(" ORDER BY");
-	    if (orderByCompletion) {
-		queryText.append(" prog.lessonComplete DESC, prog.completedActivities.size DESC,");
-	    }
-	    queryText.append(" prog.user.firstName ASC, prog.user.lastName ASC");
-	}
-	return queryText.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -254,8 +255,20 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @Override
     public Integer getNumUsersByLesson(Long lessonId, String searchPhrase) {
-	String queryText = LearnerProgressDAO.buildLearnersByLessonQuery(true, searchPhrase, null);
-	Object value = getSession().createQuery(queryText).setLong("lessonId", lessonId.longValue()).uniqueResult();
+	StringBuilder queryText = new StringBuilder(LearnerProgressDAO.COUNT_LEARNERS_BY_LESSON);
+	// find the search phrase parts in any of name parts of the user
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (prog.user.firstName LIKE '%").append(token)
+			.append("%' OR prog.user.lastName LIKE '%").append(token)
+			.append("%' OR prog.user.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	queryText.append(LearnerProgressDAO.COUNT_LEARNERS_BY_LESSON_ORDER_CLAUSE);
+
+	Object value = getSession().createQuery(queryText.toString()).setLong("lessonId", lessonId.longValue())
+		.uniqueResult();
 	return ((Number) value).intValue();
     }
 

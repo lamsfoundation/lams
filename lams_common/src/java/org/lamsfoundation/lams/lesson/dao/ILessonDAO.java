@@ -4,15 +4,15 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General License version 2.0 
  * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU General License for more details.
  * 
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
@@ -44,12 +44,12 @@ public interface ILessonDAO extends IBaseDAO {
      *            identifies the lesson to get
      * @return the lesson
      */
-    public Lesson getLesson(Long lessonId);
+    Lesson getLesson(Long lessonId);
 
     /** Get all the lessons in the database. This includes the disabled lessons. */
-    public List getAllLessons();
+    List getAllLessons();
 
-    public Lesson getLessonWithJoinFetchedProgress(Long lessonId);
+    Lesson getLessonWithJoinFetchedProgress(Long lessonId);
 
     /**
      * Gets all lessons that are active for a learner. TODO to be removed when the dummy interface is no longer needed
@@ -58,7 +58,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            a User that identifies the learner.
      * @return a Set with all active lessons in it.
      */
-    public List getActiveLessonsForLearner(User learner);
+    List getActiveLessonsForLearner(User learner);
 
     /**
      * Gets all lessons that are active for a learner, in a given organisation
@@ -69,7 +69,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            the desired organisation .
      * @return a List with all active lessons in it.
      */
-    public List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationID);
+    List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationID);
 
     /**
      * Saves or Updates a Lesson.
@@ -77,7 +77,7 @@ public interface ILessonDAO extends IBaseDAO {
      * @param lesson
      *            the Lesson to save
      */
-    public void saveLesson(Lesson lesson);
+    void saveLesson(Lesson lesson);
 
     /**
      * Deletes a Lesson <b>permanently</b>.
@@ -85,14 +85,14 @@ public interface ILessonDAO extends IBaseDAO {
      * @param lesson
      *            the Lesson to remove.
      */
-    public void deleteLesson(Lesson lesson);
+    void deleteLesson(Lesson lesson);
 
     /**
      * Update a requested lesson.
      * 
      * @param createdLesson
      */
-    public void updateLesson(Lesson lesson);
+    void updateLesson(Lesson lesson);
 
     /**
      * Returns the list of available Lessons created by a given user. Does not return disabled lessons or preview
@@ -102,7 +102,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            The user_id of the user
      * @return List The list of Lessons for the given user
      */
-    public List getLessonsCreatedByUser(Integer userID);
+    List getLessonsCreatedByUser(Integer userID);
 
     /**
      * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return disabled
@@ -112,7 +112,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            a User that identifies the teacher/staff member.
      * @return a List with all appropriate lessons in it.
      */
-    public List getLessonsForMonitoring(int userID, int organisationID);
+    List getLessonsForMonitoring(int userID, int organisationID);
 
     /**
      * Returns the all the learners that have started the requested lesson.
@@ -121,7 +121,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            the id of the requested lesson.
      * @return the list of learners.
      */
-    public List getActiveLearnerByLesson(long lessonId);
+    List getActiveLearnerByLesson(long lessonId);
 
     /**
      * Returns the all the learners that have started the requested lesson and are in the given group.
@@ -132,7 +132,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            the id of the requested group.
      * @return the list of learners.
      */
-    public List getActiveLearnerByLessonAndGroup(long lessonId, long groupId);
+    List getActiveLearnerByLessonAndGroup(long lessonId, long groupId);
 
     /**
      * Returns the count of all the learners that have started the requested lesson.
@@ -141,12 +141,14 @@ public interface ILessonDAO extends IBaseDAO {
      *            the id of the requested lesson.
      * @return the count of the learners.
      */
-    public Integer getCountActiveLearnerByLesson(long lessonId);
+    Integer getCountActiveLearnerByLesson(long lessonId);
+
+    List<User> getLearnersByLesson(Long lessonId, String searchPhrase, Integer limit, Integer offset);
 
     /**
      * Returns the count of all the learners that are a part of the lesson class.
      */
-    public Integer getCountLearnerByLesson(long lessonId);
+    Integer getCountLearnersByLesson(long lessonId, String searchPhrase);
 
     /**
      * Get all the preview lessons more with the creation date before the given date.
@@ -155,12 +157,12 @@ public interface ILessonDAO extends IBaseDAO {
      *            UTC date
      * @return the list of Lessons
      */
-    public List getPreviewLessonsBeforeDate(Date startDate);
+    List getPreviewLessonsBeforeDate(Date startDate);
 
     /**
      * Get the lesson that applies to this activity. Not all activities have an attached lesson.
      */
-    public Lesson getLessonForActivity(long activityId);
+    Lesson getLessonForActivity(long activityId);
 
     /**
      * Gets all non-removed lessons for a user in an org; set userRole parameter to learner if you want lessons where
@@ -175,8 +177,7 @@ public interface ILessonDAO extends IBaseDAO {
      * 
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
-    public List getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
-	    Integer userRole);
+    List getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole);
 
     /**
      * Gets all non-removed lessons for a user in a group including sub-groups
@@ -187,7 +188,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            an org id that identifies the organisation.
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
-    public List getLessonsByGroupAndUser(Integer userId, Integer orgId);
+    List getLessonsByGroupAndUser(Integer userId, Integer orgId);
 
     /**
      * Gets all non-removed lessons for a group.
@@ -195,7 +196,7 @@ public interface ILessonDAO extends IBaseDAO {
      * @param orgId
      * @return
      */
-    public List getLessonsByGroup(Integer orgId);
+    List getLessonsByGroup(Integer orgId);
 
     /**
      * Get lessons based on learning designs where the original learning design has the given id.
@@ -204,7 +205,7 @@ public interface ILessonDAO extends IBaseDAO {
      * @param orgId
      * @return list of lessons
      */
-    public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId);
+    List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId);
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
@@ -213,7 +214,7 @@ public interface ILessonDAO extends IBaseDAO {
      *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
+    List<User> getMonitorsByToolSessionId(Long sessionId);
 
     /**
      * Gets lesson for tools based on toolSessionID
@@ -221,5 +222,5 @@ public interface ILessonDAO extends IBaseDAO {
      * @param sessionID
      * @return
      */
-    public Lesson getLessonFromSessionID(Long toolSessionID);
+    Lesson getLessonFromSessionID(Long toolSessionID);
 }
