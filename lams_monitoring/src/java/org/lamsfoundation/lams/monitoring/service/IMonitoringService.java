@@ -690,8 +690,7 @@ public interface IMonitoringService {
      * name or, if orderByCompletion is set, by most progressed first. Used mainly by Learners tab in Monitoring
      * interface.
      */
-    List<User> getLearnersFromProgress(Long lessonId, String searchPhrase, boolean orderByCompletion, Integer limit,
-	    Integer offset);
+    List<User> getLearnersByMostProgress(Long lessonId, String searchPhrase, Integer limit, Integer offset);
 
     /**
      * Get learners who most recently entered the activity.

@@ -280,8 +280,7 @@ public class LearnerService implements ICoreLearnerService {
      * <p>
      * In terms of an started lesson, the learner progress will be returned without calculation. Tool session will be
      * initialized if necessary. Note that we won't initialize tool session for current activity because we assume tool
-     * session will always initialize before it becomes a current activity.
-     * </p
+     * session will always initialize before it becomes a current activity. </p
      * 
      * 
      * @param learnerId
@@ -436,6 +435,9 @@ public class LearnerService implements ICoreLearnerService {
     public Object[] getStructuredActivityURLs(Integer learnerId, Long lessonId) {
 
 	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
+	if (progress == null) {
+	    return null;
+	}
 	Lesson lesson = progress.getLesson();
 
 	ProgressBuilder builder = new ProgressBuilder(progress, activityDAO, activityMapping);
@@ -630,7 +632,8 @@ public class LearnerService implements ICoreLearnerService {
      * @return the updated learner progress
      */
     @Override
-    public synchronized LearnerProgress completeActivity(Integer learnerId, Activity activity, LearnerProgress progress) {
+    public synchronized LearnerProgress completeActivity(Integer learnerId, Activity activity,
+	    LearnerProgress progress) {
 	LearnerProgress nextLearnerProgress = null;
 
 	// Need to synchronise the next bit of code so that if the tool calls
@@ -658,16 +661,17 @@ public class LearnerService implements ICoreLearnerService {
 	    updateGradebookMark(activity, progress);
 	}
 	// }
-	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId, activity.getLearningDesign()
-		.getLearningDesignId(), progress.getLesson().getLessonId(), activity.getActivityId());
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
+		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
+		activity.getActivityId());
 
 	return nextLearnerProgress;
     }
 
     /**
-     * @throws
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer,
-     *      org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
+     * @throws @see
+     *             org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer,
+     *             org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
      */
     @Override
     public LearnerProgress completeActivity(Integer learnerId, Activity activity, Long lessonId) {
@@ -701,8 +705,8 @@ public class LearnerService implements ICoreLearnerService {
 		if (outputVal != null) {
 		    Double outputDouble = outputVal.getDouble();
 
-		    GradebookUserActivity gradebookUserActivity = gradebookService.getGradebookUserActivity(
-			    toolActivity.getActivityId(), learner.getUserId());
+		    GradebookUserActivity gradebookUserActivity = gradebookService
+			    .getGradebookUserActivity(toolActivity.getActivityId(), learner.getUserId());
 
 		    // Only set the mark if it hasnt previously been set by a teacher
 		    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
@@ -936,16 +940,15 @@ public class LearnerService implements ICoreLearnerService {
 
 	List lessonLearners = null;
 	Activity branchActivity = gate.getParentBranch();
-	while ((branchActivity != null)
-		&& !(branchActivity.getParentActivity().isChosenBranchingActivity() || branchActivity
-			.getParentActivity().isGroupBranchingActivity())) {
+	while ((branchActivity != null) && !(branchActivity.getParentActivity().isChosenBranchingActivity()
+		|| branchActivity.getParentActivity().isGroupBranchingActivity())) {
 	    branchActivity = branchActivity.getParentBranch();
 	}
 
 	if (branchActivity != null) {
 	    // set up list based on branch - all members of a group attached to the branch are destined for the gate
-	    SequenceActivity branchSequence = (SequenceActivity) activityDAO.getActivityByActivityId(
-		    branchActivity.getActivityId(), SequenceActivity.class);
+	    SequenceActivity branchSequence = (SequenceActivity) activityDAO
+		    .getActivityByActivityId(branchActivity.getActivityId(), SequenceActivity.class);
 	    Set branchEntries = branchSequence.getBranchEntries();
 	    Iterator entryIterator = branchEntries.iterator();
 	    while (entryIterator.hasNext()) {
@@ -1036,9 +1039,9 @@ public class LearnerService implements ICoreLearnerService {
 	try {
 	    toolSession = lamsCoreToolService.createToolSession(learner, toolActivity, lesson);
 	} catch (DataIntegrityViolationException e) {
-	    LearnerService.log
-		    .warn("There was an attempt to create two tool sessions with the same name. Skipping further attempts as the session exists.",
-			    e);
+	    LearnerService.log.warn(
+		    "There was an attempt to create two tool sessions with the same name. Skipping further attempts as the session exists.",
+		    e);
 	}
 	if (toolSession != null) {
 	    toolActivity.getToolSessions().add(toolSession);
@@ -1118,8 +1121,8 @@ public class LearnerService implements ICoreLearnerService {
 	    Iterator branchIterator = branchingActivity.getActivities().iterator();
 	    while (branchIterator.hasNext()) {
 		Activity branchActivity = (Activity) branchIterator.next();
-		SequenceActivity branchSequence = (SequenceActivity) activityDAO.getActivityByActivityId(
-			branchActivity.getActivityId(), SequenceActivity.class);
+		SequenceActivity branchSequence = (SequenceActivity) activityDAO
+			.getActivityByActivityId(branchActivity.getActivityId(), SequenceActivity.class);
 		Iterator<BranchActivityEntry> entryIterator = branchSequence.getBranchEntries().iterator();
 		while (entryIterator.hasNext()) {
 		    BranchActivityEntry entry = entryIterator.next();
@@ -1178,16 +1181,15 @@ public class LearnerService implements ICoreLearnerService {
 	    if (LearnerService.log.isDebugEnabled()) {
 		LearnerService.log
 			.debug("No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
-				+ branchingActivity.getActivityId()
-				+ ":"
-				+ branchingActivity.getTitle()
+				+ branchingActivity.getActivityId() + ":" + branchingActivity.getTitle()
 				+ " for learner " + learner.getUserId() + ":" + learner.getLogin());
 	    }
 	    return null;
 	}
     }
 
-    private SequenceActivity determineGroupBasedBranch(Lesson lesson, BranchingActivity branchingActivity, User learner) {
+    private SequenceActivity determineGroupBasedBranch(Lesson lesson, BranchingActivity branchingActivity,
+	    User learner) {
 	SequenceActivity sequenceActivity = null;
 
 	if (branchingActivity.getGrouping() != null) {
@@ -1261,12 +1263,9 @@ public class LearnerService implements ICoreLearnerService {
 			toolOutput = lamsCoreToolService.getOutputFromTool(conditionName, toolSession,
 				learner.getUserId());
 			if (toolOutput == null) {
-			    LearnerService.log
-				    .warn("Condition "
-					    + condition
-					    + " refers to a tool output "
-					    + conditionName
-					    + " but tool doesn't return any tool output for that name. Skipping this condition.");
+			    LearnerService.log.warn("Condition " + condition + " refers to a tool output "
+				    + conditionName
+				    + " but tool doesn't return any tool output for that name. Skipping this condition.");
 			} else {
 			    toolOutputMap.put(conditionName, toolOutput);
 			}
@@ -1415,8 +1414,8 @@ public class LearnerService implements ICoreLearnerService {
 	    int desiredGroupCount = learnerCount / maxNumberOfLearnersPerGroup
 		    + (learnerCount % maxNumberOfLearnersPerGroup == 0 ? 0 : 1);
 	    if (desiredGroupCount > groupCount) {
-		((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(learnerChoiceGrouping, desiredGroupCount
-			- groupCount);
+		((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(learnerChoiceGrouping,
+			desiredGroupCount - groupCount);
 		groupingDAO.update(grouping);
 	    }
 	}
@@ -1446,8 +1445,8 @@ public class LearnerService implements ICoreLearnerService {
      */
     @Override
     public ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId) {
-	DataFlowObject dataFlowObject = getDataFlowDAO()
-		.getAssignedDataFlowObject(requestingToolContentId, assigmentId);
+	DataFlowObject dataFlowObject = getDataFlowDAO().getAssignedDataFlowObject(requestingToolContentId,
+		assigmentId);
 	User learner = (User) getUserManagementService().findById(User.class, learnerId);
 	Activity activity = dataFlowObject.getDataTransition().getFromActivity();
 	String outputName = dataFlowObject.getName();
@@ -1499,8 +1498,8 @@ public class LearnerService implements ICoreLearnerService {
 			// this is tricky: the activity is the last one only if parent is and after completing it,
 			// there are no more optional activities to do
 			// (for example, it's 4th out of 5 optional activities)
-			OptionsActivity parentOptionsActivity = (OptionsActivity) getActivity(parentActivity
-				.getActivityId());
+			OptionsActivity parentOptionsActivity = (OptionsActivity) getActivity(
+				parentActivity.getActivityId());
 			Integer learnerId = LearningWebUtil.getUserId();
 			Lesson lesson = getLessonByActivity(activity);
 			LearnerProgress learnerProgress = getProgress(learnerId, lesson.getLessonId());
@@ -1508,7 +1507,8 @@ public class LearnerService implements ICoreLearnerService {
 			if (learnerProgress != null) {
 			    int completedSubactivities = 0;
 			    for (Activity subactivity : (Set<Activity>) parentOptionsActivity.getActivities()) {
-				if (LearnerProgress.ACTIVITY_COMPLETED == learnerProgress.getProgressState(subactivity)) {
+				if (LearnerProgress.ACTIVITY_COMPLETED == learnerProgress
+					.getProgressState(subactivity)) {
 				    completedSubactivities++;
 				}
 			    }

@@ -120,10 +120,14 @@ public class LessonService implements ILessonService {
     public Integer getCountActiveLessonLearners(Long lessonId) {
 	return lessonDAO.getCountActiveLearnerByLesson(lessonId);
     }
-
     @Override
-    public Integer getCountLessonLearners(Long lessonId) {
-	return lessonDAO.getCountLearnerByLesson(lessonId);
+    public List<User> getLessonLearners(Long lessonId, String searchPhrase, Integer limit, Integer offset) {
+	return lessonDAO.getLearnersByLesson(lessonId, searchPhrase, limit, offset);
+    }
+    
+    @Override
+    public Integer getCountLessonLearners(Long lessonId, String searchPhrase) {
+	return lessonDAO.getCountLearnersByLesson(lessonId, searchPhrase);
     }
 
     @Override
