@@ -166,11 +166,11 @@ public class LearnerAction extends LamsDispatchAction {
 
 	    // security check
 	    Lesson lesson = learnerService.getLesson(lessonID);
-	    User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(
-		    User.class, learner);
+	    User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
+		    .findById(User.class, learner);
 	    if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().getLearners().contains(user)) {
-		request.setAttribute("messageKey", "User " + user.getLogin()
-			+ " is not a learner in the requested lesson.");
+		request.setAttribute("messageKey",
+			"User " + user.getLogin() + " is not a learner in the requested lesson.");
 		return mapping.findForward("message");
 	    }
 	    // check lesson's state if its suitable for learner's access
@@ -193,15 +193,15 @@ public class LearnerAction extends LamsDispatchAction {
 
 	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 
-	    ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet()
-		    .getServletContext());
+	    ActivityMapping activityMapping = LearnerServiceProxy
+		    .getActivityMapping(this.getServlet().getServletContext());
 	    String url = "learning/" + activityMapping.getDisplayActivityAction(lessonID);
 
 	    redirectToURL(mapping, response, url);
 
 	} catch (Exception e) {
-	    LearnerAction.log
-		    .error("An error occurred while learner " + learner + " attempting to join the lesson.", e);
+	    LearnerAction.log.error("An error occurred while learner " + learner + " attempting to join the lesson.",
+		    e);
 	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 
@@ -258,8 +258,8 @@ public class LearnerAction extends LamsDispatchAction {
 	    // serialize a acknowledgement flash message with the path of display next
 	    // activity
 
-	    ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet()
-		    .getServletContext());
+	    ActivityMapping activityMapping = LearnerServiceProxy
+		    .getActivityMapping(this.getServlet().getServletContext());
 	    message = new FlashMessage("joinLesson", activityMapping.getDisplayActivityAction(null));
 
 	} catch (Exception e) {
@@ -429,8 +429,8 @@ public class LearnerAction extends LamsDispatchAction {
 
 	// getting requested object according to coming parameters
 	Integer learnerId = LearningWebUtil.getUserId();
-	User learner = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(
-		User.class, learnerId);
+	User learner = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
+		.findById(User.class, learnerId);
 
 	Activity requestedActivity = learnerService.getActivity(new Long(activityId));
 	Lesson lesson = learnerService.getLessonByActivity(requestedActivity);
@@ -460,6 +460,10 @@ public class LearnerAction extends LamsDispatchAction {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
+	if (ret == null) {
+	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+	    return null;
+	}
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("currentActivityId", ret[1]);
@@ -660,8 +664,8 @@ public class LearnerAction extends LamsDispatchAction {
      */
     private IAuditService getAuditService() {
 	if (LearnerAction.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    LearnerAction.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return LearnerAction.auditService;
@@ -685,8 +689,8 @@ public class LearnerAction extends LamsDispatchAction {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward forwardToLearnerActivityURL(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public ActionForward forwardToLearnerActivityURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	if (LearnerAction.log.isDebugEnabled()) {
 	    LearnerAction.log.debug("Forwarding to the url for learner activity..." + activityId);

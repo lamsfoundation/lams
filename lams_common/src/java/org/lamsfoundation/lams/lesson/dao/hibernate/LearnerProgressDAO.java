@@ -88,7 +88,19 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     private final static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + " p.currentActivity.id IN (:activityIds)";
 
-    private final static String LOAD_LEARNERS_BY_LESSON = "FROM LearnerProgress prog WHERE prog.lesson.id = :lessonId";
+    private final static String COUNT_LEARNERS_BY_LESSON = "COUNT(*) FROM LearnerProgress prog WHERE prog.lesson.id = :lessonId";
+    private final static String COUNT_LEARNERS_BY_LESSON_ORDER_CLAUSE = " ORDER BY prog.user.firstName ASC, prog.user.lastName ASC, prog.user.login ASC";
+
+    // find Learners for the given Lesson first, then see if they have Progress, i.e. started the lesson
+    private final static String LOAD_LEARNERS_BY_MOST_PROGRESS = "SELECT u.*, COUNT(comp.activity_id) AS comp_count FROM lams_lesson AS lesson "
+	    + "JOIN lams_grouping AS grouping ON lesson.class_grouping_id = grouping.grouping_id "
+	    + "JOIN lams_group AS g USING (grouping_id) JOIN lams_user_group AS ug USING (group_id) "
+	    + "JOIN lams_user AS u ON ug.user_id = u.user_id "
+	    + "LEFT JOIN lams_learner_progress AS prog ON prog.lesson_id = lesson.lesson_id AND prog.user_id = u.user_id "
+	    + "LEFT JOIN lams_progress_completed AS comp USING (learner_progress_id) "
+	    + "WHERE lesson.lesson_id = :lessonId AND g.group_name NOT LIKE '%Staff%'";
+    private final static String LOAD_LEARNERS_BY_MOST_PROGRESS_ORDER_CLAUSE = " GROUP BY u.user_id "
+	    + "ORDER BY prog.lesson_completed_flag DESC, comp_count DESC, u.first_name ASC, u.last_name ASC, u.login ASC";
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
@@ -203,16 +215,26 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<User> getLearnersByLesson(final Long lessonId, String searchPhrase, boolean orderByCompletion,
-	    final Integer limit, final Integer offset) {
-	final String queryText = LearnerProgressDAO.buildLearnersByLessonQuery(false, searchPhrase, orderByCompletion);
+    public List<User> getLearnersByMostProgress(final Long lessonId, String searchPhrase, final Integer limit,
+	    final Integer offset) {
+	final StringBuilder queryText = new StringBuilder(LearnerProgressDAO.LOAD_LEARNERS_BY_MOST_PROGRESS);
+	// find the search phrase parts in any of name parts of the user
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (u.firstName LIKE '%").append(token).append("%' OR u.lastName LIKE '%")
+			.append(token).append("%' OR u.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	queryText.append(LearnerProgressDAO.LOAD_LEARNERS_BY_MOST_PROGRESS_ORDER_CLAUSE);
 
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
 	return (List<User>) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.createQuery(queryText).setLong("lessonId", lessonId);
+		Query query = session.createSQLQuery(queryText.toString()).addEntity(User.class).setLong("lessonId",
+			lessonId);
 		if (limit != null) {
 		    query.setMaxResults(limit);
 		}
@@ -222,27 +244,6 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 		return query.list();
 	    }
 	});
-    }
-
-    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase, Boolean orderByCompletion) {
-	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "prog.user ")
-		.append(LearnerProgressDAO.LOAD_LEARNERS_BY_LESSON);
-	if (!StringUtils.isBlank(searchPhrase)) {
-	    String[] tokens = searchPhrase.trim().split("\\s+");
-	    for (String token : tokens) {
-		queryText.append(" AND (prog.user.firstName LIKE '%").append(token)
-			.append("%' OR prog.user.lastName LIKE '%").append(token)
-			.append("%' OR prog.user.login LIKE '%").append(token).append("%')");
-	    }
-	}
-	if (!count && orderByCompletion != null) {
-	    queryText.append(" ORDER BY");
-	    if (orderByCompletion) {
-		queryText.append(" prog.lessonComplete DESC, prog.completedActivities.size DESC,");
-	    }
-	    queryText.append(" prog.user.firstName ASC, prog.user.lastName ASC");
-	}
-	return queryText.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -347,12 +348,24 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 
     @Override
     public Integer getNumUsersByLesson(final Long lessonId, String searchPhrase) {
-	final String queryText = buildLearnersByLessonQuery(true, searchPhrase, null);
+	final StringBuilder queryText = new StringBuilder(LearnerProgressDAO.COUNT_LEARNERS_BY_LESSON);
+	// find the search phrase parts in any of name parts of the user
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (prog.user.firstName LIKE '%").append(token)
+			.append("%' OR prog.user.lastName LIKE '%").append(token)
+			.append("%' OR prog.user.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	queryText.append(LearnerProgressDAO.COUNT_LEARNERS_BY_LESSON_ORDER_CLAUSE);
+
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Object value = session.createQuery(queryText).setLong("lessonId", lessonId.longValue()).uniqueResult();
+		Object value = session.createQuery(queryText.toString()).setLong("lessonId", lessonId.longValue())
+			.uniqueResult();
 		return ((Number) value).intValue();
 	    }
 	});

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.lesson.dao.hibernate;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -67,9 +68,11 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    + " where organisation.organisationId=? and lessonStateId <= 6";
     private final static String LESSON_BY_SESSION_ID = "select lesson from Lesson lesson, ToolSession session where "
 	    + "session.lesson=lesson and session.toolSessionId=:toolSessionID";
-    private final static String COUNT_LEARNERS_CLASS = "SELECT COUNT(*) FROM Lesson AS lesson "
+
+    private final static String LOAD_LEARNERS_BY_LESSON = "FROM Lesson AS lesson "
 	    + "INNER JOIN lesson.lessonClass AS lessonClass INNER JOIN lessonClass.groups AS groups "
-	    + "INNER JOIN groups.users AS users" + " WHERE lesson.id = :lessonId";
+	    + "INNER JOIN groups.users AS users "
+	    + "WHERE lesson.id = :lessonId AND groups.groupName NOT LIKE '%Staff%'";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -213,13 +216,37 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	});
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Integer getCountLearnerByLesson(final long lessonId) {
+    public List<User> getLearnersByLesson(final Long lessonId, String searchPhrase, final Integer limit,
+	    final Integer offset) {
+	final String queryText = LessonDAO.buildLearnersByLessonQuery(false, searchPhrase);
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+	return (List<User>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createQuery(queryText).setLong("lessonId", lessonId);
+		if (limit != null) {
+		    query.setMaxResults(limit);
+		}
+		if (offset != null) {
+		    query.setFirstResult(offset);
+		}
+		return query.list();
+	    }
+	});
+    }
+
+    @Override
+    public Integer getCountLearnersByLesson(final long lessonId, String searchPhrase) {
+	final String queryText = LessonDAO.buildLearnersByLessonQuery(true, searchPhrase);
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.createQuery(LessonDAO.COUNT_LEARNERS_CLASS).setLong("lessonId", lessonId);
+		Query query = session.createQuery(queryText).setLong("lessonId", lessonId);
 		Object value = query.uniqueResult();
 		return ((Number) value).intValue();
 	    }
@@ -418,5 +445,21 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 		return query.uniqueResult();
 	    }
 	});
+    }
+
+    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase) {
+	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "users ")
+		.append(LessonDAO.LOAD_LEARNERS_BY_LESSON);
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (users.firstName LIKE '%").append(token).append("%' OR users.lastName LIKE '%")
+			.append(token).append("%' OR users.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	if (!count) {
+	    queryText.append(" ORDER BY users.firstName ASC, users.lastName ASC, users.login ASC");
+	}
+	return queryText.toString();
     }
 }

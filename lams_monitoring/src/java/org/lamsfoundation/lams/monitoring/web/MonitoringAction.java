@@ -983,16 +983,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	// are the learners sorted by the most completed first?
 	boolean isProgressSorted = WebUtil.readBooleanParam(request, "isProgressSorted", false);
 
-	List<User> learners = getMonitoringService().getLearnersFromProgress(lessonId, searchPhrase, isProgressSorted,
-		10, (pageNumber - 1) * 10);
+	// either sort by name or how much a learner progressed into the lesson
+	List<User> learners = isProgressSorted
+		? getMonitoringService().getLearnersByMostProgress(lessonId, searchPhrase, 10, (pageNumber - 1) * 10)
+		: getLessonService().getLessonLearners(lessonId, searchPhrase, 10, (pageNumber - 1) * 10);
 	JSONObject responseJSON = new JSONObject();
 	for (User learner : learners) {
 	    responseJSON.append("learners", WebUtil.userToJSON(learner));
 	}
 
 	// get all possible learners matching the given phrase, if any; used for max page number
-	responseJSON.put("numberActiveLearners",
-		getMonitoringService().getCountLearnersFromProgress(lessonId, searchPhrase));
+	responseJSON.put("learnerPossibleNumber", getLessonService().getCountLessonLearners(lessonId, searchPhrase));
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON.toString());
 	return null;
@@ -1020,7 +1021,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 
 	responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesign.getLearningDesignId());
-	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId));
+	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
@@ -1132,6 +1133,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	LearnerProgress searchedLearnerProgress = null;
 	if (searchedLearnerId != null) {
 	    searchedLearnerProgress = getLessonService().getUserProgressForLesson(searchedLearnerId, lessonId);
+	    responseJSON.put("searchedLearnerFound", searchedLearnerProgress != null);
 	}
 
 	JSONArray activitiesJSON = new JSONArray();
@@ -1245,7 +1247,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseJSON.append("completedLearners", learnerJSON);
 	}
 
-	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId));
+	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
 
 	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
 	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
@@ -1275,7 +1277,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String searchPhrase = request.getParameter("term");
 
-	List<User> learners = getMonitoringService().getLearnersFromProgress(lessonId, searchPhrase, false, 10, null);
+	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase, 10, null);
 	JSONArray responseJSON = new JSONArray();
 	for (User learner : learners) {
 	    JSONObject learnerJSON = new JSONObject();
@@ -1284,7 +1286,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    responseJSON.put(learnerJSON);
 	}
-	
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON);
 	return null;
@@ -1582,9 +1584,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	return result;
     }
 
-    
     /**
-     * Puts the searched learner in front of other learners in the list. 
+     * Puts the searched learner in front of other learners in the list.
      */
     private static List<User> insertSearchedLearner(User searchedLearner, List<User> latestLearners, int limit) {
 	latestLearners.remove(searchedLearner);

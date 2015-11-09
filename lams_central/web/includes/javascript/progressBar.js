@@ -1053,143 +1053,153 @@ function fillProgressBar(barId) {
 			// check if container still exists
 			// it may happen if user quickly changes pages in Monitor
 			var barContainer = $('#' + bar.containerId);
+			
+			// if the bar is gone
+			if (barContainer.length == 0){
+				return;
+			}
+			// if there is no progress returned for the given user
+			if (!result) {
+				barContainer.text(LABELS.PROGRESS_NOT_STARTED);
+				return;
+			}
 			// if nothing changed, don't do any calculations
-			if (barContainer.length > 0
-					&& (!bar.currentActivityId
-							|| result.currentActivityId != bar.currentActivityId)) {
-				bar.currentActivityId = result.currentActivityId;
-				isPreview = result.isPreview;
+			if (bar.currentActivityId && (result.currentActivityId == bar.currentActivityId)) {
+				return;
+			}
+			
+			bar.currentActivityId = result.currentActivityId;
+			isPreview = result.isPreview;
 
-				var paper = bar.paper;
-				if (!paper) {
-					// create paper only the first time
-					paper = bar.paper = Snap(isHorizontalBar ? 40 + 60 * result.activities.length : 140,
-							isHorizontalBar ? 60 : 60 * result.activities.length + 25);
-					barContainer.append(paper.node);
-					// first line on the top
-					paper.path(isHorizontalBar ? PATH_START_LINE_HORIZONTAL : PATH_START_LINE_VERTICAL);
-					
-					if (!GLOW_FILTER) {
-						GLOW_FILTER = paper.filter(Snap.filter.blur(1.5));
-					}
+			var paper = bar.paper;
+			if (!paper) {
+				// create paper only the first time
+				paper = bar.paper = Snap(isHorizontalBar ? 40 + 60 * result.activities.length : 140,
+						isHorizontalBar ? 60 : 60 * result.activities.length + 25);
+				barContainer.append(paper.node);
+				// first line on the top
+				paper.path(isHorizontalBar ? PATH_START_LINE_HORIZONTAL : PATH_START_LINE_VERTICAL);
+				
+				if (!GLOW_FILTER) {
+					GLOW_FILTER = paper.filter(Snap.filter.blur(1.5));
+				}
+			}
+
+			// we need this to scroll to the current activity
+			var currentActivityIndex = 0;
+
+			for (var activityIndex = 0; activityIndex < result.activities.length; activityIndex++) {
+				var activityData = result.activities[activityIndex],
+				// prepare the Activity descriptor, but do not draw yet
+					activity = new Activity(bar, activityIndex,
+						activityData.id, activityData.type,
+						activityData.name, activityData.status,
+						activityData.url,
+						activityData.childActivities);
+				if (activity.status == 0) {
+					currentActivityIndex = activityIndex;
 				}
 
-				// we need this to scroll to the current activity
-				var currentActivityIndex = 0;
+				var activities = bar.activities;
+				if (!activities) {
+					activities = bar.activities = [];
+				}
 
-				for (var activityIndex = 0; activityIndex < result.activities.length; activityIndex++) {
-					var activityData = result.activities[activityIndex],
-					// prepare the Activity descriptor, but do not draw yet
-						activity = new Activity(bar, activityIndex,
-							activityData.id, activityData.type,
-							activityData.name, activityData.status,
-							activityData.url,
-							activityData.childActivities);
-					if (activity.status == 0) {
-						currentActivityIndex = activityIndex;
-					}
+				var existingActivity = activities[activityIndex];
+				if (existingActivity) {
+					// if in preview mode, always display all inner
+					// activities, i.e. never expand
+					if (!isPreview && existingActivity.type == 'b' && existingActivity.id != activity.id) {
+						var branchActivityId = activityIndex,
+							afterBranchActivityId = activityIndex + 1 < activities.length ?
+									activities[activityIndex + 1].id : null,
+							branchActivities = [];
+									
+						// check if it is an empty branch
+						if (activity.id != afterBranchActivityId) {
+							branchActivities.push(activity);
+							activityIndex++;
 
-					var activities = bar.activities;
-					if (!activities) {
-						activities = bar.activities = [];
-					}
-
-					var existingActivity = activities[activityIndex];
-					if (existingActivity) {
-						// if in preview mode, always display all inner
-						// activities, i.e. never expand
-						if (!isPreview && existingActivity.type == 'b' && existingActivity.id != activity.id) {
-							var branchActivityId = activityIndex,
-								afterBranchActivityId = activityIndex + 1 < activities.length ?
-										activities[activityIndex + 1].id : null,
-								branchActivities = [];
-										
-							// check if it is an empty branch
-							if (activity.id != afterBranchActivityId) {
-								branchActivities.push(activity);
-								activityIndex++;
-	
-								// find which activities are new (branch)
-								// and which ones already existed
-								while (activityIndex < result.activities.length) {
-									activityData = result.activities[activityIndex];
-									var activity = new Activity(bar,
-											activityIndex,
-											activityData.id,
-											activityData.type,
-											activityData.name,
-											activityData.status,
-											activityData.url,
-											activityData.childActivities);
-									if (activity.id == afterBranchActivityId) {
-										// prepare for the next big loop
-										// iteration, which executes
-										// normally
-										activityIndex--;
-										break;
-									} else {
-										branchActivities.push(activity);
-										activityIndex++;
-									}
+							// find which activities are new (branch)
+							// and which ones already existed
+							while (activityIndex < result.activities.length) {
+								activityData = result.activities[activityIndex];
+								var activity = new Activity(bar,
+										activityIndex,
+										activityData.id,
+										activityData.type,
+										activityData.name,
+										activityData.status,
+										activityData.url,
+										activityData.childActivities);
+								if (activity.id == afterBranchActivityId) {
+									// prepare for the next big loop
+									// iteration, which executes
+									// normally
+									activityIndex--;
+									break;
+								} else {
+									branchActivities.push(activity);
+									activityIndex++;
 								}
-	
-								// resize main paper to accomodate new activities
-								paper.attr({
-									'width' : isHorizontalBar ? 40 + 60 * (activities.length	+ branchActivities.length - 1) : 140,
-									'height' : isHorizontalBar ? 60 : 60 * (activities.length + branchActivities.length - 1) + 25
-								});
 							}
-							
-							ActivityUtils.expandBranch(bar,
-									branchActivityId, branchActivities);
-						} else {
-							// refresh existing bar, transform
-							// activities if needed
-							ActivityUtils.transform(existingActivity,
-									activity);
+
+							// resize main paper to accomodate new activities
+							paper.attr({
+								'width' : isHorizontalBar ? 40 + 60 * (activities.length	+ branchActivities.length - 1) : 140,
+								'height' : isHorizontalBar ? 60 : 60 * (activities.length + branchActivities.length - 1) + 25
+							});
 						}
+						
+						ActivityUtils.expandBranch(bar,
+								branchActivityId, branchActivities);
 					} else {
-						// draw new activity
-						ActivityUtils.drawActivity(activity, true, activityIndex == result.activities.length - 1);
+						// refresh existing bar, transform
+						// activities if needed
+						ActivityUtils.transform(existingActivity,
+								activity);
 					}
+				} else {
+					// draw new activity
+					ActivityUtils.drawActivity(activity, true, activityIndex == result.activities.length - 1);
 				}
+			}
 
-				// draw support activities if they exist
-				var supportSeparatorRow = $('#supportSeparatorRow');
-				if (result.support && supportSeparatorRow.length > 0 && !supportSeparatorRow.is(':visible')) {
-					supportSeparatorRow.show();
+			// draw support activities if they exist
+			var supportSeparatorRow = $('#supportSeparatorRow');
+			if (result.support && supportSeparatorRow.length > 0 && !supportSeparatorRow.is(':visible')) {
+				supportSeparatorRow.show();
 
 
-					// separate paper for Support Activities frame
-					var supportPaper = Snap();
-					$('#supportPart').height(17 + 33 * result.support.length)
-									 .append(supportPaper.node)
-									 .show();
-					$.each(result.support, function(activityIndex,
-							activityData) {
-						var activity = new SupportActivity(
-								supportPaper, activityIndex,
-								activityData.name, activityData.status,
-								activityData.url);
-						activity.shape = supportPaper
-								.path(activity.path);
-						activity.shape.attr(ActivityUtils
-								.getShapeAttributes(activity));
-						ActivityUtils.addDecoration(activity, null,
-								true);
-						ActivityUtils.addEffects(activity);
-						supportPaper.text(90, 24 + 33 * activityIndex,
-								activity.name).attr(DEFAULT_TEXT_ATTRIBUTES);
-					});
-				}
+				// separate paper for Support Activities frame
+				var supportPaper = Snap();
+				$('#supportPart').height(17 + 33 * result.support.length)
+								 .append(supportPaper.node)
+								 .show();
+				$.each(result.support, function(activityIndex,
+						activityData) {
+					var activity = new SupportActivity(
+							supportPaper, activityIndex,
+							activityData.name, activityData.status,
+							activityData.url);
+					activity.shape = supportPaper
+							.path(activity.path);
+					activity.shape.attr(ActivityUtils
+							.getShapeAttributes(activity));
+					ActivityUtils.addDecoration(activity, null,
+							true);
+					ActivityUtils.addEffects(activity);
+					supportPaper.text(90, 24 + 33 * activityIndex,
+							activity.name).attr(DEFAULT_TEXT_ATTRIBUTES);
+				});
+			}
 
-				resizeElements();
-				// scroll to the current activity
-				if (!isHorizontalBar) {
-					$('#' + bar.containerId).scrollTop(
-								Math.max((currentActivityIndex - 1) * 60,0)
-							);
-				}
+			resizeElements();
+			// scroll to the current activity
+			if (!isHorizontalBar) {
+				$('#' + bar.containerId).scrollTop(
+							Math.max((currentActivityIndex - 1) * 60,0)
+						);
 			}
 		}
 	});
