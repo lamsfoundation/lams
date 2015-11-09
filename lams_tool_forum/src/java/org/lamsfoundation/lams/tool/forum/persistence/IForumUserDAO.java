@@ -18,8 +18,9 @@ public interface IForumUserDAO extends IBaseDAO {
 
     void delete(ForumUser user);
 
-    int getCountUsersBySession(Long sessionId);
+    int getCountUsersBySession(Long sessionId, String searchString);
 
-    List<ForumUser> getUsersForTablesorter(Long sessionId, int page, int size, int sorting);
+    List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
+
 
 }

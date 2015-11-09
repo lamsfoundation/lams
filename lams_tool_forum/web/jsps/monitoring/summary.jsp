@@ -89,16 +89,21 @@
 			theme: 'blue',
 		    sortInitialOrder: 'desc',
             sortList: [[0]],
-            widgets: [ "resizable" ],
+            widgets: [ "resizable", "filter" ],
+            headers: { 1: { filter: false}, 2: { filter: false}, 3: { filter: false}, 4: { filter: false} }, 
             widgetOptions: {
-            	resizable: true
+            	resizable: true,
+            	// include column filters 
+                filter_columnFilters: true, 
+                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_searchDelay: 700 
             }
 		});
 		
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?sessionMapID=${sessionMapID}&page={page}&size={size}&{sortList:column}&sessionId=" + $(this).attr('data-session-id'),
+				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?sessionMapID=${sessionMapID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionId=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 			    	if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
