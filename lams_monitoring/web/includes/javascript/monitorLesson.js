@@ -28,7 +28,7 @@ var originalSequenceCanvas = null,
 	sequenceRefreshInProgress = false,
 
 // total number of learners with ongoing progress
-	numberActiveLearners = 0,
+	learnerPossibleNumber = 0,
 // page in Learners tab
 	learnerProgressCurrentPageNumber = 1,
 
@@ -53,8 +53,7 @@ function initTabs(){
 		'activate' : function(event, ui) {
 			var sequenceInfoDialog = $('#sequenceInfoDialog');
 			if (ui.newPanel.attr('id') == 'tabSequence') {
-				if (sequenceInfoDialog.length > 0
-						&& !sequenceInfoDialog.dialog('option', 'showed')) {
+				if (sequenceTabShowInfo && !sequenceInfoDialog.dialog('option', 'showed')) {
 					sequenceInfoDialog.dialog('open');
 				}
 			} else if (sequenceInfoDialog.dialog('isOpen')) {
@@ -896,6 +895,12 @@ function updateSequenceTab() {
 				sequenceCanvas.html(sequenceCanvas.html());
 			}
 			
+			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
+				// the learner has not started the lesson yet, display an info box
+				sequenceClearSearchPhrase();
+				$('#sequenceInfoDialog').text(LABELS.PROGRESS_NOT_STARTED).dialog('open');
+			}
+			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
 			$('#learnersStartedPossibleCell').text(learnerTotalCount + ' / ' + response.numberPossibleLearners);
 			addCompletedLearnerIcons(response.completedLearners, response.completedLearnerCount, learnerTotalCount);
@@ -1378,12 +1383,14 @@ function highlightSearchedLearner(icon) {
 /**
  * Cancels the performed search.
  */
-function sequenceClearSearchPhrase(){
+function sequenceClearSearchPhrase(refresh){
 	$('#sequenceSearchPhrase').val('');
 	$('#sequenceSearchPhraseClear').css('visibility', 'hidden');
 	$('#sequenceSearchedLearnerHighlighter').hide();
 	sequenceSearchedLearner = null;
+	if (refresh) {
 	updateSequenceTab();
+}
 }
 
 
@@ -1619,8 +1626,8 @@ function learnersPageShift(increment){
  * Do the actual shifting of page numbers bar.
  */
 function shiftLearnerProgressPageHeader(startIndex, endIndex) {
-	var pageLeftCell = $('#learnersPageLeft');
-	var pageCount = Math.ceil(numberActiveLearners / 10);
+	var pageLeftCell = $('#learnersPageLeft'),
+		pageCount = Math.ceil(learnerPossibleNumber / 10);
 	$('#tabLearnerControlTable td.learnersHeaderPageCell').remove();
 	
 	if (startIndex < 1) {
@@ -1658,7 +1665,7 @@ function shiftLearnerProgressPageHeader(startIndex, endIndex) {
 function updateLearnerProgressHeader(pageNumber) {
 	var controlRow = $('#tabLearnerControlTable tr'),
 		learnersSearchPhrase = $('#learnersSearchPhrase').val();
-	if (numberActiveLearners < 10 && (!learnersSearchPhrase || learnersSearchPhrase.trim() == '')) {
+	if (learnerPossibleNumber < 10 && (!learnersSearchPhrase || learnersSearchPhrase.trim() == '')) {
 		// do not show the bar at all
 		$('.learnersHeaderCell', controlRow).hide();
 		return;
@@ -1666,7 +1673,7 @@ function updateLearnerProgressHeader(pageNumber) {
 	// show the bar
 	$('.learnersHeaderCell', controlRow).show();
 	
-	var pageCount = Math.ceil(numberActiveLearners / 10);
+	var pageCount = Math.ceil(learnerPossibleNumber / 10);
 	if (!pageNumber) {
 		pageNumber = 1;
 	} else if (pageNumber > pageCount) {
@@ -1743,7 +1750,7 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 		},
 		
 		success : function(response) {
-			numberActiveLearners = response.numberActiveLearners;
+			learnerPossibleNumber = response.learnerPossibleNumber;
 			updateLearnerProgressHeader(pageNumber);
 			
 			if (response.learners) {

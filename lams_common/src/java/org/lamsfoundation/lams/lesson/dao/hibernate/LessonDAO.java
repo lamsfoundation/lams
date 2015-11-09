@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.lesson.dao.hibernate;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
@@ -65,9 +66,11 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + " where organisation.organisationId=? and lessonStateId <= 6";
     private final static String LESSON_BY_SESSION_ID = "select lesson from Lesson lesson, ToolSession session where "
 	    + "session.lesson=lesson and session.toolSessionId=:toolSessionID";
-    private final static String COUNT_LEARNERS_CLASS = "SELECT COUNT(*) FROM Lesson AS lesson "
+
+    private final static String LOAD_LEARNERS_BY_LESSON = "FROM Lesson AS lesson "
 	    + "INNER JOIN lesson.lessonClass AS lessonClass INNER JOIN lessonClass.groups AS groups "
-	    + "INNER JOIN groups.users AS users" + " WHERE lesson.id = :lessonId";
+	    + "INNER JOIN groups.users AS users "
+	    + "WHERE lesson.id = :lessonId AND groups.groupName NOT LIKE '%Staff%'";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -83,7 +86,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     }
 
     @Override
-    public Lesson getLessonWithJoinFetchedProgress(final Long lessonId) {
+    public Lesson getLessonWithJoinFetchedProgress(Long lessonId) {
 
 	return (Lesson) getSession().createCriteria(Lesson.class).add(Restrictions.like("lessonId", lessonId))
 		.setFetchMode("learnerProgresses", FetchMode.JOIN).uniqueResult();
@@ -103,7 +106,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @return a List with all active lessons in it.
      */
     @Override
-    public List getActiveLessonsForLearner(final User learner) {
+    public List getActiveLessonsForLearner(User learner) {
 
 	Query query = getSession().getNamedQuery("activeLessonsAllOrganisations");
 	query.setInteger("userId", learner.getUserId().intValue());
@@ -121,7 +124,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @return a List with all active lessons in it.
      */
     @Override
-    public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId) {
+    public List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationId) {
 
 	Query query = getSession().getNamedQuery("activeLessons");
 	query.setInteger("userId", learnerId);
@@ -134,7 +137,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
      */
     @Override
-    public List getActiveLearnerByLesson(final long lessonId) {
+    public List getActiveLearnerByLesson(long lessonId) {
 
 	Query query = getSession().getNamedQuery("activeLearners");
 	query.setLong("lessonId", lessonId);
@@ -146,7 +149,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLessonAndGroup(long, long)
      */
     @Override
-    public List getActiveLearnerByLessonAndGroup(final long lessonId, final long groupId) {
+    public List getActiveLearnerByLessonAndGroup(long lessonId, long groupId) {
 	Query query = getSession().getNamedQuery("activeLearnersByGroup");
 	query.setLong("lessonId", lessonId);
 	query.setLong("groupId", groupId);
@@ -159,16 +162,31 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *      query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
      */
     @Override
-    public Integer getCountActiveLearnerByLesson(final long lessonId) {
+    public Integer getCountActiveLearnerByLesson(long lessonId) {
 	Query query = getSession().createQuery(LessonDAO.COUNT_ACTIVE_LEARNERS);
 	query.setLong("lessonId", lessonId);
 	Object value = query.uniqueResult();
 	return new Integer(((Number) value).intValue());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Integer getCountLearnerByLesson(final long lessonId) {
-	Query query = getSession().createQuery(LessonDAO.COUNT_LEARNERS_CLASS).setLong("lessonId", lessonId);
+    public List<User> getLearnersByLesson(Long lessonId, String searchPhrase, Integer limit, Integer offset) {
+	String queryText = LessonDAO.buildLearnersByLessonQuery(false, searchPhrase);
+	Query query = getSession().createQuery(queryText).setLong("lessonId", lessonId);
+	if (limit != null) {
+	    query.setMaxResults(limit);
+	}
+	if (offset != null) {
+	    query.setFirstResult(offset);
+	}
+	return query.list();
+    }
+
+    @Override
+    public Integer getCountLearnersByLesson(long lessonId, String searchPhrase) {
+	String queryText = LessonDAO.buildLearnersByLessonQuery(true, searchPhrase);
+	Query query = getSession().createQuery(queryText).setLong("lessonId", lessonId);
 	Object value = query.uniqueResult();
 	return ((Number) value).intValue();
     }
@@ -226,7 +244,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @return a List with all appropriate lessons in it.
      */
     @Override
-    public List getLessonsForMonitoring(final int userID, final int organisationID) {
+    public List getLessonsForMonitoring(int userID, int organisationID) {
 	Query query = getSession().getNamedQuery("lessonsForMonitoring");
 	query.setInteger("userId", userID);
 	query.setInteger("organisationId", organisationID);
@@ -242,7 +260,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @return the list of Lessons
      */
     @Override
-    public List getPreviewLessonsBeforeDate(final Date startDate) {
+    public List getPreviewLessonsBeforeDate(Date startDate) {
 	List lessons = this.doFind(LessonDAO.FIND_PREVIEW_BEFORE_START_DATE, startDate);
 	return lessons;
     }
@@ -251,7 +269,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * Get the lesson that applies to this activity. Not all activities have an attached lesson.
      */
     @Override
-    public Lesson getLessonForActivity(final long activityId) {
+    public Lesson getLessonForActivity(long activityId) {
 	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_FOR_ACTIVITY);
 	query.setLong("activityId", activityId);
 	return (Lesson) query.uniqueResult();
@@ -262,8 +280,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *      boolean)
      */
     @Override
-    public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId,
-	    final Integer userRole) {
+    public List getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole) {
 
 	String queryName;
 	if (Role.ROLE_MONITOR.equals(userRole)) {
@@ -287,7 +304,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *      boolean)
      */
     @Override
-    public List getLessonsByGroupAndUser(final Integer userId, final Integer orgId) {
+    public List getLessonsByGroupAndUser(Integer userId, Integer orgId) {
 	Query query = getSession().getNamedQuery("lessonsByOrgAndUserWithChildOrgs");
 	query.setInteger("userId", userId.intValue());
 	query.setInteger("orgId", orgId.intValue());
@@ -296,7 +313,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     }
 
     @Override
-    public List getLessonsByGroup(final Integer orgId) {
+    public List getLessonsByGroup(Integer orgId) {
 	return this.doFind(LessonDAO.LESSONS_BY_GROUP, orgId);
     }
 
@@ -304,7 +321,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOriginalLearningDesign(Integer)
      */
     @Override
-    public List getLessonsByOriginalLearningDesign(final Long ldId, final Integer orgId) {
+    public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId) {
 	Object[] args = { ldId.longValue(), orgId.intValue() };
 	List lessons = this.doFind(LessonDAO.LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
 	return lessons;
@@ -323,9 +340,25 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonDetailsFromSessionID(java.lang.Long)
      */
     @Override
-    public Lesson getLessonFromSessionID(final Long toolSessionID) {
+    public Lesson getLessonFromSessionID(Long toolSessionID) {
 	Query query = getSession().createQuery(LessonDAO.LESSON_BY_SESSION_ID);
 	query.setLong("toolSessionID", toolSessionID);
 	return (Lesson) query.uniqueResult();
+    }
+
+    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase) {
+	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "users ")
+		.append(LessonDAO.LOAD_LEARNERS_BY_LESSON);
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryText.append(" AND (users.firstName LIKE '%").append(token).append("%' OR users.lastName LIKE '%")
+			.append(token).append("%' OR users.login LIKE '%").append(token).append("%')");
+	    }
+	}
+	if (!count) {
+	    queryText.append(" ORDER BY users.firstName ASC, users.lastName ASC, users.login ASC");
+	}
+	return queryText.toString();
     }
 }

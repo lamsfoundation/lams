@@ -2370,9 +2370,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public List<User> getLearnersFromProgress(Long lessonId, String searchPhrase, boolean orderByCompletion,
-	    Integer limit, Integer offset) {
-	return learnerProgressDAO.getLearnersByLesson(lessonId, searchPhrase, orderByCompletion, limit, offset);
+    public List<User> getLearnersByMostProgress(Long lessonId, String searchPhrase, Integer limit, Integer offset) {
+	return learnerProgressDAO.getLearnersByMostProgress(lessonId, searchPhrase, limit, offset);
     }
 
     @Override

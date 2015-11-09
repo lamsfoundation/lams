@@ -74,10 +74,12 @@ public interface ILessonService {
      */
     Integer getCountActiveLessonLearners(Long lessonId);
 
+    List<User> getLessonLearners(Long lessonId, String searchPhrase, Integer limit, Integer offset);
+
     /**
      * Get the count of all the learners who are a part of the lesson class.
      */
-    Integer getCountLessonLearners(Long lessonId);
+    Integer getCountLessonLearners(Long lessonId, String searchPhrase);
 
     /**
      * Get the lesson details for the LAMS client. Suitable for the monitoring client. Contains a count of the total

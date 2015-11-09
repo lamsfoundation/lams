@@ -41,6 +41,7 @@
 			presenceEnabled =  false,
 			hasDialog = false,
 			enableExportPortfolio = ${enableExportPortfolio},
+			sequenceTabShowInfo = ${sequenceTabShowInfo eq true},
 			
 			LAMS_URL = '<lams:LAMSURL/>',
 			
@@ -136,6 +137,8 @@
 				TOSTART_ACTIVITY : '<c:out value="${TOSTART_ACTIVITY_VAR}" />',
 				<fmt:message key="label.learner.progress.activity.support.tooltip" var="SUPPORT_ACTIVITY_VAR"/>
 				SUPPORT_ACTIVITY : '<c:out value="${SUPPORT_ACTIVITY_VAR}" />',
+				<fmt:message key="label.learner.progress.not.started" var="PROGRESS_NOT_STARTED_VAR"/>
+				PROGRESS_NOT_STARTED : '<c:out value="${PROGRESS_NOT_STARTED_VAR}" />',
 				<fmt:message key="button.export" var="EXPORT_PORTFOLIO_VAR"/>
 				EXPORT_PORTFOLIO : '<c:out value="${EXPORT_PORTFOLIO_VAR}" />',
 				<fmt:message key="button.export.learner.tooltip" var="EXPORT_PORTFOLIO_LEARNER_TOOLTIP_VAR"/>
@@ -432,7 +435,7 @@
 			</a>
 			<img id="sequenceSearchPhraseClear"
 				 src="<lams:LAMSURL/>images/css/delete.png"
-				 onClick="javascript:sequenceClearSearchPhrase()"
+				 onClick="javascript:sequenceClearSearchPhrase(true)"
 				 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
 			/>
 			<input id="sequenceSearchPhrase" />
@@ -544,11 +547,9 @@
 		<iframe id="emailFrame"></iframe>
 	</div>
 	
-	<c:if test="${sequenceTabShowInfo}">
-		<div id="sequenceInfoDialog" class="dialogContainer">
-			<fmt:message key="sequence.help.info"/>
-		</div>
-	</c:if>
+	<div id="sequenceInfoDialog" class="dialogContainer">
+		<fmt:message key="sequence.help.info"/>
+	</div>
 	
 	<div id="forceBackwardsDialog" class="dialogContainer"></div>
 	
