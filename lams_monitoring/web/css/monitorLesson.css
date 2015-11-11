@@ -78,6 +78,28 @@ div.dialogListItemDisabled {
 	cursor: pointer;
 }
 
+#learnerGroupDialog td {
+	padding: 0;
+}
+
+#learnerGroupDialog td.learnerGroupNav {
+	padding: 5px 0;
+	cursor: pointer;
+}
+
+#learnerGroupDialog td.learnerGroupNav:hover {
+	background-color: #D0E5F5;
+}
+
+td.learnerGroupNav span {
+	margin: auto;
+}
+
+#learnerGroupPage {
+	text-align: center;
+	width: 100px;
+}
+
 /********** LESSON TAB STYLES **********/
 div#tabLesson {
 /*	height: 540px;*/
@@ -196,7 +218,7 @@ img#sequenceCanvasLoading {
 	margin: 6px 5px 5px 0;
 }
 
-.topButtonsContainer #sequenceSearchPhraseLabel {
+.topButtonsContainer #sequenceSearchPhraseIcon {
 	float: right;
 	margin: 9px 7px 5px 0;
 }
@@ -237,14 +259,30 @@ td.learnersHeaderCell {
 	border-right: thin solid #2E6E9E;
 }
 
-#learnersSearchPhraseCell img {
-	cursor: pointer;
-	vertical-align: middle;
+#learnersSearchPhraseIcon {
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 4px;
 }
 
-td.learnersHeaderPageCell,td.learnersPageShifter {
+#learnersSearchPhrase {
+	width: 80%;
+}
+
+#learnersSearchPhraseClear {
+	cursor: pointer;
+	float: right;
+	margin: 3px 2px 0 0;
+	display: none; 
+}
+
+td.learnersHeaderPageCell, td.learnersPageShifter {
 	min-width: 25px;
 	cursor: pointer;
+}
+
+td.learnersPageShifter span {
+	margin: auto;
 }
 
 td.learnersHeaderPageCell:hover,td.learnersPageShifter:hover {

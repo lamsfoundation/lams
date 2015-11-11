@@ -1525,13 +1525,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	case MonitoringConstants.LESSON_TYPE_HAVENT_FINISHED_LESSON:
 	    Set<User> allUsers = lesson.getAllLearners();
-	    List<User> usersCompletedLesson = getUsersCompletedLesson(lessonId);
+	    List<User> usersCompletedLesson = getUsersCompletedLesson(lessonId, null, null, true);
 	    users = CollectionUtils.subtract(allUsers, usersCompletedLesson);
 	    break;
 
 	case MonitoringConstants.LESSON_TYPE_HAVE_FINISHED_LESSON:
 	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
-	    users = getUsersCompletedLesson(lessonId);
+	    users = getUsersCompletedLesson(lessonId, null, null, true);
 	    break;
 
 	case MonitoringConstants.LESSON_TYPE_HAVENT_STARTED_LESSON:
@@ -1591,7 +1591,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    int i = 0;
 	    for (String lessonIdStr : lessonIds) {
 		lessonId = Long.parseLong(lessonIdStr);
-		List<User> completedLesson = getUsersCompletedLesson(lessonId);
+		List<User> completedLesson = getUsersCompletedLesson(lessonId, null, null, true);
 		if (i++ == 0) {
 		    users = completedLesson;
 		} else {
@@ -1613,7 +1613,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    // subtract the ones which have completed any of the selected lessons
 	    for (String lessonIdStr : lessonIds) {
 		lessonId = Long.parseLong(lessonIdStr);
-		List<User> completedLesson = getUsersCompletedLesson(lessonId);
+		List<User> completedLesson = getUsersCompletedLesson(lessonId, null, null, true);
 		users = CollectionUtils.subtract(users, completedLesson);
 	    }
 	    break;
@@ -1639,11 +1639,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @return
      */
     @Override
-    public List<User> getUsersCompletedLesson(Long lessonId) {
+    public List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending) {
 	List<User> usersCompletedLesson = new LinkedList<User>();
 
 	List<LearnerProgress> completedLearnerProgresses = learnerProgressDAO
-		.getCompletedLearnerProgressForLesson(lessonId);
+		.getCompletedLearnerProgressForLesson(lessonId, limit, offset, orderAscending);
 	for (LearnerProgress learnerProgress : completedLearnerProgresses) {
 	    usersCompletedLesson.add(learnerProgress.getUser());
 	}
@@ -2365,8 +2365,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset) {
-	return learnerProgressDAO.getLearnersByActivities(activityIds, limit, offset);
+    public List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset, boolean orderAscending) {
+	return learnerProgressDAO.getLearnersByActivities(activityIds, limit, offset, orderAscending);
     }
 
     @Override
