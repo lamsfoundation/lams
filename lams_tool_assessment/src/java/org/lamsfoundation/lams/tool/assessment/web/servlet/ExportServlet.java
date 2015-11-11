@@ -28,7 +28,6 @@ package org.lamsfoundation.lams.tool.assessment.web.servlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -43,7 +42,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.Summary;
+import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -181,12 +180,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    throw new AssessmentApplicationException(error);
 	}
 
-	List<Summary> summaryList = service.getSummaryList(toolContentID);
+	List<SessionDTO> summaryList = service.getSessionDataForExport(toolContentID);
 
 	ArrayList<QuestionSummary> questionSummaryList = new ArrayList<QuestionSummary>();
 	Set<AssessmentQuestion> questions = content.getQuestions();
 	for (AssessmentQuestion question : questions) {
-	    QuestionSummary questionSummary = service.getQuestionSummary(toolContentID, question.getUid());
+	    QuestionSummary questionSummary = service.getQuestionDataForExport(toolContentID, question.getUid());
 	    questionSummaryList.add(questionSummary);
 	}
 
