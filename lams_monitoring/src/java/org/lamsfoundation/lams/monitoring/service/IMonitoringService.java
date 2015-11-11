@@ -700,7 +700,7 @@ public interface IMonitoringService {
     /**
      * Get learners who are at the given activities at the moment.
      */
-    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset);
+    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset, boolean orderAscending);
 
     /**
      * Get number of learners whose first name, last name or login match any of the tokens from search phrase.
@@ -744,5 +744,5 @@ public interface IMonitoringService {
     /**
      * Get list of users who completed the given lesson.
      */
-    List<User> getUsersCompletedLesson(Long lessonId);
+    List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending);
 }
