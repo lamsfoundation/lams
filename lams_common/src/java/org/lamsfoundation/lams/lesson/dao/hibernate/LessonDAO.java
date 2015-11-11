@@ -219,8 +219,8 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     @SuppressWarnings("unchecked")
     @Override
     public List<User> getLearnersByLesson(final Long lessonId, String searchPhrase, final Integer limit,
-	    final Integer offset) {
-	final String queryText = LessonDAO.buildLearnersByLessonQuery(false, searchPhrase);
+	    final Integer offset, boolean orderAscending) {
+	final String queryText = LessonDAO.buildLearnersByLessonQuery(false, searchPhrase, orderAscending);
 
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
@@ -241,7 +241,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 
     @Override
     public Integer getCountLearnersByLesson(final long lessonId, String searchPhrase) {
-	final String queryText = LessonDAO.buildLearnersByLessonQuery(true, searchPhrase);
+	final String queryText = LessonDAO.buildLearnersByLessonQuery(true, searchPhrase, true);
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
@@ -447,7 +447,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	});
     }
 
-    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase) {
+    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase, boolean orderAscending) {
 	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "users ")
 		.append(LessonDAO.LOAD_LEARNERS_BY_LESSON);
 	if (!StringUtils.isBlank(searchPhrase)) {
@@ -458,7 +458,9 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    }
 	}
 	if (!count) {
-	    queryText.append(" ORDER BY users.firstName ASC, users.lastName ASC, users.login ASC");
+	    String order = orderAscending ? "ASC" : "DESC";
+	    queryText.append(" ORDER BY users.firstName ").append(order).append(", users.lastName ").append(order)
+		    .append(", users.login ").append(order);
 	}
 	return queryText.toString();
     }

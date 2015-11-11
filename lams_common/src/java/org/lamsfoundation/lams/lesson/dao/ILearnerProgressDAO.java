@@ -94,7 +94,7 @@ public interface ILearnerProgressDAO {
     /**
      * Get learners who are at the given activities at the moment.
      */
-    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset);
+    List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset, boolean orderAscending);
 
     /**
      * Get learners who most recently finished the lesson.
@@ -102,19 +102,19 @@ public interface ILearnerProgressDAO {
     List<User> getLearnersLatestCompletedForLesson(Long lessonId, Integer limit, Integer offset);
 
     /**
-     * Get learners whose first name, last name or login match any of the tokens from search phrase.
-     * Sort by most progressed first, then by name.
-     * Used by Learners tab in Monitoring interface.
+     * Get learners whose first name, last name or login match any of the tokens from search phrase. Sort by most
+     * progressed first, then by name. Used by Learners tab in Monitoring interface.
      */
     List<User> getLearnersByMostProgress(Long lessonId, String searchPhrase, Integer limit, Integer offset);
 
     /**
-     * Get all the learner progress records for a lesson where the progress is marked as completed.
+     * Get learner progress records for a lesson where the progress is marked as completed.
      * 
      * @param lessonId
      * @return List<LearnerProgress>
      */
-    List<LearnerProgress> getCompletedLearnerProgressForLesson(Long lessonId);
+    List<LearnerProgress> getCompletedLearnerProgressForLesson(Long lessonId, Integer limit, Integer offset,
+	    boolean orderAscending);
 
     /**
      * Get all the learner progress records for a lesson.

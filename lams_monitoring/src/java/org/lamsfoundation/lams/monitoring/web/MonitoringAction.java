@@ -656,22 +656,37 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
+    /**
+     * Get learners who are part of the lesson class.
+     */
     public ActionForward getLessonLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    wddxPacket = getMonitoringService().getLessonLearners(lessonID, getUserId());
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLessonLearners").serializeMessage();
+	    HttpServletResponse response) throws IOException, JSONException {
+	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
+	if (pageNumber == null) {
+	    pageNumber = 1;
 	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
+	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+	List<User> learners = getLessonService().getLessonLearners(lessonId, null, 10, (pageNumber - 1) * 10,
+		orderAscending);
+	JSONArray learnersJSON = new JSONArray();
+	for (User learner : learners) {
+	    learnersJSON.put(WebUtil.userToJSON(learner));
+	}
+
+	Integer learnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("learners", learnersJSON);
+	responseJSON.put("learnerCount", learnerCount);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responseJSON.toString());
 	return null;
     }
 
     /**
-     * Gets learners or monitors of either the lesson only or the lesson and organisation containing it.
+     * Gets learners or monitors of the lesson and organisation containing it.
      */
     @SuppressWarnings("unchecked")
     public ActionForward getClassMembers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -679,39 +694,31 @@ public class MonitoringAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
 	boolean getMonitors = Role.MONITOR.equalsIgnoreCase(role);
-	boolean classOnly = WebUtil.readBooleanParam(request, "classOnly", true);
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	Set<User> classUsers = getMonitors ? lesson.getLessonClass().getStaffGroup().getUsers()
 		: lesson.getLessonClass().getLearners();
 	JSONArray responseJSON = new JSONArray();
 
-	// get class members
 	for (User user : classUsers) {
 	    JSONObject userJSON = WebUtil.userToJSON(user);
-	    if (!classOnly) {
-		// mark that this user is a class member
-		userJSON.put("classMember", true);
-		if (lesson.getUser().equals(user)) {
-		    // mark this user is lesson author
-		    userJSON.put("lessonCreator", true);
-		}
+	    // mark that this user is a class member
+	    userJSON.put("classMember", true);
+	    if (lesson.getUser().equals(user)) {
+		// mark this user is lesson author
+		userJSON.put("lessonCreator", true);
 	    }
 	    responseJSON.put(userJSON);
 	}
 
-	// add non-class, organisation members, if requested
-	if (!classOnly) {
-	    IUserManagementService userManagementService = MonitoringServiceProxy
-		    .getUserManagementService(getServlet().getServletContext());
-	    List<User> orgUsers = userManagementService.getUsersFromOrganisationByRole(
-		    lesson.getOrganisation().getOrganisationId(), getMonitors ? Role.MONITOR : Role.LEARNER, false,
-		    true);
-	    for (User user : orgUsers) {
-		if (!classUsers.contains(user)) {
-		    JSONObject userJSON = WebUtil.userToJSON(user);
-		    userJSON.put("classMember", false);
-		    responseJSON.put(userJSON);
-		}
+	IUserManagementService userManagementService = MonitoringServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
+	List<User> orgUsers = userManagementService.getUsersFromOrganisationByRole(
+		lesson.getOrganisation().getOrganisationId(), getMonitors ? Role.MONITOR : Role.LEARNER, false, true);
+	for (User user : orgUsers) {
+	    if (!classUsers.contains(user)) {
+		JSONObject userJSON = WebUtil.userToJSON(user);
+		userJSON.put("classMember", false);
+		responseJSON.put(userJSON);
 	    }
 	}
 
@@ -725,15 +732,25 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward getCurrentLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
-	JSONArray responseJSON = new JSONArray();
+	JSONArray learnersJSON = new JSONArray();
+	Integer learnerCount = null;
+
+	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
+	if (pageNumber == null) {
+	    pageNumber = 1;
+	}
+	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
 	// if activity ID is provided, lesson ID is ignored
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	if (activityId == null) {
 	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    List<User> learners = getMonitoringService().getUsersCompletedLesson(lessonId);
+	    List<User> learners = getMonitoringService().getUsersCompletedLesson(lessonId, 10, (pageNumber - 1) * 10,
+		    orderAscending);
 	    for (User learner : learners) {
-		responseJSON.put(WebUtil.userToJSON(learner));
+		learnersJSON.put(WebUtil.userToJSON(learner));
 	    }
+
+	    learnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
 	} else {
 	    boolean flaFormat = WebUtil.readBooleanParam(request, "flaFormat", true);
 	    Activity activity = getMonitoringService().getActivityById(activityId);
@@ -750,12 +767,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 
 	    List<User> learners = getMonitoringService().getLearnersByActivities(activities.toArray(new Long[] {}),
-		    null, null);
+		    null, null, orderAscending);
 	    for (User learner : learners) {
-		responseJSON.put(WebUtil.userToJSON(learner));
+		learnersJSON.put(WebUtil.userToJSON(learner));
 	    }
+
+	    learnerCount = getMonitoringService().getCountLearnersCurrentActivity(activity);
 	}
 
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("learners", learnersJSON);
+	responseJSON.put("learnerCount", learnerCount);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
@@ -986,7 +1008,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	// either sort by name or how much a learner progressed into the lesson
 	List<User> learners = isProgressSorted
 		? getMonitoringService().getLearnersByMostProgress(lessonId, searchPhrase, 10, (pageNumber - 1) * 10)
-		: getLessonService().getLessonLearners(lessonId, searchPhrase, 10, (pageNumber - 1) * 10);
+		: getLessonService().getLessonLearners(lessonId, searchPhrase, 10, (pageNumber - 1) * 10, true);
 	JSONObject responseJSON = new JSONObject();
 	for (User learner : learners) {
 	    responseJSON.append("learners", WebUtil.userToJSON(learner));
@@ -1277,7 +1299,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String searchPhrase = request.getParameter("term");
 
-	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase, 10, null);
+	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase, 10, null, true);
 	JSONArray responseJSON = new JSONArray();
 	for (User learner : learners) {
 	    JSONObject learnerJSON = new JSONObject();
