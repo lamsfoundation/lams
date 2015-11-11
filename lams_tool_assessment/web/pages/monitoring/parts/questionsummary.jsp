@@ -9,6 +9,7 @@
 		
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
+		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 		
 		<link type="text/css" href="<lams:LAMSURL />css/jquery-ui-redmond-theme.css" rel="stylesheet">
 		<link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
@@ -26,33 +27,36 @@
 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
   	    <script>
   	    	var isEdited = false;
-  	    	var previousCellValue = "";  	    	
-  	    	var numberOfValues = 0;
+  	    	var previousCellValue = "";
 	  	  	$(document).ready(function(){
-	  			<c:forEach var="questionResultsPerSession" items="${questionSummary.questionResultsPerSession}" varStatus="status">
-	  				<c:set var="session" value="${questionResultsPerSession[0].user.session}"/>
+	  	  		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		  			
-	  				jQuery("#session${session.sessionId}").jqGrid({
-	  					datatype: "local",
-	  					rowNum: 10000,
+	  				jQuery("#session${sessionDto.sessionId}").jqGrid({
+	  					datatype: "json",
+	  					url: "<c:url value="/monitoring/getUsersByQuestion.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}&questionUid=${questionSummary.question.uid}",
 	  					height: 'auto',
 	  					autowidth: true,
 	  					shrinkToFit: false,
-	  					
+	  				    pager: 'pager${sessionDto.sessionId}',
+	  				    rowList:[5,10,20,30],
+	  				    rowNum:10,
+	  				    viewrecords:true,
+	  				    recordpos: 'left',
 	  				   	colNames:['questionResultUid',
+	  				   	     	'maxMark',
 	  		  				   	"<fmt:message key="label.monitoring.summary.user.name" />",
 	  							"<fmt:message key="label.monitoring.user.summary.response" />",
 	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
 	  						    
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
-							{name:'userName',index:'userName', width:120},
-	  				   		{name:'response', index:'response', width:427, sortable:false},
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
+							{name:'maxMark', index:'maxMark', width:0, hidden: true},
+							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }},
+	  				   		{name:'response', index:'response', width:427, sortable:false, search:false},
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
 	  				   	],
-	  				   	
 	  				   	multiselect: false,
-	  				   	caption: "${session.sessionName}",
+	  				   	caption: "${sessionDto.sessionName}",
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
 	  				  	cellEdit: true,
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
@@ -63,27 +67,29 @@
 	  	  						return null;
 	  	  					}
 	  						
-	  						var maxGrade = jQuery("table#session${session.sessionId} tr#" + iRow 
-	  								              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
-	  						if (+val > +maxGrade) {
-	  							return maxGrade;
+	  						var maxMark = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'maxMark');
+	  						
+	  						if (+val > +maxMark) {
+	  							return maxMark;
 	  						}
 	  					},
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
-	  				  		var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');
+	  				  		var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
 	  				  		if (isNaN(val) || (questionResultUid=="")) {
-	  				  			jQuery("#session${session.sessionId}").restoreCell(iRow,iCol); 
+	  				  			jQuery("#session${sessionDto.sessionId}").restoreCell(iRow,iCol); 
 	  				  		} else {
 	  				  			isEdited = true;
+	  				  			
+	  				  			var numberOfValues = jQuery("#myGrid").jqGrid('getGridParam', 'records');
 	  				  			var averageMark = (eval($("#averageMark").html())*numberOfValues - eval(previousCellValue) + eval(val))/numberOfValues;
 	  				  			$("#averageMark").html(averageMark);
-	  				  		}	
+	  				  		}
   						},	  		
 	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
 	  				  		if (isNaN(val)) {
 	  				  			return {nan:true};
 	  				  		} else {
-	  							var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');
+	  							var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
 	  							return {questionResultUid:questionResultUid};		  				  		
 	  				  		}
 	  					}
@@ -95,36 +101,15 @@
 	  						$("[id^='user']").resetSelection();
 	  					},
 	  					onCellSelect: function (rowid, iCol, cellcontent){
-	  						jQuery("#session${session.sessionId}}").resetSelection();
+	  						jQuery("#session${sessionDto.sessionId}}").resetSelection();
 	  					}*/ 	  				  	
-	  				});
-	  				
-	  	   	        <c:forEach var="questionResult" items="${questionResultsPerSession}" varStatus="i">
-			   	   	  	<c:choose>
-			   	   			<c:when test="${questionResult.uid != null}">
-			  	   	        	var responseStr = "";
-								numberOfValues++;
-			  	   	       		<c:set var="question" value="${questionResult.assessmentQuestion}"/>			  	   	        	
-			  	   	       		<%@ include file="userresponse.jsp"%>	
-			  	   	       		var grade = "<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>";	
-			   	   			</c:when>
-			   	   			<c:otherwise>
-			  	   	        	var responseStr = "-";
-			  	   	       		var grade = "-";	
-			   	   			</c:otherwise>
-		   	   			</c:choose>		  	   	        
-
-	  	   	     		var table = jQuery("#session${session.sessionId}");
-	  	   	     		table.addRowData(${i.index + 1}, {
-	  	   	     			questionResultUid:"${questionResult.uid}",
-	  	   	     			userName:"${questionResult.user.lastName}, ${questionResult.user.firstName}",
-	  	   	   	   			response:responseStr,
-	  	   	   	   			grade:grade
-	  	   	   	   	    });
-	  	   	     		
-	  	   	   			// set maxGrade attribute to cell DOM element
-	  	 	 	     	table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  ${questionResult.maxMark}});
-	  		        </c:forEach>			
+	  				})
+	  				<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
+		  				.jqGrid('filterToolbar', { 
+		  					searchOnEnter: false
+		  				})
+	  				</c:if>
+	  				.navGrid("#pager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false, refresh:false});		
 	  				
 	  			</c:forEach>
 
@@ -210,6 +195,7 @@
 					</td>
 				</tr>
 				
+				<!-- 
 				<tr>
 					<th style="width: 180px;" >
 						<fmt:message key="label.monitoring.question.summary.average.mark" />
@@ -217,18 +203,19 @@
 					<td>
 						<div id="averageMark">${questionSummary.averageMark}</div>
 					</td>
-				</tr>				
+				</tr>
+				 -->				
 			</table>
 			<br><br>
 			
-			<c:forEach var="questionResultsPerSession" items="${questionSummary.questionResultsPerSession}" varStatus="status">
-				<c:set var="session" value="${questionResultsPerSession[0].user.session}"/>
+			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 				<div style="padding-left: 0px; padding-bottom: 30px; width:99%;">
 					<div style="font-size: small; padding-bottom: 5px;">
-						<fmt:message key="label.monitoring.question.summary.group" /> ${session.sessionName}
+						<fmt:message key="label.monitoring.question.summary.group" /> ${sessionDto.sessionName}
 					</div>
 					
-					<table id="session${session.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+					<table id="session${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+					<div id="pager${sessionDto.sessionId}" class="scroll"></div>
 				</div>	
 			</c:forEach>	
 

@@ -39,16 +39,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.Summary;
+import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
@@ -81,7 +87,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 
 	String param = mapping.getParameter();
@@ -102,7 +108,13 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("setSubmissionDeadline")) {
 	    return setSubmissionDeadline(mapping, form, request, response);
-	}	
+	}
+	if (param.equals("getUsers")) {
+	    return getUsers(mapping, form, request, response);
+	}
+	if (param.equals("getUsersByQuestion")) {
+	    return getUsersByQuestion(mapping, form, request, response);
+	}
 	if (param.equals("exportSummary")) {
 	    return exportSummary(mapping, form, request, response);
 	}
@@ -112,14 +124,15 @@ public class MonitoringAction extends Action {
 
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	initAssessmentService();
+	
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	service = getAssessmentService();
-	List<Summary> summaryList = service.getSummaryList(contentId);
+	List<SessionDTO> sessionDtos = service.getSessionDtos(contentId);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	
@@ -160,7 +173,7 @@ public class MonitoringAction extends Action {
 	// cache into sessionMap
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
-	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, summaryList);
+	sessionMap.put("sessionDtos", sessionDtos);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, questionList);
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
@@ -171,9 +184,9 @@ public class MonitoringAction extends Action {
 
     private ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	initAssessmentService();
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
-	service = getAssessmentService();
 	AssessmentResult result = service.getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
@@ -182,6 +195,7 @@ public class MonitoringAction extends Action {
 
     private ActionForward questionSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -191,7 +205,6 @@ public class MonitoringAction extends Action {
 	    return null;
 	}
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	service = getAssessmentService();
 	QuestionSummary questionSummary = service.getQuestionSummary(contentId, questionUid);
 
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
@@ -200,6 +213,7 @@ public class MonitoringAction extends Action {
 
     private ActionForward userSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -207,7 +221,6 @@ public class MonitoringAction extends Action {
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	service = getAssessmentService();
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
@@ -219,9 +232,9 @@ public class MonitoringAction extends Action {
 
 	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
+	    initAssessmentService();
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
 	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));
-	    service = getAssessmentService();
 	    service.changeQuestionResultMark(questionResultUid, newGrade);
 	}
 
@@ -239,7 +252,7 @@ public class MonitoringAction extends Action {
      */
     private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	service = getAssessmentService();
+	initAssessmentService();
 	
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentID);
@@ -258,6 +271,195 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
+    
+    /**
+     * Refreshes user list.
+     */
+    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	initAssessmentService();
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	
+	Long sessionId = WebUtil.readLongParam(request, "sessionId");
+	
+	// Getting the params passed in from the jqGrid
+	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	if (sortBy == "") {
+	    sortBy = "userName";
+	}
+	String searchString = WebUtil.readStrParam(request, "userName", true);
+	
+	List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
+	int countSessionUsers = 0;
+	//in case of UseSelectLeaderToolOuput - display only one user
+	if (assessment.isUseSelectLeaderToolOuput()) {
+	    
+	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentUser groupLeader = session.getGroupLeader();
+	    
+	    if (groupLeader != null) {
+
+		float assessmentResult = service.getLastFinishedAssessmentResultGrade(assessment.getUid(),
+			groupLeader.getUserId());
+
+		AssessmentUserDTO userDto = new AssessmentUserDTO();
+		userDto.setUserId(groupLeader.getUserId());
+		userDto.setFirstName(groupLeader.getFirstName());
+		userDto.setLastName(groupLeader.getLastName());
+		userDto.setGrade(assessmentResult);
+		userDtos.add(userDto);
+		countSessionUsers = 1;
+	    }
+	    
+	} else {
+	    // Get the user list from the db
+	    userDtos = service.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder, searchString);
+	    countSessionUsers = service.getCountUsersBySession(sessionId, searchString);
+	}
+
+	int totalPages = new Double(Math.ceil(new Integer(countSessionUsers).doubleValue()
+		/ new Integer(rowLimit).doubleValue())).intValue();
+
+	JSONArray rows = new JSONArray();
+	int i = 1;
+	for (AssessmentUserDTO userDto : userDtos) {
+
+	    JSONArray userData = new JSONArray();
+	    userData.put(i);
+	    userData.put(userDto.getUserId());
+	    userData.put(sessionId);
+	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " "
+		    + userDto.getLastName());
+	    userData.put(fullName);
+	    userData.put(userDto.getGrade());
+
+	    JSONObject userRow = new JSONObject();
+	    userRow.put("id", i++);
+	    userRow.put("cell", userData);
+
+	    rows.put(userRow);
+	}
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("total", totalPages);
+	responseJSON.put("page", page);
+	responseJSON.put("records", countSessionUsers);
+	responseJSON.put("rows", rows);
+	
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responseJSON.toString()));
+	return null;
+     }
+    
+    /**
+     * Refreshes user list.
+     */
+    public ActionForward getUsersByQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	initAssessmentService();
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	
+	Long sessionId = WebUtil.readLongParam(request, "sessionId");
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	
+	// Getting the params passed in from the jqGrid
+	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	if (sortBy == "") {
+	    sortBy = "userName";
+	}
+	String searchString = WebUtil.readStrParam(request, "userName", true);
+	
+	List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
+	int countSessionUsers = 0;
+	//in case of UseSelectLeaderToolOuput - display only one user
+	if (assessment.isUseSelectLeaderToolOuput()) {
+	    
+	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentUser groupLeader = session.getGroupLeader();
+	    
+	    if (groupLeader != null) {
+
+		AssessmentResult assessmentResult = service.getLastFinishedAssessmentResult(assessment.getUid(),
+			groupLeader.getUserId());
+		Long questionResultUid = null;
+		if (assessmentResult != null) {
+		    for (AssessmentQuestionResult dbQuestionResult : assessmentResult.getQuestionResults()) {
+			if (dbQuestionResult.getAssessmentQuestion().getUid().equals(questionUid)) {
+			    questionResultUid = dbQuestionResult.getUid();
+			    break;
+			}
+		    }
+		}
+
+		AssessmentUserDTO userDto = new AssessmentUserDTO();
+		userDto.setQuestionResultUid(questionResultUid);
+		userDto.setFirstName(groupLeader.getFirstName());
+		userDto.setLastName(groupLeader.getLastName());
+		userDtos.add(userDto);
+		countSessionUsers = 1;
+	    }
+	    
+	} else {
+	    // Get the user list from the db
+	    userDtos = service.getPagedUsersBySessionAndQuestion(sessionId, questionUid, page - 1, rowLimit, sortBy, sortOrder, searchString);
+	    countSessionUsers = service.getCountUsersBySession(sessionId, searchString);
+	}
+
+	int totalPages = new Double(Math.ceil(new Integer(countSessionUsers).doubleValue()
+		/ new Integer(rowLimit).doubleValue())).intValue();
+
+	JSONArray rows = new JSONArray();
+	int i = 1;
+	for (AssessmentUserDTO userDto : userDtos) {
+	    
+	    Long questionResultUid = userDto.getQuestionResultUid();
+	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " "
+		    + userDto.getLastName());
+	    
+	    JSONArray userData = new JSONArray();
+	    if (questionResultUid != null) {
+		AssessmentQuestionResult questionResult = service.getAssessmentQuestionResultByUid(questionResultUid);
+		userData.put(questionResultUid);
+		userData.put(questionResult.getMaxMark());
+		userData.put(fullName);
+		userData.put(getAnswerObject(questionResult, true));
+		userData.put(questionResult.getMark());
+		
+	    } else {
+		userData.put("");
+		userData.put("");
+		userData.put(fullName);
+		userData.put("-");
+		userData.put("-");
+	    }
+
+	    JSONObject userRow = new JSONObject();
+	    userRow.put("id", i++);
+	    userRow.put("cell", userData);
+
+	    rows.put(userRow);
+	}
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("total", totalPages);
+	responseJSON.put("page", page);
+	responseJSON.put("records", countSessionUsers);
+	responseJSON.put("rows", rows);
+	
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responseJSON.toString()));
+	return null;
+    }
 
     /**
      * Export Excel format survey data.
@@ -271,6 +473,7 @@ public class MonitoringAction extends Action {
      */
     private ActionForward exportSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
+	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	String fileName = null;
@@ -287,7 +490,6 @@ public class MonitoringAction extends Action {
 	    showUserNames = false;
 	}
 
-	service = getAssessmentService();
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	
 	if (assessment != null) {
@@ -317,8 +519,8 @@ public class MonitoringAction extends Action {
 
     @SuppressWarnings("unchecked")
     private ExcelCell[][] getUserSummaryData(Assessment assessment, boolean showUserNames) {
+	initAssessmentService();
 	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
-	service = getAssessmentService();
 
 	if (assessment != null) {
 	    // Create the question summary
@@ -363,7 +565,7 @@ public class MonitoringAction extends Action {
 			questionType = getQuestionTypeLanguageLabel(question.getType());
 			penaltyFactor = question.getPenaltyFactor();
 
-			QuestionSummary questionSummary = service.getQuestionSummary(assessment.getContentId(),
+			QuestionSummary questionSummary = service.getQuestionDataForExport(assessment.getContentId(),
 				question.getUid());
 			if (questionSummary != null) {
 			    averageMark = questionSummary.getAverageMark();
@@ -398,19 +600,19 @@ public class MonitoringAction extends Action {
 
 	    // Adding the user results/marks summary ---------------------------
 
-	    List<Summary> summaryList = service.getSummaryList(assessment.getContentId());
+	    List<SessionDTO> summaryList = service.getSessionDataForExport(assessment.getContentId());
 	    if (summaryList != null) {
-		for (Summary summary : summaryList) {
+		for (SessionDTO sessionDTO : summaryList) {
 
 		    data.add(EMPTY_ROW);
 
 		    ExcelCell[] sessionTitle = new ExcelCell[1];
-		    sessionTitle[0] = new ExcelCell(summary.getSessionName(), true);
+		    sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		    data.add(sessionTitle);
 
 		    //List<AssessmentResult> assessmentResults = summary.getAssessmentResults();
 
-		    AssessmentSession assessmentSession = service.getAssessmentSessionBySessionId(summary
+		    AssessmentSession assessmentSession = service.getAssessmentSessionBySessionId(sessionDTO
 			    .getSessionId());
 
 		    Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
@@ -461,7 +663,7 @@ public class MonitoringAction extends Action {
 					    userResultRow[2] = new ExcelCell(assessmentResult.getStartDate(), false);
 					    userResultRow[3] = new ExcelCell(questionResult
 						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[4] = new ExcelCell(getAnswerObject(questionResult),
+					    userResultRow[4] = new ExcelCell(getAnswerObject(questionResult, false),
 						    false);
 					    userResultRow[5] = new ExcelCell(questionResult.getMark(), false);
 					    data.add(userResultRow);
@@ -471,7 +673,7 @@ public class MonitoringAction extends Action {
 					    userResultRow[1] = new ExcelCell(assessmentResult.getStartDate(), false);
 					    userResultRow[2] = new ExcelCell(questionResult
 						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[3] = new ExcelCell(getAnswerObject(questionResult),
+					    userResultRow[3] = new ExcelCell(getAnswerObject(questionResult, false),
 						    false);
 					    userResultRow[4] = new ExcelCell(questionResult.getMark(), false);
 					    data.add(userResultRow);
@@ -509,8 +711,8 @@ public class MonitoringAction extends Action {
 
     @SuppressWarnings("unchecked")
     private ExcelCell[][] getQuestionSummaryData(Assessment assessment, boolean showUserNames) {
+	initAssessmentService();
 	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
-	service = getAssessmentService();
 
 	if (assessment != null) {
 	    // Create the question summary
@@ -562,7 +764,7 @@ public class MonitoringAction extends Action {
 			data.add(summaryRowTitle);
 		    }
 
-		    QuestionSummary questionSummary = service.getQuestionSummary(assessment.getContentId(), question
+		    QuestionSummary questionSummary = service.getQuestionDataForExport(assessment.getContentId(), question
 			    .getUid());
 
 		    List<List<AssessmentQuestionResult>> allResultsForQuestion = questionSummary
@@ -589,7 +791,7 @@ public class MonitoringAction extends Action {
 				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
 				userResultRow[5] = new ExcelCell(questionResult.getUser().getFullName(), false);
 				userResultRow[6] = new ExcelCell(questionResult.getFinishDate(), false);
-				userResultRow[7] = new ExcelCell(getAnswerObject(questionResult), false);
+				userResultRow[7] = new ExcelCell(getAnswerObject(questionResult, false), false);
 
 				AssessmentResult assessmentResult = questionResult.getAssessmentResult();
 				Date finishDate = questionResult.getFinishDate();
@@ -624,7 +826,7 @@ public class MonitoringAction extends Action {
 				userResultRow[3] = new ExcelCell(maxMark, false);
 				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
 				userResultRow[5] = new ExcelCell(questionResult.getFinishDate(), false);
-				userResultRow[6] = new ExcelCell(getAnswerObject(questionResult), false);
+				userResultRow[6] = new ExcelCell(getAnswerObject(questionResult, false), false);
 
 				if (questionResult.getAssessmentResult() != null) {
 				    Date startDate = questionResult.getAssessmentResult().getStartDate();
@@ -721,7 +923,7 @@ public class MonitoringAction extends Action {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    private Object getAnswerObject(AssessmentQuestionResult questionResult) {
+    private Object getAnswerObject(AssessmentQuestionResult questionResult, boolean isMonitoring) {
 	Object ret = null;
 
 	if (questionResult != null) {
@@ -729,19 +931,19 @@ public class MonitoringAction extends Action {
 	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
 		return removeHTMLTags(questionResult.getAnswerString());
 	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS, isMonitoring);
 	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE, isMonitoring);
 	    case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
 		return questionResult.getAnswerString();
 	    case AssessmentConstants.QUESTION_TYPE_ORDERING:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_ORDERING);
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_ORDERING, isMonitoring);
 	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
 		return questionResult.getAnswerString();
 	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
 		return questionResult.getAnswerBoolean();
 	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MARK_HEDGING);
+		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MARK_HEDGING, isMonitoring);
 	    default:
 		return null;
 	    }
@@ -752,11 +954,12 @@ public class MonitoringAction extends Action {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    private String getOptionResponse(AssessmentQuestionResult questionResult, short type) {
+    private String getOptionResponse(AssessmentQuestionResult questionResult, short type, boolean isMonitoring) {
 
 	StringBuilder sb = new StringBuilder();
 	//whether there is a need to remove last comma
 	boolean trimLastComma = false;
+	final String DELIMITER = isMonitoring ? "<br>" : ", ";
 
 	Set<AssessmentQuestionOption> options = questionResult.getAssessmentQuestion().getOptions();
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
@@ -767,7 +970,7 @@ public class MonitoringAction extends Action {
 		    if (optionAnswer.getAnswerBoolean()) {
 			for (AssessmentQuestionOption option : options) {
 			    if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				sb.append(option.getOptionString() + ", ");
+				sb.append(option.getOptionString() + DELIMITER);
 				trimLastComma = true;
 			    }
 			}
@@ -780,7 +983,7 @@ public class MonitoringAction extends Action {
 			if (optionAnswer.getAnswerInt() == i) {
 			    for (AssessmentQuestionOption option : options) {
 				if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				    sb.append(option.getOptionString() + ", ");
+				    sb.append(option.getOptionString() + DELIMITER);
 				    trimLastComma = true;
 				}
 			    }
@@ -791,16 +994,34 @@ public class MonitoringAction extends Action {
 	    } else if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 
 		for (AssessmentQuestionOption option : options) {
-		    sb.append("[" + option.getOptionString() + ", ");
+		    if (isMonitoring) {
+			sb.append("<div>");
+			sb.append("	<div style='float: left;'>");
+			sb.append(		option.getQuestion());
+			sb.append("	</div>");
+			sb.append("	<div style=' float: right; width: 20%;'>");
+			sb.append(" 		- "); 
+			
+		    } else {
+			sb.append("[" + option.getQuestion() + ", ");
+		    }
 		    
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (option.getUid().equals(optionAnswer.getOptionUid())) {
 			    for (AssessmentQuestionOption option2 : options) {
 				if (option2.getUid() == optionAnswer.getAnswerInt()) {
-				    sb.append(option2.getOptionString() + "] ");
+				    sb.append(option2.getOptionString());
 				}
 			    }
 			}
+		    }
+		    
+		    if (isMonitoring) {
+			sb.append("</div>");
+			sb.append("</div>");
+			sb.append(DELIMITER);
+		    } else {
+			sb.append("] ");
 		    }
 
 		}
@@ -808,31 +1029,48 @@ public class MonitoringAction extends Action {
 	    } else if (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 		
 		for (AssessmentQuestionOption option : options) {
-		    sb.append("[" + option.getOptionString() + ", ");
+		    if (isMonitoring) {
+			sb.append(option.getOptionString() + " - ");
+		    } else {
+			sb.append("[" + option.getOptionString() + ", ");
+		    }
 		    
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (option.getUid().equals(optionAnswer.getOptionUid())) {
-			    sb.append(optionAnswer.getAnswerInt() + "] ");
+			    sb.append(optionAnswer.getAnswerInt());
 			}
+		    }
+		    
+		    if (isMonitoring) {
+			sb.append(DELIMITER);
+		    } else {
+			sb.append("] ");
 		    }
 
 		}
 	    }
 
 	}
-	String ret = sb.toString().replaceAll("\\<.*?\\>", "");
+	
+	String ret;
+	if (isMonitoring) {
+	    ret = StringEscapeUtils.escapeCsv(sb.toString());
+	    
+	} else {
+	    ret = sb.toString().replaceAll("\\<.*?\\>", "");
 
-	if (trimLastComma) {
-	    ret = ret.substring(0, ret.lastIndexOf(","));
+	    if (trimLastComma) {
+		ret = ret.substring(0, ret.lastIndexOf(","));
+	    }
 	}
-
+	
 	return ret;
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
-    private IAssessmentService getAssessmentService() {
+    private IAssessmentService initAssessmentService() {
 	if (service == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
