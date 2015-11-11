@@ -120,11 +120,13 @@ public class LessonService implements ILessonService {
     public Integer getCountActiveLessonLearners(Long lessonId) {
 	return lessonDAO.getCountActiveLearnerByLesson(lessonId);
     }
+
     @Override
-    public List<User> getLessonLearners(Long lessonId, String searchPhrase, Integer limit, Integer offset) {
-	return lessonDAO.getLearnersByLesson(lessonId, searchPhrase, limit, offset);
+    public List<User> getLessonLearners(Long lessonId, String searchPhrase, Integer limit, Integer offset,
+	    boolean orderAscending) {
+	return lessonDAO.getLearnersByLesson(lessonId, searchPhrase, limit, offset, orderAscending);
     }
-    
+
     @Override
     public Integer getCountLessonLearners(Long lessonId, String searchPhrase) {
 	return lessonDAO.getCountLearnersByLesson(lessonId, searchPhrase);
@@ -546,7 +548,8 @@ public class LessonService implements ILessonService {
 	    LessonService.log.debug("Setting learner progress to uncompleted for lesson " + lessonId);
 	}
 	int count = 0;
-	List<LearnerProgress> progresses = learnerProgressDAO.getCompletedLearnerProgressForLesson(lessonId);
+	List<LearnerProgress> progresses = learnerProgressDAO.getCompletedLearnerProgressForLesson(lessonId, null, null,
+		true);
 	Activity firstAddedActivity = (Activity) baseDAO.find(Activity.class, firstAddedActivityId);
 
 	for (LearnerProgress progress : progresses) {

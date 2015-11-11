@@ -171,8 +171,9 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<User> getLearnersByLesson(Long lessonId, String searchPhrase, Integer limit, Integer offset) {
-	String queryText = LessonDAO.buildLearnersByLessonQuery(false, searchPhrase);
+    public List<User> getLearnersByLesson(Long lessonId, String searchPhrase, Integer limit, Integer offset,
+	    boolean orderAscending) {
+	String queryText = LessonDAO.buildLearnersByLessonQuery(false, searchPhrase, orderAscending);
 	Query query = getSession().createQuery(queryText).setLong("lessonId", lessonId);
 	if (limit != null) {
 	    query.setMaxResults(limit);
@@ -185,7 +186,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     @Override
     public Integer getCountLearnersByLesson(long lessonId, String searchPhrase) {
-	String queryText = LessonDAO.buildLearnersByLessonQuery(true, searchPhrase);
+	String queryText = LessonDAO.buildLearnersByLessonQuery(true, searchPhrase, true);
 	Query query = getSession().createQuery(queryText).setLong("lessonId", lessonId);
 	Object value = query.uniqueResult();
 	return ((Number) value).intValue();
@@ -346,7 +347,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	return (Lesson) query.uniqueResult();
     }
 
-    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase) {
+    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase, boolean orderAscending) {
 	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "users ")
 		.append(LessonDAO.LOAD_LEARNERS_BY_LESSON);
 	if (!StringUtils.isBlank(searchPhrase)) {
@@ -357,7 +358,9 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    }
 	}
 	if (!count) {
-	    queryText.append(" ORDER BY users.firstName ASC, users.lastName ASC, users.login ASC");
+	    String order = orderAscending ? "ASC" : "DESC";
+	    queryText.append(" ORDER BY users.firstName ").append(order).append(", users.lastName ").append(order)
+		    .append(", users.login ").append(order);
 	}
 	return queryText.toString();
     }

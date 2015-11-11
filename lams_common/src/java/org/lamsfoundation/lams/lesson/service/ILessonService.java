@@ -74,7 +74,11 @@ public interface ILessonService {
      */
     Integer getCountActiveLessonLearners(Long lessonId);
 
-    List<User> getLessonLearners(Long lessonId, String searchPhrase, Integer limit, Integer offset);
+    /**
+     * Get learners who are part of the lesson class.
+     */
+    List<User> getLessonLearners(Long lessonId, String searchPhrase, Integer limit, Integer offset,
+	    boolean orderAscending);
 
     /**
      * Get the count of all the learners who are a part of the lesson class.

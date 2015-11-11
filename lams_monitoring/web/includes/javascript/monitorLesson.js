@@ -15,7 +15,6 @@ var originalSequenceCanvas = null,
 	sequenceSearchedLearner = null,
 // how learners in pop up lists are currently sorted
 	sortOrderAsc = {
-		learnerGroup : false,
 		classLearner : false,
 		classMonitor : false
 	},
@@ -201,8 +200,8 @@ function initLessonTab(){
 			// reset sort order
 			sortOrderAsc['classLearner'] = false;
 			sortOrderAsc['classMonitor'] = false;
-			sortDialogList('classLearner');
-			sortDialogList('classMonitor');
+			sortLessonClassDialogList('classLearner');
+			sortLessonClassDialogList('classMonitor');
 			colorDialogList('classLearner');
 			colorDialogList('classMonitor');
 			
@@ -267,13 +266,6 @@ function initLessonTab(){
 		]
 	});
 
-	$('#classLearnerSortButton').click(function(){
-		sortDialogList('classLearner');
-	});	
-	$('#classMonitorSortButton').click(function(){
-		sortDialogList('classMonitor');
-	});
-	
 	// sets up dialog for emailing learners
 	$('#emailDialog').dialog({
 		'autoOpen'  : false,
@@ -301,20 +293,15 @@ function initLessonTab(){
  * Shows all learners in the lesson class.
  */
 function showLessonLearnersDialog() {
-	$.ajax({
-		dataType : 'json',
+	var ajaxProperties = {
 		url : LAMS_URL + 'monitoring/monitoring.do',
-		cache : false,
 		data : {
-			'method'    : 'getClassMembers',
-			'lessonID'  : lessonId,
-			'role'      : 'LEARNER',
-			'classOnly' : true
-		},
-		success : function(response) {
-			 showLearnerGroupDialog(null, LABELS.LESSON_GROUP_DIALOG_CLASS, response, false, false, true);
+			'method'    : 'getLessonLearners',
+			'lessonID'  : lessonId
 		}
-	});
+	};
+	
+	showLearnerGroupDialog(ajaxProperties, LABELS.LESSON_GROUP_DIALOG_CLASS, false, false, true);
 }
 
 /**
@@ -610,18 +597,14 @@ function initSequenceTab(){
 	$('#learnerGroupDialog').dialog({
 			'autoOpen'  : false,
 			'height'    : 360,
-			'width'     : 330,
-			'minWidth'  : 330,
+			'width'     : 400,
+			'minWidth'  : 400,
 			'modal'     : true,
 			'resizable' : true,
 			'show'      : 'fold',
 			'hide'      : 'fold',
 			'open'      : function(){
 				autoRefreshBlocked = true;
-				// reset sort order
-				sortOrderAsc['learnerGroup'] = false;
-				sortDialogList('learnerGroup');
-				colorDialogList('learnerGroup');
 				// until operator selects an user, buttons remain disabled
 				$('button.learnerGroupDialogSelectableButton').blur().removeClass('ui-state-hover')
 					.attr('disabled', 'disabled');
@@ -639,7 +622,7 @@ function initSequenceTab(){
 			            		// make sure there is only one selected learner
 			            		if (selectedLearner.length == 1) {
 			            			// go to "force complete" mode, similar to draggin user to an activity
-			            			var activityId = $(this).dialog('option', 'activityId'),
+			            			var activityId = $(this).dialog('option', 'ajaxProperties').data.activityID,
 			            				dropArea = sequenceCanvas.add('#completedLearnersContainer');
 			            			dropArea.css('cursor', 'url('
 			            					+ LAMS_URL + 'images/icons/user.png),pointer')
@@ -685,10 +668,6 @@ function initSequenceTab(){
 			             }
 			]
 		});
-	
-	$('#learnerGroupSortButton').click(function(){
-		sortDialogList('learnerGroup');
-	});
 	
 	// small info box on Sequence tab, activated when the tab is showed
 	$('#sequenceInfoDialog').dialog({
@@ -1210,7 +1189,15 @@ function addActivityIconsHandlers(activity) {
 		dblTap(learnerGroup, function(event){
 			 // double click on learner group icon to see list of learners
 			event.stopPropagation();
-			showLearnerGroupDialog(activity.id, activity.title, null, true, usersViewable, false);
+			var ajaxProperties = {
+					url : LAMS_URL + 'monitoring/monitoring.do',
+					data : {
+						'method'     : 'getCurrentLearners',
+						'activityID' : activity.id,
+						'flaFormat' : flaFormat
+					}
+				};
+			showLearnerGroupDialog(ajaxProperties, activity.title, true, usersViewable, false);
 		});
 	}
 	
@@ -1279,7 +1266,14 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 		}).css('cursor', 'pointer').appendTo(iconsContainer);
 		
 		dblTap(groupIcon, function(){
-			showLearnerGroupDialog(null, LABELS.LEARNER_FINISHED_DIALOG_TITLE, null, true, false, false);
+			var ajaxProperties = {
+					url : LAMS_URL + 'monitoring/monitoring.do',
+					data : {
+						'method'     : 'getCurrentLearners',
+						'lessonID'   : lessonId
+					}
+				};
+			showLearnerGroupDialog(ajaxProperties, LABELS.LEARNER_FINISHED_DIALOG_TITLE, true, false, false);
 		});
 	}
 }
@@ -1410,8 +1404,7 @@ function showClassDialog(){
 		data : {
 			'method'    : 'getClassMembers',
 			'lessonID'  : lessonId,
-			'role'      : 'LEARNER',
-			'classOnly' : false
+			'role'      : 'LEARNER'
 		},
 		success : function(response) {
 			learners = response;
@@ -1425,8 +1418,7 @@ function showClassDialog(){
 		data : {
 			'method'    : 'getClassMembers',
 			'lessonID'  : lessonId,
-			'role'      : 'MONITOR',
-			'classOnly' : false
+			'role'      : 'MONITOR'
 		},
 		success : function(response) {
 			monitors = response;
@@ -1595,6 +1587,7 @@ function initLearnersTab() {
 		'select' : function(event, ui){
 		    // learner's ID in ui.item.value is not used here
 			$(this).val(ui.item.label);
+			$('#learnersSearchPhraseClear').show();
 			loadLearnerProgressPage(1, ui.item.label);
 			return false;
 		}
@@ -1603,6 +1596,9 @@ function initLearnersTab() {
 	.keypress(function(e){
 		if (e.which == 13) {
 			$(this).autocomplete("close");
+			if ($(this).val()) {
+				$('#learnersSearchPhraseClear').show();
+			}
 			loadLearnerProgressPage(1);
 		}
 	});
@@ -1626,8 +1622,8 @@ function learnersPageShift(increment){
  * Do the actual shifting of page numbers bar.
  */
 function shiftLearnerProgressPageHeader(startIndex, endIndex) {
-	var pageLeftCell = $('#learnersPageLeft'),
-		pageCount = Math.ceil(learnerPossibleNumber / 10);
+	var pageLeftCell = $('#learnersPageLeft');
+	var pageCount = Math.ceil(learnerPossibleNumber / 10);
 	$('#tabLearnerControlTable td.learnersHeaderPageCell').remove();
 	
 	if (startIndex < 1) {
@@ -1803,6 +1799,7 @@ function updateLearnersTab(){
 function learnersClearSearchPhrase(){
 	$('#learnersSearchPhrase').val('').autocomplete("close");
 	loadLearnerProgressPage(1, '');
+	$('#learnersSearchPhraseClear').hide();
 }
 
 //********** COMMON FUNCTIONS **********
@@ -1853,32 +1850,93 @@ function closeMonitorLessonDialog(refresh) {
 /**
  * Show a dialog with user list and optional Force Complete and View Learner buttons.
  */
-function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceComplete, allowView, allowEmail) {
-	var learnerGroupList = $('#learnerGroupList').empty(),
-		learnerGroupDialog = $('#learnerGroupDialog');
+function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete, allowView, allowEmail) {
+	var learnerGroupDialog = $('#learnerGroupDialog'),
+		learnerGroupList = $('#learnerGroupList', learnerGroupDialog).empty(),
+		// no parameters provided? just work on what we saved
+		isRefresh = ajaxProperties == null,
+		learners = null,
+		learnerCount = null;
 	
-	if (!learners) {
-		$.ajax({
+	if (isRefresh) {
+		// ajax and other properties were saved when the dialog was opened
+		ajaxProperties = learnerGroupDialog.dialog('option', 'ajaxProperties');
+		allowForceComplete = learnerGroupDialog.dialog('option', 'allowForceComplete');
+		allowView = learnerGroupDialog.dialog('option', 'allowView');
+		allowEmail = learnerGroupDialog.dialog('option', 'allowEmail');
+	} else {
+		// add few standard properties to ones provided by method calls
+		ajaxProperties = $.extend(true, ajaxProperties, {
 			dataType : 'json',
-			url : LAMS_URL + 'monitoring/monitoring.do',
 			cache : false,
 			async : false,
 			data : {
-				'method'     : 'getCurrentLearners',
-				'lessonID'   : lessonId,
-				// activity ID can be null; if it is not, lesson ID is ignored
-				'activityID' : activityId,
-				'flaFormat'  : flaFormat
-			},
-			success : function(response) {
-				learners = response;
+				'pageNumber' 	 : 1,
+				'orderAscending' : true
 			}
 		});
 	}
 	
+	var pageNumber = ajaxProperties.data.pageNumber;
+
+	// set values for current variable instances
+	ajaxProperties.success = function(response) {
+		learners = response.learners;
+		learnerCount = response.learnerCount;
+	};
+	
+	// make the call
+	$.ajax(ajaxProperties);
+
+	// did all users already drift away to an another activity or there was an error?
+	// close the dialog and refresh the main screen
+	if (!learnerCount) {
+		if (isRefresh) {
+			 learnerGroupDialog.dialog('close');
+		}
+		updateSequenceTab();
+		return;
+	}
+	
+	// did some users already drift away to an another activity?
+	// move back until you get a page with any users
+	var maxPageNumber = Math.ceil(learnerCount / 10);
+	if (pageNumber > maxPageNumber) {
+		shiftLearnerGroup(-1);
+		return;
+	}
+	
+	// hide unnecessary controls
+	if (pageNumber + 10 <= maxPageNumber) {
+		$('#learnerGroupPagePlus10', learnerGroupDialog).css('visibility', 'visible');
+	} else {
+		$('#learnerGroupPagePlus10', learnerGroupDialog).css('visibility', 'hidden');
+	}
+	if (pageNumber - 10 < 1) {
+		$('#learnerGroupPageMinus10', learnerGroupDialog).css('visibility', 'hidden');
+	} else {
+		$('#learnerGroupPageMinus10', learnerGroupDialog).css('visibility', 'visible');
+	}
+	if (pageNumber + 1 <= maxPageNumber) {
+		$('#learnerGroupPagePlus1', learnerGroupDialog).css('visibility', 'visible');
+	} else {
+		$('#learnerGroupPagePlus1', learnerGroupDialog).css('visibility', 'hidden');
+	}		
+	if (pageNumber - 1 < 1) {
+		$('#learnerGroupPageMinus1', learnerGroupDialog).css('visibility', 'hidden');
+	} else {
+		$('#learnerGroupPageMinus1', learnerGroupDialog).css('visibility', 'visible');
+	}
+	if (maxPageNumber < 2) {
+		$('#learnerGroupPage', learnerGroupDialog).css('visibility', 'hidden');
+	} else {
+		$('#learnerGroupPage', learnerGroupDialog).css('visibility', 'visible').text(pageNumber + ' / ' + maxPageNumber);
+	}
+	
 		$.each(learners, function(learnerIndex, learner) {
-			var viewUrl = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
-            				       + learner.id + '&activityID=' + activityId + '&lessonID=' + lessonId,
+		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
+        				       	  + learner.id + '&activityID=' + ajaxProperties.data.activityID + '&lessonID=' + lessonId
+        				        : null,
 				learnerDiv = $('<div />').attr({
 									'userId'  : learner.id,
 									'viewUrl'    : viewUrl
@@ -1906,6 +1964,9 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 			}
 		});
 	
+	colorDialogList('learnerGroup');
+	
+	if (!isRefresh) {
 	// show buttons depending on parameters
 	$('button#learnerGroupDialogForceCompleteButton')
 		.css('display', allowForceComplete ? 'inline' : 'none');
@@ -1918,9 +1979,14 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 		.dialog('option', 
 			{
 			 'title' : dialogTitle,
-			 'activityId' : activityId
+				 // save properties for refresh
+				 'ajaxProperties' : ajaxProperties,
+				 'allowForceComplete' : allowForceComplete,
+				 'allowView' : allowView,
+				 'allowEmail' : allowEmail
 			})
 		.dialog('open');	
+}
 }
 
 
@@ -1951,12 +2017,12 @@ function escapeHtml(unsafe) {
 
 
 /**
- * Change order of learner sorting in group dialog.
+ * Change order of learner sorting in class dialog.
  */
-function sortDialogList(listId) {
-	var list = $('#' + listId + 'List');
-	var items = list.children('div.dialogListItem');
-	var orderAsc = sortOrderAsc[listId];
+function sortLessonClassDialogList(listId) {
+	var list = $('#' + listId + 'List'),
+		items = list.children('div.dialogListItem'),
+		orderAsc = sortOrderAsc[listId];
 	if (items.length > 1) {
 		items.each(function(){
 			$(this).detach();
@@ -1980,6 +2046,27 @@ function sortDialogList(listId) {
 	}
 }
 
+/**
+ * Change order of learner sorting in group dialog.
+ */
+function sortLearnerGroupDialogList() {
+	var learnerGroupDialog = $('#learnerGroupDialog'),
+		sortIcon = $('#learnerGroupSort span', learnerGroupDialog),
+		ajaxProperties = learnerGroupDialog.dialog('option', 'ajaxProperties'),
+		// reverse current order after click
+		orderAscending = !ajaxProperties.data.orderAscending;
+
+	if (orderAscending) {
+		sortIcon.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-n');
+	} else {
+		sortIcon.removeClass('ui-icon-triangle-1-n').addClass('ui-icon-triangle-1-s');
+	}
+	
+	ajaxProperties.data.orderAscending = orderAscending;
+	// refresh the list
+	showLearnerGroupDialog();
+}
+
 function selectAllInDialogList(listId) {
 	var targetState = $('#' + listId + 'SelectAll').is(':checked') ? 'checked' : null;
 	$('#' + listId + 'List input').each(function(){
@@ -1995,6 +2082,21 @@ function colorDialogList(listId) {
 		// every odd learner has different background
 		$(userDiv).css('background-color', userIndex % 2 ? '#dfeffc' : 'inherit');
 	});
+}
+
+/**
+* Change page in the group dialog.
+*/
+function shiftLearnerGroupList(shift) {
+	var learnerGroupDialog = $('#learnerGroupDialog'),
+		ajaxProperties = learnerGroupDialog.dialog('option', 'ajaxProperties'),
+		pageNumber = ajaxProperties.data.pageNumber + shift;
+	if (pageNumber < 0) {
+		pageNumber = 1;
+	}
+	ajaxProperties.data.pageNumber = pageNumber;
+	// refresh the dialog with new parameters
+	showLearnerGroupDialog();
 }
 
 
