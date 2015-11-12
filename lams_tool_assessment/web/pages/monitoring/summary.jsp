@@ -31,7 +31,7 @@
 			   		{name:'userId',index:'userId', width:0},
 			   		{name:'sessionId',index:'sessionId', width:0},
 			   		{name:'userName',index:'userName', width:350, searchoptions: { clearSearch: false }},
-			   		{name:'total',index:'total', width:120,align:"right",sorttype:"float", search:false}		
+			   		{name:'total',index:'total', width:120,align:"right", formatter:'number', search:false}		
 			   	],
 			   	ondblClickRow: function(rowid) {
 			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');

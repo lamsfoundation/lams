@@ -65,7 +65,9 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -429,10 +431,11 @@ public class MonitoringAction extends Action {
 	    JSONArray userData = new JSONArray();
 	    if (questionResultUid != null) {
 		AssessmentQuestionResult questionResult = service.getAssessmentQuestionResultByUid(questionResultUid);
+		
 		userData.put(questionResultUid);
 		userData.put(questionResult.getMaxMark());
 		userData.put(fullName);
-		userData.put(getAnswerObject(questionResult, true));
+		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
 		userData.put(questionResult.getMark());
 		
 	    } else {
@@ -663,7 +666,7 @@ public class MonitoringAction extends Action {
 					    userResultRow[2] = new ExcelCell(assessmentResult.getStartDate(), false);
 					    userResultRow[3] = new ExcelCell(questionResult
 						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[4] = new ExcelCell(getAnswerObject(questionResult, false),
+					    userResultRow[4] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
 						    false);
 					    userResultRow[5] = new ExcelCell(questionResult.getMark(), false);
 					    data.add(userResultRow);
@@ -673,7 +676,7 @@ public class MonitoringAction extends Action {
 					    userResultRow[1] = new ExcelCell(assessmentResult.getStartDate(), false);
 					    userResultRow[2] = new ExcelCell(questionResult
 						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[3] = new ExcelCell(getAnswerObject(questionResult, false),
+					    userResultRow[3] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
 						    false);
 					    userResultRow[4] = new ExcelCell(questionResult.getMark(), false);
 					    data.add(userResultRow);
@@ -791,7 +794,7 @@ public class MonitoringAction extends Action {
 				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
 				userResultRow[5] = new ExcelCell(questionResult.getUser().getFullName(), false);
 				userResultRow[6] = new ExcelCell(questionResult.getFinishDate(), false);
-				userResultRow[7] = new ExcelCell(getAnswerObject(questionResult, false), false);
+				userResultRow[7] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
 
 				AssessmentResult assessmentResult = questionResult.getAssessmentResult();
 				Date finishDate = questionResult.getFinishDate();
@@ -826,7 +829,7 @@ public class MonitoringAction extends Action {
 				userResultRow[3] = new ExcelCell(maxMark, false);
 				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
 				userResultRow[5] = new ExcelCell(questionResult.getFinishDate(), false);
-				userResultRow[6] = new ExcelCell(getAnswerObject(questionResult, false), false);
+				userResultRow[6] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
 
 				if (questionResult.getAssessmentResult() != null) {
 				    Date startDate = questionResult.getAssessmentResult().getStartDate();
@@ -920,153 +923,6 @@ public class MonitoringAction extends Action {
 	}
     }
 
-    /**
-     * Used only for excell export (for getUserSummaryData() method).
-     */
-    private Object getAnswerObject(AssessmentQuestionResult questionResult, boolean isMonitoring) {
-	Object ret = null;
-
-	if (questionResult != null) {
-	    switch (questionResult.getAssessmentQuestion().getType()) {
-	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
-		return removeHTMLTags(questionResult.getAnswerString());
-	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS, isMonitoring);
-	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE, isMonitoring);
-	    case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-		return questionResult.getAnswerString();
-	    case AssessmentConstants.QUESTION_TYPE_ORDERING:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_ORDERING, isMonitoring);
-	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-		return questionResult.getAnswerString();
-	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-		return questionResult.getAnswerBoolean();
-	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-		return getOptionResponse(questionResult, AssessmentConstants.QUESTION_TYPE_MARK_HEDGING, isMonitoring);
-	    default:
-		return null;
-	    }
-	}
-	return ret;
-    }
-
-    /**
-     * Used only for excell export (for getUserSummaryData() method).
-     */
-    private String getOptionResponse(AssessmentQuestionResult questionResult, short type, boolean isMonitoring) {
-
-	StringBuilder sb = new StringBuilder();
-	//whether there is a need to remove last comma
-	boolean trimLastComma = false;
-	final String DELIMITER = isMonitoring ? "<br>" : ", ";
-
-	Set<AssessmentQuestionOption> options = questionResult.getAssessmentQuestion().getOptions();
-	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
-	if (optionAnswers != null) {
-
-	    if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-		for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-		    if (optionAnswer.getAnswerBoolean()) {
-			for (AssessmentQuestionOption option : options) {
-			    if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				sb.append(option.getOptionString() + DELIMITER);
-				trimLastComma = true;
-			    }
-			}
-		    }
-		}
-		
-	    } else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-		for (int i = 0; i < optionAnswers.size(); i++) {
-		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-			if (optionAnswer.getAnswerInt() == i) {
-			    for (AssessmentQuestionOption option : options) {
-				if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				    sb.append(option.getOptionString() + DELIMITER);
-				    trimLastComma = true;
-				}
-			    }
-			}
-		    }
-		}
-
-	    } else if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-
-		for (AssessmentQuestionOption option : options) {
-		    if (isMonitoring) {
-			sb.append("<div>");
-			sb.append("	<div style='float: left;'>");
-			sb.append(		option.getQuestion());
-			sb.append("	</div>");
-			sb.append("	<div style=' float: right; width: 20%;'>");
-			sb.append(" 		- "); 
-			
-		    } else {
-			sb.append("[" + option.getQuestion() + ", ");
-		    }
-		    
-		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-			if (option.getUid().equals(optionAnswer.getOptionUid())) {
-			    for (AssessmentQuestionOption option2 : options) {
-				if (option2.getUid() == optionAnswer.getAnswerInt()) {
-				    sb.append(option2.getOptionString());
-				}
-			    }
-			}
-		    }
-		    
-		    if (isMonitoring) {
-			sb.append("</div>");
-			sb.append("</div>");
-			sb.append(DELIMITER);
-		    } else {
-			sb.append("] ");
-		    }
-
-		}
-		
-	    } else if (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-		
-		for (AssessmentQuestionOption option : options) {
-		    if (isMonitoring) {
-			sb.append(option.getOptionString() + " - ");
-		    } else {
-			sb.append("[" + option.getOptionString() + ", ");
-		    }
-		    
-		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-			if (option.getUid().equals(optionAnswer.getOptionUid())) {
-			    sb.append(optionAnswer.getAnswerInt());
-			}
-		    }
-		    
-		    if (isMonitoring) {
-			sb.append(DELIMITER);
-		    } else {
-			sb.append("] ");
-		    }
-
-		}
-	    }
-
-	}
-	
-	String ret;
-	if (isMonitoring) {
-	    ret = StringEscapeUtils.escapeCsv(sb.toString());
-	    
-	} else {
-	    ret = sb.toString().replaceAll("\\<.*?\\>", "");
-
-	    if (trimLastComma) {
-		ret = ret.substring(0, ret.lastIndexOf(","));
-	    }
-	}
-	
-	return ret;
-    }
-
     // *************************************************************************************
     // Private method
     // *************************************************************************************
@@ -1077,16 +933,6 @@ public class MonitoringAction extends Action {
 	    service = (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
 	}
 	return service;
-    }
-
-    /**
-     * Removes all the html tags from a string
-     * 
-     * @param string
-     * @return
-     */
-    private String removeHTMLTags(String string) {
-	return (string == null) ? "" : string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
 }
