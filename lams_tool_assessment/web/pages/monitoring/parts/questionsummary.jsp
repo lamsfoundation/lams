@@ -79,10 +79,6 @@
 	  				  			jQuery("#session${sessionDto.sessionId}").restoreCell(iRow,iCol); 
 	  				  		} else {
 	  				  			isEdited = true;
-	  				  			
-	  				  			var numberOfValues = jQuery("#myGrid").jqGrid('getGridParam', 'records');
-	  				  			var averageMark = (eval($("#averageMark").html())*numberOfValues - eval(previousCellValue) + eval(val))/numberOfValues;
-	  				  			$("#averageMark").html(averageMark);
 	  				  		}
   						},	  		
 	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
@@ -193,18 +189,7 @@
 					<td>
 						<c:out value="${questionSummary.question.penaltyFactor}" escapeXml="true"/>
 					</td>
-				</tr>
-				
-				<!-- 
-				<tr>
-					<th style="width: 180px;" >
-						<fmt:message key="label.monitoring.question.summary.average.mark" />
-					</th>
-					<td>
-						<div id="averageMark">${questionSummary.averageMark}</div>
-					</td>
-				</tr>
-				 -->				
+				</tr>			
 			</table>
 			<br><br>
 			
@@ -217,8 +202,7 @@
 					<table id="session${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
 					<div id="pager${sessionDto.sessionId}" class="scroll"></div>
 				</div>	
-			</c:forEach>	
-
+			</c:forEach>
 
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:10px; padding-top:5px;">
