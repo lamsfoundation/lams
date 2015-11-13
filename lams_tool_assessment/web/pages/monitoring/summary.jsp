@@ -14,12 +14,12 @@
 				datatype: "json",
 				url: "<c:url value="/monitoring/getUsers.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}",
 				height: '100%',
-				width: 730,
+				autowidth: true,
+				shrinkToFit: false,
 			    pager: 'listPager${sessionDto.sessionId}',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
 			    viewrecords:true,
-			    recordpos: 'left',
 			   	colNames:['#',
 						'userId',
 						'sessionId',
@@ -27,11 +27,11 @@
 					    "<fmt:message key="label.monitoring.summary.total" />"],
 					    
 			   	colModel:[
-			   		{name:'id',index:'id', width:20, sorttype:"int", search:false},
-			   		{name:'userId',index:'userId', width:0},
-			   		{name:'sessionId',index:'sessionId', width:0},
-			   		{name:'userName',index:'userName', width:350, searchoptions: { clearSearch: false }},
-			   		{name:'total',index:'total', width:120,align:"right", formatter:'number', search:false}		
+			   		{name:'id', index:'id', width:20, sorttype:"int", search:false},
+			   		{name:'userId', index:'userId', width:0, hidden: true},
+			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
+			   		{name:'userName', index:'userName', width:570, searchoptions: { clearSearch: false }},
+			   		{name:'total', index:'total', width:174, align:"right", formatter:'number', search:false}		
 			   	],
 			   	ondblClickRow: function(rowid) {
 			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
@@ -68,8 +68,7 @@
 					searchOnEnter: false
 				})
 			</c:if>
-			.hideCol("userId").hideCol("sessionId")
-			.navGrid("#listPager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false, refresh:false});
+			.navGrid("#listPager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false});
 	        
 	        var oldValue = 0;
 			jQuery("#userSummary${sessionDto.sessionId}").jqGrid({
@@ -136,18 +135,11 @@
 		
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		        grid.each(function(index) {
-		            var gridId = $(this).attr('id');
-		            
-			        //resize only user summary grids
-			        if (gridId.match("^userSummary")) {
-		            	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-		            	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-			        }
-		        });
-		    }
+			jQuery(".ui-jqgrid-btable:visible").each(function(index) {
+		    	var gridId = $(this).attr('id');
+		    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+	        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		    });
 		}).trigger('resize');
 
 		$("#questionUid").change(function() {
@@ -237,23 +229,19 @@
 		<a onclick="" href="return false;" class="thickbox" id="userSummaryHref" style="display: none;"></a>	
 	
 		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
-			<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
+			<div class="session-container" 
+				 	style="<c:if test='${!status.last}'>padding-bottom: 30px;</c:if><c:if test='${status.last}'>padding-bottom: 15px;</c:if> ">
 				<c:if test="${sessionMap.isGroupedActivity}">
-					<div style="padding-bottom: 5px; font-size: small;">
+					<div class="session-header">
 						<B><fmt:message key="monitoring.label.group" /></B> ${sessionDto.sessionName}
 					</div>
 				</c:if>
 				
 				<table id="list${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				<div style="margin-top: 10px; width:99%;">
-					<table id="userSummary${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				</div>
+				<table id="userSummary${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 				<div id="listPager${sessionDto.sessionId}" class="scroll"></div>
 				
-			</div>	
-			<c:if test="${! status.last}">
-			
-			</c:if>
+			</div>
 		</c:forEach>	
 		
 		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-right float-right">
