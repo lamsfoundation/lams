@@ -29,22 +29,20 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 /**
- * List contains following element: <br>
  * 
- * <li>session_id</li> <li>session_name</li> <li>AssessmentQuestion.uid</li> <li>AssessmentQuestion.question_type</li> <li>
- * AssessmentQuestion.create_by_author</li> <li>AssessmentQuestion.is_hide</li> <li>AssessmentQuestion.title</li> <li>
- * User.login_name</li> <li>count(assessment_question_uid)</li>
  * 
  * @author Andrey Balan
  */
-public class Summary {
+public class SessionDTO {
 
     private Long sessionId;
     private String sessionName;
+    private int numberLearners;
     
+    //used for export purposes only
     private List<AssessmentResult> assessmentResults;
 
-    public Summary() {
+    public SessionDTO() {
     }
 
     /**
@@ -56,7 +54,7 @@ public class Summary {
      * @param question
      * @param isInitGroup
      */
-    public Summary(Long sessionId, String sessionName) {
+    public SessionDTO(Long sessionId, String sessionName) {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
     }
@@ -83,6 +81,14 @@ public class Summary {
 
     public void setAssessmentResults(List<AssessmentResult> assessmentResults) {
 	this.assessmentResults = assessmentResults;
+    }
+    
+    public int getNumberLearners() {
+	return numberLearners;
+    }
+
+    public void setNumberLearners(int numberLearners) {
+	this.numberLearners = numberLearners;
     }
 
 }

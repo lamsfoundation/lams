@@ -77,9 +77,10 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.Summary;
+import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -92,6 +93,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
@@ -289,6 +291,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public List<AssessmentUser> getUsersBySession(Long toolSessionID) {
 	return assessmentUserDao.getBySessionID(toolSessionID);
+    }
+    
+    @Override
+    public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
+	    String searchString) {
+	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
+    }
+    
+    @Override
+    public int getCountUsersBySession(Long sessionId, String searchString) {
+	return assessmentUserDao.getCountUsersBySession(sessionId, searchString);
+    }
+    
+    @Override
+    public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
+	    int size, String sortBy, String sortOrder, String searchString) {
+	return assessmentUserDao.getPagedUsersBySessionAndQuestion(sessionId, questionUid, page, size, sortBy,
+		sortOrder, searchString);
     }
 
     @Override
@@ -743,6 +763,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
+    
+    @Override
+    public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
+	return assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
+    }
 
     @Override
     public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
@@ -824,17 +849,36 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public AssessmentQuestion getAssessmentQuestionByUid(Long questionUid) {
 	return assessmentQuestionDao.getByUid(questionUid);
     }
+    
+    @Override
+    public List<SessionDTO> getSessionDtos(Long contentId) {
+	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
+
+	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
+	for (AssessmentSession session : sessionList) {
+	    Long sessionId = session.getSessionId();
+	    SessionDTO sessionDto = new SessionDTO(sessionId, session.getSessionName());
+	    
+	    //for statistics tab
+	    int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
+	    sessionDto.setNumberLearners(countUsers);
+	    
+	    sessionDtos.add(sessionDto);
+	}
+	
+	return sessionDtos;
+    }
 
     @Override
-    public List<Summary> getSummaryList(Long contentId) {
-	List<Summary> summaryList = new ArrayList<Summary>();
+    public List<SessionDTO> getSessionDataForExport(Long contentId) {
+	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
 
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
 	for (AssessmentSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
 	    Assessment assessment = session.getAssessment();
 	    // one new summary for one session.
-	    Summary summary = new Summary(sessionId, session.getSessionName());
+	    SessionDTO sessionDTO = new SessionDTO(sessionId, session.getSessionName());
 
 	    List<AssessmentUser> users = new LinkedList<AssessmentUser>();
 	    if (assessment.isUseSelectLeaderToolOuput()) {
@@ -861,13 +905,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 		assessmentResults.add(assessmentResult);
 	    }
-	    summary.setAssessmentResults(assessmentResults);
-	    summaryList.add(summary);
+	    sessionDTO.setAssessmentResults(assessmentResults);
+	    sessionDtos.add(sessionDTO);
 	}
 
-	AssessmentServiceImpl.escapeQuotes(summaryList);
+	AssessmentEscapeUtils.escapeQuotes(sessionDtos);
 
-	return summaryList;
+	return sessionDtos;
     }
 
     @Override
@@ -879,7 +923,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    new AssessmentQuestionResultComparator());
 	    questionResults.addAll(lastFinishedResult.getQuestionResults());
 	    lastFinishedResult.setQuestionResults(questionResults);
-	    AssessmentServiceImpl.escapeQuotes(lastFinishedResult);
+	    AssessmentEscapeUtils.escapeQuotes(lastFinishedResult);
 	}
 
 	return lastFinishedResult;
@@ -932,13 +976,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	userSummary.setUserSummaryItems(userSummaryItems);
 
-	AssessmentServiceImpl.escapeQuotes(userSummary);
+	AssessmentEscapeUtils.escapeQuotes(userSummary);
 
 	return userSummary;
     }
-
+    
     @Override
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
+	QuestionSummary questionSummary = new QuestionSummary();
+	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
+	questionSummary.setQuestion(question);
+	
+	return questionSummary;
+    }
+
+    @Override
+    public QuestionSummary getQuestionDataForExport(Long contentId, Long questionUid) {
 	QuestionSummary questionSummary = new QuestionSummary();
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
 	questionSummary.setQuestion(question);
@@ -1002,7 +1055,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	float averageMark = (count == 0) ? 0 : total / count;
 	questionSummary.setAverageMark(averageMark);
 
-	AssessmentServiceImpl.escapeQuotes(questionSummary);
+	AssessmentEscapeUtils.escapeQuotes(questionSummary);
 
 	return questionSummary;
     }
@@ -1444,75 +1497,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // *****************************************************************************
     // private methods
     // *****************************************************************************
-
-    /**
-     * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
-     * all quotes in the following way \").
-     */
-    private static void escapeQuotes(Object object) {
-	if (object instanceof UserSummary) {
-	    UserSummary userSummary = (UserSummary) object;
-	    for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
-		for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
-		    AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
-		}
-	    }
-	} else if (object instanceof QuestionSummary) {
-	    QuestionSummary questionSummary = (QuestionSummary) object;
-
-	    for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary
-		    .getQuestionResultsPerSession()) {
-		for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
-		    AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
-		}
-	    }
-	} else if (object instanceof List) {
-	    List<Summary> summaryList = (List<Summary>) object;
-
-	    for (Summary summary : summaryList) {
-		for (AssessmentResult result : summary.getAssessmentResults()) {
-		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-			AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
-		    }
-		}
-	    }
-	} else if (object instanceof AssessmentResult) {
-	    AssessmentResult assessmentResult = (AssessmentResult) object;
-
-	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
-		AssessmentServiceImpl.escapeQuotesInQuestionResult(questionResult);
-	    }
-	}
-    }
-
-    private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
-	String answerString = questionResult.getAnswerString();
-	if (answerString != null) {
-	    String answerStringEscaped = StringEscapeUtils.escapeJavaScript(answerString);
-	    questionResult.setAnswerStringEscaped(answerStringEscaped);
-	}
-
-	AssessmentQuestion question = questionResult.getAssessmentQuestion();
-	String title = question.getTitle();
-	if (title != null) {
-	    String titleEscaped = StringEscapeUtils.escapeJavaScript(title);
-	    question.setTitleEscaped(titleEscaped);
-	}
-
-	for (AssessmentQuestionOption option : question.getOptions()) {
-	    String questionStr = option.getQuestion();
-	    if (questionStr != null) {
-		String questionEscaped = StringEscapeUtils.escapeJavaScript(questionStr);
-		option.setQuestionEscaped(questionEscaped);
-	    }
-
-	    String optionStr = option.getOptionString();
-	    if (optionStr != null) {
-		String optionEscaped = StringEscapeUtils.escapeJavaScript(optionStr);
-		option.setOptionStringEscaped(optionEscaped);
-	    }
-	}
-    }
 
     private Assessment getDefaultAssessment() throws AssessmentApplicationException {
 	Long defaultAssessmentId = getToolDefaultContentIdBySignature(AssessmentConstants.TOOL_SIGNATURE);
