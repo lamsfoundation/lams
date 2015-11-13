@@ -20,6 +20,18 @@
 			    vertical-align:text-top;
 			    padding-top:2px;
 			}
+			
+			.session-container {
+				padding-left: 30px;
+				width:99%; 
+			}
+			.session-header {
+				padding-bottom: 5px;
+				font-size: small;
+			}
+			div[id^="gbox_userSummary"] {
+				margin-top: 5px;
+			}
 		</style>
  
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
