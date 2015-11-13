@@ -23,6 +23,7 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.rating.dto;
 
+import java.util.Date;
 
 /**
  * Holds minimum information required for displaying in Rating.tag Created in order to lighten the data passed from DB.
@@ -35,15 +36,21 @@ public class RatingCommentDTO {
 
     private Long userId;
     
+    private String userFullName;
+    
     private String comment;
+    
+    private Date postedDate;
 
     public RatingCommentDTO() {
     }
 
-    public RatingCommentDTO(Long itemId, Long userId, String comment) {
+    public RatingCommentDTO(Long itemId, Long userId, String userName, String comment, Date postedDate) {
 	this.itemId = itemId;
 	this.userId = userId;
+	this.userFullName = userName;
 	this.comment = comment;
+	this.postedDate = postedDate;
     }
 
     /**
@@ -66,11 +73,27 @@ public class RatingCommentDTO {
 	this.userId = userId;
     }
     
+    public void setUserFullName(String userFullName) {
+	this.userFullName = userFullName;
+    }
+
+    public String getUserFullName() {
+	return this.userFullName;
+    }
+    
     public void setComment(String comment) {
 	this.comment = comment;
     }
 
     public String getComment() {
 	return this.comment;
+    }
+    
+    public Date getPostedDate() {
+	return postedDate;
+    }
+
+    public void setPostedDate(Date postedDate) {
+	this.postedDate = postedDate;
     }
 }
