@@ -38,7 +38,7 @@
 	  					autowidth: true,
 	  					shrinkToFit: false,
 	  				    pager: 'pager${sessionDto.sessionId}',
-	  				    rowList:[5,10,20,30],
+	  				  	rowList:[10,20,30,40,50,100],
 	  				    rowNum:10,
 	  				    viewrecords:true,
 	  				    recordpos: 'left',
