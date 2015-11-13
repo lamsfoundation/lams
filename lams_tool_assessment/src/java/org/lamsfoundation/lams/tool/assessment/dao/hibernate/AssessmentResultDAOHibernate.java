@@ -37,7 +37,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     private static final String FIND_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? ORDER BY r.startDate DESC";
 
-    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
+    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM "
+	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
@@ -58,7 +59,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
 
-    private static final String FIND_ASSESSMENT_RESULT_GRADE = "select r.grade FROM " + AssessmentResult.class.getName()
+    private static final String FIND_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
+	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
 
     private static final String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select r.finishDate - r.startDate FROM "
@@ -82,8 +84,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
-	return (List<AssessmentResult>) doFind(AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER,
-		new Object[] { userId, sessionId });
+	return (List<AssessmentResult>) doFind(AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER, new Object[] {
+		userId, sessionId });
     }
 
     @Override
@@ -108,8 +110,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
-	List list = doFind(AssessmentResultDAOHibernate.FIND_ASSESSMENT_RESULT_GRADE,
-		new Object[] { userId, assessmentUid });
+	List list = doFind(AssessmentResultDAOHibernate.FIND_ASSESSMENT_RESULT_GRADE, new Object[] { userId,
+		assessmentUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {

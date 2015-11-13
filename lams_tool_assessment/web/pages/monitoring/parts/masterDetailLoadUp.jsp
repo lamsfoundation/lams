@@ -19,8 +19,7 @@
  	   	   			title:"${fn:escapeXml(title)}",
  	   	   			response:responseStr,
  	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
- 	   	   	    });	
- 	     		
+ 	   	   	    });
 
  	 	     	// set maxGrade attribute to cell DOM element
  	 	     	table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  ${questionResult.maxMark}});

@@ -27,22 +27,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.Summary;
+import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -86,6 +85,14 @@ public interface IAssessmentService {
      * @return
      */
     List<AssessmentUser> getUsersBySession(Long toolSessionID);
+
+    List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
+
+    int getCountUsersBySession(Long sessionId, String searchString);
+
+    List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
+	    String sortBy, String sortOrder, String searchString);
 
     /**
      * Get <code>Assessment</code> by toolContentID.
@@ -260,6 +267,8 @@ public interface IAssessmentService {
      */
     int getAssessmentResultCount(Long assessmentUid, Long userId);
     
+    AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid);
+    
     List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
     
     /**
@@ -290,6 +299,14 @@ public interface IAssessmentService {
     String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException;
 
     AssessmentQuestion getAssessmentQuestionByUid(Long questionUid);
+    
+    /**
+     * Returns sessionDtos containing only session ids and session names.
+     * 
+     * @param contentId
+     * @return
+     */
+    List<SessionDTO> getSessionDtos(Long contentId);
 
     /**
      * Return monitoring summary list. The return value is list of assessment summaries for each groups.
@@ -297,7 +314,7 @@ public interface IAssessmentService {
      * @param contentId
      * @return
      */
-    List<Summary> getSummaryList(Long contentId);
+    List<SessionDTO> getSessionDataForExport(Long contentId);
     
     AssessmentResult getUserMasterDetail(Long sessionId, Long userId);
     
@@ -310,7 +327,23 @@ public interface IAssessmentService {
      */
     UserSummary getUserSummary(Long contentId, Long userId, Long sessionId);
     
+    /**
+     * For summary tab
+     * 
+     * @param contentId
+     * @param questionUid
+     * @return
+     */
     QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
+    
+    /**
+     * For export purposes
+     * 
+     * @param contentId
+     * @param questionUid
+     * @return
+     */
+    QuestionSummary getQuestionDataForExport(Long contentId, Long questionUid);
     
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 

@@ -1,19 +1,25 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		<c:forEach var="summary" items="${summaryList}" varStatus="status">
+		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		
-			jQuery("#list${summary.sessionId}").jqGrid({
-				datatype: "local",
-				rowNum: 10000,
-				height: 'auto',
-				width: 630,
-				
+			jQuery("#list${sessionDto.sessionId}").jqGrid({
+			   	caption: "${sessionDto.sessionName}",
+			   	multiselect: false,
+				datatype: "json",
+				url: "<c:url value="/monitoring/getUsers.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}",
+				height: '100%',
+				autowidth: true,
+				shrinkToFit: false,
+			    pager: 'listPager${sessionDto.sessionId}',
+			    rowList:[10,20,30,40,50,100],
+			    rowNum:10,
+			    viewrecords:true,
 			   	colNames:['#',
 						'userId',
 						'sessionId',
@@ -21,18 +27,15 @@
 					    "<fmt:message key="label.monitoring.summary.total" />"],
 					    
 			   	colModel:[
-			   		{name:'id',index:'id', width:20, sorttype:"int"},
-			   		{name:'userId',index:'userId', width:0},
-			   		{name:'sessionId',index:'sessionId', width:0},
-			   		{name:'userName',index:'userName', width:350},
-			   		{name:'total',index:'total', width:120,align:"right",sorttype:"float"}		
+			   		{name:'id', index:'id', width:20, sorttype:"int", search:false},
+			   		{name:'userId', index:'userId', width:0, hidden: true},
+			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
+			   		{name:'userName', index:'userName', width:570, searchoptions: { clearSearch: false }},
+			   		{name:'total', index:'total', width:174, align:"right", formatter:'number', search:false}		
 			   	],
-			   	
-			   	multiselect: false,
-			   	caption: "${summary.sessionName}",
 			   	ondblClickRow: function(rowid) {
-			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
-			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
+			   		var sessionId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'sessionId');
 					var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
 					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&height=540&width=750&modal=true";
 					$("#userSummaryHref").attr("href", newUserSummaryHref);	
@@ -42,33 +45,33 @@
 			  	    if(rowid == null) { 
 			  	    	rowid=0; 
 			  	    } 
-			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
-			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
+			   		var sessionId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'sessionId');
 					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
-		  	        jQuery("#userSummary${summary.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
+		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
 		  	        	userMasterDetailUrl,
 		  	        	{
 		  	        		userID: userId,
 		  	        		sessionId: sessionId
 		  	       		}
-		  	       	);
-				  	        
-	  	  		} 
-			}).hideCol("userId").hideCol("sessionId");
-			
-   	        <c:forEach var="assessmentResult" items="${summary.assessmentResults}" varStatus="i">
-   	     		jQuery("#list${summary.sessionId}").addRowData(${i.index + 1}, {
-   	   	     		id:"${i.index + 1}",
-   	   	     		userId:"${assessmentResult.user.userId}",
-   	   	     		sessionId:"${assessmentResult.user.session.sessionId}",
-   	   	     		userName:"${assessmentResult.user.lastName}, ${assessmentResult.user.firstName}",
-   	   	     		total:"<fmt:formatNumber value='${assessmentResult.grade}' maxFractionDigits='2'/>"
-   	   	   	    });
-	        </c:forEach>
+		  	       	);    
+	  	  		},
+			    loadError: function(xhr,st,err) {
+			    	jQuery("#list${sessionDto.sessionId}").clearGridData();
+			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			    }
+
+			})
+			<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
+				.jqGrid('filterToolbar', { 
+					searchOnEnter: false
+				})
+			</c:if>
+			.navGrid("#listPager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false});
 	        
 	        var oldValue = 0;
-			jQuery("#userSummary${summary.sessionId}").jqGrid({
+			jQuery("#userSummary${sessionDto.sessionId}").jqGrid({
 				datatype: "local",
 				rowNum: 10000,
 				gridstate:"hidden",
@@ -103,7 +106,7 @@
   					}
 					
 					// get maxGrade attribute which was set in masterDetailLoadUp.jsp
-					var maxGrade = jQuery("table#userSummary${summary.sessionId} tr#" + iRow 
+					var maxGrade = jQuery("table#userSummary${sessionDto.sessionId} tr#" + iRow 
 							              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
 					if (+val > +maxGrade) {
 						return maxGrade;
@@ -111,18 +114,18 @@
 				},
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
   					if (isNaN(val)) {
-  						jQuery("#userSummary${summary.sessionId}").restoreCell(iRow,iCol); 
+  						jQuery("#userSummary${sessionDto.sessionId}").restoreCell(iRow,iCol); 
   					} else {
-  						var parentSelectedRowId = jQuery("#list${summary.sessionId}").getGridParam("selrow");
-  						var previousTotal =  eval(jQuery("#list${summary.sessionId}").getCell(parentSelectedRowId, 'total'));
-  						jQuery("#list${summary.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
+  						var parentSelectedRowId = jQuery("#list${sessionDto.sessionId}").getGridParam("selrow");
+  						var previousTotal =  eval(jQuery("#list${sessionDto.sessionId}").getCell(parentSelectedRowId, 'total'));
+  						jQuery("#list${sessionDto.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
   					}
 				},	  		
   				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
   					if (isNaN(val)) {
   						return {nan:true};
   					} else {
-  						var questionResultUid = jQuery("#userSummary${summary.sessionId}").getCell(rowid, 'questionResultUid');
+  						var questionResultUid = jQuery("#userSummary${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
   						return {questionResultUid:questionResultUid};		  				  		
   				  	}
   				}
@@ -132,18 +135,11 @@
 		
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		        grid.each(function(index) {
-		            var gridId = $(this).attr('id');
-		            
-			        //resize only user summary grids
-			        if (gridId.match("^userSummary")) {
-		            	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-		            	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-			        }
-		        });
-		    }
+			jQuery(".ui-jqgrid-btable:visible").each(function(index) {
+		    	var gridId = $(this).attr('id');
+		    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+	        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		    });
 		}).trigger('resize');
 
 		$("#questionUid").change(function() {
@@ -212,7 +208,7 @@
 
 
 <c:choose>
-	<c:when test="${empty summaryList}">
+	<c:when test="${empty sessionDtos}">
 		<div align="center">
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 		</div>	
@@ -232,22 +228,20 @@
 		</div>
 		<a onclick="" href="return false;" class="thickbox" id="userSummaryHref" style="display: none;"></a>	
 	
-		<c:forEach var="summary" items="${summaryList}" varStatus="status">
-			<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
+		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
+			<div class="session-container" 
+				 	style="<c:if test='${!status.last}'>padding-bottom: 30px;</c:if><c:if test='${status.last}'>padding-bottom: 15px;</c:if> ">
 				<c:if test="${sessionMap.isGroupedActivity}">
-					<div style="padding-bottom: 5px; font-size: small;">
-						<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
+					<div class="session-header">
+						<B><fmt:message key="monitoring.label.group" /></B> ${sessionDto.sessionName}
 					</div>
 				</c:if>
 				
-				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				<div style="margin-top: 10px; width:99%;">
-					<table id="userSummary${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				</div>
-			</div>	
-			<c:if test="${! status.last}">
-			
-			</c:if>
+				<table id="list${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				<table id="userSummary${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				<div id="listPager${sessionDto.sessionId}" class="scroll"></div>
+				
+			</div>
 		</c:forEach>	
 		
 		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-right float-right">

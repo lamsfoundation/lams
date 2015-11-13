@@ -35,65 +35,64 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements AssessmentQuestionResultDAO {
 
-	private static final String FIND_BY_UID = "FROM " + AssessmentQuestionResult.class.getName()
-			+ " AS r WHERE r.uid = ?";
+    private static final String FIND_BY_UID = "FROM " + AssessmentQuestionResult.class.getName()
+	    + " AS r WHERE r.uid = ?";
 
-	private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "FROM "
-			+ AssessmentQuestionResult.class.getName()
-			+ " AS q, "
-			+ AssessmentResult.class.getName()
-			+ " AS r "
-			+ " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? ORDER BY r.startDate ASC";
+    private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "FROM "
+	    + AssessmentQuestionResult.class.getName()
+	    + " AS q, "
+	    + AssessmentResult.class.getName()
+	    + " AS r "
+	    + " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? ORDER BY r.startDate ASC";
 
-	private static final String FIND_WRONG_ANSWERS_NUMBER = "SELECT COUNT(q) FROM  "
-			+ AssessmentQuestionResult.class.getName()
-			+ " AS q, "
-			+ AssessmentResult.class.getName()
-			+ " AS r "
-			+ " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND (ROUND(q.mark + q.penalty) < q.maxMark) AND (r.finishDate != null)";
+    private static final String FIND_WRONG_ANSWERS_NUMBER = "SELECT COUNT(q) FROM  "
+	    + AssessmentQuestionResult.class.getName()
+	    + " AS q, "
+	    + AssessmentResult.class.getName()
+	    + " AS r "
+	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.assessmentQuestion.uid =? AND (ROUND(q.mark + q.penalty) < q.maxMark) AND (r.finishDate != null)";
 
-	private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  "
-			+ AssessmentQuestionResult.class.getName()
-			+ " AS q, "
-			+ AssessmentResult.class.getName()
-			+ " AS r "
-			+ " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND (r.finishDate != null) AND r.user.userId =? AND q.assessmentQuestion.sequenceId =? ORDER BY r.startDate DESC";
+    private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  "
+	    + AssessmentQuestionResult.class.getName()
+	    + " AS q, "
+	    + AssessmentResult.class.getName()
+	    + " AS r "
+	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND (r.finishDate != null) AND r.user.userId =? AND q.assessmentQuestion.sequenceId =? ORDER BY r.startDate DESC";
 
-	@Override
-	public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
-		List list = doFind(FIND_WRONG_ANSWERS_NUMBER,
-				new Object[] { assessmentUid, userId, questionUid });
-		if (list == null || list.size() == 0) {
-			return 0;
-		} else {
-			return ((Number) list.get(0)).intValue();
-		}
+    @Override
+    public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
+	List list = doFind(FIND_WRONG_ANSWERS_NUMBER, new Object[] { assessmentUid, userId, questionUid });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	} else {
+	    return ((Number) list.get(0)).intValue();
 	}
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
-		return (List<Object[]>) doFind(FIND_BY_ASSESSMENT_QUESTION_AND_USER,
-				new Object[] { assessmentUid, userId, questionUid });
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
+	return (List<Object[]>) doFind(FIND_BY_ASSESSMENT_QUESTION_AND_USER, new Object[] { assessmentUid, userId,
+		questionUid });
+    }
 
-	@Override
-	public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
-		List list = doFind(FIND_BY_UID, new Object[] { questionResultUid });
-		if (list == null || list.size() == 0)
-			return null;
-		return (AssessmentQuestionResult) list.get(0);
-	}
+    @Override
+    public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
+	List list = doFind(FIND_BY_UID, new Object[] { questionResultUid });
+	if (list == null || list.size() == 0)
+	    return null;
+	return (AssessmentQuestionResult) list.get(0);
+    }
 
-	@Override
-	public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
-		Query q = getSession().createQuery(GET_ANSWER_MARK);
-		q.setParameter(0, assessmentUid);
-		q.setParameter(1, userId);
-		q.setParameter(2, questionSequenceId);
-		q.setMaxResults(1);
-		Object result = q.uniqueResult();
-		return result != null ? ((Number) result).floatValue() : null;
+    @Override
+    public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
+	Query q = getSession().createQuery(GET_ANSWER_MARK);
+	q.setParameter(0, assessmentUid);
+	q.setParameter(1, userId);
+	q.setParameter(2, questionSequenceId);
+	q.setMaxResults(1);
+	Object result = q.uniqueResult();
+	return result != null ? ((Number) result).floatValue() : null;
 
-	}
+    }
 }
