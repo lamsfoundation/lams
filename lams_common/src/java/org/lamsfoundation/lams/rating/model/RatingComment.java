@@ -23,6 +23,8 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.rating.model;
 
+import java.util.Date;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -40,8 +42,11 @@ public class RatingComment implements java.io.Serializable, Cloneable {
     private User learner;
     
     private String comment;
+    
+    private Date postedDate;
 
     public RatingComment() {
+	this.postedDate = new Date();
     }
 
     public RatingComment(Long itemId, RatingCriteria ratingCriteria, User learner, String comment) {
@@ -49,6 +54,7 @@ public class RatingComment implements java.io.Serializable, Cloneable {
 	this.ratingCriteria = ratingCriteria;
 	this.learner = learner;
 	this.comment = comment;
+	this.postedDate = new Date();
     }
 
     /**
@@ -97,6 +103,14 @@ public class RatingComment implements java.io.Serializable, Cloneable {
 
     public String getComment() {
 	return this.comment;
+    }
+    
+    public Date getPostedDate() {
+	return postedDate;
+    }
+
+    public void setPostedDate(Date postedDate) {
+	this.postedDate = postedDate;
     }
 }
 

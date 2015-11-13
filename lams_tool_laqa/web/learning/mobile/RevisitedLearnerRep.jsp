@@ -189,7 +189,7 @@
 											for (j = 0; i < userData.comments.length; j++){
 												var comment = userData.comments[j];
 												rows += '<div class="rating-comment">';
-												rows += 	comment;
+												rows += 	comment.comment;
 												rows += '</div>';
 											}
 											
