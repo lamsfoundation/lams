@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.util.AlphanumComparator;
  * 
  */
 public class AssessmentSessionComparator implements Comparator<AssessmentSession> {
-
+    
     private static AlphanumComparator alphanumComparator = new AlphanumComparator();
 
     public int compare(AssessmentSession session1, AssessmentSession session2) {
