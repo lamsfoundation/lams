@@ -91,4 +91,10 @@ public class SpreadsheetConstants {
 
 	public static final String DEFUALT_PROTOCOL_REFIX = "http://";
 	public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
+
+	public static final int SORT_BY_NO = 1;
+	public static final int SORT_BY_USERNAME_ASC = 2;
+	public static final int SORT_BY_USERNAME_DESC = 3;
+	public static final int SORT_BY_MARKED_ASC = 4;
+	public static final int SORT_BY_MARKED_DESC = 5;
 }

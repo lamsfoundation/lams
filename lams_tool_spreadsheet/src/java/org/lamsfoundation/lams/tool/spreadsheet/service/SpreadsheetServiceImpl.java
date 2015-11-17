@@ -23,10 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.spreadsheet.service;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,20 +35,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -90,7 +73,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * 
@@ -293,6 +275,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     public List<Summary> getSummary(Long contentId) {
+
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(contentId);
 	List<SpreadsheetSession> sessionList = spreadsheetSessionDao.getByContentId(contentId);
 
@@ -300,14 +283,25 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
 	// create the user list of all whom were started this task
 	for (SpreadsheetSession session : sessionList) {
-	    List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(session.getSessionId());
-
-	    Summary summary = new Summary(session, spreadsheet, userList);
+	    // LDEV-3590 Monitoring is now paged so don't get the list of users
+	    // List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(session.getSessionId());
+	    Summary summary = new Summary(session, spreadsheet, null);
 	    summaryList.add(summary);
 	}
 
 	return summaryList;
     }
+
+    @Override
+    public List<SpreadsheetUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
+	return spreadsheetUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString);
+    }
+    
+    @Override
+    public int getCountUsersBySession(Long sessionId, String searchString) {
+	return spreadsheetUserDao.getCountUsersBySession(sessionId, searchString);
+    }
+
 
     public List<StatisticDTO> getStatistics(Long contentId) {
 	List<SpreadsheetSession> sessionList = spreadsheetSessionDao.getByContentId(contentId);
