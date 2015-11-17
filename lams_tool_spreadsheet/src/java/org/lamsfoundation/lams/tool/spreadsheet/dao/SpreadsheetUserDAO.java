@@ -34,4 +34,8 @@ public interface SpreadsheetUserDAO extends DAO {
 	SpreadsheetUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
 	List<SpreadsheetUser> getBySessionID(Long sessionId);
+	
+	List<SpreadsheetUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
+	
+	int getCountUsersBySession(final Long sessionId, String searchString);
 }

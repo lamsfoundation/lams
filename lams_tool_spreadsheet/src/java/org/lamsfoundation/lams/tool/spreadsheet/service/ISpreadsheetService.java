@@ -139,11 +139,24 @@ public interface ISpreadsheetService{
 
 	/**
 	 * Return monitoring summary list. The return value is list of spreadsheet summaries for each groups.
+	 * It does not return the users in each session as we now use paging.
 	 * @param contentId
 	 * @return
 	 */
 	List<Summary> getSummary(Long contentId);
+
+	/**
+	 * Get a paged, optionally sorted and filtered, list of users.
+	 * @return
+	 */
+	List<SpreadsheetUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
 	
+	/**
+	 * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports filtering.
+	 * @return
+	 */
+	int getCountUsersBySession(Long sessionId, String searchString);
+
 	/**
 	 * Return monitoring statistic list. The return value is list of statistics for each groups.
 	 * @param contentId
@@ -214,5 +227,7 @@ public interface ISpreadsheetService{
          * @return
          */
         boolean isGroupedActivity(long toolContentID);
+        
+        
 }
 
