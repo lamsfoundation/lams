@@ -1106,7 +1106,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    assessmentResultDao.saveObject(result);
 
 	    // propagade changes to Gradebook
-	    gradebookService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, true);
+	    gradebookService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
 
 	    // records mark change with audit service
 	    auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, userId, user.getLoginName(), "" + oldMark,
@@ -1366,7 +1366,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			// if this is the last assessment result - propagade total mark to Gradebook
 			if (lastAssessmentResult.getUid().equals(assessmentResult.getUid())) {
 			    gradebookService.updateActivityMark(new Double(assessmentMark), null,
-				    user.getUserId().intValue(), toolSessionId, true);
+				    user.getUserId().intValue(), toolSessionId, false);
 			}
 		    }
 
@@ -1442,7 +1442,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 			    // propagade total mark to Gradebook
 			    gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionId,
-				    true);
+				    false);
 			}
 		    } else {
 
@@ -1458,7 +1458,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 			    // propagade total mark to Gradebook
 			    gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionId,
-				    true);
+				    false);
 			}
 		    }
 
