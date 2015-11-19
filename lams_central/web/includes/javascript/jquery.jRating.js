@@ -38,7 +38,10 @@
 
 			/** Functions **/
 			onSuccess : null,
-			onError : null
+			onError : null,
+			/** customized by LAMS LDEV-3609 **/
+			onTouchstart:null
+
 		}; 
 
 		if(this.length>0)
@@ -143,6 +146,55 @@
 				},
 				click : function(e){
                     var element = this;
+					
+					/*set vars*/
+					hasRated = true;
+					globalWidth = newWidth;
+					nbOfRates--;
+					
+					if(!opts.canRateAgain || parseInt(nbOfRates) <= 0) $(this).unbind().css('cursor','default').addClass('jDisabled');
+					
+					if (opts.showRateInfo) $("p.jRatingInfos").fadeOut('fast',function(){$(this).remove();});
+					e.preventDefault();
+					var rate = getNote(newWidth);
+					average.width(newWidth);
+					
+					$.post(opts.phpPath,{
+							idBox : idBox,
+							rate : rate,
+							action : 'rating'
+						},
+						function(data) {
+							if(!data.error)
+							{
+
+								/** Here you can display an alert box, 
+									or use the jNotify Plugin :) http://www.myqjqueryplugins.com/jNotify
+									exemple :	*/
+								/** customized by LAMS **/
+								if(opts.onSuccess) opts.onSuccess( data, idBox );
+							}
+							else
+							{
+
+								/** Here you can display an alert box, 
+									or use the jNotify Plugin :) http://www.myqjqueryplugins.com/jNotify
+									exemple :	*/
+								if(opts.onError) opts.onError( element, rate );
+							}
+						},
+						'json'
+					);
+				},
+				/** customized by LAMS LDEV-3609 **/
+				touchstart : function(e){
+					var element = this;
+					var realOffsetLeft = findRealLeft(this);
+					var xPos = e.originalEvent.touches[0].pageX;
+					var relativeX = xPos - realOffsetLeft;
+					//Taken from mousemove
+					if(opts.step) newWidth = Math.floor(relativeX/starWidth)*starWidth + starWidth;
+					else newWidth = relativeX;
 					
 					/*set vars*/
 					hasRated = true;
