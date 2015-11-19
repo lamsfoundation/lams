@@ -242,14 +242,14 @@
         <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
                 <datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="false">
-				    <connection-url>jdbc:mysql://localhost:3306/lams_wildfly</connection-url>
+				    <connection-url>@db.url.run@</connection-url>
 				    <driver>MySQL</driver>
 				    <connection-property name="characterEncoding">utf8</connection-property>
 				    <connection-property name="useUnicode">true</connection-property>
 				    <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
 				   
 				    <!-- Properties below are used only for embedded MySQL server -->
-				    <connection-property name="server.basedir">C:/lams/database</connection-property>
+				    <connection-property name="server.basedir">@db.location@</connection-property>
 				    <connection-property name="createDatabaseIfNotExist">false</connection-property>
 				    <connection-property name="server.initialize-user">false</connection-property>
 				    <connection-property name="server.thread_stack">128K</connection-property>
@@ -271,8 +271,8 @@
 				      <flush-strategy>FailingConnectionOnly</flush-strategy>
 				    </pool>
 				    <security>
-				      <user-name>lams</user-name>
-				      <password>lamsdemo</password>
+				      <user-name>@db.username@</user-name>
+				      <password>@db.password@</password>
 				    </security>
 				    <validation>
 				      <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker"/>
