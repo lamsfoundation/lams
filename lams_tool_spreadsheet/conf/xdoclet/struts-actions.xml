@@ -139,7 +139,7 @@
 			validate="false" 
 			scope="request">
             <forward name="editMark" path="/pages/monitoring/parts/editmark.jsp" />
-			<forward name="success" path="/pages/monitoring/parts/summarylist.jsp" />            			
+			<forward name="success" path="/pages/monitoring/parts/updatemarkaftersave.jsp" />            			
 		</action>		
 		
 		<!-- ========== BEGIN: Common ============================== -->
