@@ -458,7 +458,16 @@ public class GradebookService implements IGradebookService {
 		gradebookUserLesson.setLesson(lesson);
 	    }
 
-	    aggregateTotalMarkForLesson(gradebookUserLesson);
+	    // In order to calculate lesson's mark correctly we need to flush the session beforehand. This is required
+	    // as change to gradebookUserActivity isn't synchronized with the DB at this point due to the current transaction isn't
+	    // committed yet
+	    gradebookDAO.flush();
+
+	    // Calculates a lesson's total mark and saves it
+	    Double totalMark = gradebookDAO.getGradebookUserActivityMarkSum(gradebookUserLesson.getLesson()
+		    .getLessonId(), gradebookUserLesson.getLearner().getUserId());
+	    gradebookUserLesson.setMark(totalMark);
+	    gradebookDAO.insertOrUpdate(gradebookUserLesson);
 
 	    // audit log changed gradebook mark
 	    if (isAuditLogRequired) {
@@ -1222,18 +1231,6 @@ public class GradebookService implements IGradebookService {
 	    status = originalStatus;
 	}
 	return status;
-    }
-
-    /**
-     * Adds a mark to the aggregated total and saves it
-     * 
-     * @param gradebookUserLesson
-     */
-    private void aggregateTotalMarkForLesson(GradebookUserLesson gradebookUserLesson) {
-	Double totalMark = gradebookDAO.getGradebookUserActivityMarkSum(gradebookUserLesson.getLesson().getLessonId(),
-		gradebookUserLesson.getLearner().getUserId());
-	gradebookUserLesson.setMark(totalMark);
-	gradebookDAO.insertOrUpdate(gradebookUserLesson);
     }
 
     /**
