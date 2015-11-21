@@ -90,6 +90,56 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 		return notebookEntryDAO.get(id, idType, signature, userID);
 	}
 	
+	/** 
+	 * Add the SQL needed to look up entries for a given tool. Expects a valid string buffer to be supplied.
+	 * This allows a tool to get the single matching entry (assuming the tool has only created one notebook entry
+	 * for each learner in each session) for the teacher to view. This is an efficient way to get the 
+	 * entries at the same time as retrieving the tool data, rather than making a separate lookup.
+	 * Note - if there is more than on row for each tool/session/learner, then the tool will end up with a 
+	 * cross product against the learner record and you will get one row in the learner + notebook result for each 
+	 * notebook entry.
+	 * 
+	 * May only be used for entries where the external_id_type = CoreNotebookConstants.NOTEBOOK_TOOL
+	 * 
+	 * The parameters are strings, and the SQL is built up rather than using parameters as either sessionIdString or
+	 * userIdString may be the name of a field you are joining on. Typically the sessionId will be a number as the tool
+	 * would be requesting the entries for only one session but the user field will need to be a reference to a column
+	 * in the user table so that it can get entries for more than one user. If you wanted multiple users across
+	 * multiple sessions, then the sessionId would need to refer to the column in the user/session table.
+	 * 
+	 * If you only want an entry for one user, use getEntry(id, idIdType, signature, userID);
+	 * 
+	 * The return values are the entry for the select clause (will always have a leading but no trailing comma and 
+	 * an alias of notebookEntry) and the sql join clause, which should go with any other join clauses.
+	 * 
+	 * To make sure it always returns the same number of objects add the select clause like this:
+	 * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
+	 * 
+	 * Then if there is isn't a notebookEntry to return, it still returns a notebookEntry column, which translates
+	 * to null. So you can return a collection like List<Object[UserObject, String]> irrespective of whether
+	 * or not the notebook entries (the Strings) are needed. 
+	 * 
+	 * Finally, as it will be returning the notebook entry as a separate field in select clause, set up the sql -> java
+	 * object translation using ".addScalar("notebookEntry", Hibernate.STRING)".
+	 * 
+	 * @param sessionIdString Session identifier, usually the toolSessionId
+	 * @param toolSignature Tool's string signature (without any quotes) e.g. lantbk11
+	 * @param userIdString User identifier field string e.g. 
+	 * @return String[] { partial select string, join clause }
+	 * 
+	 */
+	public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString) {
+	    StringBuilder buf = new StringBuilder(" LEFT JOIN lams_notebook_entry entry ON entry.external_id=");
+	    buf.append(sessionIdString);
+	    buf.append(" AND entry.external_id_type=");
+	    buf.append(CoreNotebookConstants.NOTEBOOK_TOOL);
+	    buf.append(" AND entry.external_signature=\"");
+	    buf.append(toolSignature);
+	    buf.append("\" AND entry.user_id=");
+	    buf.append(userIdString);
+	    return  new String[] { ", entry.entry notebookEntry ", buf.toString() };
+	}
+
 	public List<NotebookEntry> getEntry(Long id, Integer idType, String signature) {
 		return notebookEntryDAO.get(id, idType, signature);
 	}
