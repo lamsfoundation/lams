@@ -126,6 +126,11 @@ public class LAMSBaseDAO implements IBaseDAO {
 	public void updateAnythingLike(Class clazz, Object newValues, Object conditions) {
 		// TODO implement me
 	}
+	
+	@Override
+	public void flush() {
+	    getSession().flush();
+	}
 
 	/*
 	 * (non-Javadoc)

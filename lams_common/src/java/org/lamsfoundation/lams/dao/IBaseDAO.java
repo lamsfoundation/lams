@@ -138,6 +138,15 @@ public interface IBaseDAO {
 	public void updateAnythingLike(Class clazz, Object newValues, Object conditions);
 	
 	/**
+	 * Force this session to flush. Must be called at the end of a unit of work, before commiting the transaction and
+	 * closing the session (depending on flush-mode, Transaction.commit() calls this method).
+	 * 
+	 * @throws HibernateException
+	 *             - Indicates problems flushing the session or talking to the database.
+	 */
+	void flush();
+	
+	/**
 	 * Remove an object from the database.
 	 * @param object The object to be deleted
 	 */
