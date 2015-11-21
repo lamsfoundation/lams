@@ -28,7 +28,8 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.hibernate.SQLQuery;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetUserDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
@@ -59,14 +60,18 @@ public class SpreadsheetUserDAOHibernate extends BaseDAOHibernate implements Spr
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<SpreadsheetUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
+	/** Will return List<[SpreadsheetUser, String], [SpreadsheetUser, String], ... , [SpreadsheetUser, String]>
+	 * where the String is the notebook entry. No notebook entries needed? Will return in their place.
+	 */
+	public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
+		boolean getNotebookEntries, ICoreNotebookService coreNotebookService) {
 	    String sortingOrder;
 	    switch (sorting) {
 	    case SpreadsheetConstants.SORT_BY_USERNAME_ASC:
-		sortingOrder = "user.lastName ASC, user.firstName ASC";
+		sortingOrder = "user.last_name ASC, user.first_name ASC";
 		break;
 	    case SpreadsheetConstants.SORT_BY_USERNAME_DESC:
-		sortingOrder = "user.lastName DESC, user.firstName DESC";
+		sortingOrder = "user.last_name DESC, user.first_name DESC";
 		break;
 	    case SpreadsheetConstants.SORT_BY_MARKED_ASC:
 		sortingOrder = " mark.marks ASC";
@@ -75,50 +80,66 @@ public class SpreadsheetUserDAOHibernate extends BaseDAOHibernate implements Spr
 		sortingOrder = " mark.marks DESC";
 		break;
 	    default:
-		sortingOrder = "user.lastName, user.firstName";
+		sortingOrder = "user.last_name, user.first_name";
 	    }
 
-	    String filteredSearchString = buildNameSearch(searchString);
-	    String queryText = "SELECT user FROM " + SpreadsheetUser.class.getName() + " as user ";
+	    // If the session uses notebook, then get the sql to join across to get the entries
+	    String[] notebookEntryStrings = null;
+	    if ( getNotebookEntries ) {
+		notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),SpreadsheetConstants.TOOL_SIGNATURE,"user.user_id" );
+	    }
+
+	    // Basic select for the user records
+	    StringBuilder queryText = new StringBuilder();
+	    queryText.append("SELECT user.* ");
+	    queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
+	    queryText.append(" FROM tl_lasprd10_user user ");
+	    queryText.append(" JOIN tl_lasprd10_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
+
+	    // If sorting by mark then join to mark
 	    if (sorting == SpreadsheetConstants.SORT_BY_MARKED_ASC
 		    || sorting == SpreadsheetConstants.SORT_BY_MARKED_DESC) {
-		queryText += " LEFT JOIN user.userModifiedSpreadsheet as ums "
-			+ " LEFT JOIN ums.mark as mark ";
+		queryText.append(" LEFT JOIN tl_lasprd10_user_modified_spreadsheet ms on user.user_modified_spreadsheet_uid=ms.uid ");
+		queryText.append(" LEFT JOIN tl_lasprd10_spreadsheet_mark mark on ms.mark_id = mark.uid ");
 	    }
 
-	    queryText+=  " WHERE user.session.sessionId=:sessionId "
-		    + ( filteredSearchString != null ? filteredSearchString : "" )
-		    + " ORDER BY " + sortingOrder;
+	    // If using notebook, add the notebook join
+	    if ( notebookEntryStrings != null )
+		queryText.append(notebookEntryStrings[1]);
 
-	    return getSession().createQuery(queryText).setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size).list();
+	    // If filtering by name add a name based where clause
+	    buildNameSearch(searchString, queryText);
+
+	    // Now specify the sort based on the switch statement above.
+	    queryText.append(" ORDER BY " + sortingOrder);
+
+	    SQLQuery query =  getSession().createSQLQuery(queryText.toString());
+	    query.addEntity("user", SpreadsheetUser.class)
+		.addScalar("notebookEntry", Hibernate.STRING)
+	    	.setLong("sessionId", sessionId.longValue());
+	    return query.list();
 	}
 
-	private String buildNameSearch(String searchString) {
-	    String filteredSearchString = null;
+	private void buildNameSearch(String searchString, StringBuilder sqlBuilder) {
 	    if (!StringUtils.isBlank(searchString)) {
-		StringBuilder searchStringBuilder = new StringBuilder("");
 		String[] tokens = searchString.trim().split("\\s+");
 		for (String token : tokens) {
 		    String escToken = StringEscapeUtils.escapeSql(token);
-		    searchStringBuilder.append(" AND (user.firstName LIKE '%").append(escToken)
-		    .append("%' OR user.lastName LIKE '%").append(escToken)
-		    .append("%' OR user.loginName LIKE '%").append(escToken).append("%')");
+		    sqlBuilder.append(" WHERE (user.first_name LIKE '%").append(escToken)
+		    .append("%' OR user.last_name LIKE '%").append(escToken)
+		    .append("%' OR user.login_name LIKE '%").append(escToken).append("%') ");
 		}
-		filteredSearchString = searchStringBuilder.toString();
 	    }
-	    return filteredSearchString;
 	} 
 
 	@SuppressWarnings("rawtypes")
 	public int getCountUsersBySession(final Long sessionId, String searchString) {
 
-	    String filteredSearchString = buildNameSearch(searchString);
-	    String queryText = "SELECT count(*) FROM " + SpreadsheetUser.class.getName() + " user WHERE user.session.sessionId=:sessionId ";
-	    if ( filteredSearchString != null ) 
-		queryText += filteredSearchString;
+	    StringBuilder queryText = new StringBuilder("SELECT count(*) FROM tl_lasprd10_user user ");
+	    queryText.append(" JOIN tl_lasprd10_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
+	    buildNameSearch(searchString, queryText);
 	    
-	    List list = getSession().createQuery(queryText).setLong("sessionId", sessionId.longValue()).list();
-
+	    List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue()).list();
 	    if (list == null || list.size() == 0) {
 		return 0;
 	    }

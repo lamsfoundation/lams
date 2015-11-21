@@ -165,18 +165,18 @@ public class MonitoringAction extends Action {
 
 		//return user list according to the given sessionID
 		ISpreadsheetService service = getSpreadsheetService();
-		List<SpreadsheetUser> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString);
+		Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
+		List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString, spreadsheet.isReflectOnActivity());
 		
 		JSONArray rows = new JSONArray();
 		JSONObject responsedata = new JSONObject();
 		responsedata.put("total_rows", service.getCountUsersBySession(sessionID, searchString));
 
-		Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
-		boolean reflect = spreadsheet.isReflectOnActivity();
-		
-		for (SpreadsheetUser user : users) {
-    
+		for (Object[] userAndReflection : users) {
+
 		    JSONObject responseRow = new JSONObject();
+		    
+		    SpreadsheetUser user = (SpreadsheetUser) userAndReflection[0];
 		    responseRow.put(SpreadsheetConstants.ATTR_USER_UID, user.getUid());
 		    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 		    if ( user.getUserModifiedSpreadsheet() != null ) {
@@ -186,11 +186,8 @@ public class MonitoringAction extends Action {
 			}
 		    }
 		    
-		    if ( reflect ) {
-			NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-				SpreadsheetConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-			if ( notebookEntry != null )
-			    responseRow.put("reflection", notebookEntry.getEntry());
+		    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
+			responseRow.put("reflection", userAndReflection[1]);
 		    }
 		    
 		    rows.put(responseRow);

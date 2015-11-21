@@ -149,7 +149,7 @@ public interface ISpreadsheetService{
 	 * Get a paged, optionally sorted and filtered, list of users.
 	 * @return
 	 */
-	List<SpreadsheetUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
+	List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, boolean getNotebookEntries);
 	
 	/**
 	 * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports filtering.
