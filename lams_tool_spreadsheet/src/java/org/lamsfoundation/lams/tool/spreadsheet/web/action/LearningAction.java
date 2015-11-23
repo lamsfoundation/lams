@@ -328,8 +328,8 @@ public class LearningAction extends Action {
 //		 get the existing reflection entry
 		ISpreadsheetService submitFilesService = getSpreadsheetService();
 		
-		SessionMap map = (SessionMap)request.getSession().getAttribute(sessionMapID);
-		Long toolSessionID = (Long)map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		Long toolSessionID = (Long)sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, SpreadsheetConstants.TOOL_SIGNATURE, user.getUserID());
 		
 		if (entry != null) {
