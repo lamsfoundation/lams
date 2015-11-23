@@ -27,15 +27,20 @@ package org.lamsfoundation.lams.tool.spreadsheet.web.action;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -50,6 +55,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
@@ -60,8 +68,10 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetMark;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
+import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.web.form.MarkForm;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -73,13 +83,16 @@ public class MonitoringAction extends Action {
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
+			throws IOException, ServletException, JSONException {
 		String param = mapping.getParameter();
 
 		request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 
 		if (param.equals("summary")) {
 			return summary(mapping, form, request, response);
+		}
+		if (param.equals("getUsers")) {
+			return getUsers(mapping, form, request, response);
 		}
 		if (param.equals("doStatistic")) {
 			return doStatistic(mapping, form, request, response);
@@ -99,11 +112,6 @@ public class MonitoringAction extends Action {
 		if (param.equals("saveMark")) {
 			return saveMark(mapping, form, request, response);
 		}
-
-		if (param.equals("viewReflection")) {
-			return viewReflection(mapping, form, request, response);
-		}
-
 		return mapping.findForward(SpreadsheetConstants.ERROR);
 	}
 
@@ -122,19 +130,72 @@ public class MonitoringAction extends Action {
 
 		Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
 
-		Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(contentId, false);
-
 		//cache into sessionMap
 		sessionMap.put(SpreadsheetConstants.ATTR_SUMMARY_LIST, summaryList);
 		sessionMap.put(SpreadsheetConstants.PAGE_EDITABLE, spreadsheet.isContentInUse());
 		sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE, spreadsheet);
 		sessionMap.put(SpreadsheetConstants.ATTR_TOOL_CONTENT_ID, contentId);
-		sessionMap.put(SpreadsheetConstants.ATTR_REFLECT_LIST, reflectList);
 		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
 				AttributeNames.PARAM_CONTENT_FOLDER_ID));
 		sessionMap.put(SpreadsheetConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
 		return mapping.findForward(SpreadsheetConstants.SUCCESS);
+	}
+
+
+	private ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+	   throws JSONException, IOException {
+
+	    	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+
+		// paging parameters of tablesorter
+		int size = WebUtil.readIntParam(request, "size");
+		int page = WebUtil.readIntParam(request, "page");
+		Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+		Integer sortByMarked = WebUtil.readIntParam(request, "column[1]", true);
+		String searchString = request.getParameter("fcol[0]"); 
+		
+		int sorting = SpreadsheetConstants.SORT_BY_NO;
+		if ( sortByName != null ) {
+		    sorting = sortByName.equals(0) ? SpreadsheetConstants.SORT_BY_USERNAME_ASC : SpreadsheetConstants.SORT_BY_USERNAME_DESC; 
+		} else if ( sortByMarked !=null ) {
+		    sorting = sortByMarked.equals(0) ? SpreadsheetConstants.SORT_BY_MARKED_ASC : SpreadsheetConstants.SORT_BY_MARKED_DESC; 
+		}
+
+		//return user list according to the given sessionID
+		ISpreadsheetService service = getSpreadsheetService();
+		Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
+		List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString, spreadsheet.isReflectOnActivity());
+		
+		JSONArray rows = new JSONArray();
+		JSONObject responsedata = new JSONObject();
+		responsedata.put("total_rows", service.getCountUsersBySession(sessionID, searchString));
+
+		for (Object[] userAndReflection : users) {
+
+		    JSONObject responseRow = new JSONObject();
+		    
+		    SpreadsheetUser user = (SpreadsheetUser) userAndReflection[0];
+		    responseRow.put(SpreadsheetConstants.ATTR_USER_UID, user.getUid());
+		    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+		    if ( user.getUserModifiedSpreadsheet() != null ) {
+			responseRow.put("userModifiedSpreadsheet", "true");
+			if ( user.getUserModifiedSpreadsheet().getMark() != null ) {
+			    responseRow.put("mark", user.getUserModifiedSpreadsheet().getMark().getMarks());		    
+			}
+		    }
+		    
+		    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
+			responseRow.put("reflection", userAndReflection[1]);
+		    }
+		    
+		    rows.put(responseRow);
+		}
+		responsedata.put("rows", rows);
+		response.setContentType("application/json;charset=utf-8");
+		response.getWriter().print(new String(responsedata.toString()));
+		return null;	
 	}
 
 	/**
@@ -367,66 +428,15 @@ public class MonitoringAction extends Action {
 			getSpreadsheetService().saveOrUpdateUserModifiedSpreadsheet(user.getUserModifiedSpreadsheet());
 		}
 
-		//update user data in sessionMap
-		String sessionMapID = markForm.getSessionMapID();
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-		List<Summary> summaryList = (List<Summary>) sessionMap.get(SpreadsheetConstants.ATTR_SUMMARY_LIST);
-		for (Summary summary : summaryList) {
-			for (SpreadsheetUser sessionUser : summary.getUsers()) {
-				if (sessionUser.getUid().equals(user.getUid())) {
-					sessionUser.setUserModifiedSpreadsheet(user.getUserModifiedSpreadsheet());
-				}
-			}
-		}
-
+		request.setAttribute("mark",markForm.getMarks());
+		request.setAttribute("userUid",userUid);
+		
 		//set session map ID so that itemlist.jsp can get sessionMAP
 		request.setAttribute(SpreadsheetConstants.ATTR_SESSION_MAP_ID, markForm.getSessionMapID());
 
 		return mapping.findForward(SpreadsheetConstants.SUCCESS);
 	}
 
-	//	private ActionForward listuser(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	//		Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	//		Long itemUid = WebUtil.readLongParam(request, SpreadsheetConstants.PARAM_RESOURCE_ITEM_UID);
-	////
-	////		//get user list by given item uid
-	//		ISpreadsheetService service = getSpreadsheetService();
-	//		//TODO
-	//		List list = null;
-	////		List list = service.getUserListBySessionItem(sessionId, itemUid);
-	//		
-	//		//set to request
-	//		request.setAttribute(SpreadsheetConstants.ATTR_USER_LIST, list);
-	//		return mapping.findForward(SpreadsheetConstants.SUCCESS);
-	//	}
-
-	private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-
-		Long uid = WebUtil.readLongParam(request, SpreadsheetConstants.ATTR_USER_UID);
-
-		ISpreadsheetService service = getSpreadsheetService();
-		SpreadsheetUser user = service.getUser(uid);
-		Long sessionID = user.getSession().getSessionId();
-		NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-				SpreadsheetConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-		SpreadsheetSession session = service.getSessionBySessionId(sessionID);
-
-		ReflectDTO refDTO = new ReflectDTO(user);
-		if (notebookEntry == null) {
-			refDTO.setFinishReflection(false);
-			refDTO.setReflect(null);
-		}
-		else {
-			refDTO.setFinishReflection(true);
-			refDTO.setReflect(notebookEntry.getEntry());
-		}
-		refDTO.setReflectInstructions(session.getSpreadsheet().getReflectInstructions());
-
-		request.setAttribute("userDTO", refDTO);
-		return mapping.findForward("success");
-	}
 
 	// *************************************************************************************
 	// Private method
