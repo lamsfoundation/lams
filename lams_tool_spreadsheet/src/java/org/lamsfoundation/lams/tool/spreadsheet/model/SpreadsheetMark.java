@@ -45,7 +45,7 @@ public class SpreadsheetMark {
     /** identifier field */
     private Long uid;
     
-    private String marks;
+    private Float marks;
     private String comments;
     private Date dateMarksReleased;
     
@@ -54,7 +54,7 @@ public class SpreadsheetMark {
 	}
     
     /** full constructor */
-    public SpreadsheetMark(String comments, String marks, Date dateMarksReleased) {
+    public SpreadsheetMark(String comments, Float marks, Date dateMarksReleased) {
         this.comments = comments;
         this.marks = marks;
         this.dateMarksReleased = dateMarksReleased;
@@ -74,11 +74,11 @@ public class SpreadsheetMark {
     /** 
      * @hibernate.property column="marks"
      */
-    public String getMarks() {
+    public Float getMarks() {
         return this.marks;
     }
 
-    public void setMarks(String marks) {
+    public void setMarks(Float marks) {
         this.marks = marks;
     }
 
@@ -148,5 +148,6 @@ public class SpreadsheetMark {
 	        .append(getDateMarksReleased())
 	        .toHashCode();
 	}
+	
 }
  
