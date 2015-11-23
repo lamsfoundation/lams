@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants"%>
 <lams:html>
 <lams:head>
 	<title>
@@ -109,7 +110,7 @@
 									<fmt:message key="label.learning.not.available" />
 								</c:when>
 								<c:otherwise>
-									<c:out value="${mark.marks}" escapeXml="false" />
+									<fmt:formatNumber type="number" maxFractionDigits="<%= SpreadsheetConstants.MARK_NUM_DEC_PLACES %>" value="${mark.marks}"/>
 								</c:otherwise>
 							</c:choose>
 						</td>

@@ -2,6 +2,8 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants"%>
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
@@ -60,7 +62,7 @@
 						<td>
 							<c:choose>
 								<c:when test="${(user.userModifiedSpreadsheet != null) && (user.userModifiedSpreadsheet.mark != null)}">
-									<c:out value="${user.userModifiedSpreadsheet.mark.marks}" escapeXml="false" />
+									<fmt:formatNumber type="number" maxFractionDigits="<%= SpreadsheetConstants.MARK_NUM_DEC_PLACES %>" value="${user.userModifiedSpreadsheet.mark.marks}"/>
 								</c:when>
 								<c:otherwise>
 									<fmt:message key="label.learning.not.available" />
