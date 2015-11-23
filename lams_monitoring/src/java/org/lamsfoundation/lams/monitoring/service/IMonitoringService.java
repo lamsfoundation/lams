@@ -669,13 +669,18 @@ public interface IMonitoringService {
      *            Activity id of the branchingActivity
      */
     SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException;
-
+    
     /**
-     * Get the list of users who have attempted an activity. This is based on the progress engine records. This will
+     * Get all the users records where the user has attempted the given activity, but has not completed it yet. Uses the
+     * progress records to determine the users.
+     */
+    List<User> getLearnersAttemptedActivity(Activity activity);
+    
+    /**
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
      */
-    List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
+    List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException;
 
     /** Get the record of the learner's progress for a particular lesson */
     LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);

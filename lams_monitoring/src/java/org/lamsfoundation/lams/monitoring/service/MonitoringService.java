@@ -1007,7 +1007,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if ((gate != null) && (userId != null) && (userId >= 0)) {
 	    User user = (User) baseDAO.find(User.class, userId);
-	    gate.addLeaner(user, true);
+	    gate.getAllowedToPassLearners().add(user);
 	    activityDAO.update(gate);
 	}
 	return gate;
@@ -1548,7 +1548,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
 	    Activity activity = learnerService.getActivity(activityId);
 	    allUsers = lesson.getAllLearners();
-	    List<User> usersAttemptedActivity = lessonService.getLearnersHaveAttemptedActivity(activity);
+	    List<User> usersAttemptedActivity = lessonService.getLearnersAttemptedOrCompletedActivity(activity);
 	    users = CollectionUtils.subtract(allUsers, usersAttemptedActivity);
 	    break;
 
@@ -1579,7 +1579,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    for (Lesson les : lessons) {
 		Activity firstActivity = les.getLearningDesign().getFirstActivity();
 		List<User> usersStartedFirstActivity = learnerProgressDAO
-			.getLearnersHaveAttemptedActivity(firstActivity);
+			.getLearnersAttemptedOrCompletedActivity(firstActivity);
 		usersStartedAtLest1Lesson.addAll(usersStartedFirstActivity);
 	    }
 
@@ -2350,8 +2350,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
-	return lessonService.getLearnersHaveAttemptedActivity(activity);
+    public List<User> getLearnersAttemptedActivity(Activity activity){
+	return learnerProgressDAO.getLearnersAttemptedActivity(activity);
+    }
+    
+    @Override
+    public List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException {
+	return lessonService.getLearnersAttemptedOrCompletedActivity(activity);
     }
 
     @Override

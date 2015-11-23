@@ -1372,7 +1372,6 @@ public class LD102Importer implements ApplicationContextAware{
 			gate.setActivityUIID(++maxId);
 			gate.setTitle(title!=null?title:"Gate");
 			gate.setGateOpen(false);
-			gate.setWaitingLearners(null);
 			gate.setGateActivityLevelId(GateActivity.LEARNER_GATE_LEVEL);
 			gate.setApplyGrouping(false); // not nullable so default to false
 			gate.setGroupingSupportType(Activity.GROUPING_SUPPORT_OPTIONAL);

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -823,8 +824,8 @@ public class LearnerService implements ICoreLearnerService {
 				Lesson lesson = getLesson(lessonId);
 				int learnerCount = lesson.getAllLearners().size();
 				int groupCount = grouping.getGroups().size();
-				maxNumberOfLearnersPerGroup = learnerCount / groupCount
-					+ (learnerCount % groupCount == 0 ? 0 : 1);
+				maxNumberOfLearnersPerGroup = (learnerCount / groupCount)
+					+ ((learnerCount % groupCount) == 0 ? 0 : 1);
 			    }
 			}
 		    } else {
@@ -900,21 +901,31 @@ public class LearnerService implements ICoreLearnerService {
      */
     @Override
     public GateActivityDTO knockGate(GateActivity gate, User knocker, boolean forceGate) {
-	Lesson lesson = getLessonByActivity(gate);
-	List lessonLearners = getLearnersForGate(gate, lesson);
-
 	boolean gateOpen = false;
 
 	if (forceGate) {
+	    Lesson lesson = getLessonByActivity(gate);
 	    if (lesson.isPreviewLesson()) {
 		// special case for preview - if forceGate is true then brute force open the gate
-		gateOpen = gate.forceGateOpen();
+		gate.setGateOpen(true);
+		gateOpen = true;
 	    }
 	}
 
+	Integer expectedLearnerCount = null;
+	Integer waitingLearnerCount = null;
+
 	if (!gateOpen) {
+	    waitingLearnerCount = learnerProgressDAO.getNumUsersAttemptedActivity(gate);
+
+	    expectedLearnerCount = 0;
+	    Set<Group> learnerGroups = getGroupsForGate(gate);
+	    for (Group learnerGroup : learnerGroups) {
+		expectedLearnerCount += learnerGroup.getUsers().size();
+	    }
+
 	    // normal case - knock the gate.
-	    gateOpen = gate.shouldOpenGateFor(knocker, lessonLearners);
+	    gateOpen = gate.shouldOpenGateFor(knocker, expectedLearnerCount, waitingLearnerCount);
 	    if (!gateOpen) {
 		// only for a condition gate
 		gateOpen = determineConditionGateStatus(gate, knocker);
@@ -924,21 +935,18 @@ public class LearnerService implements ICoreLearnerService {
 	// update gate including updating the waiting list and gate status in
 	// the database.
 	activityDAO.update(gate);
-	return new GateActivityDTO(gate, lessonLearners, gateOpen);
+	return new GateActivityDTO(gate, expectedLearnerCount, waitingLearnerCount, gateOpen);
     }
 
     /**
-     * Get all the learners who may come through this gate. For a Group Based branch and the Teacher Grouped branch, it
-     * is the group of users in the Branch's group, but only the learners who have started the lesson. Otherwise we just
-     * get all learners who have started the lesson.
-     * 
-     * @param gate
-     * @param lesson
-     * @return List of User
+     * Get all the groups of learners who may come through this gate. For a Group Based branch and the Teacher Grouped
+     * branch, it is the group of users in the Branch's group. Otherwise we just get all learners in the lesson.
      */
-    private List getLearnersForGate(GateActivity gate, Lesson lesson) {
+    @Override
+    public Set<Group> getGroupsForGate(GateActivity gate) {
+	Lesson lesson = getLessonByActivity(gate);
+	Set<Group> result = new HashSet<Group>();
 
-	List lessonLearners = null;
 	Activity branchActivity = gate.getParentBranch();
 	while ((branchActivity != null) && !(branchActivity.getParentActivity().isChosenBranchingActivity()
 		|| branchActivity.getParentActivity().isGroupBranchingActivity())) {
@@ -949,34 +957,17 @@ public class LearnerService implements ICoreLearnerService {
 	    // set up list based on branch - all members of a group attached to the branch are destined for the gate
 	    SequenceActivity branchSequence = (SequenceActivity) activityDAO
 		    .getActivityByActivityId(branchActivity.getActivityId(), SequenceActivity.class);
-	    Set branchEntries = branchSequence.getBranchEntries();
-	    Iterator entryIterator = branchEntries.iterator();
-	    while (entryIterator.hasNext()) {
-		BranchActivityEntry branchActivityEntry = (BranchActivityEntry) entryIterator.next();
+	    for (BranchActivityEntry branchActivityEntry : branchSequence.getBranchEntries()) {
 		Group group = branchActivityEntry.getGroup();
 		if (group != null) {
-		    List groupLearners = lessonService.getActiveLessonLearnersByGroup(lesson.getLessonId(),
-			    group.getGroupId());
-		    if (lessonLearners == null) {
-			lessonLearners = groupLearners;
-		    } else {
-			lessonLearners.addAll(groupLearners);
-		    }
+		    result.add(group);
 		}
 	    }
-
 	} else {
-	    lessonLearners = getActiveLearnersByLesson(lesson.getLessonId());
+	    result.add(lesson.getLessonClass().getLearnersGroup());
 	}
-	return lessonLearners;
-    }
 
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getWaitingGateLearners(org.lamsfoundation.lams.learningdesign.GateActivity)
-     */
-    @Override
-    public List getLearnersForGate(GateActivity gate) {
-	return getLearnersForGate(gate, getLessonByActivity(gate));
+	return result;
     }
 
     /**
@@ -989,14 +980,6 @@ public class LearnerService implements ICoreLearnerService {
 	Activity requestedActivity = getActivity(activityId);
 	Lesson lesson = getLessonByActivity(requestedActivity);
 	return activityMapping.calculateActivityURLForProgressView(lesson, learner, requestedActivity);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getActiveLearnersByLesson(long)
-     */
-    @Override
-    public List getActiveLearnersByLesson(long lessonId) {
-	return lessonService.getActiveLessonLearners(lessonId);
     }
 
     /**
@@ -1247,15 +1230,10 @@ public class LearnerService implements ICoreLearnerService {
 
 	    if (toolSession != null) {
 
-		Set<BranchActivityEntry> branchEntries = conditionGate.getBranchActivityEntries();
-
 		// Go through each condition until we find one that passes and that opens the gate.
 		// Cache the tool output so that we aren't calling it over an over again.
 		Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
-		Iterator<BranchActivityEntry> entryIterator = branchEntries.iterator();
-
-		while (entryIterator.hasNext()) {
-		    BranchActivityEntry entry = entryIterator.next();
+		for (BranchActivityEntry entry : conditionGate.getBranchActivityEntries()) {
 		    BranchCondition condition = entry.getCondition();
 		    String conditionName = condition.getName();
 		    ToolOutput toolOutput = toolOutputMap.get(conditionName);
@@ -1277,7 +1255,7 @@ public class LearnerService implements ICoreLearnerService {
 			    // save the learner to the "allowed to pass" list so we don't check the conditions over and
 			    // over
 			    // again (maybe we should??)
-			    conditionGate.addLeaner(learner, true);
+			    conditionGate.getAllowedToPassLearners().add(learner);
 			}
 			break;
 		    }
@@ -1407,12 +1385,12 @@ public class LearnerService implements ICoreLearnerService {
 		groupingDAO.update(grouping);
 	    }
 	    if (learnerChoiceGrouping.getEqualNumberOfLearnersPerGroup()) {
-		maxNumberOfLearnersPerGroup = learnerCount / groupCount + (learnerCount % groupCount == 0 ? 0 : 1);
+		maxNumberOfLearnersPerGroup = (learnerCount / groupCount) + ((learnerCount % groupCount) == 0 ? 0 : 1);
 	    }
 	} else {
 	    maxNumberOfLearnersPerGroup = learnerChoiceGrouping.getLearnersPerGroup();
-	    int desiredGroupCount = learnerCount / maxNumberOfLearnersPerGroup
-		    + (learnerCount % maxNumberOfLearnersPerGroup == 0 ? 0 : 1);
+	    int desiredGroupCount = (learnerCount / maxNumberOfLearnersPerGroup)
+		    + ((learnerCount % maxNumberOfLearnersPerGroup) == 0 ? 0 : 1);
 	    if (desiredGroupCount > groupCount) {
 		((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(learnerChoiceGrouping,
 			desiredGroupCount - groupCount);
@@ -1513,7 +1491,8 @@ public class LearnerService implements ICoreLearnerService {
 				}
 			    }
 
-			    isLast = completedSubactivities == parentOptionsActivity.getMaxNumberOfOptionsNotNull() - 1;
+			    isLast = completedSubactivities == (parentOptionsActivity.getMaxNumberOfOptionsNotNull()
+				    - 1);
 			}
 		    }
 		} else if (parentActivity.isBranchingActivity() || parentActivity.isParallelActivity()) {

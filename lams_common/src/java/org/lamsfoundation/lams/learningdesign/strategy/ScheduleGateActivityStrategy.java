@@ -23,12 +23,8 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
@@ -73,29 +69,26 @@ public class ScheduleGateActivityStrategy extends GateActivityStrategy {
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
      */
     @Override
-    protected boolean isOpenConditionMet(List lessonLearners) {
-	if (gateActivity != null) {
-	    return gateActivity.getGateOpen().booleanValue();
-	}
-	return true;
+    protected boolean isOpenConditionMet(int expectedLearnerCount, int waitingLearnerCount) {
+	return false;
     }
 
-    @SuppressWarnings({ "rawtypes" })
     @Override
-    public boolean shouldOpenGateFor(User learner, List lessonLearners) {
+    public boolean shouldOpenGateFor(User learner, int expectedLearnerCount, int waitingLearnerCount) {
 	ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gateActivity;
 	if (Boolean.TRUE.equals((scheduleGate.getGateActivityCompletionBased()))) {
-	    Date previousActivityCompletionTime = getPreviousActivityCompletionDate(scheduleGate, learner);
+	    Date previousActivityCompletionTime = ScheduleGateActivityStrategy
+		    .getPreviousActivityCompletionDate(scheduleGate, learner);
 	    if (previousActivityCompletionTime != null) {
 		Date openTime = scheduleGate.getGateOpenTime(previousActivityCompletionTime);
 		if (openTime.compareTo(new Date()) <= 0) {
-		    gateActivity.addLeaner(learner, true);
+		    gateActivity.getAllowedToPassLearners().add(learner);
 		    return true;
 		}
 	    }
 	    return false;
 	}
-	return super.shouldOpenGateFor(learner, lessonLearners);
+	return super.shouldOpenGateFor(learner, expectedLearnerCount, waitingLearnerCount);
     }
 
     @SuppressWarnings({ "unchecked" })

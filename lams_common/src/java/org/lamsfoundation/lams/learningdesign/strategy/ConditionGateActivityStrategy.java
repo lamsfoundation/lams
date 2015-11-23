@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -36,28 +35,30 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
  */
 public class ConditionGateActivityStrategy extends GateActivityStrategy {
 
-	public ConditionGateActivityStrategy(GateActivity gateActivity) {
-		super(gateActivity);
-	}
+    public ConditionGateActivityStrategy(GateActivity gateActivity) {
+	super(gateActivity);
+    }
 
-	//---------------------------------------------------------------------
-	// Overriden methods 
-	//---------------------------------------------------------------------
-	/**
-	 * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
-	 */
-	@Override
-	protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
-		contributionTypes.add(ContributionTypes.CONDITION_GATE);
-	}
+    // ---------------------------------------------------------------------
+    // Overriden methods
+    // ---------------------------------------------------------------------
+    /**
+     * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity,
+     *      java.util.ArrayList)
+     */
+    @Override
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
+	contributionTypes.add(ContributionTypes.CONDITION_GATE);
+    }
 
-	/**
-	 * Since the gate is open only for individuals and never for the whole class, this method returns <code>false</code>.
-	 * 
-	 * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
-	 */
-	@Override
-	protected boolean isOpenConditionMet(List lessonLearners) {
-		return false;
-	}
+    /**
+     * Since the gate is open only for individuals and never for the whole class, this method returns <code>false</code>
+     * .
+     * 
+     * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
+     */
+    @Override
+    protected boolean isOpenConditionMet(int expectedLearnerCount, int waitingLearnerCount) {
+	return false;
+    }
 }

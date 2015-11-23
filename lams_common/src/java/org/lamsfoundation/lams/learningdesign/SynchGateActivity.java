@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -46,8 +45,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 	    Integer gateActivityLevelId, Set waitingLearners, SystemTool sysTool, Set branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, waitingLearners,
-		sysTool, branchActivityEntries);
+		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
+		branchActivityEntries);
 	super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
 
@@ -64,7 +63,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
 	    Transition transitionFrom, Integer gateActivityLevelId, Set waitingLearners) {
 	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, gateActivityLevelId, waitingLearners);
+		transitionTo, transitionFrom, gateActivityLevelId);
 	super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
 
@@ -73,6 +72,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
      * 
      * @return SynchGateActivity Returns a deep-copy of the originalActivity
      */
+    @Override
     public Activity createCopy(int uiidOffset) {
 	SynchGateActivity newSynchGateActivity = new SynchGateActivity();
 	copyToNewActivity(newSynchGateActivity, uiidOffset);
@@ -81,6 +81,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 	return newSynchGateActivity;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
@@ -88,6 +89,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
+    @Override
     public boolean isNull() {
 	return false;
     }
