@@ -49,11 +49,11 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId,
-	    Set waitingLearners, SystemTool sysTool, Set branchActivityEntries) {
+	    SystemTool sysTool, Set branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, waitingLearners,
-		sysTool, branchActivityEntries);
+		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
+		branchActivityEntries);
 	super.simpleActivityStrategy = new ConditionGateActivityStrategy(this);
     }
 
@@ -68,9 +68,9 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
 	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
 	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
 	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Integer gateActivityLevelId, Set waitingLearners) {
+	    Transition transitionFrom, Integer gateActivityLevelId) {
 	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, gateActivityLevelId, waitingLearners);
+		transitionTo, transitionFrom, gateActivityLevelId);
 	super.simpleActivityStrategy = new ConditionGateActivityStrategy(this);
     }
 
@@ -86,14 +86,14 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
 	newConditionGateActivity.setGateOpen(new Boolean(false));
 	newConditionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
 
-	if (this.getBranchActivityEntries() != null && this.getBranchActivityEntries().size() > 0) {
+	if ((this.getBranchActivityEntries() != null) && (this.getBranchActivityEntries().size() > 0)) {
 	    newConditionGateActivity.setBranchActivityEntries(new HashSet());
 	    Iterator iter = this.getBranchActivityEntries().iterator();
 	    while (iter.hasNext()) {
 		BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
-		BranchActivityEntry newEntry = new BranchActivityEntry(null, LearningDesign.addOffset(
-			oldEntry.getEntryUIID(), uiidOffset), null, newConditionGateActivity, null,
-			oldEntry.getGateOpenWhenConditionMet());
+		BranchActivityEntry newEntry = new BranchActivityEntry(null,
+			LearningDesign.addOffset(oldEntry.getEntryUIID(), uiidOffset), null, newConditionGateActivity,
+			null, oldEntry.getGateOpenWhenConditionMet());
 		if (oldEntry.getCondition() != null) {
 		    BranchCondition newCondition = oldEntry.getCondition().clone(uiidOffset);
 		    newEntry.setCondition(newCondition);
@@ -115,6 +115,7 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
+    @Override
     public boolean isNull() {
 	return false;
     }
@@ -123,10 +124,11 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
     public Vector validateActivity(MessageService messageService) {
 	Vector listOfValidationErrors = new Vector();
 
-	if (getInputActivities() == null || getInputActivities().size() == 0) {
-	    listOfValidationErrors.add(new ValidationErrorDTO(
-		    ValidationErrorDTO.CONDITION_GATE_ACTVITY_TOOLINPUT_ERROR_CODE, messageService
-			    .getMessage(ValidationErrorDTO.CONDITION_GATE_ACTVITY_TOOLINPUT), this.getActivityUIID()));
+	if ((getInputActivities() == null) || (getInputActivities().size() == 0)) {
+	    listOfValidationErrors
+		    .add(new ValidationErrorDTO(ValidationErrorDTO.CONDITION_GATE_ACTVITY_TOOLINPUT_ERROR_CODE,
+			    messageService.getMessage(ValidationErrorDTO.CONDITION_GATE_ACTVITY_TOOLINPUT),
+			    this.getActivityUIID()));
 	}
 
 	boolean conditionsExist = false;
@@ -134,25 +136,27 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
 	    for (BranchActivityEntry entry : (Set<BranchActivityEntry>) getBranchActivityEntries()) {
 		BranchCondition condition = entry.getCondition();
 		if (condition == null) {
-		    listOfValidationErrors.add(new ValidationErrorDTO(
-			    ValidationErrorDTO.BRANCH_CONDITION_INVALID_ERROR_CODE, messageService
-				    .getMessage(ValidationErrorDTO.BRANCH_CONDITION_INVALID), this.getActivityUIID()));
+		    listOfValidationErrors
+			    .add(new ValidationErrorDTO(ValidationErrorDTO.BRANCH_CONDITION_INVALID_ERROR_CODE,
+				    messageService.getMessage(ValidationErrorDTO.BRANCH_CONDITION_INVALID),
+				    this.getActivityUIID()));
 		} else {
 		    conditionsExist = true;
 		    if (!condition.isValid()) {
-			listOfValidationErrors.add(new ValidationErrorDTO(
-				ValidationErrorDTO.BRANCH_CONDITION_INVALID_ERROR_CODE, messageService
-					.getMessage(ValidationErrorDTO.BRANCH_CONDITION_INVALID), this
-					.getActivityUIID()));
+			listOfValidationErrors
+				.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCH_CONDITION_INVALID_ERROR_CODE,
+					messageService.getMessage(ValidationErrorDTO.BRANCH_CONDITION_INVALID),
+					this.getActivityUIID()));
 		    }
 		}
 	    }
 	}
 
 	if (!conditionsExist) {
-	    listOfValidationErrors.add(new ValidationErrorDTO(
-		    ValidationErrorDTO.CONDITION_GATE_ACTVITY_CONDITION_ERROR_CODE, messageService
-			    .getMessage(ValidationErrorDTO.CONDITION_GATE_ACTVITY_CONDITION), this.getActivityUIID()));
+	    listOfValidationErrors
+		    .add(new ValidationErrorDTO(ValidationErrorDTO.CONDITION_GATE_ACTVITY_CONDITION_ERROR_CODE,
+			    messageService.getMessage(ValidationErrorDTO.CONDITION_GATE_ACTVITY_CONDITION),
+			    this.getActivityUIID()));
 	}
 	return listOfValidationErrors;
     }

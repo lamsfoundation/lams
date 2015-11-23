@@ -65,11 +65,6 @@ public interface ILessonService {
     List getActiveLessonLearners(Long lessonId);
 
     /**
-     * Get all the learners who have started the lesson and are part of a given group. They may not be currently online.
-     */
-    List getActiveLessonLearnersByGroup(Long lessonId, Long groupId);
-
-    /**
      * Get the count of all the learners who have started the lesson. They may not be currently online.
      */
     Integer getCountActiveLessonLearners(Long lessonId);
@@ -324,7 +319,7 @@ public interface ILessonService {
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
      */
-    List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
+    List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException;
 
     /**
      * Gets the count of the users who have attempted an activity. This is based on the progress engine records. This

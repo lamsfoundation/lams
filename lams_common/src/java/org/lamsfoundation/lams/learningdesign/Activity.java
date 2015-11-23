@@ -573,7 +573,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /**
      * @return Returns the branchActivityEntries.
      */
-    public Set getBranchActivityEntries() {
+    public Set<BranchActivityEntry> getBranchActivityEntries() {
 	return branchActivityEntries;
     }
 

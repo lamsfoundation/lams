@@ -112,11 +112,6 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public List getActiveLessonLearnersByGroup(Long lessonId, Long groupId) {
-	return lessonDAO.getActiveLearnerByLessonAndGroup(lessonId, groupId);
-    }
-
-    @Override
     public Integer getCountActiveLessonLearners(Long lessonId) {
 	return lessonDAO.getCountActiveLearnerByLesson(lessonId);
     }
@@ -571,8 +566,8 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
-	return learnerProgressDAO.getLearnersHaveAttemptedActivity(activity);
+    public List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException {
+	return learnerProgressDAO.getLearnersAttemptedOrCompletedActivity(activity);
     }
 
     @Override

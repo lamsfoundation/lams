@@ -55,6 +55,12 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
     private final static String LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + "p.lessonComplete > 0 and p.lesson.id = :lessonId ORDER BY p.finishDate DESC";
 
+    private final static String LOAD_LEARNERS_ATTEMPTED_ACTIVITY = "SELECT prog.user FROM LearnerProgress prog, "
+	    + " Activity act join prog.attemptedActivities attAct where act.id = :activityId and index(attAct) = act";
+
+    private final static String LOAD_LEARNERS_COMPLETED_ACTIVITY = "SELECT prog.user FROM LearnerProgress prog, "
+	    + " Activity act join prog.completedActivities compAct where act.id = :activityId and index(compAct) = act";
+
     private final static String COUNT_COMPLETED_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p "
 	    + " where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
@@ -243,11 +249,22 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<User> getLearnersHaveAttemptedActivity(Activity activity) {
-	List<User> learners = getSession().getNamedQuery("usersAttemptedActivity")
+    public List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) {
+	List<User> users = getSession().createQuery(LearnerProgressDAO.LOAD_LEARNERS_ATTEMPTED_ACTIVITY)
+		.setLong("activityId", activity.getActivityId().longValue()).list();
+	users.addAll(getSession().createQuery(LearnerProgressDAO.LOAD_LEARNERS_COMPLETED_ACTIVITY)
+		.setLong("activityId", activity.getActivityId().longValue()).list());
+
+	return users;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getLearnersAttemptedActivity(Activity activity) {
+	List<User> users = getSession().createQuery(LearnerProgressDAO.LOAD_LEARNERS_ATTEMPTED_ACTIVITY)
 		.setLong("activityId", activity.getActivityId().longValue()).list();
 
-	return learners;
+	return users;
     }
 
     @Override

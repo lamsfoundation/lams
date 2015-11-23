@@ -24,50 +24,44 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 
 /**
- * Activity strategy that deals with the calculation specific to gate activity.
- * The major part of this strategy will be overiding the methods that defined
- * in the abstract level.
+ * Activity strategy that deals with the calculation specific to gate activity. The major part of this strategy will be
+ * overiding the methods that defined in the abstract level.
  * 
  * @author Jacky Fang
  * @author Minhas
  * @version 1.1
  */
 public class SystemGateActivityStrategy extends GateActivityStrategy {
-    
-	public SystemGateActivityStrategy(GateActivity gateActivity) {
-		super(gateActivity);
-	}
-    //---------------------------------------------------------------------
+
+    public SystemGateActivityStrategy(GateActivity gateActivity) {
+	super(gateActivity);
+    }
+
+    // ---------------------------------------------------------------------
     // Overriden methods
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     /**
-     * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity,
+     *      java.util.ArrayList)
      */
-    protected void setUpContributionType(ArrayList<Integer> contributionTypes)
-    {
-        contributionTypes.add(ContributionTypes.SYSTEM_GATE);
+    @Override
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes) {
+	contributionTypes.add(ContributionTypes.SYSTEM_GATE);
     }
 
     /**
-     * Regarding permission gate, we don't validate the open condition for the 
-     * learner because the decision of opening the gate or not comes from the 
-     * teacher. The teacher may open or close the gate at monitoring interface.
+     * Regarding permission gate, we don't validate the open condition for the learner because the decision of opening
+     * the gate or not comes from the teacher. The teacher may open or close the gate at monitoring interface.
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
      */
-    protected boolean isOpenConditionMet(List lessonLearners)
-    {
-    	if ( gateActivity != null ) { 
-    		return gateActivity.getGateOpen().booleanValue();
-    	}
-    	return true;
-    	
+    @Override
+    protected boolean isOpenConditionMet(int expectedLearnerCount, int waitingLearnerCount) {
+	return false;
     }
-
 }

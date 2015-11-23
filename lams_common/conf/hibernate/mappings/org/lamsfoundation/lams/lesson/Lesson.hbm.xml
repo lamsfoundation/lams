@@ -263,18 +263,6 @@
 		  AND   (lams_learner_progress.lesson_id  = :lessonId)
 	</sql-query>
 
-	<sql-query name="activeLearnersByGroup">
-		<return alias="learner" class="org.lamsfoundation.lams.usermanagement.User" />
-		SELECT DISTINCT {learner.*}
-		  FROM lams_user {learner},
-		       lams_learner_progress,
-		       lams_user_group
-		  WHERE ({learner}.user_id = lams_learner_progress.user_id)
-		  AND   (lams_learner_progress.lesson_id  = :lessonId)
-		  AND   ({learner}.user_id = lams_user_group.user_id) 
-		  AND   (lams_user_group.group_id = :groupId)
-	</sql-query>
-
 	<sql-query name="learnerLessonsByOrgAndUserWithCompletedFlag">
 		<return-scalar column="lesson_id" type="long" />
 		<return-scalar column="name" type="string" />

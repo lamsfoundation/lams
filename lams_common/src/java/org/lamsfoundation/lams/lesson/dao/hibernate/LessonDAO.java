@@ -146,18 +146,6 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     }
 
     /**
-     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLessonAndGroup(long, long)
-     */
-    @Override
-    public List getActiveLearnerByLessonAndGroup(long lessonId, long groupId) {
-	Query query = getSession().getNamedQuery("activeLearnersByGroup");
-	query.setLong("lessonId", lessonId);
-	query.setLong("groupId", groupId);
-	List result = query.list();
-	return result;
-    }
-
-    /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long) Note: Hibernate 3.1
      *      query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
      */
