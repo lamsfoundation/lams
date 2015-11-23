@@ -97,4 +97,6 @@ public class SpreadsheetConstants {
 	public static final int SORT_BY_USERNAME_DESC = 3;
 	public static final int SORT_BY_MARKED_ASC = 4;
 	public static final int SORT_BY_MARKED_DESC = 5;
+	
+	public static final int MARK_NUM_DEC_PLACES = 2;
 }

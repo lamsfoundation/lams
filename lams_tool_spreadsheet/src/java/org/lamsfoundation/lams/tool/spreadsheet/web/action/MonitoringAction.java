@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.web.form.MarkForm;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -182,7 +183,8 @@ public class MonitoringAction extends Action {
 		    if ( user.getUserModifiedSpreadsheet() != null ) {
 			responseRow.put("userModifiedSpreadsheet", "true");
 			if ( user.getUserModifiedSpreadsheet().getMark() != null ) {
-			    responseRow.put("mark", user.getUserModifiedSpreadsheet().getMark().getMarks());		    
+			    responseRow.put("mark", NumberUtil.formatLocalisedNumber(user.getUserModifiedSpreadsheet().getMark().getMarks(), 
+				    request.getLocale(), SpreadsheetConstants.MARK_NUM_DEC_PLACES) );		    
 			}
 		    }
 		    
@@ -326,15 +328,8 @@ public class MonitoringAction extends Action {
 
 					cell = row.createCell(count++);
 					if (mark.getMarks() != null) {
-						String marks = "";
-						try {
-							NumberFormat format = NumberFormat.getInstance();
-							format.setMaximumFractionDigits(1);
-							marks = format.format(NumberUtils.createFloat(mark.getMarks()));
-						}
-						catch (Exception e) {
-						}
-						cell.setCellValue(marks);
+					    cell.setCellValue(NumberUtil.formatLocalisedNumber(mark.getMarks(), request.getLocale(), 
+						    SpreadsheetConstants.MARK_NUM_DEC_PLACES));
 					}
 					else {
 						cell.setCellValue("");
@@ -394,7 +389,8 @@ public class MonitoringAction extends Action {
 		markForm.setUserUid(user.getUid());
 		if (user.getUserModifiedSpreadsheet().getMark() != null) {
 			SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
-			markForm.setMarks(mark.getMarks());
+			markForm.setMarks(NumberUtil.formatLocalisedNumber(mark.getMarks(), request.getLocale(), 
+				    SpreadsheetConstants.MARK_NUM_DEC_PLACES));
 			markForm.setComments(mark.getComments());
 		}
 
@@ -404,12 +400,34 @@ public class MonitoringAction extends Action {
 	public ActionForward saveMark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		MarkForm markForm = (MarkForm) form;
 
-		ActionErrors errors = validateSpreadsheetMark(markForm);
+		Float markFloat = null;
+		String markComment = null;
+
+		// get the mark details, validating as we go.
+		ActionErrors errors = new ActionErrors();
+		String markStr = markForm.getMarks();
+		if (StringUtils.isBlank(markStr)) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_BLANK));
+		} else {
+        		try {
+        		    markFloat = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
+        		}
+        		catch (Exception e) {
+        			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_INVALID_NUMBER));
+        		}
+		}
+		
+		markComment = markForm.getComments();
+		if (StringUtils.isBlank(markComment)) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_COMMENTS_BLANK));
+		}
+
 		if (!errors.isEmpty()) {
 			this.addErrors(request, errors);
 			return mapping.findForward("editMark");
 		}
 
+		// passed validation so proceed to save
 		Long userUid = markForm.getUserUid();
 		SpreadsheetUser user = getSpreadsheetService().getUser(userUid);
 		if (user != null && user.getUserModifiedSpreadsheet() != null) {
@@ -422,13 +440,15 @@ public class MonitoringAction extends Action {
 			else { //edit
 				mark = user.getUserModifiedSpreadsheet().getMark();
 			}
-			mark.setMarks(markForm.getMarks());
-			mark.setComments(markForm.getComments());
+
+			mark.setMarks(markFloat);
+			mark.setComments(markComment);
 
 			getSpreadsheetService().saveOrUpdateUserModifiedSpreadsheet(user.getUserModifiedSpreadsheet());
 		}
 
-		request.setAttribute("mark",markForm.getMarks());
+		request.setAttribute("mark",NumberUtil.formatLocalisedNumber(markFloat, request.getLocale(), 
+			    SpreadsheetConstants.MARK_NUM_DEC_PLACES)); // reduce it to the standard number of decimal places for redisplay
 		request.setAttribute("userUid",userUid);
 		
 		//set session map ID so that itemlist.jsp can get sessionMAP
@@ -458,30 +478,4 @@ public class MonitoringAction extends Action {
 		return (ISpreadsheetService) wac.getBean(SpreadsheetConstants.RESOURCE_SERVICE);
 	}
 
-	/**
-	 * Vaidate UserModifiedSpreadsheet mark
-	 * @param itemForm
-	 * @return
-	 */
-	private ActionErrors validateSpreadsheetMark(MarkForm markForm) {
-		ActionErrors errors = new ActionErrors();
-
-		String mark = markForm.getMarks();
-		if (StringUtils.isBlank(mark)) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_BLANK));
-		}
-
-		try {
-			Long.parseLong(mark);
-		}
-		catch (Exception e) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_MARKS_INVALID_NUMBER));
-		}
-
-		if (StringUtils.isBlank(markForm.getComments())) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(SpreadsheetConstants.ERROR_MSG_COMMENTS_BLANK));
-		}
-
-		return errors;
-	}
 }
