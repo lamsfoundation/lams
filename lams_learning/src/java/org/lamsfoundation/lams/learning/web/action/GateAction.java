@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -75,7 +76,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @since 2005-4-7
  * @version 1.1
  * 
- * ----------------XDoclet Tags--------------------
+ *          ----------------XDoclet Tags--------------------
  * 
  * @struts:action name="GateForm" path="/gate" parameter="method" validate="false"
  * 
@@ -139,23 +140,23 @@ public class GateAction extends LamsDispatchAction {
 
 	if (activity != null) {
 	    // knock the gate
-	    GateActivityDTO gate = learnerService.knockGate(activityId, learner, forceGate);
+	    GateActivityDTO gateDTO = learnerService.knockGate(activityId, learner, forceGate);
 
-	    if (gate == null) {
+	    if (gateDTO == null) {
 		throw new LearnerServiceException("Gate missing. gate id [" + activityId + "]");
 	    }
 
 	    // if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
-	    if (!gate.getAllowToPass()) {
-		ActionForward forward = findViewByGateType(mapping, (DynaActionForm) form, gate, lesson);
+	    if (!gateDTO.getAllowToPass()) {
+		ActionForward forward = findViewByGateType(mapping, (DynaActionForm) form, gateDTO, lesson);
 		LearningWebUtil.setupProgressInRequest((DynaActionForm) form, request, learnerProgress);
 		return forward;
 	    }
 	}
 
 	// gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
-	return LearningWebUtil.completeActivity(request, response, actionMappings, learnerProgress, activity, learner
-		.getUserId(), learnerService, true);
+	return LearningWebUtil.completeActivity(request, response, actionMappings, learnerProgress, activity,
+		learner.getUserId(), learnerService, true);
 
     }
 
@@ -166,40 +167,41 @@ public class GateAction extends LamsDispatchAction {
      * Dispatch view the according to the gate type.
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * @param gateForm
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param permissionGate
-     *                the gate activity object
+     *            the gate activity object
      * @param totalNumActiveLearners
-     *                total number of active learners in the lesson (may not all be logged in)
+     *            total number of active learners in the lesson (may not all be logged in)
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      */
-    private ActionForward findViewByGateType(ActionMapping mapping, DynaActionForm gateForm, GateActivityDTO gate,
+    private ActionForward findViewByGateType(ActionMapping mapping, DynaActionForm gateForm, GateActivityDTO gateDTO,
 	    Lesson lesson) {
-	gateForm.set("totalLearners", new Integer(gate.getExpectedLearners().size()));
-	gateForm.set("waitingLearners", new Integer(gate.getWaitingLearners().size()));
+	gateForm.set("totalLearners", gateDTO.getExpectedLearnerCount());
+	gateForm.set("waitingLearners", gateDTO.getWaitingLearnerCount());
 	gateForm.set("previewLesson", lesson.isPreviewLesson());
 	gateForm.set("monitorCanOpenGate", true);
+	GateActivity gate = gateDTO.getGate();
 	gateForm.set(AttributeNames.PARAM_ACTIVITY_ID, gate.getActivityId());
 	gateForm.set(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
 	gateForm.set("gate", gate);
 	if (gate.isSynchGate()) {
 	    return mapping.findForward(GateAction.VIEW_SYNCH_GATE);
 	} else if (gate.isScheduleGate()) {
-	    ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate.getGateActivity();
+	    ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
 	    if (Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
 		// so it is in seconds
 		gateForm.set("startOffset", scheduleGate.getGateStartTimeOffset() * 60);
-		
-		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet()
-			.getServletContext());
+
+		ICoreLearnerService learnerService = LearnerServiceProxy
+			.getLearnerService(getServlet().getServletContext());
 		User learner = LearningWebUtil.getUser(learnerService);
 		Date reachTime = ScheduleGateActivityStrategy.getPreviousActivityCompletionDate(scheduleGate, learner);
 		gateForm.set("reachDate", reachTime);
-		
+
 		Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
 		startingTime.setTime(reachTime);
 		startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
@@ -228,5 +230,4 @@ public class GateAction extends LamsDispatchAction {
 		    + "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");
 	}
     }
-
 }

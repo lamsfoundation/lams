@@ -143,13 +143,19 @@ public interface ILearnerProgressDAO {
     List<LearnerProgress> getLearnerProgressForLessons(List<Long> lessonIds);
 
     /**
-     * Get all the users records where the user has attempted the given activity. Uses the progress records to determine
-     * the users.
+     * Get all the users records where the user has attempted the given activity, but has not completed it yet. Uses the
+     * progress records to determine the users.
+     */
+    List<User> getLearnersAttemptedActivity(Activity activity);
+
+    /**
+     * Get all the users records where the user has ever attempted the given activity. Uses the progress records to
+     * determine the users.
      * 
      * @param activityId
      * @return List<User>
      */
-    List<User> getLearnersHaveAttemptedActivity(Activity activity);
+    List<User> getLearnersAttemptedOrCompletedActivity(Activity activity);
 
     /**
      * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have

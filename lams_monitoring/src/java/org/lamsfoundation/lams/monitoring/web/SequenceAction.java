@@ -107,7 +107,7 @@ public class SequenceAction extends LamsDispatchAction {
 	    	
 		// only show the group names if this is a group based branching activity - the names
 		// are meaningless for chosen and tool based branching
-		List<User> learners = monitoringService.getLearnersHaveAttemptedActivity(activity);
+		List<User> learners = monitoringService.getLearnersAttemptedOrCompletedActivity(activity);
 		request.setAttribute(PARAM_LEARNERS, learners);
 		return mapping.findForward(VIEW_SEQUENCE);
 	}

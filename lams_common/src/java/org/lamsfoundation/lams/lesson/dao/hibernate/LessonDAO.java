@@ -178,27 +178,6 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     }
 
     /**
-     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLessonAndGroup(long, long)
-     */
-    @Override
-    public List getActiveLearnerByLessonAndGroup(final long lessonId, final long groupId) {
-	List learners = null;
-
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	learners = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    @Override
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("activeLearnersByGroup");
-		query.setLong("lessonId", lessonId);
-		query.setLong("groupId", groupId);
-		List result = query.list();
-		return result;
-	    }
-	});
-	return learners;
-    }
-
-    /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long) Note: Hibernate 3.1
      *      query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
      */

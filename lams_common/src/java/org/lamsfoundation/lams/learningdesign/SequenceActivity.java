@@ -46,7 +46,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 
     private static Logger log = Logger.getLogger(SequenceActivity.class);
 
-    private Set branchEntries;
+    private Set<BranchActivityEntry> branchEntries;
     private SystemTool systemTool;
 
     /** full constructor */
@@ -55,7 +55,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set activities,
-	    Activity defaultActivity, Set branchEntries, SystemTool systemTool, Set branchActivityEntries) {
+	    Activity defaultActivity, Set<BranchActivityEntry> branchEntries, SystemTool systemTool,
+	    Set branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, activities, defaultActivity,
@@ -98,9 +99,9 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	    Iterator iter = this.getBranchEntries().iterator();
 	    while (iter.hasNext()) {
 		BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
-		BranchActivityEntry newEntry = new BranchActivityEntry(null, LearningDesign.addOffset(
-			oldEntry.getEntryUIID(), uiidOffset), newSequenceActivity, oldEntry.getBranchingActivity(),
-			oldEntry.getGroup());
+		BranchActivityEntry newEntry = new BranchActivityEntry(null,
+			LearningDesign.addOffset(oldEntry.getEntryUIID(), uiidOffset), newSequenceActivity,
+			oldEntry.getBranchingActivity(), oldEntry.getGroup());
 		if (oldEntry.getCondition() != null) {
 		    BranchCondition newCondition = oldEntry.getCondition().clone(uiidOffset);
 		    newEntry.setCondition(newCondition);
@@ -144,7 +145,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      * @hibernate.collection-key column="sequence_activity_id"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
      */
-    public Set getBranchEntries() {
+    public Set<BranchActivityEntry> getBranchEntries() {
 	return branchEntries;
     }
 
@@ -202,10 +203,10 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     public Vector validateActivity(MessageService messageService) {
 	Vector listOfValidationErrors = new Vector();
 	if (getActivities() != null && getActivities().size() > 0 && getDefaultActivity() == null) {
-	    listOfValidationErrors.add(new ValidationErrorDTO(
-		    ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE, messageService
-			    .getMessage(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY), this
-			    .getActivityUIID()));
+	    listOfValidationErrors.add(
+		    new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE,
+			    messageService.getMessage(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY),
+			    this.getActivityUIID()));
 	}
 	return listOfValidationErrors;
     }

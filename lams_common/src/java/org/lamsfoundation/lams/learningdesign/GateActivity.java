@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -54,30 +52,21 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     private Boolean gateOpen;
 
     /**
-     * The learners who are waiting at the gate.
-     */
-    private Set<User> waitingLearners;
-    /**
      * The learners who passed the gate.
      */
     private Set<User> allowedToPassLearners;
-    /**
-     * The learners who reached the gate.
-     */
-    private Set<GateUser> allGateUsers;
 
     /** full constructor */
     public GateActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
 	    Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
 	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
 	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-	    Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId, Set waitingLearners,
-	    SystemTool sysTool, Set branchActivityEntries) {
+	    Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId, SystemTool sysTool,
+	    Set branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
 	this.gateActivityLevelId = gateActivityLevelId;
-	this.waitingLearners = waitingLearners;
 	systemTool = sysTool;
     }
 
@@ -91,11 +80,10 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
 	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
 	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Integer gateActivityLevelId, Set waitingLearners) {
+	    Transition transitionFrom, Integer gateActivityLevelId) {
 	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
 		transitionTo, transitionFrom);
 	this.gateActivityLevelId = gateActivityLevelId;
-	this.waitingLearners = waitingLearners;
     }
 
     /**
@@ -111,24 +99,6 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 	this.gateActivityLevelId = gateActivityLevelId;
     }
 
-    /**
-     * @return Returns the waitingLearners.
-     */
-    public Set getWaitingLearners() {
-	if (waitingLearners == null) {
-	    this.setWaitingLearners(new HashSet());
-	}
-	return waitingLearners;
-    }
-
-    /**
-     * @param waitingLearners
-     *            The waitingLearners to set.
-     */
-    public void setWaitingLearners(Set waitingLearners) {
-	this.waitingLearners = waitingLearners;
-    }
-
     public Boolean getGateOpen() {
 	return gateOpen;
     }
@@ -142,56 +112,19 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     // ---------------------------------------------------------------------
 
     /**
-     * Add a learner into the waiting or allowed to pass list.
-     * 
-     * @param learner
-     *            the new learner.
-     * @param isAllowedToPass
-     *            is the learner allowed to pass the gate
-     */
-    public void addLeaner(User learner, boolean isAllowedToPass) {
-	boolean add = true;
-	GateUser gateUser = new GateUser();
-	gateUser.setUser(learner);
-
-	if (getWaitingLearners().contains(learner)) {
-	    if (isAllowedToPass) {
-		gateUser.setAllowedToPass(false);
-		getAllGateUsers().remove(gateUser);
-		getWaitingLearners().remove(learner);
-	    } else {
-		add = false;
-	    }
-	} else if (getAllowedToPassLearners().contains(learner)) {
-	    // Once a learner was allowed to pass, he/she may never be forbidden back.
-	    add = false;
-	}
-
-	if (add) {
-	    gateUser.setAllowedToPass(isAllowedToPass);
-	    getAllGateUsers().add(gateUser);
-	    if (isAllowedToPass) {
-		getAllowedToPassLearners().add(learner);
-	    } else {
-		getWaitingLearners().add(learner);
-	    }
-	}
-    }
-
-    /**
      * Delegate to strategy class to calculate whether we should open the gate for this learner.
      * 
      * @param learner
      *            the learner who wants to go through the gate.
      * @return the gate is open or closed.
      */
-    public boolean shouldOpenGateFor(User learner, List lessonLearners) {
+    public boolean shouldOpenGateFor(User learner, int expectedLearnerCount, int waitingLearnerCount) {
 	// by default, we close the gate
 	if (getGateOpen() == null) {
-	    this.setGateOpen(Boolean.FALSE);
+	    this.setGateOpen(false);
 	}
-
-	return ((GateActivityStrategy) simpleActivityStrategy).shouldOpenGateFor(learner, lessonLearners);
+	return ((GateActivityStrategy) simpleActivityStrategy).shouldOpenGateFor(learner, expectedLearnerCount,
+		waitingLearnerCount);
     }
 
     /**
@@ -200,10 +133,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
      * 
      * @return the gate is open or closed.
      */
-    public boolean forceGateOpen() {
-	setGateOpen(Boolean.TRUE);
-	getAllGateUsers().clear();
-	return true;
+    public void forceGateOpen() {
+	setGateOpen(true);
     }
 
     // ---------------------------------------------------------------------
@@ -214,10 +145,12 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
+    @Override
     public SystemTool getSystemTool() {
 	return systemTool;
     }
 
+    @Override
     public void setSystemTool(SystemTool systemTool) {
 	this.systemTool = systemTool;
     }
@@ -229,25 +162,10 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     }
 
     public Set<User> getAllowedToPassLearners() {
-	if (allowedToPassLearners == null) {
-	    this.setAllowedToPassLearners(new HashSet<User>());
-	}
 	return allowedToPassLearners;
     }
 
     public void setAllowedToPassLearners(Set<User> allowedToPassLearners) {
 	this.allowedToPassLearners = allowedToPassLearners;
     }
-
-    public Set<GateUser> getAllGateUsers() {
-	if (allGateUsers == null) {
-	    this.setAllGateUsers(new HashSet<GateUser>());
-	}
-	return allGateUsers;
-    }
-
-    public void setAllGateUsers(Set<GateUser> allLearners) {
-	allGateUsers = allLearners;
-    }
-
 }

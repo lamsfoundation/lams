@@ -57,6 +57,12 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     private final static String LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + "p.lessonComplete > 0 and p.lesson.id = :lessonId ORDER BY p.finishDate DESC";
 
+    private final static String LOAD_LEARNERS_ATTEMPTED_ACTIVITY = "SELECT prog.user FROM LearnerProgress prog, "
+	    + " Activity act join prog.attemptedActivities attAct where act.id = :activityId and index(attAct) = act";
+
+    private final static String LOAD_LEARNERS_COMPLETED_ACTIVITY = "SELECT prog.user FROM LearnerProgress prog, "
+	    + " Activity act join prog.completedActivities compAct where act.id = :activityId and index(compAct) = act";
+
     private final static String COUNT_COMPLETED_PROGRESS_BY_LESSON = "select count(*) from LearnerProgress p "
 	    + " where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
@@ -317,14 +323,33 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<User> getLearnersHaveAttemptedActivity(final Activity activity) {
+    public List<User> getLearnersAttemptedOrCompletedActivity(final Activity activity) {
 	List<User> learners = null;
 
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	learners = (List<User>) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		return session.getNamedQuery("usersAttemptedActivity")
+		List<User> users = session.createQuery(LearnerProgressDAO.LOAD_LEARNERS_ATTEMPTED_ACTIVITY)
+			.setLong("activityId", activity.getActivityId().longValue()).list();
+		return users.addAll(session.createQuery(LearnerProgressDAO.LOAD_LEARNERS_COMPLETED_ACTIVITY)
+			.setLong("activityId", activity.getActivityId().longValue()).list());
+	    }
+	});
+
+	return learners;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getLearnersAttemptedActivity(final Activity activity) {
+	List<User> learners = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	learners = (List<User>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(LearnerProgressDAO.LOAD_LEARNERS_ATTEMPTED_ACTIVITY)
 			.setLong("activityId", activity.getActivityId().longValue()).list();
 	    }
 	});

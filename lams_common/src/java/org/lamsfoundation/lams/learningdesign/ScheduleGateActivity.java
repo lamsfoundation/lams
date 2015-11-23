@@ -80,12 +80,11 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId,
-	    Long gateStartTimeOffset, Long gateEndTimeOffset, Set waitingLearners, SystemTool sysTool,
-	    Set branchActivityEntries) {
+	    Long gateStartTimeOffset, Long gateEndTimeOffset, SystemTool sysTool, Set branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, waitingLearners,
-		sysTool, branchActivityEntries);
+		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
+		branchActivityEntries);
 	// validate pre-condition.
 	if ((gateStartTimeOffset != null) && (gateEndTimeOffset != null)
 		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue())) {
@@ -103,16 +102,14 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
 
     /** minimal constructor */
-    @SuppressWarnings("rawtypes")
     public ScheduleGateActivity(Long activityId, java.util.Date createDateTime,
 	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
 	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
 	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
 	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Integer gateActivityLevelId, Long gateStartTimeOffset, Long gateEndTimeOffset,
-	    Set waitingLearners) {
+	    Transition transitionFrom, Integer gateActivityLevelId, Long gateStartTimeOffset, Long gateEndTimeOffset) {
 	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, gateActivityLevelId, waitingLearners);
+		transitionTo, transitionFrom, gateActivityLevelId);
 	if ((gateStartTimeOffset != null) && (gateEndTimeOffset != null)
 		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue())) {
 	    throw new IllegalStateException("End time offset must be larger" + " than start time offset");
@@ -253,12 +250,12 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	if (isScheduledByTimeOffset()) {
 	    if (getGateStartTimeOffset().equals(getGateEndTimeOffset())) {
 		listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SCHEDULE_GATE_ERROR_CODE,
-			messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY), this
-				.getActivityUIID()));
+			messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY),
+			this.getActivityUIID()));
 	    } else if (getGateStartTimeOffset().compareTo(getGateEndTimeOffset()) > 0) {
 		listOfValidationErrors.add(new ValidationErrorDTO(ValidationErrorDTO.SCHEDULE_GATE_ERROR_CODE,
-			messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE2_KEY), this
-				.getActivityUIID()));
+			messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE2_KEY),
+			this.getActivityUIID()));
 	    }
 
 	}
