@@ -59,7 +59,7 @@
 				<td>
 					<c:choose>
 						<c:when test="${(user.userModifiedSpreadsheet != null) && (user.userModifiedSpreadsheet.mark != null)}">
-							<c:out value="${user.userModifiedSpreadsheet.mark.marks}" escapeXml="false" />
+							<fmt:formatNumber type="number" maxFractionDigits="<%= SpreadsheetConstants.MARK_NUM_DEC_PLACES %>" value="${user.userModifiedSpreadsheet.mark.marks}"/>
 						</c:when>
 						<c:otherwise>
 							<fmt:message key="label.learning.not.available" />
