@@ -102,6 +102,10 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		<action path="/monitoring/getUsers"
+			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
+			parameter="getUsers" >
+		</action>
 		<action path="/monitoring/doStatistic"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
 			parameter="doStatistic" >
@@ -135,13 +139,8 @@
 			validate="false" 
 			scope="request">
             <forward name="editMark" path="/pages/monitoring/parts/editmark.jsp" />
-			<forward name="success" path="/pages/monitoring/parts/summarylist.jsp" />            			
+			<forward name="success" path="/pages/monitoring/parts/updatemarkaftersave.jsp" />            			
 		</action>		
-		<action path="/monitoring/viewReflection"
-			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/parts/notebook.jsp" />
-		</action>
 		
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"

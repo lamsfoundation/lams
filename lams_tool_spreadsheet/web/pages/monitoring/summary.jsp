@@ -29,6 +29,14 @@
 		showMessage(url);
 	}
 	
+	function updateMarkAfterSaving(userUid, mark) {
+		var span = document.getElementById('mark'+userUid);
+		while( span.firstChild ) {
+		    span.removeChild( span.firstChild );
+		}
+		span.appendChild( document.createTextNode(mark) );
+	}
+	
 	function downloadMarks(sessionId){
 		var url = "<c:url value="/monitoring/downloadMarks.do"/>";
 	    var reqIDVar = new Date();
