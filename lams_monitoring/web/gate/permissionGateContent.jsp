@@ -54,6 +54,7 @@
 				<p><fmt:message key="label.gate.open.single.learner"/></p>
 			</c:if>
 			<html:form action="/gate?method=openGateForSingleUser" onsubmit="return onSubmitForm();" target="_self">
+			<input type="hidden" id="activityId" name="activityId" value="${GateForm.map.activityId}" />
 			<input type="hidden" id="userId" name="userId" />
 			<table>
 				<tr>

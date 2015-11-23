@@ -622,45 +622,4 @@
 
 </class>
 
-   <sql-query name="usersAttemptedActivity">
-		<return alias="user" class="org.lamsfoundation.lams.usermanagement.User" />
-		SELECT DISTINCT {user.*}
-		  FROM lams_user {user},
-		  	lams_learner_progress prog,
-		    lams_learning_activity act, 
-		    lams_progress_attempted attempt
-		  WHERE 
-		    prog.learner_progress_id = attempt.learner_progress_id 
-		    and attempt.activity_id=act.activity_id 
-		    and act.activity_id=:activityId
-		    and prog.user_id={user}.user_id
-		    
-		UNION
-
-		SELECT DISTINCT {user.*}
-		  FROM lams_user {user},
-		  	lams_learner_progress prog,
-		    lams_learning_activity act, 
-		    lams_progress_completed completed
-		  WHERE 
-		    prog.learner_progress_id = completed.learner_progress_id 
-		    and completed.activity_id=act.activity_id 
-		    and act.activity_id=:activityId
-		    and prog.user_id={user}.user_id
-	</sql-query>
-
-    <sql-query name="usersCompletedActivity">
-		<return alias="user" class="org.lamsfoundation.lams.usermanagement.User" />
-		SELECT DISTINCT {user.*}
-		  FROM lams_user {user},
-		  	lams_learner_progress prog,
-		    lams_learning_activity act, 
-		    lams_progress_completed completed
-		  WHERE 
-		    prog.learner_progress_id = completed.learner_progress_id 
-		    and completed.activity_id=act.activity_id 
-		    and act.activity_id=:activityId
-		    and prog.user_id={user}.user_id
-	</sql-query>
-
 </hibernate-mapping>

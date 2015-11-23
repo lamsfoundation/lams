@@ -170,7 +170,7 @@ public class BranchingAction extends LamsDispatchAction {
 				if ( group.getUsers() == null ) {
 					group.setUsers(new HashSet());
 				}
-				List<User> learners = monitoringService.getLearnersHaveAttemptedActivity(branch);
+				List<User> learners = monitoringService.getLearnersAttemptedOrCompletedActivity(branch);
 				group.getUsers().addAll(learners);
 				groups.add(group);
 			}

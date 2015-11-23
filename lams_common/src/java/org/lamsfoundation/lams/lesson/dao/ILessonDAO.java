@@ -124,17 +124,6 @@ public interface ILessonDAO extends IBaseDAO {
     List getActiveLearnerByLesson(long lessonId);
 
     /**
-     * Returns the all the learners that have started the requested lesson and are in the given group.
-     * 
-     * @param lessonId
-     *            the id of the requested lesson.
-     * @param groupId
-     *            the id of the requested group.
-     * @return the list of learners.
-     */
-    List getActiveLearnerByLessonAndGroup(long lessonId, long groupId);
-
-    /**
      * Returns the count of all the learners that have started the requested lesson.
      * 
      * @param lessonId

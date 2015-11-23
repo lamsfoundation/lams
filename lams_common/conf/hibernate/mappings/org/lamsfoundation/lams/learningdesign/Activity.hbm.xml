@@ -224,21 +224,11 @@
              	<column name="system_tool_id" not-null="false"/>
              </many-to-one>                 
 
-			<set  name="waitingLearners" lazy="true" cascade="none" table="lams_activity_learners" batch-size="20" where="allowed_to_pass=0">
+   			<set name="allowedToPassLearners" table="lams_gate_allowed_learners" lazy="true" cascade="none">
        			<key><column name="activity_id" /></key>
-       			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
+        		<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User" />
    			</set>
-   			<set name="allowedToPassLearners" lazy="true" cascade="none" table="lams_activity_learners" batch-size="20" where="allowed_to_pass=1">
-       			<key><column name="activity_id" /></key>
-       			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
-   			</set>
-   			<set name="allGateUsers" table="lams_activity_learners" lazy="true" cascade="all" batch-size="20">
-       			<key><column name="activity_id" /></key>
-       			<composite-element class="org.lamsfoundation.lams.learningdesign.GateUser">
-       				<many-to-one name="user" class="org.lamsfoundation.lams.usermanagement.User" column="user_id" cascade="none" />
-       				<property name="allowedToPass" column="allowed_to_pass" not-null="true"></property>
-       			</composite-element>
-   			</set>
+   			
 			<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11" />
 			<property name="gateOpen" type="java.lang.Boolean" column="gate_open_flag" length="4" />
 			

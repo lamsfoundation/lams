@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.GateUser;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -291,11 +290,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    }
 	} else if (activity.isGateActivity()) {
 	    GateActivity gateActivity = (GateActivity) activity;
-	    Iterator<GateUser> gateUserIterator = gateActivity.getAllGateUsers().iterator();
+	    Iterator<User> gateUserIterator = gateActivity.getAllowedToPassLearners().iterator();
 	    boolean removed = false;
 	    while (gateUserIterator.hasNext()) {
-		User user = gateUserIterator.next().getUser();
-		// there can be more than one entry (why?!), so do not "break"
+		User user = gateUserIterator.next();
 		if (learner.getUserId().equals(user.getUserId())) {
 		    removed = true;
 		    gateUserIterator.remove();
@@ -325,9 +323,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    return false;
 	} else if (activity.isGateActivity()) {
 	    GateActivity gateActivity = (GateActivity) activity;
-	    return !gateActivity.getAllGateUsers().isEmpty();
+	    return !gateActivity.getAllowedToPassLearners().isEmpty();
 	}
-	
+
 	// just check the flag
 	return isActivityReadOnlyFlag(activity);
     }

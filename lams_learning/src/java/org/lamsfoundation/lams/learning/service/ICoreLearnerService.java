@@ -25,11 +25,13 @@
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -234,15 +236,6 @@ public interface ICoreLearnerService extends ILearnerService {
     public Activity getActivity(Long activityId);
 
     /**
-     * Returns all the active learners by the lesson id.
-     * 
-     * @param lessonId
-     *                the requested lesson id.
-     * @return the list of learners.
-     */
-    public List getActiveLearnersByLesson(long lessonId);
-
-    /**
      * Perform grouping for the learners who have started the lesson, based on the grouping activity.
      * 
      * @param lessonId
@@ -319,16 +312,8 @@ public interface ICoreLearnerService extends ILearnerService {
      */
     public GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate);
 
-    /**
-     * Get all the learners who may come through this gate. For a Group Based branch and the Teacher Grouped branch, it
-     * is the group of users in the Branch's group, but only the learners who have started the lesson. Otherwise we just
-     * get all learners who have started the lesson.
-     * 
-     * @param gate
-     *                activity
-     * @return List of User
-     */
-    public List getLearnersForGate(GateActivity gate);
+ 
+    public Set<Group> getGroupsForGate(GateActivity gate);
 
     /**
      * Get the learner url for a particular activity.
