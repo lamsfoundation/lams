@@ -19,7 +19,6 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="spreadsheet" value="${sessionMap.spreadsheet}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
-	<c:set var="user" value="${sessionMap.user}" />
 
 	<script type="text/javascript">
 	<!--
