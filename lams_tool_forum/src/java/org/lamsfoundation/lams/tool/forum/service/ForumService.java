@@ -1538,7 +1538,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	boolean isHtmlFormat = forum.isAllowRichEditor();
 
 	if (forum.isNotifyLearnersOnForumPosting()) {
-	    List<User> learners = lessonService.getLearnersHaveAttemptedActivity(activity);
+	    List<User> learners = lessonService.getLearnersAttemptedOrCompletedActivity(activity);
 	    if (learners != null && !learners.isEmpty()) {
 		ArrayList<Integer> learnerIds = new ArrayList<Integer>();
 		for (User learner : learners) {
