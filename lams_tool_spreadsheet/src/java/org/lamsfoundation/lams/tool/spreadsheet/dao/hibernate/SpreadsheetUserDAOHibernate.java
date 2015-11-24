@@ -116,7 +116,9 @@ public class SpreadsheetUserDAOHibernate extends BaseDAOHibernate implements Spr
 	    SQLQuery query =  getSession().createSQLQuery(queryText.toString());
 	    query.addEntity("user", SpreadsheetUser.class)
 		.addScalar("notebookEntry", Hibernate.STRING)
-	    	.setLong("sessionId", sessionId.longValue());
+	    	.setLong("sessionId", sessionId.longValue())
+	    	.setFirstResult(page * size)
+	    	.setMaxResults(size);
 	    return query.list();
 	}
 
