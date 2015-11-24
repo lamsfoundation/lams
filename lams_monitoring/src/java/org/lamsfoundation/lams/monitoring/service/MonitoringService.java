@@ -538,8 +538,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	// if lesson isn't started recreate the lesson class
 	if (newLesson.isLessonStarted()) {
 	    securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
-	    lessonService.setLearners(newLesson, organizationUsers);
-	    lessonService.setStaffMembers(newLesson, staffs);
+	    lessonService.updateLearners(newLesson, organizationUsers);
+	    lessonService.updateStaffMembers(newLesson, staffs);
 	} else {
 	    if (organisation != null) {
 		// security check needs organisation to be set
