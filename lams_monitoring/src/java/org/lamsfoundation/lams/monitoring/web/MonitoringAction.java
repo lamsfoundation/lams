@@ -806,10 +806,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	List<User> learners = parseUserList(request, "learners", allUsers);
-	getLessonService().setLearners(lesson, learners);
+	getLessonService().updateLearners(lesson, learners);
 
 	List<User> staff = parseUserList(request, "monitors", allUsers);
-	getLessonService().setStaffMembers(lesson, staff);
+	getLessonService().updateStaffMembers(lesson, staff);
 
 	return null;
     }

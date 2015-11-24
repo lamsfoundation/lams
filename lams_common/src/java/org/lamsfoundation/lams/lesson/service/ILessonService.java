@@ -251,7 +251,7 @@ public interface ILessonService {
      * @param users
      *            the users to set as staff
      */
-    void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
+    void updateLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
 
     /**
      * Add a new staff member to the lesson class. Checks for duplicates.
@@ -294,7 +294,7 @@ public interface ILessonService {
      * @param users
      *            the users to set as staff
      */
-    void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
+    void updateStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
 
     /**
      * Remove references to an activity from all learner progress entries. Used by Live Edit, to remove any references

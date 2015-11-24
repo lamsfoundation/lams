@@ -384,7 +384,7 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException {
+    public void updateLearners(Lesson lesson, Collection<User> users) throws LessonServiceException {
 	LessonClass lessonClass = lesson.getLessonClass();
 	int numberOfLearners = lessonClass.setLearners(users);
 	lessonClassDAO.updateLessonClass(lessonClass);
@@ -461,8 +461,7 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException {
-
+    public void updateStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException {
 	LessonClass lessonClass = lesson.getLessonClass();
 	int numberOfStaff = lessonClass.setStaffMembers(users);
 	lessonClassDAO.updateLessonClass(lessonClass);
