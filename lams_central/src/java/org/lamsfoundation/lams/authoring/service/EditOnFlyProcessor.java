@@ -48,10 +48,12 @@ public class EditOnFlyProcessor extends LearningDesignProcessor {
 
     @Override
     public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
-	if (activity.isActivityReadOnly()) {
-	    lastReadOnlyActivity = activity;
-	} else if (firstAddedActivity == null) {
-	    firstAddedActivity = activity;
+	if (!activity.isFloatingActivity()) {
+	    if (activity.isActivityReadOnly()) {
+		lastReadOnlyActivity = activity;
+	    } else if (firstAddedActivity == null) {
+		firstAddedActivity = activity;
+	    }
 	}
     }
 
@@ -63,13 +65,12 @@ public class EditOnFlyProcessor extends LearningDesignProcessor {
     /** Creates an ActivityPortfolio. */
     @Override
     public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
-	if (activity.isActivityReadOnly()) {
-	    // skip Floating Activity as it is not in the main flow
-	    if ((activity.getParentActivity() == null) || !activity.getParentActivity().isFloatingActivity()) {
+	if (!activity.isFloating()) {
+	    if (activity.isActivityReadOnly()) {
 		lastReadOnlyActivity = activity;
+	    } else if (firstAddedActivity == null) {
+		firstAddedActivity = activity;
 	    }
-	} else if (firstAddedActivity == null) {
-	    firstAddedActivity = activity;
 	}
     }
 }
