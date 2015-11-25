@@ -29,11 +29,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.IForumUserDAO;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.springframework.stereotype.Repository;
 
@@ -84,89 +85,119 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 	return (ForumUser) this.getSession().get(ForumUser.class, userUid);
     }
     
-    @Override
     @SuppressWarnings("unchecked")
-    public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
-	String sortingOrder = "";
+    /** Will return List<[ForumUser, String], [ForumUser, String], ... , [ForumUser, String]>
+     * where the String is the notebook entry. No notebook entries needed? Will return "null" in their place.
+     */
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
+	    boolean getNotebookEntries, ICoreNotebookService coreNotebookService) {
+	String sortingOrder;
+	boolean sortOnMessage;
 	switch (sorting) {
-	case ForumConstants.SORT_BY_NO:
-	    sortingOrder = "user.lastName";
-	    break;
 	case ForumConstants.SORT_BY_USER_NAME_ASC:
-	    sortingOrder = "user.lastName ASC, user.firstName ASC";
+	    sortingOrder = "user.last_name ASC, user.first_name ASC";
+	    sortOnMessage = false;
 	    break;
 	case ForumConstants.SORT_BY_USER_NAME_DESC:
-	    sortingOrder = "user.lastName DESC, user.firstName DESC";
+	    sortingOrder = "user.last_name DESC, user.first_name DESC";
+	    sortOnMessage = false;
 	    break;
 	case ForumConstants.SORT_BY_LAST_POSTING_ASC:
-	    sortingOrder = " MAX(message.updated) ASC";
+	    sortingOrder = " MAX(message.update_date) ASC";
+	    sortOnMessage = true;
 	    break;
 	case ForumConstants.SORT_BY_LAST_POSTING_DESC:
-	    sortingOrder = " MAX(message.updated) DESC";
+	    sortingOrder = " MAX(message.update_date) DESC";
+	    sortOnMessage = true;
 	    break;
 	case ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC:
-	    sortingOrder = " COUNT(message) ASC";
+	    sortingOrder = " COUNT(message.uid) ASC";
+	    sortOnMessage = true;
 	    break;
 	case ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC:
-	    sortingOrder = " COUNT(message) DESC";
+	    sortingOrder = " COUNT(message.uid) DESC";
+	    sortOnMessage = true;
 	    break;
+	case ForumConstants.SORT_BY_MARKED_ASC:
+	    sortingOrder = " AVG(report.mark) ASC";
+	    sortOnMessage = true;
+	    break;
+	case ForumConstants.SORT_BY_MARKED_DESC:
+	    sortingOrder = " AVG(report.mark) DESC";
+	    sortOnMessage = true;
+	    break;
+	case ForumConstants.SORT_BY_NO:
+	default: 
+	    sortingOrder = "user.uid";
+	    sortOnMessage = false;
 	}
 
-	String filteredSearchString = buildNameSearch(searchString);
+	// If the session uses notebook, then get the SQL to join across to get the entries
+	String[] notebookEntryStrings = null;
+	if (getNotebookEntries) {
+	    notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
+		    ForumConstants.TOOL_SIGNATURE, "user.user_id");
+	}
 
-	String queryText = null;
-	if (sorting == ForumConstants.SORT_BY_NUMBER_OF_POSTS_ASC
-		|| sorting == ForumConstants.SORT_BY_NUMBER_OF_POSTS_DESC
-		|| sorting == ForumConstants.SORT_BY_LAST_POSTING_ASC
-		|| sorting == ForumConstants.SORT_BY_LAST_POSTING_DESC) {
+	// Basic select for the user records
+	StringBuilder queryText = new StringBuilder();
 
-	    queryText = "SELECT user FROM "
-		    + Message.class.getName() + " as message " + " RIGHT JOIN message.createdBy as user "
-		    + " WHERE user.session.sessionId=:sessionId "
-		    + ( filteredSearchString != null ? filteredSearchString : "" )
-		    + " GROUP BY user.userId ORDER BY " + sortingOrder;
+	queryText.append("SELECT user.* ");
+	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
+	queryText.append(" FROM tl_lafrum11_forum_user user ");
+	queryText.append(" JOIN tl_lafrum11_tool_session session ON user.session_id = session.uid and session.session_id = :sessionId");
 
-	} else {
+	if (sortOnMessage) {
+	    queryText.append(" LEFT JOIN tl_lafrum11_message message ON message.create_by = user.uid");
+	    if (sorting == ForumConstants.SORT_BY_MARKED_ASC || sorting == ForumConstants.SORT_BY_MARKED_DESC) {
+		queryText.append(" LEFT JOIN tl_lafrum11_report report ON report.uid = message.report_id");
+	    }
+	}
 
-	    queryText = "from user in class ForumUser "
-		    + "where user.session.sessionId=:sessionId " 
-		    + ( filteredSearchString != null ? filteredSearchString : "" )
-		    + " ORDER BY " + sortingOrder;
+	// If using notebook, add the notebook join
+	if ( notebookEntryStrings != null )
+	    queryText.append(notebookEntryStrings[1]);
+
+	// If filtering by name add a name based where clause
+	buildNameSearch(queryText, searchString);
+
+	if (sortOnMessage) {
+	    queryText.append(" GROUP BY user.user_id");
 	}
 	
-	Query query = getSession().createQuery(queryText).setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
-	return query.list();
+	// Now specify the sort based on the switch statement above.
+	queryText.append(" ORDER BY " + sortingOrder);
 
+	SQLQuery query =  getSession().createSQLQuery(queryText.toString());
+	    query.addEntity("user", ForumUser.class)
+		.addScalar("notebookEntry", StringType.INSTANCE)
+	    	.setLong("sessionId", sessionId.longValue())
+	    	.setFirstResult(page * size)
+	    	.setMaxResults(size);
+	return query.list();
+	
     }
-    
-    private String buildNameSearch(String searchString) {
-	String filteredSearchString = null;
+
+    private void buildNameSearch(StringBuilder queryText, String searchString) {
 	if (!StringUtils.isBlank(searchString)) {
-	    StringBuilder searchStringBuilder = new StringBuilder("");
 	    String[] tokens = searchString.trim().split("\\s+");
 	    for (String token : tokens) {
 		String escToken = StringEscapeUtils.escapeSql(token);
-		searchStringBuilder.append(" AND (user.firstName LIKE '%").append(escToken)
-			.append("%' OR user.lastName LIKE '%").append(escToken)
-			.append("%' OR user.loginName LIKE '%").append(escToken).append("%')");
+		queryText.append(" AND (user.first_name LIKE '%").append(escToken)
+			.append("%' OR user.last_name LIKE '%").append(escToken)
+			.append("%' OR user.login_name LIKE '%").append(escToken).append("%')");
 	    }
-	    filteredSearchString = searchStringBuilder.toString();
 	}
-	return filteredSearchString;
     } 
 
     @SuppressWarnings("rawtypes")
     public int getCountUsersBySession(final Long sessionId, String searchString) {
 
-	String filteredSearchString = buildNameSearch(searchString);
-	String queryText = "SELECT COUNT(*) from " 
-		+ ForumUser.class.getName() 
-		+ " as user where user.session.sessionId=:sessionId ";
-	if ( filteredSearchString != null ) 
-	    queryText += filteredSearchString;
-
-	List list = getSession().createQuery(queryText).setLong("sessionId", sessionId.longValue()).list();
-
+	StringBuilder queryText = new StringBuilder("SELECT count(*) FROM tl_lafrum11_forum_user user ");
+	queryText.append(" JOIN tl_lafrum11_tool_session session ON user.session_id = session.uid and session.session_id = :sessionId");
+	buildNameSearch(queryText, searchString);
+	    
+	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue()).list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

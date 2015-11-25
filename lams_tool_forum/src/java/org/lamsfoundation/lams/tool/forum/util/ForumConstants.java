@@ -41,6 +41,8 @@ public interface ForumConstants {
     public static final int SORT_BY_LAST_POSTING_DESC = 4;
     public static final int SORT_BY_NUMBER_OF_POSTS_ASC = 5;
     public static final int SORT_BY_NUMBER_OF_POSTS_DESC = 6;
+    public static final int SORT_BY_MARKED_ASC = 7;
+    public static final int SORT_BY_MARKED_DESC = 8;
 
     // See LDEV652
     // For old style (Fiona's description): The oldest topic is at the top, does not depends the reply date etc.

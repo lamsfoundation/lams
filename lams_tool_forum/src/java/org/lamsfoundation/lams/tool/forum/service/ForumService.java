@@ -527,12 +527,13 @@ public class ForumService
     public ForumUser getUserByUserAndSession(Long userId, Long sessionId) {
 	return forumUserDao.getByUserIdAndSessionId(userId, sessionId);
     }
-
+    
     @Override
-    public List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
-	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString);
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
+		boolean getNotebookEntries) {
+	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries, coreNotebookService);
     }
-
+        
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return forumUserDao.getCountUsersBySession(sessionId, searchString);

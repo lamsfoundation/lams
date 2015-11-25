@@ -87,7 +87,7 @@
 	    
 		$(".tablesorter").tablesorter({
 			theme: 'blue',
-		    sortInitialOrder: 'desc',
+		    sortInitialOrder: 'asc',
             sortList: [[0]],
             widgets: [ "resizable", "filter" ],
             headers: { 1: { filter: false}, 2: { filter: false}, 3: { filter: false}, 4: { filter: false} }, 
@@ -146,7 +146,7 @@
 							
 							if (${forum.reflectOnActivity}) {
 								rows += '<td>';
-								rows += 	(userData["notebookEntry"] == 'null') ? '-' : userData["notebookEntry"];
+								rows += 	(userData["notebookEntry"]) ? userData["notebookEntry"] : '-' ;
 								rows += '</td>';
 							}
 							
@@ -206,7 +206,7 @@
 	<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
 		<thead>
 			<tr>
-				<th width="25%">
+				<th>
 					<fmt:message key="monitoring.user.fullname"/>
 				</th>
 				<th width="5%" align="center"> 
@@ -214,7 +214,7 @@
 				</th>
 				<c:choose>
 				  <c:when test="${forum.reflectOnActivity}">
-				     <th width="10%" align="center">
+				     <th width="15%" align="center">
 				  </c:when>
 				  <c:otherwise>
 				     <th width="25%" align="center">
@@ -222,7 +222,7 @@
 				</c:choose>
 					<fmt:message key="label.latest.posting.date"/>
 				</th>
-				<th width="10%" align="center" class="sorter-false">
+				<th width="10%" align="center">
 					<fmt:message key="monitoring.marked.question"/>
 				</th>
 				<c:if test="${forum.reflectOnActivity}">

@@ -64,8 +64,6 @@ import org.apache.struts.config.ForwardConfig;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -78,7 +76,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumUserComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.util.MessageDTOByDateComparator;
-import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.util.SessionDTOComparator;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
@@ -255,6 +252,7 @@ public class MonitoringAction extends Action {
 	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
 	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
 	Integer isSort3 = WebUtil.readIntParam(request, "column[2]", true);
+	Integer isSort4 = WebUtil.readIntParam(request, "column[3]", true);
 	String searchString = request.getParameter("fcol[0]"); 
 	
 	int sorting = ForumConstants.SORT_BY_NO;
@@ -275,6 +273,12 @@ public class MonitoringAction extends Action {
 
 	} else if ((isSort3 != null) && isSort3.equals(1)) {
 	    sorting = ForumConstants.SORT_BY_LAST_POSTING_DESC;
+	    
+	} else if ((isSort4 != null) && isSort4.equals(0)) {
+	    sorting = ForumConstants.SORT_BY_MARKED_ASC;
+
+	} else if ((isSort4 != null) && isSort4.equals(1)) {
+	    sorting = ForumConstants.SORT_BY_MARKED_DESC;
 	}
 
 	Set<SessionDTO> sessionDtos = (Set<SessionDTO>) sessionMap.get(ForumConstants.ATTR_SESSION_DTOS);
@@ -287,16 +291,21 @@ public class MonitoringAction extends Action {
 	}
 	Map<ForumUser, List<MessageDTO>> topicsByUser = currentSessionDto.getTopicsByUser();
 
-	List<ForumUser> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString);
+	Forum forum = (Forum) sessionMap.get("forum");
+	List<Object[]> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString, 
+		forum.isReflectOnActivity());
 
 	JSONArray rows = new JSONArray();
 
 	JSONObject responcedata = new JSONObject();
 	responcedata.put("total_rows", forumService.getCountUsersBySession(sessionId, searchString));
 
-	for (ForumUser user : users) {
+	for (Object[] userAndReflection : users) {
 
 	    JSONObject responseRow = new JSONObject();
+	    
+	    ForumUser user = (ForumUser) userAndReflection[0];
+
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put("userName", StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 
@@ -327,15 +336,9 @@ public class MonitoringAction extends Action {
 	    responseRow.put("anyPostsMarked", isAnyPostsMarked);
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
-	    Forum forum = (Forum) sessionMap.get("forum");
-	    if (forum.isReflectOnActivity()) {
-		NotebookEntry notebookEntry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			ForumConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-		String reflection = (notebookEntry == null) ? null : notebookEntry.getEntry();
-		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml(reflection));
+	    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
+		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml((String)userAndReflection[1]));
 	    }
-
 	    rows.put(responseRow);
 	}
 	responcedata.put("rows", rows);
