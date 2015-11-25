@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
@@ -85,7 +86,8 @@ public interface IForumService {
      */
     Forum getForumByContentId(Long contentID) throws PersistenceException;
     
-    List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
+		boolean getNotebookEntries);
     
     int getCountUsersBySession(Long sessionId, String searchString);
 
