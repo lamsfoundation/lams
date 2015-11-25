@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 
 public interface IForumUserDAO extends IBaseDAO {
 
@@ -20,7 +21,8 @@ public interface IForumUserDAO extends IBaseDAO {
 
     int getCountUsersBySession(Long sessionId, String searchString);
 
-    List<ForumUser> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
+	    boolean getNotebookEntries, ICoreNotebookService coreNotebookService);
 
 
 }
