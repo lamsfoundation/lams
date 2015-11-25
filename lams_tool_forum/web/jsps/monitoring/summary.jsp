@@ -87,7 +87,7 @@
 	    
 		$(".tablesorter").tablesorter({
 			theme: 'blue',
-		    sortInitialOrder: 'asc',
+		    sortInitialOrder: 'desc',
             sortList: [[0]],
             widgets: [ "resizable", "filter" ],
             headers: { 1: { filter: false}, 2: { filter: false}, 3: { filter: false}, 4: { filter: false} }, 
