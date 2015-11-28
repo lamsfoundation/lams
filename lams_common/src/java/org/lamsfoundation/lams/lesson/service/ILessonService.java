@@ -76,6 +76,13 @@ public interface ILessonService {
 	    boolean orderAscending);
 
     /**
+     * Maps users from an organisation with the given role to a boolean value saying whether they participate in the
+     * given lesson.
+     */
+    Map<User, Boolean> getUsersWithLessonParticipation(Long lessonId, String role, String searchPhrase, Integer limit,
+	    Integer offset, boolean orderAscending);
+
+    /**
      * Get the count of all the learners who are a part of the lesson class.
      */
     Integer getCountLessonLearners(Long lessonId, String searchPhrase);
@@ -243,6 +250,11 @@ public interface ILessonService {
     void addLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
 
     /**
+     * Removes the learner from the lesson.
+     */
+    boolean removeLearner(Long lessonId, Integer userId);
+
+    /**
      * Set the learners in a lesson class. Learners not in the users collection will be removed. To be called within
      * LAMS.
      * 
@@ -284,6 +296,9 @@ public interface ILessonService {
      *            the users to add as learners
      */
     void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
+
+    // removes the staff member from the lesson
+    boolean removeStaffMember(Long lessonId, Integer userId);
 
     /**
      * Set the staff members in a lesson class. Staff members not in the users collection will be removed. To be called
