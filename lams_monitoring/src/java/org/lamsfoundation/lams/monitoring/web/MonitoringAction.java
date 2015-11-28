@@ -38,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -136,8 +137,9 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final String ERROR = "error";
     private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
 
-    private static final Integer LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
-    private static final Integer LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
+    private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
+    private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
+    private static final int USER_PAGE_SIZE = 10;
 
     private static IAuditService auditService;
 
@@ -148,6 +150,8 @@ public class MonitoringAction extends LamsDispatchAction {
     private static ISecurityService securityService;
 
     private static IMonitoringService monitoringService;
+
+    private static IUserManagementService userManagementService;
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
@@ -668,8 +672,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	List<User> learners = getLessonService().getLessonLearners(lessonId, null, 10, (pageNumber - 1) * 10,
-		orderAscending);
+	List<User> learners = getLessonService().getLessonLearners(lessonId, null, MonitoringAction.USER_PAGE_SIZE,
+		(pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE, orderAscending);
 	JSONArray learnersJSON = new JSONArray();
 	for (User learner : learners) {
 	    learnersJSON.put(WebUtil.userToJSON(learner));
@@ -688,39 +692,45 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Gets learners or monitors of the lesson and organisation containing it.
      */
-    @SuppressWarnings("unchecked")
     public ActionForward getClassMembers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
-	boolean getMonitors = Role.MONITOR.equalsIgnoreCase(role);
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	Set<User> classUsers = getMonitors ? lesson.getLessonClass().getStaffGroup().getUsers()
-		: lesson.getLessonClass().getLearners();
-	JSONArray responseJSON = new JSONArray();
+	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
+	boolean isMonitor = role.equals(Role.MONITOR);
+	User creator = isMonitor ? lesson.getUser() : null;
+	Integer currentUserId = isMonitor ? getUserId() : null;
+	String searchPhrase = request.getParameter("searchPhrase");
+	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
+	if (pageNumber == null) {
+	    pageNumber = 1;
+	}
+	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
+	JSONObject responseJSON = new JSONObject();
 
-	for (User user : classUsers) {
+	// find organisation users and whether they participate in the current lesson
+	Map<User, Boolean> users = getLessonService().getUsersWithLessonParticipation(lessonId, role, searchPhrase,
+		MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE, orderAscending);
+
+	// if the result is less then page size, then no need for full check of user count
+	Integer userCount = users.size() < MonitoringAction.USER_PAGE_SIZE ? users.size()
+		: getUserManagementService().getCountRoleForOrg(lesson.getOrganisation().getOrganisationId(),
+			isMonitor ? Role.ROLE_MONITOR : Role.ROLE_LEARNER, searchPhrase);
+
+	responseJSON.put("userCount", userCount);
+
+	JSONArray usersJSON = new JSONArray();
+	for (Entry<User, Boolean> userEntry : users.entrySet()) {
+	    User user = userEntry.getKey();
 	    JSONObject userJSON = WebUtil.userToJSON(user);
-	    // mark that this user is a class member
-	    userJSON.put("classMember", true);
-	    if (lesson.getUser().equals(user)) {
-		// mark this user is lesson author
-		userJSON.put("lessonCreator", true);
+	    userJSON.put("classMember", userEntry.getValue());
+	    // teacher can't remove lesson creator and himself from the lesson staff
+	    if (isMonitor && (creator.getUserId().equals(user.getUserId()) || currentUserId.equals(user.getUserId()))) {
+		userJSON.put("readonly", true);
 	    }
-	    responseJSON.put(userJSON);
+	    usersJSON.put(userJSON);
 	}
-
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(getServlet().getServletContext());
-	List<User> orgUsers = userManagementService.getUsersFromOrganisationByRole(
-		lesson.getOrganisation().getOrganisationId(), getMonitors ? Role.MONITOR : Role.LEARNER, false, true);
-	for (User user : orgUsers) {
-	    if (!classUsers.contains(user)) {
-		JSONObject userJSON = WebUtil.userToJSON(user);
-		userJSON.put("classMember", false);
-		responseJSON.put(userJSON);
-	    }
-	}
+	responseJSON.put("users", usersJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
@@ -744,7 +754,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	if (activityId == null) {
 	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    List<User> learners = getMonitoringService().getUsersCompletedLesson(lessonId, 10, (pageNumber - 1) * 10,
+	    List<User> learners = getMonitoringService().getUsersCompletedLesson(lessonId,
+		    MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE,
 		    orderAscending);
 	    for (User learner : learners) {
 		learnersJSON.put(WebUtil.userToJSON(learner));
@@ -767,7 +778,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 
 	    List<User> learners = getMonitoringService().getLearnersByActivities(activities.toArray(new Long[] {}),
-		    null, null, orderAscending);
+		    MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE,
+		    orderAscending);
 	    for (User learner : learners) {
 		learnersJSON.put(WebUtil.userToJSON(learner));
 	    }
@@ -789,27 +801,33 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward updateLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	int userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
+	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
+	boolean add = WebUtil.readBooleanParam(request, "add");
+	boolean result = false;
 
-	// monitor user opted for removing lesson progress for following users
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(getServlet().getServletContext());
-	List<User> allUsers = userManagementService
-		.getUsersFromOrganisation(lesson.getOrganisation().getOrganisationId());
-	List<User> removedLearners = parseUserList(request, "removedLearners", allUsers);
-	for (User removedLearner : removedLearners) {
-	    getLessonService().removeLearnerProgress(lessonId, removedLearner.getUserId());
-	    if (LamsDispatchAction.log.isDebugEnabled()) {
-		LamsDispatchAction.log.debug(
-			"Removed progress for user ID: " + removedLearner.getUserId() + " in lesson ID: " + lessonId);
+	if (role.equals(Role.MONITOR)) {
+	    if (add) {
+		result = getLessonService().addStaffMember(lessonId, userId);
+	    } else {
+		result = getLessonService().removeStaffMember(lessonId, userId);
+	    }
+	} else if (role.equals(Role.LEARNER)) {
+	    if (add) {
+		result = getLessonService().addLearner(lessonId, userId);
+	    } else {
+		getLessonService().removeLearnerProgress(lessonId, userId);
+		result = getLessonService().removeLearner(lessonId, userId);
 	    }
 	}
 
-	List<User> learners = parseUserList(request, "learners", allUsers);
-	getLessonService().setLearners(lesson, learners);
-
-	List<User> staff = parseUserList(request, "monitors", allUsers);
-	getLessonService().setStaffMembers(lesson, staff);
+	if (result) {
+	    LamsDispatchAction.log.info((add ? "Added a " : "Removed a ") + role + " with ID " + userId
+		    + (add ? " to" : " from") + " lesson " + lessonId);
+	} else {
+	    LamsDispatchAction.log.warn("Failed when trying to " + (add ? "add a " : "remove a ") + role + " with ID "
+		    + userId + (add ? " to" : " from") + " lesson " + lessonId);
+	}
 
 	return null;
     }
@@ -1299,7 +1317,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String searchPhrase = request.getParameter("term");
 
-	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase, 10, null, true);
+	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase,
+		MonitoringAction.USER_PAGE_SIZE, null, true);
 	JSONArray responseJSON = new JSONArray();
 	for (User learner : learners) {
 	    JSONObject learnerJSON = new JSONObject();
@@ -1432,6 +1451,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    MonitoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return MonitoringAction.securityService;
+    }
+
+    private IUserManagementService getUserManagementService() {
+	if (MonitoringAction.userManagementService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    MonitoringAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
+	}
+	return MonitoringAction.userManagementService;
     }
 
     /**

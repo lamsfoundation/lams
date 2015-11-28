@@ -23,41 +23,17 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * Inteface defines Lesson DAO Methods
- * @author chris
+ * Inteface defines Role DAO Methods
  */
-public interface IRoleDAO extends IBaseDAO
-{
-	/**
-	 * 
-	 * @param userId
-	 * @param roleId
-	 * @param organisation
-	 * @return
-	 */
-	 public User getUserByOrganisationAndRole(final Integer userId, final Integer roleId, final Organisation organisation);
-	 
-	 
-	 /**
-	  * 
-	  * @param roleId
-	  * @return
-	  */
-    public Integer getCountRoleForSystem(final Integer roleId);
-    
-    /**
-     * Get number of users with roleId in orgId.
-     * @param roleId
-     * @param orgId
-     * @return
-     */
-    public Integer getCountRoleForOrg(final Integer roleId, final Integer orgId);
+public interface IRoleDAO extends IBaseDAO {
+    User getUserByOrganisationAndRole(Integer userId, Integer roleId, Organisation organisation);
 
+    Integer getCountRoleForSystem(final Integer roleId);
+
+    Integer getCountRoleForOrg(Integer roleId, Integer orgId, String searchPhrase);
 }

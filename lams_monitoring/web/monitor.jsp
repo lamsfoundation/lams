@@ -510,42 +510,38 @@
 	
 	<div id="learnerGroupDialog" class="dialogContainer">
 		<table>
-			<tr id="learnerGroupControls">
-				<td id="learnerGroupPageMinus10"
-					class="learnerGroupNav"
+			<tr>
+				<td class="navCell pageMinus10Cell"
 					title="<fmt:message key='learner.group.backward.10'/>"
 					onClick="javascript:shiftLearnerGroupList(-10)">
 						<span class="ui-icon ui-icon-seek-prev"></span>
 				</td>
-				<td id="learnerGroupPageMinus1"
-					class="learnerGroupNav"
+				<td class="navCell pageMinus1Cell"
 					title="<fmt:message key='learner.group.backward.1'/>"
 					onClick="javascript:shiftLearnerGroupList(-1)">
 					<span class="ui-icon ui-icon-arrowthick-1-w"></span>
 				</td>
-				<td id="learnerGroupPage"
+				<td class="pageCell"
 					title="<fmt:message key='learners.page'/>">
 				</td>
-				<td id="learnerGroupPagePlus1"
-					class="learnerGroupNav"
+				<td class="navCell pagePlus1Cell"
 					title="<fmt:message key='learner.group.forward.1'/>"
 					onClick="javascript:shiftLearnerGroupList(1)">
 						<span class="ui-icon ui-icon-arrowthick-1-e"></span>
 				</td>
-				<td id="learnerGroupPagePlus10" 
-					class="learnerGroupNav" 
+				<td class="navCell pagePlus10Cell" 
 					title="<fmt:message key='learner.group.forward.10'/>"
 					onClick="javascript:shiftLearnerGroupList(10)">
 						<span class="ui-icon ui-icon-seek-next"></span>
 				</td>
-				<td id="learnerGroupSort" 
-					class="learnerGroupNav" 
+				<td class="navCell sortCell" 
 					title="<fmt:message key='learner.group.sort.button'/>" 
-					onClick="javascript:sortLearnerGroupDialogList()">
+					onClick="javascript:sortLearnerGroupList()">
 						<span class="ui-icon ui-icon-triangle-1-n"></span>
 				</td>
+			</tr>
 			<tr>
-				<td colspan="6" id="learnerGroupList"></td>
+				<td colspan="6" class="dialogList"></td>
 			</tr>
 		</table>
 	</div>
@@ -553,35 +549,112 @@
 	<div id="classDialog" class="dialogContainer">
 		<table id="classDialogTable">
 			<tr>
-				<td class="dialogTitle">
-					<fmt:message key="lesson.learners"/>
-					<span id="classLearnerSortButton" class="dialogListSortButton"
-				  		  title="<fmt:message key='learner.group.sort.button'/>"
-				  		  click="javascript:sortLessonClassDialogList('classLearner')">▲</span>
-				</td>
-				<td class="dialogTitle">
-					<fmt:message key="lesson.monitors"/>
-					<span id="classMonitorSortButton" class="dialogListSortButton"
-				  		  title="<fmt:message key='learner.group.sort.button'/>"
-				  		  click="javascript:sortLessonClassDialogList('classMonitor')">▲</span>
-				</td>
-			</tr>
-			<tr>
 				<td>
-					<input type="checkbox" id="classLearnerSelectAll"
-						   onChange="javascript:selectAllInDialogList('classLearner')" />
-					<fmt:message key="learner.group.select.all"/>
+					<table id="classLearnerTable">
+						<tr>
+							<td class="dialogTitle" colspan="6">
+								<fmt:message key="lesson.learners"/>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span id="classSearchPhraseIconCell"
+									  class="ui-icon ui-icon-search"
+									  title="<fmt:message key='search.learner.textbox' />"></span>
+							</td>
+							<td colspan="4">
+								<input id="classSearchPhrase" 
+									   title="<fmt:message key='search.learner.textbox' />"/>
+							</td>
+							<td>
+								<span id="classSearchPhraseClear"
+									  class="ui-icon ui-icon-circle-close"
+									  onClick="javascript:classClearSearchPhrase()"
+									  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
+								></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="navCell pageMinus10Cell"
+								title="<fmt:message key='learner.group.backward.10'/>"
+								onClick="javascript:shiftClassList('Learner', -10)">
+									<span class="ui-icon ui-icon-seek-prev"></span>
+							</td>
+							<td class="navCell pageMinus1Cell"
+								title="<fmt:message key='learner.group.backward.1'/>"
+								onClick="javascript:shiftClassList('Learner', -1)">
+								<span class="ui-icon ui-icon-arrowthick-1-w"></span>
+							</td>
+							<td class="pageCell"
+								title="<fmt:message key='learners.page'/>">
+							</td>
+							<td class="navCell pagePlus1Cell"
+								title="<fmt:message key='learner.group.forward.1'/>"
+								onClick="javascript:shiftClassList('Learner', 1)">
+									<span class="ui-icon ui-icon-arrowthick-1-e"></span>
+							</td>
+							<td class="navCell pagePlus10Cell" 
+								title="<fmt:message key='learner.group.forward.10'/>"
+								onClick="javascript:shiftClassList('Learner', 10)">
+									<span class="ui-icon ui-icon-seek-next"></span>
+							</td>
+							<td class="navCell sortCell" 
+								title="<fmt:message key='learner.group.sort.button'/>" 
+								onClick="javascript:sortClassList('Learner')">
+									<span class="ui-icon ui-icon-triangle-1-n"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="dialogList" colspan="6">
+							</td>
+						</tr>
+					</table>
 				</td>
 				<td>
-					<input type="checkbox" id="classMonitorSelectAll"
-						   onChange="javascript:selectAllInDialogList('classMonitor')" />
-					<fmt:message key="learner.group.select.all"/>
-				</td>
-			</tr>
-			<tr>
-				<td id="classLearnerList" class="dialogList">
-				</td>
-				<td id="classMonitorList" class="dialogList">
+					<table id="classMonitorTable">
+						<tr>
+							<td class="dialogTitle" colspan="6">
+								<fmt:message key="lesson.monitors"/>
+							</td>
+						</tr>
+						<tr>
+							<td id="classMonitorSearchRow" colspan="6">&nbsp;</td>
+						</tr>
+						<tr>
+							<td class="navCell pageMinus10Cell"
+								title="<fmt:message key='learner.group.backward.10'/>"
+								onClick="javascript:shiftClassList('Monitor', -10)">
+									<span class="ui-icon ui-icon-seek-prev"></span>
+							</td>
+							<td class="navCell pageMinus1Cell"
+								title="<fmt:message key='learner.group.backward.1'/>"
+								onClick="javascript:shiftClassList('Monitor', -1)">
+								<span class="ui-icon ui-icon-arrowthick-1-w"></span>
+							</td>
+							<td class="pageCell"
+								title="<fmt:message key='learners.page'/>">
+							</td>
+							<td class="navCell pagePlus1Cell"
+								title="<fmt:message key='learner.group.forward.1'/>"
+								onClick="javascript:shiftClassList('Monitor', 1)">
+									<span class="ui-icon ui-icon-arrowthick-1-e"></span>
+							</td>
+							<td class="navCell pagePlus10Cell" 
+								title="<fmt:message key='learner.group.forward.10'/>"
+								onClick="javascript:shiftClassList('Monitor', 10)">
+									<span class="ui-icon ui-icon-seek-next"></span>
+							</td>
+							<td class="navCell sortCell" 
+								title="<fmt:message key='learner.group.sort.button'/>" 
+								onClick="javascript:sortClassList('Monitor')">
+									<span class="ui-icon ui-icon-triangle-1-n"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="dialogList" colspan="6">
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		</table>

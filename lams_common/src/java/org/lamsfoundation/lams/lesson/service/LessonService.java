@@ -123,6 +123,12 @@ public class LessonService implements ILessonService {
     }
 
     @Override
+    public Map<User, Boolean> getUsersWithLessonParticipation(Long lessonId, String role, String searchPhrase,
+	    Integer limit, Integer offset, boolean orderAscending) {
+	return lessonDAO.getUsersWithLessonParticipation(lessonId, role, searchPhrase, limit, offset, orderAscending);
+    }
+
+    @Override
     public Integer getCountLessonLearners(Long lessonId, String searchPhrase) {
 	return lessonDAO.getCountLearnersByLesson(lessonId, searchPhrase);
     }
@@ -341,6 +347,20 @@ public class LessonService implements ILessonService {
     }
 
     @Override
+    public boolean removeLearner(Long lessonId, Integer userId) {
+	Lesson lesson = lessonDAO.getLesson(lessonId);
+	LessonClass lessonClass = lesson.getLessonClass();
+	User user = (User) baseDAO.find(User.class, userId);
+	Group learnerGroup = lessonClass.getGroupBy(user);
+	boolean result = learnerGroup.getUsers().remove(user);
+
+	if (result) {
+	    lessonClassDAO.updateLessonClass(lessonClass);
+	}
+	return result;
+    }
+
+    @Override
     public void addLearners(Long lessonId, Integer[] userIds) throws LessonServiceException {
 
 	Lesson lesson = lessonDAO.getLesson(lessonId);
@@ -417,6 +437,20 @@ public class LessonService implements ILessonService {
 	    lessonClassDAO.updateLessonClass(lessonClass);
 	}
 	return ret;
+    }
+
+    @Override
+    public boolean removeStaffMember(Long lessonId, Integer userId) {
+	Lesson lesson = lessonDAO.getLesson(lessonId);
+	LessonClass lessonClass = lesson.getLessonClass();
+	User user = (User) baseDAO.find(User.class, userId);
+	Group staffGroup = lessonClass.getStaffGroup();
+	boolean result = staffGroup.getUsers().remove(user);
+
+	if (result) {
+	    lessonClassDAO.updateLessonClass(lessonClass);
+	}
+	return result;
     }
 
     @Override

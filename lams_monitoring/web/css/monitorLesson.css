@@ -43,9 +43,8 @@ input[type="checkbox"] {
 	border: none;
 }
 
-.dialogList {
+.dialogContainer .dialogList {
 	overflow: auto;
-	border: thin solid black;
 	padding: 5px;
 }
 
@@ -71,31 +70,24 @@ div.dialogListItemDisabled {
 	text-align: center;
 }
 
-.dialogListSortButton {
-	text-align: right;
-	padding-right: 3px;
-	float: right;
-	cursor: pointer;
-}
-
-#learnerGroupDialog td {
+div.dialogContainer td {
 	padding: 0;
 }
 
-#learnerGroupDialog td.learnerGroupNav {
+div.dialogContainer td.navCell {
 	padding: 5px 0;
 	cursor: pointer;
 }
 
-#learnerGroupDialog td.learnerGroupNav:hover {
+div.dialogContainer td.navCell:hover {
 	background-color: #D0E5F5;
 }
 
-td.learnerGroupNav span {
+div.dialogContainer td.navCell span {
 	margin: auto;
 }
 
-#learnerGroupPage {
+div.dialogContainer td.pageCell {
 	text-align: center;
 	width: 100px;
 }
@@ -171,18 +163,40 @@ td.contributeEntryCell a {
 	float: right;
 }
 
-#classDialogTable {
-	border-spacing: 5px 0;
+#classDialogTable td {
+	vertical-align: top;
 }
 
-#classDialogTable td {
-	width: 50%;
-	vertical-align: top;
+#classDialogTable #classMonitorSearchRow {
+	height: 23px;
+}
+
+#classDialogTable #classSearchPhrase {
+	width: 90%;
+}
+
+#classDialogTable #classSearchPhraseIcon {
+	margin-top: 2px;
+}
+
+#classDialogTable #classSearchPhraseClear {
+	visibility: hidden;
+	margin-top: 3px;
+	cursor: pointer;
 }
 
 #classDialogTable input[type="checkbox"] {
 	margin: 0 5px 0px 0px;
 	border: none;
+}
+
+#classLearnerTable {
+	width: 320px;
+	border-right: thin solid black;
+}
+
+#classMonitorTable {
+	margin-left: 10px;
 }
 
 #emailDialog {
