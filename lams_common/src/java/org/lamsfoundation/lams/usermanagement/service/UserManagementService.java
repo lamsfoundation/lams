@@ -1093,8 +1093,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public Integer getCountRoleForOrg(Integer orgId, Integer roleId) {
-	Integer count = roleDAO.getCountRoleForOrg(roleId, orgId);
+    public Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase) {
+	Integer count = roleDAO.getCountRoleForOrg(roleId, orgId, searchPhrase);
 	if (count != null) {
 	    return count;
 	} else {

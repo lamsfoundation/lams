@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.lesson.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -142,6 +143,13 @@ public interface ILessonDAO extends IBaseDAO {
      * Returns the count of all the learners that are a part of the lesson class.
      */
     Integer getCountLearnersByLesson(long lessonId, String searchPhrase);
+
+    /**
+     * Maps users from an organisation with the given role to a boolean value saying whether they participate in the
+     * given lesson.
+     */
+    Map<User, Boolean> getUsersWithLessonParticipation(Long lessonId, String role, String searchPhrase, Integer limit,
+	    Integer offset, boolean orderAscending);
 
     /**
      * Get all the preview lessons more with the creation date before the given date.
