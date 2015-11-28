@@ -271,8 +271,8 @@ public interface IUserManagementService {
      *            filters results by course name. It can be null and then doesn't affect results
      * @return
      */
-    List<Organisation> getPagedCourses(final Integer parentOrgId, final Integer typeId, final Integer stateId,
-	    int page, int size, String sortBy, String sortOrder, String searchString);
+    List<Organisation> getPagedCourses(final Integer parentOrgId, final Integer typeId, final Integer stateId, int page,
+	    int size, String sortBy, String sortOrder, String searchString);
 
     /**
      * Counts courses with specified type, state and parent course.
@@ -456,7 +456,7 @@ public interface IUserManagementService {
      * @param roleId
      * @return
      */
-    Integer getCountRoleForOrg(Integer orgId, Integer roleId);
+    Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase);
 
     /**
      * Get default flash theme of server.

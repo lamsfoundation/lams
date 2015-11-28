@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.FetchMode;
@@ -71,8 +73,16 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 
     private final static String LOAD_LEARNERS_BY_LESSON = "FROM Lesson AS lesson "
 	    + "INNER JOIN lesson.lessonClass AS lessonClass INNER JOIN lessonClass.groups AS groups "
-	    + "INNER JOIN groups.users AS users "
-	    + "WHERE lesson.id = :lessonId AND groups.groupName NOT LIKE '%Staff%'";
+	    + "INNER JOIN groups.users AS users WHERE lesson.id = :lessonId AND lessonClass.staffGroup != groups";
+
+    private final static String LOAD_USERS_WITH_LESSON_PARTICIPATION = "SELECT users.*, ug.user_id IS NOT NULL AS participant "
+	    + "FROM lams_lesson AS l "
+	    + "JOIN lams_user_organisation AS uo ON l.lesson_id = :lessonId AND l.organisation_id = uo.organisation_id "
+	    + "JOIN lams_user_organisation_role AS r ON r.role_id = :roleId AND r.user_organisation_id = uo.user_organisation_id "
+	    + "JOIN lams_user AS users ON uo.user_id = users.user_id "
+	    + "JOIN lams_grouping AS ging ON l.class_grouping_id = ging.grouping_id "
+	    + "JOIN lams_group AS g ON g.group_id <IS_STAFF> ging.staff_group_id AND g.grouping_id = ging.grouping_id "
+	    + "LEFT JOIN lams_user_group AS ug ON ug.group_id = g.group_id AND users.user_id = ug.user_id";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -199,10 +209,21 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     @Override
     public List<User> getLearnersByLesson(final Long lessonId, String searchPhrase, final Integer limit,
 	    final Integer offset, boolean orderAscending) {
-	final String queryText = LessonDAO.buildLearnersByLessonQuery(false, searchPhrase, orderAscending);
+	StringBuilder queryTextBuilder = new StringBuilder("SELECT users ").append(LessonDAO.LOAD_LEARNERS_BY_LESSON);
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryTextBuilder.append(" AND (users.firstName LIKE '%").append(token)
+			.append("%' OR users.lastName LIKE '%").append(token).append("%' OR users.login LIKE '%")
+			.append(token).append("%')");
+	    }
+	}
+	String order = orderAscending ? "ASC" : "DESC";
+	queryTextBuilder.append(" ORDER BY users.firstName ").append(order).append(", users.lastName ").append(order)
+		.append(", users.login ").append(order);
+	final String queryText = queryTextBuilder.toString();
 
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-
 	return (List<User>) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
@@ -220,7 +241,18 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 
     @Override
     public Integer getCountLearnersByLesson(final long lessonId, String searchPhrase) {
-	final String queryText = LessonDAO.buildLearnersByLessonQuery(true, searchPhrase, true);
+	StringBuilder queryTextBuilder = new StringBuilder("SELECT COUNT(*) ")
+		.append(LessonDAO.LOAD_LEARNERS_BY_LESSON);
+	if (!StringUtils.isBlank(searchPhrase)) {
+	    String[] tokens = searchPhrase.trim().split("\\s+");
+	    for (String token : tokens) {
+		queryTextBuilder.append(" AND (users.firstName LIKE '%").append(token)
+			.append("%' OR users.lastName LIKE '%").append(token).append("%' OR users.login LIKE '%")
+			.append(token).append("%')");
+	    }
+	}
+	final String queryText = queryTextBuilder.toString();
+
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
 	    @Override
@@ -426,21 +458,58 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	});
     }
 
-    private static String buildLearnersByLessonQuery(boolean count, String searchPhrase, boolean orderAscending) {
-	StringBuilder queryText = new StringBuilder("SELECT ").append(count ? "COUNT(*) " : "users ")
-		.append(LessonDAO.LOAD_LEARNERS_BY_LESSON);
+    /**
+     * Maps users from an organisation with the given role to a boolean value saying whether they participate in the
+     * given lesson.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<User, Boolean> getUsersWithLessonParticipation(final Long lessonId, final String role,
+	    String searchPhrase, final Integer limit, final Integer offset, boolean orderAscending) {
+	String queryTextBase = LessonDAO.LOAD_USERS_WITH_LESSON_PARTICIPATION;
+	// whether to exclude staff group or make it the only group that counts
+	queryTextBase = queryTextBase.replace("<IS_STAFF>", role.equals(Role.MONITOR) ? "=" : "<>");
+	StringBuilder queryTextBuilder = new StringBuilder(queryTextBase);
+	// is it a result of a search?
 	if (!StringUtils.isBlank(searchPhrase)) {
+	    queryTextBuilder.append(" WHERE");
 	    String[] tokens = searchPhrase.trim().split("\\s+");
 	    for (String token : tokens) {
-		queryText.append(" AND (users.firstName LIKE '%").append(token).append("%' OR users.lastName LIKE '%")
-			.append(token).append("%' OR users.login LIKE '%").append(token).append("%')");
+		queryTextBuilder.append(" (users.first_name LIKE '%").append(token)
+			.append("%' OR users.last_name LIKE '%").append(token).append("%' OR users.login LIKE '%")
+			.append(token).append("%') AND");
 	    }
+	    queryTextBuilder.delete(queryTextBuilder.length() - 4, queryTextBuilder.length());
 	}
-	if (!count) {
-	    String order = orderAscending ? "ASC" : "DESC";
-	    queryText.append(" ORDER BY users.firstName ").append(order).append(", users.lastName ").append(order)
-		    .append(", users.login ").append(order);
-	}
-	return queryText.toString();
+	String order = orderAscending ? "ASC" : "DESC";
+	queryTextBuilder.append(" ORDER BY users.first_name ").append(order).append(", users.last_name ").append(order)
+		.append(", users.login ").append(order);
+	final String queryText = queryTextBuilder.toString();
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	return (Map<User, Boolean>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		// the query returns User object and 0/1 value saying if he is a part of the lesson
+		Query query = session.createSQLQuery(queryText).addEntity(User.class).addScalar("participant")
+			.setLong("lessonId", lessonId)
+			.setInteger("roleId", role.equals(Role.MONITOR) ? Role.ROLE_MONITOR : Role.ROLE_LEARNER);
+		if (limit != null) {
+		    query.setMaxResults(limit);
+		}
+		if (offset != null) {
+		    query.setFirstResult(offset);
+		}
+		List<Object[]> resultQuery = query.list();
+
+		// this map keeps the insertion order
+		Map<User, Boolean> result = new LinkedHashMap<User, Boolean>();
+		// make the result easier to process
+		for (Object[] entry : resultQuery) {
+		    result.put((User) entry[0], ((Integer) entry[1]).equals(1));
+		}
+		return result;
+	    }
+	});
     }
 }

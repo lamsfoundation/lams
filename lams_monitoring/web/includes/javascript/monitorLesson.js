@@ -13,11 +13,6 @@ var originalSequenceCanvas = null,
 	sequenceInfoTimeout = 10000,
 // which learner was selected in the search box
 	sequenceSearchedLearner = null,
-// how learners in pop up lists are currently sorted
-	sortOrderAsc = {
-		classLearner : false,
-		classMonitor : false
-	},
 // container for learners' progress bars metadata
 	bars = null,
 // placeholder for single learner's progress bar and title
@@ -188,7 +183,7 @@ function initLessonTab(){
 	// sets up dialog for editing class
 	$('#classDialog').dialog({
 		'autoOpen'  : false,
-		'height'    : 360,
+		'height'    : 435,
 		'width'     : 700,
 		'minWidth'  : 700,
 		'modal'     : true,
@@ -197,65 +192,12 @@ function initLessonTab(){
 		'hide'      : 'fold',
 		'open'      : function(){
 			autoRefreshBlocked = true;
-			// reset sort order
-			sortOrderAsc['classLearner'] = false;
-			sortOrderAsc['classMonitor'] = false;
-			sortLessonClassDialogList('classLearner');
-			sortLessonClassDialogList('classMonitor');
-			colorDialogList('classLearner');
-			colorDialogList('classMonitor');
-			
-			var selectedLearners = getSelectedClassUserList('classLearnerList');
-			$(this).dialog('option', 'initSelectedLearners', selectedLearners);
 		},
 		'close' : function(){
 			autoRefreshBlocked = false;
+			refreshMonitor();
 		},
 		'buttons' : [
-		             {
-		            	'text'   : LABELS.SAVE_BUTTON,
-		            	'id'     : 'classDialogSaveButton',
-		            	'click'  : function() {
-		            		var removedLearners = [],
-		            			dialog = $(this),
-		            			initSelectedLearners = dialog.dialog('option', 'initSelectedLearners'),
-		            			learners = getSelectedClassUserList('classLearnerList'),
-		            			monitors = getSelectedClassUserList('classMonitorList');
-		            		
-		            		// check for learners removed from lesson
-		            		$.each(initSelectedLearners, function(index, selectedLearnerId){
-		            			if ($.inArray(selectedLearnerId, learners) == -1) {
-		            				removedLearners.push(selectedLearnerId);
-		            			}
-		            		});
-		            		
-		            		// check if monitoring user really wants to remove progress
-		            		if (removedLearners.length > 0 && !confirm(LABELS.LEARNER_GROUP_REMOVE_PROGRESS)){
-		            			removedLearners = [];
-		            		}
-		            		
-		            		$.ajax({
-		            			url : LAMS_URL + 'monitoring/monitoring.do',
-		            			type : 'POST',
-		            			cache : false,
-		            			data : {
-		            				'method'    	  : 'updateLessonClass',
-		            				'lessonID'  	  : lessonId,
-		            				'learners'  	  : learners.join(),
-		            				'monitors'  	  : monitors.join(),
-		            				'removedLearners' : removedLearners.join()
-		            			},
-		            			success : function() {
-		            				dialog.dialog('close');
-		            				if (removedLearners.length > 0) {
-		            					refreshMonitor();
-		            				} else {
-		            					refreshMonitor('lesson');
-		            				}
-		            			}
-		            		});
-						}
-		             },
 		             {
 		            	'text'   : LABELS.CANCEL_BUTTON,
 		            	'id'     : 'classDialogCancelButton',
@@ -265,6 +207,38 @@ function initLessonTab(){
 		             }
 		]
 	});
+	
+	
+	// search for users with the term the Monitor entered
+	$("#classSearchPhrase").autocomplete({
+			'source' : LAMS_URL + "monitoring/monitoring.do?method=autocompleteMonitoringLearners&lessonID=" + lessonId,
+			'delay'  : 700,
+			'select' : function(event, ui){
+				var phraseField = $(this);
+			    // learner's ID in ui.item.value is not used here
+				phraseField.val(ui.item.label);
+				$('#classSearchPhraseClear').css('visibility', 'visible');
+				// reset to page 1
+				$('#classDialog').dialog('option','LearnerAjaxProperties').pageNumber = 1;
+				showClassDialog('Learner');
+				return false;
+			}
+		})
+		// run the real search when the Monitor presses Enter
+		.keypress(function(e){
+			if (e.which == 13) {
+				var phraseField = $(this);
+				
+				phraseField.autocomplete("close");
+				if (phraseField.val()) {
+					$('#classSearchPhraseClear').css('visibility', 'visible');
+				}
+				// reset to page 1
+				$('#classDialog').dialog('option','LearnerAjaxProperties').pageNumber = 1;
+				showClassDialog('Learner');
+			}
+		});
+	
 	
 	// sets up dialog for emailing learners
 	$('#emailDialog').dialog({
@@ -596,7 +570,7 @@ function initSequenceTab(){
     // initialise lesson dialog
 	$('#learnerGroupDialog').dialog({
 			'autoOpen'  : false,
-			'height'    : 360,
+			'height'    : 365,
 			'width'     : 400,
 			'minWidth'  : 400,
 			'modal'     : true,
@@ -1395,112 +1369,131 @@ function sequenceClearSearchPhrase(refresh){
 /**
  * Shows Edit Class dialog for class manipulation.
  */
-function showClassDialog(){
-	var learners = [];
-	var monitors = [];
-	
+function showClassDialog(role){
 	// fetch available and already participating learners and monitors
-	$.ajax({
-		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring.do',
-		cache : false,
-		async : false,
-		data : {
-			'method'    : 'getClassMembers',
-			'lessonID'  : lessonId,
-			'role'      : 'LEARNER'
-		},
-		success : function(response) {
-			learners = response;
-		}
-	});
-	$.ajax({
-		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring.do',
-		cache : false,
-		async : false,
-		data : {
-			'method'    : 'getClassMembers',
-			'lessonID'  : lessonId,
-			'role'      : 'MONITOR'
-		},
-		success : function(response) {
-			monitors = response;
-		}
-	});
-	
-	// fill lists
-	fillClassDialogList('classLearner', learners, false);
-	fillClassDialogList('classMonitor', monitors, true);
+	if (!role) {
+		// first time show, fill both lists
+		fillClassList('Learner', false);
+		fillClassList('Monitor', true);
 
-	$('#classDialog')
-		.dialog('option',
-			{
-			 'title' : LABELS.LESSON_EDIT_CLASS
-			})
-		.dialog('open');
+		$('#classDialog')
+			.dialog('option',
+				{
+				 'title' : LABELS.LESSON_EDIT_CLASS
+				})
+			.dialog('open');
+	} else {
+		// refresh after page shift or search
+		fillClassList(role, role.toLowerCase() == 'monitor');
+	}
 }
 
 
 /**
  * Fills class member list with user information.
  */
-function fillClassDialogList(listId, users, disableCreator) {
-	var list = $('#' + listId + 'List').empty();
-	var selectAllInitState = true;
+function fillClassList(role, disableCreator) {
+	var dialog = $('#classDialog'),
+		tableID = 'class' + role + 'Table',
+		table = $('#' + tableID, dialog),
+		list = $('.dialogList', table).empty(),
+		searchPhrase = role == 'Learner' ? $('#classSearchPhrase', table).val() : null,
+		ajaxProperties = dialog.dialog('option', role + 'AjaxProperties'),
+		users = null,
+		userCount = null;
 	
+	if (!ajaxProperties) {
+		// initialise ajax config
+		ajaxProperties = {
+				dataType : 'json',
+				url : LAMS_URL + 'monitoring/monitoring.do',
+				cache : false,
+				async : false,
+				data : {
+					'method'    	 : 'getClassMembers',
+					'lessonID'  	 : lessonId,
+					'role'      	 : role.toUpperCase(),
+					'pageNumber'	 : 1,
+					'orderAscending' : true
+				}
+			};
+		
+		dialog.dialog('option', role + 'AjaxProperties', ajaxProperties);
+	}
+	
+	// add properties for this call only
+	if (searchPhrase && searchPhrase.trim() == ''){
+		searchPhrase = null;
+	}
+	ajaxProperties.data.searchPhrase = searchPhrase;
+	ajaxProperties.success = function(response) {
+		users = response.users;
+		userCount = response.userCount;
+	}
+	
+	$.ajax(ajaxProperties);
+	
+	// hide unnecessary controls
+	togglePagingCells(table, ajaxProperties.data.pageNumber, Math.ceil(userCount / 10));
+
 	$.each(users, function(userIndex, user) {
 		var checkbox = $('<input />').attr({
 	    	 'type' : 'checkbox'
 	      }).change(function(){
-	    	var itemState = $(this).is(':checked');
-	    	if (itemState) {
-	    		var selectAllState = true;
-	    		$('input', list).each(function(){
-	    			if (!$(this).is(':checked')) {
-	    				selectAllState = false;
-	    				return false;
-	    			}
-	    		});
-	    		
-	    		if (selectAllState) {
-	    			$('#' + listId + 'SelectAll').prop('checked', 'checked');
-	    		}
-	    	} else {
-	    		$('#' + listId + 'SelectAll').prop('checked', null);
-	    	}
-	    	
-	      });
+	    	editClassMember($(this));
+	      }),
+	      
+	      userDiv = $('<div />').attr({
+				'userId'  : user.id
+				})
+	          .addClass('dialogListItem')
+		      .html(getLearnerDisplayName(user))
+		      .prepend(checkbox)
+		      .appendTo(list);
+		
 		if (user.classMember) {
 			checkbox.prop('checked', 'checked');
-			if (disableCreator && user.lessonCreator) {
+			if (user.readonly) {
 				// user creator must not be deselected
 				checkbox.attr('disabled', 'disabled');
 			}
-		} else {
-			selectAllInitState = false;
 		}
-		
-		var userDiv = $('<div />').attr({
-			'userId'  : user.id
-			})
-          .addClass('dialogListItem')
-	      .html(getLearnerDisplayName(user))
-	      .prepend(checkbox)
-	      .appendTo(list);
 		
 		if (disableCreator && user.lessonCreator) {
 			userDiv.addClass('dialogListItemDisabled');
 		} else {
 			userDiv.click(function(event){
-				if (event.target == this) {
+				if (event.target == this && !checkbox.is(':disabled')) {
 		    		checkbox.prop('checked', checkbox.is(':checked') ? null : 'checked');
+		    		checkbox.change();
 		    	}
 		    })
 		}
-	});	
+	});
+	
+	colorDialogList(tableID);
+}
 
-	$('#' + listId + 'SelectAll').prop('checked', selectAllInitState ? 'checked' : null);
+/**
+ * Adds/removes a Learner/Monitor to/from the class.
+ */
+function editClassMember(userCheckbox){
+	var userID = userCheckbox.parent().attr('userId'),
+		role = userCheckbox.closest('table').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
+		add = userCheckbox.is(':checked');
+		
+	$.ajax({
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		type : 'POST',
+		cache : false,
+		data : {
+			'method'   : 'updateLessonClass',
+			'lessonID' : lessonId,
+			'userID'   : userID,
+			'role'     : role,
+			'add' 	   : add
+		}
+	});
 }
 
 
@@ -1807,6 +1800,18 @@ function learnersClearSearchPhrase(){
 	$('#learnersSearchPhraseClear').hide();
 }
 
+/**
+ * Clears previous run search for phrase.
+ */
+function classClearSearchPhrase(){
+	$('#classSearchPhrase').val('').autocomplete("close");
+	$('#classDialog').dialog('option', 'LearnerAjaxProperties').pageNumber = 1;
+	showClassDialog('Learner');
+	$('#classSearchPhraseClear').css('visibility', 'hidden');
+}
+
+
+
 
 //********** COMMON FUNCTIONS **********
 
@@ -1858,7 +1863,7 @@ function closeMonitorLessonDialog(refresh) {
  */
 function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete, allowView, allowEmail) {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
-		learnerGroupList = $('#learnerGroupList', learnerGroupDialog).empty(),
+		learnerGroupList = $('.dialogList', learnerGroupDialog).empty(),
 		// no parameters provided? just work on what we saved
 		isRefresh = ajaxProperties == null,
 		learners = null,
@@ -1913,31 +1918,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete,
 	}
 	
 	// hide unnecessary controls
-	if (pageNumber + 10 <= maxPageNumber) {
-		$('#learnerGroupPagePlus10', learnerGroupDialog).css('visibility', 'visible');
-	} else {
-		$('#learnerGroupPagePlus10', learnerGroupDialog).css('visibility', 'hidden');
-	}
-	if (pageNumber - 10 < 1) {
-		$('#learnerGroupPageMinus10', learnerGroupDialog).css('visibility', 'hidden');
-	} else {
-		$('#learnerGroupPageMinus10', learnerGroupDialog).css('visibility', 'visible');
-	}
-	if (pageNumber + 1 <= maxPageNumber) {
-		$('#learnerGroupPagePlus1', learnerGroupDialog).css('visibility', 'visible');
-	} else {
-		$('#learnerGroupPagePlus1', learnerGroupDialog).css('visibility', 'hidden');
-	}		
-	if (pageNumber - 1 < 1) {
-		$('#learnerGroupPageMinus1', learnerGroupDialog).css('visibility', 'hidden');
-	} else {
-		$('#learnerGroupPageMinus1', learnerGroupDialog).css('visibility', 'visible');
-	}
-	if (maxPageNumber < 2) {
-		$('#learnerGroupPage', learnerGroupDialog).css('visibility', 'hidden');
-	} else {
-		$('#learnerGroupPage', learnerGroupDialog).css('visibility', 'visible').text(pageNumber + ' / ' + maxPageNumber);
-	}
+	togglePagingCells(learnerGroupDialog, pageNumber, maxPageNumber);
 	
 	$.each(learners, function(learnerIndex, learner) {
 		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
@@ -1970,7 +1951,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete,
 		}
 	});
 	
-	colorDialogList('learnerGroup');
+	colorDialogList('learnerGroupDialog');
 	
 	if (!isRefresh) {
 		// show buttons depending on parameters
@@ -2021,43 +2002,12 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 
-
-/**
- * Change order of learner sorting in class dialog.
- */
-function sortLessonClassDialogList(listId) {
-	var list = $('#' + listId + 'List'),
-		items = list.children('div.dialogListItem'),
-		orderAsc = sortOrderAsc[listId];
-	if (items.length > 1) {
-		items.each(function(){
-			$(this).detach();
-		}).sort(function(a, b){
-			var keyA = $(a).text().toLowerCase();
-			var keyB = $(b).text().toLowerCase();
-			var result = keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
-			return orderAsc ? -result : result;
-		}).each(function(){
-			$(this).appendTo(list);
-		});
-		
-		var button = $('#' + listId + 'SortButton');
-		if (orderAsc) {
-			button.html('▼');
-			sortOrderAsc[listId] = false;
-		} else {
-			button.html('▲');
-			sortOrderAsc[listId] = true;
-		}
-	}
-}
-
 /**
  * Change order of learner sorting in group dialog.
  */
-function sortLearnerGroupDialogList() {
+function sortLearnerGroupList() {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
-		sortIcon = $('#learnerGroupSort span', learnerGroupDialog),
+		sortIcon = $('td.sortCell span', learnerGroupDialog),
 		ajaxProperties = learnerGroupDialog.dialog('option', 'ajaxProperties'),
 		// reverse current order after click
 		orderAscending = !ajaxProperties.data.orderAscending;
@@ -2073,18 +2023,33 @@ function sortLearnerGroupDialogList() {
 	showLearnerGroupDialog();
 }
 
-function selectAllInDialogList(listId) {
-	var targetState = $('#' + listId + 'SelectAll').is(':checked') ? 'checked' : null;
-	$('#' + listId + 'List input').each(function(){
-		if (!$(this).is(':disabled')) {
-			$(this).prop('checked', targetState);
-		}		
-	});
+/**
+ * Change order of learner sorting in Edit Class dialog.
+ */
+function sortClassList(role) {
+	var classDialog = $('#classDialog'),
+		table = $('#class' + role + 'Table', classDialog),
+		sortIcon = $('td.sortCell span', table),
+		ajaxProperties = classDialog.dialog('option', role + 'AjaxProperties'),
+		// reverse current order after click
+		orderAscending = !ajaxProperties.data.orderAscending;
+
+	if (orderAscending) {
+		sortIcon.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-n');
+	} else {
+		sortIcon.removeClass('ui-icon-triangle-1-n').addClass('ui-icon-triangle-1-s');
+	}
+
+	ajaxProperties.data.orderAscending = orderAscending;
+	// refresh the list
+	showClassDialog(role);
 }
 
-
-function colorDialogList(listId) {
-	$('#' + listId + 'List div.dialogListItem').each(function(userIndex, userDiv){
+/**
+ * Colours a list of users
+ */
+function colorDialogList(parent) {
+	$('#' + parent + ' .dialogList div.dialogListItem').each(function(userIndex, userDiv){
 		// every odd learner has different background
 		$(userDiv).css('background-color', userIndex % 2 ? '#dfeffc' : 'inherit');
 	});
@@ -2103,6 +2068,53 @@ function shiftLearnerGroupList(shift) {
 	ajaxProperties.data.pageNumber = pageNumber;
 	// refresh the dialog with new parameters
 	showLearnerGroupDialog();
+}
+
+/**
+* Change page in the Edit Class dialog.
+*/
+function shiftClassList(role, shift) {
+	var classDialog = $('#classDialog'),
+		ajaxProperties = classDialog.dialog('option', role + 'AjaxProperties'),
+		pageNumber = ajaxProperties.data.pageNumber + shift;
+	if (pageNumber < 0) {
+		pageNumber = 1;
+	}
+	ajaxProperties.data.pageNumber = pageNumber;
+	// refresh the dialog with new parameters
+	showClassDialog(role);
+}
+
+
+/**
+ * Hides/shows paging controls
+ */
+function togglePagingCells(parent, pageNumber, maxPageNumber) {
+	if (pageNumber + 10 <= maxPageNumber) {
+		$('td.pagePlus10Cell', parent).css('visibility', 'visible');
+	} else {
+		$('td.pagePlus10Cell', parent).css('visibility', 'hidden');
+	}
+	if (pageNumber - 10 < 1) {
+		$('td.pageMinus10Cell', parent).css('visibility', 'hidden');
+	} else {
+		$('td.pageMinus10Cell', parent).css('visibility', 'visible');
+	}
+	if (pageNumber + 1 <= maxPageNumber) {
+		$('td.pagePlus1Cell', parent).css('visibility', 'visible');
+	} else {
+		$('td.pagePlus1Cell', parent).css('visibility', 'hidden');
+	}		
+	if (pageNumber - 1 < 1) {
+		$('td.pageMinus1Cell', parent).css('visibility', 'hidden');
+	} else {
+		$('td.pageMinus1Cell', parent).css('visibility', 'visible');
+	}
+	if (maxPageNumber < 2) {
+		$('td.pageCell', parent).css('visibility', 'hidden');
+	} else {
+		$('td.pageCell', parent).css('visibility', 'visible').text(pageNumber + ' / ' + maxPageNumber);
+	}
 }
 
 
