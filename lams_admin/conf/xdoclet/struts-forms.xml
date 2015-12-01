@@ -83,6 +83,7 @@
 	<form-property name="serverUrl" type="java.lang.String" />
 	<form-property name="timeoutUrl" type="java.lang.String" initial="http://dummy.url/not.implemented"/>
 	<form-property name="lessonFinishUrl" type="java.lang.String"/>
+	<form-property name="extGroupsUrl" type="java.lang.String"/>
 	<form-property name="disabled" type="java.lang.Boolean" initial="false"/>
 	<form-property name="timeToLiveLoginRequestEnabled" type="java.lang.Boolean" initial="true"/>
 	<form-property name="timeToLiveLoginRequest" type="java.lang.Integer" initial="80"/>

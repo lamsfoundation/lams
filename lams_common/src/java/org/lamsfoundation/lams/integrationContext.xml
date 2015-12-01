@@ -3,6 +3,7 @@
 <beans>
 	<bean id="integrationServiceTarget" class="org.lamsfoundation.lams.integration.service.IntegrationService">
 		<property name="service"><ref bean="userManagementService"/></property>
+		<property name="lessonService"><ref bean="lessonService"/></property>
 	</bean>
 	
 	<bean id="integrationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
