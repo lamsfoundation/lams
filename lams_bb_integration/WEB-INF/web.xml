@@ -10,6 +10,10 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.UserDataServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>GroupDataServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.GroupDataServlet</servlet-class>
+  </servlet>  
+  <servlet>
     <servlet-name>LamsLearningDesignServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignServlet</servlet-class>
   </servlet>
@@ -47,6 +51,10 @@
     <servlet-name>UserDataServlet</servlet-name>
     <url-pattern>/UserData</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GroupDataServlet</servlet-name>
+    <url-pattern>/GroupData</url-pattern>
+  </servlet-mapping>  
   <servlet-mapping>
     <servlet-name>GradebookServlet</servlet-name>
     <url-pattern>/Gradebook</url-pattern>

@@ -115,3 +115,4 @@ Also supports calls to the LAMS server to use a dummy course to suit the templat
 * LDEV-3510: Previous releases were opening lessons in a new window due to a change made for LDEV-3510. 
 Now reverted back to previous behaviour with lesson loading in the same tab.
 * LKC-61: Gradebook syncing change
+* LDEV-3621: Ability to import and use groups from integrated server
