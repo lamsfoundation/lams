@@ -665,6 +665,7 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward getLessonLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
+	String searchPhrase = request.getParameter("searchPhrase");
 	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
 	if (pageNumber == null) {
 	    pageNumber = 1;
@@ -672,14 +673,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	List<User> learners = getLessonService().getLessonLearners(lessonId, null, MonitoringAction.USER_PAGE_SIZE,
-		(pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE, orderAscending);
+	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase,
+		MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE, orderAscending);
 	JSONArray learnersJSON = new JSONArray();
 	for (User learner : learners) {
 	    learnersJSON.put(WebUtil.userToJSON(learner));
 	}
 
-	Integer learnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
+	Integer learnerCount = getLessonService().getCountLessonLearners(lessonId, searchPhrase);
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("learners", learnersJSON);
@@ -1310,22 +1311,33 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Gives suggestions when a Monitor searches for a Learner in Sequence and Learners tabs.
+     * Gives suggestions when a Monitor searches for Learners and staff members.
      */
-    public ActionForward autocompleteMonitoringLearners(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward autocomplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String searchPhrase = request.getParameter("term");
+	boolean isOrganisationSearch = WebUtil.readStrParam(request, "scope").equalsIgnoreCase("organisation");
 
-	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase,
-		MonitoringAction.USER_PAGE_SIZE, null, true);
+	Collection<User> users = null;
+	if (isOrganisationSearch) {
+	    // search for Learners in the organisation
+	    Map<User, Boolean> result = getLessonService().getUsersWithLessonParticipation(lessonId, Role.LEARNER,
+		    searchPhrase, MonitoringAction.USER_PAGE_SIZE, null, true);
+	    users = result.keySet();
+	} else {
+	    // search for Learners in the lesson
+	    users = getLessonService().getLessonLearners(lessonId, searchPhrase, MonitoringAction.USER_PAGE_SIZE, null,
+		    true);
+	}
+
 	JSONArray responseJSON = new JSONArray();
-	for (User learner : learners) {
-	    JSONObject learnerJSON = new JSONObject();
-	    learnerJSON.put("label", learner.getFirstName() + " " + learner.getLastName() + " " + learner.getLogin());
-	    learnerJSON.put("value", learner.getUserId());
+	for (User user : users) {
+	    JSONObject userJSON = new JSONObject();
+	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " " + user.getLogin());
+	    userJSON.put("value", user.getUserId());
 
-	    responseJSON.put(learnerJSON);
+	    responseJSON.put(userJSON);
 	}
 
 	response.setContentType("application/json;charset=utf-8");

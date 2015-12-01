@@ -34,7 +34,8 @@ var originalSequenceCanvas = null,
 
 // double tap support
 	tapTimeout = 500,
-	lastTap = 0,
+	lastTapTime = 0,
+	lastTapTarget = null,
 
 // after first entering of branching in old SVGs layout gets a bit broken
 // setting this property fixes it
@@ -181,7 +182,7 @@ function initLessonTab(){
 	});
 	
 	// sets up dialog for editing class
-	$('#classDialog').dialog({
+	var classDialog = $('#classDialog').dialog({
 		'autoOpen'  : false,
 		'height'    : 435,
 		'width'     : 700,
@@ -209,17 +210,19 @@ function initLessonTab(){
 		            		});
 		            		
 	
-	// search for users with the term the Monitor entered
-	$("#classSearchPhrase").autocomplete({
-			'source' : LAMS_URL + "monitoring/monitoring.do?method=autocompleteMonitoringLearners&lessonID=" + lessonId,
+	// search for users in the organisation with the term the Monitor entered
+	$('.dialogSearchPhrase', classDialog).autocomplete({
+			'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=organisation&lessonID=" + lessonId,
 			'delay'  : 700,
 			'select' : function(event, ui){
-				var phraseField = $(this);
+				var phraseField = $(this),
+					dialog = $('#classDialog');
 			    // learner's ID in ui.item.value is not used here
 				phraseField.val(ui.item.label);
-				$('#classSearchPhraseClear').css('visibility', 'visible');
+				// show the "clear search phrase" button
+				$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
 				// reset to page 1
-				$('#classDialog').dialog('option','LearnerAjaxProperties').pageNumber = 1;
+				dialog.dialog('option','LearnerAjaxProperties').pageNumber = 1;
 				showClassDialog('Learner');
 				return false;
 		            		}
@@ -227,14 +230,15 @@ function initLessonTab(){
 		// run the real search when the Monitor presses Enter
 		.keypress(function(e){
 			if (e.which == 13) {
-				var phraseField = $(this);
+				var phraseField = $(this),
+					dialog = $('#classDialog');
 		            		
 				phraseField.autocomplete("close");
 				if (phraseField.val()) {
-					$('#classSearchPhraseClear').css('visibility', 'visible');
+					$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
 		            				}
 				// reset to page 1
-				$('#classDialog').dialog('option','LearnerAjaxProperties').pageNumber = 1;
+				dialog.dialog('option','LearnerAjaxProperties').pageNumber = 1;
 				showClassDialog('Learner');
 		            			}
 		            		});
@@ -274,7 +278,7 @@ function showLessonLearnersDialog() {
 		}
 	};
 	
-	showLearnerGroupDialog(ajaxProperties, LABELS.LESSON_GROUP_DIALOG_CLASS, false, false, true);
+	showLearnerGroupDialog(ajaxProperties, LABELS.LESSON_GROUP_DIALOG_CLASS, true, false, false, true);
 }
 
 /**
@@ -567,9 +571,9 @@ function updateContributeActivities(contributeActivities) {
  */
 function initSequenceTab(){
     // initialise lesson dialog
-	$('#learnerGroupDialog').dialog({
+	var learnerGroupDialog = $('#learnerGroupDialog').dialog({
 			'autoOpen'  : false,
-			'height'    : 365,
+			'height'    : 390,
 			'width'     : 400,
 			'minWidth'  : 400,
 			'modal'     : true,
@@ -591,7 +595,7 @@ function initSequenceTab(){
 			            	'id'     : 'learnerGroupDialogForceCompleteButton',
 			            	'class'  : 'learnerGroupDialogSelectableButton',
 			            	'click'  : function() {
-			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
+			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
 			            		// make sure there is only one selected learner
 			            		if (selectedLearner.length == 1) {
 			            			// go to "force complete" mode, similar to draggin user to an activity
@@ -614,7 +618,7 @@ function initSequenceTab(){
 			            	'id'     : 'learnerGroupDialogViewButton',
 			            	'class'  : 'learnerGroupDialogSelectableButton',
 			            	'click'  : function() {
-			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
+			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
 			            		if (selectedLearner.length == 1) {
 			            			// open pop up with user progress in the given activity
 			            			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
@@ -626,7 +630,7 @@ function initSequenceTab(){
 			            	'id'     : 'learnerGroupDialogEmailButton',
 			            	'class'  : 'learnerGroupDialogSelectableButton',
 			            	'click'  : function() {
-			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
+			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
 			            		if (selectedLearner.length == 1) {
 			            			showEmailDialog(selectedLearner.attr('userId'));
 			            		}
@@ -641,6 +645,40 @@ function initSequenceTab(){
 			             }
 			]
 		});
+	
+	// search for users with the term the Monitor entered
+	$('.dialogSearchPhrase', learnerGroupDialog).autocomplete({
+			'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=lesson&lessonID=" + lessonId,
+			'delay'  : 700,
+			'select' : function(event, ui){
+				var phraseField = $(this),
+					dialog = $('#learnerGroupDialog');
+			    // learner's ID in ui.item.value is not used here
+				phraseField.val(ui.item.label);
+				$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
+				// reset to page 1
+				dialog.dialog('option','ajaxProperties').pageNumber = 1;
+				showLearnerGroupDialog();
+				return false;
+			}
+		})
+		// run the real search when the Monitor presses Enter
+		.keypress(function(e){
+			if (e.which == 13) {
+				var phraseField = $(this),
+					dialog = $('#learnerGroupDialog');
+				
+				phraseField.autocomplete("close");
+				if (phraseField.val()) {
+					$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
+				}
+				// reset to page 1
+				dialog.dialog('option','ajaxProperties').pageNumber = 1;
+				showLearnerGroupDialog();
+			}
+		});
+	
+	
 	
 	// small info box on Sequence tab, activated when the tab is showed
 	$('#sequenceInfoDialog').dialog({
@@ -711,7 +749,7 @@ function initSequenceTab(){
 	
 	// search for users with the term the Monitor entered
 	$("#sequenceSearchPhrase").autocomplete( {
-		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocompleteMonitoringLearners&lessonID=" + lessonId,
+		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=lesson&lessonID=" + lessonId,
 		'delay'  : 700,
 		'select' : function(event, ui){
 			// put the learner first name, last name and login into the box
@@ -1170,7 +1208,7 @@ function addActivityIconsHandlers(activity) {
 						'flaFormat' : flaFormat
 					}
 				};
-			showLearnerGroupDialog(ajaxProperties, activity.title, true, usersViewable, false);
+			showLearnerGroupDialog(ajaxProperties, activity.title, false, true, usersViewable, false);
 		});
 	}
 	
@@ -1246,7 +1284,7 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 						'lessonID'   : lessonId
 					}
 				};
-			showLearnerGroupDialog(ajaxProperties, LABELS.LEARNER_FINISHED_DIALOG_TITLE, true, false, false);
+			showLearnerGroupDialog(ajaxProperties, LABELS.LEARNER_FINISHED_DIALOG_TITLE, false, true, false, false);
 		});
 	}
 }
@@ -1389,10 +1427,9 @@ function showClassDialog(role){
  */
 function fillClassList(role, disableCreator) {
 	var dialog = $('#classDialog'),
-		tableID = 'class' + role + 'Table',
-		table = $('#' + tableID, dialog),
+		table = $('#class' + role + 'Table', dialog),
 		list = $('.dialogList', table).empty(),
-		searchPhrase = role == 'Learner' ? $('#classSearchPhrase', table).val() : null,
+		searchPhrase = role == 'Learner' ? $('.dialogSearchPhrase', table).val().trim() : null,
 		ajaxProperties = dialog.dialog('option', role + 'AjaxProperties'),
 		users = null,
 		userCount = null;
@@ -1417,7 +1454,7 @@ function fillClassList(role, disableCreator) {
 	}
 
 	// add properties for this call only
-	if (searchPhrase && searchPhrase.trim() == ''){
+	if (!searchPhrase){
 		searchPhrase = null;
 	}
 	ajaxProperties.data.searchPhrase = searchPhrase;
@@ -1466,7 +1503,7 @@ function fillClassList(role, disableCreator) {
 		}
 	});	
 
-	colorDialogList(tableID);
+	colorDialogList(table);
 }
 
 /**
@@ -1574,7 +1611,7 @@ function resizeSequenceCanvas(width, height){
 function initLearnersTab() {
 	// search for users with the term the Monitor entered
 	$("#learnersSearchPhrase").autocomplete( {
-		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocompleteMonitoringLearners&lessonID=" + lessonId,
+		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=lesson&lessonID=" + lessonId,
 		'delay'  : 700,
 		'select' : function(event, ui){
 		    // learner's ID in ui.item.value is not used here
@@ -1677,8 +1714,8 @@ function updateLearnerProgressHeader(pageNumber) {
 	}
 	
 	// calculate currently visible page numbers
-	var pageStartIndex = pageNumber - 5;
-	var pageEndIndex = pageNumber + 5 - Math.min(pageStartIndex,0);
+	var pageStartIndex = pageNumber - 5,
+		pageEndIndex = pageNumber + 5 - Math.min(pageStartIndex,0);
 	shiftLearnerProgressPageHeader(pageStartIndex, pageEndIndex, pageNumber);
 }
 
@@ -1786,7 +1823,7 @@ function updateLearnersTab(){
 
 
 /**
- * Clears previous run search for phrase.
+ * Clears previous run search for phrase, in Learners tab.
  */
 function learnersClearSearchPhrase(){
 	$('#learnersSearchPhrase').val('').autocomplete("close");
@@ -1795,14 +1832,30 @@ function learnersClearSearchPhrase(){
 }
 
 /**
- * Clears previous run search for phrase.
+ * Clears previous run search for phrase, in Edit Class dialog.
  */
 function classClearSearchPhrase(){
-	$('#classSearchPhrase').val('').autocomplete("close");
-	$('#classDialog').dialog('option', 'LearnerAjaxProperties').pageNumber = 1;
+	var dialog = $('#classDialog');
+	$('.dialogSearchPhrase', dialog).val('').autocomplete("close");
+	dialog.dialog('option', 'LearnerAjaxProperties').data.pageNumber = 1;
 	showClassDialog('Learner');
-	$('#classSearchPhraseClear').css('visibility', 'hidden');
+	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
 }
+
+
+/**
+ * Clears previous run search for phrase, in Learner Group dialogs.
+ */
+function learnerGroupClearSearchPhrase(){
+	var dialog = $('#learnerGroupDialog');
+	$('.dialogSearchPhrase', dialog).val('').autocomplete("close");
+	dialog.dialog('option', 'ajaxProperties').data.pageNumber = 1;
+	showLearnerGroupDialog();
+	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
+}
+
+
+
 //********** COMMON FUNCTIONS **********
 
 /**
@@ -1851,7 +1904,7 @@ function closeMonitorLessonDialog(refresh) {
 /**
  * Show a dialog with user list and optional Force Complete and View Learner buttons.
  */
-function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete, allowView, allowEmail) {
+function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowForceComplete, allowView, allowEmail) {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
 		learnerGroupList = $('.dialogList', learnerGroupDialog).empty(),
 		// no parameters provided? just work on what we saved
@@ -1865,6 +1918,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete,
 		allowForceComplete = learnerGroupDialog.dialog('option', 'allowForceComplete');
 		allowView = learnerGroupDialog.dialog('option', 'allowView');
 		allowEmail = learnerGroupDialog.dialog('option', 'allowEmail');
+		allowSearch = $('#learnerGroupSearchRow', learnerGroupDialog).is(':visible');
 	} else {
 		// add few standard properties to ones provided by method calls
 		ajaxProperties = $.extend(true, ajaxProperties, {
@@ -1876,6 +1930,8 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete,
 				'orderAscending' : true
 			}
 		});
+		
+		$('#learnerGroupSearchRow', learnerGroupDialog).css('display', allowSearch ? 'table-row' : 'none');
 	}
 	
 	var pageNumber = ajaxProperties.data.pageNumber;
@@ -1886,12 +1942,15 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete,
 		learnerCount = response.learnerCount;
 	};
 	
+	var searchPhrase = allowSearch ?  $('.dialogSearchPhrase', learnerGroupDialog).val().trim() : null;
+	ajaxProperties.data.searchPhrase = searchPhrase; 
+	
 	// make the call
 	$.ajax(ajaxProperties);
 
 	// did all users already drift away to an another activity or there was an error?
 	// close the dialog and refresh the main screen
-	if (!learnerCount) {
+	if (!learnerCount && !searchPhrase) {
 		if (isRefresh) {
 			 learnerGroupDialog.dialog('close');
 		}
@@ -1902,8 +1961,8 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete,
 	// did some users already drift away to an another activity?
 	// move back until you get a page with any users
 	var maxPageNumber = Math.ceil(learnerCount / 10);
-	if (pageNumber > maxPageNumber) {
-		shiftLearnerGroup(-1);
+	if (maxPageNumber > 0 && pageNumber > maxPageNumber) {
+		shiftLearnerGroupList(-1);
 		return;
 	}
 	
@@ -1941,7 +2000,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowForceComplete,
 			}
 		});
 	
-	colorDialogList('learnerGroupDialog');
+	colorDialogList(learnerGroupDialog);
 	
 	if (!isRefresh) {
 	// show buttons depending on parameters
@@ -2040,7 +2099,7 @@ function sortClassList(role) {
  * Colours a list of users
  */
 function colorDialogList(parent) {
-	$('#' + parent + ' .dialogList div.dialogListItem').each(function(userIndex, userDiv){
+	$('.dialogList div.dialogListItem', parent).each(function(userIndex, userDiv){
 		// every odd learner has different background
 		$(userDiv).css('background-color', userIndex % 2 ? '#dfeffc' : 'inherit');
 	});
@@ -2133,12 +2192,17 @@ function appendXMLElement(tagName, attributesObject, content, target) {
 function dblTap(elem, dblClickFunction) {
  	 // double tap detection on mobile devices; it works also for mouse clicks
  	 elem.tap(function(event){
+ 	 	  // is the second click on the same element as the first one?
+ 		  if (event.currentTarget == lastTapTarget) {
+ 		  	  // was the second click quick enough after the first one?
 		  var currentTime = new Date().getTime(),
-		  	  tapLength = currentTime - lastTap;
+			  	  tapLength = currentTime - lastTapTime;
 		  if (tapLength < tapTimeout && tapLength > 0) {
 			  event.preventDefault();
 			  dblClickFunction(event);
 		  }
-		  lastTap = currentTime;
+ 		  }
+		  lastTapTime = currentTime;
+		  lastTapTarget = event.currentTarget;
 	  });
 }
