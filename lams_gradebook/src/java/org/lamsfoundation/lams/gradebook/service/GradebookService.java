@@ -1332,10 +1332,13 @@ public class GradebookService implements IGradebookService {
 	if (learnerProgress != null) {
 	    if (learnerProgress.isComplete()) {
 		status = "<img src='" + IMAGES_DIR + "/tick.png' />";
+		
 	    } else if ((learnerProgress.getAttemptedActivities() != null)
 		    && (learnerProgress.getAttemptedActivities().size() > 0)) {
-		status = "<img src='" + IMAGES_DIR + "/cog.png' title='"
-			+ StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle()) + "' />";
+		
+		String currentActivityTitle = learnerProgress.getCurrentActivity() == null ? "" : StringEscapeUtils
+			.escapeHtml(learnerProgress.getCurrentActivity().getTitle());
+		status = "<img src='" + IMAGES_DIR + "/cog.png' title='" + currentActivityTitle + "' />";
 	    }
 	}
 	return status;
