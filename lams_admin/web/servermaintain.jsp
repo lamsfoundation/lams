@@ -88,6 +88,10 @@
 		<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
 		<td><html:text property="lessonFinishUrl" size="70"/></td>
 	</tr>
+		<tr>
+		<td><fmt:message key="sysadmin.extGroupsUrl" />:</td>
+		<td><html:text property="extGroupsUrl" size="70"/></td>
+	</tr>
 </table>
 <div align="center">
 	<html:submit property="submitbutton" styleClass="button"><fmt:message key="admin.save" /></html:submit>
@@ -129,7 +133,6 @@
 				servername: "<c:set var="namev"><fmt:message key='sysadmin.servername' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 				prefix: "<c:set var="namev"><fmt:message key='sysadmin.prefix' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 				userinfoUrl: "<c:set var="namev"><fmt:message key='sysadmin.userinfoUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
-				timeoutUrl: "<c:set var="namev"><fmt:message key='sysadmin.timeoutUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 				timeoutUrl: "<c:set var="namev"><fmt:message key='sysadmin.timeoutUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 				timeToLiveLoginRequest: {
 					required: "<c:set var="namev"><fmt:message key='sysadmin.login.request.ttl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
