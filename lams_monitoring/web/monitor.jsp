@@ -510,6 +510,22 @@
 	
 	<div id="learnerGroupDialog" class="dialogContainer">
 		<table>
+			<tr id="learnerGroupSearchRow">
+				<td>
+					<span class="dialogSearchPhraseIcon ui-icon ui-icon-search"
+						  title="<fmt:message key='search.learner.textbox' />"></span>
+				</td>
+				<td colspan="4">
+					<input class="dialogSearchPhrase" 
+						   title="<fmt:message key='search.learner.textbox' />"/>
+				</td>
+				<td>
+					<span class="dialogSearchPhraseClear ui-icon ui-icon-circle-close"
+						  onClick="javascript:learnerGroupClearSearchPhrase()"
+						  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
+					></span>
+				</td>
+			</tr>
 			<tr>
 				<td class="navCell pageMinus10Cell"
 					title="<fmt:message key='learner.group.backward.10'/>"
@@ -558,17 +574,15 @@
 						</tr>
 						<tr>
 							<td>
-								<span id="classSearchPhraseIconCell"
-									  class="ui-icon ui-icon-search"
+								<span class="dialogSearchPhraseIcon ui-icon ui-icon-search"
 									  title="<fmt:message key='search.learner.textbox' />"></span>
 							</td>
 							<td colspan="4">
-								<input id="classSearchPhrase" 
+								<input class="dialogSearchPhrase" 
 									   title="<fmt:message key='search.learner.textbox' />"/>
 							</td>
 							<td>
-								<span id="classSearchPhraseClear"
-									  class="ui-icon ui-icon-circle-close"
+								<span class="dialogSearchPhraseClear ui-icon ui-icon-circle-close"
 									  onClick="javascript:classClearSearchPhrase()"
 									  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
 								></span>
