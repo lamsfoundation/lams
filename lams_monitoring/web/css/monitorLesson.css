@@ -163,7 +163,7 @@ td.contributeEntryCell a {
 	float: right;
 }
 
-#classDialogTable td {
+#classDialogTable > tbody > tr > td {
 	vertical-align: top;
 }
 
@@ -171,15 +171,15 @@ td.contributeEntryCell a {
 	height: 23px;
 }
 
-#classDialogTable #classSearchPhrase {
+.dialogSearchPhrase {
 	width: 90%;
 }
 
-#classDialogTable #classSearchPhraseIcon {
+.dialogSearchPhraseIcon {
 	margin-top: 2px;
 }
 
-#classDialogTable #classSearchPhraseClear {
+.dialogSearchPhraseClear {
 	visibility: hidden;
 	margin-top: 3px;
 	cursor: pointer;
