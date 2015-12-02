@@ -24,10 +24,12 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -271,7 +274,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	// check if any groups already exist in this grouping
 	Grouping lessonGrouping = getLessonGrouping(request, activityId, true);
 	Set<Group> lessonGroups = lessonGrouping == null ? null : lessonGrouping.getGroups();
-	if ((activityId != null) && (isExternalGroupsSelected || (orgGroupingId != null))
+	if ((activityId != null) && (lessonGrouping != null) && (isExternalGroupsSelected || (orgGroupingId != null))
 		&& isDefaultChosenGrouping(lessonGrouping)) {
 	    if (OrganisationGroupAction.log.isDebugEnabled()) {
 		OrganisationGroupAction.log.debug("Removing default groups for grouping " + orgGroupingId);
@@ -304,6 +307,27 @@ public class OrganisationGroupAction extends DispatchAction {
 	    
 	    // serialize database group objects into JSON
 	    if (extGroups != null) {
+		
+		//if there are duplicate users - put them into unassigned column
+		List<User> allDuplicates = new ArrayList<User>();
+		for (ExtGroupDTO groupA : extGroups) {
+		    for (ExtGroupDTO groupB : extGroups) {
+			List<User> usersA = groupA.getUsers();
+			List<User> usersB = groupB.getUsers();
+			
+			//proceed for non empty and different groups
+			if ((usersA != null) && (usersB != null) && !groupA.getGroupId().equals(groupB.getGroupId())) {
+			    
+			    Collection<User> duplicates = CollectionUtils.intersection(usersA, usersB);
+			    allDuplicates.addAll(duplicates);
+			    
+			    usersA.removeAll(duplicates);
+			    usersB.removeAll(duplicates);
+			}
+			
+		    }
+		}
+		
 		// sort groups by their name
 		Collections.sort(extGroups);
 		for (ExtGroupDTO extGroup : extGroups) {
