@@ -665,13 +665,18 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward getLessonLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson learners", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
 	String searchPhrase = request.getParameter("searchPhrase");
 	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
 	if (pageNumber == null) {
 	    pageNumber = 1;
 	}
 	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
-	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase,
 		MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE, orderAscending);
@@ -696,6 +701,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getClassMembers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get class members", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
 	boolean isMonitor = role.equals(Role.MONITOR);
@@ -755,6 +765,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	if (activityId == null) {
 	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	    if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson completed learners", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+		return null;
+	    }
+
 	    List<User> learners = getMonitoringService().getUsersCompletedLesson(lessonId,
 		    MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE,
 		    orderAscending);
@@ -764,8 +779,15 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    learnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
 	} else {
-	    boolean flaFormat = WebUtil.readBooleanParam(request, "flaFormat", true);
 	    Activity activity = getMonitoringService().getActivityById(activityId);
+	    Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+	    if (!getSecurityService().isLessonMonitor(lesson.getLessonId(), getUserId(), "get activity learners",
+		    false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+		return null;
+	    }
+
+	    boolean flaFormat = WebUtil.readBooleanParam(request, "flaFormat", true);
 	    Set<Long> activities = new TreeSet<Long>();
 	    activities.add(activityId);
 
@@ -802,6 +824,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward updateLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "update lesson class", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
 	int userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
 	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
 	boolean add = WebUtil.readBooleanParam(request, "add");
@@ -852,7 +879,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	String wddxPacket;
 	try {
 	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    getSecurityService().isLessonMonitor(lessonID, getUserId(), "get learning design details", true);
+	    if (!getSecurityService().isLessonMonitor(lessonID, getUserId(), "get learning design details", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+		return null;
+	    }
 	    wddxPacket = getMonitoringService().getLearningDesignDetails(lessonID);
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getLearningDesignDetails").serializeMessage();
@@ -1016,6 +1046,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLearnerProgressPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get learner progress page", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
 	String searchPhrase = request.getParameter("searchPhrase");
 	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
 	if (pageNumber == null) {
@@ -1316,6 +1351,11 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward autocomplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "autocomplete in monitoring", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
 	String searchPhrase = request.getParameter("term");
 	boolean isOrganisationSearch = WebUtil.readStrParam(request, "scope").equalsIgnoreCase("organisation");
 
