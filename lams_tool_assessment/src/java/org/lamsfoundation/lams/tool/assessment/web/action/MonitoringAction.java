@@ -332,7 +332,6 @@ public class MonitoringAction extends Action {
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    JSONArray userData = new JSONArray();
-	    userData.put(i);
 	    userData.put(userDto.getUserId());
 	    userData.put(sessionId);
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " "
@@ -492,16 +491,22 @@ public class MonitoringAction extends Action {
 	    fileName = WebUtil.readStrParam(request, "fileName");
 	    showUserNames = false;
 	}
+	List<SessionDTO> sessionDtos = (List<SessionDTO>) sessionMap.get("sessionDtos");
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	
 	if (assessment != null) {
 	    LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	    
+	    if (showUserNames) {
+		ExcelCell[][] summaryData = getSummaryData(assessment, sessionDtos);
+		dataToExport.put(service.getMessage("label.export.summary"), summaryData);
+	    }
 
 	    ExcelCell[][] questionSummaryData = getQuestionSummaryData(assessment, showUserNames);
 	    dataToExport.put(service.getMessage("lable.export.summary.by.question"), questionSummaryData);
 
-	    ExcelCell[][] userSummaryData = getUserSummaryData(assessment, showUserNames);
+	    ExcelCell[][] userSummaryData = getUserSummaryData(assessment, sessionDtos, showUserNames);
 	    dataToExport.put(service.getMessage("label.export.summary.by.user"), userSummaryData);
 
 	    // Setting the filename if it wasn't passed in the request
@@ -519,9 +524,77 @@ public class MonitoringAction extends Action {
 	
 	return null;
     }
+    
+    @SuppressWarnings("unchecked")
+    private ExcelCell[][] getSummaryData(Assessment assessment, List<SessionDTO> sessionDtos) {
+	initAssessmentService();
+	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
+
+	if (assessment == null) {
+	    return new ExcelCell[0][0];
+	}
+
+	// Adding the user results/marks summary ---------------------------
+	if (sessionDtos != null) {
+	    for (SessionDTO sessionDTO : sessionDtos) {
+		Long sessionId = sessionDTO.getSessionId();
+		
+		data.add(EMPTY_ROW);
+
+		ExcelCell[] sessionTitle = new ExcelCell[1];
+		sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
+		data.add(sessionTitle);
+
+		// Adding the question summary -------------------------------------
+		ExcelCell[] summaryRowTitle = new ExcelCell[2];
+		summaryRowTitle[0] = new ExcelCell(service.getMessage("label.monitoring.summary.user.name"), true);
+		summaryRowTitle[1] = new ExcelCell(service.getMessage("label.monitoring.summary.total"), true);
+		data.add(summaryRowTitle);
+		
+		List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
+		//in case of UseSelectLeaderToolOuput - display only one user
+		if (assessment.isUseSelectLeaderToolOuput()) {
+		    
+		    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+		    AssessmentUser groupLeader = session.getGroupLeader();
+		    
+		    if (groupLeader != null) {
+
+			float assessmentResult = service.getLastFinishedAssessmentResultGrade(assessment.getUid(),
+				groupLeader.getUserId());
+
+			AssessmentUserDTO userDto = new AssessmentUserDTO();
+			userDto.setFirstName(groupLeader.getFirstName());
+			userDto.setLastName(groupLeader.getLastName());
+			userDto.setGrade(assessmentResult);
+			userDtos.add(userDto);
+		    }
+		    
+		} else {
+		    int countSessionUsers = sessionDTO.getNumberLearners();
+		    
+		    // Get the user list from the db
+		    userDtos = service.getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
+		}
+		
+		for (AssessmentUserDTO userDto : userDtos) {
+		    ExcelCell[] userResultRow = new ExcelCell[2];
+		    userResultRow[0] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
+		    userResultRow[1] = new ExcelCell(userDto.getGrade(), false);
+		    data.add(userResultRow);
+		}
+		
+		data.add(EMPTY_ROW);
+	    }
+	}
+
+	// ------------------------------------------------------------------
+
+	return data.toArray(new ExcelCell[][] {});
+    }
 
     @SuppressWarnings("unchecked")
-    private ExcelCell[][] getUserSummaryData(Assessment assessment, boolean showUserNames) {
+    private ExcelCell[][] getUserSummaryData(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames) {
 	initAssessmentService();
 	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
 
@@ -602,10 +675,8 @@ public class MonitoringAction extends Action {
 	    //------------------------------------------------------------------
 
 	    // Adding the user results/marks summary ---------------------------
-
-	    List<SessionDTO> summaryList = service.getSessionDataForExport(assessment.getContentId());
-	    if (summaryList != null) {
-		for (SessionDTO sessionDTO : summaryList) {
+	    if (sessionDtos != null) {
+		for (SessionDTO sessionDTO : sessionDtos) {
 
 		    data.add(EMPTY_ROW);
 
