@@ -67,14 +67,10 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
 		    " FROM tl_laasse10_user user" + 
 		    " INNER JOIN tl_laasse10_session session" +
 		    " ON user.session_uid=session.uid" +
-		    " LEFT OUTER JOIN (" +
-		    " 	  SELECT * FROM ( " +
-		    "         SELECT res.user_uid, res.grade " +
-		    "         FROM tl_laasse10_assessment_result res" + 
-		    "         WHERE (res.finish_date IS NOT NULL) ORDER BY res.start_date DESC" +
-		    "     ) latest_res GROUP BY latest_res.user_uid" +
-		    " ) result" +
+		    " LEFT OUTER JOIN tl_laasse10_assessment_result result " +
 		    " ON result.user_uid = user.uid" +
+		    " 	AND result.finish_date IS NOT NULL" +
+		    " 	AND result.latest = 1" +
 		    " WHERE session.session_id = :sessionId " +
 		    " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
 		    " ORDER BY " + 
@@ -145,21 +141,14 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
 		    " INNER JOIN tl_laasse10_session session" +
 		    " ON user.session_uid=session.uid" +
 		    
-		    " LEFT OUTER JOIN (" +
-		    " 	  SELECT * FROM ( " +
-		    "         SELECT res.uid, res.user_uid " +
-		    "         FROM tl_laasse10_assessment_result res" + 
-		    "         WHERE (res.finish_date IS NOT NULL) ORDER BY res.start_date DESC" +
-		    "     ) latest_res GROUP BY latest_res.user_uid" +
-		    " ) result" +
+		    " LEFT OUTER JOIN tl_laasse10_assessment_result result " +
 		    " ON result.user_uid = user.uid" +
+		    " 	AND result.finish_date IS NOT NULL" +
+		    " 	AND result.latest = 1" +
 		    
-		    " INNER JOIN (" +
-		    "     SELECT question_res.uid, question_res.result_uid, question_res.mark " +
-		    "     FROM tl_laasse10_question_result question_res" + 
-		    "     WHERE question_res.assessment_question_uid =:questionUid" +
-		    " ) question_result" +
+		    " INNER JOIN tl_laasse10_question_result question_result " +
 		    " ON result.uid=question_result.result_uid" +
+		    " 	AND question_result.assessment_question_uid = :questionUid" +
 		    
 		    " WHERE session.session_id = :sessionId " +
 		    " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +

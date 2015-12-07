@@ -42,6 +42,8 @@ public class AssessmentResult {
     private Long uid;
     private Assessment assessment;
     private Date startDate;
+    //indicates the latest retry
+    private boolean isLatest;
     private Date finishDate;
     private AssessmentUser user;
     private Long sessionId;
@@ -103,6 +105,18 @@ public class AssessmentResult {
 
     public void setStartDate(Date startDate) {
 	this.startDate = startDate;
+    }
+    
+    /**
+     * @hibernate.property column="latest"
+     * @return
+     */
+    public boolean isLatest() {
+	return isLatest;
+    }
+
+    public void setLatest(boolean isLatest) {
+	this.isLatest = isLatest;
     }
     
     /**
