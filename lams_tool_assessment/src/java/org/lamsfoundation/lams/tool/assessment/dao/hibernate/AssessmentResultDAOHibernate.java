@@ -30,15 +30,15 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
 
-    private static final String FIND_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? ORDER BY r.startDate DESC LIMIT 1";
+    private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND r.latest=1";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
-    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
+    private static final String FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER = "FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
+	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_BY_SESSION_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=?";
@@ -46,9 +46,9 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
-    private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1 = "FROM "
+    private static final String FIND_LAST_FINISHED_BY_SESSION_AND_USER = "FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
 	    + AssessmentResult.class.getName()
@@ -56,11 +56,11 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 
     private static final String FIND_LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate DESC LIMIT 1";
+	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
-    private static final String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select r.finishDate - r.startDate FROM "
+    private static final String FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_BY_UID = "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.uid = ?";
 
@@ -84,7 +84,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 
     @Override
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_BY_ASSESSMENT_AND_USER,
+	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_LAST_BY_ASSESSMENT_AND_USER,
 		new Object[] { userId, assessmentUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -96,7 +96,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 	List list = getHibernateTemplate().find(
-		AssessmentResultDAOHibernate.FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED_LIMIT1,
+		AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER,
 		new Object[] { userId, assessmentUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -119,11 +119,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     @Override
     public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
 
-	String FIND_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
-		+ AssessmentResult.class.getName()
-		+ " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
-
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_TIME_TAKEN,
+	List list = getHibernateTemplate().find(FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN,
 		new Object[] { userId, assessmentUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -135,7 +131,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     @Override
     public AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId) {
 	List list = getHibernateTemplate().find(
-		AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER_AND_FINISHED_LIMIT1,
+		AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_SESSION_AND_USER,
 		new Object[] { userId, sessionId });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;

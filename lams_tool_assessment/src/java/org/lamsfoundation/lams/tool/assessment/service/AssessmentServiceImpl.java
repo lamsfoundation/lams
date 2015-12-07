@@ -249,6 +249,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	// copy results from leader to user in both cases (when there is no userResult yet and when if it's been changed
 	// by the leader)
 	userResult.setStartDate(leaderResult.getStartDate());
+	userResult.setLatest(leaderResult.isLatest());
 	userResult.setFinishDate(leaderResult.getFinishDate());
 	userResult.setMaximumGrade(leaderResult.getMaximumGrade());
 	userResult.setGrade(leaderResult.getGrade());
@@ -426,9 +427,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
-	// don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
-	if ((lastResult != null) && (lastResult.getFinishDate() == null)) {
-	    return;
+	if (lastResult != null) {
+	    
+	    // don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
+	    if (lastResult.getFinishDate() == null) {
+		return;
+		
+	    // mark previous attempt as not the latest anymore
+	    } else {
+		lastResult.setLatest(false);
+		assessmentResultDao.saveObject(lastResult);
+	    }
 	}
 
 	AssessmentResult result = new AssessmentResult();
@@ -436,6 +445,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	result.setUser(assessmentUser);
 	result.setSessionId(toolSessionId);
 	result.setStartDate(new Timestamp(new Date().getTime()));
+	result.setLatest(true);
 	assessmentResultDao.saveObject(result);
     }
 
