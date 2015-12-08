@@ -100,7 +100,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		Long userId = ((Number) element[0]).longValue();
 		String firstName = (String) element[1];
 		String lastName = (String) element[2];
-		float grade = ((Number) element[3]).floatValue();
+		float grade = element[3] == null ? 0 : ((Number) element[3]).floatValue();
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(userId);
@@ -180,7 +180,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		Long questionResultUid = ((Number) element[0]).longValue();
 		String firstName = (String) element[1];
 		String lastName = (String) element[2];
-		float grade = ((Number) element[3]).floatValue();
+		float grade = element[3] == null ? 0 : ((Number) element[3]).floatValue();
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setQuestionResultUid(questionResultUid);;
