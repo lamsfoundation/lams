@@ -20,14 +20,12 @@
 			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
 			    viewrecords:true,
-			   	colNames:['#',
-						'userId',
+			   	colNames:['userId',
 						'sessionId',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
 					    "<fmt:message key="label.monitoring.summary.total" />"],
 					    
 			   	colModel:[
-			   		{name:'id', index:'id', width:20, sorttype:"int", search:false},
 			   		{name:'userId', index:'userId', width:0, hidden: true},
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
 			   		{name:'userName', index:'userName', width:570, searchoptions: { clearSearch: false }},
