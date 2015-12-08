@@ -41,7 +41,6 @@
 	  				  	rowList:[10,20,30,40,50,100],
 	  				    rowNum:10,
 	  				    viewrecords:true,
-	  				    recordpos: 'left',
 	  				   	colNames:['questionResultUid',
 	  				   	     	'maxMark',
 	  		  				   	"<fmt:message key="label.monitoring.summary.user.name" />",
@@ -105,7 +104,7 @@
 		  					searchOnEnter: false
 		  				})
 	  				</c:if>
-	  				.navGrid("#pager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false, refresh:false});		
+	  				.navGrid("#pager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false, refresh:true});		
 	  				
 	  			</c:forEach>
 
