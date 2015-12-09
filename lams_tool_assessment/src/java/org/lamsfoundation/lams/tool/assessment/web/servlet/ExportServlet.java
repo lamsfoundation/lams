@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.assessment.web.servlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -181,18 +182,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	List<SessionDTO> summaryList = service.getSessionDataForExport(toolContentID);
-
-	ArrayList<QuestionSummary> questionSummaryList = new ArrayList<QuestionSummary>();
-	Set<AssessmentQuestion> questions = content.getQuestions();
-	for (AssessmentQuestion question : questions) {
-	    QuestionSummary questionSummary = service.getQuestionDataForExport(toolContentID, question.getUid());
-	    questionSummaryList.add(questionSummary);
-	}
+	Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(content);
 
 	// cache into sessionMap
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, content);
 	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, summaryList);
-	sessionMap.put(AssessmentConstants.ATTR_QUESTION_SUMMARY_LIST, questionSummaryList);
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_SUMMARY_LIST, questionSummaries.values());
 
 	// Create reflectList if reflection is enabled.
 	if (content.isReflectOnActivity()) {

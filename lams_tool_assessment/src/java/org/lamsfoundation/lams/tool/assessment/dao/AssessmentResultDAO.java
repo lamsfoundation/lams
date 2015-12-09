@@ -44,6 +44,14 @@ public interface AssessmentResultDAO extends DAO {
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
     AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId);
+    
+    /**
+     * Returns all last finished results for the specified assessment.
+     * 
+     * @param contentId
+     * @return
+     */
+    List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId);
 
     int getAssessmentResultCount(Long assessmentUid, Long userId);
 

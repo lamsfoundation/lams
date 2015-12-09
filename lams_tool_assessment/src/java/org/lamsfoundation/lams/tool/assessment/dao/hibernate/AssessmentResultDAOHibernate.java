@@ -49,6 +49,10 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     private static final String FIND_LAST_FINISHED_BY_SESSION_AND_USER = "FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) AND r.latest=1";
+    
+    private static final String FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID = "FROM "
+	    + AssessmentResult.class.getName()
+	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
 	    + AssessmentResult.class.getName()
@@ -138,6 +142,12 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	} else {
 	    return (AssessmentResult) list.get(0);
 	}
+    }
+    
+    @Override
+    public List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId) {
+	return getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID,
+		new Object[] { contentId });
     }
 
     @Override
