@@ -83,7 +83,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
 
-    public static final ExcelCell[] EMPTY_ROW = new ExcelCell[0];
 
     private IAssessmentService service;
 
@@ -464,7 +463,7 @@ public class MonitoringAction extends Action {
     }
 
     /**
-     * Export Excel format survey data.
+     * Excel Summary Export.
      * 
      * @param mapping
      * @param form
@@ -482,516 +481,41 @@ public class MonitoringAction extends Action {
 	boolean showUserNames = true;
 
 	Long contentId = null;
+	List<SessionDTO> sessionDtos;
 	if (sessionMap != null) {
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	    showUserNames = true;
+	    sessionDtos = (List<SessionDTO>) sessionMap.get("sessionDtos");
+	    
 	} else {
 	    contentId = WebUtil.readLongParam(request, "toolContentID");
 	    fileName = WebUtil.readStrParam(request, "fileName");
 	    showUserNames = false;
+	    sessionDtos = service.getSessionDtos(contentId);
 	}
-	List<SessionDTO> sessionDtos = (List<SessionDTO>) sessionMap.get("sessionDtos");
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	
-	if (assessment != null) {
-	    LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
-	    
-	    if (showUserNames) {
-		ExcelCell[][] summaryData = getSummaryData(assessment, sessionDtos);
-		dataToExport.put(service.getMessage("label.export.summary"), summaryData);
-	    }
-
-	    ExcelCell[][] questionSummaryData = getQuestionSummaryData(assessment, showUserNames);
-	    dataToExport.put(service.getMessage("lable.export.summary.by.question"), questionSummaryData);
-
-	    ExcelCell[][] userSummaryData = getUserSummaryData(assessment, sessionDtos, showUserNames);
-	    dataToExport.put(service.getMessage("label.export.summary.by.user"), userSummaryData);
-
-	    // Setting the filename if it wasn't passed in the request
-	    if (fileName == null) {
-		fileName = "assessment_" + assessment.getUid() + "_export.xlsx";
-	    }
-
-	    response.setContentType("application/x-download");
-	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-	    log.debug("Exporting assessment to a spreadsheet: " + assessment.getContentId());
-
-	    ServletOutputStream out = response.getOutputStream();
-	    ExcelUtil.createExcel(out, dataToExport, service.getMessage("label.export.exported.on"), true);
-	}
-	
-	return null;
-    }
-    
-    @SuppressWarnings("unchecked")
-    private ExcelCell[][] getSummaryData(Assessment assessment, List<SessionDTO> sessionDtos) {
-	initAssessmentService();
-	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
-
 	if (assessment == null) {
-	    return new ExcelCell[0][0];
-	}
-
-	// Adding the user results/marks summary ---------------------------
-	if (sessionDtos != null) {
-	    for (SessionDTO sessionDTO : sessionDtos) {
-		Long sessionId = sessionDTO.getSessionId();
-		
-		data.add(EMPTY_ROW);
-
-		ExcelCell[] sessionTitle = new ExcelCell[1];
-		sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
-		data.add(sessionTitle);
-
-		// Adding the question summary -------------------------------------
-		ExcelCell[] summaryRowTitle = new ExcelCell[2];
-		summaryRowTitle[0] = new ExcelCell(service.getMessage("label.monitoring.summary.user.name"), true);
-		summaryRowTitle[1] = new ExcelCell(service.getMessage("label.monitoring.summary.total"), true);
-		data.add(summaryRowTitle);
-		
-		List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
-		//in case of UseSelectLeaderToolOuput - display only one user
-		if (assessment.isUseSelectLeaderToolOuput()) {
-		    
-		    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
-		    AssessmentUser groupLeader = session.getGroupLeader();
-		    
-		    if (groupLeader != null) {
-
-			float assessmentResult = service.getLastFinishedAssessmentResultGrade(assessment.getUid(),
-				groupLeader.getUserId());
-
-			AssessmentUserDTO userDto = new AssessmentUserDTO();
-			userDto.setFirstName(groupLeader.getFirstName());
-			userDto.setLastName(groupLeader.getLastName());
-			userDto.setGrade(assessmentResult);
-			userDtos.add(userDto);
-		    }
-		    
-		} else {
-		    int countSessionUsers = sessionDTO.getNumberLearners();
-		    
-		    // Get the user list from the db
-		    userDtos = service.getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
-		}
-		
-		for (AssessmentUserDTO userDto : userDtos) {
-		    ExcelCell[] userResultRow = new ExcelCell[2];
-		    userResultRow[0] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
-		    userResultRow[1] = new ExcelCell(userDto.getGrade(), false);
-		    data.add(userResultRow);
-		}
-		
-		data.add(EMPTY_ROW);
-	    }
-	}
-
-	// ------------------------------------------------------------------
-
-	return data.toArray(new ExcelCell[][] {});
-    }
-
-    @SuppressWarnings("unchecked")
-    private ExcelCell[][] getUserSummaryData(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames) {
-	initAssessmentService();
-	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
-
-	if (assessment != null) {
-	    // Create the question summary
-	    ExcelCell[] summaryTitle = new ExcelCell[1];
-	    summaryTitle[0] = new ExcelCell(service.getMessage("label.export.user.summary"), true);
-	    data.add(summaryTitle);
-
-	    // Adding the question summary -------------------------------------
-	    ExcelCell[] summaryRowTitle = new ExcelCell[5];
-	    summaryRowTitle[0] = new ExcelCell(service.getMessage("label.monitoring.question.summary.question"), true);
-	    summaryRowTitle[1] = new ExcelCell(service.getMessage("label.authoring.basic.list.header.type"), true);
-	    summaryRowTitle[2] = new ExcelCell(service.getMessage("label.authoring.basic.penalty.factor"), true);
-	    summaryRowTitle[3] = new ExcelCell(service.getMessage("label.monitoring.question.summary.default.mark"),
-		    true);
-	    summaryRowTitle[4] = new ExcelCell(service.getMessage("label.monitoring.question.summary.average.mark"),
-		    true);
-	    data.add(summaryRowTitle);
-	    Float totalGradesPossible = new Float(0);
-	    Float totalAverage = new Float(0);
-	    if (assessment.getQuestionReferences() != null) {
-		Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
-		questionReferences.addAll(assessment.getQuestionReferences());
-
-		int randomQuestionsCount = 1;
-		for (QuestionReference questionReference : questionReferences) {
-		    
-		    String title;
-		    String questionType;
-		    Float penaltyFactor;
-		    Float averageMark = null;
-		    if (questionReference.isRandomQuestion()) {
-
-			title = service.getMessage("label.authoring.basic.type.random.question")
-				+ randomQuestionsCount++;
-			questionType = service.getMessage("label.authoring.basic.type.random.question");
-			penaltyFactor = null;
-			averageMark = null;
-		    } else {
-
-			AssessmentQuestion question = questionReference.getQuestion();
-			title = question.getTitle();
-			questionType = getQuestionTypeLanguageLabel(question.getType());
-			penaltyFactor = question.getPenaltyFactor();
-
-			QuestionSummary questionSummary = service.getQuestionDataForExport(assessment.getContentId(),
-				question.getUid());
-			if (questionSummary != null) {
-			    averageMark = questionSummary.getAverageMark();
-			    totalAverage += questionSummary.getAverageMark();
-			}
-		    }
-
-		    int maxGrade = questionReference.getDefaultGrade();
-		    totalGradesPossible += maxGrade;
-
-		    ExcelCell[] questCell = new ExcelCell[5];
-		    questCell[0] = new ExcelCell(title, false);
-		    questCell[1] = new ExcelCell(questionType, false);
-		    questCell[2] = new ExcelCell(penaltyFactor, false);
-		    questCell[3] = new ExcelCell(maxGrade, false);
-		    questCell[4] = new ExcelCell(averageMark, false);
-
-		    data.add(questCell);
-
-		}
-		
-		if (totalGradesPossible.floatValue() > 0) {
-		    ExcelCell[] totalCell = new ExcelCell[5];
-		    totalCell[2] = new ExcelCell(service.getMessage("label.monitoring.summary.total"), true);
-		    totalCell[3] = new ExcelCell(totalGradesPossible, false);
-		    totalCell[4] = new ExcelCell(totalAverage, false);
-		    data.add(totalCell);
-		}
-		data.add(EMPTY_ROW);
-	    }
-	    //------------------------------------------------------------------
-
-	    // Adding the user results/marks summary ---------------------------
-	    if (sessionDtos != null) {
-		for (SessionDTO sessionDTO : sessionDtos) {
-
-		    data.add(EMPTY_ROW);
-
-		    ExcelCell[] sessionTitle = new ExcelCell[1];
-		    sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
-		    data.add(sessionTitle);
-
-		    //List<AssessmentResult> assessmentResults = summary.getAssessmentResults();
-
-		    AssessmentSession assessmentSession = service.getAssessmentSessionBySessionId(sessionDTO
-			    .getSessionId());
-
-		    Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
-
-		    if (assessmentUsers != null) {
-
-			for (AssessmentUser assessmentUser : assessmentUsers) {
-
-			    if (showUserNames) {
-				ExcelCell[] userTitleRow = new ExcelCell[6];
-				userTitleRow[0] = new ExcelCell(service.getMessage("label.export.user.id"), true);
-				userTitleRow[1] = new ExcelCell(service
-					.getMessage("label.monitoring.user.summary.user.name"), true);
-				userTitleRow[2] = new ExcelCell(service.getMessage("label.export.date.attempted"), true);
-				userTitleRow[3] = new ExcelCell(service
-					.getMessage("label.monitoring.question.summary.question"), true);
-				userTitleRow[4] = new ExcelCell(service
-					.getMessage("label.authoring.basic.option.answer"), true);
-				userTitleRow[5] = new ExcelCell(service.getMessage("label.export.mark"), true);
-				data.add(userTitleRow);
-			    } else {
-				ExcelCell[] userTitleRow = new ExcelCell[5];
-				userTitleRow[0] = new ExcelCell(service.getMessage("label.export.user.id"), true);
-				userTitleRow[1] = new ExcelCell(service.getMessage("label.export.date.attempted"), true);
-				userTitleRow[2] = new ExcelCell(service
-					.getMessage("label.monitoring.question.summary.question"), true);
-				userTitleRow[3] = new ExcelCell(service
-					.getMessage("label.authoring.basic.option.answer"), true);
-				userTitleRow[4] = new ExcelCell(service.getMessage("label.export.mark"), true);
-				data.add(userTitleRow);
-			    }
-
-			    AssessmentResult assessmentResult = service.getLastFinishedAssessmentResult(assessment.getUid(),
-				    assessmentUser.getUserId());
-
-			    if (assessmentResult != null) {
-				Set<AssessmentQuestionResult> questionResults = assessmentResult
-					.getQuestionResults();
-
-				if (questionResults != null) {
-
-				    for (AssessmentQuestionResult questionResult : questionResults) {
-
-					if (showUserNames) {
-					    ExcelCell[] userResultRow = new ExcelCell[6];
-					    userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
-					    userResultRow[1] = new ExcelCell(assessmentUser.getFullName(), false);
-					    userResultRow[2] = new ExcelCell(assessmentResult.getStartDate(), false);
-					    userResultRow[3] = new ExcelCell(questionResult
-						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[4] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
-						    false);
-					    userResultRow[5] = new ExcelCell(questionResult.getMark(), false);
-					    data.add(userResultRow);
-					} else {
-					    ExcelCell[] userResultRow = new ExcelCell[5];
-					    userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
-					    userResultRow[1] = new ExcelCell(assessmentResult.getStartDate(), false);
-					    userResultRow[2] = new ExcelCell(questionResult
-						    .getAssessmentQuestion().getTitle(), false);
-					    userResultRow[3] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
-						    false);
-					    userResultRow[4] = new ExcelCell(questionResult.getMark(), false);
-					    data.add(userResultRow);
-					}
-				    }
-				}
-
-				ExcelCell[] userTotalRow;
-				if (showUserNames) {
-				    userTotalRow = new ExcelCell[6];
-				    userTotalRow[4] = new ExcelCell(service
-					    .getMessage("label.monitoring.summary.total"), true);
-				    userTotalRow[5] = new ExcelCell(assessmentResult.getGrade(), false);
-				} else {
-				    userTotalRow = new ExcelCell[5];
-				    userTotalRow[3] = new ExcelCell(service
-					    .getMessage("label.monitoring.summary.total"), true);
-				    userTotalRow[4] = new ExcelCell(assessmentResult.getGrade(), false);
-				}
-
-				data.add(userTotalRow);
-				data.add(EMPTY_ROW);
-			    }
-			}
-		    }
-		}
-	    }
-
-	    //------------------------------------------------------------------
-
-	}
-
-	return data.toArray(new ExcelCell[][] {});
-    }
-
-    @SuppressWarnings("unchecked")
-    private ExcelCell[][] getQuestionSummaryData(Assessment assessment, boolean showUserNames) {
-	initAssessmentService();
-	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
-
-	if (assessment != null) {
-	    // Create the question summary
-	    ExcelCell[] summaryTitle = new ExcelCell[1];
-	    summaryTitle[0] = new ExcelCell(service.getMessage("label.export.question.summary"), true);
-	    data.add(summaryTitle);
-
-	    if (assessment.getQuestions() != null) {
-		Set<AssessmentQuestion> questions = (Set<AssessmentQuestion>) assessment.getQuestions();
-
-		for (AssessmentQuestion question : questions) {
-
-		    // Adding the question summary 
-		    if (showUserNames) {
-			ExcelCell[] summaryRowTitle = new ExcelCell[10];
-			summaryRowTitle[0] = new ExcelCell(service
-				.getMessage("label.monitoring.question.summary.question"), true);
-			summaryRowTitle[1] = new ExcelCell(
-				service.getMessage("label.authoring.basic.list.header.type"), true);
-			summaryRowTitle[2] = new ExcelCell(service.getMessage("label.authoring.basic.penalty.factor"),
-				true);
-			summaryRowTitle[3] = new ExcelCell(service
-				.getMessage("label.monitoring.question.summary.default.mark"), true);
-			summaryRowTitle[4] = new ExcelCell(service.getMessage("label.export.user.id"), true);
-			summaryRowTitle[5] = new ExcelCell(service
-				.getMessage("label.monitoring.user.summary.user.name"), true);
-			summaryRowTitle[6] = new ExcelCell(service.getMessage("label.export.date.attempted"), true);
-			summaryRowTitle[7] = new ExcelCell(service.getMessage("label.authoring.basic.option.answer"),
-				true);
-			summaryRowTitle[8] = new ExcelCell(service.getMessage("label.export.time.taken"), true);
-			summaryRowTitle[9] = new ExcelCell(service.getMessage("label.export.mark"), true);
-			data.add(summaryRowTitle);
-		    } else {
-			ExcelCell[] summaryRowTitle = new ExcelCell[9];
-			summaryRowTitle[0] = new ExcelCell(service
-				.getMessage("label.monitoring.question.summary.question"), true);
-			summaryRowTitle[1] = new ExcelCell(
-				service.getMessage("label.authoring.basic.list.header.type"), true);
-			summaryRowTitle[2] = new ExcelCell(service.getMessage("label.authoring.basic.penalty.factor"),
-				true);
-			summaryRowTitle[3] = new ExcelCell(service
-				.getMessage("label.monitoring.question.summary.default.mark"), true);
-			summaryRowTitle[4] = new ExcelCell(service.getMessage("label.export.user.id"), true);
-			summaryRowTitle[5] = new ExcelCell(service.getMessage("label.export.date.attempted"), true);
-			summaryRowTitle[6] = new ExcelCell(service.getMessage("label.authoring.basic.option.answer"),
-				true);
-			summaryRowTitle[7] = new ExcelCell(service.getMessage("label.export.time.taken"), true);
-			summaryRowTitle[8] = new ExcelCell(service.getMessage("label.export.mark"), true);
-			data.add(summaryRowTitle);
-		    }
-
-		    QuestionSummary questionSummary = service.getQuestionDataForExport(assessment.getContentId(), question
-			    .getUid());
-
-		    List<List<AssessmentQuestionResult>> allResultsForQuestion = questionSummary
-			    .getQuestionResultsPerSession();
-
-		    int markCount = 0;
-		    Float markTotal = new Float(0.0);
-		    int timeTakenCount = 0;
-		    int timeTakenTotal = 0;
-		    for (List<AssessmentQuestionResult> resultList : allResultsForQuestion) {
-			for (AssessmentQuestionResult questionResult : resultList) {
-
-			    if (showUserNames) {
-				ExcelCell[] userResultRow = new ExcelCell[10];
-				userResultRow[0] = new ExcelCell(questionResult.getAssessmentQuestion().getTitle(),
-					false);
-				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(questionResult
-					.getAssessmentQuestion().getType()), false);
-				userResultRow[2] = new ExcelCell(new Float(questionResult.getAssessmentQuestion()
-					.getPenaltyFactor()), false);
-				Float maxMark = (questionResult.getMaxMark() == null) ? 0 : new Float(
-					questionResult.getMaxMark());
-				userResultRow[3] = new ExcelCell(maxMark, false);
-				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
-				userResultRow[5] = new ExcelCell(questionResult.getUser().getFullName(), false);
-				userResultRow[6] = new ExcelCell(questionResult.getFinishDate(), false);
-				userResultRow[7] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
-
-				AssessmentResult assessmentResult = questionResult.getAssessmentResult();
-				Date finishDate = questionResult.getFinishDate();
-				if (assessmentResult != null && finishDate != null) {
-				    Date startDate = assessmentResult.getStartDate();
-				    if (startDate != null) {
-					Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
-					userResultRow[8] = new ExcelCell(seconds, false);
-					timeTakenCount++;
-					timeTakenTotal += seconds;
-				    }
-				}
-
-				Float mark = questionResult.getMark();
-				if (mark != null) {
-				    userResultRow[9] = new ExcelCell(questionResult.getMark(), false);
-				    markCount++;
-				    markTotal += questionResult.getMark();
-				}
-
-				data.add(userResultRow);
-			    } else {
-				ExcelCell[] userResultRow = new ExcelCell[9];
-				userResultRow[0] = new ExcelCell(questionResult.getAssessmentQuestion().getTitle(),
-					false);
-				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(questionResult
-					.getAssessmentQuestion().getType()), false);
-				userResultRow[2] = new ExcelCell(new Float(questionResult.getAssessmentQuestion()
-					.getPenaltyFactor()), false);
-				Float maxMark = (questionResult.getMaxMark() == null) ? 0 : new Float(
-					questionResult.getMaxMark());
-				userResultRow[3] = new ExcelCell(maxMark, false);
-				userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
-				userResultRow[5] = new ExcelCell(questionResult.getFinishDate(), false);
-				userResultRow[6] = new ExcelCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
-
-				if (questionResult.getAssessmentResult() != null) {
-				    Date startDate = questionResult.getAssessmentResult().getStartDate();
-				    Date finishDate = questionResult.getFinishDate();
-				    if (startDate != null && finishDate != null) {
-					Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
-					userResultRow[7] = new ExcelCell(seconds, false);
-					timeTakenCount++;
-					timeTakenTotal += seconds;
-				    }
-				}
-
-				userResultRow[8] = new ExcelCell(questionResult.getMark(), false);
-
-				if (questionResult.getMark() != null) {
-				    markCount++;
-				    markTotal += questionResult.getMark();
-				}
-
-				data.add(userResultRow);
-			    }
-
-			}
-		    }
-
-		    // Calculating the averages
-		    ExcelCell[] averageRow;
-
-		    if (showUserNames) {
-			averageRow = new ExcelCell[10];
-
-			averageRow[7] = new ExcelCell(service.getMessage("label.export.average"), true);
-
-			if (timeTakenTotal > 0) {
-			    averageRow[8] = new ExcelCell(new Long(timeTakenTotal / timeTakenCount), false);
-			}
-			if (markTotal > 0) {
-			    Float averageMark = new Float(markTotal / markCount);
-			    averageRow[9] = new ExcelCell(averageMark, false);
-			} else {
-			    averageRow[9] = new ExcelCell(new Float(0.0), false);
-			}
-		    } else {
-			averageRow = new ExcelCell[9];
-			averageRow[6] = new ExcelCell(service.getMessage("label.export.average"), true);
-
-			if (timeTakenTotal > 0) {
-			    averageRow[7] = new ExcelCell(new Long(timeTakenTotal / timeTakenCount), false);
-			}
-			if (markTotal > 0) {
-			    Float averageMark = new Float(markTotal / markCount);
-			    averageRow[8] = new ExcelCell(averageMark, false);
-			} else {
-			    averageRow[8] = new ExcelCell(new Float(0.0), false);
-			}
-		    }
-
-		    data.add(averageRow);
-		    data.add(EMPTY_ROW);
-		}
-
-	    }
-	}
-
-	return data.toArray(new ExcelCell[][] {});
-    }
-
-    /**
-     * Used only for excell export (for getUserSummaryData() method).
-     */
-    private String getQuestionTypeLanguageLabel(short type) {
-	switch (type) {
-	case AssessmentConstants.QUESTION_TYPE_ESSAY:
-	    return "Essay";
-	case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-	    return "Matching Pairs";
-	case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-	    return "Multiple Choice";
-	case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-	    return "Numerical";
-	case AssessmentConstants.QUESTION_TYPE_ORDERING:
-	    return "Ordering";
-	case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-	    return "Short Answer";
-	case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-	    return "True/False";
-	case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-	    return "Mark Hedging";	    
-	default:
 	    return null;
 	}
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportSummary(assessment, sessionDtos,
+		showUserNames);
+
+	// Setting the filename if it wasn't passed in the request
+	if (fileName == null) {
+	    fileName = "assessment_" + assessment.getUid() + "_export.xlsx";
+	}
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+	log.debug("Exporting assessment to a spreadsheet: " + assessment.getContentId());
+
+	ServletOutputStream out = response.getOutputStream();
+	ExcelUtil.createExcel(out, dataToExport, service.getMessage("label.export.exported.on"), true);
+	
+	return null;
     }
 
     // *************************************************************************************
