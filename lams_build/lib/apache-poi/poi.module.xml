@@ -30,5 +30,7 @@
   </resources>
   <dependencies>
     <module name="javax.api"/>
+    <module name="org.apache.xmlbeans"/>
+    <module name="org.dom4j"/>
   </dependencies>
 </module>

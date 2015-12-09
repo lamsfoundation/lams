@@ -26,4 +26,7 @@
   <resources>
     <resource-root path="xmlbeans-2.3.0.jar"/>
   </resources>
+  <dependencies>
+    <module name="javax.api" />
+  </dependencies>
 </module>
