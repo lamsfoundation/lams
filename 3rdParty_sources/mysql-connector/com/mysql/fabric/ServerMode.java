@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -23,28 +23,14 @@
 
 package com.mysql.fabric;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Server modes.
- * From: lib/mysql/fabric/server.py #SERVER MODE CONSTANTS
- *       and connector-semantics.pdf
+ * From: lib/mysql/fabric/server.py #SERVER MODE CONSTANTS and connector-semantics.pdf
  */
 public enum ServerMode {
-	OFFLINE,
-	READ_ONLY,
-	READ_WRITE;
+    OFFLINE, READ_ONLY, WRITE_ONLY, READ_WRITE;
 
-	/* Lookup logic from integer constants provided by server. */
-	private static final Map<Integer, ServerMode> serverModesByConstant = new HashMap<Integer, ServerMode>();
-	static {
-		serverModesByConstant.put(0, OFFLINE);
-		serverModesByConstant.put(1, READ_ONLY);
-		serverModesByConstant.put(3, READ_WRITE);
-	}
-
-	public static ServerMode getFromConstant(Integer constant) {
-		return serverModesByConstant.get(constant);
-	}
+    public static ServerMode getFromConstant(Integer constant) {
+        return values()[constant];
+    }
 }

@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -29,94 +29,88 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-public class StandardLoadBalanceExceptionChecker implements
-		LoadBalanceExceptionChecker {
-	
-	private List<String> sqlStateList;
-	private List<Class<?>> sqlExClassList;
-	
-	public boolean shouldExceptionTriggerFailover(SQLException ex) {
-		String sqlState = ex.getSQLState();
+public class StandardLoadBalanceExceptionChecker implements LoadBalanceExceptionChecker {
 
-		if (sqlState != null) {
-			if (sqlState.startsWith("08")) {
-				// connection error
-				return true;
-			}
-			if(this.sqlStateList != null){
-				// check against SQLState list
-				for(Iterator<String> i = sqlStateList.iterator(); i.hasNext(); ){
-					if(sqlState.startsWith(i.next().toString())){
-						return true;
-					}
-				}
-			}
-		}
-		
-		// always handle CommunicationException
-		if(ex instanceof CommunicationsException){
-			return true;
-		}
-		if(this.sqlExClassList != null){
-			// check against configured class lists
-			for(Iterator<Class<?>> i = sqlExClassList.iterator(); i.hasNext(); ){
-				if(i.next().isInstance(ex)){
-					return true;
-				}
-			}
-		}
-		// no matches
-		return false;
+    private List<String> sqlStateList;
+    private List<Class<?>> sqlExClassList;
 
-	}
+    public boolean shouldExceptionTriggerFailover(SQLException ex) {
+        String sqlState = ex.getSQLState();
 
-	public void destroy() {
-		// TODO Auto-generated method stub
+        if (sqlState != null) {
+            if (sqlState.startsWith("08")) {
+                // connection error
+                return true;
+            }
+            if (this.sqlStateList != null) {
+                // check against SQLState list
+                for (Iterator<String> i = this.sqlStateList.iterator(); i.hasNext();) {
+                    if (sqlState.startsWith(i.next().toString())) {
+                        return true;
+                    }
+                }
+            }
+        }
 
-	}
+        // always handle CommunicationException
+        if (ex instanceof CommunicationsException) {
+            return true;
+        }
 
-	public void init(Connection conn, Properties props) throws SQLException {
-		configureSQLStateList(props.getProperty("loadBalanceSQLStateFailover", null));
-		configureSQLExceptionSubclassList(props.getProperty("loadBalanceSQLExceptionSubclassFailover", null));
+        if (this.sqlExClassList != null) {
+            // check against configured class lists
+            for (Iterator<Class<?>> i = this.sqlExClassList.iterator(); i.hasNext();) {
+                if (i.next().isInstance(ex)) {
+                    return true;
+                }
+            }
+        }
+        // no matches
+        return false;
+    }
 
-	}
-	
-	private void configureSQLStateList(String sqlStates){
-		if(sqlStates == null || "".equals(sqlStates)){
-			return;
-		}
-		List<String> states = StringUtils.split(sqlStates, ",", true);
-		List<String> newStates = new ArrayList<String>();
-		
-		for (String state : states){
-			if(state.length() > 0){
-				newStates.add(state);
-			}
-		}
-		if(newStates.size() > 0){
-			this.sqlStateList = newStates;
-		}
-		
-	}
-	private void configureSQLExceptionSubclassList(String sqlExClasses){
-		if(sqlExClasses == null || "".equals(sqlExClasses)){
-			return;
-		}
-		List<String> classes = StringUtils.split(sqlExClasses, ",", true);
-		List<Class<?>> newClasses = new ArrayList<Class<?>>();
-		
-		for (String exClass : classes) {
-			try{
-				Class<?> c = Class.forName(exClass);
-				newClasses.add(c);
-			} catch (Exception e){ 
-				// ignore and don't check, class doesn't exist
-			}
-		}
-		if(newClasses.size() > 0){
-			this.sqlExClassList = newClasses;
-		}
-		
-	}
+    public void destroy() {
+    }
 
+    public void init(Connection conn, Properties props) throws SQLException {
+        configureSQLStateList(props.getProperty("loadBalanceSQLStateFailover", null));
+        configureSQLExceptionSubclassList(props.getProperty("loadBalanceSQLExceptionSubclassFailover", null));
+    }
+
+    private void configureSQLStateList(String sqlStates) {
+        if (sqlStates == null || "".equals(sqlStates)) {
+            return;
+        }
+        List<String> states = StringUtils.split(sqlStates, ",", true);
+        List<String> newStates = new ArrayList<String>();
+
+        for (String state : states) {
+            if (state.length() > 0) {
+                newStates.add(state);
+            }
+        }
+        if (newStates.size() > 0) {
+            this.sqlStateList = newStates;
+        }
+    }
+
+    private void configureSQLExceptionSubclassList(String sqlExClasses) {
+        if (sqlExClasses == null || "".equals(sqlExClasses)) {
+            return;
+        }
+        List<String> classes = StringUtils.split(sqlExClasses, ",", true);
+        List<Class<?>> newClasses = new ArrayList<Class<?>>();
+
+        for (String exClass : classes) {
+            try {
+                Class<?> c = Class.forName(exClass);
+                newClasses.add(c);
+            } catch (Exception e) {
+                // ignore and don't check, class doesn't exist
+            }
+        }
+        if (newClasses.size() > 0) {
+            this.sqlExClassList = newClasses;
+        }
+    }
 }

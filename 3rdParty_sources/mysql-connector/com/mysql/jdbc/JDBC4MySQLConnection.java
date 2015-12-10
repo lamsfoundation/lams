@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -33,39 +33,40 @@ import java.sql.Struct;
 import java.util.Properties;
 import java.util.TimerTask;
 
-
 import com.mysql.jdbc.ConnectionImpl;
 import com.mysql.jdbc.Messages;
 import com.mysql.jdbc.SQLError;
 
-
 public interface JDBC4MySQLConnection extends MySQLConnection {
-	
-	public SQLXML createSQLXML() throws SQLException;
-	
-	public java.sql.Array createArrayOf(String typeName, Object[] elements) throws SQLException;
 
-	public Struct createStruct(String typeName, Object[] attributes) throws SQLException;
+    public SQLXML createSQLXML() throws SQLException;
 
-	public Properties getClientInfo() throws SQLException;
+    public java.sql.Array createArrayOf(String typeName, Object[] elements) throws SQLException;
 
-	public String getClientInfo(String name) throws SQLException;
-	
-	public boolean isValid(int timeout) throws SQLException;
-	
-	public void setClientInfo(Properties properties) throws SQLClientInfoException;
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException;
 
-	public void setClientInfo(String name, String value) throws SQLClientInfoException;
+    public Properties getClientInfo() throws SQLException;
 
-	public boolean isWrapperFor(Class<?> iface) throws SQLException;
-	
+    public String getClientInfo(String name) throws SQLException;
+
+    public boolean isValid(int timeout) throws SQLException;
+
+    public void setClientInfo(Properties properties) throws SQLClientInfoException;
+
+    public void setClientInfo(String name, String value) throws SQLClientInfoException;
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException;
+
     public <T> T unwrap(java.lang.Class<T> iface) throws java.sql.SQLException;
+
+    public Blob createBlob();
+
+    public Clob createClob();
+
+    public NClob createNClob();
     
-	public Blob createBlob();
-	
-	public Clob createClob();
-	
-	public NClob createNClob();
-	
-	
+    /*
+     * Non standard methods:
+     */
+    JDBC4ClientInfoProvider getClientInfoProviderImpl() throws SQLException;
 }

@@ -570,20 +570,7 @@
             length="1"
         </meta>    
     </property>
-    
-    <property
-        name="openidURL"
-        type="java.lang.String"
-        column="openid_url"
-        length="255"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="openid_url"
-            length="255"
-        </meta>    
-    </property>
-    
+
    <set
     name="recentlyModifiedLearningDesigns"
     table="lams_planner_recent_learning_designs"

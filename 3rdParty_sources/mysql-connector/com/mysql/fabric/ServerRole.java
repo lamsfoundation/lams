@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -23,28 +23,13 @@
 
 package com.mysql.fabric;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Server roles.
  */
 public enum ServerRole {
-	SPARE,
-	SCALE,
-	SECONDARY,
-	PRIMARY;
+    FAULTY, SPARE, SECONDARY, PRIMARY, CONFIGURING;
 
-	/* Lookup logic from integer constants provided by server. */
-	private static final Map<Integer, ServerRole> serverRolesByConstant = new HashMap<Integer, ServerRole>();
-	static {
-		serverRolesByConstant.put(0, SPARE);
-		serverRolesByConstant.put(1, SCALE);
-		serverRolesByConstant.put(2, SECONDARY);
-		serverRolesByConstant.put(3, PRIMARY);
-	}
-
-	public static ServerRole getFromConstant(Integer constant) {
-		return serverRolesByConstant.get(constant);
-	}
+    public static ServerRole getFromConstant(Integer constant) {
+        return values()[constant];
+    }
 }

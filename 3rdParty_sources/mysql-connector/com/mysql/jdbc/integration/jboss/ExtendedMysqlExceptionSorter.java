@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -28,29 +28,26 @@ import java.sql.SQLException;
 import org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter;
 
 /**
- * Exception sorter used for JBoss to make recovery of downed/stale connections
- * work more consistently.
- * 
- * @version $Id: ExtendedMysqlExceptionSorter.java,v 1.1.2.1 2005/05/13 18:58:42
- *          mmatthews Exp $
+ * Exception sorter used for JBoss to make recovery of downed/stale connections work more consistently.
  */
 public final class ExtendedMysqlExceptionSorter extends MySQLExceptionSorter {
 
-	static final long serialVersionUID = -2454582336945931069L;
+    static final long serialVersionUID = -2454582336945931069L;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.jboss.resource.adapter.jdbc.ExceptionSorter#isExceptionFatal(java.sql.SQLException)
-	 */
-	public boolean isExceptionFatal(SQLException ex) {
-		String sqlState = ex.getSQLState();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.jboss.resource.adapter.jdbc.ExceptionSorter#isExceptionFatal(java.sql.SQLException)
+     */
+    @Override
+    public boolean isExceptionFatal(SQLException ex) {
+        String sqlState = ex.getSQLState();
 
-		if (sqlState != null && sqlState.startsWith("08")) {
-			return true;
-		}
+        if (sqlState != null && sqlState.startsWith("08")) {
+            return true;
+        }
 
-		return super.isExceptionFatal(ex);
-	}
+        return super.isExceptionFatal(ex);
+    }
 
 }

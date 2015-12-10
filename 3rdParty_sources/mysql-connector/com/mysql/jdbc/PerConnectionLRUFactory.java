@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -32,65 +32,63 @@ import com.mysql.jdbc.util.LRUCache;
 
 public class PerConnectionLRUFactory implements CacheAdapterFactory<String, ParseInfo> {
 
-	public CacheAdapter<String, ParseInfo> getInstance(Connection forConnection,
-			String url, int cacheMaxSize, int maxKeySize,
-			Properties connectionProperties) throws SQLException {
+    public CacheAdapter<String, ParseInfo> getInstance(Connection forConnection, String url, int cacheMaxSize, int maxKeySize, Properties connectionProperties)
+            throws SQLException {
 
-		return new PerConnectionLRU(forConnection, cacheMaxSize, maxKeySize);
-	}
+        return new PerConnectionLRU(forConnection, cacheMaxSize, maxKeySize);
+    }
 
-	class PerConnectionLRU implements CacheAdapter<String, ParseInfo> {
-		private final int cacheSqlLimit;
-		private final LRUCache cache;
-		private final Connection conn;
-		
-		protected PerConnectionLRU(Connection forConnection, int cacheMaxSize,
-				int maxKeySize) {
-			final int cacheSize = cacheMaxSize;
-			cacheSqlLimit = maxKeySize;
-			cache = new LRUCache(cacheSize);
-			conn = forConnection;
-		}
-		
-		public ParseInfo get(String key) {
-			if (key == null || key.length() > cacheSqlLimit) {
-				return null;
-			}
+    class PerConnectionLRU implements CacheAdapter<String, ParseInfo> {
+        private final int cacheSqlLimit;
+        private final LRUCache cache;
+        private final Connection conn;
 
-			synchronized (conn.getConnectionMutex()) {
-				return (ParseInfo) cache.get(key);
-			}
-		}
+        protected PerConnectionLRU(Connection forConnection, int cacheMaxSize, int maxKeySize) {
+            final int cacheSize = cacheMaxSize;
+            this.cacheSqlLimit = maxKeySize;
+            this.cache = new LRUCache(cacheSize);
+            this.conn = forConnection;
+        }
 
-		public void put(String key, ParseInfo value) {
-			if (key == null || key.length() > cacheSqlLimit) {
-				return;
-			}
+        public ParseInfo get(String key) {
+            if (key == null || key.length() > this.cacheSqlLimit) {
+                return null;
+            }
 
-			synchronized (conn.getConnectionMutex()) {
-				cache.put(key, value);
-			}
-		}
+            synchronized (this.conn.getConnectionMutex()) {
+                return (ParseInfo) this.cache.get(key);
+            }
+        }
 
-		public void invalidate(String key) {
-			synchronized (conn.getConnectionMutex()) {
-				cache.remove(key);
-			}
-		}
+        public void put(String key, ParseInfo value) {
+            if (key == null || key.length() > this.cacheSqlLimit) {
+                return;
+            }
 
-		public void invalidateAll(Set<String> keys) {
-			synchronized (conn.getConnectionMutex()) {
-				for (String key : keys) {
-					cache.remove(key);
-				}
-			}
-			
-		}
+            synchronized (this.conn.getConnectionMutex()) {
+                this.cache.put(key, value);
+            }
+        }
 
-		public void invalidateAll() {
-			synchronized (conn.getConnectionMutex()) {
-				cache.clear();
-			}
-		}
-	}
+        public void invalidate(String key) {
+            synchronized (this.conn.getConnectionMutex()) {
+                this.cache.remove(key);
+            }
+        }
+
+        public void invalidateAll(Set<String> keys) {
+            synchronized (this.conn.getConnectionMutex()) {
+                for (String key : keys) {
+                    this.cache.remove(key);
+                }
+            }
+
+        }
+
+        public void invalidateAll() {
+            synchronized (this.conn.getConnectionMutex()) {
+                this.cache.clear();
+            }
+        }
+    }
 }

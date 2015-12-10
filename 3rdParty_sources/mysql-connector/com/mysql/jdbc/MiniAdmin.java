@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -28,81 +28,69 @@ import java.util.Properties;
 
 /**
  * Utility functions for admin functionality from Java.
- * 
- * @author Mark Matthews
  */
 public class MiniAdmin {
-	// ~ Instance fields
-	// --------------------------------------------------------
+    private Connection conn;
 
-	private Connection conn;
+    /**
+     * Create a new MiniAdmin using the given connection
+     * 
+     * @param conn
+     *            the existing connection to use.
+     * 
+     * @throws SQLException
+     *             if an error occurs
+     */
+    public MiniAdmin(java.sql.Connection conn) throws SQLException {
+        if (conn == null) {
+            throw SQLError.createSQLException(Messages.getString("MiniAdmin.0"), SQLError.SQL_STATE_GENERAL_ERROR, null);
+        }
 
-	// ~ Constructors
-	// -----------------------------------------------------------
+        if (!(conn instanceof Connection)) {
+            throw SQLError.createSQLException(Messages.getString("MiniAdmin.1"), SQLError.SQL_STATE_GENERAL_ERROR,
+                    ((com.mysql.jdbc.ConnectionImpl) conn).getExceptionInterceptor());
+        }
 
-	/**
-	 * Create a new MiniAdmin using the given connection
-	 * 
-	 * @param conn
-	 *            the existing connection to use.
-	 * 
-	 * @throws SQLException
-	 *             if an error occurs
-	 */
-	public MiniAdmin(java.sql.Connection conn) throws SQLException {
-		if (conn == null) {
-			throw SQLError.createSQLException(
-					Messages.getString("MiniAdmin.0"), SQLError.SQL_STATE_GENERAL_ERROR, null); //$NON-NLS-1$
-		}
+        this.conn = (Connection) conn;
+    }
 
-		if (!(conn instanceof Connection)) {
-			throw SQLError.createSQLException(Messages.getString("MiniAdmin.1"), //$NON-NLS-1$
-					SQLError.SQL_STATE_GENERAL_ERROR, ((com.mysql.jdbc.ConnectionImpl)conn).getExceptionInterceptor());
-		}
+    /**
+     * Create a new MiniAdmin, connecting using the given JDBC URL.
+     * 
+     * @param jdbcUrl
+     *            the JDBC URL to use
+     * 
+     * @throws SQLException
+     *             if an error occurs
+     */
+    public MiniAdmin(String jdbcUrl) throws SQLException {
+        this(jdbcUrl, new Properties());
+    }
 
-		this.conn = (Connection) conn;
-	}
+    /**
+     * Create a new MiniAdmin, connecting using the given JDBC URL and
+     * properties
+     * 
+     * @param jdbcUrl
+     *            the JDBC URL to use
+     * @param props
+     *            the properties to use when connecting
+     * 
+     * @throws SQLException
+     *             if an error occurs
+     */
+    public MiniAdmin(String jdbcUrl, Properties props) throws SQLException {
+        this.conn = (Connection) (new Driver().connect(jdbcUrl, props));
+    }
 
-	/**
-	 * Create a new MiniAdmin, connecting using the given JDBC URL.
-	 * 
-	 * @param jdbcUrl
-	 *            the JDBC URL to use
-	 * 
-	 * @throws SQLException
-	 *             if an error occurs
-	 */
-	public MiniAdmin(String jdbcUrl) throws SQLException {
-		this(jdbcUrl, new Properties());
-	}
-
-	/**
-	 * Create a new MiniAdmin, connecting using the given JDBC URL and
-	 * properties
-	 * 
-	 * @param jdbcUrl
-	 *            the JDBC URL to use
-	 * @param props
-	 *            the properties to use when connecting
-	 * 
-	 * @throws SQLException
-	 *             if an error occurs
-	 */
-	public MiniAdmin(String jdbcUrl, Properties props) throws SQLException {
-		this.conn = (Connection) (new Driver().connect(jdbcUrl, props));
-	}
-
-	// ~ Methods
-	// ----------------------------------------------------------------
-
-	/**
-	 * Shuts down the MySQL server at the other end of the connection that this
-	 * MiniAdmin was created from/for.
-	 * 
-	 * @throws SQLException
-	 *             if an error occurs
-	 */
-	public void shutdown() throws SQLException {
-		this.conn.shutdownServer();
-	}
+    /**
+     * Shuts down the MySQL server at the other end of the connection that this
+     * MiniAdmin was created from/for.
+     * 
+     * @throws SQLException
+     *             if an error occurs
+     */
+    public void shutdown() throws SQLException {
+        this.conn.shutdownServer();
+    }
 }

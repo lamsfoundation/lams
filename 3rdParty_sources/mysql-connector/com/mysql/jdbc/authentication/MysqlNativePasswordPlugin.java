@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 2012, 2014 Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -38,70 +38,61 @@ import com.mysql.jdbc.Security;
 
 /**
  * MySQL Native Password Authentication Plugin
- *
  */
 public class MysqlNativePasswordPlugin implements AuthenticationPlugin {
-	
-	private Connection connection;
-	private Properties properties;
-	private String password = null;
 
-	public void init(Connection conn, Properties props) throws SQLException {
-		this.connection = conn;
-		this.properties = props;
-	}
+    private Connection connection;
+    private String password = null;
 
-	public void destroy() {
-		this.password = null;
-	}
+    public void init(Connection conn, Properties props) throws SQLException {
+        this.connection = conn;
+    }
 
-	public String getProtocolPluginName() {
-		return "mysql_native_password";
-	}
+    public void destroy() {
+        this.password = null;
+    }
 
-	public boolean requiresConfidentiality() {
-		return false;
-	}
+    public String getProtocolPluginName() {
+        return "mysql_native_password";
+    }
 
-	public boolean isReusable() {
-		return true;
-	}
+    public boolean requiresConfidentiality() {
+        return false;
+    }
 
-	public void setAuthenticationParameters(String user, String password) {
-		this.password = password;
-	}
+    public boolean isReusable() {
+        return true;
+    }
 
-	public boolean nextAuthenticationStep(Buffer fromServer, List<Buffer> toServer) throws SQLException {
+    public void setAuthenticationParameters(String user, String password) {
+        this.password = password;
+    }
 
-		try {
-			toServer.clear();
+    public boolean nextAuthenticationStep(Buffer fromServer, List<Buffer> toServer) throws SQLException {
 
-			Buffer bresp = null;
-			
-			String pwd = this.password;
-			if (pwd == null) {
-				pwd = this.properties.getProperty("password");
-			}
-			
-			if (fromServer == null || pwd == null || pwd.length() == 0) {
-				bresp = new Buffer(new byte[0]);
-			} else {
-				bresp = new Buffer(Security.scramble411(pwd, fromServer.readString(),
-														this.connection.getPasswordCharacterEncoding()));
-			}
-			toServer.add(bresp);
-			
-		} catch (NoSuchAlgorithmException nse) {
-			throw SQLError.createSQLException(Messages.getString("MysqlIO.95") //$NON-NLS-1$
-				+Messages.getString("MysqlIO.96"), //$NON-NLS-1$
-				SQLError.SQL_STATE_GENERAL_ERROR, null);
-		} catch (UnsupportedEncodingException e) {
-			throw SQLError.createSQLException(Messages.getString("MysqlIO.95") //$NON-NLS-1$
-				+Messages.getString("MysqlIO.96"), //$NON-NLS-1$
-				SQLError.SQL_STATE_GENERAL_ERROR, null);
-		}
+        try {
+            toServer.clear();
 
-		return true;
-	}
+            Buffer bresp = null;
+
+            String pwd = this.password;
+
+            if (fromServer == null || pwd == null || pwd.length() == 0) {
+                bresp = new Buffer(new byte[0]);
+            } else {
+                bresp = new Buffer(Security.scramble411(pwd, fromServer.readString(), this.connection.getPasswordCharacterEncoding()));
+            }
+            toServer.add(bresp);
+
+        } catch (NoSuchAlgorithmException nse) {
+            throw SQLError.createSQLException(Messages.getString("MysqlIO.91") + Messages.getString("MysqlIO.92"), SQLError.SQL_STATE_GENERAL_ERROR, null);
+        } catch (UnsupportedEncodingException e) {
+            throw SQLError.createSQLException(
+                    Messages.getString("MysqlNativePasswordPlugin.1", new Object[] { this.connection.getPasswordCharacterEncoding() }),
+                    SQLError.SQL_STATE_GENERAL_ERROR, null);
+        }
+
+        return true;
+    }
 
 }

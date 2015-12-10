@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -27,21 +27,21 @@ import java.sql.SQLException;
 
 public class MySQLTransientException extends SQLException {
 
-	static final long serialVersionUID = -1885878228558607563L;
+    static final long serialVersionUID = -1885878228558607563L;
 
-	public MySQLTransientException(String reason, String SQLState, int vendorCode) {
-		super(reason, SQLState, vendorCode);
-	}
+    public MySQLTransientException(String reason, String SQLState, int vendorCode) {
+        super(reason, SQLState, vendorCode);
+    }
 
-	public MySQLTransientException(String reason, String SQLState) {
-		super(reason, SQLState);
-	}
+    public MySQLTransientException(String reason, String SQLState) {
+        super(reason, SQLState);
+    }
 
-	public MySQLTransientException(String reason) {
-		super(reason);
-	}
+    public MySQLTransientException(String reason) {
+        super(reason);
+    }
 
-	public MySQLTransientException() {
-		super();
-	}
+    public MySQLTransientException() {
+        super();
+    }
 }

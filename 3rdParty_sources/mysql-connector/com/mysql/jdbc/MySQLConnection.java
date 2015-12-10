@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -34,178 +34,178 @@ import com.mysql.jdbc.log.Log;
 import com.mysql.jdbc.profiler.ProfilerEventHandler;
 
 public interface MySQLConnection extends Connection, ConnectionProperties {
-	
-	public boolean isProxySet();
 
-	void createNewIO(boolean isForReconnect) throws SQLException;
+    public boolean isProxySet();
 
-	void dumpTestcaseQuery(String query);
+    void createNewIO(boolean isForReconnect) throws SQLException;
 
-	Connection duplicate() throws SQLException;
+    void dumpTestcaseQuery(String query);
 
-	ResultSetInternalMethods execSQL(StatementImpl callingStatement,
-			String sql, int maxRows, Buffer packet, int resultSetType,
-			int resultSetConcurrency, boolean streamResults, String catalog,
-			Field[] cachedMetadata) throws SQLException;
+    Connection duplicate() throws SQLException;
 
-	ResultSetInternalMethods execSQL(StatementImpl callingStatement,
-			String sql, int maxRows, Buffer packet, int resultSetType,
-			int resultSetConcurrency, boolean streamResults, String catalog,
-			Field[] cachedMetadata, boolean isBatch) throws SQLException;
+    ResultSetInternalMethods execSQL(StatementImpl callingStatement, String sql, int maxRows, Buffer packet, int resultSetType, int resultSetConcurrency,
+            boolean streamResults, String catalog, Field[] cachedMetadata) throws SQLException;
 
-	String extractSqlFromPacket(String possibleSqlQuery, Buffer queryPacket,
-			int endOfQueryPacketPosition) throws SQLException;
+    ResultSetInternalMethods execSQL(StatementImpl callingStatement, String sql, int maxRows, Buffer packet, int resultSetType, int resultSetConcurrency,
+            boolean streamResults, String catalog, Field[] cachedMetadata, boolean isBatch) throws SQLException;
 
-	StringBuffer generateConnectionCommentBlock(StringBuffer buf);
+    String extractSqlFromPacket(String possibleSqlQuery, Buffer queryPacket, int endOfQueryPacketPosition) throws SQLException;
 
-	int getActiveStatementCount();
+    StringBuilder generateConnectionCommentBlock(StringBuilder buf);
 
-	int getAutoIncrementIncrement();
+    int getActiveStatementCount();
 
-	CachedResultSetMetaData getCachedMetaData(String sql);
+    int getAutoIncrementIncrement();
 
-	Calendar getCalendarInstanceForSessionOrNew();
+    CachedResultSetMetaData getCachedMetaData(String sql);
 
-	Timer getCancelTimer();
+    Calendar getCalendarInstanceForSessionOrNew();
 
-	String getCharacterSetMetadata();
+    Timer getCancelTimer();
 
-	SingleByteCharsetConverter getCharsetConverter(String javaEncodingName)
-			throws SQLException;
+    String getCharacterSetMetadata();
 
-	String getCharsetNameForIndex(int charsetIndex) throws SQLException;
+    SingleByteCharsetConverter getCharsetConverter(String javaEncodingName) throws SQLException;
 
-	TimeZone getDefaultTimeZone();
+    /**
+     * @deprecated replaced by <code>getEncodingForIndex(int collationIndex)</code>
+     */
+    @Deprecated
+    String getCharsetNameForIndex(int charsetIndex) throws SQLException;
 
-	String getErrorMessageEncoding();
+    String getEncodingForIndex(int collationIndex) throws SQLException;
 
-	ExceptionInterceptor getExceptionInterceptor();
+    TimeZone getDefaultTimeZone();
 
-	String getHost();
+    String getErrorMessageEncoding();
 
-	long getId();
+    ExceptionInterceptor getExceptionInterceptor();
 
-	long getIdleFor();
+    String getHost();
 
-	MysqlIO getIO() throws SQLException;
+    long getId();
 
-	Log getLog() throws SQLException;
+    long getIdleFor();
 
-	int getMaxBytesPerChar(String javaCharsetName) throws SQLException;
+    MysqlIO getIO() throws SQLException;
 
-	int getMaxBytesPerChar(Integer charsetIndex, String javaCharsetName) throws SQLException;
+    Log getLog() throws SQLException;
 
-	java.sql.Statement getMetadataSafeStatement() throws SQLException;
+    int getMaxBytesPerChar(String javaCharsetName) throws SQLException;
 
-	int getNetBufferLength();
+    int getMaxBytesPerChar(Integer charsetIndex, String javaCharsetName) throws SQLException;
 
-	Properties getProperties();
+    java.sql.Statement getMetadataSafeStatement() throws SQLException;
 
-	boolean getRequiresEscapingEncoder();
+    int getNetBufferLength();
 
-	String getServerCharacterEncoding();
+    Properties getProperties();
 
-	int getServerMajorVersion();
+    boolean getRequiresEscapingEncoder();
 
-	int getServerMinorVersion();
+    String getServerCharset();
 
-	int getServerSubMinorVersion();
+    int getServerMajorVersion();
 
-	TimeZone getServerTimezoneTZ();
+    int getServerMinorVersion();
 
-	String getServerVariable(String variableName);
+    int getServerSubMinorVersion();
 
-	String getServerVersion();
+    TimeZone getServerTimezoneTZ();
 
-	Calendar getSessionLockedCalendar();
+    String getServerVariable(String variableName);
 
-	String getStatementComment();
+    String getServerVersion();
 
-	List<StatementInterceptorV2> getStatementInterceptorsInstances();
+    Calendar getSessionLockedCalendar();
 
-	String getURL();
+    String getStatementComment();
 
-	String getUser();
+    List<StatementInterceptorV2> getStatementInterceptorsInstances();
 
-	Calendar getUtcCalendar();
+    String getURL();
 
-	void incrementNumberOfPreparedExecutes();
+    String getUser();
 
-	void incrementNumberOfPrepares();
+    Calendar getUtcCalendar();
 
-	void incrementNumberOfResultSetsCreated();
+    void incrementNumberOfPreparedExecutes();
 
-	void initializeResultsMetadataFromCache(String sql,
-			CachedResultSetMetaData cachedMetaData,
-			ResultSetInternalMethods resultSet) throws SQLException;
+    void incrementNumberOfPrepares();
 
-	void initializeSafeStatementInterceptors() throws SQLException;
+    void incrementNumberOfResultSetsCreated();
 
-	boolean isAbonormallyLongQuery(long millisOrNanos);
+    void initializeResultsMetadataFromCache(String sql, CachedResultSetMetaData cachedMetaData, ResultSetInternalMethods resultSet) throws SQLException;
 
-	boolean isClientTzUTC();
+    void initializeSafeStatementInterceptors() throws SQLException;
 
-	boolean isCursorFetchEnabled() throws SQLException;
+    boolean isAbonormallyLongQuery(long millisOrNanos);
 
-	boolean isReadInfoMsgEnabled();
+    boolean isClientTzUTC();
 
-	public boolean isReadOnly() throws SQLException;
+    boolean isCursorFetchEnabled() throws SQLException;
 
-	public boolean isReadOnly(boolean useSessionStatus) throws SQLException;
+    boolean isReadInfoMsgEnabled();
 
-	boolean isRunningOnJDK13();
+    public boolean isReadOnly() throws SQLException;
 
-	boolean isServerTzUTC();
+    public boolean isReadOnly(boolean useSessionStatus) throws SQLException;
 
-	boolean lowerCaseTableNames();
+    boolean isRunningOnJDK13();
 
-	void pingInternal(boolean checkForClosedConnection, int timeoutMillis)
-			throws SQLException;
+    boolean isServerTzUTC();
 
-	void realClose(boolean calledExplicitly, boolean issueRollback,
-			boolean skipLocalTeardown, Throwable reason) throws SQLException;
+    boolean lowerCaseTableNames();
 
-	void recachePreparedStatement(ServerPreparedStatement pstmt)
-			throws SQLException;
+    void pingInternal(boolean checkForClosedConnection, int timeoutMillis) throws SQLException;
 
-	void decachePreparedStatement(ServerPreparedStatement pstmt)
-			throws SQLException;
+    void realClose(boolean calledExplicitly, boolean issueRollback, boolean skipLocalTeardown, Throwable reason) throws SQLException;
 
-	void registerQueryExecutionTime(long queryTimeMs);
+    void recachePreparedStatement(ServerPreparedStatement pstmt) throws SQLException;
 
-	void registerStatement(Statement stmt);
+    void decachePreparedStatement(ServerPreparedStatement pstmt) throws SQLException;
 
-	void reportNumberOfTablesAccessed(int numTablesAccessed);
+    void registerQueryExecutionTime(long queryTimeMs);
 
-	boolean serverSupportsConvertFn() throws SQLException;
+    void registerStatement(Statement stmt);
 
-	void setProxy(MySQLConnection proxy);
+    void reportNumberOfTablesAccessed(int numTablesAccessed);
 
-	void setReadInfoMsgEnabled(boolean flag);
+    boolean serverSupportsConvertFn() throws SQLException;
 
-	void setReadOnlyInternal(boolean readOnlyFlag) throws SQLException;
+    void setProxy(MySQLConnection proxy);
 
-	void shutdownServer() throws SQLException;
+    void setReadInfoMsgEnabled(boolean flag);
 
-	boolean storesLowerCaseTableName();
+    void setReadOnlyInternal(boolean readOnlyFlag) throws SQLException;
 
-	void throwConnectionClosedException() throws SQLException;
+    void shutdownServer() throws SQLException;
 
-	void transactionBegun() throws SQLException;
+    boolean storesLowerCaseTableName();
 
-	void transactionCompleted() throws SQLException;
+    void throwConnectionClosedException() throws SQLException;
 
-	void unregisterStatement(Statement stmt);
+    void transactionBegun() throws SQLException;
 
-	void unSafeStatementInterceptors() throws SQLException;
+    void transactionCompleted() throws SQLException;
 
-	boolean useAnsiQuotedIdentifiers();
+    void unregisterStatement(Statement stmt);
 
-	String getConnectionAttributes() throws SQLException;
-		
-	MySQLConnection getLoadBalanceSafeProxy();
-	
-	ProfilerEventHandler getProfilerEventHandlerInstance();
+    void unSafeStatementInterceptors() throws SQLException;
 
-	void setProfilerEventHandlerInstance(ProfilerEventHandler h);
+    boolean useAnsiQuotedIdentifiers();
+
+    String getConnectionAttributes() throws SQLException;
+
+    /**
+     * @deprecated replaced by <code>getMultiHostSafeProxy()</code>
+     */
+    @Deprecated
+    MySQLConnection getLoadBalanceSafeProxy();
+
+    MySQLConnection getMultiHostSafeProxy();
+
+    ProfilerEventHandler getProfilerEventHandlerInstance();
+
+    void setProfilerEventHandlerInstance(ProfilerEventHandler h);
 }

@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -24,37 +24,56 @@
 package com.mysql.fabric;
 
 import java.util.List;
+import java.util.Map;
+
+import com.mysql.fabric.proto.xmlrpc.ResultSetParser;
 
 /**
  * Response from Fabric request.
  */
 public class Response {
-    private boolean successful;
-    private Object returnValue;
-    private String traceString;
+    private int protocolVersion;
+    private String fabricUuid;
+    private int ttl;
+    private String errorMessage;
+    private List<Map> resultSet;
 
-    public Response(List<?> responseData) {
-		this.successful = (Boolean)responseData.get(0);
-		if (this.successful) {
-			this.returnValue = responseData.get(2);
-		} else {
-			this.traceString = (String)responseData.get(1);
-			String trace[] = traceString.split("\n");
-			// python uses the second from the end of the array
-			this.returnValue = trace[trace.length-1];
-		}
-		// "details" ignored
+    public Response(List responseData) throws FabricCommunicationException {
+        // parser of protocol version 1 as defined by WL#7760
+        this.protocolVersion = (Integer) responseData.get(0);
+        if (this.protocolVersion != 1) {
+            throw new FabricCommunicationException("Unknown protocol version: " + this.protocolVersion);
+        }
+        this.fabricUuid = (String) responseData.get(1);
+        this.ttl = (Integer) responseData.get(2);
+        this.errorMessage = (String) responseData.get(3);
+        if ("".equals(this.errorMessage)) {
+            this.errorMessage = null;
+        }
+        List resultSets = (List) responseData.get(4);
+        if (resultSets.size() > 0) {
+            Map<String, ?> resultData = (Map<String, ?>) resultSets.get(0);
+            this.resultSet = new ResultSetParser().parse((Map) resultData.get("info"), (List<List>) resultData.get("rows"));
+        }
     }
 
-    public boolean isSuccessful() {
-		return this.successful;
+    public int getProtocolVersion() {
+        return this.protocolVersion;
     }
 
-    public Object getReturnValue() {
-		return this.returnValue;
+    public String getFabricUuid() {
+        return this.fabricUuid;
     }
 
-	public String getTraceString() {
-		return this.traceString;
-	}
+    public int getTtl() {
+        return this.ttl;
+    }
+
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
+
+    public List<Map> getResultSet() {
+        return this.resultSet;
+    }
 }

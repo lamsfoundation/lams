@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -28,29 +28,30 @@ import java.util.List;
 
 public class Struct {
 
-	protected List<Member> member;
+    protected List<Member> member;
 
-	public List<Member> getMember() {
-		if (member == null) {
-			member = new ArrayList<Member>();
-		}
-		return this.member;
-	}
+    public List<Member> getMember() {
+        if (this.member == null) {
+            this.member = new ArrayList<Member>();
+        }
+        return this.member;
+    }
 
-	public void addMember(Member m) {
-		getMember().add(m);
-	}
+    public void addMember(Member m) {
+        getMember().add(m);
+    }
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		if (this.member != null) {
-			sb.append("<struct>");
-			for (int i = 0; i < this.member.size(); i++) {
-				sb.append(this.member.get(i).toString());
-			}
-			sb.append("</struct>");
-		}
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (this.member != null) {
+            sb.append("<struct>");
+            for (int i = 0; i < this.member.size(); i++) {
+                sb.append(this.member.get(i).toString());
+            }
+            sb.append("</struct>");
+        }
+        return sb.toString();
+    }
 
 }

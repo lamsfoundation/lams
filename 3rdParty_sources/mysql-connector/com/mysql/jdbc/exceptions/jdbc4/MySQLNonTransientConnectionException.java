@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -25,22 +25,21 @@ package com.mysql.jdbc.exceptions.jdbc4;
 
 import java.sql.SQLNonTransientConnectionException;
 
-public class MySQLNonTransientConnectionException extends
-		SQLNonTransientConnectionException {
+public class MySQLNonTransientConnectionException extends SQLNonTransientConnectionException {
 
-	public MySQLNonTransientConnectionException() {
-		super();
-	}
+    public MySQLNonTransientConnectionException() {
+        super();
+    }
 
-	public MySQLNonTransientConnectionException(String reason, String SQLState, int vendorCode) {
-		super(reason, SQLState, vendorCode);
-	}
+    public MySQLNonTransientConnectionException(String reason, String SQLState, int vendorCode) {
+        super(reason, SQLState, vendorCode);
+    }
 
-	public MySQLNonTransientConnectionException(String reason, String SQLState) {
-		super(reason, SQLState);
-	}
+    public MySQLNonTransientConnectionException(String reason, String SQLState) {
+        super(reason, SQLState);
+    }
 
-	public MySQLNonTransientConnectionException(String reason) {
-		super(reason);
-	}
+    public MySQLNonTransientConnectionException(String reason) {
+        super(reason);
+    }
 }

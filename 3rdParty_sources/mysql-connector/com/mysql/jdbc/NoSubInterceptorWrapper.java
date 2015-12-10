@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -27,53 +27,47 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Wraps statement interceptors during driver startup so that they don't produce
- * different result sets than we expect.
+ * Wraps statement interceptors during driver startup so that they don't produce different result sets than we expect.
  */
 public class NoSubInterceptorWrapper implements StatementInterceptorV2 {
 
-	private final StatementInterceptorV2 underlyingInterceptor;
-	
-	public NoSubInterceptorWrapper(StatementInterceptorV2 underlyingInterceptor) {
-		if (underlyingInterceptor == null) {
-			throw new RuntimeException("Interceptor to be wrapped can not be NULL");
-		}
-		
-		this.underlyingInterceptor = underlyingInterceptor;
-	}
-	
-	public void destroy() {
-		underlyingInterceptor.destroy();
-	}
+    private final StatementInterceptorV2 underlyingInterceptor;
 
-	public boolean executeTopLevelOnly() {
-		return underlyingInterceptor.executeTopLevelOnly();
-	}
+    public NoSubInterceptorWrapper(StatementInterceptorV2 underlyingInterceptor) {
+        if (underlyingInterceptor == null) {
+            throw new RuntimeException("Interceptor to be wrapped can not be NULL");
+        }
 
-	public void init(Connection conn, Properties props) throws SQLException {
-		underlyingInterceptor.init(conn, props);
-	}
+        this.underlyingInterceptor = underlyingInterceptor;
+    }
 
-	public ResultSetInternalMethods postProcess(String sql,
-			Statement interceptedStatement,
-			ResultSetInternalMethods originalResultSet, Connection connection,
-			int warningCount, boolean noIndexUsed, boolean noGoodIndexUsed,
-			SQLException statementException) throws SQLException {
-		underlyingInterceptor.postProcess(sql, interceptedStatement, originalResultSet, 
-				connection, warningCount, noIndexUsed, noGoodIndexUsed, statementException);
-		
-		return null; // don't allow result set substitution
-	}
+    public void destroy() {
+        this.underlyingInterceptor.destroy();
+    }
 
-	public ResultSetInternalMethods preProcess(String sql,
-			Statement interceptedStatement, Connection connection)
-			throws SQLException {
-		underlyingInterceptor.preProcess(sql, interceptedStatement, connection);
-		
-		return null; // don't allow result set substitution
-	}
-	
-	public StatementInterceptorV2 getUnderlyingInterceptor() {
-		return underlyingInterceptor;
-	}
+    public boolean executeTopLevelOnly() {
+        return this.underlyingInterceptor.executeTopLevelOnly();
+    }
+
+    public void init(Connection conn, Properties props) throws SQLException {
+        this.underlyingInterceptor.init(conn, props);
+    }
+
+    public ResultSetInternalMethods postProcess(String sql, Statement interceptedStatement, ResultSetInternalMethods originalResultSet, Connection connection,
+            int warningCount, boolean noIndexUsed, boolean noGoodIndexUsed, SQLException statementException) throws SQLException {
+        this.underlyingInterceptor.postProcess(sql, interceptedStatement, originalResultSet, connection, warningCount, noIndexUsed, noGoodIndexUsed,
+                statementException);
+
+        return null; // don't allow result set substitution
+    }
+
+    public ResultSetInternalMethods preProcess(String sql, Statement interceptedStatement, Connection connection) throws SQLException {
+        this.underlyingInterceptor.preProcess(sql, interceptedStatement, connection);
+
+        return null; // don't allow result set substitution
+    }
+
+    public StatementInterceptorV2 getUnderlyingInterceptor() {
+        return this.underlyingInterceptor;
+    }
 }

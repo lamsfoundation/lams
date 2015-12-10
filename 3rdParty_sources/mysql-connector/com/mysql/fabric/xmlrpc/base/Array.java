@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -25,34 +25,34 @@ package com.mysql.fabric.xmlrpc.base;
 
 public class Array {
 
-	protected Data data;
+    protected Data data;
 
-	/**
-	 * Gets the value of the data property.
-	 */
-	public Data getData() {
-		return data;
-	}
+    /**
+     * Gets the value of the data property.
+     */
+    public Data getData() {
+        return this.data;
+    }
 
-	/**
-	 * Sets the value of the data property.
-	 */
-	public void setData(Data value) {
-		this.data = value;
-	}
+    /**
+     * Sets the value of the data property.
+     */
+    public void setData(Data value) {
+        this.data = value;
+    }
 
-	public void addValue(Value v) {
-		if (this.data == null) {
-			this.data = new Data();
-		}
-		this.data.addValue(v);
-	}
+    public void addValue(Value v) {
+        if (this.data == null) {
+            this.data = new Data();
+        }
+        this.data.addValue(v);
+    }
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("<array>");
-		sb.append(this.data.toString());
-		sb.append("</array>");
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("<array>");
+        sb.append(this.data.toString());
+        sb.append("</array>");
+        return sb.toString();
+    }
 }

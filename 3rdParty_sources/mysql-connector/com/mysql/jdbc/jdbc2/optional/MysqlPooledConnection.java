@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -39,218 +39,195 @@ import com.mysql.jdbc.SQLError;
 import com.mysql.jdbc.Util;
 
 /**
- * This class is used to wrap and return a physical connection within a logical
- * handle. It also registers and notifies ConnectionEventListeners of any
+ * This class is used to wrap and return a physical connection within a logical handle. It also registers and notifies ConnectionEventListeners of any
  * ConnectionEvents
- * 
- * @see javax.sql.PooledConnection
- * @see org.gjt.mm.mysql.jdbc2.optional.LogicalHandle
- * @author Todd Wolff <todd.wolff_at_prodigy.net>
  */
 public class MysqlPooledConnection implements PooledConnection {
 
-	private static final Constructor<?> JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR;
+    private static final Constructor<?> JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR;
 
-	static {
-		if (Util.isJdbc4()) {
-			try {
-				JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR = Class.forName(
-						"com.mysql.jdbc.jdbc2.optional.JDBC4MysqlPooledConnection")
-						.getConstructor(
-								new Class[] { com.mysql.jdbc.Connection.class });
-			} catch (SecurityException e) {
-				throw new RuntimeException(e);
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR = null;
-		}
-	}
+    static {
+        if (Util.isJdbc4()) {
+            try {
+                JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR = Class.forName("com.mysql.jdbc.jdbc2.optional.JDBC4MysqlPooledConnection").getConstructor(
+                        new Class[] { com.mysql.jdbc.Connection.class });
+            } catch (SecurityException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR = null;
+        }
+    }
 
-	protected static MysqlPooledConnection getInstance(com.mysql.jdbc.Connection connection) throws SQLException {
-		if (!Util.isJdbc4()) {
-			return new MysqlPooledConnection(connection);
-		}
+    protected static MysqlPooledConnection getInstance(com.mysql.jdbc.Connection connection) throws SQLException {
+        if (!Util.isJdbc4()) {
+            return new MysqlPooledConnection(connection);
+        }
 
-		return (MysqlPooledConnection) Util.handleNewInstance(
-				JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR, new Object[] {
-						connection}, connection.getExceptionInterceptor());
-	}
-	
-	/**
-	 * The flag for an exception being thrown.
-	 */
-	public static final int CONNECTION_ERROR_EVENT = 1;
+        return (MysqlPooledConnection) Util.handleNewInstance(JDBC_4_POOLED_CONNECTION_WRAPPER_CTOR, new Object[] { connection },
+                connection.getExceptionInterceptor());
+    }
 
-	/**
-	 * The flag for a connection being closed.
-	 */
-	public static final int CONNECTION_CLOSED_EVENT = 2;
+    /**
+     * The flag for an exception being thrown.
+     */
+    public static final int CONNECTION_ERROR_EVENT = 1;
 
-	// ~ Instance/static variables .............................................
+    /**
+     * The flag for a connection being closed.
+     */
+    public static final int CONNECTION_CLOSED_EVENT = 2;
 
-	private Map<ConnectionEventListener, ConnectionEventListener> connectionEventListeners;
+    private Map<ConnectionEventListener, ConnectionEventListener> connectionEventListeners;
 
-	private Connection logicalHandle;
+    private Connection logicalHandle;
 
-	private com.mysql.jdbc.Connection physicalConn;
-	
-	private ExceptionInterceptor exceptionInterceptor;
+    private com.mysql.jdbc.Connection physicalConn;
 
-	// ~ Constructors ..........................................................
+    private ExceptionInterceptor exceptionInterceptor;
 
-	/**
-	 * Construct a new MysqlPooledConnection and set instance variables
-	 * 
-	 * @param connection
-	 *            physical connection to db
-	 */
-	public MysqlPooledConnection(com.mysql.jdbc.Connection connection) {
-		this.logicalHandle = null;
-		this.physicalConn = connection;
-		this.connectionEventListeners = new HashMap<ConnectionEventListener, ConnectionEventListener>();
-		this.exceptionInterceptor = this.physicalConn.getExceptionInterceptor();
-	}
+    /**
+     * Construct a new MysqlPooledConnection and set instance variables
+     * 
+     * @param connection
+     *            physical connection to db
+     */
+    public MysqlPooledConnection(com.mysql.jdbc.Connection connection) {
+        this.logicalHandle = null;
+        this.physicalConn = connection;
+        this.connectionEventListeners = new HashMap<ConnectionEventListener, ConnectionEventListener>();
+        this.exceptionInterceptor = this.physicalConn.getExceptionInterceptor();
+    }
 
-	/**
-	 * Adds ConnectionEventListeners to a hash table to be used for notification
-	 * of ConnectionEvents
-	 * 
-	 * @param connectioneventlistener
-	 *            listener to be notified with ConnectionEvents
-	 */
-	public synchronized void addConnectionEventListener(
-			ConnectionEventListener connectioneventlistener) {
+    /**
+     * Adds ConnectionEventListeners to a hash table to be used for notification
+     * of ConnectionEvents
+     * 
+     * @param connectioneventlistener
+     *            listener to be notified with ConnectionEvents
+     */
+    public synchronized void addConnectionEventListener(ConnectionEventListener connectioneventlistener) {
 
-		if (this.connectionEventListeners != null) {
-			this.connectionEventListeners.put(connectioneventlistener,
-					connectioneventlistener);
-		}
-	}
+        if (this.connectionEventListeners != null) {
+            this.connectionEventListeners.put(connectioneventlistener, connectioneventlistener);
+        }
+    }
 
-	/**
-	 * Removes ConnectionEventListeners from hash table used for notification of
-	 * ConnectionEvents
-	 * 
-	 * @param connectioneventlistener
-	 *            listener to be removed
-	 */
-	public synchronized void removeConnectionEventListener(
-			ConnectionEventListener connectioneventlistener) {
+    /**
+     * Removes ConnectionEventListeners from hash table used for notification of
+     * ConnectionEvents
+     * 
+     * @param connectioneventlistener
+     *            listener to be removed
+     */
+    public synchronized void removeConnectionEventListener(ConnectionEventListener connectioneventlistener) {
 
-		if (this.connectionEventListeners != null) {
-			this.connectionEventListeners.remove(connectioneventlistener);
-		}
-	}
+        if (this.connectionEventListeners != null) {
+            this.connectionEventListeners.remove(connectioneventlistener);
+        }
+    }
 
-	/**
-	 * Invoked by the container. Return a logicalHandle object that wraps a
-	 * physical connection.
-	 * 
-	 * @see java.sql.DataSource#getConnection()
-	 */
-	public synchronized Connection getConnection() throws SQLException {
-		return getConnection(true, false);
-		
-	}
-	
-	protected synchronized Connection getConnection(boolean resetServerState, 
-			boolean forXa)
-		throws SQLException {
-		if (this.physicalConn == null) {
+    /**
+     * Invoked by the container. Return a logicalHandle object that wraps a
+     * physical connection.
+     * 
+     * @see java.sql.DataSource#getConnection()
+     */
+    public synchronized Connection getConnection() throws SQLException {
+        return getConnection(true, false);
 
-			SQLException sqlException = SQLError.createSQLException(
-					"Physical Connection doesn't exist", this.exceptionInterceptor);
-			callConnectionEventListeners(CONNECTION_ERROR_EVENT, sqlException);
+    }
 
-			throw sqlException;
-		}
+    protected synchronized Connection getConnection(boolean resetServerState, boolean forXa) throws SQLException {
+        if (this.physicalConn == null) {
 
-		try {
+            SQLException sqlException = SQLError.createSQLException("Physical Connection doesn't exist", this.exceptionInterceptor);
+            callConnectionEventListeners(CONNECTION_ERROR_EVENT, sqlException);
 
-			if (this.logicalHandle != null) {
-				((ConnectionWrapper) this.logicalHandle).close(false);
-			}
+            throw sqlException;
+        }
 
-			if (resetServerState) {
-				this.physicalConn.resetServerState();
-			}
+        try {
 
-			this.logicalHandle = ConnectionWrapper.getInstance(this, 
-					this.physicalConn, 
-					forXa);
-		} catch (SQLException sqlException) {
-			callConnectionEventListeners(CONNECTION_ERROR_EVENT, sqlException);
+            if (this.logicalHandle != null) {
+                ((ConnectionWrapper) this.logicalHandle).close(false);
+            }
 
-			throw sqlException;
-		}
+            if (resetServerState) {
+                this.physicalConn.resetServerState();
+            }
 
-		return this.logicalHandle;
-	}
+            this.logicalHandle = ConnectionWrapper.getInstance(this, this.physicalConn, forXa);
+        } catch (SQLException sqlException) {
+            callConnectionEventListeners(CONNECTION_ERROR_EVENT, sqlException);
 
-	/**
-	 * Invoked by the container (not the client), and should close the physical
-	 * connection. This will be called if the pool is destroyed or the
-	 * connectionEventListener receives a connectionErrorOccurred event.
-	 * 
-	 * @see java.sql.DataSource#close()
-	 */
-	public synchronized void close() throws SQLException {
-		if (this.physicalConn != null) {
-			this.physicalConn.close();
-			
-			this.physicalConn = null;
-		}
-		
-		if (this.connectionEventListeners != null) {
-			this.connectionEventListeners.clear();
-			
-			this.connectionEventListeners = null;
-		}
-	}
+            throw sqlException;
+        }
 
-	/**
-	 * Notifies all registered ConnectionEventListeners of ConnectionEvents.
-	 * Instantiates a new ConnectionEvent which wraps sqlException and invokes
-	 * either connectionClose or connectionErrorOccurred on listener as
-	 * appropriate.
-	 * 
-	 * @param eventType
-	 *            value indicating whether connectionClosed or
-	 *            connectionErrorOccurred called
-	 * @param sqlException
-	 *            the exception being thrown
-	 */
-	protected synchronized void callConnectionEventListeners(int eventType,
-			SQLException sqlException) {
+        return this.logicalHandle;
+    }
 
-		if (this.connectionEventListeners == null) {
+    /**
+     * Invoked by the container (not the client), and should close the physical
+     * connection. This will be called if the pool is destroyed or the
+     * connectionEventListener receives a connectionErrorOccurred event.
+     * 
+     * @see java.sql.DataSource#close()
+     */
+    public synchronized void close() throws SQLException {
+        if (this.physicalConn != null) {
+            this.physicalConn.close();
 
-			return;
-		}
+            this.physicalConn = null;
+        }
 
-		Iterator<Map.Entry<ConnectionEventListener, ConnectionEventListener>> iterator = this.connectionEventListeners.entrySet().iterator();
-		
-		ConnectionEvent connectionevent = new ConnectionEvent(this,
-				sqlException);
+        if (this.connectionEventListeners != null) {
+            this.connectionEventListeners.clear();
 
-		while (iterator.hasNext()) {
+            this.connectionEventListeners = null;
+        }
+    }
 
-			ConnectionEventListener connectioneventlistener = iterator.next().getValue();
+    /**
+     * Notifies all registered ConnectionEventListeners of ConnectionEvents.
+     * Instantiates a new ConnectionEvent which wraps sqlException and invokes
+     * either connectionClose or connectionErrorOccurred on listener as
+     * appropriate.
+     * 
+     * @param eventType
+     *            value indicating whether connectionClosed or
+     *            connectionErrorOccurred called
+     * @param sqlException
+     *            the exception being thrown
+     */
+    protected synchronized void callConnectionEventListeners(int eventType, SQLException sqlException) {
 
-			if (eventType == CONNECTION_CLOSED_EVENT) {
-				connectioneventlistener.connectionClosed(connectionevent);
-			} else if (eventType == CONNECTION_ERROR_EVENT) {
-				connectioneventlistener
-						.connectionErrorOccurred(connectionevent);
-			}
-		}
-	}
-	
-	protected ExceptionInterceptor getExceptionInterceptor() {
-		return this.exceptionInterceptor;
-	}
+        if (this.connectionEventListeners == null) {
+
+            return;
+        }
+
+        Iterator<Map.Entry<ConnectionEventListener, ConnectionEventListener>> iterator = this.connectionEventListeners.entrySet().iterator();
+
+        ConnectionEvent connectionevent = new ConnectionEvent(this, sqlException);
+
+        while (iterator.hasNext()) {
+
+            ConnectionEventListener connectioneventlistener = iterator.next().getValue();
+
+            if (eventType == CONNECTION_CLOSED_EVENT) {
+                connectioneventlistener.connectionClosed(connectionevent);
+            } else if (eventType == CONNECTION_ERROR_EVENT) {
+                connectioneventlistener.connectionErrorOccurred(connectionevent);
+            }
+        }
+    }
+
+    protected ExceptionInterceptor getExceptionInterceptor() {
+        return this.exceptionInterceptor;
+    }
 }

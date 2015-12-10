@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -35,43 +35,37 @@ import com.mysql.jdbc.NonRegisteringDriver;
 import com.mysql.jdbc.SQLError;
 
 /**
- * Relay the exception to {@link FabricMySQLConnectionProxy} for error
- * reporting.
+ * Relay the exception to {@link FabricMySQLConnectionProxy} for error reporting. This class exists solely because extensions cannot be provided with instances
+ * but instead require the connection to instantiate the provided class.
  */
 public class ErrorReportingExceptionInterceptor implements ExceptionInterceptor {
-	private String hostname;
-	private String port;
-	private String fabricHaGroup;
+    private String hostname;
+    private String port;
+    private String fabricHaGroup;
 
-	public SQLException interceptException(SQLException sqlEx, Connection conn) {
-		MySQLConnection mysqlConn = (MySQLConnection) conn;
+    public SQLException interceptException(SQLException sqlEx, Connection conn) {
+        MySQLConnection mysqlConn = (MySQLConnection) conn;
 
-		// don't intercept exceptions during initialization, before
-		// the proxy has a chance to setProxy() on the physical
-		// connection
-		if (ConnectionImpl.class.isAssignableFrom(mysqlConn.getLoadBalanceSafeProxy().getClass())) {
-			return null;
-		}
+        // don't intercept exceptions during initialization, before the proxy has a chance to setProxy() on the physical connection
+        if (ConnectionImpl.class.isAssignableFrom(mysqlConn.getMultiHostSafeProxy().getClass())) {
+            return null;
+        }
 
-		FabricMySQLConnectionProxy fabricProxy = (FabricMySQLConnectionProxy)
-			mysqlConn.getLoadBalanceSafeProxy();
-		try {
-			return fabricProxy.interceptException(sqlEx, conn, this.fabricHaGroup,
-												  this.hostname, this.port);
-		} catch (FabricCommunicationException ex) {
-			return SQLError.createSQLException("Failed to report error to Fabric.",
-											   SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE,
-											   ex, conn.getExceptionInterceptor(), conn);
-		}
-	}
+        FabricMySQLConnectionProxy fabricProxy = (FabricMySQLConnectionProxy) mysqlConn.getMultiHostSafeProxy();
+        try {
+            return fabricProxy.interceptException(sqlEx, conn, this.fabricHaGroup, this.hostname, this.port);
+        } catch (FabricCommunicationException ex) {
+            return SQLError.createSQLException("Failed to report error to Fabric.", SQLError.SQL_STATE_COMMUNICATION_LINK_FAILURE, ex, null);
+        }
+    }
 
-	public void init(Connection conn, Properties props) throws SQLException {
-		this.hostname = props.getProperty(NonRegisteringDriver.HOST_PROPERTY_KEY);
-		this.port = props.getProperty(NonRegisteringDriver.PORT_PROPERTY_KEY);
-		String connectionAttributes = props.getProperty("connectionAttributes");
-		this.fabricHaGroup = connectionAttributes.replaceAll("^.*\\bfabricHaGroup:(.+)\\b.*$", "$1");
-	}
+    public void init(Connection conn, Properties props) throws SQLException {
+        this.hostname = props.getProperty(NonRegisteringDriver.HOST_PROPERTY_KEY);
+        this.port = props.getProperty(NonRegisteringDriver.PORT_PROPERTY_KEY);
+        String connectionAttributes = props.getProperty("connectionAttributes");
+        this.fabricHaGroup = connectionAttributes.replaceAll("^.*\\bfabricHaGroup:(.+)\\b.*$", "$1");
+    }
 
-	public void destroy() {
-	}
+    public void destroy() {
+    }
 }

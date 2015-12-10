@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 2005, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2005, 2015, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -28,49 +28,45 @@ import java.sql.SQLException;
 
 import javax.sql.XAConnection;
 
-/**
- * @author mmatthew
- * 
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates. To enable and disable the creation of type
- * comments go to Window>Preferences>Java>Code Generation.
- */
-public class MysqlXADataSource extends MysqlDataSource implements
-		javax.sql.XADataSource {
+public class MysqlXADataSource extends MysqlDataSource implements javax.sql.XADataSource {
 
-	static final long serialVersionUID = 7911390333152247455L;
+    static final long serialVersionUID = 7911390333152247455L;
 
-	/**
-	 * @see javax.sql.XADataSource#getXAConnection()
-	 */
-	public XAConnection getXAConnection() throws SQLException {
+    /**
+     * Default no-arg constructor is required by specification.
+     */
+    public MysqlXADataSource() {
+    }
 
-		Connection conn = getConnection();
+    /**
+     * @see javax.sql.XADataSource#getXAConnection()
+     */
+    public XAConnection getXAConnection() throws SQLException {
 
-		return wrapConnection(conn);
-	}
+        Connection conn = getConnection();
 
-	/**
-	 * @see javax.sql.XADataSource#getXAConnection(String, String)
-	 */
-	public XAConnection getXAConnection(String u, String p)
-			throws SQLException {
+        return wrapConnection(conn);
+    }
 
-		Connection conn = getConnection(u, p);
+    /**
+     * @see javax.sql.XADataSource#getXAConnection(String, String)
+     */
+    public XAConnection getXAConnection(String u, String p) throws SQLException {
 
-		return wrapConnection(conn);
-	}
+        Connection conn = getConnection(u, p);
 
-	/**
-	 * Wraps a connection as a 'fake' XAConnection
-	 */
+        return wrapConnection(conn);
+    }
 
-	private XAConnection wrapConnection(Connection conn) throws SQLException {
-		if (getPinGlobalTxToPhysicalConnection() || 
-				((com.mysql.jdbc.Connection)conn).getPinGlobalTxToPhysicalConnection()) {
-			return SuspendableXAConnection.getInstance((com.mysql.jdbc.ConnectionImpl) conn);
-		}
-		
-		return MysqlXAConnection.getInstance((com.mysql.jdbc.ConnectionImpl) conn, getLogXaCommands());
-	}
+    /**
+     * Wraps a connection as a 'fake' XAConnection
+     */
+
+    private XAConnection wrapConnection(Connection conn) throws SQLException {
+        if (getPinGlobalTxToPhysicalConnection() || ((com.mysql.jdbc.Connection) conn).getPinGlobalTxToPhysicalConnection()) {
+            return SuspendableXAConnection.getInstance((com.mysql.jdbc.Connection) conn);
+        }
+
+        return MysqlXAConnection.getInstance((com.mysql.jdbc.Connection) conn, getLogXaCommands());
+    }
 }
