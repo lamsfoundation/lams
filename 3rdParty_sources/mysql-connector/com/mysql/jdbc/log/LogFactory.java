@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -32,100 +32,79 @@ import com.mysql.jdbc.SQLError;
 
 /**
  * Creates instances of loggers for the driver to use.
- * 
- * @author Mark Matthews
- * 
- * @version $Id$
  */
 public class LogFactory {
 
-	/**
-	 * Returns a logger instance of the given class, with the given instance
-	 * name.
-	 * 
-	 * @param className
-	 *            the class to instantiate
-	 * @param instanceName
-	 *            the instance name
-	 * @return a logger instance
-	 * @throws SQLException
-	 *             if unable to create a logger instance
-	 */
-	public static Log getLogger(String className, String instanceName, ExceptionInterceptor exceptionInterceptor)
-			throws SQLException {
+    /**
+     * Returns a logger instance of the given class, with the given instance
+     * name.
+     * 
+     * @param className
+     *            the class to instantiate
+     * @param instanceName
+     *            the instance name
+     * @return a logger instance
+     * @throws SQLException
+     *             if unable to create a logger instance
+     */
+    public static Log getLogger(String className, String instanceName, ExceptionInterceptor exceptionInterceptor) throws SQLException {
 
-		if (className == null) {
-			throw SQLError.createSQLException("Logger class can not be NULL",
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-		}
+        if (className == null) {
+            throw SQLError.createSQLException("Logger class can not be NULL", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+        }
 
-		if (instanceName == null) {
-			throw SQLError.createSQLException(
-					"Logger instance name can not be NULL",
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-		}
+        if (instanceName == null) {
+            throw SQLError.createSQLException("Logger instance name can not be NULL", SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+        }
 
-		try {
-			Class<?> loggerClass = null;
+        try {
+            Class<?> loggerClass = null;
 
-			try {
-				loggerClass = Class.forName(className);
-			} catch (ClassNotFoundException nfe) {
-				loggerClass = Class.forName(Log.class.getPackage().getName()
-						+ "." + className);
-			}
+            try {
+                loggerClass = Class.forName(className);
+            } catch (ClassNotFoundException nfe) {
+                loggerClass = Class.forName(Log.class.getPackage().getName() + "." + className);
+            }
 
-			Constructor<?> constructor = loggerClass
-					.getConstructor(new Class[] { String.class });
+            Constructor<?> constructor = loggerClass.getConstructor(new Class[] { String.class });
 
-			return (Log) constructor.newInstance(new Object[] { instanceName });
-		} catch (ClassNotFoundException cnfe) {
-			SQLException sqlEx = SQLError.createSQLException(
-					"Unable to load class for logger '" + className + "'",
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-			sqlEx.initCause(cnfe);
+            return (Log) constructor.newInstance(new Object[] { instanceName });
+        } catch (ClassNotFoundException cnfe) {
+            SQLException sqlEx = SQLError.createSQLException("Unable to load class for logger '" + className + "'", SQLError.SQL_STATE_ILLEGAL_ARGUMENT,
+                    exceptionInterceptor);
+            sqlEx.initCause(cnfe);
 
-			throw sqlEx;
-		} catch (NoSuchMethodException nsme) {
-			SQLException sqlEx = SQLError
-					.createSQLException(
-							"Logger class does not have a single-arg constructor that takes an instance name",
-							SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-			sqlEx.initCause(nsme);
+            throw sqlEx;
+        } catch (NoSuchMethodException nsme) {
+            SQLException sqlEx = SQLError.createSQLException("Logger class does not have a single-arg constructor that takes an instance name",
+                    SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+            sqlEx.initCause(nsme);
 
-			throw sqlEx;
-		} catch (InstantiationException inse) {
-			SQLException sqlEx = SQLError.createSQLException(
-					"Unable to instantiate logger class '" + className
-							+ "', exception in constructor?",
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-			sqlEx.initCause(inse);
+            throw sqlEx;
+        } catch (InstantiationException inse) {
+            SQLException sqlEx = SQLError.createSQLException("Unable to instantiate logger class '" + className + "', exception in constructor?",
+                    SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+            sqlEx.initCause(inse);
 
-			throw sqlEx;
-		} catch (InvocationTargetException ite) {
-			SQLException sqlEx = SQLError.createSQLException(
-					"Unable to instantiate logger class '" + className
-							+ "', exception in constructor?",
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-			sqlEx.initCause(ite);
+            throw sqlEx;
+        } catch (InvocationTargetException ite) {
+            SQLException sqlEx = SQLError.createSQLException("Unable to instantiate logger class '" + className + "', exception in constructor?",
+                    SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+            sqlEx.initCause(ite);
 
-			throw sqlEx;
-		} catch (IllegalAccessException iae) {
-			SQLException sqlEx = SQLError.createSQLException(
-					"Unable to instantiate logger class '" + className
-							+ "', constructor not public",
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-			sqlEx.initCause(iae);
+            throw sqlEx;
+        } catch (IllegalAccessException iae) {
+            SQLException sqlEx = SQLError.createSQLException("Unable to instantiate logger class '" + className + "', constructor not public",
+                    SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+            sqlEx.initCause(iae);
 
-			throw sqlEx;
-		} catch (ClassCastException cce) {
-			SQLException sqlEx = SQLError.createSQLException("Logger class '"
-					+ className + "' does not implement the '"
-					+ Log.class.getName() + "' interface",
-					SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
-			sqlEx.initCause(cce);
+            throw sqlEx;
+        } catch (ClassCastException cce) {
+            SQLException sqlEx = SQLError.createSQLException("Logger class '" + className + "' does not implement the '" + Log.class.getName() + "' interface",
+                    SQLError.SQL_STATE_ILLEGAL_ARGUMENT, exceptionInterceptor);
+            sqlEx.initCause(cce);
 
-			throw sqlEx;
-		}
-	}
+            throw sqlEx;
+        }
+    }
 }

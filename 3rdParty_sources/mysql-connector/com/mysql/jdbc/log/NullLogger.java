@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -24,172 +24,131 @@
 package com.mysql.jdbc.log;
 
 /**
- * A logger that does nothing. Used before the log is configured via the URL or
- * properties.
- * 
- * @author Mark Matthews
- * 
- * @version $Id$
+ * A logger that does nothing. Used before the log is configured via the URL or properties.
  */
 public class NullLogger implements Log {
 
-	/**
-	 * Creates a new NullLogger with the given name
-	 * 
-	 * @param instanceName
-	 *            (ignored)
-	 */
-	public NullLogger(String instanceName) {
-	}
+    /**
+     * Creates a new NullLogger with the given name
+     * 
+     * @param instanceName
+     *            (ignored)
+     */
+    public NullLogger(String instanceName) {
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isDebugEnabled()
-	 */
-	public boolean isDebugEnabled() {
-		// XXX Auto-generated method stub
-		return false;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isDebugEnabled()
+     */
+    public boolean isDebugEnabled() {
+        return false;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isErrorEnabled()
-	 */
-	public boolean isErrorEnabled() {
-		// XXX Auto-generated method stub
-		return false;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isErrorEnabled()
+     */
+    public boolean isErrorEnabled() {
+        return false;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isFatalEnabled()
-	 */
-	public boolean isFatalEnabled() {
-		// XXX Auto-generated method stub
-		return false;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isFatalEnabled()
+     */
+    public boolean isFatalEnabled() {
+        return false;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isInfoEnabled()
-	 */
-	public boolean isInfoEnabled() {
-		// XXX Auto-generated method stub
-		return false;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isInfoEnabled()
+     */
+    public boolean isInfoEnabled() {
+        return false;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isTraceEnabled()
-	 */
-	public boolean isTraceEnabled() {
-		// XXX Auto-generated method stub
-		return false;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isTraceEnabled()
+     */
+    public boolean isTraceEnabled() {
+        return false;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isWarnEnabled()
-	 */
-	public boolean isWarnEnabled() {
-		// XXX Auto-generated method stub
-		return false;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isWarnEnabled()
+     */
+    public boolean isWarnEnabled() {
+        return false;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#logDebug(java.lang.Object)
-	 */
-	public void logDebug(Object msg) {
-		// XXX Auto-generated method stub
+    /**
+     * @see com.mysql.jdbc.log.Log#logDebug(java.lang.Object)
+     */
+    public void logDebug(Object msg) {
+    }
 
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#logDebug(java.lang.Object, java.lang.Throwable)
+     */
+    public void logDebug(Object msg, Throwable thrown) {
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#logDebug(java.lang.Object,
-	 *      java.lang.Throwable)
-	 */
-	public void logDebug(Object msg, Throwable thrown) {
-		// XXX Auto-generated method stub
+    /**
+     * @see com.mysql.jdbc.log.Log#logError(java.lang.Object)
+     */
+    public void logError(Object msg) {
+    }
 
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#logError(java.lang.Object, java.lang.Throwable)
+     */
+    public void logError(Object msg, Throwable thrown) {
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#logError(java.lang.Object)
-	 */
-	public void logError(Object msg) {
-		// XXX Auto-generated method stub
+    /**
+     * @see com.mysql.jdbc.log.Log#logFatal(java.lang.Object)
+     */
+    public void logFatal(Object msg) {
+    }
 
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#logFatal(java.lang.Object, java.lang.Throwable)
+     */
+    public void logFatal(Object msg, Throwable thrown) {
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#logError(java.lang.Object,
-	 *      java.lang.Throwable)
-	 */
-	public void logError(Object msg, Throwable thrown) {
-		// XXX Auto-generated method stub
+    /**
+     * @see com.mysql.jdbc.log.Log#logInfo(java.lang.Object)
+     */
+    public void logInfo(Object msg) {
+    }
 
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#logInfo(java.lang.Object, java.lang.Throwable)
+     */
+    public void logInfo(Object msg, Throwable thrown) {
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#logFatal(java.lang.Object)
-	 */
-	public void logFatal(Object msg) {
-		// XXX Auto-generated method stub
+    /**
+     * @see com.mysql.jdbc.log.Log#logTrace(java.lang.Object)
+     */
+    public void logTrace(Object msg) {
+    }
 
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#logTrace(java.lang.Object, java.lang.Throwable)
+     */
+    public void logTrace(Object msg, Throwable thrown) {
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#logFatal(java.lang.Object,
-	 *      java.lang.Throwable)
-	 */
-	public void logFatal(Object msg, Throwable thrown) {
-		// XXX Auto-generated method stub
+    /**
+     * @see com.mysql.jdbc.log.Log#logWarn(java.lang.Object)
+     */
+    public void logWarn(Object msg) {
+    }
 
-	}
-
-	/**
-	 * @see com.mysql.jdbc.log.Log#logInfo(java.lang.Object)
-	 */
-	public void logInfo(Object msg) {
-		// XXX Auto-generated method stub
-
-	}
-
-	/**
-	 * @see com.mysql.jdbc.log.Log#logInfo(java.lang.Object,
-	 *      java.lang.Throwable)
-	 */
-	public void logInfo(Object msg, Throwable thrown) {
-		// XXX Auto-generated method stub
-
-	}
-
-	/**
-	 * @see com.mysql.jdbc.log.Log#logTrace(java.lang.Object)
-	 */
-	public void logTrace(Object msg) {
-		// XXX Auto-generated method stub
-
-	}
-
-	/**
-	 * @see com.mysql.jdbc.log.Log#logTrace(java.lang.Object,
-	 *      java.lang.Throwable)
-	 */
-	public void logTrace(Object msg, Throwable thrown) {
-		// XXX Auto-generated method stub
-
-	}
-
-	/**
-	 * @see com.mysql.jdbc.log.Log#logWarn(java.lang.Object)
-	 */
-	public void logWarn(Object msg) {
-		// XXX Auto-generated method stub
-
-	}
-
-	/**
-	 * @see com.mysql.jdbc.log.Log#logWarn(java.lang.Object,
-	 *      java.lang.Throwable)
-	 */
-	public void logWarn(Object msg, Throwable thrown) {
-		// XXX Auto-generated method stub
-
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#logWarn(java.lang.Object, java.lang.Throwable)
+     */
+    public void logWarn(Object msg, Throwable thrown) {
+    }
 
 }

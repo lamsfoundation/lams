@@ -175,9 +175,6 @@ public class User implements Serializable, Comparable {
 
     private Date modifiedDate;
 
-    /** persistent field */
-    private String openidURL;
-
     /** default constructor */
     public User() {
 	changePassword = false;
@@ -655,13 +652,4 @@ public class User implements Serializable, Comparable {
     public void setModifiedDate(Date modifiedDate) {
 	this.modifiedDate = modifiedDate;
     }
-
-    public String getOpenidURL() {
-	return openidURL;
-    }
-
-    public void setOpenidURL(String openidURL) {
-	this.openidURL = openidURL;
-    }
-
 }

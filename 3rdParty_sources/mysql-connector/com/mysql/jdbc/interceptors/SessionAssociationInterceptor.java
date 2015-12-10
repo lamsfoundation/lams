@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -34,58 +34,54 @@ import com.mysql.jdbc.StatementInterceptor;
 
 public class SessionAssociationInterceptor implements StatementInterceptor {
 
-	protected String currentSessionKey;
-	protected final static ThreadLocal<String> sessionLocal = new ThreadLocal<String>();
-	
-	public static final void setSessionKey(String key) {
-		sessionLocal.set(key);
-	}
-	
-	public static final void resetSessionKey() {
-		sessionLocal.set(null);
-	}
-	
-	public static final String getSessionKey() {
-		return sessionLocal.get();
-	}
-	
-	public boolean executeTopLevelOnly() {
-		return true;
-	}
+    protected String currentSessionKey;
+    protected final static ThreadLocal<String> sessionLocal = new ThreadLocal<String>();
 
-	public void init(Connection conn, Properties props) throws SQLException {
+    public static final void setSessionKey(String key) {
+        sessionLocal.set(key);
+    }
 
-	}
+    public static final void resetSessionKey() {
+        sessionLocal.set(null);
+    }
 
-	public ResultSetInternalMethods postProcess(String sql,
-			Statement interceptedStatement,
-			ResultSetInternalMethods originalResultSet, Connection connection)
-			throws SQLException {
-		return null;
-	}
+    public static final String getSessionKey() {
+        return sessionLocal.get();
+    }
 
-	public ResultSetInternalMethods preProcess(String sql,
-			Statement interceptedStatement, Connection connection)
-			throws SQLException {
-		String key = getSessionKey();
-		
-		if (key != null && !key.equals(this.currentSessionKey)) {
-			PreparedStatement pstmt = connection.clientPrepareStatement("SET @mysql_proxy_session=?");
-			
-			try {
-				pstmt.setString(1, key);
-				pstmt.execute();
-			} finally {
-				pstmt.close();
-			}
-			
-			this.currentSessionKey = key;
-		}
-		
-		return null;
-	}
+    public boolean executeTopLevelOnly() {
+        return true;
+    }
 
-	public void destroy() {
-		
-	}
+    public void init(Connection conn, Properties props) throws SQLException {
+
+    }
+
+    public ResultSetInternalMethods postProcess(String sql, Statement interceptedStatement, ResultSetInternalMethods originalResultSet, Connection connection)
+            throws SQLException {
+        return null;
+    }
+
+    public ResultSetInternalMethods preProcess(String sql, Statement interceptedStatement, Connection connection) throws SQLException {
+        String key = getSessionKey();
+
+        if (key != null && !key.equals(this.currentSessionKey)) {
+            PreparedStatement pstmt = connection.clientPrepareStatement("SET @mysql_proxy_session=?");
+
+            try {
+                pstmt.setString(1, key);
+                pstmt.execute();
+            } finally {
+                pstmt.close();
+            }
+
+            this.currentSessionKey = key;
+        }
+
+        return null;
+    }
+
+    public void destroy() {
+
+    }
 }

@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -25,21 +25,15 @@ package com.mysql.jdbc;
 
 /**
  * Thrown from methods not required to be implemented.
- * 
- * @author Mark Matthews
  */
 public class NotImplemented extends java.sql.SQLException {
 
-	static final long serialVersionUID = 7768433826547599990L;
+    static final long serialVersionUID = 7768433826547599990L;
 
-	// ~ Constructors
-	// -----------------------------------------------------------
-
-	/**
-	 * Creates a new NotImplemented object.
-	 */
-	public NotImplemented() {
-		super(
-				Messages.getString("NotImplemented.0"), SQLError.SQL_STATE_DRIVER_NOT_CAPABLE); //$NON-NLS-1$
-	}
+    /**
+     * Creates a new NotImplemented object.
+     */
+    public NotImplemented() {
+        super(Messages.getString("NotImplemented.0"), SQLError.SQL_STATE_DRIVER_NOT_CAPABLE);
+    }
 }

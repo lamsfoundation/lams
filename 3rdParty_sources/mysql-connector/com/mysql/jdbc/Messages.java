@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -30,85 +30,73 @@ import java.util.ResourceBundle;
 
 /**
  * Support for localized messages.
- * 
- * @author Mark Matthews
- * @version $Id$
  */
 public class Messages {
 
-	private static final String BUNDLE_NAME = "com.mysql.jdbc.LocalizedErrorMessages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "com.mysql.jdbc.LocalizedErrorMessages";
 
-	private static final ResourceBundle RESOURCE_BUNDLE;
+    private static final ResourceBundle RESOURCE_BUNDLE;
 
-	static {
-		ResourceBundle temp = null;
+    static {
+        ResourceBundle temp = null;
 
-		//
-		// Overly-pedantic here, some appserver and JVM combos don't deal
-		// well with the no-args version, others don't deal well with
-		// the three-arg version, so we need to try both :(
-		//
+        //
+        // Overly-pedantic here, some appserver and JVM combos don't deal well with the no-args version, others don't deal well with the three-arg version, so
+        // we need to try both :(
+        //
 
-		try {
-			temp = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(),
-					Messages.class.getClassLoader());
-		} catch (Throwable t) {
-			try {
-				temp = ResourceBundle.getBundle(BUNDLE_NAME);
-			} catch (Throwable t2) {
-				RuntimeException rt = new RuntimeException(
-						"Can't load resource bundle due to underlying exception "
-								+ t.toString());
-				rt.initCause(t2);
-				
-				throw rt;
-			}
-		} finally {
-			RESOURCE_BUNDLE = temp;
-		}
-	}
+        try {
+            temp = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), Messages.class.getClassLoader());
+        } catch (Throwable t) {
+            try {
+                temp = ResourceBundle.getBundle(BUNDLE_NAME);
+            } catch (Throwable t2) {
+                RuntimeException rt = new RuntimeException("Can't load resource bundle due to underlying exception " + t.toString());
+                rt.initCause(t2);
 
-	/**
-	 * Returns the localized message for the given message key
-	 * 
-	 * @param key
-	 *            the message key
-	 * @return The localized message for the key
-	 */
-	public static String getString(String key) {
-		if (RESOURCE_BUNDLE == null) {
-			throw new RuntimeException(
-					"Localized messages from resource bundle '" + BUNDLE_NAME
-							+ "' not loaded during initialization of driver.");
-		}
+                throw rt;
+            }
+        } finally {
+            RESOURCE_BUNDLE = temp;
+        }
+    }
 
-		try {
-			if (key == null) {
-				throw new IllegalArgumentException(
-						"Message key can not be null");
-			}
+    /**
+     * Returns the localized message for the given message key
+     * 
+     * @param key
+     *            the message key
+     * @return The localized message for the key
+     */
+    public static String getString(String key) {
+        if (RESOURCE_BUNDLE == null) {
+            throw new RuntimeException("Localized messages from resource bundle '" + BUNDLE_NAME + "' not loaded during initialization of driver.");
+        }
 
-			String message = RESOURCE_BUNDLE.getString(key);
+        try {
+            if (key == null) {
+                throw new IllegalArgumentException("Message key can not be null");
+            }
 
-			if (message == null) {
-				message = "Missing error message for key '" + key + "'";
-			}
+            String message = RESOURCE_BUNDLE.getString(key);
 
-			return message;
-		} catch (MissingResourceException e) {
-			return '!' + key + '!';
-		}
-	}
+            if (message == null) {
+                message = "Missing error message for key '" + key + "'";
+            }
 
-	public static String getString(String key, Object[] args) {
-		return MessageFormat.format(getString(key), args);
-	}
+            return message;
+        } catch (MissingResourceException e) {
+            return '!' + key + '!';
+        }
+    }
 
-	/**
-	 * Dis-allow construction ...
-	 */
-	private Messages() {
+    public static String getString(String key, Object[] args) {
+        return MessageFormat.format(getString(key), args);
+    }
 
-		// XXX Auto-generated constructor stub
-	}
+    /**
+     * Dis-allow construction ...
+     */
+    private Messages() {
+    }
 }

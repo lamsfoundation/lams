@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -26,26 +26,22 @@ package com.mysql.jdbc.util;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-/**
- * @author Mark Matthews
- * @version $Id$
- */
 public class LRUCache extends LinkedHashMap<Object, Object> {
     private static final long serialVersionUID = 1L;
     protected int maxElements;
 
-	public LRUCache(int maxSize) {
-		super(maxSize, 0.75F, true);
-		this.maxElements = maxSize;
-	}
+    public LRUCache(int maxSize) {
+        super(maxSize, 0.75F, true);
+        this.maxElements = maxSize;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
-	 */
-	@Override
-	protected boolean removeEldestEntry(Entry<Object, Object> eldest) {
-		return (size() > this.maxElements);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
+     */
+    @Override
+    protected boolean removeEldestEntry(Entry<Object, Object> eldest) {
+        return (size() > this.maxElements);
+    }
 }

@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -24,27 +24,27 @@
 package com.mysql.fabric;
 
 public class FabricStateResponse<T> {
-	private T data;
-	private long expireTimeMillis;
+    private T data;
+    private long expireTimeMillis;
 
-	public FabricStateResponse(T data, int secsTtl) {
-		this.data = data;
-		this.expireTimeMillis = System.currentTimeMillis() + (1000 * secsTtl);
-	}
+    public FabricStateResponse(T data, int secsTtl) {
+        this.data = data;
+        this.expireTimeMillis = System.currentTimeMillis() + (1000 * secsTtl);
+    }
 
-	public FabricStateResponse(T data, long expireTimeMillis) {
-		this.data = data;
-		this.expireTimeMillis = expireTimeMillis;
-	}
+    public FabricStateResponse(T data, long expireTimeMillis) {
+        this.data = data;
+        this.expireTimeMillis = expireTimeMillis;
+    }
 
-	public T getData() {
-		return this.data;
-	}
+    public T getData() {
+        return this.data;
+    }
 
-	/**
-	 * The expiration time of this data. Should be compared to {@link System.currentTimeMillis()}.
-	 */
-	public long getExpireTimeMillis() {
-		return this.expireTimeMillis;
-	}
+    /**
+     * The expiration time of this data. Should be compared to {@link System.currentTimeMillis()}.
+     */
+    public long getExpireTimeMillis() {
+        return this.expireTimeMillis;
+    }
 }

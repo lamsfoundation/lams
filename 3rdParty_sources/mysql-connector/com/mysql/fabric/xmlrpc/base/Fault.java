@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -25,29 +25,30 @@ package com.mysql.fabric.xmlrpc.base;
 
 public class Fault {
 
-	protected Value value;
+    protected Value value;
 
-	/**
-	 * Gets the value of the value property.
-	 */
-	public Value getValue() {
-		return value;
-	}
+    /**
+     * Gets the value of the value property.
+     */
+    public Value getValue() {
+        return this.value;
+    }
 
-	/**
-	 * Sets the value of the value property.
-	 */
-	public void setValue(Value value) {
-		this.value = value;
-	}
+    /**
+     * Sets the value of the value property.
+     */
+    public void setValue(Value value) {
+        this.value = value;
+    }
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		if (this.value != null) {
-			sb.append("<fault>");
-			sb.append(this.value.toString());
-			sb.append("</fault>");
-		}
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (this.value != null) {
+            sb.append("<fault>");
+            sb.append(this.value.toString());
+            sb.append("</fault>");
+        }
+        return sb.toString();
+    }
 }

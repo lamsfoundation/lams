@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -29,307 +29,281 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Converter for char[]->byte[] and byte[]->char[] for single-byte character
- * sets.
- * 
- * Much faster (5-6x) than the built-in solution that ships with the JVM, even
- * with JDK-1.4.x and NewIo.
- * 
- * @author Mark Matthews
+ * Converter for char[]->byte[] and byte[]->char[] for single-byte character sets.
  */
 public class SingleByteCharsetConverter {
 
-	private static final int BYTE_RANGE = (1 + Byte.MAX_VALUE) - Byte.MIN_VALUE;
-	private static byte[] allBytes = new byte[BYTE_RANGE];
-	private static final Map<String, SingleByteCharsetConverter> CONVERTER_MAP = new HashMap<String, SingleByteCharsetConverter>();
+    private static final int BYTE_RANGE = (1 + Byte.MAX_VALUE) - Byte.MIN_VALUE;
+    private static byte[] allBytes = new byte[BYTE_RANGE];
+    private static final Map<String, SingleByteCharsetConverter> CONVERTER_MAP = new HashMap<String, SingleByteCharsetConverter>();
 
-	private final static byte[] EMPTY_BYTE_ARRAY = new byte[0];
+    private final static byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
-	// The initial charToByteMap, with all char mappings mapped
-	// to (byte) '?', so that unknown characters are mapped to '?'
-	// instead of '\0' (which means end-of-string to MySQL).
-	private static byte[] unknownCharsMap = new byte[65536];
+    // The initial charToByteMap, with all char mappings mapped to (byte) '?', so that unknown characters are mapped to '?' instead of '\0' (which means
+    // end-of-string to MySQL).
+    private static byte[] unknownCharsMap = new byte[65536];
 
-	static {
-		for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
-			allBytes[i - Byte.MIN_VALUE] = (byte) i;
-		}
+    static {
+        for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
+            allBytes[i - Byte.MIN_VALUE] = (byte) i;
+        }
 
-		for (int i = 0; i < unknownCharsMap.length; i++) {
-			unknownCharsMap[i] = (byte) '?'; // use something 'sane' for
-												// unknown chars
-		}
-	}
+        for (int i = 0; i < unknownCharsMap.length; i++) {
+            unknownCharsMap[i] = (byte) '?'; // use something 'sane' for unknown chars
+        }
+    }
 
-	// ~ Instance fields
-	// --------------------------------------------------------
+    /**
+     * Get a converter for the given encoding name
+     * 
+     * @param encodingName
+     *            the Java character encoding name
+     * @param conn
+     * 
+     * @return a converter for the given encoding name
+     * @throws UnsupportedEncodingException
+     *             if the character encoding is not supported
+     */
+    public static synchronized SingleByteCharsetConverter getInstance(String encodingName, Connection conn) throws UnsupportedEncodingException, SQLException {
+        SingleByteCharsetConverter instance = CONVERTER_MAP.get(encodingName);
 
-	/**
-	 * Get a converter for the given encoding name
-	 * 
-	 * @param encodingName
-	 *            the Java character encoding name
-	 * @param conn 
-	 * 
-	 * @return a converter for the given encoding name
-	 * @throws UnsupportedEncodingException
-	 *             if the character encoding is not supported
-	 */
-	public static synchronized SingleByteCharsetConverter getInstance(
-			String encodingName, Connection conn)
-			throws UnsupportedEncodingException, SQLException {
-		SingleByteCharsetConverter instance = CONVERTER_MAP
-				.get(encodingName);
+        if (instance == null) {
+            instance = initCharset(encodingName);
+        }
 
-		if (instance == null) {
-			instance = initCharset(encodingName);
-		}
+        return instance;
+    }
 
-		return instance;
-	}
+    /**
+     * Initialize the shared instance of a converter for the given character
+     * encoding.
+     * 
+     * @param javaEncodingName
+     *            the Java name for the character set to initialize
+     * @return a converter for the given character set
+     * @throws UnsupportedEncodingException
+     *             if the character encoding is not supported
+     */
+    public static SingleByteCharsetConverter initCharset(String javaEncodingName) throws UnsupportedEncodingException, SQLException {
+        try {
+            if (CharsetMapping.isMultibyteCharset(javaEncodingName)) {
+                return null;
+            }
+        } catch (RuntimeException ex) {
+            SQLException sqlEx = SQLError.createSQLException(ex.toString(), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null);
+            sqlEx.initCause(ex);
+            throw sqlEx;
+        }
 
-	/**
-	 * Initialize the shared instance of a converter for the given character
-	 * encoding.
-	 * 
-	 * @param javaEncodingName
-	 *            the Java name for the character set to initialize
-	 * @return a converter for the given character set
-	 * @throws UnsupportedEncodingException
-	 *             if the character encoding is not supported
-	 */
-	public static SingleByteCharsetConverter initCharset(String javaEncodingName)
-			throws UnsupportedEncodingException, SQLException {
-		try {
-			if (CharsetMapping.isMultibyteCharset(javaEncodingName)) {
-				return null;
-			}
-		} catch (RuntimeException ex) {
-			SQLException sqlEx = SQLError.createSQLException(ex.toString(), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, null);
-			sqlEx.initCause(ex);
-			throw sqlEx;
-		}
+        SingleByteCharsetConverter converter = new SingleByteCharsetConverter(javaEncodingName);
 
-		SingleByteCharsetConverter converter = new SingleByteCharsetConverter(
-				javaEncodingName);
+        CONVERTER_MAP.put(javaEncodingName, converter);
 
-		CONVERTER_MAP.put(javaEncodingName, converter);
+        return converter;
+    }
 
-		return converter;
-	}
+    /**
+     * Convert the byte buffer from startPos to a length of length to a string
+     * using the default platform encoding.
+     * 
+     * @param buffer
+     *            the bytes to convert
+     * @param startPos
+     *            the index to start at
+     * @param length
+     *            the number of bytes to convert
+     * @return the String representation of the given bytes
+     */
+    public static String toStringDefaultEncoding(byte[] buffer, int startPos, int length) {
+        return new String(buffer, startPos, length);
+    }
 
-	// ~ Constructors
-	// -----------------------------------------------------------
+    private char[] byteToChars = new char[BYTE_RANGE];
 
-	/**
-	 * Convert the byte buffer from startPos to a length of length to a string
-	 * using the default platform encoding.
-	 * 
-	 * @param buffer
-	 *            the bytes to convert
-	 * @param startPos
-	 *            the index to start at
-	 * @param length
-	 *            the number of bytes to convert
-	 * @return the String representation of the given bytes
-	 */
-	public static String toStringDefaultEncoding(byte[] buffer, int startPos,
-			int length) {
-		return new String(buffer, startPos, length);
-	}
+    private byte[] charToByteMap = new byte[65536];
 
-	// ~ Methods
-	// ----------------------------------------------------------------
+    /**
+     * Prevent instantiation, called out of static method initCharset().
+     * 
+     * @param encodingName
+     *            a JVM character encoding
+     * @throws UnsupportedEncodingException
+     *             if the JVM does not support the encoding
+     */
+    private SingleByteCharsetConverter(String encodingName) throws UnsupportedEncodingException {
+        String allBytesString = new String(allBytes, 0, BYTE_RANGE, encodingName);
+        int allBytesLen = allBytesString.length();
 
-	private char[] byteToChars = new char[BYTE_RANGE];
+        System.arraycopy(unknownCharsMap, 0, this.charToByteMap, 0, this.charToByteMap.length);
 
-	private byte[] charToByteMap = new byte[65536];
+        for (int i = 0; i < BYTE_RANGE && i < allBytesLen; i++) {
+            char c = allBytesString.charAt(i);
+            this.byteToChars[i] = c;
+            this.charToByteMap[c] = allBytes[i];
+        }
+    }
 
-	/**
-	 * Prevent instantiation, called out of static method initCharset().
-	 * 
-	 * @param encodingName
-	 *            a JVM character encoding
-	 * @throws UnsupportedEncodingException
-	 *             if the JVM does not support the encoding
-	 */
-	private SingleByteCharsetConverter(String encodingName)
-			throws UnsupportedEncodingException {
-		String allBytesString = new String(allBytes, 0, BYTE_RANGE,
-				encodingName);
-		int allBytesLen = allBytesString.length();
+    public final byte[] toBytes(char[] c) {
+        if (c == null) {
+            return null;
+        }
 
-		System.arraycopy(unknownCharsMap, 0, this.charToByteMap, 0,
-				this.charToByteMap.length);
+        int length = c.length;
+        byte[] bytes = new byte[length];
 
-		for (int i = 0; i < BYTE_RANGE && i < allBytesLen; i++) {
-			char c = allBytesString.charAt(i);
-			this.byteToChars[i] = c;
-			this.charToByteMap[c] = allBytes[i];
-		}
-	}
+        for (int i = 0; i < length; i++) {
+            bytes[i] = this.charToByteMap[c[i]];
+        }
 
-	public final byte[] toBytes(char[] c) {
-		if (c == null) {
-			return null;
-		}
+        return bytes;
+    }
 
-		int length = c.length;
-		byte[] bytes = new byte[length];
+    public final byte[] toBytesWrapped(char[] c, char beginWrap, char endWrap) {
+        if (c == null) {
+            return null;
+        }
 
-		for (int i = 0; i < length; i++) {
-			bytes[i] = this.charToByteMap[c[i]];
-		}
+        int length = c.length + 2;
+        int charLength = c.length;
 
-		return bytes;
-	}
-	
-	public final byte[] toBytesWrapped(char[] c, char beginWrap, char endWrap) {
-		if (c == null) {
-			return null;
-		}
+        byte[] bytes = new byte[length];
+        bytes[0] = this.charToByteMap[beginWrap];
 
-		int length = c.length + 2;
-		int charLength = c.length;
-		
-		byte[] bytes = new byte[length];
-		bytes[0] = this.charToByteMap[beginWrap];
-		
-		for (int i = 0; i < charLength; i++) {
-			bytes[i + 1] = this.charToByteMap[c[i]];
-		}
-		
-		bytes[length - 1] = this.charToByteMap[endWrap];
+        for (int i = 0; i < charLength; i++) {
+            bytes[i + 1] = this.charToByteMap[c[i]];
+        }
 
-		return bytes;
-	}
+        bytes[length - 1] = this.charToByteMap[endWrap];
 
-	public final byte[] toBytes(char[] chars, int offset, int length) {
-		if (chars == null) {
-			return null;
-		}
+        return bytes;
+    }
 
-		if (length == 0) {
-			return EMPTY_BYTE_ARRAY;
-		}
+    public final byte[] toBytes(char[] chars, int offset, int length) {
+        if (chars == null) {
+            return null;
+        }
 
-		byte[] bytes = new byte[length];
+        if (length == 0) {
+            return EMPTY_BYTE_ARRAY;
+        }
 
-		for (int i = 0; (i < length); i++) {
-			bytes[i] = this.charToByteMap[chars[i + offset]];
-		}
+        byte[] bytes = new byte[length];
 
-		return bytes;
-	}
+        for (int i = 0; (i < length); i++) {
+            bytes[i] = this.charToByteMap[chars[i + offset]];
+        }
 
-	/**
-	 * Convert the given string to an array of bytes.
-	 * 
-	 * @param s
-	 *            the String to convert
-	 * @return the bytes that make up the String
-	 */
-	public final byte[] toBytes(String s) {
-		if (s == null) {
-			return null;
-		}
+        return bytes;
+    }
 
-		int length = s.length();
-		byte[] bytes = new byte[length];
+    /**
+     * Convert the given string to an array of bytes.
+     * 
+     * @param s
+     *            the String to convert
+     * @return the bytes that make up the String
+     */
+    public final byte[] toBytes(String s) {
+        if (s == null) {
+            return null;
+        }
 
-		for (int i = 0; i < length; i++) {
-			bytes[i] = this.charToByteMap[s.charAt(i)];
-		}
+        int length = s.length();
+        byte[] bytes = new byte[length];
 
-		return bytes;
-	}
-	
-	public final byte[] toBytesWrapped(String s, char beginWrap, char endWrap) {
-		if (s == null) {
-			return null;
-		}
+        for (int i = 0; i < length; i++) {
+            bytes[i] = this.charToByteMap[s.charAt(i)];
+        }
 
-		int stringLength = s.length();
-		
-		int length = stringLength + 2;
-		
-		byte[] bytes = new byte[length];
-		
-		bytes[0] = this.charToByteMap[beginWrap];
-		
-		for (int i = 0; i < stringLength; i++) {
-			bytes[i + 1] = this.charToByteMap[s.charAt(i)];
-		}
+        return bytes;
+    }
 
-		bytes[length - 1] = this.charToByteMap[endWrap];
-		
-		return bytes;
-	}
+    public final byte[] toBytesWrapped(String s, char beginWrap, char endWrap) {
+        if (s == null) {
+            return null;
+        }
 
-	/**
-	 * Convert the given string to an array of bytes.
-	 * 
-	 * @param s
-	 *            the String to convert
-	 * @param offset
-	 *            the offset to start at
-	 * @param length
-	 *            length (max) to convert
-	 * 
-	 * @return the bytes that make up the String
-	 */
-	public final byte[] toBytes(String s, int offset, int length) {
-		if (s == null) {
-			return null;
-		}
+        int stringLength = s.length();
 
-		if (length == 0) {
-			return EMPTY_BYTE_ARRAY;
-		}
+        int length = stringLength + 2;
 
-		byte[] bytes = new byte[length];
+        byte[] bytes = new byte[length];
 
-		for (int i = 0; (i < length); i++) {
-			char c = s.charAt(i + offset);
-			bytes[i] = this.charToByteMap[c];
-		}
+        bytes[0] = this.charToByteMap[beginWrap];
 
-		return bytes;
-	}
+        for (int i = 0; i < stringLength; i++) {
+            bytes[i + 1] = this.charToByteMap[s.charAt(i)];
+        }
 
-	/**
-	 * Convert the byte buffer to a string using this instance's character
-	 * encoding.
-	 * 
-	 * @param buffer
-	 *            the bytes to convert to a String
-	 * @return the converted String
-	 */
-	public final String toString(byte[] buffer) {
-		return toString(buffer, 0, buffer.length);
-	}
+        bytes[length - 1] = this.charToByteMap[endWrap];
 
-	/**
-	 * Convert the byte buffer from startPos to a length of length to a string
-	 * using this instance's character encoding.
-	 * 
-	 * @param buffer
-	 *            the bytes to convert
-	 * @param startPos
-	 *            the index to start at
-	 * @param length
-	 *            the number of bytes to convert
-	 * @return the String representation of the given bytes
-	 */
-	public final String toString(byte[] buffer, int startPos, int length) {
-		char[] charArray = new char[length];
-		int readpoint = startPos;
+        return bytes;
+    }
 
-		for (int i = 0; i < length; i++) {
-			charArray[i] = this.byteToChars[buffer[readpoint] - Byte.MIN_VALUE];
-			readpoint++;
-		}
+    /**
+     * Convert the given string to an array of bytes.
+     * 
+     * @param s
+     *            the String to convert
+     * @param offset
+     *            the offset to start at
+     * @param length
+     *            length (max) to convert
+     * 
+     * @return the bytes that make up the String
+     */
+    public final byte[] toBytes(String s, int offset, int length) {
+        if (s == null) {
+            return null;
+        }
 
-		return new String(charArray);
-	}
+        if (length == 0) {
+            return EMPTY_BYTE_ARRAY;
+        }
+
+        byte[] bytes = new byte[length];
+
+        for (int i = 0; (i < length); i++) {
+            char c = s.charAt(i + offset);
+            bytes[i] = this.charToByteMap[c];
+        }
+
+        return bytes;
+    }
+
+    /**
+     * Convert the byte buffer to a string using this instance's character
+     * encoding.
+     * 
+     * @param buffer
+     *            the bytes to convert to a String
+     * @return the converted String
+     */
+    public final String toString(byte[] buffer) {
+        return toString(buffer, 0, buffer.length);
+    }
+
+    /**
+     * Convert the byte buffer from startPos to a length of length to a string
+     * using this instance's character encoding.
+     * 
+     * @param buffer
+     *            the bytes to convert
+     * @param startPos
+     *            the index to start at
+     * @param length
+     *            the number of bytes to convert
+     * @return the String representation of the given bytes
+     */
+    public final String toString(byte[] buffer, int startPos, int length) {
+        char[] charArray = new char[length];
+        int readpoint = startPos;
+
+        for (int i = 0; i < length; i++) {
+            charArray[i] = this.byteToChars[buffer[readpoint] - Byte.MIN_VALUE];
+            readpoint++;
+        }
+
+        return new String(charArray);
+    }
 }

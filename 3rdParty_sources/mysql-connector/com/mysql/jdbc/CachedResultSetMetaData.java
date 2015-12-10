@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -26,31 +26,31 @@ package com.mysql.jdbc;
 import java.util.Map;
 
 public class CachedResultSetMetaData {
-		/** Map column names (and all of their permutations) to column indices */
-		Map<String, Integer> columnNameToIndex = null;
+    /** Map column names (and all of their permutations) to column indices */
+    Map<String, Integer> columnNameToIndex = null;
 
-		/** Cached Field info */
-		Field[] fields;
+    /** Cached Field info */
+    Field[] fields;
 
-		/** Map of fully-specified column names to column indices */
-		Map<String, Integer> fullColumnNameToIndex = null;
+    /** Map of fully-specified column names to column indices */
+    Map<String, Integer> fullColumnNameToIndex = null;
 
-		/** Cached ResultSetMetaData */
-		java.sql.ResultSetMetaData metadata;
+    /** Cached ResultSetMetaData */
+    java.sql.ResultSetMetaData metadata;
 
-		public Map<String, Integer> getColumnNameToIndex() {
-			return columnNameToIndex;
-		}
+    public Map<String, Integer> getColumnNameToIndex() {
+        return this.columnNameToIndex;
+    }
 
-		public Field[] getFields() {
-			return fields;
-		}
+    public Field[] getFields() {
+        return this.fields;
+    }
 
-		public Map<String, Integer> getFullColumnNameToIndex() {
-			return fullColumnNameToIndex;
-		}
+    public Map<String, Integer> getFullColumnNameToIndex() {
+        return this.fullColumnNameToIndex;
+    }
 
-		public java.sql.ResultSetMetaData getMetadata() {
-			return metadata;
-		}
-	}
+    public java.sql.ResultSetMetaData getMetadata() {
+        return this.metadata;
+    }
+}

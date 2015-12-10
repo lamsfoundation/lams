@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -25,6 +25,7 @@ package com.mysql.fabric.proto.xmlrpc;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,74 +46,74 @@ import com.mysql.fabric.xmlrpc.base.Value;
  * library.
  */
 public class InternalXmlRpcMethodCaller implements XmlRpcMethodCaller {
-	private Client xmlRpcClient;
+    private Client xmlRpcClient;
 
-	public InternalXmlRpcMethodCaller(String url) throws FabricCommunicationException {
-		try {
-			xmlRpcClient = new Client(url);
-		} catch(MalformedURLException ex) {
-			throw new FabricCommunicationException(ex);
-		}
-	}
+    public InternalXmlRpcMethodCaller(String url) throws FabricCommunicationException {
+        try {
+            this.xmlRpcClient = new Client(url);
+        } catch (MalformedURLException ex) {
+            throw new FabricCommunicationException(ex);
+        }
+    }
 
-	/**
-	 * Unwrap the underlying object from the Value wrapper.
-	 */
-	private Object unwrapValue(Value v) {
-		if (v.getType() == Value.TYPE_array) {
-			return methodResponseArrayToList((Array)v.getValue());
-		} else if (v.getType() == Value.TYPE_struct) {
-			Map<String, Object> s = new HashMap<String, Object>();
-			for (Member m : ((Struct)v.getValue()).getMember()) {
-				s.put(m.getName(), unwrapValue(m.getValue()));
-			}
-			return s;
-		}
-		return v.getValue();
-	}
+    /**
+     * Unwrap the underlying object from the Value wrapper.
+     */
+    private Object unwrapValue(Value v) {
+        if (v.getType() == Value.TYPE_array) {
+            return methodResponseArrayToList((Array) v.getValue());
+        } else if (v.getType() == Value.TYPE_struct) {
+            Map<String, Object> s = new HashMap<String, Object>();
+            for (Member m : ((Struct) v.getValue()).getMember()) {
+                s.put(m.getName(), unwrapValue(m.getValue()));
+            }
+            return s;
+        }
+        return v.getValue();
+    }
 
-	private List methodResponseArrayToList(Array array) {
-		List result = new ArrayList();
-		for (Value v : array.getData().getValue()) {
-			result.add(unwrapValue(v));
-		}
-		return result;
-	}
+    private List methodResponseArrayToList(Array array) {
+        List result = new ArrayList();
+        for (Value v : array.getData().getValue()) {
+            result.add(unwrapValue(v));
+        }
+        return result;
+    }
 
-	public void setHeader(String name, String value) {
-		this.xmlRpcClient.setHeader(name, value);
-	}
+    public void setHeader(String name, String value) {
+        this.xmlRpcClient.setHeader(name, value);
+    }
 
-	public void clearHeader(String name) {
-		this.xmlRpcClient.clearHeader(name);
-	}
+    public void clearHeader(String name) {
+        this.xmlRpcClient.clearHeader(name);
+    }
 
-	public List call(String methodName, Object args[]) throws FabricCommunicationException {
-		MethodCall methodCall = new MethodCall();
-		Params p = new Params();
-		if (args == null) {
-			args = new Object[] {};
-		}
-		for (int i = 0; i < args.length; ++i) {
-			if (args[i] == null) {
-				throw new NullPointerException("nil args unsupported");
-			} else if (String.class.isAssignableFrom(args[i].getClass())) {
-				p.addParam(new Param(new Value((String)args[i])));
-			} else if (Double.class.isAssignableFrom(args[i].getClass())) {
-				p.addParam(new Param(new Value((Double)args[i])));
-			} else if (Integer.class.isAssignableFrom(args[i].getClass())) {
-				p.addParam(new Param(new Value((Integer)args[i])));
-			} else {
-				throw new IllegalArgumentException("Unknown argument type: " + args[i].getClass());
-			}
-		}
-		methodCall.setMethodName(methodName);
-		methodCall.setParams(p);
-		try {
-			MethodResponse resp = this.xmlRpcClient.execute(methodCall);
-			return methodResponseArrayToList((Array)resp.getParams().getParam().get(0).getValue().getValue());
-		} catch(Exception ex) {
-			throw new FabricCommunicationException("Error during call to `" + methodName + "' (args=" + args + ")", ex); //irrecoverable
-		}
-	}
+    public List call(String methodName, Object args[]) throws FabricCommunicationException {
+        MethodCall methodCall = new MethodCall();
+        Params p = new Params();
+        if (args == null) {
+            args = new Object[] {};
+        }
+        for (int i = 0; i < args.length; ++i) {
+            if (args[i] == null) {
+                throw new NullPointerException("nil args unsupported");
+            } else if (String.class.isAssignableFrom(args[i].getClass())) {
+                p.addParam(new Param(new Value((String) args[i])));
+            } else if (Double.class.isAssignableFrom(args[i].getClass())) {
+                p.addParam(new Param(new Value((Double) args[i])));
+            } else if (Integer.class.isAssignableFrom(args[i].getClass())) {
+                p.addParam(new Param(new Value((Integer) args[i])));
+            } else {
+                throw new IllegalArgumentException("Unknown argument type: " + args[i].getClass());
+            }
+        }
+        methodCall.setMethodName(methodName);
+        methodCall.setParams(p);
+        try {
+            MethodResponse resp = this.xmlRpcClient.execute(methodCall);
+            return methodResponseArrayToList((Array) resp.getParams().getParam().get(0).getValue().getValue());
+        } catch (Exception ex) {
+            throw new FabricCommunicationException("Error during call to `" + methodName + "' (args=" + Arrays.toString(args) + ")", ex); //irrecoverable
+        }
+    }
 }

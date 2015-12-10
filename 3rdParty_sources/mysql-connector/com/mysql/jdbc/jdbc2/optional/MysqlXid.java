@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -27,84 +27,84 @@ import javax.transaction.xa.Xid;
 
 /**
  * Implementation of the XID interface for MySQL XA
- * 
- * @version $Id$
  */
 public class MysqlXid implements Xid {
 
-	int hash = 0;
+    int hash = 0;
 
-	byte[] myBqual;
+    byte[] myBqual;
 
-	int myFormatId;
+    int myFormatId;
 
-	byte[] myGtrid;
+    byte[] myGtrid;
 
-	public MysqlXid(byte[] gtrid, byte[] bqual, int formatId) {
-		this.myGtrid = gtrid;
-		this.myBqual = bqual;
-		this.myFormatId = formatId;
-	}
+    public MysqlXid(byte[] gtrid, byte[] bqual, int formatId) {
+        this.myGtrid = gtrid;
+        this.myBqual = bqual;
+        this.myFormatId = formatId;
+    }
 
-	public boolean equals(Object another) {
+    @Override
+    public boolean equals(Object another) {
 
-		if (another instanceof Xid) {
-			Xid anotherAsXid = (Xid) another;
+        if (another instanceof Xid) {
+            Xid anotherAsXid = (Xid) another;
 
-			if (this.myFormatId != anotherAsXid.getFormatId()) {
-				return false;
-			}
+            if (this.myFormatId != anotherAsXid.getFormatId()) {
+                return false;
+            }
 
-			byte[] otherBqual = anotherAsXid.getBranchQualifier();
-			byte[] otherGtrid = anotherAsXid.getGlobalTransactionId();
+            byte[] otherBqual = anotherAsXid.getBranchQualifier();
+            byte[] otherGtrid = anotherAsXid.getGlobalTransactionId();
 
-			if (otherGtrid != null && otherGtrid.length == this.myGtrid.length) {
-				int length = otherGtrid.length;
+            if (otherGtrid != null && otherGtrid.length == this.myGtrid.length) {
+                int length = otherGtrid.length;
 
-				for (int i = 0; i < length; i++) {
-					if (otherGtrid[i] != this.myGtrid[i]) {
-						return false;
-					}
-				}
+                for (int i = 0; i < length; i++) {
+                    if (otherGtrid[i] != this.myGtrid[i]) {
+                        return false;
+                    }
+                }
 
-				if (otherBqual != null && otherBqual.length == myBqual.length) {
-					length = otherBqual.length;
+                if (otherBqual != null && otherBqual.length == this.myBqual.length) {
+                    length = otherBqual.length;
 
-					for (int i = 0; i < length; i++) {
-						if (otherBqual[i] != this.myBqual[i]) {
-							return false;
-						}
-					}
-				} else {
-					return false;
-				}
+                    for (int i = 0; i < length; i++) {
+                        if (otherBqual[i] != this.myBqual[i]) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public byte[] getBranchQualifier() {
-		return this.myBqual;
-	}
+    public byte[] getBranchQualifier() {
+        return this.myBqual;
+    }
 
-	public int getFormatId() {
-		return this.myFormatId;
-	};
+    public int getFormatId() {
+        return this.myFormatId;
+    };
 
-	public byte[] getGlobalTransactionId() {
-		return this.myGtrid;
-	}
+    public byte[] getGlobalTransactionId() {
+        return this.myGtrid;
+    }
 
-	public synchronized int hashCode() {
-		if (this.hash == 0) {
-			for (int i = 0; i < this.myGtrid.length; i++) {
-				this.hash = 33 * this.hash + this.myGtrid[i];
-			}
-		}
+    @Override
+    public synchronized int hashCode() {
+        if (this.hash == 0) {
+            for (int i = 0; i < this.myGtrid.length; i++) {
+                this.hash = 33 * this.hash + this.myGtrid[i];
+            }
+        }
 
-		return this.hash;
-	}
+        return this.hash;
+    }
 }

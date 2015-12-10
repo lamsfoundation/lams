@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -25,31 +25,25 @@ package com.mysql.jdbc;
 
 /**
  * Represents various constants used in the driver.
- * 
- * @author Mark Matthews
- * 
- * @version $Id$
  */
 public class Constants {
-	/**
-	 * Avoids allocation of empty byte[] when representing 0-length strings.
-	 */
-	public final static byte[] EMPTY_BYTE_ARRAY = new byte[0];
+    /**
+     * Avoids allocation of empty byte[] when representing 0-length strings.
+     */
+    public final static byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
-	/**
-	 * I18N'd representation of the abbreviation for "ms"
-	 */
-	public final static String MILLIS_I18N = Messages.getString("Milliseconds");
-	
-	public final static byte[] SLASH_STAR_SPACE_AS_BYTES = new byte[] {
-			(byte) '/', (byte) '*', (byte) ' ' };
+    /**
+     * I18N'd representation of the abbreviation for "ms"
+     */
+    public final static String MILLIS_I18N = Messages.getString("Milliseconds");
 
-	public final static byte[] SPACE_STAR_SLASH_SPACE_AS_BYTES = new byte[] {
-			(byte) ' ', (byte) '*', (byte) '/', (byte) ' ' };
+    public final static byte[] SLASH_STAR_SPACE_AS_BYTES = new byte[] { (byte) '/', (byte) '*', (byte) ' ' };
 
-	/**
-	 * Prevents instantiation
-	 */
-	private Constants() {
-	}
+    public final static byte[] SPACE_STAR_SLASH_SPACE_AS_BYTES = new byte[] { (byte) ' ', (byte) '*', (byte) '/', (byte) ' ' };
+
+    /**
+     * Prevents instantiation
+     */
+    private Constants() {
+    }
 }

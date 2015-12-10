@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -28,29 +28,30 @@ import java.util.List;
 
 public class Params {
 
-	protected List<Param> param;
+    protected List<Param> param;
 
-	public List<Param> getParam() {
-		if (param == null) {
-			param = new ArrayList<Param>();
-		}
-		return this.param;
-	}
+    public List<Param> getParam() {
+        if (this.param == null) {
+            this.param = new ArrayList<Param>();
+        }
+        return this.param;
+    }
 
-	public void addParam(Param p) {
-		getParam().add(p);
-	}
+    public void addParam(Param p) {
+        getParam().add(p);
+    }
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		if (this.param != null) {
-			sb.append("<params>");
-			for (int i = 0; i < this.param.size(); i++) {
-				sb.append(this.param.get(i).toString());
-			}
-			sb.append("</params>");
-		}
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (this.param != null) {
+            sb.append("<params>");
+            for (int i = 0; i < this.param.size(); i++) {
+                sb.append(this.param.get(i).toString());
+            }
+            sb.append("</params>");
+        }
+        return sb.toString();
+    }
 
 }

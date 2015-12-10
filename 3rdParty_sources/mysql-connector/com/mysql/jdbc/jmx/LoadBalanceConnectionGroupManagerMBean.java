@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -25,31 +25,30 @@ package com.mysql.jdbc.jmx;
 
 import java.sql.SQLException;
 
-
 public interface LoadBalanceConnectionGroupManagerMBean {
 
-	public abstract int getActiveHostCount(String group);
+    public abstract int getActiveHostCount(String group);
 
-	public abstract int getTotalHostCount(String group);
+    public abstract int getTotalHostCount(String group);
 
-	public abstract long getTotalLogicalConnectionCount(String group);
+    public abstract long getTotalLogicalConnectionCount(String group);
 
-	public abstract long getActiveLogicalConnectionCount(String group);
+    public abstract long getActiveLogicalConnectionCount(String group);
 
-	public abstract long getActivePhysicalConnectionCount(String group);
+    public abstract long getActivePhysicalConnectionCount(String group);
 
-	public abstract long getTotalPhysicalConnectionCount(String group);
+    public abstract long getTotalPhysicalConnectionCount(String group);
 
-	public abstract long getTotalTransactionCount(String group);
+    public abstract long getTotalTransactionCount(String group);
 
-	public abstract void removeHost(String group, String host) throws SQLException;
+    public abstract void removeHost(String group, String host) throws SQLException;
 
-	public abstract void stopNewConnectionsToHost(String group, String host) throws SQLException;
+    public abstract void stopNewConnectionsToHost(String group, String host) throws SQLException;
 
-	public abstract void addHost(String group, String host, boolean forExisting);
-	
-	public abstract String getActiveHostsList(String group);
-	
-	public abstract String getRegisteredConnectionGroups();
+    public abstract void addHost(String group, String host, boolean forExisting);
+
+    public abstract String getActiveHostsList(String group);
+
+    public abstract String getRegisteredConnectionGroups();
 
 }

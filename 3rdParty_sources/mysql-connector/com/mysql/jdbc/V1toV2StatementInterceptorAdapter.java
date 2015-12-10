@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -27,35 +27,31 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class V1toV2StatementInterceptorAdapter implements StatementInterceptorV2 {
-	private final StatementInterceptor toProxy;
-	
-	public V1toV2StatementInterceptorAdapter(StatementInterceptor toProxy) {
-		this.toProxy = toProxy;
-	}
-	public ResultSetInternalMethods postProcess(String sql,
-			Statement interceptedStatement,
-			ResultSetInternalMethods originalResultSet, Connection connection,
-			int warningCount, boolean noIndexUsed, boolean noGoodIndexUsed, 
-			SQLException statementException) throws SQLException {
-		return toProxy.postProcess(sql, interceptedStatement, originalResultSet, connection);
-	}
+    private final StatementInterceptor toProxy;
 
-	public void destroy() {
-		toProxy.destroy();
-	}
+    public V1toV2StatementInterceptorAdapter(StatementInterceptor toProxy) {
+        this.toProxy = toProxy;
+    }
 
-	public boolean executeTopLevelOnly() {
-		return toProxy.executeTopLevelOnly();
-	}
+    public ResultSetInternalMethods postProcess(String sql, Statement interceptedStatement, ResultSetInternalMethods originalResultSet, Connection connection,
+            int warningCount, boolean noIndexUsed, boolean noGoodIndexUsed, SQLException statementException) throws SQLException {
+        return this.toProxy.postProcess(sql, interceptedStatement, originalResultSet, connection);
+    }
 
-	public void init(Connection conn, Properties props) throws SQLException {
-		toProxy.init(conn, props);
-	}
+    public void destroy() {
+        this.toProxy.destroy();
+    }
 
-	public ResultSetInternalMethods preProcess(String sql,
-			Statement interceptedStatement, Connection connection)
-			throws SQLException {
-		return toProxy.preProcess(sql, interceptedStatement, connection);
-	}
+    public boolean executeTopLevelOnly() {
+        return this.toProxy.executeTopLevelOnly();
+    }
+
+    public void init(Connection conn, Properties props) throws SQLException {
+        this.toProxy.init(conn, props);
+    }
+
+    public ResultSetInternalMethods preProcess(String sql, Statement interceptedStatement, Connection connection) throws SQLException {
+        return this.toProxy.preProcess(sql, interceptedStatement, connection);
+    }
 
 }

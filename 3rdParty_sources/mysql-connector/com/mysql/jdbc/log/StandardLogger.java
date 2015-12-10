@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -29,297 +29,296 @@ import com.mysql.jdbc.Util;
 import com.mysql.jdbc.profiler.ProfilerEvent;
 
 /**
- * Provides logging facilities for those platforms that don't have built-in
- * facilities. Simply logs messages to STDERR.
- * 
- * @author Mark Matthews
- * 
- * @version $Id$
+ * Provides logging facilities for those platforms that don't have built-in facilities. Simply logs messages to STDERR.
  */
 public class StandardLogger implements Log {
-	private static final int FATAL = 0;
+    private static final int FATAL = 0;
 
-	private static final int ERROR = 1;
+    private static final int ERROR = 1;
 
-	private static final int WARN = 2;
+    private static final int WARN = 2;
 
-	private static final int INFO = 3;
+    private static final int INFO = 3;
 
-	private static final int DEBUG = 4;
+    private static final int DEBUG = 4;
 
-	private static final int TRACE = 5;
+    private static final int TRACE = 5;
 
-	public static StringBuffer bufferedLog = null;
+    private static StringBuffer bufferedLog = null;
 
-	private boolean logLocationInfo = true;
+    private boolean logLocationInfo = true;
 
-	/**
-	 * Creates a new StandardLogger object.
-	 * 
-	 * @param name
-	 *            the name of the configuration to use -- ignored
-	 */
-	public StandardLogger(String name) {
-		this(name, false);
-	}
+    /**
+     * Creates a new StandardLogger object.
+     * 
+     * @param name
+     *            the name of the configuration to use -- ignored
+     */
+    public StandardLogger(String name) {
+        this(name, false);
+    }
 
-	/**
-	 * 
-	 * @param name
-	 * @param logLocationInfo
-	 */
-	public StandardLogger(String name, boolean logLocationInfo) {
-		this.logLocationInfo = logLocationInfo;
-	}
+    /**
+     * @param name
+     * @param logLocationInfo
+     */
+    public StandardLogger(String name, boolean logLocationInfo) {
+        this.logLocationInfo = logLocationInfo;
+    }
 
-	public static void saveLogsToBuffer() {
-		if (bufferedLog == null) {
-			bufferedLog = new StringBuffer();
-		}
-	}
+    public static void startLoggingToBuffer() {
+        bufferedLog = new StringBuffer();
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isDebugEnabled()
-	 */
-	public boolean isDebugEnabled() {
-		return true;
-	}
+    public static void dropBuffer() {
+        bufferedLog = null;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isErrorEnabled()
-	 */
-	public boolean isErrorEnabled() {
-		return true;
-	}
+    public static Appendable getBuffer() {
+        return bufferedLog;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isFatalEnabled()
-	 */
-	public boolean isFatalEnabled() {
-		return true;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isDebugEnabled()
+     */
+    public boolean isDebugEnabled() {
+        return true;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isInfoEnabled()
-	 */
-	public boolean isInfoEnabled() {
-		return true;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isErrorEnabled()
+     */
+    public boolean isErrorEnabled() {
+        return true;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isTraceEnabled()
-	 */
-	public boolean isTraceEnabled() {
-		return true;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isFatalEnabled()
+     */
+    public boolean isFatalEnabled() {
+        return true;
+    }
 
-	/**
-	 * @see com.mysql.jdbc.log.Log#isWarnEnabled()
-	 */
-	public boolean isWarnEnabled() {
-		return true;
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isInfoEnabled()
+     */
+    public boolean isInfoEnabled() {
+        return true;
+    }
 
-	/**
-	 * Logs the given message instance using the 'debug' level
-	 * 
-	 * @param message
-	 *            the message to log
-	 */
-	public void logDebug(Object message) {
-		logInternal(DEBUG, message, null);
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isTraceEnabled()
+     */
+    public boolean isTraceEnabled() {
+        return true;
+    }
 
-	/**
-	 * Logs the given message and Throwable at the 'debug' level.
-	 * 
-	 * @param message
-	 *            the message to log
-	 * @param exception
-	 *            the throwable to log (may be null)
-	 */
-	public void logDebug(Object message, Throwable exception) {
-		logInternal(DEBUG, message, exception);
-	}
+    /**
+     * @see com.mysql.jdbc.log.Log#isWarnEnabled()
+     */
+    public boolean isWarnEnabled() {
+        return true;
+    }
 
-	/**
-	 * Logs the given message instance using the 'error' level
-	 * 
-	 * @param message
-	 *            the message to log
-	 */
-	public void logError(Object message) {
-		logInternal(ERROR, message, null);
-	}
+    /**
+     * Logs the given message instance using the 'debug' level
+     * 
+     * @param message
+     *            the message to log
+     */
+    public void logDebug(Object message) {
+        logInternal(DEBUG, message, null);
+    }
 
-	/**
-	 * Logs the given message and Throwable at the 'error' level.
-	 * 
-	 * @param message
-	 *            the message to log
-	 * @param exception
-	 *            the throwable to log (may be null)
-	 */
-	public void logError(Object message, Throwable exception) {
-		logInternal(ERROR, message, exception);
-	}
+    /**
+     * Logs the given message and Throwable at the 'debug' level.
+     * 
+     * @param message
+     *            the message to log
+     * @param exception
+     *            the throwable to log (may be null)
+     */
+    public void logDebug(Object message, Throwable exception) {
+        logInternal(DEBUG, message, exception);
+    }
 
-	/**
-	 * Logs the given message instance using the 'fatal' level
-	 * 
-	 * @param message
-	 *            the message to log
-	 */
-	public void logFatal(Object message) {
-		logInternal(FATAL, message, null);
-	}
+    /**
+     * Logs the given message instance using the 'error' level
+     * 
+     * @param message
+     *            the message to log
+     */
+    public void logError(Object message) {
+        logInternal(ERROR, message, null);
+    }
 
-	/**
-	 * Logs the given message and Throwable at the 'fatal' level.
-	 * 
-	 * @param message
-	 *            the message to log
-	 * @param exception
-	 *            the throwable to log (may be null)
-	 */
-	public void logFatal(Object message, Throwable exception) {
-		logInternal(FATAL, message, exception);
-	}
+    /**
+     * Logs the given message and Throwable at the 'error' level.
+     * 
+     * @param message
+     *            the message to log
+     * @param exception
+     *            the throwable to log (may be null)
+     */
+    public void logError(Object message, Throwable exception) {
+        logInternal(ERROR, message, exception);
+    }
 
-	/**
-	 * Logs the given message instance using the 'info' level
-	 * 
-	 * @param message
-	 *            the message to log
-	 */
-	public void logInfo(Object message) {
-		logInternal(INFO, message, null);
-	}
+    /**
+     * Logs the given message instance using the 'fatal' level
+     * 
+     * @param message
+     *            the message to log
+     */
+    public void logFatal(Object message) {
+        logInternal(FATAL, message, null);
+    }
 
-	/**
-	 * Logs the given message and Throwable at the 'info' level.
-	 * 
-	 * @param message
-	 *            the message to log
-	 * @param exception
-	 *            the throwable to log (may be null)
-	 */
-	public void logInfo(Object message, Throwable exception) {
-		logInternal(INFO, message, exception);
-	}
+    /**
+     * Logs the given message and Throwable at the 'fatal' level.
+     * 
+     * @param message
+     *            the message to log
+     * @param exception
+     *            the throwable to log (may be null)
+     */
+    public void logFatal(Object message, Throwable exception) {
+        logInternal(FATAL, message, exception);
+    }
 
-	/**
-	 * Logs the given message instance using the 'trace' level
-	 * 
-	 * @param message
-	 *            the message to log
-	 */
-	public void logTrace(Object message) {
-		logInternal(TRACE, message, null);
-	}
+    /**
+     * Logs the given message instance using the 'info' level
+     * 
+     * @param message
+     *            the message to log
+     */
+    public void logInfo(Object message) {
+        logInternal(INFO, message, null);
+    }
 
-	/**
-	 * Logs the given message and Throwable at the 'trace' level.
-	 * 
-	 * @param message
-	 *            the message to log
-	 * @param exception
-	 *            the throwable to log (may be null)
-	 */
-	public void logTrace(Object message, Throwable exception) {
-		logInternal(TRACE, message, exception);
-	}
+    /**
+     * Logs the given message and Throwable at the 'info' level.
+     * 
+     * @param message
+     *            the message to log
+     * @param exception
+     *            the throwable to log (may be null)
+     */
+    public void logInfo(Object message, Throwable exception) {
+        logInternal(INFO, message, exception);
+    }
 
-	/**
-	 * Logs the given message instance using the 'warn' level
-	 * 
-	 * @param message
-	 *            the message to log
-	 */
-	public void logWarn(Object message) {
-		logInternal(WARN, message, null);
-	}
+    /**
+     * Logs the given message instance using the 'trace' level
+     * 
+     * @param message
+     *            the message to log
+     */
+    public void logTrace(Object message) {
+        logInternal(TRACE, message, null);
+    }
 
-	/**
-	 * Logs the given message and Throwable at the 'warn' level.
-	 * 
-	 * @param message
-	 *            the message to log
-	 * @param exception
-	 *            the throwable to log (may be null)
-	 */
-	public void logWarn(Object message, Throwable exception) {
-		logInternal(WARN, message, exception);
-	}
+    /**
+     * Logs the given message and Throwable at the 'trace' level.
+     * 
+     * @param message
+     *            the message to log
+     * @param exception
+     *            the throwable to log (may be null)
+     */
+    public void logTrace(Object message, Throwable exception) {
+        logInternal(TRACE, message, exception);
+    }
 
-	protected void logInternal(int level, Object msg, Throwable exception) {
-		StringBuffer msgBuf = new StringBuffer();
-		msgBuf.append(new Date().toString());
-		msgBuf.append(" ");
+    /**
+     * Logs the given message instance using the 'warn' level
+     * 
+     * @param message
+     *            the message to log
+     */
+    public void logWarn(Object message) {
+        logInternal(WARN, message, null);
+    }
 
-		switch (level) {
-		case FATAL:
-			msgBuf.append("FATAL: ");
+    /**
+     * Logs the given message and Throwable at the 'warn' level.
+     * 
+     * @param message
+     *            the message to log
+     * @param exception
+     *            the throwable to log (may be null)
+     */
+    public void logWarn(Object message, Throwable exception) {
+        logInternal(WARN, message, exception);
+    }
 
-			break;
+    protected void logInternal(int level, Object msg, Throwable exception) {
+        StringBuilder msgBuf = new StringBuilder();
+        msgBuf.append(new Date().toString());
+        msgBuf.append(" ");
 
-		case ERROR:
-			msgBuf.append("ERROR: ");
+        switch (level) {
+            case FATAL:
+                msgBuf.append("FATAL: ");
 
-			break;
+                break;
 
-		case WARN:
-			msgBuf.append("WARN: ");
+            case ERROR:
+                msgBuf.append("ERROR: ");
 
-			break;
+                break;
 
-		case INFO:
-			msgBuf.append("INFO: ");
+            case WARN:
+                msgBuf.append("WARN: ");
 
-			break;
+                break;
 
-		case DEBUG:
-			msgBuf.append("DEBUG: ");
+            case INFO:
+                msgBuf.append("INFO: ");
 
-			break;
+                break;
 
-		case TRACE:
-			msgBuf.append("TRACE: ");
+            case DEBUG:
+                msgBuf.append("DEBUG: ");
 
-			break;
-		}
+                break;
 
-		if (msg instanceof ProfilerEvent) {
-			msgBuf.append(LogUtils.expandProfilerEventIfNecessary(msg));
+            case TRACE:
+                msgBuf.append("TRACE: ");
 
-		} else {
-			if (this.logLocationInfo && level != TRACE) {
-				Throwable locationException = new Throwable();
-				msgBuf.append(LogUtils
-						.findCallingClassAndMethod(locationException));
-				msgBuf.append(" ");
-			}
-			
-			if (msg != null) {
-				msgBuf.append(String.valueOf(msg));
-			}
-		}
+                break;
+        }
 
-		if (exception != null) {
-			msgBuf.append("\n");
-			msgBuf.append("\n");
-			msgBuf.append("EXCEPTION STACK TRACE:");
-			msgBuf.append("\n");
-			msgBuf.append("\n");
-			msgBuf.append(Util.stackTraceToString(exception));
-		}
+        if (msg instanceof ProfilerEvent) {
+            msgBuf.append(LogUtils.expandProfilerEventIfNecessary(msg));
 
-		String messageAsString = msgBuf.toString();
+        } else {
+            if (this.logLocationInfo && level != TRACE) {
+                Throwable locationException = new Throwable();
+                msgBuf.append(LogUtils.findCallingClassAndMethod(locationException));
+                msgBuf.append(" ");
+            }
 
-		System.err.println(messageAsString);
+            if (msg != null) {
+                msgBuf.append(String.valueOf(msg));
+            }
+        }
 
-		if (bufferedLog != null) {
-			bufferedLog.append(messageAsString);
-		}
-	}
+        if (exception != null) {
+            msgBuf.append("\n");
+            msgBuf.append("\n");
+            msgBuf.append("EXCEPTION STACK TRACE:");
+            msgBuf.append("\n");
+            msgBuf.append("\n");
+            msgBuf.append(Util.stackTraceToString(exception));
+        }
+
+        String messageAsString = msgBuf.toString();
+
+        System.err.println(messageAsString);
+
+        if (bufferedLog != null) {
+            bufferedLog.append(messageAsString);
+        }
+    }
 }

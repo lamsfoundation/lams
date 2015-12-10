@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -28,36 +28,26 @@ import java.io.IOException;
 
 /**
  * A java.io.OutputStream used to write ASCII data into Blobs and Clobs
- * 
- * @author Mark Matthews
  */
 class WatchableOutputStream extends ByteArrayOutputStream {
-	// ~ Instance fields
-	// --------------------------------------------------------
+    private OutputStreamWatcher watcher;
 
-	private OutputStreamWatcher watcher;
+    /**
+     * @see java.io.OutputStream#close()
+     */
+    @Override
+    public void close() throws IOException {
+        super.close();
 
-	// ~ Methods
-	// ----------------------------------------------------------------
+        if (this.watcher != null) {
+            this.watcher.streamClosed(this);
+        }
+    }
 
-	/**
-	 * @see java.io.OutputStream#close()
-	 */
-	public void close() throws IOException {
-		super.close();
-
-		if (this.watcher != null) {
-			this.watcher.streamClosed(this);
-		}
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param watcher
-	 *            DOCUMENT ME!
-	 */
-	public void setWatcher(OutputStreamWatcher watcher) {
-		this.watcher = watcher;
-	}
+    /**
+     * @param watcher
+     */
+    public void setWatcher(OutputStreamWatcher watcher) {
+        this.watcher = watcher;
+    }
 }

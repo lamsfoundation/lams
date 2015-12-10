@@ -4,7 +4,7 @@
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -24,19 +24,13 @@
 package com.mysql.jdbc;
 
 /**
- * Wraps output from EscapeProcessor, to help prevent multiple passes over the
- * query string, to detect characters such as '@' (defining/using a variable),
+ * Wraps output from EscapeProcessor, to help prevent multiple passes over the query string, to detect characters such as '@' (defining/using a variable),
  * which are used further up the call stack to handle failover.
- * 
- * @author Mark Matthews
- * 
- * @version $Id: EscapeProcessorResult.java,v 1.1.2.1 2005/05/13 18:58:38
- *          mmatthews Exp $
  */
 class EscapeProcessorResult {
-	boolean callingStoredFunction = false;
+    boolean callingStoredFunction = false;
 
-	String escapedSql;
+    String escapedSql;
 
-	byte usesVariables = StatementImpl.USES_VARIABLES_FALSE;
+    byte usesVariables = StatementImpl.USES_VARIABLES_FALSE;
 }

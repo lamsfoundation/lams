@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 
   The MySQL Connector/J is licensed under the terms of the GPLv2
   <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most MySQL Connectors.
   There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
-  this software, see the FLOSS License Exception
+  this software, see the FOSS License Exception
   <http://www.mysql.com/about/legal/licensing/foss-exception.html>.
 
   This program is free software; you can redistribute it and/or modify it under the terms
@@ -33,104 +33,94 @@ import java.sql.Struct;
 import java.util.Properties;
 import java.util.TimerTask;
 
-
 import com.mysql.jdbc.ConnectionImpl;
+import com.mysql.jdbc.LoadBalancedMySQLConnection;
+import com.mysql.jdbc.LoadBalancedConnectionProxy;
 import com.mysql.jdbc.Messages;
 import com.mysql.jdbc.SQLError;
 
+public class JDBC4LoadBalancedMySQLConnection extends LoadBalancedMySQLConnection implements JDBC4MySQLConnection {
 
-public class JDBC4LoadBalancedMySQLConnection extends
-		LoadBalancedMySQLConnection implements JDBC4MySQLConnection {
-	
-	public JDBC4LoadBalancedMySQLConnection(LoadBalancingConnectionProxy proxy) throws SQLException {
-		super(proxy);
-	}
+    public JDBC4LoadBalancedMySQLConnection(LoadBalancedConnectionProxy proxy) throws SQLException {
+        super(proxy);
+    }
 
-	private JDBC4Connection getJDBC4Connection(){
-		return (JDBC4Connection)this.proxy.currentConn;
-	}
-	public SQLXML createSQLXML() throws SQLException {
-		return this.getJDBC4Connection().createSQLXML();
-	}
-	
-	public java.sql.Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-		return this.getJDBC4Connection(). createArrayOf(typeName, elements);
-	}
+    private JDBC4MySQLConnection getJDBC4Connection() {
+        return (JDBC4MySQLConnection) getActiveMySQLConnection();
+    }
 
-	public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-		return this.getJDBC4Connection().createStruct(typeName, attributes);
-	}
+    public SQLXML createSQLXML() throws SQLException {
+        return this.getJDBC4Connection().createSQLXML();
+    }
 
-	public Properties getClientInfo() throws SQLException {
-		return this.getJDBC4Connection().getClientInfo();
-	}
+    public java.sql.Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+        return this.getJDBC4Connection().createArrayOf(typeName, elements);
+    }
 
-	public String getClientInfo(String name) throws SQLException {
-		return this.getJDBC4Connection().getClientInfo(name);
-	}
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+        return this.getJDBC4Connection().createStruct(typeName, attributes);
+    }
 
-	public boolean isValid(int timeout) throws SQLException {
-		synchronized (proxy) {
-			return this.getJDBC4Connection().isValid(timeout);
-		}
-	}
+    public Properties getClientInfo() throws SQLException {
+        return this.getJDBC4Connection().getClientInfo();
+    }
 
+    public String getClientInfo(String name) throws SQLException {
+        return this.getJDBC4Connection().getClientInfo(name);
+    }
 
-	public void setClientInfo(Properties properties) throws SQLClientInfoException {
-		this.getJDBC4Connection().setClientInfo(properties);
-	}
+    public boolean isValid(int timeout) throws SQLException {
+        return this.getJDBC4Connection().isValid(timeout);
+    }
 
-	public void setClientInfo(String name, String value) throws SQLClientInfoException {
-		this.getJDBC4Connection().setClientInfo(name, value);
-	}
-	
-	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		checkClosed();
-		
-		// This works for classes that aren't actually wrapping
-		// anything
-		return iface.isInstance(this);
-	}
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        this.getJDBC4Connection().setClientInfo(properties);
+    }
 
+    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+        this.getJDBC4Connection().setClientInfo(name, value);
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        checkClosed();
+
+        // This works for classes that aren't actually wrapping anything
+        return iface.isInstance(this);
+    }
 
     public <T> T unwrap(java.lang.Class<T> iface) throws java.sql.SQLException {
-    	try {
-    		// This works for classes that aren't actually wrapping
-    		// anything
+        try {
+            // This works for classes that aren't actually wrapping anything
             return iface.cast(this);
         } catch (ClassCastException cce) {
-            throw SQLError.createSQLException("Unable to unwrap to " + iface.toString(), 
-            		SQLError.SQL_STATE_ILLEGAL_ARGUMENT, getExceptionInterceptor());
+            throw SQLError.createSQLException("Unable to unwrap to " + iface.toString(), SQLError.SQL_STATE_ILLEGAL_ARGUMENT, getExceptionInterceptor());
         }
     }
-    
-	/**
-	 * @see java.sql.Connection#createBlob()
-	 */
-	public Blob createBlob() {
-	    return this.getJDBC4Connection().createBlob();
-	}
 
-	/**
-	 * @see java.sql.Connection#createClob()
-	 */
-	public Clob createClob() {
-	    return this.getJDBC4Connection().createClob();
-	}
+    /**
+     * @see java.sql.Connection#createBlob()
+     */
+    public Blob createBlob() {
+        return this.getJDBC4Connection().createBlob();
+    }
 
-	/**
-	 * @see java.sql.Connection#createNClob()
-	 */
-	public NClob createNClob() {
-	    return this.getJDBC4Connection().createNClob();
-	}
-	
-	protected JDBC4ClientInfoProvider getClientInfoProviderImpl() throws SQLException {
-		synchronized (proxy) {
-			return this.getJDBC4Connection().getClientInfoProviderImpl();
-		}
-	
-	}
-	
-	
+    /**
+     * @see java.sql.Connection#createClob()
+     */
+    public Clob createClob() {
+        return this.getJDBC4Connection().createClob();
+    }
+
+    /**
+     * @see java.sql.Connection#createNClob()
+     */
+    public NClob createNClob() {
+        return this.getJDBC4Connection().createNClob();
+    }
+
+    public JDBC4ClientInfoProvider getClientInfoProviderImpl() throws SQLException {
+        synchronized (getThisAsProxy()) {
+            return this.getJDBC4Connection().getClientInfoProviderImpl();
+        }
+    }
 }
