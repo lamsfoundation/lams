@@ -1,0 +1,44 @@
+#formulaButtonsTable { 
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+#formulaButtonsTable td {
+	padding: 6px 0 3px 0;
+	border-bottom: 1px solid gray;
+}
+
+#formulaButtonsTable th {
+	font-size: 14px;
+	font-weight: normal;
+	padding-right: 15px;
+	border-bottom: 1px solid gray;
+}
+
+#formulaButtonsTable tbody tr:last-child td, #formulaButtonsTable tbody tr:last-child th {
+	border-bottom: none;
+}
+
+#formulaButtonsTable button {
+	width: 30px;
+	height: 25px;
+	margin: 0 0 4px 0;
+	background: none;
+	background-color: #EEEEEE;
+	color: black;
+	font-size : 14px;
+	font-weight: normal;
+}
+
+#formulaButtonsTable button:hover {
+	background-color: #DDDDDD;
+}
+
+#formulaButtonsTable button span {
+	padding: 2px 3px 3px 3px !important;
+}
+
+#formulaButtonsTable button.formulaButtonShifted span {
+	padding-top: 0px !important;
+}
