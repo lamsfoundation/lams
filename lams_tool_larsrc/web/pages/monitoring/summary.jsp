@@ -32,7 +32,6 @@
 				autowidth: true,
 				shrinkToFit: false,
 			   	colNames:['#',
-						'sessionId',
 						'itemUid',
 						"<fmt:message key="monitoring.label.title" />",
 						"<fmt:message key="monitoring.label.type" />",
@@ -42,7 +41,6 @@
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
-			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
 			   		{name:'itemUid', index:'itemUid', width:0, hidden: true},
 			   		{name:'title', index:'title', width:260},
 			   		{name:'type', index:'type', width:90, align:"center"},
@@ -54,18 +52,20 @@
 				subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 					var subgridTableId = subgrid_id+"_t";
-					var sessionId = jQuery("#group${groupSummary.sessionId}").getRowData(row_id)["sessionId"];
 					var itemUid = jQuery("#group${groupSummary.sessionId}").getRowData(row_id)["itemUid"];
 					   
-					jQuery("#"+subgrid_id).html("<table id='" + subgridTableId + "' class='scroll'></table>");
+					jQuery("#"+subgrid_id).html("<table id='" + subgridTableId + "' class='scroll'></table>" + 
+							"<div id='pager-" + subgridTableId + "' class='scroll'></div>")
 					   
 					jQuery("#"+subgridTableId).jqGrid({
 						datatype: "json",
-						loadonce: true,
-						rowNum: 10000,
-						url: "<c:url value='/monitoring/getSubgridData.do'/>?itemUid=" + itemUid + '&toolSessionID=' + sessionId,
+						url: "<c:url value='/monitoring/getSubgridData.do'/>?itemUid=" + itemUid + '&toolSessionID=${groupSummary.sessionId}',
 						height: "100%",
 						autowidth:true,
+						pager: 'pager-' + subgridTableId,
+						rowList:[10,20,30,40,50,100],
+						rowNum:10,
+						viewrecords:true,
 						colNames: [
 						   '',
 						   "<fmt:message key="monitoring.label.user.name"/>",
@@ -75,16 +75,20 @@
 						],
 						colModel:[
 						   {name:'id', index:'id', hidden:true},
-						   {name:'userName',index:'userName'},
-						   {name:'startTime', index:'startTime', width:140, align:"center"},
-						   {name:'completeTime', index:'completeTime', width:140, align:"center"},
-						   {name:'timeTaken',index:'timeTaken', width:70, align:"center"}
+						   {name:'userName',index:'userName', searchoptions: { clearSearch: false }},
+						   {name:'startTime', index:'startTime', width:140, align:"center", search:false},
+						   {name:'completeTime', index:'completeTime', width:140, align:"center", search:false},
+						   {name:'timeTaken',index:'timeTaken', width:70, align:"center", search:false}
 						],
 						loadError: function(xhr,st,err) {
 					    	jQuery("#"+subgridTableId).clearGridData();
 					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 					    }
 					})
+					.jqGrid('filterToolbar', { 
+						searchOnEnter: false
+					})
+					.navGrid("#pager-" + subgridTableId, {edit:false,add:false,del:false,search:false});
 				}
 			});
 			
@@ -119,7 +123,6 @@
 				
    	     		jQuery("#group${groupSummary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:		"${i.index + 1}",
-   	   	     		sessionId:	"${groupSummary.sessionId}",
    	   	     		itemUid:	"${item.itemUid}",
    	   	     		title:	"<a href='#nogo' onclick='javascript:viewItem(${item.itemUid}); return false;'>${itemTitle}</a>",
    	   	     		type:	"${itemTypeLabel}",
