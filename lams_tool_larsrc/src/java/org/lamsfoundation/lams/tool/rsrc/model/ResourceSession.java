@@ -30,129 +30,135 @@ import org.apache.log4j.Logger;
 
 /**
  * Resource
+ * 
  * @author Dapeng Ni
- *
- * @hibernate.class  table="tl_larsrc11_session"
- *
+ * 
+ * @hibernate.class table="tl_larsrc11_session"
+ * 
  */
-public class ResourceSession{
-	
-	private static Logger log = Logger.getLogger(ResourceSession.class);
-	
-	private Long uid;
-	private Long sessionId;
-	private String sessionName;
-	private Resource resource;
-	private Date sessionStartDate;
-	private Date sessionEndDate;
-	//finish or not
-	private int status;
-	//resource Items
-	private Set resourceItems;
+public class ResourceSession {
 
-  	
-//  **********************************************************
-  	//		Get/Set methods
-//  **********************************************************
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * @return Returns the learnerID.
-	 */
-	public Long getUid() {
-		return uid;
-	}
-	public void setUid(Long uuid) {
-		this.uid = uuid;
-	}
-	
-	/**
-	 * @hibernate.property column="session_end_date"
-	 * @return
-	 */
-	public Date getSessionEndDate() {
-		return sessionEndDate;
-	}
-	public void setSessionEndDate(Date sessionEndDate) {
-		this.sessionEndDate = sessionEndDate;
-	}
-	/**
-	 * @hibernate.property column="session_start_date"
-	 * 
-	 * @return
-	 */
-	public Date getSessionStartDate() {
-		return sessionStartDate;
-	}
-	public void setSessionStartDate(Date sessionStartDate) {
-		this.sessionStartDate = sessionStartDate;
-	}
-	/**
-	 * @hibernate.property
-	 * @return
-	 */
-	public int getStatus() {
-		return status;
-	}
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    private static Logger log = Logger.getLogger(ResourceSession.class);
 
-	/**
- 	 * @hibernate.many-to-one  column="resource_uid"
- 	 * cascade="none"
-	 * @return
-	 */
-	public Resource getResource() {
-		return resource;
-	}
-	public void setResource(Resource resource) {
-		this.resource = resource;
-	}
-	/**
-	 * @hibernate.property column="session_id"
-	 * @return
-	 */
-	public Long getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
-	}
+    private Long uid;
+    private Long sessionId;
+    private String sessionName;
+    private Resource resource;
+    private Date sessionStartDate;
+    private Date sessionEndDate;
+    // finish or not
+    private int status;
+    // resource Items
+    private Set resourceItems;
 
-	/**
-	 * @hibernate.property column="session_name" length="250"
-	 * @return Returns the session name
-	 */
-	public String getSessionName() {
-		return sessionName;
-	}
+    // **********************************************************
+    // Get/Set methods
+    // **********************************************************
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @return Returns the learnerID.
+     */
+    public Long getUid() {
+	return uid;
+    }
 
-	/**
-	 * 
-	 * @param sessionName The session name to set.
-	 */
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
+    public void setUid(Long uuid) {
+	this.uid = uuid;
+    }
 
-	/**
-	 * 
-	 * 
-	 * @hibernate.set lazy="true"
-	 *                inverse="false"
-	 *                cascade="all"
-	 *                order-by="create_date desc"
-	 * @hibernate.collection-key column="session_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
-	 * 
-	 * @return
-	 */
-	public Set getResourceItems() {
-		return resourceItems;
-	}
-	public void setResourceItems(Set resourceItems) {
-		this.resourceItems= resourceItems;
-	}
+    /**
+     * @hibernate.property column="session_end_date"
+     * @return
+     */
+    public Date getSessionEndDate() {
+	return sessionEndDate;
+    }
 
+    public void setSessionEndDate(Date sessionEndDate) {
+	this.sessionEndDate = sessionEndDate;
+    }
+
+    /**
+     * @hibernate.property column="session_start_date"
+     * 
+     * @return
+     */
+    public Date getSessionStartDate() {
+	return sessionStartDate;
+    }
+
+    public void setSessionStartDate(Date sessionStartDate) {
+	this.sessionStartDate = sessionStartDate;
+    }
+
+    /**
+     * @hibernate.property
+     * @return
+     */
+    public int getStatus() {
+	return status;
+    }
+
+    public void setStatus(int status) {
+	this.status = status;
+    }
+
+    /**
+     * @hibernate.many-to-one column="resource_uid" cascade="none"
+     * @return
+     */
+    public Resource getResource() {
+	return resource;
+    }
+
+    public void setResource(Resource resource) {
+	this.resource = resource;
+    }
+
+    /**
+     * @hibernate.property column="session_id"
+     * @return
+     */
+    public Long getSessionId() {
+	return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+	this.sessionId = sessionId;
+    }
+
+    /**
+     * @hibernate.property column="session_name" length="250"
+     * @return Returns the session name
+     */
+    public String getSessionName() {
+	return sessionName;
+    }
+
+    /**
+     * 
+     * @param sessionName
+     *            The session name to set.
+     */
+    public void setSessionName(String sessionName) {
+	this.sessionName = sessionName;
+    }
+
+    /**
+     * 
+     * 
+     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
+     * @hibernate.collection-key column="session_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
+     * 
+     * @return
+     */
+    public Set getResourceItems() {
+	return resourceItems;
+    }
+
+    public void setResourceItems(Set resourceItems) {
+	this.resourceItems = resourceItems;
+    }
 
 }

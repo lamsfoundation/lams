@@ -23,41 +23,59 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.rsrc.dto;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Date;
 
-public class GroupSummary {
+public class VisitLogDTO {
+    
+    private Long userId;
+    
+    private String userFullName;
 
-    private Long sessionId;
-    private String sessionName;
-    private List<ItemSummary> items;
-
-    public GroupSummary () {
-	items = new LinkedList<ItemSummary>();
+    // the user access some reousrce item date time. Use in monitoring summary page
+    private Date accessDate;
+    // resource item complete date. Use in monitoring summary page
+    private Date completeDate;
+    // difference between completeDate and accessDate
+    private Date timeTaken;
+    
+    public Long getUserId() {
+	return userId;
     }
 
-    public Long getSessionId() {
-	return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-	this.sessionId = sessionId;
-    }
-
-    public String getSessionName() {
-	return sessionName;
-    }
-
-    public void setSessionName(String sessionName) {
-	this.sessionName = sessionName;
+    public void setUserId(Long userId) {
+	this.userId = userId;
     }
     
-    public List<ItemSummary> getItems() {
-	return items;
+    public String getUserFullName() {
+	return userFullName;
     }
 
-    public void setItems(List<ItemSummary> items) {
-	this.items = items;
+    public void setUserFullName(String userFullName) {
+	this.userFullName = userFullName;
     }
+
+    public Date getAccessDate() {
+	return accessDate;
+    }
+
+    public void setAccessDate(Date accessDate) {
+	this.accessDate = accessDate;
+    }
+
+    public Date getCompleteDate() {
+	return completeDate;
+    }
+
+    public void setCompleteDate(Date completeDate) {
+	this.completeDate = completeDate;
+    }
+
+    public Date getTimeTaken() {
+	return timeTaken;
+    }
+
+    public void setTimeTaken(Date timeTaken) {
+	this.timeTaken = timeTaken;
+    }
+
 }
-

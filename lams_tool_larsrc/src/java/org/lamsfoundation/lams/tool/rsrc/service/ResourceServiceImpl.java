@@ -87,9 +87,10 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
-import org.lamsfoundation.lams.tool.rsrc.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
 import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
@@ -318,14 +319,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<ItemSummary> exportBySessionId(Long sessionId, boolean skipHide) {
+    public List<ResourceItemDTO> exportBySessionId(Long sessionId, boolean skipHide) {
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
 	    ResourceServiceImpl.log.error("Failed get ResourceSession by ID [" + sessionId + "]");
 	    return null;
 	}
 	// initial resource items list
-	List<ItemSummary> itemList = new ArrayList();
+	List<ResourceItemDTO> itemList = new ArrayList();
 	Set<ResourceItem> resList = session.getResource().getResourceItems();
 	for (ResourceItem item : resList) {
 	    if (skipHide && item.isHide()) {
@@ -333,7 +334,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    }
 	    // if item is create by author
 	    if (item.isCreateByAuthor()) {
-		ItemSummary sum = new ItemSummary(session.getSessionId(), session.getSessionName(), item, false);
+		ResourceItemDTO sum = new ResourceItemDTO(item, false);
 		itemList.add(sum);
 	    }
 	}
@@ -347,7 +348,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // to skip all item create by author
 	    if (!item.isCreateByAuthor()) {
-		ItemSummary sum = new ItemSummary(session.getSessionId(), session.getSessionName(), item, false);
+		ResourceItemDTO sum = new ResourceItemDTO(item, false);
 		itemList.add(sum);
 	    }
 	}
@@ -356,17 +357,17 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<List<ItemSummary>> exportByContentId(Long contentId) {
+    public List<List<ResourceItemDTO>> exportByContentId(Long contentId) {
 	Resource resource = resourceDao.getByContentId(contentId);
-	List<List<ItemSummary>> groupList = new ArrayList();
+	List<List<ResourceItemDTO>> groupList = new ArrayList();
 
 	// create init resource items list
-	List<ItemSummary> initList = new ArrayList();
+	List<ResourceItemDTO> initList = new ArrayList();
 	groupList.add(initList);
 	Set<ResourceItem> resList = resource.getResourceItems();
 	for (ResourceItem item : resList) {
 	    if (item.isCreateByAuthor()) {
-		ItemSummary sum = new ItemSummary(null, null, item, true);
+		ResourceItemDTO sum = new ResourceItemDTO(item, true);
 		initList.add(sum);
 	    }
 	}
@@ -374,18 +375,18 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	// session by session
 	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
 	for (ResourceSession session : sessionList) {
-	    List<ItemSummary> group = new ArrayList<ItemSummary>();
+	    List<ResourceItemDTO> group = new ArrayList<ResourceItemDTO>();
 	    // get this session's all resource items
 	    Set<ResourceItem> sessList = session.getResourceItems();
 	    for (ResourceItem item : sessList) {
 		// to skip all item create by author
 		if (!item.isCreateByAuthor()) {
-		    ItemSummary sum = new ItemSummary(session.getSessionId(), session.getSessionName(), item, false);
+		    ResourceItemDTO sum = new ResourceItemDTO(item, false);
 		    group.add(sum);
 		}
 	    }
 	    if (group.size() == 0) {
-		group.add(new ItemSummary(session.getSessionId(), session.getSessionName(), null, false));
+		group.add(new ResourceItemDTO(null, false));
 	    }
 	    groupList.add(group);
 	}
@@ -501,8 +502,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<GroupSummary> getSummary(Long contentId) {
-	List<GroupSummary> groupList = new ArrayList<GroupSummary>();
+    public List<SessionDTO> getSummary(Long contentId) {
+	List<SessionDTO> groupList = new ArrayList<SessionDTO>();
 
 	// get all item which is accessed by user
 	Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId);
@@ -514,7 +515,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	for (ResourceSession session : sessionList) {
 	    // one new group for one session.
-	    GroupSummary group = new GroupSummary();
+	    SessionDTO group = new SessionDTO();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
 
@@ -525,12 +526,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    items.addAll(session.getResourceItems());
 
 	    for (ResourceItem item : items) {
-		ItemSummary itemSummary = new ItemSummary(item);
+		ResourceItemDTO resourceItemDTO = new ResourceItemDTO(item);
 		// set viewNumber according visit log
 		if (visitCountMap.containsKey(item.getUid())) {
-		    itemSummary.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+		    resourceItemDTO.setViewNumber(visitCountMap.get(item.getUid()).intValue());
 		}
-		group.getItems().add(itemSummary);
+		group.getItems().add(resourceItemDTO);
 	    }
 
 	    groupList.add(group);
@@ -582,6 +583,18 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    userList.add(user);
 	}
 	return userList;
+    }
+    
+    @Override
+    public List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
+	    String sortBy, String sortOrder, String searchString) {
+	return resourceItemVisitDao.getPagedVisitLogsBySessionAndItem(sessionId, itemUid, page, size, sortBy,
+		sortOrder, searchString);
+    }
+    
+    @Override
+    public int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString) {
+	return resourceItemVisitDao.getCountVisitLogsBySessionAndItem(sessionId, itemUid, searchString);
     }
 
     @Override

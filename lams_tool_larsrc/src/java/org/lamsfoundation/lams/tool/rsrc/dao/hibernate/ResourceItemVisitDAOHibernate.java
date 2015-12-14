@@ -23,12 +23,17 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
+import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
@@ -89,5 +94,79 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		
 		return (List<ResourceItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION,new Object[]{sessionId,itemUid});
 	}
+
+    @Override
+    public List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
+	    String sortBy, String sortOrder, String searchString) {
+	String LOAD_USERS_ORDERED_BY_NAME = "SELECT visit.user.userId, CONCAT(visit.user.lastName, ' ', visit.user.firstName), visit.completeDate, visit.accessDate"
+		+ " FROM "
+		+ ResourceItemVisitLog.class.getName()
+		+ " visit"
+		+ " WHERE visit.sessionId = :sessionId "
+		+ " AND visit.resourceItem.uid = :itemUid "
+		+ " AND (CONCAT(visit.user.lastName, ' ', visit.user.firstName) LIKE CONCAT('%', :searchString, '%')) "
+		+ " ORDER BY "
+		+ " CASE "
+		+ " WHEN :sortBy='userName' THEN CONCAT(user.lastName, ' ', user.firstName) "
+		+ " WHEN :sortBy='startTime' THEN visit.accessDate "
+		+ " WHEN :sortBy='completeTime' THEN visit.completeDate "
+		+ " WHEN :sortBy='timeTaken' THEN TIMEDIFF(visit.completeDate,visit.accessDate) " + " END " + sortOrder;
+
+	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
+	query.setLong("sessionId", sessionId);
+	query.setLong("itemUid", itemUid);
+	// support for custom search from a toolbar
+	searchString = searchString == null ? "" : searchString;
+	query.setString("searchString", searchString);
+	query.setString("sortBy", sortBy);
+	query.setFirstResult(page * size);
+	query.setMaxResults(size);
+	List<Object[]> list = query.list();
+
+	ArrayList<VisitLogDTO> visitLogDto = new ArrayList<VisitLogDTO>();
+	if (list != null && list.size() > 0) {
+	    for (Object[] element : list) {
+
+		Long userId = ((Number) element[0]).longValue();
+		String userFullName = (String) element[1];
+		Date completeDate = element[2] == null ? null : new Date(((Timestamp) element[2]).getTime());
+		Date accessDate = element[3] == null ? null : new Date(((Timestamp) element[3]).getTime());
+		Date timeTaken = (element[2] == null || element[3] == null) ? null : new Date(completeDate.getTime()
+			- accessDate.getTime());
+
+		VisitLogDTO userDto = new VisitLogDTO();
+		userDto.setUserId(userId);
+		userDto.setUserFullName(userFullName);
+		userDto.setCompleteDate(completeDate);
+		userDto.setAccessDate(accessDate);
+		userDto.setTimeTaken(timeTaken);
+		;
+		visitLogDto.add(userDto);
+	    }
+	}
+
+	return visitLogDto;
+    }
+
+    @Override
+    public int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString) {
+	String COUNT_USERS_BY_SESSION_AND_ITEM = "SELECT COUNT(*) FROM " + ResourceItemVisitLog.class.getName()
+		+ " visit WHERE visit.sessionId = :sessionId AND visit.resourceItem.uid = :itemUid"
+		+ " AND (CONCAT(visit.user.lastName, ' ', visit.user.firstName) LIKE CONCAT('%', :searchString, '%')) ";
+
+	Query query = getSession().createQuery(COUNT_USERS_BY_SESSION_AND_ITEM);
+	query.setLong("sessionId", sessionId);
+	query.setLong("itemUid", itemUid);
+	// support for custom search from a toolbar
+	searchString = searchString == null ? "" : searchString;
+	query.setString("searchString", searchString);
+	List list = query.list();
+
+	if ((list == null) || (list.size() == 0)) {
+	    return 0;
+	} else {
+	    return ((Number) list.get(0)).intValue();
+	}
+    }
 
 }

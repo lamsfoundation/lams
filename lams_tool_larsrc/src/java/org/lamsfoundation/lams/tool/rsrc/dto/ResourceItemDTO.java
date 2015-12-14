@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 /**
  * List contains following element: <br>
  * 
- * <li>session_id</li> <li>session_name</li> <li>ResourceItem.uid</li> <li>
+ * <li>ResourceItem.uid</li> <li>
  * ResourceItem.item_type</li> <li>ResourceItem.create_by_author</li> <li>
  * ResourceItem.is_hide</li> <li>ResourceItem.title</li> <li>User.login_name</li>
  * <li>count(resource_item_uid)</li>
@@ -44,10 +44,8 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
  * 
  * @version $Revision$
  */
-public class ItemSummary {
+public class ResourceItemDTO {
 
-    private Long sessionId;
-    private String sessionName;
     private Long itemUid;
     private short itemType;
     private boolean itemCreateByAuthor;
@@ -67,7 +65,7 @@ public class ItemSummary {
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
 
-    public ItemSummary() {
+    public ResourceItemDTO() {
     }
 
     /**
@@ -79,9 +77,7 @@ public class ItemSummary {
      * @param item
      * @param isInitGroup
      */
-    public ItemSummary(ResourceItem item) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
+    public ResourceItemDTO(ResourceItem item) {
 	if (item != null) {
 	    this.itemUid = item.getUid();
 	    this.itemType = item.getType();
@@ -106,9 +102,7 @@ public class ItemSummary {
      * @param item
      * @param isInitGroup
      */
-    public ItemSummary(Long sessionId, String sessionName, ResourceItem item, boolean isInitGroup) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
+    public ResourceItemDTO(ResourceItem item, boolean isInitGroup) {
 	if (item != null) {
 	    this.itemUid = item.getUid();
 	    this.itemType = item.getType();
@@ -167,22 +161,6 @@ public class ItemSummary {
 
     public void setItemUid(Long itemUid) {
 	this.itemUid = itemUid;
-    }
-
-    public Long getSessionId() {
-	return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-	this.sessionId = sessionId;
-    }
-
-    public String getSessionName() {
-	return sessionName;
-    }
-
-    public void setSessionName(String sessionName) {
-	this.sessionName = sessionName;
     }
 
     public String getUsername() {
