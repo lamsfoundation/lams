@@ -32,9 +32,10 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.rsrc.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
+import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
@@ -198,9 +199,14 @@ public interface IResourceService {
      * @param contentId
      * @return
      */
-    List<GroupSummary> getSummary(Long contentId);
+    List<SessionDTO> getSummary(Long contentId);
 
     List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid);
+    
+    List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
+	    String sortBy, String sortOrder, String searchString);
+    
+    int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString);
 
     /**
      * Set a resource item visible or not.
@@ -212,7 +218,7 @@ public interface IResourceService {
     void setItemVisible(Long itemUid, boolean visible);
 
     /**
-     * Get resource item <code>ItemSummary</code> list according to sessionId and skipHide flag.
+     * Get resource item <code>ResourceItemDTO</code> list according to sessionId and skipHide flag.
      * 
      * @param sessionId
      * @param skipHide
@@ -220,9 +226,9 @@ public interface IResourceService {
      *                resource item
      * @return
      */
-    List<ItemSummary> exportBySessionId(Long sessionId, boolean skipHide);
+    List<ResourceItemDTO> exportBySessionId(Long sessionId, boolean skipHide);
 
-    List<List<ItemSummary>> exportByContentId(Long contentId);
+    List<List<ResourceItemDTO>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.

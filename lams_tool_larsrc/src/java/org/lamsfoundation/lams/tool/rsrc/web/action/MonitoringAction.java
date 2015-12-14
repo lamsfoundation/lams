@@ -27,13 +27,15 @@ package org.lamsfoundation.lams.tool.rsrc.web.action;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -45,15 +47,17 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
-import org.lamsfoundation.lams.tool.rsrc.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -100,7 +104,7 @@ public class MonitoringAction extends Action {
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	IResourceService service = getResourceService();
-	List<GroupSummary> groupList = service.getSummary(contentId);
+	List<SessionDTO> groupList = service.getSummary(contentId);
 
 	Resource resource = service.getResourceByContentId(contentId);
 	
@@ -135,42 +139,62 @@ public class MonitoringAction extends Action {
     
     private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
+	IResourceService service = getResourceService();
 
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	
+	// Getting the params passed in from the jqGrid
+	int page = WebUtil.readIntParam(request, ResourceConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, ResourceConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, ResourceConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, ResourceConstants.PARAM_SIDX, true);
+	if (sortBy == "") {
+	    sortBy = "userName";
+	}
+	String searchString = WebUtil.readStrParam(request, "userName", true);
 
-	IResourceService service = getResourceService();
-	List<ResourceUser> userList = service.getUserListBySessionItem(sessionId, itemUid);
+	List<VisitLogDTO> visitLogDtos = service.getPagedVisitLogsBySessionAndItem(sessionId, itemUid, page - 1,
+		rowLimit, sortBy, sortOrder, searchString);
+	int countVisitLogs = service.getCountVisitLogsBySessionAndItem(sessionId, itemUid, searchString);
+
+	int totalPages = new Double(Math.ceil(new Integer(countVisitLogs).doubleValue()
+		/ new Integer(rowLimit).doubleValue())).intValue();
 	
 	JSONArray rows = new JSONArray();
-	for (ResourceUser user : userList) {
-	    DateFormat timeTakenFormatter = new SimpleDateFormat("H:mm:ss");
-	    DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
-	    
-	    JSONArray userData = new JSONArray();
-	    userData.put(user.getUserId());
-	    userData.put(user.getFirstName() + " " + user.getLastName());
-	    String accessDate = (user.getAccessDate() == null) ? "" : dateFormatter.format(DateUtil.convertToUTC(user
-		    .getAccessDate()));
-	    userData.put(accessDate);
-	    String completeDate = (user.getCompleteDate() == null) ? "" : dateFormatter.format(DateUtil
-		    .convertToUTC(user.getCompleteDate()));
-	    userData.put(completeDate);
-	    String timeTaken = (user.getTimeTaken() == null) ? "" : timeTakenFormatter.format(DateUtil
-		    .convertToUTC(user.getTimeTaken()));
-	    userData.put(timeTaken);
-	    
+	DateFormat timeTakenFormatter = new SimpleDateFormat("H:mm:ss");
+	DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
+	HttpSession ss = SessionManager.getSession();
+	UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	TimeZone monitorTimeZone = learnerDto.getTimeZone();
+	int i = 1;
+	for (VisitLogDTO visitLogDto : visitLogDtos) {
+
+	    JSONArray visitLogData = new JSONArray();
+	    visitLogData.put(visitLogDto.getUserId());
+	    String fullName = StringEscapeUtils.escapeHtml(visitLogDto.getUserFullName());
+	    visitLogData.put(fullName);
+	    String accessDate = (visitLogDto.getAccessDate() == null) ? "" : dateFormatter.format(DateUtil
+		    .convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getAccessDate()));
+	    visitLogData.put(accessDate);
+	    String completeDate = (visitLogDto.getCompleteDate() == null) ? "" : dateFormatter.format(DateUtil
+		    .convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getCompleteDate()));
+	    visitLogData.put(completeDate);
+	    String timeTaken = (visitLogDto.getTimeTaken() == null) ? "" : timeTakenFormatter.format(visitLogDto
+		    .getTimeTaken());
+	    visitLogData.put(timeTaken);
+
 	    JSONObject userRow = new JSONObject();
-	    userRow.put("id", user.getUserId());
-	    userRow.put("cell", userData);
-	    
+	    userRow.put("id", i++);
+	    userRow.put("cell", visitLogData);
+
 	    rows.put(userRow);
 	}
 
 	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("total", 1);
-	responseJSON.put("page", 1);
-	responseJSON.put("records", rows.length());
+	responseJSON.put("total", totalPages);
+	responseJSON.put("page", page);
+	responseJSON.put("records", countVisitLogs);
 	responseJSON.put("rows", rows);
 	    
 	response.setContentType("application/json;charset=utf-8");

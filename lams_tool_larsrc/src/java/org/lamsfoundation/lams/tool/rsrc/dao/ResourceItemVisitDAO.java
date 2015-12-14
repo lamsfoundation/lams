@@ -26,22 +26,28 @@ package org.lamsfoundation.lams.tool.rsrc.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 
 public interface ResourceItemVisitDAO extends DAO {
 
-	
-	public ResourceItemVisitLog getResourceItemLog(Long itemUid,Long userId);
+    ResourceItemVisitLog getResourceItemLog(Long itemUid, Long userId);
 
-	public int getUserViewLogCount(Long sessionId, Long userUid);
-	/**
-	 * Return list which contains key pair which key is resource item uid, value is number view.
-	 * 
-	 * @param contentId
-	 * @return
-	 */
-	public Map<Long,Integer> getSummary(Long contentId);
-	
-	public List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId,Long itemUid);
+    int getUserViewLogCount(Long sessionId, Long userUid);
+
+    /**
+     * Return list which contains key pair which key is resource item uid, value is number view.
+     * 
+     * @param contentId
+     * @return
+     */
+    Map<Long, Integer> getSummary(Long contentId);
+
+    List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId, Long itemUid);
+    
+    List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
+	    String sortBy, String sortOrder, String searchString);
+    
+    int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString);
 
 }

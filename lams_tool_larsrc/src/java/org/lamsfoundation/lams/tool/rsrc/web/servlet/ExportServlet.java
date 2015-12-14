@@ -30,9 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -46,14 +43,12 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.rsrc.dto.ItemSummary;
+import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
-import org.lamsfoundation.lams.tool.rsrc.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -140,10 +135,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 		
 		
-		List<ItemSummary> group = service.exportBySessionId(toolSessionID,true);
+		List<ResourceItemDTO> group = service.exportBySessionId(toolSessionID,true);
 		saveFileToLocal(group, directoryName);
 		
-		List<List<ItemSummary>> groupList = new ArrayList<List<ItemSummary>>();
+		List<List<ResourceItemDTO>> groupList = new ArrayList<List<ResourceItemDTO>>();
 		if(group.size() > 0)
 			groupList.add(group);
 		
@@ -184,9 +179,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new ResourceApplicationException(error);
 		}
-		List<List<ItemSummary>> groupList = service.exportByContentId(toolContentID);
+		List<List<ResourceItemDTO>> groupList = service.exportByContentId(toolContentID);
 		if(groupList != null) {
-			for (List<ItemSummary> list : groupList) {
+			for (List<ResourceItemDTO> list : groupList) {
 				saveFileToLocal(list, directoryName);
 			}
 		}
@@ -207,19 +202,19 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
-    private void saveFileToLocal(List<ItemSummary> list, String directoryName) {
+    private void saveFileToLocal(List<ResourceItemDTO> list, String directoryName) {
     	handler = getToolContentHandler();
-		for (ItemSummary itemSummary : list) {
+		for (ResourceItemDTO resourceItemDTO : list) {
 			//for learning object, it just display "No offline package available" information.
-			if(itemSummary.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT 
-				|| itemSummary.getItemType() == ResourceConstants.RESOURCE_TYPE_URL
-				|| itemSummary.getItemType() == 0){
+			if(resourceItemDTO.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT 
+				|| resourceItemDTO.getItemType() == ResourceConstants.RESOURCE_TYPE_URL
+				|| resourceItemDTO.getItemType() == 0){
 			    continue;
 			}
 				
 			try{
 				int idx= 1;
-				String userName = itemSummary.getUsername();
+				String userName = resourceItemDTO.getUsername();
 				String localDir;
 				while(true){
 					localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
@@ -230,8 +225,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					}
 					idx++;
 				}
-				itemSummary.setAttachmentLocalUrl(userName + "/" + idx + "/" + itemSummary.getFileUuid() + '.' + FileUtil.getFileExtension(itemSummary.getFileName()));
-				handler.saveFile(itemSummary.getFileUuid(), FileUtil.getFullPath(directoryName, itemSummary.getAttachmentLocalUrl()));
+				resourceItemDTO.setAttachmentLocalUrl(userName + "/" + idx + "/" + resourceItemDTO.getFileUuid() + '.' + FileUtil.getFileExtension(resourceItemDTO.getFileName()));
+				handler.saveFile(resourceItemDTO.getFileUuid(), FileUtil.getFullPath(directoryName, resourceItemDTO.getAttachmentLocalUrl()));
 			} catch (Exception e) {
 				logger.error("Export forum topic attachment failed: " + e.toString());
 			}
