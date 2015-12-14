@@ -121,6 +121,12 @@ public class ResourceConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
     
     public static final String ATTR_IS_URL_ITEM_TYPE = "isUrlItemType";
+    
+    // jqGrid parameters
+    public static final String PARAM_PAGE = "page";
+    public static final String PARAM_ROWS = "rows";
+    public static final String PARAM_SIDX = "sidx";
+    public static final String PARAM_SORD = "sord";
 
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

@@ -25,98 +25,107 @@
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
+
 /**
  * Resource
+ * 
  * @author Dapeng Ni
- *
- * @hibernate.class  table="tl_larsrc11_item_log"
- *
+ * 
+ * @hibernate.class table="tl_larsrc11_item_log"
+ * 
  */
 public class ResourceItemVisitLog {
 
-	private Long uid;
-	private ResourceUser user;
-	private ResourceItem resourceItem;
-	private boolean complete;
-	private Date completeDate;
-	private Date accessDate;
-	private Long sessionId;
-	
-	/**
-	 * @hibernate.property column="access_date"
-	 * @return
-	 */
-	public Date getAccessDate() {
-		return accessDate;
-	}
-	public void setAccessDate(Date accessDate) {
-		this.accessDate = accessDate;
-	}
-	/**
-	 * @hibernate.property column="complete_date"
-	 * @return
-	 */
-	public Date getCompleteDate() {
-		return completeDate;
-	}
-	public void setCompleteDate(Date completeDate) {
-		this.completeDate = completeDate;
-	}
-	/**
-	 * @hibernate.many-to-one  column="resource_item_uid"
- 	 * cascade="none"
-	 * @return
-	 */
-	public ResourceItem getResourceItem() {
-		return resourceItem;
-	}
-	public void setResourceItem(ResourceItem item) {
-		this.resourceItem = item;
-	}
-	
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * @return Returns the log Uid.
-	 */
-	public Long getUid() {
-		return uid;
-	}
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-	/**
-	 * @hibernate.many-to-one  column="user_uid"
- 	 * cascade="none"
-	 * @return
-	 */
-	public ResourceUser getUser() {
-		return user;
-	}
-	public void setUser(ResourceUser user) {
-		this.user = user;
-	}
-	/**
-	 * @hibernate.property column="complete"
-	 * @return
-	 */
-	public boolean isComplete() {
-		return complete;
-	}
-	public void setComplete(boolean complete) {
-		this.complete = complete;
-	}
-	/**
-	 * @hibernate.property column="session_id"
-	 * @return
-	 */
-	public Long getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
-	}
+    private Long uid;
+    private ResourceUser user;
+    private ResourceItem resourceItem;
+    private boolean complete;
+    private Date completeDate;
+    private Date accessDate;
+    private Long sessionId;
 
+    /**
+     * @hibernate.property column="access_date"
+     * @return
+     */
+    public Date getAccessDate() {
+	return accessDate;
+    }
 
-	
-	
+    public void setAccessDate(Date accessDate) {
+	this.accessDate = accessDate;
+    }
+
+    /**
+     * @hibernate.property column="complete_date"
+     * @return
+     */
+    public Date getCompleteDate() {
+	return completeDate;
+    }
+
+    public void setCompleteDate(Date completeDate) {
+	this.completeDate = completeDate;
+    }
+
+    /**
+     * @hibernate.many-to-one column="resource_item_uid" cascade="none"
+     * @return
+     */
+    public ResourceItem getResourceItem() {
+	return resourceItem;
+    }
+
+    public void setResourceItem(ResourceItem item) {
+	this.resourceItem = item;
+    }
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @return Returns the log Uid.
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * @hibernate.many-to-one column="user_uid" cascade="none"
+     * @return
+     */
+    public ResourceUser getUser() {
+	return user;
+    }
+
+    public void setUser(ResourceUser user) {
+	this.user = user;
+    }
+
+    /**
+     * @hibernate.property column="complete"
+     * @return
+     */
+    public boolean isComplete() {
+	return complete;
+    }
+
+    public void setComplete(boolean complete) {
+	this.complete = complete;
+    }
+
+    /**
+     * @hibernate.property column="session_id"
+     * @return
+     */
+    public Long getSessionId() {
+	return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+	this.sessionId = sessionId;
+    }
+
 }
