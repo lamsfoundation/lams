@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.comments.CommentLike"
+        table="lams_comment_likes"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+            </generator>
+        </id>
+
+        <many-to-one
+            name="comment"
+            class="org.lamsfoundation.lams.comments.Comment"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="comment_uid"
+        />
+
+        <property
+            name="userId"
+            type="int"
+            update="true"
+            insert="true"
+            column="user_id"
+        />
+
+        <property
+            name="vote"
+            type="int"
+            update="true"
+            insert="true"
+            column="vote"
+        />
+
+    </class>
+
+</hibernate-mapping>
