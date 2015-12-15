@@ -12,5 +12,7 @@ function insertFormula(text) {
 }
 
 $(document).ready(function(){
-	$('#formulaButtonsTable button').button();
+	$('#formulaTabs').tabs().removeClass('ui-widget-content');
+	$('#formulaTabs > ul').removeClass('ui-widget-header');
+	$('#formulaTabs button').button();
 });

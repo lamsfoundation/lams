@@ -1,26 +1,16 @@
-#formulaButtonsTable { 
-    border-spacing: 0;
-    border-collapse: collapse;
-    margin-bottom: 10px;
+#formulaTabs {
+	height: 170px;
 }
 
-#formulaButtonsTable td {
-	padding: 6px 0 3px 0;
-	border-bottom: 1px solid gray;
+#formulaTabs > div.ui-tabs-panel {
+	padding-left: 5px;
 }
 
-#formulaButtonsTable th {
-	font-size: 14px;
-	font-weight: normal;
-	padding-right: 15px;
-	border-bottom: 1px solid gray;
+#formulaTabs > ul a {
+	font-size: 12px;
 }
 
-#formulaButtonsTable tbody tr:last-child td, #formulaButtonsTable tbody tr:last-child th {
-	border-bottom: none;
-}
-
-#formulaButtonsTable button {
+#formulaTabs button {
 	width: 30px;
 	height: 25px;
 	margin: 0 0 4px 0;
@@ -31,14 +21,18 @@
 	font-weight: normal;
 }
 
-#formulaButtonsTable button:hover {
+#formulaTabs button:hover {
 	background-color: #DDDDDD;
 }
 
-#formulaButtonsTable button span {
+#formulaTabs button span {
 	padding: 2px 3px 3px 3px !important;
 }
 
-#formulaButtonsTable button.formulaButtonShifted span {
+#formulaTabs button.formulaButtonShifted span {
 	padding-top: 0px !important;
+}
+
+img#preview {
+	margin-top: 20px;
 }
