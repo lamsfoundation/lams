@@ -50,6 +50,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
@@ -101,6 +102,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -921,8 +923,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	// create an empty excel file
 	HSSFWorkbook wb = new HSSFWorkbook();
 	HSSFCellStyle greenColor = wb.createCellStyle();
-	greenColor.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
 	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	Font whiteFont = wb.createFont();
+	whiteFont.setColor(IndexedColors.WHITE.getIndex());
+	whiteFont.setFontName(ExcelUtil.DEFAULT_FONT_NAME);
+	greenColor.setFont(whiteFont);
 	
 	// ======================================================= Report by question IRA page
 	// =======================================
