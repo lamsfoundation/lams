@@ -58,7 +58,7 @@ public class ExcelUtil {
     private static CellStyle borderStyleLeftThinBoldFont;
     private static CellStyle borderStyleRightThickBoldFont;
     
-    private final static String DEFAULT_FONT_NAME = "Calibri-Regular";
+    public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
     /**
      * Create .xlsx file out of provided data and then write out it to an OutputStream.
