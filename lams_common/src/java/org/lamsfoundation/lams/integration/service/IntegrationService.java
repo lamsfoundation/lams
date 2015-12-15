@@ -578,15 +578,17 @@ public class IntegrationService implements IIntegrationService {
     }
     
     @Override
-    public boolean isLessonCreatedUsingIntegrations(Long lessonId) {
+    public boolean isIntegratedServerGroupFetchingAvailable(Long lessonId) {
 
-	boolean isLessonCreatedByIntegratedServer = false;
+	boolean isIntegratedServerGroupFetchingAvailable = false;
 	if (lessonId != null) {
 	    ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
-	    isLessonCreatedByIntegratedServer = extServerLesson != null;
+	    
+	    isIntegratedServerGroupFetchingAvailable = (extServerLesson != null)
+		    && StringUtils.isNotBlank(extServerLesson.getExtServer().getExtGroupsUrl());	    
 	}
 
-	return isLessonCreatedByIntegratedServer;
+	return isIntegratedServerGroupFetchingAvailable;
     }
     
     @Override

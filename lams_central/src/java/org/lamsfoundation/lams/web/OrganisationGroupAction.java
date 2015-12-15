@@ -191,7 +191,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
 	// if this is a chosen group and lesson is created using integrations - show groups received from LMS instead of actual LAMS ones
-	if (lessonId != null && getIntegrationService().isLessonCreatedUsingIntegrations(lessonId)) {
+	if (lessonId != null && getIntegrationService().isIntegratedServerGroupFetchingAvailable(lessonId)) {
 	    List<ExtGroupDTO> extGroups = getIntegrationService().getExtGroups(lessonId, null);
 	    request.setAttribute("extGroups", extGroups);
 	    // TODO ? show only with user number >0

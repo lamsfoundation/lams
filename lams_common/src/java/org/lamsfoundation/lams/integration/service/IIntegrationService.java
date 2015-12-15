@@ -150,12 +150,14 @@ public interface IIntegrationService {
     String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
     
     /**
-     * Checks whether lesson was created using integrations.
+     * Checks whether lesson was created using integrations and whether according integrated server has ExtGroupsUrl
+     * property set up.
      * 
      * @param lessonId
-     * @return true in case lesson was created using integrations, false otherwise
+     * @return true in case lesson was created using integrations and according integrated server has ExtGroupsUrl
+     *         property set up, false otherwise
      */
-    boolean isLessonCreatedUsingIntegrations(Long lessonId);
+    boolean isIntegratedServerGroupFetchingAvailable(Long lessonId);
     
     List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception;
 }
