@@ -38,6 +38,8 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     
     /** persistent field */
     private String lessonFinishUrl;
+    
+    private String extGroupsUrl;
 
     /** persistent field */
     private Boolean disabled;
@@ -139,6 +141,14 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     public void setLessonFinishUrl(String lessonFinishUrl) {
 	this.lessonFinishUrl = lessonFinishUrl;
+    }
+    
+    public String getExtGroupsUrl() {
+	return this.extGroupsUrl;
+    }
+
+    public void setExtGroupsUrl(String extGroupsUrl) {
+	this.extGroupsUrl = extGroupsUrl;
     }
 
     public Boolean getDisabled() {
