@@ -73,6 +73,9 @@ public class NoticeboardContent implements Serializable {
 
     /** nullable persistent field */
     private Date dateUpdated;
+    
+    /** nullable persistent field */
+    private boolean allowComments;
 
     /** persistent field */
     private Set<NoticeboardSession> nbSessions = new HashSet<NoticeboardSession>();
@@ -83,8 +86,8 @@ public class NoticeboardContent implements Serializable {
 
     /** full constructor */
     public NoticeboardContent(Long nbContentId, String title, String content, boolean defineLater,
-	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId,
-	    Date dateCreated, Date dateUpdated) {
+	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId, 
+	    Date dateCreated, Date dateUpdated, boolean allowComments) {
 	this.nbContentId = nbContentId;
 	this.title = title;
 	this.content = content;
@@ -95,6 +98,7 @@ public class NoticeboardContent implements Serializable {
 	this.creatorUserId = creatorUserId;
 	this.dateCreated = dateCreated;
 	this.dateUpdated = dateUpdated;
+	this.allowComments = allowComments;
     }
 
     /**
@@ -113,6 +117,7 @@ public class NoticeboardContent implements Serializable {
 	this.creatorUserId = null;
 	this.dateCreated = dateCreated;
 	this.dateUpdated = null;
+	this.allowComments = false;
     }
 
     /**
@@ -197,19 +202,19 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     * @hibernate.property column="allow_comments" length="1"
      */
 
-    public boolean isContentInUse() {
-	return contentInUse;
+    public boolean isAllowComments() {
+	return allowComments;
     }
 
     /**
-     * @param contentInUse
-     *            The contentInUse to set.
+     * @param allowComments
+     *            The allowComments to set.
      */
-    public void setContentInUse(boolean contentInUse) {
-	this.contentInUse = contentInUse;
+    public void setAllowComments(boolean allowComments) {
+	this.allowComments = allowComments;
     }
 
     /**
@@ -263,6 +268,22 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
+     * @hibernate.property column="content_in_use" length="1"
+     */
+
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
+
+    /**
+     * @param contentInUse
+     *            The contentInUse to set.
+     */
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
+
+    /**
      * Creates a new NoticeboardContent object from the supplied object. Assigns it the toContendId.
      * 
      * @param nb
@@ -277,7 +298,7 @@ public class NoticeboardContent implements Serializable {
 	    RepositoryCheckedException {
 	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(),
 		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(), nb.isContentInUse(),
-		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated());
+		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments());
 
 	return newContent;
     }

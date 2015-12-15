@@ -1,3 +1,4 @@
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 <%@ include file="/includes/taglibs.jsp"%>
 
 
@@ -64,6 +65,11 @@
 
 			</div>
 		</c:if>
+		
+		<c:if test="${allowComments}">
+			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"/>
+		</c:if>
+		
 	</div>
 
 	<div data-role="footer" data-theme="b" class="ui-bar">

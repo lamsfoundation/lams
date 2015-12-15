@@ -62,7 +62,8 @@ public class NoticeboardConstants
     
     public static final String MONITOR_PAGE = "monitorPage";
     public static final String MONITOR_REFLECTION_PAGE ="monitorReflectionPage";
-    
+    public static final String MONITOR_COMMENTS_PAGE ="monitorCommentsPage";
+     
     // ------------------------------
     // Action Names
     // ------------------------------

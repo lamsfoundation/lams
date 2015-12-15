@@ -2,6 +2,14 @@
 
 <!-- ========== Advanced Tab ========== -->
 
+<p class="small-space-top">
+	<html:checkbox property="allowComments" value="1"
+		styleClass="noBorder" styleId="allowComments"></html:checkbox>
+	<label for="allowComments">
+		<fmt:message key="advanced.allow.comments" />
+	</label>
+
+</p>
 
 <p class="small-space-top">
 	<html:checkbox property="reflectOnActivity" value="1"
