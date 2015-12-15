@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
+import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -151,4 +152,16 @@ public interface IIntegrationService {
      * @throws UnsupportedEncodingException
      */
     String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
+    
+    /**
+     * Checks whether lesson was created using integrations and whether according integrated server has ExtGroupsUrl
+     * property set up. 
+     * 
+     * @param lessonId
+     * @return true in case lesson was created using integrations and according integrated server has ExtGroupsUrl
+     *         property set up, false otherwise
+     */
+    boolean isIntegratedServerGroupFetchingAvailable(Long lessonId);
+    
+    List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception;
 }

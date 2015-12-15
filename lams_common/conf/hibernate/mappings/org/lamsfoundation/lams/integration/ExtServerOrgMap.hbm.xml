@@ -115,6 +115,16 @@
             length="65535"
             not-null="false"
         />
+        
+		<property
+            name="extGroupsUrl"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="ext_groups_url"
+            length="65535"
+            not-null="false"
+        />
 
         <property
             name="disabled"

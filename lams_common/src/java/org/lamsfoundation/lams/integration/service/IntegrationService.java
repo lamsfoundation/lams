@@ -34,6 +34,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
@@ -48,9 +51,12 @@ import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
+import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -64,6 +70,7 @@ import org.lamsfoundation.lams.util.CSVUtil;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * <p>
@@ -77,14 +84,7 @@ public class IntegrationService implements IIntegrationService {
     private static Logger log = Logger.getLogger(IntegrationService.class);
 
     private IUserManagementService service;
-
-    public IUserManagementService getService() {
-	return service;
-    }
-
-    public void setService(IUserManagementService service) {
-	this.service = service;
-    }
+    private ILessonService lessonService;
 
     @Override
     public ExtServerOrgMap getExtServerOrgMap(String serverId) {
@@ -561,7 +561,7 @@ public class IntegrationService implements IIntegrationService {
     @Override
     public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
 	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
-	// "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
+	// "http://server.com/lams--bb/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
 	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values
 	String lessonFinishCallbackUrl = null;
 
@@ -594,6 +594,150 @@ public class IntegrationService implements IIntegrationService {
 
 	return lessonFinishCallbackUrl;
     }
+    
+    @Override
+    public boolean isIntegratedServerGroupFetchingAvailable(Long lessonId) {
+
+	boolean isIntegratedServerGroupFetchingAvailable = false;
+	if (lessonId != null) {
+	    ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
+	    isIntegratedServerGroupFetchingAvailable = (extServerLesson != null)
+		    && StringUtils.isNotBlank(extServerLesson.getExtServer().getExtGroupsUrl());
+	}
+
+	return isIntegratedServerGroupFetchingAvailable;
+    }
+    
+    @Override
+    public List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception {
+	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
+	// "http://server.org/lams-bb/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
+	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values
+	
+	if (lessonId == null) {
+	    throw new GroupInfoFetchException("Fail to fetch group data from external server:"
+		    + " specified lessonId is null");
+	}
+	
+	Lesson lesson = (Lesson) service.findById(Lesson.class, lessonId);
+	if (lesson == null) {
+	    throw new GroupInfoFetchException("Fail to fetch group data from external server:"
+		    + " specified lesson is null");
+	}
+	Organisation organisation = lesson.getOrganisation();
+	Integer organisationId = lesson.getOrganisation().getOrganisationId();
+
+	ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
+	ExtCourseClassMap extCourse = getExtCourseClassMap(organisationId);
+
+	// checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
+	if (extServerLesson == null) {
+	    throw new GroupInfoFetchException("Fail to fetch group data from external server:"
+		    + " there is no corresponding ExtServerLessonMap for lessonId " + lessonId);
+	}
+
+	if (StringUtils.isBlank(extServerLesson.getExtServer().getExtGroupsUrl())) {
+	    throw new GroupInfoFetchException("Fail to fetch group data from external server:"
+		    + " corresponding ExtCourseClassMap doesn't have extGroupsUrl specified.");
+	}
+
+	if (extCourse == null) {
+	    throw new GroupInfoFetchException("Fail to fetch group data from external server:"
+		    + " there is no corresponding ExtCourseClassMap for lessonId " + lessonId);
+	}
+
+	ExtServerOrgMap serverMap = extServerLesson.getExtServer();
+
+	// construct real lessonFinishCallbackUrl
+	String lmsGroupsUrl = serverMap.getExtGroupsUrl();
+
+	//in case group info is also requested - provide selected groups' ids
+	if (extGroupIds != null && extGroupIds.length > 0) {
+
+	    if (!lmsGroupsUrl.contains("?")) {
+		lmsGroupsUrl += "?";
+	    }
+	    String extGroupIdsParam = "";
+	    for (String extGroupId : extGroupIds) {
+		extGroupIdsParam += "&extGroupIds=" + extGroupId;
+	    }
+	    lmsGroupsUrl += extGroupIdsParam;
+	}
+	
+	String timestamp = Long.toString(new Date().getTime());
+	String hashUsername = "username";
+	String hash = hash(serverMap, hashUsername, timestamp);
+
+	// set values for the parameters
+	HashMap<String, String> params = new HashMap<String, String>();
+	params.put("uid", hashUsername);
+	params.put("ts", timestamp);
+	params.put("hash", hash);
+	params.put("course_id", extCourse.getCourseid());
+	
+	// send the request to the external server
+	InputStream is = WebUtil.getResponseInputStreamFromExternalServer(lmsGroupsUrl, params);
+	BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
+	String str = isReader.readLine();
+	
+	JSONArray jsonGroups = new JSONArray(str);
+	List<ExtGroupDTO> extGroups = new ArrayList<ExtGroupDTO>();
+	for (int i = 0; i < jsonGroups.length(); i++) {
+	    JSONObject jsonGroup = jsonGroups.getJSONObject(i);
+	    ExtGroupDTO group = new ExtGroupDTO();
+	    group.setGroupName(jsonGroup.getString("groupName"));
+	    group.setGroupId(jsonGroup.getString("groupId"));
+	    extGroups.add(group);
+	    
+	    // in case group info is also requested - provide selected groups' ids
+	    if (extGroupIds != null && extGroupIds.length > 0) {
+		ArrayList<User> users = new ArrayList<User>();
+		
+		JSONArray jsonUsers = jsonGroup.getJSONArray("users");
+		for (int j = 0; j < jsonUsers.length(); j++) {
+		    JSONObject jsonUser = jsonUsers.getJSONObject(j);
+		    
+		    String extUsername = jsonUser.getString("userName");
+		    
+		    ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
+
+		    //create extUserUseridMap if it's not available
+		    if (extUserUseridMap == null) {
+			// User properties list format: <Title>,<First name>,<Last name>,<Address>,<City>,<State>,
+			// <Postcode>,<Country>,<Day time number>,<Mobile number>,<Fax number>,<Email>,<Locale
+			// language>,<Locale country>
+			String[] userData = new String[14];
+			for (int k=1; k <= 14; k++) {
+			    String userProperty = jsonUser.getString("" + k);
+			    userData[k-1] = userProperty;
+			}
+			String salt = HashUtil.salt();
+			String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
+			extUserUseridMap = createExtUserUseridMap(serverMap, extUsername, password, salt, userData, true);
+		    }
+		    User user = extUserUseridMap.getUser();
+		    Integer userId = extUserUseridMap.getUser().getUserId();
+		    
+		    //add user to organisation if it's not there
+		    updateUserRoles(user, organisation, false);
+		    
+		    //check if user belong to the lesson. and if not - add it 
+		    if (!lesson.getLessonClass().getLearnersGroup().hasLearner(user)) {
+			lessonService.addLearner(lessonId, userId);
+		    }
+		    
+		    users.add(user);
+		}
+		
+		group.setUsers(users);
+	    } else {
+		group.setNumberUsers(jsonGroup.getInt("groupSize"));
+	    }
+	    
+	}
+
+	return extGroups;
+    }
 
     private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
 	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
@@ -614,5 +758,22 @@ public class IntegrationService implements IIntegrationService {
 	} else {
 	    return (ExtUserUseridMap) list.get(0);
 	}
+    }
+    
+    private ExtCourseClassMap getExtCourseClassMap(Integer organisationId) {
+	List list = service.findByProperty(ExtCourseClassMap.class, "organisation.organisationId", organisationId);
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return (ExtCourseClassMap) list.get(0);
+	}
+    }
+
+    public void setService(IUserManagementService service) {
+	this.service = service;
+    }
+    
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
     }
 }
