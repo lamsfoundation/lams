@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	
+	<bean id="commentSessionDAO" class="org.lamsfoundation.lams.comments.dao.hibernate.CommentSessionDAO">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+	<bean id="commentDAO" class="org.lamsfoundation.lams.comments.dao.hibernate.CommentDAO">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+	<bean id="commentLikeDAO" class="org.lamsfoundation.lams.comments.dao.hibernate.CommentLikeDAO">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="commentServiceTarget" class="org.lamsfoundation.lams.comments.service.CommentService" >
+		<property name="userService"><ref bean="userManagementService"/></property>	
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="auditService"><ref bean="auditService"/></property>
+		<property name="commentSessionDAO"><ref bean="commentSessionDAO"/></property> 
+		<property name="commentDAO"><ref bean="commentDAO"/></property> 
+		<property name="commentLikeDAO"><ref bean="commentLikeDAO"/></property> 
+	</bean>
+	
+	<bean id="commentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="commentServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="hide*">PROPAGATION_REQUIRED</prop>
+ 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+</beans>
