@@ -4,11 +4,11 @@
 
 CREATE PROCEDURE `with_emulator`(
 recursive_table varchar(100),
-initial_SELECT varchar(21845), 
-recursive_SELECT varchar(21845),
-final_SELECT varchar(21845),
+initial_SELECT text, 
+recursive_SELECT text,
+final_SELECT text,
 max_recursion int unsigned, 
-create_table_options varchar(21845) 
+create_table_options text 
 )
 BEGIN
   declare new_rows int unsigned;
