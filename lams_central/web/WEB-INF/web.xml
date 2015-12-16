@@ -279,6 +279,11 @@
 		<servlet-name>insertLearningDesign</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.authoring.web.InsertLDServlet</servlet-class>
 
+	</servlet>	
+	<servlet>
+		<servlet-name>jlatexmath</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.JlatexmathServlet</servlet-class>
+
 	</servlet>
 	<servlet>
 		<servlet-name>saveLessonOrder</servlet-name>
@@ -577,6 +582,10 @@
 	<servlet-mapping>
 		<servlet-name>insertLearningDesign</servlet-name>
 		<url-pattern>/servlet/authoring/insertLearningDesign</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>jlatexmath</servlet-name>
+		<url-pattern>/servlet/jlatexmath</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>saveLessonOrder</servlet-name>

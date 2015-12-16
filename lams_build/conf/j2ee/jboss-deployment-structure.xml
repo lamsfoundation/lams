@@ -40,6 +40,7 @@
       <module name="org.hibernate" export="true" />
       <module name="org.jboss.jbossweb" export="true" />
       <module name="org.jdom" export="true" />
+      <module name="org.scilab.forge.jlatexmath" export="true" />
       <module name="org.verisign.joid" export="true" />
       <module name="com.google.gson" export="true" />
       <module name="org.apache.lucene" slot="4.10" export="true" />
