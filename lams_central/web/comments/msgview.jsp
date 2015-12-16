@@ -105,21 +105,17 @@
 						<span id="msgvote${commentDto.comment.uid}">
 						<c:choose> 
 						<c:when test="${empty commentDto.comment.vote}">
-							<img src="<html:rewrite page='/images/like.gif' />"
-							border="0" title="<fmt:message key="label.like"/>"
-							onclick="javascript:likeEntry(${commentDto.comment.uid});" id="msglikebutton${commentDto.comment.uid}">
-							<img src="<html:rewrite page='/images/dislike.gif' />"
-							border="0" title="<fmt:message key="label.dislike"/>"
-							onclick="javascript:dislikeEntry(${commentDto.comment.uid});" id="msgdislikebutton${commentDto.comment.uid}">
+							<span class="fa fa-thumbs-up fa-lg fa-faded" title="<fmt:message key="label.like"/>"
+								onclick="javascript:likeEntry(${commentDto.comment.uid});" id="msglikebutton${commentDto.comment.uid}"></span>
+							&nbsp;<span class="fa fa-thumbs-down fa-lg fa-flip-horizontal fa-faded" title="<fmt:message key="label.dislike"/>"
+							onclick="javascript:dislikeEntry(${commentDto.comment.uid});" id="msgdislikebutton${commentDto.comment.uid}"></span>
 						</c:when>
 						<c:when test="${commentDto.comment.vote == 1}">
-							<img src="<html:rewrite page='/images/like_disabled.gif' />"
-							border="0" title="<fmt:message key="label.like"/>"
-							id="msglikebutton${commentDto.comment.uid}">
+							<span class="fa fa-thumbs-o-up fa-lg" title="<fmt:message key="label.like"/>"
+							id="msglikebutton${commentDto.comment.uid}"/>
 						</c:when>
 						<c:otherwise>
-							<img src="<html:rewrite page='/images/dislike_disabled.gif' />"
-							border="0" title="<fmt:message key="label.dislike"/>"
+							<span class="fa fa-thumbs-o-down fa-lg fa-flip-horizontal" title="<fmt:message key="label.dislike"/>"
 							id="msgdislikebutton${commentDto.comment.uid}">
 						</c:otherwise>
 						</c:choose>
