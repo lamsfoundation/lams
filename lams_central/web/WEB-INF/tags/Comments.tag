@@ -25,7 +25,7 @@
 
 <script>
 function resizeCommentFrame(pixels){
-    var w = window.innerWidth;
-    var h = window.innerHeight;
+	pixels+=40;
+    document.getElementById('commentFrame').style.height=pixels+"px";
 }
 </script>

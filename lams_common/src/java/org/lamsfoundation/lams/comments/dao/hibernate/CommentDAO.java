@@ -82,9 +82,6 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
     private static final String SQL_QUERY_FIND_NEXT_THREAD_TOP = "select uid from lams_comment"
 	    + " where root_comment_uid = :rootUid and uid < :lastUid and comment_level = 1 order by uid DESC";
 
-//    private static final String SQL_QUERY_FIND_NEXT_THREAD_MESSAGES = "from " + Comment.class.getName()
-//	    + " where root_comment_uid = ? and comment_level > 1 and thread_comment_uid in ?";
-
     private static final String SQL_QUERY_FIND_NEXT_THREAD_MESSAGES = 
 	    "SELECT c.*, SUM(l.vote) likes_total, l2.vote user_vote FROM lams_comment c "
 	    + " LEFT JOIN lams_comment_likes l ON c.uid = l.comment_uid "
@@ -92,9 +89,6 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
 	    + " WHERE c.thread_comment_uid IN (:threadIds) "
 	    + " GROUP BY c.uid";
     
-//    private static final String SQL_QUERY_GET_COMPLETE_THREAD = "from " + Comment.class.getName()
-//	    + " where thread_comment_uid = ?";
-
     private static final String SQL_QUERY_GET_COMPLETE_THREAD = 
 	    "SELECT c.*, SUM(l.vote) likes_total, l2.vote user_vote FROM lams_comment c "
 	    + " LEFT JOIN lams_comment_likes l ON c.uid = l.comment_uid "
@@ -132,21 +126,20 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
     @Override
     @SuppressWarnings("unchecked")
     public SortedSet<Comment> getNextThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId, Integer numberOfThreads, Integer userId) {
-	HibernateTemplate template = this.getHibernateTemplate();
 
-	template.setMaxResults(numberOfThreads);
 	List<Number> threadUidList = null;
 	if (previousThreadMessageId == null || previousThreadMessageId == 0L) {
 	    threadUidList = (List<Number>) getSession().createSQLQuery(SQL_QUERY_FIND_FIRST_THREAD_TOP)
 		    .setLong("rootUid", rootTopicId)
+		    .setMaxResults(numberOfThreads)
 		    .list();
 	} else {
 	    threadUidList = (List<Number>) getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_TOP)
 		    .setLong("rootUid", rootTopicId)
 		    .setLong("lastUid", previousThreadMessageId)
+		    .setMaxResults(numberOfThreads)
 		    .list();
 	}
-	template.setMaxResults(0);
 
 	if (threadUidList != null && threadUidList.size() > 0) {
 	    SQLQuery query =  getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES);

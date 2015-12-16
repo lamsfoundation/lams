@@ -1,5 +1,5 @@
 	function resizeIframe() {
-	//	parent.resizeCommentFrame(document.body.scrollHeight); Don't use at present - breaks the scrolling
+		parent.resizeCommentFrame(document.body.scrollHeight); 
 	}						
 
 	function highlightMessage() {
@@ -31,8 +31,8 @@
 				$(threadDiv).load(loadString, function() {
 					$('#msg'+commentUid).focus();
 					highlightMessage();
+					resizeIframe();
 				});
-				resizeIframe();
 			}
     	} else if ( response.errMessage ) {
 	    	// No valid id? Something failed. Assume it is a response message coming back.
