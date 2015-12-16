@@ -41,8 +41,9 @@
 			var parentDiv = document.getElementById('msg'+commentUid);
 			parentDiv.appendChild(replyDiv);
 			
-			$(replyDiv).load(url);
-			resizeIframe();
+			$(replyDiv).load(url, function() {
+				resizeIframe();
+			});
 		}
 	}
 	
@@ -59,8 +60,9 @@
 			var parentDiv = document.getElementById('msg'+commentUid);
 			parentDiv.appendChild(editDiv);
 
-			$(editDiv).load(url);
-			resizeIframe();
+			$(editDiv).load(url, function() {
+				resizeIframe();
+			});
 		}
 	}
 

@@ -43,9 +43,9 @@
        				var loadString = '<html:rewrite page="/comments/viewTopicThread.do?sessionMapID="/>' + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
 					$(newThreadDiv).load(loadString, function() {
 						highlightMessage();
+						resizeIframe();
 					});
 					clearNewForm();
-					resizeIframe();
 				} else if ( response.errMessage ) {
 					alert(response.errMessage);
 				} else {

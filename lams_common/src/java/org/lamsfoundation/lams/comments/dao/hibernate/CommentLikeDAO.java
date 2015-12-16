@@ -25,12 +25,10 @@
 
 package org.lamsfoundation.lams.comments.dao.hibernate;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.comments.dao.ICommentLikeDAO;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class CommentLikeDAO extends HibernateDaoSupport implements ICommentLikeDAO {
-    private static Logger log = Logger.getLogger(CommentLikeDAO.class);
     
     private static String INSERT_LIKE = "INSERT IGNORE INTO lams_comment_likes(comment_uid, user_id, vote) VALUES (:comment,:user,:vote);";
 	    
@@ -40,8 +38,6 @@ public class CommentLikeDAO extends HibernateDaoSupport implements ICommentLikeD
 		.setParameter("user", userId)
 		.setParameter("vote", vote)
 		.executeUpdate();
-
-	log.debug("Insert returned "+status);
 	return status == 1;
     }
 

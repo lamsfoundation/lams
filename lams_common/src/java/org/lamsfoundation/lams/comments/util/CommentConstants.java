@@ -49,7 +49,7 @@ public class CommentConstants {
     // for paging long topics & inlining reply
     public static final String PAGE_LAST_ID = "pageLastId";
     public static final String PAGE_SIZE = "size";
-    public static final int DEFAULT_PAGE_SIZE = 4;
+    public static final int DEFAULT_PAGE_SIZE = 2;
     public static final String ATTR_NO_MORE_PAGES = "noMorePages";
 
     public static final int MAX_BODY_LENGTH = 5000;
