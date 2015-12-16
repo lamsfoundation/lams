@@ -13,7 +13,7 @@
      -->
      
      <action
-      path="/comments"
+      path="/comments/comments"
       type="org.lamsfoundation.lams.comments.web.CommentAction"
       parameter="init"
       validate="false"
@@ -23,7 +23,7 @@
     </action>
 
     <action
-      path="/viewTopic"
+      path="/comments/viewTopic"
       type="org.lamsfoundation.lams.comments.web.CommentAction"
       parameter="viewTopic"
       validate="false"
@@ -32,7 +32,7 @@
     <forward name="success" path="/comments/topicviewwrapper.jsp" />
     </action>
     <action
-      path="/viewTopicThread"
+      path="/comments/viewTopicThread"
       type="org.lamsfoundation.lams.comments.web.CommentAction"
       parameter="viewTopicThread"
       validate="false"
@@ -41,7 +41,7 @@
     <forward name="success" path="/comments/topicviewwrapper.jsp" />
     </action>
 
-	<action path="/newComment"
+	<action path="/comments/newComment"
 		type="org.lamsfoundation.lams.comments.web.CommentAction"
 		parameter="newComment" 
 		validate="false" 
@@ -50,7 +50,7 @@
 	</action>
 	
     <action
-      path="/newReplyTopic"
+      path="/comments/newReplyTopic"
       type="org.lamsfoundation.lams.comments.web.CommentAction"
       parameter="newReplyTopic"
       validate="false"
@@ -58,7 +58,7 @@
     >
     <forward name="success" path="/comments/reply.jsp" />
     </action>
-	<action path="/replyTopicInline"
+	<action path="/comments/replyTopicInline"
 		type="org.lamsfoundation.lams.comments.web.CommentAction"
 		parameter="replyTopicInline" 
 		validate="false" 
@@ -67,7 +67,7 @@
 	</action>
 
     <action
-      path="/editTopic"
+      path="/comments/editTopic"
       type="org.lamsfoundation.lams.comments.web.CommentAction"
       parameter="editTopic"
       validate="false"
@@ -75,7 +75,7 @@
     >
     <forward name="success" path="/comments/edit.jsp" />
     </action>
-	<action path="/updateTopicInline"
+	<action path="/comments/updateTopicInline"
 		type="org.lamsfoundation.lams.comments.web.CommentAction"
 		parameter="updateTopicInline" 
 		validate="false" 
@@ -84,14 +84,14 @@
 	</action>
 
 
-	<action path="/like"
+	<action path="/comments/like"
 		type="org.lamsfoundation.lams.comments.web.CommentAction"
 		parameter="like" 
 		validate="false" 
 		scope="request">
 		<!--  JSON response on success -->
 	</action>
-	<action path="/dislike"
+	<action path="/comments/dislike"
 		type="org.lamsfoundation.lams.comments.web.CommentAction"
 		parameter="dislike" 
 		validate="false" 
@@ -99,7 +99,7 @@
 		<!--  JSON response on success -->
 	</action>
 	
-	<action path="/hide"
+	<action path="/comments/hide"
 		type="org.lamsfoundation.lams.comments.web.CommentAction"
 		parameter="hide" 
 		validate="false" 
