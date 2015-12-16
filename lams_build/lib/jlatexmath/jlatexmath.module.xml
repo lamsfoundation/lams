@@ -26,4 +26,7 @@
   <resources>
     <resource-root path="jlatexmath-1.0.3.jar"/>
   </resources>
+  <dependencies>
+    <module name="javax.api" />
+  </dependencies>
 </module>
