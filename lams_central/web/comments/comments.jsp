@@ -28,6 +28,7 @@
 		</c:choose>
 		<link type="text/css" href="<lams:LAMSURL />css/jquery.treetable.css" rel="stylesheet"/>
 		<link type="text/css" href="<lams:LAMSURL />css/jquery.treetable.lams.css" rel="stylesheet"/>
+		<link rel="stylesheet" href="<lams:LAMSURL />/includes/font-awesome/css/font-awesome.min.css">
 		
 		<!-- ********************  javascript ********************** -->
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>

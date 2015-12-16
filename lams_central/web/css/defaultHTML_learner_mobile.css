@@ -665,3 +665,7 @@ textarea.comment {
 div.comment-entry {
     width: 98%;
 }
+
+.fa-faded {
+	color: silver
+}

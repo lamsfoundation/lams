@@ -75,7 +75,7 @@
 	    });
 	}
 
-	function updateLike(commentUid, url, buttonToGrey, urlOfGreyImage, buttonToHide, incValue) {
+	function updateLike(commentUid, url, incValue) {
 		$.ajax({ // create an AJAX call...
 		    type: 'GET', 
 		    url: url
@@ -90,26 +90,25 @@
   				currentCount = +currentCount + incValue;
 	       		$('#msglikeCount'+commentUid).html(currentCount);
 			}
-			buttonToHide.style.display = 'none';
-			buttonToGrey.removeAttribute('onclick');
-			buttonToGrey.src = urlOfGreyImage;
 		});
 	}
 		
 	function likeEntry(commentUid) {
 		updateLike(commentUid,
 			'<html:rewrite page="/comments/like.do"/>?sessionMapID=${sessionMapID}&commentUid='+commentUid,
-			document.getElementById('msglikebutton'+commentUid),
-			'<html:rewrite page="/images/like_disabled.gif"/>',
-			document.getElementById('msgdislikebutton'+commentUid), 1);		
+			1);		
+		$( '#msglikebutton'+commentUid ).removeClass( 'fa-thumbs-up fa-faded' ).addClass( 'fa-thumbs-o-up' );
+		$( '#msglikebutton'+commentUid ).prop( 'onclick', null );
+		$( '#msgdislikebutton'+commentUid ).css( "display", "none" );
 	}
 
 	function dislikeEntry(commentUid) {
 		updateLike(commentUid, 
 			'<html:rewrite page="/comments/dislike.do"/>?sessionMapID=${sessionMapID}&commentUid='+commentUid,
-			document.getElementById('msgdislikebutton'+commentUid),
-			'<html:rewrite page="/images/dislike_disabled.gif"/>',
-			document.getElementById('msglikebutton'+commentUid), -1);		
+			 -1);		
+		$( '#msgdislikebutton'+commentUid ).removeClass( 'fa-thumbs-down fa-faded' ).addClass( 'fa-thumbs-o-down' );
+		$( '#msgdislikebutton'+commentUid ).prop( 'onclick', null );
+		$( '#msglikebutton'+commentUid ).css( "display", "none" );
 	}
 
 </script>
