@@ -429,7 +429,7 @@ public class CommentAction extends Action {
     }
 
     private boolean validateText(String commentText) {
-	return commentText != null & commentText.length() > 0 && commentText.length() < CommentConstants.MAX_BODY_LENGTH;
+	return commentText != null && commentText.length() > 0 && commentText.length() < CommentConstants.MAX_BODY_LENGTH;
     }
     
     private JSONObject getFailedValidationJSON() throws JSONException {
