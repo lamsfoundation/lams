@@ -26,6 +26,8 @@ cglib             cglib_jboss404GA.jar                  4.0.4.GA               A
 
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
 
+font-awesome      										4.5.0                  SIL OFL 1.1, MIT License      Dave Gandy                       Icon font
+
 flagstone		  transform.jar												   BSD							 Flagstone Software Ltd.		  reading and writing Flash 
 				  translate.jar
 
