@@ -55,7 +55,7 @@ public class CommentConstants {
     public static final int MAX_BODY_LENGTH = 5000;
     
     // message keys
-    public static final String KEY_BODY_VALIDATION = "label.body.validation";
+    public static final String KEY_BODY_VALIDATION = "label.comment.body.validation";
 
     
 }
