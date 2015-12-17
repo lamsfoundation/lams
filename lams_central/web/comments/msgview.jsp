@@ -43,7 +43,7 @@
 					<span id="msgBody">
 					<c:if
 						test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
-						<c:out value="${commentDto.comment.body}" escapeXml="true" />
+						<lams:out value="${commentDto.comment.body}" escapeHtml="true" />
 					</c:if>
 					<c:if test='${hidden}'>
 						<i><fmt:message key="label.hidden" /></i>
