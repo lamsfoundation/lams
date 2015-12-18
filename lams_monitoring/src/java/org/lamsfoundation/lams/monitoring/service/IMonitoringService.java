@@ -747,6 +747,21 @@ public interface IMonitoringService {
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
 
     /**
+     * Same as cloneLessons method, except it clones only one lesson.
+     * 
+     * @param lessonId
+     * @param addAllStaff
+     * @param addAllLearners
+     * @param staffIds
+     * @param learnerIds
+     * @param group
+     * @return cloned lesson's id
+     * @throws MonitoringServiceException
+     */
+    Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
+	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
+
+    /**
      * Get list of users who completed the given lesson.
      */
     List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending);

@@ -186,6 +186,13 @@ public class LessonManagerServlet extends HttpServlet {
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
+		
+	    } else if (method.equals(CentralConstants.METHOD_CLONE)) {
+		lsId = new Long(lsIdStr);
+		Long lessonId = cloneLesson(serverId, datetime, hashValue, username, lsId, courseId);
+
+		element = document.createElement(CentralConstants.ELEM_LESSON);
+		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());		
 
 	    } else if (method.equals(CentralConstants.METHOD_DELETE)
 		    || method.equals(CentralConstants.METHOD_REMOVE_LESSON)) {
@@ -397,6 +404,33 @@ public class LessonManagerServlet extends HttpServlet {
 	    LessonManagerServlet.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser()
 		    .getUserId());
 	    return lesson.getLessonId();
+	} catch (Exception e) {
+	    throw new RemoteException(e.getMessage(), e);
+	}
+    }
+    
+    private Long cloneLesson(String serverId, String datetime, String hashValue, String username, long lsId,
+	    String courseId) throws RemoteException {
+	try {
+	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap.getSid(),
+		    courseId);
+	    if (orgMap == null) {
+		LessonManagerServlet.log.debug("No course exists for: " + courseId + ". Can't delete any lessons.");
+		throw new Exception("Course with courseId: " + courseId + " could not be found");
+	    }
+	    Organisation organisation = orgMap.getOrganisation();
+
+	    // clone lesson
+	    Long newLessonId = monitoringService.cloneLesson(lsId, userMap.getUser().getUserId(), true, true, null,
+		    null, organisation);
+	    // store information which extServer has started the lesson
+	    LessonManagerServlet.integrationService.createExtServerLessonMap(newLessonId, serverMap);
+
+	    return newLessonId;
 	} catch (Exception e) {
 	    throw new RemoteException(e.getMessage(), e);
 	}
