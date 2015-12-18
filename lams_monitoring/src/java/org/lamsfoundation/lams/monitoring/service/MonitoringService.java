@@ -2440,6 +2440,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     public Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException {
 	Lesson newLesson = null;
+	
+	securityService.isGroupMonitor(group.getOrganisationId(), creatorId, "cloneLesson", true);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
 	if (lesson != null) {
