@@ -332,8 +332,9 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 	    public Object doInHibernate(Session session) throws HibernateException {
 		List<User> users = session.createQuery(LearnerProgressDAO.LOAD_LEARNERS_ATTEMPTED_ACTIVITY)
 			.setLong("activityId", activity.getActivityId().longValue()).list();
-		return users.addAll(session.createQuery(LearnerProgressDAO.LOAD_LEARNERS_COMPLETED_ACTIVITY)
+		users.addAll(session.createQuery(LearnerProgressDAO.LOAD_LEARNERS_COMPLETED_ACTIVITY)
 			.setLong("activityId", activity.getActivityId().longValue()).list());
+		return users;
 	    }
 	});
 
