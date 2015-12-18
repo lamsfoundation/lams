@@ -202,7 +202,18 @@ public class LessonManagerServlet extends HttpServlet {
 		verifyPostRequestMethod(request);
 		
 		element = removeAllLessons(document, serverId, datetime, hashValue, username, courseId);
-			
+		
+	    } else if (method.equals(CentralConstants.METHOD_REMOVE_USER)) {
+		verifyPostRequestMethod(request);
+		
+		lsId = new Long(lsIdStr);
+		element = removeUser(document, serverId, datetime, hashValue, username, lsId, userIds);
+
+	    } else if (method.equals(CentralConstants.METHOD_REMOVE_ALL_USERS)) {
+		verifyPostRequestMethod(request);
+		
+		lsId = new Long(lsIdStr);
+		element = removeAllUsers(document, serverId, datetime, hashValue, username, lsId);		
 
 	    } else if (method.equals(CentralConstants.METHOD_STUDENT_PROGRESS)) {
 		lsId = new Long(lsIdStr);
@@ -577,6 +588,71 @@ public class LessonManagerServlet extends HttpServlet {
 	}
 
 	return lessonsElement;
+    }
+    
+    /**
+     * Deletes all lessons from the specified course.
+     */
+    private Element removeUser(Document document, String serverId, String datetime, String hashValue,
+	    String username, long lsId, String userIds) throws Exception {
+	// Create the root node of the xml document
+	Element usersElement = document.createElement("Users");
+
+	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+
+//	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	//check is user monitor?
+	
+	String[] extUsernames = (userIds != null) ? userIds.split(",") : new String[0];
+	for (String extUsername : extUsernames) {
+
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, extUsername);
+	    Integer userId = userMap.getUser().getUserId();
+	    // remove user
+	    lessonService.removeLearner(lsId, userId);
+
+	    // add userId to output xml document
+	    Element lessonElement = document.createElement("User");
+	    lessonElement.setAttribute(CentralConstants.PARAM_USER_ID, "" + userId);
+	    lessonElement.setAttribute(CentralConstants.ATTR_DELETED, "true");
+	    usersElement.appendChild(lessonElement);
+	}
+
+	return usersElement;
+    }
+    
+    /**
+     * Deletes all lessons from the specified course.
+     */
+    private Element removeAllUsers(Document document, String serverId, String datetime, String hashValue,
+	    String username, long lsId) throws Exception {
+	// Create the root node of the xml document
+	Element usersElement = document.createElement("Users");
+
+	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+
+//	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	
+	Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
+	Set<User> users = lesson.getAllLearners();
+	if (users != null) {
+	    for (User user : users) {
+
+		Integer userId = user.getUserId();
+		// remove user
+		lessonService.removeLearner(lsId, userId);
+
+		// add userId to output xml document
+		Element lessonElement = document.createElement("User");
+		lessonElement.setAttribute(CentralConstants.PARAM_USER_ID, "" + userId);
+		lessonElement.setAttribute(CentralConstants.ATTR_DELETED, "true");
+		usersElement.appendChild(lessonElement);
+	    }
+	}
+
+	return usersElement;
     }
 
     private Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
