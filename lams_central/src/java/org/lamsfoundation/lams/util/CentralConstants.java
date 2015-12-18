@@ -74,6 +74,8 @@ public class CentralConstants {
     public static final String PARAM_CUSTOM_CSV = "customCSV";
     
     public static final String PARAM_USER_ID = "userId";
+    
+    public static final String PARAM_USER_IDS = "userIds";
 
     public static final String METHOD_START = "start";
 
@@ -82,8 +84,18 @@ public class CentralConstants {
     public static final String METHOD_IMPORT = "import";
 
     public static final String METHOD_SCHEDULE = "schedule";
+    
+    public static final String METHOD_CLONE = "clone";
 
     public static final String METHOD_DELETE = "delete";
+    
+    public static final String METHOD_REMOVE_LESSON = "removeLesson";
+    
+    public static final String METHOD_REMOVE_ALL_LESSONS = "removeAllLessons";
+    
+    public static final String METHOD_REMOVE_USER = "removeUser";
+    
+    public static final String METHOD_REMOVE_ALL_USERS = "removeAllUsers";
 
     public static final String METHOD_STUDENT_PROGRESS = "studentProgress";
 
