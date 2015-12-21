@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.security.SecurityService;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -92,6 +93,8 @@ public class LessonManagerServlet extends HttpServlet {
     private static IGradebookService gradebookService = null;
 
     private static IUserManagementService userManagementService = null;
+    
+    private static ISecurityService securityService = null;
 
     /**
      * The doGet method of the servlet. <br>
@@ -635,9 +638,11 @@ public class LessonManagerServlet extends HttpServlet {
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	Authenticator.authenticate(serverMap, datetime, username, hashValue);
 
-//	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	//check is user monitor?
+	//check is user monitor
+	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove user", true);
 	
+	//remove requested user
 	String[] extUsernames = (userIds != null) ? userIds.split(",") : new String[0];
 	for (String extUsername : extUsernames) {
 
@@ -667,8 +672,11 @@ public class LessonManagerServlet extends HttpServlet {
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	Authenticator.authenticate(serverMap, datetime, username, hashValue);
 
-//	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	//check is user monitor
+	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove all users", true);
 	
+	//remove all users from the specified lesson
 	Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
 	Set<User> users = lesson.getAllLearners();
 	if (users != null) {
@@ -806,6 +814,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 	LessonManagerServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
+	
+	LessonManagerServlet.securityService = (ISecurityService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("securityService");
     }
 
     private class AddUsersToLessonThread implements Runnable {
