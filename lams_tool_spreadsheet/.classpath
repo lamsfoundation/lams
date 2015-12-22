@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jbossweb.sar/jbossweb.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
