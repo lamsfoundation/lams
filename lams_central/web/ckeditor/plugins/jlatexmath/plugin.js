@@ -31,8 +31,8 @@ CKEDITOR.plugins.add('jlatexmath', {
 	            	'Jlatexmath',
 	            	editor.lang.jlatexmath.DlgJlatexmathTitle,
 	                pluginPath + 'jlatexmath.jsp',
-	                930,
-	                400
+	                950,
+	                530
 	             );
 	             
 	 			editor.on( 
