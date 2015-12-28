@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,11 +53,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author Fei Yang
  *
- * @struts:action path="/organisation"
- *              name="OrganisationForm"
- *              scope="request"
- *              parameter="method"
- * 				validate="false"
+ * @struts:action path="/organisation" name="OrganisationForm" scope="request" parameter="method" validate="false"
  * 
  * @struts:action-forward name="organisation" path=".organisation"
  * @struts:action-forward name="organisationCourseAdmin" path=".organisationCourseAdmin"
@@ -64,97 +61,116 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class OrganisationAction extends LamsDispatchAction {
 
-	private static IUserManagementService service;
-	private static MessageService messageService;
-	private static List<SupportedLocale> locales; 
-	private static List status;
-	
-	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		initLocalesAndStatus();
-		DynaActionForm orgForm = (DynaActionForm)form;
-		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
-		
-		HttpSession session = SessionManager.getSession();
-		if (session != null) {
-			UserDTO userDto = (UserDTO)session.getAttribute(AttributeNames.USER);
-			if (userDto != null) {
-				Integer userId = userDto.getUserID();
-				// sysadmin, global group admin, group manager, group admin can edit group
-				if (service.canEditGroup(userId, orgId)) {
-					//	edit existing organisation
-					if (orgId != null){
-						Organisation org = (Organisation)service.findById(Organisation.class,orgId);
-						BeanUtils.copyProperties(orgForm,org);
-						orgForm.set("parentId",org.getParentOrganisation().getOrganisationId());
-						orgForm.set("parentName",org.getParentOrganisation().getName());
-						orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
-						orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
-						SupportedLocale locale = org.getLocale();
-						orgForm.set("localeId",locale != null ? locale.getLocaleId() : null);
-					}
-					request.getSession().setAttribute("locales",locales);
-					request.getSession().setAttribute("status",status);
-					if (service.isUserSysAdmin() || service.isUserGlobalGroupAdmin()) {
-						return mapping.findForward("organisation");
-					} else {
-						return mapping.findForward("organisationCourseAdmin");
-					}
-				}
-			}
+    private static IUserManagementService service;
+    private static MessageService messageService;
+    private static List<SupportedLocale> locales;
+    private static List status;
+
+    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	OrganisationAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
+	initLocalesAndStatus();
+	DynaActionForm orgForm = (DynaActionForm) form;
+	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
+
+	HttpSession session = SessionManager.getSession();
+	if (session != null) {
+	    UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	    if (userDto != null) {
+		Integer userId = userDto.getUserID();
+		// sysadmin, global group admin, group manager, group admin can edit group
+		if (OrganisationAction.service.canEditGroup(userId, orgId)) {
+		    // edit existing organisation
+		    if (orgId != null) {
+			Organisation org = (Organisation) OrganisationAction.service.findById(Organisation.class,
+				orgId);
+			BeanUtils.copyProperties(orgForm, org);
+			orgForm.set("parentId", org.getParentOrganisation().getOrganisationId());
+			orgForm.set("parentName", org.getParentOrganisation().getName());
+			orgForm.set("typeId", org.getOrganisationType().getOrganisationTypeId());
+			orgForm.set("stateId", org.getOrganisationState().getOrganisationStateId());
+			SupportedLocale locale = org.getLocale();
+			orgForm.set("localeId", locale != null ? locale.getLocaleId() : null);
+		    }
+		    request.getSession().setAttribute("locales", OrganisationAction.locales);
+		    request.getSession().setAttribute("status", OrganisationAction.status);
+		    if (OrganisationAction.service.isUserSysAdmin()
+			    || OrganisationAction.service.isUserGlobalGroupAdmin()) {
+			return mapping.findForward("organisation");
+		    } else {
+			return mapping.findForward("organisationCourseAdmin");
+		    }
 		}
-		
+	    }
+	}
+
+	return error(mapping, request);
+    }
+
+    public ActionForward create(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	OrganisationAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
+	initLocalesAndStatus();
+	DynaActionForm orgForm = (DynaActionForm) form;
+
+	if (!(request.isUserInRole(Role.SYSADMIN) || OrganisationAction.service.isUserGlobalGroupAdmin())) {
+	    // only sysadmins and global group admins can create groups
+	    if (((orgForm.get("typeId") != null) && orgForm.get("typeId").equals(OrganisationType.COURSE_TYPE))
+		    || (orgForm.get("typeId") == null)) {
 		return error(mapping, request);
-	}
-	
-	public ActionForward create(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		initLocalesAndStatus();
-		DynaActionForm orgForm = (DynaActionForm)form;
-		
-		if(!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
-			// only sysadmins and global group admins can create groups
-			if (orgForm.get("typeId")!=null && orgForm.get("typeId").equals(OrganisationType.COURSE_TYPE)
-					|| orgForm.get("typeId")==null) {
-				return error(mapping, request);
-			}
-		}
-		
-		// creating new organisation
-		orgForm.set("orgId", null);
-		Integer parentId = WebUtil.readIntParam(request,"parentId",true);
-		if (parentId!=null) {
-			Organisation parentOrg = (Organisation)service.findById(Organisation.class,parentId);
-			orgForm.set("parentName", parentOrg.getName());
-		}
-		request.getSession().setAttribute("locales",locales);
-		request.getSession().setAttribute("status",status);
-		return mapping.findForward("organisation");
-	}
-	
-	private ActionForward error(ActionMapping mapping, HttpServletRequest request) {
-		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		request.setAttribute("errorName", "OrganisationAction");
-		request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
-		return mapping.findForward("error");
+	    }
 	}
 
-	/*public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
-		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		getService().deleteById(Organisation.class,orgId);
-		Integer parentId = WebUtil.readIntParam(request,"parentId");
-		request.setAttribute("org",parentId);
-		return mapping.findForward("orglist");
-	}*/
-	
-	@SuppressWarnings("unchecked")
-	private void initLocalesAndStatus(){
-		if((locales==null)||(status==null) && service!=null){
-			locales = service.findAll(SupportedLocale.class);
-			status = service.findAll(OrganisationState.class);
-			Collections.sort(locales);
-		}
+	// creating new organisation
+	orgForm.set("orgId", null);
+	Integer parentId = WebUtil.readIntParam(request, "parentId", true);
+	if (parentId != null) {
+	    Organisation parentOrg = (Organisation) OrganisationAction.service.findById(Organisation.class, parentId);
+	    orgForm.set("parentName", parentOrg.getName());
 	}
+	request.getSession().setAttribute("locales", OrganisationAction.locales);
+	request.getSession().setAttribute("status", OrganisationAction.status);
+	return mapping.findForward("organisation");
+    }
 
-} // end Action
+    /**
+     * Looks up course ID by its name. Used mainly by TestHarness.
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getOrganisationIdByName(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	String organisationName = WebUtil.readStrParam(request, "name");
+	OrganisationAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
+	List<Organisation> organisations = service.findByProperty(Organisation.class, "name", organisationName);
+	if (!organisations.isEmpty()) {
+	    response.setContentType("text/plain;charset=utf-8");
+	    response.getWriter().print(organisations.get(0).getOrganisationId());
+	}
+	return null;
+    }
 
+    private ActionForward error(ActionMapping mapping, HttpServletRequest request) {
+	OrganisationAction.messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+	request.setAttribute("errorName", "OrganisationAction");
+	request.setAttribute("errorMessage", OrganisationAction.messageService.getMessage("error.authorisation"));
+	return mapping.findForward("error");
+    }
+
+    /*public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
+    	Integer orgId = WebUtil.readIntParam(request,"orgId");
+    	getService().deleteById(Organisation.class,orgId);
+    	Integer parentId = WebUtil.readIntParam(request,"parentId");
+    	request.setAttribute("org",parentId);
+    	return mapping.findForward("orglist");
+    }*/
+
+    @SuppressWarnings("unchecked")
+    private void initLocalesAndStatus() {
+	if ((OrganisationAction.locales == null)
+		|| ((OrganisationAction.status == null) && (OrganisationAction.service != null))) {
+	    OrganisationAction.locales = OrganisationAction.service.findAll(SupportedLocale.class);
+	    OrganisationAction.status = OrganisationAction.service.findAll(OrganisationState.class);
+	    Collections.sort(OrganisationAction.locales);
+	}
+    }
+}
