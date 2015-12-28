@@ -52,7 +52,7 @@ import com.meterware.httpunit.WebTable;
 /**
  * @version
  * 
- *          <p>
+ * 	 <p>
  *          <a href="MockAdmin.java.html"><i>View Source</i></a>
  *          </p>
  * 
@@ -94,28 +94,18 @@ public class MockAdmin extends MockUser {
 		    createCourseURL).execute();
 	    if (!MockUser.checkPageContains(resp, MockAdmin.COURSE_FORM_FLAG)) {
 		MockAdmin.log.debug(resp.getText());
-		throw new TestHarnessException(username + " did not get course creation page with the url:"
-			+ createCourseURL);
+		throw new TestHarnessException(
+			username + " did not get course creation page with the url:" + createCourseURL);
 	    }
 	    Map<String, Object> params = new HashMap<String, Object>();
 	    params.put(MockAdmin.COURSE_NAME, courseName);
 	    // fill the form and submit it and return the course id
-	    resp = (WebResponse) new Call(wc, test, username + " submit course creation form",
-		    fillForm(resp, 0, params)).execute();
-	    WebTable[] tables = resp.getTables();
-	    if ((tables == null) || (tables.length == 0)) {
-		MockAdmin.log.debug(resp.getText());
-		throw new TestHarnessException(username
-			+ " failed to get an course table after submitting course creation form");
-	    }
-	    WebTable table = tables[0];
-	    String idAsString = null;
-	    for (int i = table.getRowCount() - 1; i >= 0; i--) {
-		if (table.getCellAsText(i, 1).indexOf(courseName) != -1) {// found the organisation created just now
-		    idAsString = table.getCellAsText(i, 0);
-		    break;
-		}
-	    }
+	    new Call(wc, test, username + " submit course creation form", fillForm(resp, 0, params)).execute();
+
+	    resp = (WebResponse) new Call(wc, test, username + " checking course ID by name " + courseName,
+		    "/admin/organisation.do?method=getOrganisationIdByName&name=" + courseName).execute();
+	    String idAsString = resp.getText();
+
 	    if (idAsString == null) {
 		MockAdmin.log.debug(resp.getText());
 		throw new TestHarnessException("Failed to get the course id for " + courseName);
@@ -151,7 +141,8 @@ public class MockAdmin extends MockUser {
 		    resp = (WebResponse) new Call(wc, test, username + " creating user " + name, url).execute();
 		    if (!MockUser.checkPageContains(resp, MockAdmin.USER_FORM_FLAG)) {
 			MockAdmin.log.debug(resp.getText());
-			throw new TestHarnessException(username + " did not get user creation page with the url " + url);
+			throw new TestHarnessException(
+				username + " did not get user creation page with the url " + url);
 		    }
 		    Map<String, Object> params = new HashMap<String, Object>();
 		    params.put(MockAdmin.LOGIN, name);
@@ -159,10 +150,10 @@ public class MockAdmin extends MockUser {
 		    params.put(MockAdmin.PASSWORD2, name);
 		    params.put(MockAdmin.FIRST_NAME, name);
 		    params.put(MockAdmin.LAST_NAME, MockAdmin.COMMON_LAST_NAME);
-		    params.put(MockAdmin.EMAIL, name + "@" + MockAdmin.COMMON_LAST_NAME + "."
-			    + MockAdmin.COMMON_LAST_NAME.toLowerCase());
-		    resp = (WebResponse) new Call(wc, test, username + " submit user creation form", fillForm(resp, 0,
-			    params)).execute();
+		    params.put(MockAdmin.EMAIL,
+			    name + "@" + MockAdmin.COMMON_LAST_NAME + "." + MockAdmin.COMMON_LAST_NAME.toLowerCase());
+		    resp = (WebResponse) new Call(wc, test, username + " submit user creation form",
+			    fillForm(resp, 0, params)).execute();
 		    // add the roles
 		    String respText = resp.getText();
 
@@ -173,8 +164,8 @@ public class MockAdmin extends MockUser {
 			    mockUser.setUserId(userId);
 			    MockAdmin.log.debug("User " + name + " already exists with ID " + userId);
 			} else {
-			    throw new TestHarnessException("User " + name
-				    + " already exists, but could not retrieve his ID");
+			    throw new TestHarnessException(
+				    "User " + name + " already exists, but could not retrieve his ID");
 			}
 		    } else {
 			Matcher m = MockAdmin.NEW_USER_ID_PATTERN.matcher(respText);
@@ -182,14 +173,14 @@ public class MockAdmin extends MockUser {
 			    String userId = m.group(1);
 			    if (userId.equals("0")) {
 				log.error(respText);
-				throw new TestHarnessException("Error while creating user " + name
-					+ ". Server returned user ID 0");
+				throw new TestHarnessException(
+					"Error while creating user " + name + ". Server returned user ID 0");
 			    }
 			    mockUser.setUserId(userId);
 			    MockAdmin.log.debug("User " + name + " created with ID " + userId);
 			} else {
-			    throw new TestHarnessException("User " + name
-				    + " was just created, but could not retrieve his ID");
+			    throw new TestHarnessException(
+				    "User " + name + " was just created, but could not retrieve his ID");
 			}
 		    }
 		} else {
@@ -207,8 +198,8 @@ public class MockAdmin extends MockUser {
 		WebTable[] tables = resp.getTables();
 		if ((tables == null) || (tables.length < 2)) {
 		    MockAdmin.log.debug(resp.getText());
-		    throw new TestHarnessException(username
-			    + " failed to get an user table after submitting user role form");
+		    throw new TestHarnessException(
+			    username + " failed to get an user table after submitting user role form");
 		}
 
 		WebTable table = tables[1];
