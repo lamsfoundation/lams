@@ -26,28 +26,14 @@ package org.lamsfoundation.lams.tool.pixlr.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.SortedMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -74,7 +60,6 @@ import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrException;
-import org.lamsfoundation.lams.tool.pixlr.util.PixlrToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -90,7 +75,8 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class PixlrService implements ToolSessionManager, ToolContentManager, IPixlrService, ToolContentImport102Manager {
+public class PixlrService
+	implements ToolSessionManager, ToolContentManager, IPixlrService, ToolContentImport102Manager {
 
     private static Logger logger = Logger.getLogger(PixlrService.class.getName());
 
@@ -123,7 +109,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     /* ************ Methods from ToolSessionManager ************* */
-    
+
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (PixlrService.logger.isDebugEnabled()) {
@@ -147,14 +133,15 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public ToolSessionExportOutputData exportToolSession(List ToolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List ToolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -173,14 +160,14 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getPixlrOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ************ Methods from ToolContentManager ************************* */
-    
+
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
@@ -267,14 +254,30 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	pixlrDAO.saveOrUpdate(pixlr);
     }
 
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
-	// TODO Auto-generated method stub
+    @Override
+    public void removeToolContent(Long toolContentId) throws SessionDataExistsException, ToolException {
+	Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
+	if (pixlr == null) {
+	    PixlrService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (PixlrSession session : pixlr.getPixlrSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, PixlrConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	pixlrDAO.delete(pixlr);
     }
 
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Pixlr image for user ID " + userId + " and toolContentId " + toolContentId);
+	if (PixlrService.logger.isDebugEnabled()) {
+	    PixlrService.logger
+		    .debug("Removing Pixlr image for user ID " + userId + " and toolContentId " + toolContentId);
 
 	    Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
 	    if (pixlr != null) {
@@ -296,11 +299,12 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
 	if (pixlr == null) {
@@ -316,8 +320,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	// bundling the author image in export
 	try {
 	    if (pixlr.getImageFileName() != null) {
-		File imageFile = new File(PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator
-			+ pixlr.getImageFileName());
+		File imageFile = new File(
+			PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator + pixlr.getImageFileName());
 		if (imageFile.exists()) {
 
 		    String ext = getFileExtension(pixlr.getImageFileName());
@@ -349,19 +353,20 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(PixlrImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, pixlrToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Pixlr)) {
-		throw new ImportToolContentException("Import Pixlr tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Pixlr tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Pixlr pixlr = (Pixlr) toolPOJO;
 
@@ -394,10 +399,11 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	}
     }
 
+    @Override
     public String getFileExtension(String fileName) {
 	String ext = "";
 	int i = fileName.lastIndexOf('.');
-	if (i > 0 && i < fileName.length() - 1) {
+	if ((i > 0) && (i < (fileName.length() - 1))) {
 	    ext += "." + fileName.substring(i + 1).toLowerCase();
 	}
 	return ext;
@@ -411,6 +417,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Pixlr pixlr = getPixlrDAO().getByContentId(toolContentId);
@@ -419,24 +426,28 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	}
 	return getPixlrOutputFactory().getToolOutputDefinitions(pixlr, definitionType);
     }
-    
+
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getPixlrByContentId(toolContentId).getTitle();
     }
-    
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getPixlrByContentId(toolContentId).isDefineLater();
     }
 
     /* ********** IPixlrService Methods ********************************* */
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -446,10 +457,12 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     /**
      * @param notebookEntry
      */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -461,6 +474,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	return toolContentId;
     }
 
+    @Override
     public Pixlr getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(PixlrConstants.TOOL_SIGNATURE);
 	Pixlr defaultContent = getPixlrByContentId(defaultContentID);
@@ -472,6 +486,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	return defaultContent;
     }
 
+    @Override
     public Pixlr copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -488,6 +503,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	return newContent;
     }
 
+    @Override
     public Pixlr getPixlrByContentId(Long toolContentID) {
 	Pixlr pixlr = pixlrDAO.getByContentId(toolContentID);
 	if (pixlr == null) {
@@ -496,6 +512,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	return pixlr;
     }
 
+    @Override
     public PixlrSession getSessionBySessionId(Long toolSessionId) {
 	PixlrSession pixlrSession = pixlrSessionDAO.getBySessionId(toolSessionId);
 	if (pixlrSession == null) {
@@ -504,6 +521,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	return pixlrSession;
     }
 
+    @Override
     public PixlrUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return pixlrUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
@@ -512,22 +530,27 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	return pixlrUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public PixlrUser getUserByUID(Long uid) {
 	return pixlrUserDAO.getByUID(uid);
     }
 
+    @Override
     public void saveOrUpdatePixlr(Pixlr pixlr) {
 	pixlrDAO.saveOrUpdate(pixlr);
     }
 
+    @Override
     public void saveOrUpdatePixlrSession(PixlrSession pixlrSession) {
 	pixlrSessionDAO.saveOrUpdate(pixlrSession);
     }
 
+    @Override
     public void saveOrUpdatePixlrUser(PixlrUser pixlrUser) {
 	pixlrUserDAO.saveOrUpdate(pixlrUser);
     }
 
+    @Override
     public PixlrUser createPixlrUser(UserDTO user, PixlrSession pixlrSession) {
 	PixlrUser pixlrUser = new PixlrUser(user, pixlrSession);
 	saveOrUpdatePixlrUser(pixlrUser);
@@ -541,15 +564,18 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
     }
-    
+
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
 
+    @Override
     public PixlrConfigItem getConfigItem(String key) {
 	return pixlrConfigItemDAO.getConfigItemByKey(key);
     }
 
+    @Override
     public void saveOrUpdatePixlrConfigItem(PixlrConfigItem item) {
 	pixlrConfigItemDAO.saveOrUpdate(item);
     }
@@ -559,6 +585,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     /**
      * Import the data for a 1.0.2 Pixlr
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
@@ -567,8 +594,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	pixlr.setCreateBy(new Long(user.getUserID().longValue()));
 	pixlr.setCreateDate(now);
 	pixlr.setDefineLater(Boolean.FALSE);
-	pixlr.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	pixlr.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	pixlr.setLockOnFinished(Boolean.TRUE);
 	pixlr.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	pixlr.setToolContentId(toolContentId);
@@ -583,11 +610,12 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     /**
      * Set the description, throws away the title value as this is not supported in 2.0
      */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
-	PixlrService.logger
-		.warn("Setting the reflective field on a pixlr. This doesn't make sense as the pixlr is for reflection and we don't reflect on reflection!");
+	PixlrService.logger.warn(
+		"Setting the reflective field on a pixlr. This doesn't make sense as the pixlr is for reflection and we don't reflect on reflection!");
 	Pixlr pixlr = getPixlrByContentId(toolContentId);
 	if (pixlr == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -680,6 +708,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	this.pixlrConfigItemDAO = pixlrConfigItemDAO;
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getPixlrOutputFactory().getSupportedDefinitionClasses(definitionType);
     }

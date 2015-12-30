@@ -85,7 +85,8 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
-public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager, ToolRestManager {
+public class WikiService
+	implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(WikiService.class.getName());
 
@@ -141,11 +142,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	// Create an empty list to copy the wiki pages into
 	Set<WikiPage> sessionWikiPages = new HashSet<WikiPage>();
-	
+
 	// Here we need to clone wikipages and content for tool session versions
-	//for (WikiPage childPage : wiki.getWikiPages()) {  // LDEV-2436
+	// for (WikiPage childPage : wiki.getWikiPages()) { // LDEV-2436
 	for (WikiPage childPage : (List<WikiPage>) wikiDAO.findByProperty(WikiPage.class, "parentWiki", wiki)) {
-	
+
 	    // check that this page does not already have a session
 	    if (childPage.getWikiSession() != null) {
 		continue;
@@ -184,13 +185,14 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -219,10 +221,10 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 	return wikiOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     @Override
@@ -235,17 +237,17 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 	return wikiOutputFactory.getToolOutputDefinitions(wiki, definitionType);
     }
-    
+
     @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getWikiByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getWikiByContentId(toolContentId).isDefineLater();
     }
-   
+
     /* ************ Methods from ToolContentManager ************************* */
 
     @Override
@@ -273,7 +275,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	insertUnsavedWikiContent(toContent);
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
@@ -285,30 +287,45 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
-	// TODO Auto-generated method stub
+    public void removeToolContent(Long toolContentId) throws SessionDataExistsException, ToolException {
+	Wiki wiki = wikiDAO.getByContentId(toolContentId);
+	if (wiki == null) {
+	    WikiService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (WikiSession session : wiki.getWikiSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	wikiDAO.delete(wiki);
     }
-    
+
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Wiki contents for user ID " + userId + " and toolContentId " + toolContentId);
+	if (WikiService.logger.isDebugEnabled()) {
+	    WikiService.logger
+		    .debug("Removing Wiki contents for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
 	if (wiki == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    WikiService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
 	for (WikiSession session : wiki.getWikiSessions()) {
 	    /*
 	    for (WikiPage page : session.getWikiPages()) {
-        	    if (page.getAddedBy() != null && page.getAddedBy().getUserId().equals(userId.longValue())) {
-        	        page.setDeleted(true);
-        	        wikiPageDAO.update(page);
-        	    }
+	        if (page.getAddedBy() != null && page.getAddedBy().getUserId().equals(userId.longValue())) {
+	            page.setDeleted(true);
+	            wikiPageDAO.update(page);
+	        }
 	    }
 	    */
 
@@ -325,7 +342,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    }
 	}
     }
-    
+
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
@@ -372,12 +389,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(WikiContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, wikiToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Wiki)) {
-		throw new ImportToolContentException("Import Wiki tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Wiki tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Wiki wiki = (Wiki) toolPOJO;
 
@@ -407,6 +424,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#createNotebookEntry(java.lang.Long,
      *      java.lang.Integer, java.lang.String, java.lang.Integer, java.lang.String)
      */
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
@@ -416,9 +434,10 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
      */
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -430,6 +449,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
      */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
@@ -439,6 +459,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#comparePages(String,String)
      */
+    @Override
     public String comparePages(String old, String current) {
 	String oldArray[] = old.replaceAll("[\\t\\n\\r]", "").split("<div>");
 	String currentArray[] = current.replaceAll("[\\t\\n\\r]", "").split("<div>");
@@ -453,15 +474,15 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    if (difference.getDeletedEnd() == -1) {
 		// Added
 		for (int i = difference.getAddedStart(); i <= difference.getAddedEnd(); i++) {
-		    result.set(i + resultOffset, "<div style='background-color:#99FFCC; width: 90%;'> "
-			    + currentArray[i]);
+		    result.set(i + resultOffset,
+			    "<div style='background-color:#99FFCC; width: 90%;'> " + currentArray[i]);
 		}
 	    } else if (difference.getAddedEnd() == -1) {
 		// Deleted
 		for (int i = difference.getDeletedStart(); i <= difference.getDeletedEnd(); i++) {
-		    if (result.size() > i + resultOffset) {
-			result.add(i + resultOffset, "<div style='background-color:#FF9999; width: 90%;'>"
-				+ oldArray[i]);
+		    if (result.size() > (i + resultOffset)) {
+			result.add(i + resultOffset,
+				"<div style='background-color:#FF9999; width: 90%;'>" + oldArray[i]);
 		    } else {
 			result.add("<div style='background-color:#FF9999; width: 90%;'>" + oldArray[i]);
 		    }
@@ -471,13 +492,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 		// Replaced
 		for (int i = difference.getAddedStart(); i <= difference.getAddedEnd(); i++) {
-		    result.set(i + resultOffset, "<div style='background-color:#99FFCC; width: 90%;'>"
-			    + currentArray[i]);
+		    result.set(i + resultOffset,
+			    "<div style='background-color:#99FFCC; width: 90%;'>" + currentArray[i]);
 		}
 		for (int i = difference.getDeletedStart(); i <= difference.getDeletedEnd(); i++) {
-		    if (result.size() > i + resultOffset) {
-			result.add(i + resultOffset, "<div style='background-color:#FF9999; width: 90%;'>"
-				+ oldArray[i]);
+		    if (result.size() > (i + resultOffset)) {
+			result.add(i + resultOffset,
+				"<div style='background-color:#FF9999; width: 90%;'>" + oldArray[i]);
 		    } else {
 			result.add("<div style='background-color:#FF9999; width: 90%;'>" + oldArray[i]);
 		    }
@@ -512,6 +533,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getDefaultContentIdBySignature(String)
      */
+    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -528,6 +550,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getDefaultContent()
      */
+    @Override
     public Wiki getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(WikiConstants.TOOL_SIGNATURE);
 	Wiki defaultContent = getWikiByContentId(defaultContentID);
@@ -544,6 +567,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#copyDefaultContent(Long)
      */
+    @Override
     public Wiki copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -596,6 +620,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return wiki;
     }
 
+    @Override
     public Wiki getWikiByContentId(Long toolContentID) {
 	Wiki wiki = wikiDAO.getByContentId(toolContentID);
 	if (wiki == null) {
@@ -604,6 +629,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return wiki;
     }
 
+    @Override
     public WikiSession getSessionBySessionId(Long toolSessionId) {
 	WikiSession wikiSession = wikiSessionDAO.getBySessionId(toolSessionId);
 	if (wikiSession == null) {
@@ -612,6 +638,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return wikiSession;
     }
 
+    @Override
     public WikiUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return wikiUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
@@ -620,6 +647,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return wikiUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public WikiUser getUserByUID(Long uid) {
 	return wikiUserDAO.getByUID(uid);
     }
@@ -630,6 +658,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateWikiPage(org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm,
      *      org.lamsfoundation.lams.tool.wiki.model.WikiPage, org.lamsfoundation.lams.tool.wiki.model.WikiUser)
      */
+    @Override
     public void updateWikiPage(WikiPageForm wikiPageForm, WikiPage wikiPage, WikiUser user) {
 
 	if (wikiPage == null) {
@@ -667,6 +696,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      *      org.lamsfoundation.lams.tool.wiki.model.Wiki, org.lamsfoundation.lams.tool.wiki.model.WikiUser,
      *      org.lamsfoundation.lams.tool.wiki.model.WikiSession)
      */
+    @Override
     public Long insertWikiPage(WikiPageForm wikiPageForm, Wiki wiki, WikiUser user, WikiSession session) {
 
 	// First create a new wiki page
@@ -703,77 +733,90 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return wikiPage.getUid();
     }
 
+    @Override
     public void deleteWikiPage(WikiPage wikiPage) {
 	wikiPageDAO.delete(wikiPage);
     }
-    
+
+    @Override
     public void markWikiPageAsDeleted(WikiPage wikiPage) {
 	wikiPage.setDeleted(true);
 	wikiPageDAO.saveOrUpdate(wikiPage);
     }
-    
+
+    @Override
     public void restoreWikiPage(WikiPage wikiPage) {
 	wikiPage.setDeleted(false);
 	wikiPageDAO.saveOrUpdate(wikiPage);
     }
 
+    @Override
     public void saveOrUpdateWiki(Wiki wiki) {
 	wikiDAO.saveOrUpdate(wiki);
     }
 
+    @Override
     public void saveOrUpdateWikiPage(WikiPage wikiPage) {
 	wikiPageDAO.saveOrUpdate(wikiPage);
     }
 
+    @Override
     public WikiPage getWikiPageByWikiAndTitle(Wiki wiki, String title) {
 	return wikiPageDAO.getByWikiAndTitle(wiki, title);
     }
 
+    @Override
     public WikiPage getWikiBySessionAndTitle(WikiSession wikiSession, String title) {
 	return wikiPageDAO.getBySessionAndTitle(wikiSession, title);
     }
 
+    @Override
     public WikiPage getWikiPageByUid(Long uid) {
 	List list = wikiPageDAO.findByProperty(WikiPage.class, "uid", uid);
-	if (list == null || list.size() == 0) {
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (WikiPage) list.get(0);
 	}
     }
 
+    @Override
     public WikiPageContent getWikiPageContent(Long uid) {
 	List list = wikiPageContentDAO.findByProperty(WikiPageContent.class, "uid", uid);
-	if (list == null || list.size() == 0) {
+	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (WikiPageContent) list.get(0);
 	}
     }
 
+    @Override
     public void saveOrUpdateWikiPageContent(WikiPageContent wikiPageContent) {
 	wikiPageContentDAO.saveOrUpdate(wikiPageContent);
     }
 
+    @Override
     public void saveOrUpdateWikiSession(WikiSession wikiSession) {
 	wikiSessionDAO.saveOrUpdate(wikiSession);
     }
 
+    @Override
     public void saveOrUpdateWikiUser(WikiUser wikiUser) {
 	wikiUserDAO.saveOrUpdate(wikiUser);
     }
 
+    @Override
     public WikiUser createWikiUser(UserDTO user, WikiSession wikiSession) {
 	WikiUser wikiUser = new WikiUser(user, wikiSession);
 	saveOrUpdateWikiUser(wikiUser);
 	return wikiUser;
     }
-    
+
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
@@ -785,6 +828,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * @param toolSessionId
      * @return
      */
+    @Override
     public int getEditsNum(Long learnerId, Long toolSessionId) {
 	WikiUser wikiUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
 
@@ -793,7 +837,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	int edits = 0;
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
 	    for (WikiPageContent wikiPageContent : wikiPage.getWikiContentVersions()) {
-		if (wikiPageContent.getEditor() != null
+		if ((wikiPageContent.getEditor() != null)
 			&& wikiPageContent.getEditor().getUid().equals(wikiUser.getUid())) {
 		    edits++;
 		}
@@ -808,6 +852,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * @param toolSessionId
      * @return
      */
+    @Override
     public int getAddsNum(Long learnerId, Long toolSessionId) {
 
 	WikiUser wikiUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
@@ -816,7 +861,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	int adds = 0;
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
-	    if (wikiPage.getAddedBy() != null && wikiPage.getAddedBy().getUid().equals(wikiUser.getUid())) {
+	    if ((wikiPage.getAddedBy() != null) && wikiPage.getAddedBy().getUid().equals(wikiUser.getUid())) {
 		adds++;
 	    }
 	}
@@ -830,6 +875,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     /**
      * Import the data for a 1.0.2 Wiki
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Wiki wiki = new Wiki();
@@ -837,8 +883,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wiki.setCreateBy(new Long(user.getUserID().longValue()));
 	wiki.setCreateDate(now);
 	wiki.setDefineLater(Boolean.FALSE);
-	wiki.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	wiki.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	wiki.setLockOnFinished(Boolean.TRUE);
 	wiki.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	wiki.setToolContentId(toolContentId);
@@ -857,11 +903,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     /**
      * Set the description, throws away the title value as this is not supported in 2.0
      */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
-	WikiService.logger
-		.warn("Setting the reflective field on a wiki. This doesn't make sense as the wiki is for reflection and we don't reflect on reflection!");
+	WikiService.logger.warn(
+		"Setting the reflective field on a wiki. This doesn't make sense as the wiki is for reflection and we don't reflect on reflection!");
 	Wiki wiki = getWikiByContentId(toolContentId);
 	if (wiki == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -966,6 +1013,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	this.wikiOutputFactory = wikiOutputFactory;
     }
 
+    @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -982,10 +1030,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	this.messageService = messageService;
     }
 
+    @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
 
+    @Override
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
@@ -998,10 +1048,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	this.lessonService = lessonService;
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getWikiOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     /* ****************** REST methods **************************************************************************/
 
     /**
@@ -1071,9 +1122,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    // Apply the content to the wiki page and save
 	    wikiPage.setCurrentWikiContent(wikiPageContent);
 	    wikiPage.getWikiContentVersions().add(wikiPageContent);
-	    if ( firstEntry ) {
+	    if (firstEntry) {
 		content.setMainPage(wikiPage);
-		firstEntry=false;
+		firstEntry = false;
 	    }
 	    content.getWikiPages().add(wikiPage);
 	}

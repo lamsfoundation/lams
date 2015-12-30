@@ -66,9 +66,13 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 		}
 	    } catch (DataIntegrityViolationException e) {
 		exception = e;
+		if (exception.getCause() instanceof ConstraintViolationException) {
+		    TransactionRetryInterceptor.log.error("Schema error", exception);
+		}
 		processException(e, invocation, attempt);
 	    } catch (ConstraintViolationException e) {
 		exception = e;
+		TransactionRetryInterceptor.log.error("Schema error", exception);
 		processException(e, invocation, attempt);
 	    } catch (CannotAcquireLockException e) {
 		exception = e;
@@ -107,6 +111,6 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
     }
 
     public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+	this.sessionFactory = sessionFactory;
     }
 }

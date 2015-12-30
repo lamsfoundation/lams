@@ -31,21 +31,21 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
 public interface INotebookEntryDAO {
 
-	void saveOrUpdate(NotebookEntry nb);
+    void saveOrUpdate(NotebookEntry nb);
 
-	NotebookEntry get(Long uid);
+    NotebookEntry get(Long uid);
 
-	List<NotebookEntry> get(Integer userID);
+    List<NotebookEntry> get(Integer userID);
 
-	List<NotebookEntry> get(Integer userID, Integer idType);
-	
-	List<NotebookEntry> get(Integer userID, Long lessonID);
+    List<NotebookEntry> get(Integer userID, Integer idType);
 
-	List<NotebookEntry> get(Long id, Integer idType, Integer userID);
-	
-	List<NotebookEntry> get(Long id, Integer idType, String signature,
-			Integer userID);
-	
-	List<NotebookEntry> get(Long id, Integer idType, String signature);
+    List<NotebookEntry> get(Integer userID, Long lessonID);
 
+    List<NotebookEntry> get(Long id, Integer idType, Integer userID);
+
+    List<NotebookEntry> get(Long id, Integer idType, String signature, Integer userID);
+
+    List<NotebookEntry> get(Long id, Integer idType, String signature);
+
+    void delete(NotebookEntry notebookEntry);
 }

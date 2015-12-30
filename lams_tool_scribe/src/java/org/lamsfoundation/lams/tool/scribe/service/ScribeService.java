@@ -54,7 +54,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeDAO;
 import org.lamsfoundation.lams.tool.scribe.dao.IScribeHeadingDAO;
@@ -81,8 +80,8 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class ScribeService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, ToolRestManager, 
-	IScribeService {
+public class ScribeService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager,
+	ToolRestManager, IScribeService {
 
     private static Logger logger = Logger.getLogger(ScribeService.class.getName());
 
@@ -109,7 +108,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     }
 
     /* ************ Methods from ToolSessionManager ************* */
-    
+
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ScribeService.logger.isDebugEnabled()) {
@@ -134,13 +133,14 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -159,10 +159,10 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ************ Methods from ToolContentManager ************************* */
@@ -191,7 +191,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	Scribe toContent = Scribe.newInstance(fromContent, toContentId);
 	scribeDAO.saveOrUpdate(toContent);
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Scribe scribe = scribeDAO.getByContentId(toolContentId);
@@ -202,27 +202,43 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribeDAO.saveOrUpdate(scribe);
     }
 
-    @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
-	// TODO Auto-generated method stub
-    }
-    
-    @Override
     @SuppressWarnings("unchecked")
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Scribe contents for user ID " + userId + " and toolContentId " + toolContentId);
-	}
-
+    @Override
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Scribe scribe = scribeDAO.getByContentId(toolContentId);
 	if (scribe == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    ScribeService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
 	for (ScribeSession session : (Set<ScribeSession>) scribe.getScribeSessions()) {
-	    if (session.getAppointedScribe() != null
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	scribeDAO.delete(scribe);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+	if (ScribeService.logger.isDebugEnabled()) {
+	    ScribeService.logger
+		    .debug("Removing Scribe contents for user ID " + userId + " and toolContentId " + toolContentId);
+	}
+
+	Scribe scribe = scribeDAO.getByContentId(toolContentId);
+	if (scribe == null) {
+	    ScribeService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return;
+	}
+
+	for (ScribeSession session : (Set<ScribeSession>) scribe.getScribeSessions()) {
+	    if ((session.getAppointedScribe() != null)
 		    && session.getAppointedScribe().getUserId().equals(userId.longValue())) {
 
 		for (ScribeUser user : (Set<ScribeUser>) session.getScribeUsers()) {
@@ -253,7 +269,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    }
 	}
     }
-    
+
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Scribe scribe = scribeDAO.getByContentId(toolContentId);
@@ -287,12 +303,12 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(ScribeImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, scribeToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Scribe)) {
-		throw new ImportToolContentException("Import Scribe tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Scribe tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Scribe scribe = (Scribe) toolPOJO;
 
@@ -311,27 +327,27 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
- 
+
     @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getScribeByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getScribeByContentId(toolContentId).isDefineLater();
     }
-   
-    
+
     /* ********** IScribeService Methods ************************************** */
 
+    @Override
     public void createReportEntry(Long toolSessionId) {
 	// creating scribeReports for each heading and add to session.
 	ScribeSession session = scribeSessionDAO.getBySessionId(toolSessionId);
 
 	// these heading report already copied from content, the skipit.
 	Set entries = session.getScribeReportEntries();
-	if (entries != null && entries.size() > 0) {
+	if ((entries != null) && (entries.size() > 0)) {
 	    return;
 	}
 
@@ -353,11 +369,13 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     }
 
+    @Override
     public void deleteHeadingReport(Long uid) {
 	scribeHeadingDAO.deleteReport(uid);
 
     }
 
+    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -369,6 +387,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return toolContentId;
     }
 
+    @Override
     public Scribe getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(ScribeConstants.TOOL_SIGNATURE);
 	Scribe defaultContent = getScribeByContentId(defaultContentID);
@@ -380,6 +399,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return defaultContent;
     }
 
+    @Override
     public Scribe copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -396,6 +416,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return newContent;
     }
 
+    @Override
     public Scribe getScribeByContentId(Long toolContentID) {
 	Scribe scribe = scribeDAO.getByContentId(toolContentID);
 	if (scribe == null) {
@@ -404,6 +425,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return scribe;
     }
 
+    @Override
     public ScribeSession getSessionBySessionId(Long toolSessionId) {
 	ScribeSession scribeSession = scribeSessionDAO.getBySessionId(toolSessionId);
 	if (scribeSession == null) {
@@ -412,42 +434,49 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return scribeSession;
     }
 
+    @Override
     public ScribeUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return scribeUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
 
+    @Override
     public ScribeUser getUserByLoginNameAndSessionId(String loginName, Long toolSessionId) {
 	return scribeUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public ScribeUser getUserByUID(Long uid) {
 	return scribeUserDAO.getByUID(uid);
     }
 
+    @Override
     public void saveOrUpdateScribe(Scribe scribe) {
 	scribeDAO.saveOrUpdate(scribe);
     }
 
+    @Override
     public void saveOrUpdateScribeSession(ScribeSession scribeSession) {
 	scribeSessionDAO.saveOrUpdate(scribeSession);
     }
 
+    @Override
     public void saveOrUpdateScribeUser(ScribeUser scribeUser) {
 	scribeUserDAO.saveOrUpdate(scribeUser);
     }
 
+    @Override
     public ScribeUser createScribeUser(UserDTO user, ScribeSession scribeSession) {
 	ScribeUser scribeUser = new ScribeUser(user, scribeSession);
 	saveOrUpdateScribeUser(scribeUser);
 	return scribeUser;
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
 
     /* ********** Used by Spring to "inject" the linked objects ************* */
-
 
     public IScribeDAO getScribeDAO() {
 	return scribeDAO;
@@ -513,14 +542,16 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	this.coreNotebookService = coreNotebookService;
     }
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
 
 	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -532,6 +563,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     /**
      * Import the data for a 1.0.2 Scribe
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Scribe scribe = new Scribe();
@@ -554,14 +586,12 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	} catch (WDDXProcessorConversionException e) {
 	    ScribeService.logger.error("Unable to content for activity " + scribe.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException(
-		    "Invalid import data format for activity "
-			    + scribe.getTitle()
-			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	    throw new ToolException("Invalid import data format for activity " + scribe.getTitle()
+		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
 	}
 
 	String headingList = (String) importValues.get(ToolContentImport102Manager.CONTENT_BODY);
-	if (headingList != null && headingList.length() > 0) {
+	if ((headingList != null) && (headingList.length() > 0)) {
 	    String[] headings = headingList.split("\\^");
 	    Set<ScribeHeading> set = new HashSet<ScribeHeading>();
 	    for (int i = 0; i < headings.length; i++) {
@@ -580,8 +610,9 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Scribe scribe = getScribeByContentId(toolContentId);
 	if (scribe == null) {
@@ -599,23 +630,26 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	this.scribeHeadingDAO = scribeHeadingDAO;
     }
 
+    @Override
     public void deleteHeading(Long headingUid) {
 	scribeHeadingDAO.deleteById(ScribeHeading.class, headingUid);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }
-    
+
     // ****************** REST methods *************************
-    
-    /** Used by the Rest calls to create content. 
-     * Mandatory fields in toolContentJSON: "title", "instructions", "questions".
-     * Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields: "displayOrder", "questionText"
-     * There must be at least one topic object in the "questions" array.
+
+    /**
+     * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: "title", "instructions",
+     * "questions". Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields:
+     * "displayOrder", "questionText" There must be at least one topic object in the "questions" array.
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	Date updateDate = new Date();
 
@@ -637,12 +671,12 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	scribe.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scribe.setShowAggregatedReports(JsonUtil.opt(toolContentJSON, "showAggregatedReports", Boolean.FALSE));
 
-	if ( scribe.getScribeHeadings() == null ) {
+	if (scribe.getScribeHeadings() == null) {
 	    scribe.setScribeHeadings(new HashSet());
 	}
 
 	JSONArray topics = toolContentJSON.getJSONArray(RestTags.QUESTIONS);
-	for ( int i=0; i<topics.length(); i++) {
+	for (int i = 0; i < topics.length(); i++) {
 	    JSONObject topic = topics.getJSONObject(i);
 	    ScribeHeading heading = new ScribeHeading();
 	    heading.setDisplayOrder(topic.getInt(RestTags.DISPLAY_ORDER));
@@ -653,20 +687,22 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
 	// must have at least one heading - it should be supplied by the caller but have a backup just in case.
 	// if we don't, the scribe can't actually enter any text!
-	if ( scribe.getScribeHeadings().size() == 0 ) {
+	if (scribe.getScribeHeadings().size() == 0) {
 	    ScribeHeading heading = new ScribeHeading();
 	    heading.setDisplayOrder(1);
 
 	    Scribe defaultContent = getDefaultContent();
 	    Set defaultHeadings = defaultContent.getScribeHeadings();
-	    if ( defaultHeadings != null && defaultHeadings.size() > 0 ) {
+	    if ((defaultHeadings != null) && (defaultHeadings.size() > 0)) {
 		Iterator iter = defaultHeadings.iterator();
-		if ( iter.hasNext() )
-		    heading.setHeadingText(((ScribeHeading)iter.next()).getHeadingText());
+		if (iter.hasNext()) {
+		    heading.setHeadingText(((ScribeHeading) iter.next()).getHeadingText());
+		}
 	    }
-	    if ( heading.getHeadingText() == null )
+	    if (heading.getHeadingText() == null) {
 		heading.setHeadingText("Heading");
-	    
+	    }
+
 	    heading.setScribe(scribe);
 	    scribe.getScribeHeadings().add(heading);
 	}

@@ -54,7 +54,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
@@ -92,8 +91,8 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.service.ITaskListService
  */
-public class TaskListServiceImpl implements ITaskListService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+public class TaskListServiceImpl
+	implements ITaskListService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
     private static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
     private TaskListDAO taskListDao;
     private TaskListItemDAO taskListItemDao;
@@ -147,9 +146,9 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     @Override
     public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException {
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadTaskListFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
+	    throw new UploadTaskListFileException(
+		    messageService.getMessage("error.msg.upload.file.not.found", new Object[] { uploadFile }));
 	}
 
 	// upload file to repository
@@ -321,8 +320,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 		    TaskListItem item = itemList.get(j);
 
 		    // retreiving TaskListItemVisitLog for current taskList and user
-		    TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), user
-			    .getUserId());
+		    TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(),
+			    user.getUserId());
 		    if (visitLog != null) {
 			complete[i][j] = visitLog.isComplete();
 			if (visitLog.isComplete()) {
@@ -372,8 +371,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 		TaskListItemVisitLogSummary taskListItemVisitLogSummary = new TaskListItemVisitLogSummary();
 		taskListItemVisitLogSummary.setUser(user);
 
-		TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(taskListItem.getUid(), user
-			.getUserId());
+		TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(taskListItem.getUid(),
+			user.getUserId());
 		// If TaskListItemVisitLog exists then fill up taskSummaryItem otherwise put false in a completed field
 		if (visitLog != null) {
 		    taskListItemVisitLogSummary.setCompleted(visitLog.isComplete());
@@ -556,7 +555,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -567,7 +566,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
-    
+
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
@@ -659,6 +658,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	this.coreNotebookService = coreNotebookService;
     }
 
+    @Override
     public MessageService getMessageService() {
 	return messageService;
     }
@@ -703,7 +703,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(TaskListImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, taskListToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof TaskList)) {
@@ -747,16 +747,17 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
 	return getTaskListOutputFactory().getToolOutputDefinitions(taskList, definitionType);
     }
-    
+
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getTaskListByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getTaskListByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
@@ -788,7 +789,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    }
 	}
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	TaskList taskList = taskListDao.getByContentId(toolContentId);
@@ -799,37 +800,43 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	TaskList taskList = taskListDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = taskListSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		TaskListSession session = (TaskListSession) iter.next();
-		taskListSessionDao.delete(session);
+	if (taskList == null) {
+	    TaskListServiceImpl.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (TaskListSession session : taskListSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, TaskListConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	taskListDao.delete(taskList);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Task List contents for user ID " + userId + " and toolContentId " + toolContentId);
+	if (TaskListServiceImpl.log.isDebugEnabled()) {
+	    TaskListServiceImpl.log
+		    .debug("Removing Task List contents for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 	TaskList taskList = taskListDao.getByContentId(toolContentId);
 	if (taskList == null) {
-	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    TaskListServiceImpl.log
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
 	Set<TaskListItem> items = taskList.getTaskListItems();
 	for (TaskListItem item : items) {
-	    if (log.isDebugEnabled()) {
-		log.debug("Removing visit log, comments and attachments for user ID " + userId + " and item UID "
-			+ item.getUid());
+	    if (TaskListServiceImpl.log.isDebugEnabled()) {
+		TaskListServiceImpl.log.debug("Removing visit log, comments and attachments for user ID " + userId
+			+ " and item UID " + item.getUid());
 	    }
 
 	    TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(), userId.longValue());
@@ -911,13 +918,14 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -937,13 +945,14 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
      *      java.lang.Long)
      */
+    @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return taskListOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     // *******************************************************************************
@@ -955,8 +964,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     }
 
     @Override
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	TaskList toolContentObj = getTaskListByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1000,7 +1009,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
      * 
      * @param contentId
      * @param sessionId
-     *                sessionId which defines Group
+     *            sessionId which defines Group
      * @return
      */
     private List<TaskListItem> getItemListForGroup(Long contentId, Long sessionId) {
@@ -1051,7 +1060,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
      */
     private NodeKey processFile(FormFile file) throws UploadTaskListFileException {
 	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
 		node = taskListToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
@@ -1072,6 +1081,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     // Service method
     // *******************************************************************************
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getTaskListOutputFactory().getSupportedDefinitionClasses(definitionType);
     }

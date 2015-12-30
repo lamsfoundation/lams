@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaCommentDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaDAO;
@@ -85,19 +84,19 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class KalturaService implements ToolSessionManager, ToolContentManager, IKalturaService,
-	ToolContentImport102Manager {
+public class KalturaService
+	implements ToolSessionManager, ToolContentManager, IKalturaService, ToolContentImport102Manager {
 
     private static Logger logger = Logger.getLogger(KalturaService.class.getName());
 
     private IKalturaDAO kalturaDao = null;
-    
+
     private IKalturaItemDAO kalturaItemDao = null;
-    
+
     private IKalturaItemVisitDAO kalturaItemVisitDao = null;
-    
+
     private IKalturaCommentDAO kalturaCommentDao = null;
-    
+
     private IKalturaRatingDAO kalturaRatingDao = null;
 
     private IKalturaSessionDAO kalturaSessionDao = null;
@@ -107,9 +106,9 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     private ILearnerService learnerService;
 
     private ILamsToolService toolService;
-    
+
     private IUserManagementService userManagementService;
-    
+
     private MessageService messageService;
 
     private IToolContentHandler kalturaToolContentHandler = null;
@@ -129,8 +128,8 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     /* ************ Methods from ToolSessionManager ************* */
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+	if (KalturaService.logger.isDebugEnabled()) {
+	    KalturaService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
 		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
@@ -149,13 +148,14 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -173,10 +173,10 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getKalturaOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ************ Methods from ToolContentManager ************************* */
@@ -184,8 +184,8 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
+	if (KalturaService.logger.isDebugEnabled()) {
+	    KalturaService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
 		    + " toContentId=" + toContentId);
 	}
 
@@ -214,14 +214,14 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 		}
 	    }
 	}
-	
+
 	kalturaDao.saveOrUpdate(toContent);
-	for (KalturaItem item : (Set<KalturaItem>)items) {
+	for (KalturaItem item : (Set<KalturaItem>) items) {
 	    kalturaUserDao.saveOrUpdate(item.getCreatedBy());
 	    kalturaItemDao.insert(item);
 	}
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);
@@ -232,17 +232,33 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	kalturaDao.saveOrUpdate(kaltura);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);
+	if (kaltura == null) {
+	    KalturaService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (KalturaSession session : (Set<KalturaSession>) kaltura.getKalturaSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, KalturaConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	kalturaDao.delete(kaltura);
     }
-    
+
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("This tool does not support learner content removing yet.");
+	if (KalturaService.logger.isDebugEnabled()) {
+	    KalturaService.logger.debug("This tool does not support learner content removing yet.");
 	}
     }
-    
+
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);
@@ -274,19 +290,18 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(KalturaImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, kalturaToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Kaltura)) {
-		throw new ImportToolContentException("Import Kaltura tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Kaltura tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Kaltura kaltura = (Kaltura) toolPOJO;
 
 	    // reset it to new toolContentId
 	    kaltura.setToolContentId(toolContentId);
-	    KalturaUser user = kalturaUserDao.getByUserIdAndContentId(new Long(newUserUid.longValue()),
-		    toolContentId);
+	    KalturaUser user = kalturaUserDao.getByUserIdAndContentId(new Long(newUserUid.longValue()), toolContentId);
 	    if (user == null) {
 		user = new KalturaUser();
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
@@ -320,14 +335,16 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	return getKalturaOutputFactory().getToolOutputDefinitions(kaltura, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getKalturaByContentId(toolContentId).getTitle();
     }
-    
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getKalturaByContentId(toolContentId).isDefineLater();
     }
-    
+
     /* ********** IKalturaService Methods ********************************* */
     @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
@@ -340,7 +357,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public NotebookEntry getEntry(Long sessionId, Integer userId) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		KalturaConstants.TOOL_SIGNATURE, userId);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -351,7 +368,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
-    
+
     @Override
     public List<NotebookEntryDTO> getReflectList(Kaltura kaltura) {
 	List<NotebookEntryDTO> reflectList = new LinkedList<NotebookEntryDTO>();
@@ -367,18 +384,18 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 		if (entry != null) {
 		    NotebookEntryDTO notebookEntryDTO = new NotebookEntryDTO(entry);
 		    notebookEntryDTO.setFullName(user.getFirstName() + " " + user.getLastName());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified() : entry
-			    .getCreateDate();
+		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+			    : entry.getCreateDate();
 		    notebookEntryDTO.setLastModified(postedDate);
 		    reflectList.add(notebookEntryDTO);
 		}
-		
+
 	    }
 	}
 
 	return reflectList;
     }
-    
+
     @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws KalturaException {
 	KalturaUser user = kalturaUserDao.getByUserIdAndSessionId(userId, toolSessionId);
@@ -395,14 +412,14 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	}
 	return nextUrl;
     }
-    
+
     @Override
     public AverageRatingDTO rateMessage(Long itemUid, Long userId, Long toolSessionId, float rating) {
 	KalturaUser user = getUserByUserIdAndSessionId(userId, toolSessionId);
 	KalturaRating itemRating = kalturaRatingDao.getKalturaRatingByItemAndUser(itemUid, userId);
-	KalturaItem item = getKalturaItem(itemUid);	
+	KalturaItem item = getKalturaItem(itemUid);
 
-	//persist KalturaRating changes in DB
+	// persist KalturaRating changes in DB
 	if (itemRating == null) { // add
 	    itemRating = new KalturaRating();
 	    itemRating.setCreateBy(user);
@@ -410,31 +427,31 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	}
 	itemRating.setRating(rating);
 	kalturaRatingDao.insertOrUpdate(itemRating);
-	
-	//to make available new changes be visible in jsp page
+
+	// to make available new changes be visible in jsp page
 	return kalturaRatingDao.getAverageRatingDtoByItem(itemUid, toolSessionId);
     }
-    
+
     @Override
     public AverageRatingDTO getAverageRatingDto(Long itemUid, Long sessionId) {
 	return kalturaRatingDao.getAverageRatingDtoByItem(itemUid, sessionId);
     }
-    
+
     @Override
     public void deleteKalturaItem(Long uid) {
 	kalturaItemDao.deleteById(KalturaItem.class, uid);
     }
-    
+
     @Override
     public KalturaItem getKalturaItem(Long itemUid) {
 	return kalturaItemDao.getByUid(itemUid);
     }
-    
+
     @Override
     public void saveKalturaItem(KalturaItem item) {
 	kalturaItemDao.insertOrUpdate(item);
     }
-    
+
     @Override
     public Set<KalturaItem> getGroupItems(Long toolContentId, Long toolSessionId, Long useId, boolean isMonitoring) {
 	TreeSet<KalturaItem> groupItems = new TreeSet<KalturaItem>(new KalturaItemComparator());
@@ -443,25 +460,26 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	Set<KalturaItem> allItems = kaltura.getKalturaItems();
 
 	for (KalturaItem item : allItems) {
-	    //hide hidden items from learner and ignore this parameter for teacher
-	    boolean isHidden = isMonitoring  || !isMonitoring && !item.isHidden();
-	    
-	    //remove hidden
-	    if (isHidden && 
-		//show authored items
-		(item.isCreateByAuthor()
-		//user should see his own items
-		|| item.getCreatedBy().getUserId().equals(useId)
-		//filter items from other groups
-		|| item.getCreatedBy().getSession().getSessionId().equals(toolSessionId) && (kaltura.isAllowSeeingOtherUsersRecordings() || isMonitoring)  )) {
-		
+	    // hide hidden items from learner and ignore this parameter for teacher
+	    boolean isHidden = isMonitoring || (!isMonitoring && !item.isHidden());
+
+	    // remove hidden
+	    if (isHidden &&
+		    // show authored items
+		    (item.isCreateByAuthor()
+			    // user should see his own items
+			    || item.getCreatedBy().getUserId().equals(useId)
+			    // filter items from other groups
+			    || (item.getCreatedBy().getSession().getSessionId().equals(toolSessionId)
+				    && (kaltura.isAllowSeeingOtherUsersRecordings() || isMonitoring)))) {
+
 		groupItems.add(item);
 	    }
 	}
 
 	return groupItems;
     }
-    
+
     @Override
     public void logItemWatched(Long itemUid, Long userId, Long toolSessionId) {
 	KalturaItemVisitLog log = kalturaItemVisitDao.getKalturaItemLog(itemUid, userId);
@@ -477,14 +495,14 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	    kalturaItemVisitDao.insert(log);
 	}
     }
-    
+
     @Override
     public void markItem(Long itemUid, Long mark) {
 	KalturaItem item = kalturaItemDao.getByUid(itemUid);
 	item.setMark(mark);
 	kalturaItemDao.update(item);
     }
-    
+
     @Override
     public void hideItem(Long itemUid, boolean isHiding) {
 	KalturaItem item = kalturaItemDao.getByUid(itemUid);
@@ -493,7 +511,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	    kalturaItemDao.update(item);
 	}
     }
-    
+
     @Override
     public void hideComment(Long commentUid, boolean isHiding) {
 	KalturaComment comment = kalturaCommentDao.getCommentByUid(commentUid);
@@ -502,12 +520,12 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	    kalturaCommentDao.update(comment);
 	}
     }
-    
+
     @Override
     public int getNumberViewedVideos(Long toolSessionId, Long userId) {
 	return kalturaItemVisitDao.getUserViewLogCount(toolSessionId, userId);
     }
-    
+
     @Override
     public int getNumberUploadedVideos(Long toolSessionId, Long userId) {
 	return kalturaItemDao.getItemsCountByUser(toolSessionId, userId);
@@ -519,7 +537,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
 	if (toolContentId == null) {
 	    String error = "Could not retrieve default content id for this tool";
-	    logger.error(error);
+	    KalturaService.logger.error(error);
 	    throw new KalturaException(error);
 	}
 	return toolContentId;
@@ -531,7 +549,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	Kaltura defaultContent = getKalturaByContentId(defaultContentID);
 	if (defaultContent == null) {
 	    String error = "Could not retrieve default content record for this tool";
-	    logger.error(error);
+	    KalturaService.logger.error(error);
 	    throw new KalturaException(error);
 	}
 	return defaultContent;
@@ -542,7 +560,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 
 	if (newContentID == null) {
 	    String error = "Cannot copy the Kaltura tools default content: + " + "newContentID is null";
-	    logger.error(error);
+	    KalturaService.logger.error(error);
 	    throw new KalturaException(error);
 	}
 
@@ -558,7 +576,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public Kaltura getKalturaByContentId(Long toolContentID) {
 	Kaltura kaltura = kalturaDao.getByContentId(toolContentID);
 	if (kaltura == null) {
-	    logger.debug("Could not find the content with toolContentID:" + toolContentID);
+	    KalturaService.logger.debug("Could not find the content with toolContentID:" + toolContentID);
 	}
 	return kaltura;
     }
@@ -567,7 +585,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public KalturaSession getSessionBySessionId(Long toolSessionId) {
 	KalturaSession kalturaSession = kalturaSessionDao.getBySessionId(toolSessionId);
 	if (kalturaSession == null) {
-	    logger.debug("Could not find the kaltura session with toolSessionID:" + toolSessionId);
+	    KalturaService.logger.debug("Could not find the kaltura session with toolSessionID:" + toolSessionId);
 	}
 	return kalturaSession;
     }
@@ -581,7 +599,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public KalturaUser getUserByUid(Long uid) {
 	return kalturaUserDao.getByUid(uid);
     }
-    
+
     @Override
     public KalturaUser getUserByUserIdAndContentId(Long userId, Long contentId) {
 	return kalturaUserDao.getByUserIdAndContentId(userId, contentId);
@@ -616,7 +634,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
     }
-    
+
     @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
@@ -627,14 +645,16 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     /**
      * Import the data for a 1.0.2 Kaltura
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
     }
 
     @Override
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
-	logger.warn("Setting the reflective field on a kaltura. This doesn't make sense as the kaltura is for reflection and we don't reflect on reflection!");
+	KalturaService.logger.warn(
+		"Setting the reflective field on a kaltura. This doesn't make sense as the kaltura is for reflection and we don't reflect on reflection!");
 	Kaltura kaltura = getKalturaByContentId(toolContentId);
 	if (kaltura == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -650,19 +670,19 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public void setKalturaDao(IKalturaDAO kalturaDAO) {
 	this.kalturaDao = kalturaDAO;
     }
-    
+
     public void setKalturaItemDao(IKalturaItemDAO kalturaItemDAO) {
 	this.kalturaItemDao = kalturaItemDAO;
     }
-    
+
     public void setKalturaItemVisitDao(IKalturaItemVisitDAO kalturaItemVisitDAO) {
 	this.kalturaItemVisitDao = kalturaItemVisitDAO;
     }
-    
+
     public void setKalturaCommentDao(IKalturaCommentDAO kalturaCommentDAO) {
 	this.kalturaCommentDao = kalturaCommentDAO;
     }
-    
+
     public void setKalturaRatingDao(IKalturaRatingDAO kalturaRatingDAO) {
 	this.kalturaRatingDao = kalturaRatingDAO;
     }
@@ -694,7 +714,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
     }
-    
+
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
@@ -710,15 +730,17 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public void setKalturaOutputFactory(KalturaOutputFactory kalturaOutputFactory) {
 	this.kalturaOutputFactory = kalturaOutputFactory;
     }
-    
+
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getKalturaOutputFactory().getSupportedDefinitionClasses(definitionType);
     }

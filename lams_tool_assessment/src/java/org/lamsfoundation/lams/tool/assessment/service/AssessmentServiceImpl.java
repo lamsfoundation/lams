@@ -42,7 +42,6 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
@@ -100,7 +99,6 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -295,18 +293,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public List<AssessmentUser> getUsersBySession(Long toolSessionID) {
 	return assessmentUserDao.getBySessionID(toolSessionID);
     }
-    
+
     @Override
-    public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
-	    String searchString) {
+    public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
+	    String sortOrder, String searchString) {
 	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
     }
-    
+
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return assessmentUserDao.getCountUsersBySession(sessionId, searchString);
     }
-    
+
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
@@ -407,12 +405,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
 	if (lastResult != null) {
-	    
+
 	    // don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
 	    if (lastResult.getFinishDate() == null) {
 		return;
-		
-	    // mark previous attempt as not the latest anymore
+
+		// mark previous attempt as not the latest anymore
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -752,7 +750,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
-    
+
     @Override
     public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
 	return assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
@@ -833,7 +831,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	return nextUrl;
     }
-    
+
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId) {
 	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
@@ -842,18 +840,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	for (AssessmentSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
 	    SessionDTO sessionDto = new SessionDTO(sessionId, session.getSessionName());
-	    
-	    //for statistics tab
+
+	    // for statistics tab
 	    int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
 	    sessionDto.setNumberLearners(countUsers);
-	    
+
 	    sessionDtos.add(sessionDto);
 	}
-	
+
 	return sessionDtos;
     }
 
-    //remove method once we remove export portfolio
+    // remove method once we remove export portfolio
     @Override
     @Deprecated
     public List<SessionDTO> getSessionDataForExport(Long contentId) {
@@ -966,34 +964,34 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	return userSummary;
     }
-    
+
     @Override
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	QuestionSummary questionSummary = new QuestionSummary();
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
 	questionSummary.setQuestion(question);
-	
+
 	return questionSummary;
     }
 
     @Override
     public Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment) {
 	Map<Long, QuestionSummary> questionSummaries = new HashMap<Long, QuestionSummary>();
-	
+
 	if (assessment.getQuestions() == null) {
 	    return questionSummaries;
 	}
-	
+
 	SortedSet<AssessmentSession> sessions = new TreeSet<AssessmentSession>(new AssessmentSessionComparator());
 	sessions.addAll(assessmentSessionDao.getByContentId(assessment.getContentId()));
-	
-	List<AssessmentResult> assessmentResults = assessmentResultDao.getLastFinishedAssessmentResults(assessment
-		.getContentId());
+
+	List<AssessmentResult> assessmentResults = assessmentResultDao
+		.getLastFinishedAssessmentResults(assessment.getContentId());
 	Map<Long, AssessmentResult> userUidToResultMap = new HashMap<Long, AssessmentResult>();
 	for (AssessmentResult assessmentResult : assessmentResults) {
 	    userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
 	}
-	
+
 	Map<Long, List<AssessmentUser>> sessionIdToUsersMap = new HashMap<Long, List<AssessmentUser>>();
 	for (AssessmentSession session : sessions) {
 
@@ -1012,7 +1010,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	    sessionIdToUsersMap.put(sessionId, users);
 	}
-	
+
 	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
 	    Long questionUid = question.getUid();
 	    QuestionSummary questionSummary = new QuestionSummary();
@@ -1070,9 +1068,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	return questionSummaries;
     }
-    
+
     @Override
-    public LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames) {
+    public LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
+	    boolean showUserNames) {
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 	final ExcelCell[] EMPTY_ROW = new ExcelCell[0];
 
@@ -1134,10 +1133,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	    dataToExport.put(getMessage("label.export.summary"), summaryTab.toArray(new ExcelCell[][] {}));
 	}
-	
+
 	// ------------------------------------------------------------------
 	// -------------- Second tab: Question Summary ----------------------
-	
+
 	ArrayList<ExcelCell[]> questionSummaryTab = new ArrayList<ExcelCell[]>();
 
 	// Create the question summary
@@ -1148,15 +1147,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	Map<Long, QuestionSummary> questionSummaries = getQuestionSummaryForExport(assessment);
 
 	if (assessment.getQuestions() != null) {
-	    Set<AssessmentQuestion> questions = (Set<AssessmentQuestion>) assessment.getQuestions();
-	    
+	    Set<AssessmentQuestion> questions = assessment.getQuestions();
+
 	    // question row title
 	    int count = 0;
 	    ExcelCell[] summaryRowTitle = showUserNames ? new ExcelCell[10] : new ExcelCell[9];
 	    summaryRowTitle[count++] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true);
 	    summaryRowTitle[count++] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true);
 	    summaryRowTitle[count++] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true);
-	    summaryRowTitle[count++] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"), true);
+	    summaryRowTitle[count++] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"),
+		    true);
 	    summaryRowTitle[count++] = new ExcelCell(getMessage("label.export.user.id"), true);
 	    if (showUserNames) {
 		summaryRowTitle[count++] = new ExcelCell(getMessage("label.monitoring.user.summary.user.name"), true);
@@ -1184,12 +1184,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			if (showUserNames) {
 			    ExcelCell[] userResultRow = new ExcelCell[10];
 			    userResultRow[0] = new ExcelCell(questionResult.getAssessmentQuestion().getTitle(), false);
-			    userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(questionResult
-				    .getAssessmentQuestion().getType()), false);
-			    userResultRow[2] = new ExcelCell(new Float(questionResult.getAssessmentQuestion()
-				    .getPenaltyFactor()), false);
-			    Float maxMark = (questionResult.getMaxMark() == null) ? 0 : new Float(
-				    questionResult.getMaxMark());
+			    userResultRow[1] = new ExcelCell(
+				    getQuestionTypeLanguageLabel(questionResult.getAssessmentQuestion().getType()),
+				    false);
+			    userResultRow[2] = new ExcelCell(
+				    new Float(questionResult.getAssessmentQuestion().getPenaltyFactor()), false);
+			    Float maxMark = (questionResult.getMaxMark() == null) ? 0
+				    : new Float(questionResult.getMaxMark());
 			    userResultRow[3] = new ExcelCell(maxMark, false);
 			    userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
 			    userResultRow[5] = new ExcelCell(questionResult.getUser().getFullName(), false);
@@ -1199,7 +1200,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 			    AssessmentResult assessmentResult = questionResult.getAssessmentResult();
 			    Date finishDate = questionResult.getFinishDate();
-			    if (assessmentResult != null && finishDate != null) {
+			    if ((assessmentResult != null) && (finishDate != null)) {
 				Date startDate = assessmentResult.getStartDate();
 				if (startDate != null) {
 				    Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
@@ -1220,12 +1221,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			} else {
 			    ExcelCell[] userResultRow = new ExcelCell[9];
 			    userResultRow[0] = new ExcelCell(questionResult.getAssessmentQuestion().getTitle(), false);
-			    userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(questionResult
-				    .getAssessmentQuestion().getType()), false);
-			    userResultRow[2] = new ExcelCell(new Float(questionResult.getAssessmentQuestion()
-				    .getPenaltyFactor()), false);
-			    Float maxMark = (questionResult.getMaxMark() == null) ? 0 : new Float(
-				    questionResult.getMaxMark());
+			    userResultRow[1] = new ExcelCell(
+				    getQuestionTypeLanguageLabel(questionResult.getAssessmentQuestion().getType()),
+				    false);
+			    userResultRow[2] = new ExcelCell(
+				    new Float(questionResult.getAssessmentQuestion().getPenaltyFactor()), false);
+			    Float maxMark = (questionResult.getMaxMark() == null) ? 0
+				    : new Float(questionResult.getMaxMark());
 			    userResultRow[3] = new ExcelCell(maxMark, false);
 			    userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
 			    userResultRow[5] = new ExcelCell(questionResult.getFinishDate(), false);
@@ -1235,7 +1237,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    if (questionResult.getAssessmentResult() != null) {
 				Date startDate = questionResult.getAssessmentResult().getStartDate();
 				Date finishDate = questionResult.getFinishDate();
-				if (startDate != null && finishDate != null) {
+				if ((startDate != null) && (finishDate != null)) {
 				    Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
 				    userResultRow[7] = new ExcelCell(seconds, false);
 				    timeTakenCount++;
@@ -1295,10 +1297,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	dataToExport.put(getMessage("lable.export.summary.by.question"),
 		questionSummaryTab.toArray(new ExcelCell[][] {}));
-	
+
 	// ------------------------------------------------------------------
 	// -------------- Third tab: User Summary ---------------------------
-	
+
 	ArrayList<ExcelCell[]> userSummaryTab = new ArrayList<ExcelCell[]>();
 
 	// Create the question summary
@@ -1370,13 +1372,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 
 	if (sessionDtos != null) {
-	    List<AssessmentResult> assessmentResults = assessmentResultDao.getLastFinishedAssessmentResults(assessment
-		    .getContentId());
+	    List<AssessmentResult> assessmentResults = assessmentResultDao
+		    .getLastFinishedAssessmentResults(assessment.getContentId());
 	    Map<Long, AssessmentResult> userUidToResultMap = new HashMap<Long, AssessmentResult>();
 	    for (AssessmentResult assessmentResult : assessmentResults) {
 		userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
 	    }
-	    
+
 	    for (SessionDTO sessionDTO : sessionDtos) {
 
 		userSummaryTab.add(EMPTY_ROW);
@@ -1396,23 +1398,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			if (showUserNames) {
 			    ExcelCell[] userTitleRow = new ExcelCell[6];
 			    userTitleRow[0] = new ExcelCell(getMessage("label.export.user.id"), true);
-			    userTitleRow[1] = new ExcelCell(
-				    getMessage("label.monitoring.user.summary.user.name"), true);
-			    userTitleRow[2] = new ExcelCell(getMessage("label.export.date.attempted"), true);
-			    userTitleRow[3] = new ExcelCell(
-				    getMessage("label.monitoring.question.summary.question"), true);
-			    userTitleRow[4] = new ExcelCell(getMessage("label.authoring.basic.option.answer"),
+			    userTitleRow[1] = new ExcelCell(getMessage("label.monitoring.user.summary.user.name"),
 				    true);
+			    userTitleRow[2] = new ExcelCell(getMessage("label.export.date.attempted"), true);
+			    userTitleRow[3] = new ExcelCell(getMessage("label.monitoring.question.summary.question"),
+				    true);
+			    userTitleRow[4] = new ExcelCell(getMessage("label.authoring.basic.option.answer"), true);
 			    userTitleRow[5] = new ExcelCell(getMessage("label.export.mark"), true);
 			    userSummaryTab.add(userTitleRow);
 			} else {
 			    ExcelCell[] userTitleRow = new ExcelCell[5];
 			    userTitleRow[0] = new ExcelCell(getMessage("label.export.user.id"), true);
 			    userTitleRow[1] = new ExcelCell(getMessage("label.export.date.attempted"), true);
-			    userTitleRow[2] = new ExcelCell(
-				    getMessage("label.monitoring.question.summary.question"), true);
-			    userTitleRow[3] = new ExcelCell(getMessage("label.authoring.basic.option.answer"),
+			    userTitleRow[2] = new ExcelCell(getMessage("label.monitoring.question.summary.question"),
 				    true);
+			    userTitleRow[3] = new ExcelCell(getMessage("label.authoring.basic.option.answer"), true);
 			    userTitleRow[4] = new ExcelCell(getMessage("label.export.mark"), true);
 			    userSummaryTab.add(userTitleRow);
 			}
@@ -1431,8 +1431,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 					userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
 					userResultRow[1] = new ExcelCell(assessmentUser.getFullName(), false);
 					userResultRow[2] = new ExcelCell(assessmentResult.getStartDate(), false);
-					userResultRow[3] = new ExcelCell(questionResult.getAssessmentQuestion()
-						.getTitle(), false);
+					userResultRow[3] = new ExcelCell(
+						questionResult.getAssessmentQuestion().getTitle(), false);
 					userResultRow[4] = new ExcelCell(
 						AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
 						false);
@@ -1442,8 +1442,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 					ExcelCell[] userResultRow = new ExcelCell[5];
 					userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
 					userResultRow[1] = new ExcelCell(assessmentResult.getStartDate(), false);
-					userResultRow[2] = new ExcelCell(questionResult.getAssessmentQuestion()
-						.getTitle(), false);
+					userResultRow[2] = new ExcelCell(
+						questionResult.getAssessmentQuestion().getTitle(), false);
 					userResultRow[3] = new ExcelCell(
 						AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
 						false);
@@ -1456,13 +1456,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    ExcelCell[] userTotalRow;
 			    if (showUserNames) {
 				userTotalRow = new ExcelCell[6];
-				userTotalRow[4] = new ExcelCell(getMessage("label.monitoring.summary.total"),
-					true);
+				userTotalRow[4] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
 				userTotalRow[5] = new ExcelCell(assessmentResult.getGrade(), false);
 			    } else {
 				userTotalRow = new ExcelCell[5];
-				userTotalRow[3] = new ExcelCell(getMessage("label.monitoring.summary.total"),
-					true);
+				userTotalRow[3] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
 				userTotalRow[4] = new ExcelCell(assessmentResult.getGrade(), false);
 			    }
 
@@ -1474,10 +1472,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
 	dataToExport.put(getMessage("label.export.summary.by.user"), userSummaryTab.toArray(new ExcelCell[][] {}));
-	
+
 	return dataToExport;
     }
-    
+
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
@@ -1498,7 +1496,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
 	    return "True/False";
 	case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-	    return "Mark Hedging";	    
+	    return "Mark Hedging";
 	default:
 	    return null;
 	}
@@ -2127,17 +2125,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Assessment assessment = assessmentDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = assessmentSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		AssessmentSession session = (AssessmentSession) iter.next();
-		assessmentSessionDao.delete(session);
+	if (assessment == null) {
+	    AssessmentServiceImpl.log
+		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (AssessmentSession session : assessmentSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, AssessmentConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	assessmentDao.delete(assessment);
     }
 
@@ -2167,7 +2170,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    assessmentDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
 
-		if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+		if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 		    session.setGroupLeader(null);
 		}
 
@@ -2434,7 +2437,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setShuffled(JsonUtil.opt(toolContentJSON, "shuffled", Boolean.FALSE));
 	assessment.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
-	assessment.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	assessment.setUseSelectLeaderToolOuput(
+		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	// submission deadline set in monitoring
 
 	if (toolContentJSON.has("overallFeedback")) {
@@ -2557,9 +2561,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     // TODO Implement REST support for all types and then remove checkType method
     void checkType(short type) throws JSONException {
-	if (type != AssessmentConstants.QUESTION_TYPE_ESSAY && type != AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	if ((type != AssessmentConstants.QUESTION_TYPE_ESSAY)
+		&& (type != AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)) {
 	    throw new JSONException(
-		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type " + type);
+		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type "
+			    + type);
 	}
 	// public static final short QUESTION_TYPE_MATCHING_PAIRS = 2;
 	// public static final short QUESTION_TYPE_SHORT_ANSWER = 3;

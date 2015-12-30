@@ -36,18 +36,6 @@
     </property>
 
  	<property
-        name="voteQueContentId"
-        type="java.lang.Long"
-        column="vote_nomination_content_id"
-        not-null="true"
-   	    update="false"
-	    insert="false"
-        length="20"
-    >
-    </property>
-     
-
- 	<property
         name="queUsrId"
         type="java.lang.Long"
         column="que_usr_id"

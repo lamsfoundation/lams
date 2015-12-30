@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
 /**
@@ -44,11 +43,11 @@ public interface ToolContentManager {
      * the default content id.
      * 
      * @param fromContentId
-     *                the original tool content id.
+     *            the original tool content id.
      * @param toContentId
-     *                the destination tool content id.
+     *            the destination tool content id.
      * @throws ToolException
-     *                 if an error occurs e.g. defaultContent is missing
+     *             if an error occurs e.g. defaultContent is missing
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
@@ -67,30 +66,18 @@ public interface ToolContentManager {
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException;
 
     /**
-     * Remove tool's content according specified the content id. It will be needed by lams to modify the learning
-     * design.
+     * Remove tool's content according specified the content id.
      * 
-     * If the tool content includes files in the content repository then the
-     * files should be removed from the repository.
-     * 
-     * If session data for this toolContentId exists and removeSessionData = true, then the tool should delete the
-     * session data as well as the content data.
-     * 
-     * If session data for this toolContentId exists and removeSessionData = false, then the tool should throw
-     * SessionDataExists.
-     * 
-     * If no matching data exists, the tool should return without throwing an exception.
+     * If the tool content includes files in the content repository then the files should be removed from the
+     * repository. If no matching data exists, the tool should return without throwing an exception.
      * 
      * @param toolContentId
-     *                the requested tool content id.
-     * @param removeSessionData
-     *                should it remove any related session data?
+     *            the requested tool content id.
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException;
-    
+    public void removeToolContent(Long toolContentId) throws ToolException;
+
     /**
      * Removes content previously added by the given user.
      */
@@ -100,9 +87,9 @@ public interface ToolContentManager {
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException;
 
@@ -110,7 +97,7 @@ public interface ToolContentManager {
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException;
@@ -123,18 +110,18 @@ public interface ToolContentManager {
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition.
      * 
-     * Added in LAMS 2.1
+     *         Added in LAMS 2.1
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException;
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType);
-    
+
     /**
      * Finds title entered in the tool content.
      */
     public String getToolContentTitle(Long toolContentId);
-    
+
     /**
      * Is an activity being edited by Monitor?
      */
