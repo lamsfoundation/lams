@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -308,9 +307,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     @Override
-    public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId,
-	    final Long excludeUserId, int page, int size, int sorting, String searchString) {
-	return qaUsrRespDAO.getResponsesForTablesorter(toolContentId, qaSessionId, questionId, excludeUserId, page, size, sorting, searchString);
+    public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId,
+	    final Long questionId, final Long excludeUserId, int page, int size, int sorting, String searchString) {
+	return qaUsrRespDAO.getResponsesForTablesorter(toolContentId, qaSessionId, questionId, excludeUserId, page,
+		size, sorting, searchString);
     }
 
     @Override
@@ -549,43 +549,24 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeToolContent(Long toolContentID, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
-	if (toolContentID == null) {
-	    throw new ToolException("toolContentID is missing");
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	QaContent qaContent = qaDAO.getQaByContentId(toolContentId.longValue());
+	if (qaContent == null) {
+	    QaServicePOJO.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
 	}
 
-	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
-
-	if (qaContent != null) {
-	    Iterator sessionIterator = qaContent.getQaSessions().iterator();
-	    while (sessionIterator.hasNext()) {
-		if (removeSessionData == false) {
-		    QaServicePOJO.logger.error("removeSessionData is false, throwing SessionDataExistsException.");
-		    throw new SessionDataExistsException();
-		}
-
-		QaSession qaSession = (QaSession) sessionIterator.next();
-
-		Iterator sessionUsersIterator = qaSession.getQaQueUsers().iterator();
-		while (sessionUsersIterator.hasNext()) {
-		    QaQueUsr qaQueUsr = (QaQueUsr) sessionUsersIterator.next();
-
-		    Iterator sessionUsersResponsesIterator = qaQueUsr.getQaUsrResps().iterator();
-		    while (sessionUsersResponsesIterator.hasNext()) {
-			QaUsrResp qaUsrResp = (QaUsrResp) sessionUsersResponsesIterator.next();
-			removeUserResponse(qaUsrResp);
-		    }
-		}
+	for (QaSession session : (Set<QaSession>) qaContent.getQaSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getQaSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
-
-	    // removed all existing responses of toolContent with toolContentID
-	    qaDAO.removeQa(toolContentID);
-	} else {
-	    QaServicePOJO.logger.error("Warning!!!, We should have not come here. qaContent is null.");
-	    throw new ToolException("toolContentID is missing");
 	}
+
+	qaDAO.removeQa(toolContentId);
     }
 
     @Override

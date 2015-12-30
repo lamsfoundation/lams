@@ -259,7 +259,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException {
 	try {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
-	    contentManager.removeToolContent(toolActivity.getToolContentId(), true);
+	    contentManager.removeToolContent(toolActivity.getToolContentId());
 	} catch (NoSuchBeanDefinitionException e) {
 	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete the tool content. ToolActivity "
 		    + toolActivity;

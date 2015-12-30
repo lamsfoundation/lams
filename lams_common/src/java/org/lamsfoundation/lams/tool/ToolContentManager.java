@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
 /**
@@ -67,29 +66,17 @@ public interface ToolContentManager {
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException;
 
     /**
-     * Remove tool's content according specified the content id. It will be needed by lams to modify the learning
-     * design.
+     * Remove tool's content according specified the content id.
      * 
      * If the tool content includes files in the content repository then the files should be removed from the
-     * repository.
-     * 
-     * If session data for this toolContentId exists and removeSessionData = true, then the tool should delete the
-     * session data as well as the content data.
-     * 
-     * If session data for this toolContentId exists and removeSessionData = false, then the tool should throw
-     * SessionDataExists.
-     * 
-     * If no matching data exists, the tool should return without throwing an exception.
+     * repository. If no matching data exists, the tool should return without throwing an exception.
      * 
      * @param toolContentId
      *            the requested tool content id.
-     * @param removeSessionData
-     *            should it remove any related session data?
      * @throws ToolException
      *             if any other error occurs
      */
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException;
+    public void removeToolContent(Long toolContentId) throws ToolException;
 
     /**
      * Removes content previously added by the given user.

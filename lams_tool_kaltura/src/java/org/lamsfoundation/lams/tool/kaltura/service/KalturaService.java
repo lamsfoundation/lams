@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaCommentDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaDAO;
@@ -233,9 +232,24 @@ public class KalturaService
 	kalturaDao.saveOrUpdate(kaltura);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Kaltura kaltura = kalturaDao.getByContentId(toolContentId);
+	if (kaltura == null) {
+	    KalturaService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (KalturaSession session : (Set<KalturaSession>) kaltura.getKalturaSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, KalturaConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	kalturaDao.delete(kaltura);
     }
 
     @Override

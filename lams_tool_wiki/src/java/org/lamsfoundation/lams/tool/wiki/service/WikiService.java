@@ -299,9 +299,22 @@ public class WikiService
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
-	// TODO Auto-generated method stub
+    public void removeToolContent(Long toolContentId) throws SessionDataExistsException, ToolException {
+	Wiki wiki = wikiDAO.getByContentId(toolContentId);
+	if (wiki == null) {
+	    WikiService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (WikiSession session : wiki.getWikiSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	wikiDAO.delete(wiki);
     }
 
     @Override

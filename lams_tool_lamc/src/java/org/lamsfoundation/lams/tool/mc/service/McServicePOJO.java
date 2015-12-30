@@ -74,7 +74,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
@@ -1237,38 +1236,24 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
-
-	if (toolContentId == null) {
-	    McServicePOJO.logger.error("toolContentId is null");
-	    throw new ToolException("toolContentId is missing");
-	}
-
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-
-	if (mcContent != null) {
-	    Iterator sessionIterator = mcContent.getMcSessions().iterator();
-	    while (sessionIterator.hasNext()) {
-		if (removeSessionData == false) {
-		    throw new SessionDataExistsException();
-		}
-
-		McSession mcSession = (McSession) sessionIterator.next();
-
-		Iterator sessionUsersIterator = mcSession.getMcQueUsers().iterator();
-		while (sessionUsersIterator.hasNext()) {
-		    McQueUsr mcQueUsr = (McQueUsr) sessionUsersIterator.next();
-
-		    mcUsrAttemptDAO.removeAllUserAttempts(mcQueUsr.getUid());
-		}
-	    }
-	    mcContentDAO.removeMcById(toolContentId);
-	} else {
-	    McServicePOJO.logger.error("Warning!!!, We should have not come here. mcContent is null.");
-	    throw new ToolException("toolContentId is missing");
+	if (mcContent == null) {
+	    McServicePOJO.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
 	}
+
+	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getMcSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.MY_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	mcContentDAO.delete(mcContent);
     }
 
     @Override

@@ -79,7 +79,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -215,23 +214,22 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
-	if (submitFilesContent != null) {
-	    // if session data exist and removeSessionData=false, throw an exception
-	    List submissionData = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
-	    if (!((submissionData == null) || submissionData.isEmpty()) && !removeSessionData) {
-		throw new SessionDataExistsException(
-			"Delete failed: There is session data that belongs to this tool content id");
-	    } else if (submissionData != null) {
-		Iterator iter = submissionData.iterator();
-		while (iter.hasNext()) {
-		    SubmitFilesSession element = (SubmitFilesSession) iter.next();
-		    removeToolSession(element);
-		}
-	    }
-	    submitFilesContentDAO.delete(submitFilesContent);
+	if (submitFilesContent == null) {
+	    SubmitFilesService.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
 	}
+
+	for (SubmitFilesSession session : submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionID(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, SbmtConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	submitFilesContentDAO.delete(submitFilesContent);
     }
 
     @Override

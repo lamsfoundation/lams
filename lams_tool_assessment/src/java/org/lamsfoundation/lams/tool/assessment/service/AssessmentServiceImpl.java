@@ -41,7 +41,6 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
@@ -99,7 +98,6 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -295,8 +293,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
     
     @Override
-    public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
-	    String searchString) {
+    public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
+	    String sortOrder, String searchString) {
 	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
     }
     
@@ -1698,15 +1696,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Assessment assessment = assessmentDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = assessmentSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		AssessmentSession session = (AssessmentSession) iter.next();
-		assessmentSessionDao.delete(session);
+	if (assessment == null) {
+	    AssessmentServiceImpl.log
+		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (AssessmentSession session : assessmentSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, AssessmentConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
 	assessmentDao.delete(assessment);
@@ -1738,7 +1740,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    assessmentDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
 
-		if (session.getGroupLeader() != null && session.getGroupLeader().getUid().equals(user.getUid())) {
+		if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 		    session.setGroupLeader(null);
 		}
 
@@ -2019,7 +2021,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setShuffled(JsonUtil.opt(toolContentJSON, "shuffled", Boolean.FALSE));
 	assessment.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
-	assessment.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	assessment.setUseSelectLeaderToolOuput(
+		JsonUtil.opt(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	// submission deadline set in monitoring
 
 	if (toolContentJSON.has("overallFeedback")) {
@@ -2142,9 +2145,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     // TODO Implement REST support for all types and then remove checkType method
     void checkType(short type) throws JSONException {
-	if (type != AssessmentConstants.QUESTION_TYPE_ESSAY && type != AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	if ((type != AssessmentConstants.QUESTION_TYPE_ESSAY)
+		&& (type != AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)) {
 	    throw new JSONException(
-		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type " + type);
+		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type "
+			    + type);
 	}
 	// public static final short QUESTION_TYPE_MATCHING_PAIRS = 2;
 	// public static final short QUESTION_TYPE_SHORT_ANSWER = 3;

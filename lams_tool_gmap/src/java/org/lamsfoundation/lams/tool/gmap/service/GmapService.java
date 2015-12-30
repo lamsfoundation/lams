@@ -54,7 +54,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapConfigItemDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
@@ -218,9 +217,22 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
-	// TODO Auto-generated method stub
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Gmap gmap = gmapDAO.getByContentId(toolContentId);
+	if (gmap == null) {
+	    GmapService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (GmapSession session : gmap.getGmapSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	gmapDAO.delete(gmap);
     }
 
     @Override

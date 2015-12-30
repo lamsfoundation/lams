@@ -57,8 +57,6 @@ public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> 
 
     private boolean singleUserEntry;
 
-    private Long voteQueContentId;
-
     /** persistent field */
     private VoteQueContent voteQueContent;
 
@@ -130,21 +128,6 @@ public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> 
      */
     public void setQueUsrId(Long queUsrId) {
 	this.queUsrId = queUsrId;
-    }
-
-    /**
-     * @return Returns the voteQueContentId.
-     */
-    public Long getVoteQueContentId() {
-	return voteQueContentId;
-    }
-
-    /**
-     * @param voteQueContentId
-     *            The voteQueContentId to set.
-     */
-    public void setVoteQueContentId(Long voteQueContentId) {
-	this.voteQueContentId = voteQueContentId;
     }
 
     /**
