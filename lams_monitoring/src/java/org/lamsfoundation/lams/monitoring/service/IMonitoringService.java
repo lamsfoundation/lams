@@ -342,7 +342,12 @@ public interface IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    void removeLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void removeLesson(long lessonId, Integer userId) throws SecurityException;
+
+    /**
+     * Removes the lesson and all referenced resources (learning design, tool content etc.) from the database. 
+     */
+    void removeLessonPermanently(long lessonId, Integer userId) throws SecurityException;
 
     /**
      * Set the gate to open to let all the learners through. This learning service is triggerred by the system
@@ -669,13 +674,13 @@ public interface IMonitoringService {
      *            Activity id of the branchingActivity
      */
     SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException;
-    
+
     /**
      * Get all the users records where the user has attempted the given activity, but has not completed it yet. Uses the
      * progress records to determine the users.
      */
     List<User> getLearnersAttemptedActivity(Activity activity);
-    
+
     /**
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.

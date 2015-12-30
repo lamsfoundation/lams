@@ -28,35 +28,37 @@ package org.lamsfoundation.lams.notebook.service;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 public interface ICoreNotebookService {
 
-	Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String title, String entry);
+    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String title, String entry);
 
-	TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType);
-	
-	List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID);
-	
-	String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString);
-	    
-	List<NotebookEntry> getEntry(Long id, Integer idType, String signature);
-	
-	List<NotebookEntry> getEntry(Long id, Integer idType, Integer userID);
-	
-	NotebookEntry getEntry(Long uid);
-	
-	void updateEntry(Long uid, String title, String entry);
-	
-	void updateEntry(NotebookEntry notebookEntry);
-	
-	void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry);
-	
-	IUserManagementService getUserManagementService();
-	
-	MessageService getMessageService();
+    TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType);
+
+    List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID);
+
+    String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString);
+
+    List<NotebookEntry> getEntry(Long id, Integer idType, String signature);
+
+    List<NotebookEntry> getEntry(Long id, Integer idType, Integer userID);
+
+    List<NotebookEntry> getEntry(Integer userID, Integer idType);
+
+    NotebookEntry getEntry(Long uid);
+
+    void updateEntry(Long uid, String title, String entry);
+
+    void updateEntry(NotebookEntry notebookEntry);
+
+    void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry);
+
+    IUserManagementService getUserManagementService();
+
+    MessageService getMessageService();
+
+    void deleteEntry(NotebookEntry entry);
 }

@@ -25,9 +25,9 @@
 
 package org.lamsfoundation.lams.notebook.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -35,189 +35,198 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.dao.INotebookEntryDAO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Role;
+public class CoreNotebookService implements ICoreNotebookService {
 
+    private static Logger log = Logger.getLogger(CoreNotebookService.class);
 
-public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreNotebookService{
+    private INotebookEntryDAO notebookEntryDAO;
 
-	private static Logger log = Logger.getLogger(CoreNotebookService.class);
-
-	private INotebookEntryDAO notebookEntryDAO;
-	
     private IBaseDAO baseDAO;
 
-	protected IUserManagementService userManagementService;
-	
-	protected MessageService messageService;
-	
-	public Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String title, String entry) {
-		User user = (User)getUserManagementService().findById(User.class, userID);
-		NotebookEntry notebookEntry = new NotebookEntry(id, idType, signature,
-				user, title, entry, new Date());
-		saveOrUpdateNotebookEntry(notebookEntry);
-		return notebookEntry.getUid();
-	}
-	
-	public TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType) {
-		TreeMap<Long, List<NotebookEntry>> entryMap = new TreeMap<Long, List<NotebookEntry>>();
-		List<NotebookEntry> list = getEntry(userID, idType);
-		
-		for (NotebookEntry entry : list) {
-			if(entryMap.containsKey(entry.getExternalID())) {
-				String lessonName = (String) entryMap.get(entry.getExternalID()).get(0).getLessonName();
-				entry.setLessonName(lessonName);
-				entryMap.get(entry.getExternalID()).add(entry);
-			} else {
-				Lesson lesson = (Lesson) baseDAO.find(Lesson.class, entry.getExternalID());
-				List<NotebookEntry> newEntryList = new ArrayList<NotebookEntry>();
-				
-				entry.setLessonName(lesson.getLessonName());
-				newEntryList.add(entry);
-				
-				entryMap.put(entry.getExternalID(), newEntryList);
-			}
-		}
-		
-		return entryMap;
+    protected IUserManagementService userManagementService;
+
+    protected MessageService messageService;
+
+    @Override
+    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String title,
+	    String entry) {
+	User user = (User) getUserManagementService().findById(User.class, userID);
+	NotebookEntry notebookEntry = new NotebookEntry(id, idType, signature, user, title, entry, new Date());
+	saveOrUpdateNotebookEntry(notebookEntry);
+	return notebookEntry.getUid();
+    }
+
+    @Override
+    public TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType) {
+	TreeMap<Long, List<NotebookEntry>> entryMap = new TreeMap<Long, List<NotebookEntry>>();
+	List<NotebookEntry> list = getEntry(userID, idType);
+
+	for (NotebookEntry entry : list) {
+	    if (entryMap.containsKey(entry.getExternalID())) {
+		String lessonName = entryMap.get(entry.getExternalID()).get(0).getLessonName();
+		entry.setLessonName(lessonName);
+		entryMap.get(entry.getExternalID()).add(entry);
+	    } else {
+		Lesson lesson = (Lesson) baseDAO.find(Lesson.class, entry.getExternalID());
+		List<NotebookEntry> newEntryList = new ArrayList<NotebookEntry>();
+
+		entry.setLessonName(lesson.getLessonName());
+		newEntryList.add(entry);
+
+		entryMap.put(entry.getExternalID(), newEntryList);
+	    }
 	}
 
-	public List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID) {
-		return notebookEntryDAO.get(id, idType, signature, userID);
-	}
-	
-	/** 
-	 * Add the SQL needed to look up entries for a given tool. Expects a valid string buffer to be supplied.
-	 * This allows a tool to get the single matching entry (assuming the tool has only created one notebook entry
-	 * for each learner in each session) for the teacher to view. This is an efficient way to get the 
-	 * entries at the same time as retrieving the tool data, rather than making a separate lookup.
-	 * Note - if there is more than on row for each tool/session/learner, then the tool will end up with a 
-	 * cross product against the learner record and you will get one row in the learner + notebook result for each 
-	 * notebook entry.
-	 * 
-	 * May only be used for entries where the external_id_type = CoreNotebookConstants.NOTEBOOK_TOOL
-	 * 
-	 * The parameters are strings, and the SQL is built up rather than using parameters as either sessionIdString or
-	 * userIdString may be the name of a field you are joining on. Typically the sessionId will be a number as the tool
-	 * would be requesting the entries for only one session but the user field will need to be a reference to a column
-	 * in the user table so that it can get entries for more than one user. If you wanted multiple users across
-	 * multiple sessions, then the sessionId would need to refer to the column in the user/session table.
-	 * 
-	 * If you only want an entry for one user, use getEntry(id, idIdType, signature, userID);
-	 * 
-	 * The return values are the entry for the select clause (will always have a leading but no trailing comma and 
-	 * an alias of notebookEntry) and the sql join clause, which should go with any other join clauses.
-	 * 
-	 * To make sure it always returns the same number of objects add the select clause like this:
-	 * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
-	 * 
-	 * Then if there is isn't a notebookEntry to return, it still returns a notebookEntry column, which translates
-	 * to null. So you can return a collection like List<Object[UserObject, String]> irrespective of whether
-	 * or not the notebook entries (the Strings) are needed. 
-	 * 
-	 * Finally, as it will be returning the notebook entry as a separate field in select clause, set up the sql -> java
-	 * object translation using ".addScalar("notebookEntry", Hibernate.STRING)".
-	 * 
-	 * @param sessionIdString Session identifier, usually the toolSessionId
-	 * @param toolSignature Tool's string signature (without any quotes) e.g. lantbk11
-	 * @param userIdString User identifier field string e.g. 
-	 * @return String[] { partial select string, join clause }
-	 * 
-	 */
-	public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString) {
-	    StringBuilder buf = new StringBuilder(" LEFT JOIN lams_notebook_entry entry ON entry.external_id=");
-	    buf.append(sessionIdString);
-	    buf.append(" AND entry.external_id_type=");
-	    buf.append(CoreNotebookConstants.NOTEBOOK_TOOL);
-	    buf.append(" AND entry.external_signature=\"");
-	    buf.append(toolSignature);
-	    buf.append("\" AND entry.user_id=");
-	    buf.append(userIdString);
-	    return  new String[] { ", entry.entry notebookEntry ", buf.toString() };
-	}
+	return entryMap;
+    }
 
-	public List<NotebookEntry> getEntry(Long id, Integer idType, String signature) {
-		return notebookEntryDAO.get(id, idType, signature);
-	}
-	
-	public List<NotebookEntry> getEntry(Long id, Integer idType, Integer userID) {
-		return notebookEntryDAO.get(id, idType, userID);
-	}
+    @Override
+    public List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID) {
+	return notebookEntryDAO.get(id, idType, signature, userID);
+    }
 
-	public List<NotebookEntry> getEntry(Integer userID) {
-		return notebookEntryDAO.get(userID);
-	}
-	
-	public List<NotebookEntry> getEntry(Integer userID, Integer idType) {
-		return notebookEntryDAO.get(userID, idType);
-	}
-
-	public List<NotebookEntry> getEntry(Integer userID, Long lessonID) {
-		return notebookEntryDAO.get(userID, lessonID);		
-	}
-	
-	public NotebookEntry getEntry(Long uid) {
-		return notebookEntryDAO.get(uid);
-	}
-
-	public void updateEntry(Long uid, String title, String entry) {
-		NotebookEntry ne = getEntry(uid);
-		if (ne != null) {
-			ne.setTitle(title);
-			ne.setEntry(entry);
-			ne.setLastModified(new Date());
-			saveOrUpdateNotebookEntry(ne);
-		} else {
-			log.debug("updateEntry: uid " + uid + "does not exist");
-		}
-	}
-
-	public void updateEntry(NotebookEntry notebookEntry) {
-		notebookEntry.setLastModified(new Date());
-		saveOrUpdateNotebookEntry(notebookEntry);
-	}
-
-	public void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry) {
-		notebookEntryDAO.saveOrUpdate(notebookEntry);
-	}
-
-	/* ********** Used by Spring to "inject" the linked objects ************* */
-
-	public void setNotebookEntryDAO(INotebookEntryDAO notebookEntryDAO) {
-		this.notebookEntryDAO = notebookEntryDAO;
-	}
-	
-	public void setBaseDAO(IBaseDAO baseDAO) {
-		this.baseDAO = baseDAO;
-	}
-	
-	/**
+    /**
+     * Add the SQL needed to look up entries for a given tool. Expects a valid string buffer to be supplied. This allows
+     * a tool to get the single matching entry (assuming the tool has only created one notebook entry for each learner
+     * in each session) for the teacher to view. This is an efficient way to get the entries at the same time as
+     * retrieving the tool data, rather than making a separate lookup. Note - if there is more than on row for each
+     * tool/session/learner, then the tool will end up with a cross product against the learner record and you will get
+     * one row in the learner + notebook result for each notebook entry.
      * 
-     * @param IUserManagementService The userManagementService to set.
+     * May only be used for entries where the external_id_type = CoreNotebookConstants.NOTEBOOK_TOOL
+     * 
+     * The parameters are strings, and the SQL is built up rather than using parameters as either sessionIdString or
+     * userIdString may be the name of a field you are joining on. Typically the sessionId will be a number as the tool
+     * would be requesting the entries for only one session but the user field will need to be a reference to a column
+     * in the user table so that it can get entries for more than one user. If you wanted multiple users across multiple
+     * sessions, then the sessionId would need to refer to the column in the user/session table.
+     * 
+     * If you only want an entry for one user, use getEntry(id, idIdType, signature, userID);
+     * 
+     * The return values are the entry for the select clause (will always have a leading but no trailing comma and an
+     * alias of notebookEntry) and the sql join clause, which should go with any other join clauses.
+     * 
+     * To make sure it always returns the same number of objects add the select clause like this:
+     * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
+     * 
+     * Then if there is isn't a notebookEntry to return, it still returns a notebookEntry column, which translates to
+     * null. So you can return a collection like List<Object[UserObject, String]> irrespective of whether or not the
+     * notebook entries (the Strings) are needed.
+     * 
+     * Finally, as it will be returning the notebook entry as a separate field in select clause, set up the sql -> java
+     * object translation using ".addScalar("notebookEntry", Hibernate.STRING)".
+     * 
+     * @param sessionIdString
+     *            Session identifier, usually the toolSessionId
+     * @param toolSignature
+     *            Tool's string signature (without any quotes) e.g. lantbk11
+     * @param userIdString
+     *            User identifier field string e.g.
+     * @return String[] { partial select string, join clause }
+     * 
      */
-	public void setUserManagementService(IUserManagementService userManagementService) {
-		this.userManagementService = userManagementService;
+    @Override
+    public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString) {
+	StringBuilder buf = new StringBuilder(" LEFT JOIN lams_notebook_entry entry ON entry.external_id=");
+	buf.append(sessionIdString);
+	buf.append(" AND entry.external_id_type=");
+	buf.append(CoreNotebookConstants.NOTEBOOK_TOOL);
+	buf.append(" AND entry.external_signature=\"");
+	buf.append(toolSignature);
+	buf.append("\" AND entry.user_id=");
+	buf.append(userIdString);
+	return new String[] { ", entry.entry notebookEntry ", buf.toString() };
+    }
+
+    @Override
+    public List<NotebookEntry> getEntry(Long id, Integer idType, String signature) {
+	return notebookEntryDAO.get(id, idType, signature);
+    }
+
+    @Override
+    public List<NotebookEntry> getEntry(Long id, Integer idType, Integer userID) {
+	return notebookEntryDAO.get(id, idType, userID);
+    }
+
+    @Override
+    public List<NotebookEntry> getEntry(Integer userID, Integer idType) {
+	return notebookEntryDAO.get(userID, idType);
+    }
+
+    @Override
+    public NotebookEntry getEntry(Long uid) {
+	return notebookEntryDAO.get(uid);
+    }
+
+    @Override
+    public void updateEntry(Long uid, String title, String entry) {
+	NotebookEntry ne = getEntry(uid);
+	if (ne != null) {
+	    ne.setTitle(title);
+	    ne.setEntry(entry);
+	    ne.setLastModified(new Date());
+	    saveOrUpdateNotebookEntry(ne);
+	} else {
+	    CoreNotebookService.log.debug("updateEntry: uid " + uid + "does not exist");
 	}
-	
-	public IUserManagementService getUserManagementService() {
-		return userManagementService;
-	}
-	
-	/**
-	 * Set i18n MessageService
-	 */
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
-	}
-	
-	/**
-	 * Get i18n MessageService
-	 */
-	public MessageService getMessageService() {
-		return this.messageService;
-	}
+    }
+
+    @Override
+    public void updateEntry(NotebookEntry notebookEntry) {
+	notebookEntry.setLastModified(new Date());
+	saveOrUpdateNotebookEntry(notebookEntry);
+    }
+
+    @Override
+    public void saveOrUpdateNotebookEntry(NotebookEntry notebookEntry) {
+	notebookEntryDAO.saveOrUpdate(notebookEntry);
+    }
+
+    @Override
+    public void deleteEntry(NotebookEntry notebookEntry) {
+	notebookEntryDAO.delete(notebookEntry);
+    }
+
+    /* ********** Used by Spring to "inject" the linked objects ************* */
+
+    public void setNotebookEntryDAO(INotebookEntryDAO notebookEntryDAO) {
+	this.notebookEntryDAO = notebookEntryDAO;
+    }
+
+    public void setBaseDAO(IBaseDAO baseDAO) {
+	this.baseDAO = baseDAO;
+    }
+
+    /**
+     * 
+     * @param IUserManagementService
+     *            The userManagementService to set.
+     */
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
+    }
+
+    @Override
+    public IUserManagementService getUserManagementService() {
+	return userManagementService;
+    }
+
+    /**
+     * Set i18n MessageService
+     */
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    /**
+     * Get i18n MessageService
+     */
+    @Override
+    public MessageService getMessageService() {
+	return this.messageService;
+    }
 }

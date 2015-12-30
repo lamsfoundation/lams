@@ -53,6 +53,8 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -83,7 +85,10 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -930,6 +935,67 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	securityService.isLessonMonitor(lessonId, userId, "remove lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	setLessonState(requestedLesson, Lesson.REMOVED_STATE);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void removeLessonPermanently(long lessonId, Integer userId) {
+	securityService.isLessonMonitor(lessonId, userId, "remove lesson permanently", true);
+
+	Lesson lesson = lessonDAO.getLesson(lessonId);
+	LearningDesign learningDesign = lesson.getLearningDesign();
+
+	// remove lesson resources
+	lessonDAO.deleteByProperty(LogEvent.class, "lessonId", lessonId);
+	lessonDAO.deleteByProperty(ToolSession.class, "lesson.lessonId", lessonId);
+	Map<String, Object> notebookProperties = new TreeMap<String, Object>();
+	notebookProperties.put("externalID", lessonId);
+	notebookProperties.put("externalSignature", CoreNotebookConstants.SCRATCH_PAD_SIG);
+	lessonDAO.deleteByProperties(NotebookEntry.class, notebookProperties);
+	lessonDAO.deleteLesson(lesson);
+
+	// remove each Tool activity content
+	// It has to be done before removing BranchEntries as fetching Tool content
+	// in its own transaction would re-add connected BranchEntries (Hibernate error) 
+	Set<Activity> systemActivities = new HashSet<Activity>();
+	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+	    // get the real object, not the proxy
+	    activity = activityDAO.getActivityByActivityId(activity.getActivityId());
+	    if (activity.isToolActivity()) {
+		ToolActivity toolActivity = (ToolActivity) activity;
+		// delete content of each tool
+		lamsCoreToolService.notifyToolToDeleteContent(toolActivity);
+		//  possible nonthreadsafe access to session!!!
+		lessonDAO.flush();
+		Long toolContentId = toolActivity.getToolContentId();
+		lessonDAO.deleteById(ToolContent.class, toolContentId);
+	    } else {
+		systemActivities.add(activity);
+	    }
+	}
+
+	// remove branching and grouping resources
+	for (Activity activity : systemActivities) {
+	    if (activity.isBranchingActivity()) {
+		BranchingActivity branchingActivity = (BranchingActivity) activity;
+		Grouping grouping = branchingActivity.getGrouping();
+		groupingDAO.delete(grouping);
+
+		for (BranchActivityEntry entry : branchingActivity.getBranchActivityEntries()) {
+		    BranchCondition condition = entry.getCondition();
+		    if (condition != null) {
+			lessonDAO.deleteById(BranchCondition.class, condition.getConditionId());
+		    }
+		}
+	    } else if (activity.isGroupingActivity()) {
+		GroupingActivity groupingActivity = (GroupingActivity) activity;
+		Grouping grouping = groupingActivity.getCreateGrouping();
+		groupingDAO.delete(grouping);
+	    }
+	}
+
+	// finally remove the learning design
+	lessonDAO.delete(learningDesign);
     }
 
     @Override
@@ -2350,10 +2416,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public List<User> getLearnersAttemptedActivity(Activity activity){
+    public List<User> getLearnersAttemptedActivity(Activity activity) {
 	return learnerProgressDAO.getLearnersAttemptedActivity(activity);
     }
-    
+
     @Override
     public List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException {
 	return lessonService.getLearnersAttemptedOrCompletedActivity(activity);
@@ -2370,7 +2436,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset, boolean orderAscending) {
+    public List<User> getLearnersByActivities(Long[] activityIds, Integer limit, Integer offset,
+	    boolean orderAscending) {
 	return learnerProgressDAO.getLearnersByActivities(activityIds, limit, offset, orderAscending);
     }
 
@@ -2414,12 +2481,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException {
-	
 	int result = 0;
-	HttpSession ss = SessionManager.getSession();
-	if (ss != null) {
-	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if (userDto != null) {
+		HttpSession ss = SessionManager.getSession();
+		if (ss != null) {
+		    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		    if (userDto != null) {
 		Integer creatorId = userDto.getUserID();
 
 		for (String lessonIdStr : lessonIds) {
@@ -2446,17 +2512,17 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	Lesson lesson = lessonService.getLesson(lessonId);
 	if (lesson != null) {
 
-	    if ((!addAllStaff && (staffIds.length > 0)) || addAllStaff) {
-		// create staff LessonClass
-		String staffGroupName = group.getName() + " Staff";
-		List<User> staffUsers = createStaffGroup(group.getOrganisationId(), addAllStaff, staffIds);
+			if ((!addAllStaff && (staffIds.length > 0)) || addAllStaff) {
+			    // create staff LessonClass
+			    String staffGroupName = group.getName() + " Staff";
+			    List<User> staffUsers = createStaffGroup(group.getOrganisationId(), addAllStaff, staffIds);
 
-		if ((!addAllLearners && (learnerIds.length > 0)) || addAllLearners) {
-		    // create learner LessonClass for lesson
-		    String learnerGroupName = group.getName() + " Learners";
+			    if ((!addAllLearners && (learnerIds.length > 0)) || addAllLearners) {
+				// create learner LessonClass for lesson
+				String learnerGroupName = group.getName() + " Learners";
 		    List<User> learnerUsers = createLearnerGroup(group.getOrganisationId(), addAllLearners, learnerIds);
 
-		    // init Lesson with user as creator
+				// init Lesson with user as creator
 		    newLesson = this.initializeLesson(lesson.getLessonName(), lesson.getLessonDescription(), lesson
 			    .getLearningDesign().getLearningDesignId(), group.getOrganisationId(), creatorId, null,
 			    lesson.isEnableLessonIntro(), lesson.isDisplayDesignImage(), lesson
@@ -2464,26 +2530,26 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 				    .getLearnerImAvailable(), lesson.getLiveEditEnabled(), lesson
 				    .getEnableLessonNotifications(), lesson.getLearnerRestart(), null, null);
 
-		    // save LessonClasses
+				// save LessonClasses
 		    newLesson = this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName,
 			    learnerUsers, staffGroupName, staffUsers, creatorId);
 
-		    // start Lessons
-		    // TODO user-specified creator; must be someone in staff group
-		    this.startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
+				// start Lessons
+				// TODO user-specified creator; must be someone in staff group
+				this.startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
 
-		} else {
+			    } else {
 		    throw new MonitoringServiceException("No learners specified, can't create any Lessons.");
-		}
-	    } else {
-		throw new MonitoringServiceException("No staff specified, can't create any Lessons.");
-	    }
-	} else {
+			    }
+			} else {
+			    throw new MonitoringServiceException("No staff specified, can't create any Lessons.");
+			}
+		    } else {
 	    throw new MonitoringServiceException("Couldn't find Lesson based on id=" + lessonId);
-	}
+		    }
 
 	return newLesson.getLessonId();
-    }
+		}
 
     /*
      * Used in cloneLessons.

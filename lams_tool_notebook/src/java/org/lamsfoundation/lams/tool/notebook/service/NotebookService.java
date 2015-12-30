@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -52,7 +53,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookSessionDAO;
@@ -99,9 +99,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
-    
+
     private IEventNotificationService eventNotificationService;
-    
+
     private MessageService messageService;
 
     private NotebookOutputFactory notebookOutputFactory;
@@ -136,13 +136,14 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -161,10 +162,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getNotebookOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ************ Methods from ToolContentManager ************************* */
@@ -192,7 +193,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	Notebook toContent = Notebook.newInstance(fromContent, toContentId);
 	notebookDAO.saveOrUpdate(toContent);
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Notebook notebook = notebookDAO.getByContentId(toolContentId);
@@ -204,22 +205,39 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	if (notebook == null) {
+	    NotebookService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (NotebookSession session : (Set<NotebookSession>) notebook.getNotebookSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	notebookDAO.delete(notebook);
     }
-    
+
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Notebook entries for user ID " + userId + " and toolContentId " + toolContentId);
+	if (NotebookService.logger.isDebugEnabled()) {
+	    NotebookService.logger
+		    .debug("Removing Notebook entries for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Notebook notebook = notebookDAO.getByContentId(toolContentId);
 	if (notebook == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    NotebookService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
-	
+
 	for (NotebookSession session : (Set<NotebookSession>) notebook.getNotebookSessions()) {
 	    NotebookUser user = notebookUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
@@ -237,11 +255,12 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Notebook notebook = notebookDAO.getByContentId(toolContentId);
 	if (notebook == null) {
@@ -266,19 +285,20 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(NotebookImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, notebookToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Notebook)) {
-		throw new ImportToolContentException("Import Notebook tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Notebook tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Notebook notebook = (Notebook) toolPOJO;
 
@@ -300,6 +320,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Notebook notebook = getNotebookDAO().getByContentId(toolContentId);
@@ -308,29 +329,35 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	}
 	return getNotebookOutputFactory().getToolOutputDefinitions(notebook, definitionType);
     }
-    
+
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getNotebookByContentId(toolContentId).getTitle();
     }
-    
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getNotebookByContentId(toolContentId).isDefineLater();
     }
-   
+
     /* ********** INotebookService Methods ********************************* */
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long uid) {
 	return coreNotebookService.getEntry(uid);
     }
 
+    @Override
     public void updateEntry(Long uid, String entry) {
 	coreNotebookService.updateEntry(uid, "", entry);
     }
 
+    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -342,6 +369,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return toolContentId;
     }
 
+    @Override
     public Notebook getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(NotebookConstants.TOOL_SIGNATURE);
 	Notebook defaultContent = getNotebookByContentId(defaultContentID);
@@ -357,6 +385,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return defaultContent;
     }
 
+    @Override
     public Notebook copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -373,6 +402,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return newContent;
     }
 
+    @Override
     public Notebook getNotebookByContentId(Long toolContentID) {
 	Notebook notebook = notebookDAO.getByContentId(toolContentID);
 	if (notebook == null) {
@@ -381,6 +411,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return notebook;
     }
 
+    @Override
     public NotebookSession getSessionBySessionId(Long toolSessionId) {
 	NotebookSession notebookSession = notebookSessionDAO.getBySessionId(toolSessionId);
 	if (notebookSession == null) {
@@ -389,6 +420,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return notebookSession;
     }
 
+    @Override
     public NotebookUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return notebookUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
@@ -397,28 +429,33 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return notebookUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public NotebookUser getUserByUID(Long uid) {
 	return notebookUserDAO.getByUID(uid);
     }
 
+    @Override
     public void saveOrUpdateNotebook(Notebook notebook) {
 	notebookDAO.saveOrUpdate(notebook);
     }
 
+    @Override
     public void saveOrUpdateNotebookSession(NotebookSession notebookSession) {
 	notebookSessionDAO.saveOrUpdate(notebookSession);
     }
 
+    @Override
     public void saveOrUpdateNotebookUser(NotebookUser notebookUser) {
 	notebookUserDAO.saveOrUpdate(notebookUser);
     }
 
+    @Override
     public NotebookUser createNotebookUser(UserDTO user, NotebookSession notebookSession) {
 	NotebookUser notebookUser = new NotebookUser(user, notebookSession);
 	saveOrUpdateNotebookUser(notebookUser);
 	return notebookUser;
     }
-    
+
     @Override
     public boolean notifyUser(Integer userId, String comment) {
 	boolean isHtmlFormat = false;
@@ -437,6 +474,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     /**
      * Import the data for a 1.0.2 Notebook
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Notebook notebook = new Notebook();
@@ -444,8 +482,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	notebook.setCreateBy(new Long(user.getUserID().longValue()));
 	notebook.setCreateDate(now);
 	notebook.setDefineLater(Boolean.FALSE);
-	notebook.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	notebook.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	notebook.setLockOnFinished(Boolean.TRUE);
 	notebook.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	notebook.setToolContentId(toolContentId);
@@ -457,11 +495,12 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
-	NotebookService.logger
-		.warn("Setting the reflective field on a notebook. This doesn't make sense as the notebook is for reflection and we don't reflect on reflection!");
+	NotebookService.logger.warn(
+		"Setting the reflective field on a notebook. This doesn't make sense as the notebook is for reflection and we don't reflect on reflection!");
 	Notebook notebook = getNotebookByContentId(toolContentId);
 	if (notebook == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -545,11 +584,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
-    
+
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
     }
-    
+
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -565,6 +604,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String createConditionName(Collection<NotebookCondition> existingConditions) {
 	String uniqueNumber = null;
 	do {
@@ -579,6 +619,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	return getNotebookOutputFactory().buildUserEntryConditionName(uniqueNumber);
     }
 
+    @Override
     public void releaseConditionsFromCache(Notebook notebook) {
 	if (notebook.getConditions() != null) {
 	    for (NotebookCondition condition : notebook.getConditions()) {
@@ -587,8 +628,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	}
     }
 
+    @Override
     public void deleteCondition(NotebookCondition condition) {
-	if (condition != null && condition.getConditionId() != null) {
+	if ((condition != null) && (condition.getConditionId() != null)) {
 	    notebookDAO.delete(condition);
 	}
     }
@@ -597,22 +639,25 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getNotebookOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     // ****************** REST methods *************************
 
-    /** Rest call to create a new Notebook content. Required fields in toolContentJSON: "title", "instructions".
+    /**
+     * Rest call to create a new Notebook content. Required fields in toolContentJSON: "title", "instructions".
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 	Date updateDate = new Date();
 
 	Notebook nb = new Notebook();
@@ -630,10 +675,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	nb.setContentInUse(false);
 	nb.setDefineLater(false);
 	this.saveOrUpdateNotebook(nb);
-	
+
 	// TODO
 	// nb.setConditions(conditions);
-	
+
     }
-    
+
 }

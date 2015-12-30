@@ -54,7 +54,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapConfigItemDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
@@ -131,9 +130,9 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	gmapSessionDAO.saveOrUpdate(session);
 
 	Set<GmapMarker> markers = gmap.getGmapMarkers();
-	if (markers != null && markers.size() > 0) {
+	if ((markers != null) && (markers.size() > 0)) {
 	    for (GmapMarker marker : markers) {
-		if (marker.isAuthored() && marker.getGmapSession() == null) {
+		if (marker.isAuthored() && (marker.getGmapSession() == null)) {
 		    GmapMarker newMarker = (GmapMarker) marker.clone();
 		    newMarker.setGmapSession(session);
 		    saveOrUpdateGmapMarker(newMarker);
@@ -148,13 +147,14 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -173,14 +173,15 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ************ Methods from ToolContentManager ************************* */
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (GmapService.logger.isDebugEnabled()) {
@@ -214,19 +215,36 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	gmap.setDefineLater(false);
 	gmapDAO.saveOrUpdate(gmap);
     }
-    
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
-	// TODO Auto-generated method stub
+
+    @Override
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Gmap gmap = gmapDAO.getByContentId(toolContentId);
+	if (gmap == null) {
+	    GmapService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (GmapSession session : gmap.getGmapSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	gmapDAO.delete(gmap);
     }
 
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Gmap markers for user ID " + userId + " and toolContentId " + toolContentId);
+	if (GmapService.logger.isDebugEnabled()) {
+	    GmapService.logger
+		    .debug("Removing Gmap markers for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 	Gmap gmap = gmapDAO.getByContentId(toolContentId);
 	if (gmap == null) {
-	    logger.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    GmapService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -253,16 +271,17 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	    }
 	}
     }
-    
+
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Gmap gmap = gmapDAO.getByContentId(toolContentId);
 	if (gmap == null) {
@@ -303,19 +322,20 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(GmapImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, gmapToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Gmap)) {
-		throw new ImportToolContentException("Import Gmap tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Gmap tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    Gmap gmap = (Gmap) toolPOJO;
 
@@ -354,21 +374,25 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getGmapByContentId(toolContentId).getTitle();
     }
-    
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getGmapByContentId(toolContentId).isDefineLater();
     }
-    
+
     /* ********** IGmapService Methods ********************************* */
 
+    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -380,6 +404,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return toolContentId;
     }
 
+    @Override
     public Gmap getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(GmapConstants.TOOL_SIGNATURE);
 	Gmap defaultContent = getGmapByContentId(defaultContentID);
@@ -391,6 +416,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return defaultContent;
     }
 
+    @Override
     public Gmap copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -407,6 +433,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return newContent;
     }
 
+    @Override
     public Gmap getGmapByContentId(Long toolContentID) {
 	Gmap gmap = gmapDAO.getByContentId(toolContentID);
 	if (gmap == null) {
@@ -415,6 +442,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return gmap;
     }
 
+    @Override
     public GmapSession getSessionBySessionId(Long toolSessionId) {
 	GmapSession gmapSession = gmapSessionDAO.getBySessionId(toolSessionId);
 	if (gmapSession == null) {
@@ -423,6 +451,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return gmapSession;
     }
 
+    @Override
     public GmapUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return gmapUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
@@ -431,40 +460,49 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return gmapUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public GmapUser getUserByUID(Long uid) {
 	return gmapUserDAO.getByUID(uid);
     }
 
+    @Override
     public void saveOrUpdateGmap(Gmap gmap) {
 	gmapDAO.saveOrUpdate(gmap);
     }
 
+    @Override
     public void saveOrUpdateGmapMarker(GmapMarker gmapMarker) {
 	gmapMarkerDAO.saveOrUpdate(gmapMarker);
     }
 
+    @Override
     public List<GmapMarker> getGmapMarkersBySessionId(Long sessionId) {
 	return gmapMarkerDAO.getByToolSessionId(sessionId);
     }
 
+    @Override
     public void saveOrUpdateGmapSession(GmapSession gmapSession) {
 	gmapSessionDAO.saveOrUpdate(gmapSession);
     }
 
+    @Override
     public void saveOrUpdateGmapUser(GmapUser gmapUser) {
 	gmapUserDAO.saveOrUpdate(gmapUser);
     }
 
+    @Override
     public GmapUser createGmapUser(UserDTO user, GmapSession gmapSession) {
 	GmapUser gmapUser = new GmapUser(user, gmapSession);
 	saveOrUpdateGmapUser(gmapUser);
 	return gmapUser;
     }
 
+    @Override
     public GmapConfigItem getConfigItem(String key) {
 	return gmapConfigItemDAO.getConfigItemByKey(key);
     }
 
+    @Override
     public void saveOrUpdateGmapConfigItem(GmapConfigItem item) {
 	gmapConfigItemDAO.saveOrUpdate(item);
     }
@@ -476,10 +514,11 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
      *      org.lamsfoundation.lams.tool.gmap.model.Gmap, org.lamsfoundation.lams.tool.gmap.model.GmapUser, boolean,
      *      org.lamsfoundation.lams.tool.gmap.model.GmapSession)
      */
+    @Override
     public void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser, boolean isAuthored,
 	    GmapSession session) {
 
-	if (markerXML != null && !markerXML.equals("")) {
+	if ((markerXML != null) && !markerXML.equals("")) {
 	    try {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
@@ -531,7 +570,8 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	    GmapService.logger.debug("MarkerXML string was empty");
 	}
     }
-    
+
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -541,6 +581,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     /**
      * Import the data for a 1.0.2 Gmap
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Gmap gmap = new Gmap();
@@ -556,11 +597,12 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
-	GmapService.logger
-		.warn("Setting the reflective field on a gmap. This doesn't make sense as the gmap is for reflection and we don't reflect on reflection!");
+	GmapService.logger.warn(
+		"Setting the reflective field on a gmap. This doesn't make sense as the gmap is for reflection and we don't reflect on reflection!");
 	Gmap gmap = getGmapByContentId(toolContentId);
 	if (gmap == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -653,13 +695,15 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	this.gmapConfigItemDAO = gmapConfigItemDAO;
     }
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -669,10 +713,12 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     /**
      * @param notebookEntry
      */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }

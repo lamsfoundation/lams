@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -130,13 +131,14 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -155,10 +157,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getMindmapOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /**
@@ -168,6 +170,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * @param toolSessionId
      * @return
      */
+    @Override
     public int getNumNodes(Long learnerId, Long toolSessionId) {
 	MindmapUser mindmapUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
 	// MindmapSession mindmapSession = getSessionBySessionId(toolSessionId);
@@ -178,6 +181,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     /*
      * Methods from ToolContentManager Called on adding lesson.
      */
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (MindmapService.logger.isDebugEnabled()) {
@@ -237,8 +241,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * @param toContent
      * @return
      */
-    public void cloneMindmapNodesForRuntime(MindmapNode fromMindmapNode, MindmapNode toMindmapNode,
-	    Mindmap fromContent, Mindmap toContent) {
+    public void cloneMindmapNodesForRuntime(MindmapNode fromMindmapNode, MindmapNode toMindmapNode, Mindmap fromContent,
+	    Mindmap toContent) {
 	toMindmapNode = saveMindmapNode(null, toMindmapNode, fromMindmapNode.getUniqueId(), fromMindmapNode.getText(),
 		fromMindmapNode.getColor(), fromMindmapNode.getUser(), toContent, null);
 
@@ -264,6 +268,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * @param mindmap
      * @return null
      */
+    @Override
     public MindmapNode saveMindmapNode(MindmapNode currentMindmapNode, MindmapNode parentMindmapNode, Long uniqueId,
 	    String text, String color, MindmapUser mindmapUser, Mindmap mindmap, MindmapSession session) {
 	if (currentMindmapNode == null) {
@@ -290,6 +295,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * @param mindmapUser
      * @return rootNodeModel
      */
+    @Override
     public NodeModel getMindmapXMLFromDatabase(Long rootNodeId, Long mindmapId, NodeModel rootNodeModel,
 	    MindmapUser mindmapUser) {
 	List mindmapNodes = getMindmapNodeByParentId(rootNodeId, mindmapId);
@@ -329,6 +335,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return rootNodeModel;
     }
 
+    @Override
     public void getChildMindmapNodes(List<NodeModel> branches, MindmapNode rootMindmapNode, MindmapUser mindmapUser,
 	    Mindmap mindmap, MindmapSession mindmapSession) {
 	for (Iterator<NodeModel> iterator = branches.iterator(); iterator.hasNext();) {
@@ -359,6 +366,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	}
     }
 
+    @Override
     public String getLanguageXML() {
 	ArrayList<String> languageCollection = new ArrayList<String>();
 	languageCollection.add(new String("local.title"));
@@ -378,7 +386,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
 	return languageOutput;
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
@@ -389,22 +397,38 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	mindmapDAO.saveOrUpdate(mindmap);
     }
 
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
-	// TODO Auto-generated method stub
+    @SuppressWarnings("unchecked")
+    @Override
+    public void removeToolContent(Long toolContentId) throws SessionDataExistsException, ToolException {
+	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
+	if (mindmap == null) {
+	    MindmapService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, MindmapConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	mindmapDAO.delete(mindmap);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (MindmapService.logger.isDebugEnabled()) {
-	    MindmapService.logger.debug("Removing Mindmap content for user ID " + userId + " and toolContentId "
-		    + toolContentId);
+	    MindmapService.logger
+		    .debug("Removing Mindmap content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
 	if (mindmap == null) {
-	    MindmapService.logger.warn("Did not find activity with toolContentId: " + toolContentId
-		    + " to remove learner content");
+	    MindmapService.logger
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -446,8 +470,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @SuppressWarnings("unchecked")
     private boolean userOwnsChildrenNodes(MindmapNode node, Long userId, List<MindmapNode> descendants) {
-	List<MindmapNode> children = mindmapNodeDAO.getMindmapNodeByParentIdMindmapIdSessionId(node.getNodeId(), node
-		.getMindmap().getUid(), node.getSession().getSessionId());
+	List<MindmapNode> children = mindmapNodeDAO.getMindmapNodeByParentIdMindmapIdSessionId(node.getNodeId(),
+		node.getMindmap().getUid(), node.getSession().getSessionId());
 	for (MindmapNode child : children) {
 	    boolean userOwnsChild = (child.getUser() != null) && child.getUser().getUserId().equals(userId)
 		    && userOwnsChildrenNodes(child, userId, descendants);
@@ -467,6 +491,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * @throws ToolException
      *             if any other error occurs
      */
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
 	if (mindmap == null) {
@@ -512,6 +537,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * @throws ToolException
      *             if any other error occurs
      */
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
@@ -521,8 +547,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, mindmapToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Mindmap)) {
-		throw new ImportToolContentException("Import Mindmap tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Mindmap tool content failed. Deserialized object is " + toolPOJO);
 	    }
 
 	    Mindmap mindmap = (Mindmap) toolPOJO;
@@ -566,6 +592,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	Mindmap mindmap = getMindmapDAO().getByContentId(toolContentId);
@@ -575,32 +602,39 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return getMindmapOutputFactory().getToolOutputDefinitions(mindmap, definitionType);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getMindmapByContentId(toolContentId).getTitle();
     }
-    
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getMindmapByContentId(toolContentId).isDefineLater();
     }
 
     /* IMindmapService Methods */
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long uid) {
 	return coreNotebookService.getEntry(uid);
     }
 
+    @Override
     public void updateEntry(Long uid, String entry) {
 	coreNotebookService.updateEntry(uid, "", entry);
     }
 
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -612,6 +646,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return toolContentId;
     }
 
+    @Override
     public Mindmap getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(MindmapConstants.TOOL_SIGNATURE);
 	Mindmap defaultContent = getMindmapByContentId(defaultContentID);
@@ -624,6 +659,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return defaultContent;
     }
 
+    @Override
     public Mindmap copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -640,6 +676,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return newContent;
     }
 
+    @Override
     public Mindmap getMindmapByContentId(Long toolContentID) {
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentID);
 	if (mindmap == null) {
@@ -648,6 +685,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmap;
     }
 
+    @Override
     public Mindmap getMindmapByUid(Long Uid) {
 	Mindmap mindmap = mindmapDAO.getMindmapByUid(Uid);
 	if (mindmap == null) {
@@ -656,6 +694,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmap;
     }
 
+    @Override
     public MindmapSession getSessionBySessionId(Long toolSessionId) {
 	MindmapSession mindmapSession = mindmapSessionDAO.getBySessionId(toolSessionId);
 	if (mindmapSession == null) {
@@ -664,6 +703,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmapSession;
     }
 
+    @Override
     public MindmapUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return mindmapUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
@@ -672,26 +712,32 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmapUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
+    @Override
     public MindmapUser getUserByUID(Long uid) {
 	return mindmapUserDAO.getByUID(uid);
     }
 
+    @Override
     public void saveOrUpdateMindmap(Mindmap mindmap) {
 	mindmapDAO.saveOrUpdate(mindmap);
     }
 
+    @Override
     public void saveOrUpdateMindmapRequest(MindmapRequest mindmapRequest) {
 	mindmapRequestDAO.saveOrUpdate(mindmapRequest);
     }
 
+    @Override
     public void saveOrUpdateMindmapSession(MindmapSession mindmapSession) {
 	mindmapSessionDAO.saveOrUpdate(mindmapSession);
     }
 
+    @Override
     public void saveOrUpdateMindmapUser(MindmapUser mindmapUser) {
 	mindmapUserDAO.saveOrUpdate(mindmapUser);
     }
 
+    @Override
     public MindmapUser createMindmapUser(UserDTO user, MindmapSession mindmapSession) {
 	MindmapUser mindmapUser = new MindmapUser(user, mindmapSession);
 	saveOrUpdateMindmapUser(mindmapUser);
@@ -711,6 +757,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     /**
      * Import the data for a 1.0.2 Mindmap
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	Mindmap mindmap = new Mindmap();
@@ -718,8 +765,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	mindmap.setCreateBy(new Long(user.getUserID().longValue()));
 	mindmap.setCreateDate(now);
 	mindmap.setDefineLater(Boolean.FALSE);
-	mindmap.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	mindmap.setInstructions(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	mindmap.setLockOnFinished(Boolean.TRUE);
 	mindmap.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	mindmap.setToolContentId(toolContentId);
@@ -731,11 +778,12 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
-	MindmapService.logger
-		.warn("Setting the reflective field on a mindmap. This doesn't make sense as the mindmap is for reflection and we don't reflect on reflection!");
+	MindmapService.logger.warn(
+		"Setting the reflective field on a mindmap. This doesn't make sense as the mindmap is for reflection and we don't reflect on reflection!");
 	Mindmap mindmap = getMindmapByContentId(toolContentId);
 	if (mindmap == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -820,6 +868,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	this.mindmapOutputFactory = mindmapOutputFactory;
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -832,62 +881,77 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmapNodeDAO;
     }
 
+    @Override
     public void saveOrUpdateMindmapNode(MindmapNode mindmapNode) {
 	mindmapNodeDAO.saveOrUpdate(mindmapNode);
     }
 
+    @Override
     public List getAuthorRootNodeByMindmapId(Long mindmapId) {
 	return mindmapNodeDAO.getAuthorRootNodeByMindmapId(mindmapId);
     }
 
+    @Override
     public List getAuthorRootNodeBySessionId(Long sessionId) {
 	return mindmapNodeDAO.getAuthorRootNodeBySessionId(sessionId);
     }
 
+    @Override
     public List getAuthorRootNodeByMindmapSession(Long mindmapId, Long toolSessionId) {
 	return mindmapNodeDAO.getAuthorRootNodeByMindmapSession(mindmapId, toolSessionId);
     }
 
+    @Override
     public List getRootNodeByMindmapIdAndUserId(Long mindmapId, Long userId) {
 	return mindmapNodeDAO.getRootNodeByMindmapIdAndUserId(mindmapId, userId);
     }
 
+    @Override
     public List getRootNodeByMindmapIdAndSessionId(Long mindmapId, Long sessionId) {
 	return mindmapNodeDAO.getRootNodeByMindmapIdAndUserId(mindmapId, sessionId);
     }
 
+    @Override
     public List getMindmapNodeByParentId(Long parentId, Long mindmapId) {
 	return mindmapNodeDAO.getMindmapNodeByParentId(parentId, mindmapId);
     }
 
+    @Override
     public List getMindmapNodeByParentIdMindmapIdSessionId(Long parentId, Long mindmapId, Long sessionId) {
 	return mindmapNodeDAO.getMindmapNodeByParentIdMindmapIdSessionId(parentId, mindmapId, sessionId);
     }
 
+    @Override
     public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId) {
 	return mindmapNodeDAO.getMindmapNodeByUniqueId(uniqueId, mindmapId);
     }
 
+    @Override
     public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
 	return mindmapNodeDAO.getMindmapNodeByUniqueIdSessionId(uniqueId, mindmapId, sessionId);
     }
 
+    @Override
     public List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId) {
 	return mindmapNodeDAO.getMindmapNodeByUniqueIdMindmapIdUserId(uniqueId, mindmapId, userId);
     }
 
+    @Override
     public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId, Long sessionId) {
 	mindmapNodeDAO.deleteNodeByUniqueMindmapUser(uniqueId, mindmapId, userId, sessionId);
     }
 
+    @Override
     public void deleteNodes(String nodesToDeleteCondition) {
 	mindmapNodeDAO.deleteNodes(nodesToDeleteCondition);
     }
 
+    @Override
     public String getNodesToDeleteCondition() {
 	return nodesToDeleteCondition;
     }
 
+    @Override
     public void setNodesToDeleteCondition(String nodesToDeleteCondition) {
 	this.nodesToDeleteCondition = nodesToDeleteCondition;
     }
@@ -900,42 +964,51 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmapRequestDAO;
     }
 
+    @Override
     public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
 	return mindmapRequestDAO.getLastRequestsAfterGlobalId(globalId, mindmapId, userId, sessionId);
     }
 
+    @Override
     public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId) {
 	return mindmapRequestDAO.getRequestByUniqueId(uniqueId, userId, mindmapId, globalId);
     }
 
+    @Override
     public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId) {
 	return mindmapRequestDAO.getLastGlobalIdByMindmapId(mindmapId, sessionId);
     }
 
+    @Override
     public Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId) {
 	return mindmapNodeDAO.getNodeLastUniqueIdByMindmapUidSessionId(mindmapUid, sessionId);
     }
 
+    @Override
     public void setMindmapMessageService(MessageService mindmapMessageService) {
 	this.mindmapMessageService = mindmapMessageService;
     }
 
+    @Override
     public MessageService getMindmapMessageService() {
 	return mindmapMessageService;
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getMindmapOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     // ****************** REST methods *************************
 
-    /** Used by the Rest calls to create content.  Creates default nodes as seen when first opening authoring.
-     * Mandatory fields in toolContentJSON: title, instructions
-     * Optional fields: multiUserMode (default false), lockWhenFinished (default false), reflectOnActivity (default false), reflectInstructions
+    /**
+     * Used by the Rest calls to create content. Creates default nodes as seen when first opening authoring. Mandatory
+     * fields in toolContentJSON: title, instructions Optional fields: multiUserMode (default false), lockWhenFinished
+     * (default false), reflectOnActivity (default false), reflectInstructions
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	Mindmap content = new Mindmap();
 	Date updateDate = new Date();
@@ -962,7 +1035,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	String rootNodeName = getMindmapMessageService().getMessage("node.root.defaultName");
 	String childNodeName1 = getMindmapMessageService().getMessage("node.child1.defaultName");
 	String childNodeName2 = getMindmapMessageService().getMessage("node.child2.defaultName");
-	    
+
 	MindmapNode rootMindmapNode = saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, content, null);
 	saveOrUpdateMindmapNode(rootMindmapNode);
 	saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, content, null);

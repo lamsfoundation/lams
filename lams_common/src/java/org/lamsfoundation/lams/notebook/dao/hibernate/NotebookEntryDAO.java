@@ -32,59 +32,73 @@ import org.lamsfoundation.lams.notebook.dao.INotebookEntryDAO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
 public class NotebookEntryDAO extends BaseDAO implements INotebookEntryDAO {
-	
-	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG = "from " + NotebookEntry.class.getName() 
-							+ " where external_id=? and external_id_type=? and external_signature=? and user_id=?"
-							+ " order by create_date desc";
-	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG_ALL = "from " + NotebookEntry.class.getName() 
-							+ " where external_id=? and external_id_type=? and external_signature=?"
-							+ " order by user_id asc, create_date desc";
-	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "from " + NotebookEntry.class.getName() 
-							+ " where external_id=? and external_id_type=? and user_id=?"
-							+ " order by create_date desc";
-	private static final String SQL_QUERY_FIND_ENTRY_BY_USER_ID = "from " + NotebookEntry.class.getName() 
-							+ " where user_id=?";
-	private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE = "from " + NotebookEntry.class.getName() 
-							+ " where user_id=? and external_id_type=?"
-							+ " order by external_signature desc, create_date desc";
-	
-	
-	public void saveOrUpdate(NotebookEntry notebookEntry) {
-		this.getHibernateTemplate().saveOrUpdate(notebookEntry);
-		this.getHibernateTemplate().flush();
-	}
 
-	public List<NotebookEntry> get(Long id, Integer idType, String signature, Integer userID) {
-		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG, new Object[]{id, idType, signature, userID}));
-	}
-	
-	public List<NotebookEntry> get(Long id, Integer idType, String signature) {
-		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG_ALL, new Object[]{id, idType, signature}));
-	}
-	
-	public List<NotebookEntry> get(Long id, Integer idType, Integer userID) {
-		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID, new Object[]{id, idType, userID}));
-	}
+    private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG = "from " + NotebookEntry.class.getName()
+	    + " where external_id=? and external_id_type=? and external_signature=? and user_id=?"
+	    + " order by create_date desc";
+    private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG_ALL = "from " + NotebookEntry.class.getName()
+	    + " where external_id=? and external_id_type=? and external_signature=?"
+	    + " order by user_id asc, create_date desc";
+    private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID = "from " + NotebookEntry.class.getName()
+	    + " where external_id=? and external_id_type=? and user_id=?" + " order by create_date desc";
+    private static final String SQL_QUERY_FIND_ENTRY_BY_USER_ID = "from " + NotebookEntry.class.getName()
+	    + " where user_id=?";
+    private static final String SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE = "from " + NotebookEntry.class.getName()
+	    + " where user_id=? and external_id_type=?" + " order by external_signature desc, create_date desc";
 
-	public NotebookEntry get(Long uid) {
-		if (uid != null) {
-			Object o = getHibernateTemplate().get(NotebookEntry.class, uid);
-			return (NotebookEntry)o;
-		} else {
-			return null;
-		}
-	}
+    @Override
+    public void saveOrUpdate(NotebookEntry notebookEntry) {
+	this.getHibernateTemplate().saveOrUpdate(notebookEntry);
+	this.getHibernateTemplate().flush();
+    }
 
-	public List<NotebookEntry> get(Integer userID) {
-		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_USER_ID, userID));
-	}
+    @Override
+    public List<NotebookEntry> get(Long id, Integer idType, String signature, Integer userID) {
+	return (getHibernateTemplate().find(NotebookEntryDAO.SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG,
+		new Object[] { id, idType, signature, userID }));
+    }
 
-	public List<NotebookEntry> get(Integer userID, Integer idType) {
-		return (List<NotebookEntry>)(getHibernateTemplate().find(SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE, new Object[]{userID, idType}));
+    @Override
+    public List<NotebookEntry> get(Long id, Integer idType, String signature) {
+	return (getHibernateTemplate().find(NotebookEntryDAO.SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_SIG_ALL,
+		new Object[] { id, idType, signature }));
+    }
+
+    @Override
+    public List<NotebookEntry> get(Long id, Integer idType, Integer userID) {
+	return (getHibernateTemplate().find(NotebookEntryDAO.SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID,
+		new Object[] { id, idType, userID }));
+    }
+
+    @Override
+    public NotebookEntry get(Long uid) {
+	if (uid != null) {
+	    Object o = getHibernateTemplate().get(NotebookEntry.class, uid);
+	    return (NotebookEntry) o;
+	} else {
+	    return null;
 	}
-	
-	public List<NotebookEntry> get(Integer userID, Long lessonID) {
-		// TODO need to write hql query for lessionID and userID
-		return null;
-	}
+    }
+
+    @Override
+    public List<NotebookEntry> get(Integer userID) {
+	return (getHibernateTemplate().find(NotebookEntryDAO.SQL_QUERY_FIND_ENTRY_BY_USER_ID, userID));
+    }
+
+    @Override
+    public List<NotebookEntry> get(Integer userID, Integer idType) {
+	return (getHibernateTemplate().find(NotebookEntryDAO.SQL_QUERY_FIND_ENTRY_BY_EXTERNAL_ID_TYPE,
+		new Object[] { userID, idType }));
+    }
+
+    @Override
+    public List<NotebookEntry> get(Integer userID, Long lessonID) {
+	// TODO need to write hql query for lessionID and userID
+	return null;
+    }
+    
+    @Override
+    public void delete(NotebookEntry notebookEntry) {
+	this.getHibernateTemplate().delete(notebookEntry);
+    }
 }

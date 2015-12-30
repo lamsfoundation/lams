@@ -40,17 +40,13 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -91,7 +87,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler;
 import org.lamsfoundation.lams.tool.commonCartridge.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -109,8 +104,8 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * @author Andrey Balan
  * 
  */
-public class CommonCartridgeServiceImpl implements ICommonCartridgeService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+public class CommonCartridgeServiceImpl
+	implements ICommonCartridgeService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
     static Logger log = Logger.getLogger(CommonCartridgeServiceImpl.class.getName());
 
     private CommonCartridgeDAO commonCartridgeDao;
@@ -136,7 +131,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     private ILamsToolService toolService;
 
     private ILearnerService learnerService;
-    
+
     private IAuditService auditService;
 
     private IUserManagementService userManagementService;
@@ -149,6 +144,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     private ILessonService lessonService;
 
+    @Override
     public IVersionedNode getFileNode(Long itemUid, String relPathString) throws CommonCartridgeApplicationException {
 	CommonCartridgeItem item = (CommonCartridgeItem) commonCartridgeItemDao.getObject(CommonCartridgeItem.class,
 		itemUid);
@@ -227,11 +223,13 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public CommonCartridge getCommonCartridgeByContentId(Long contentId) {
 	CommonCartridge rs = commonCartridgeDao.getByContentId(contentId);
 	return rs;
     }
 
+    @Override
     public CommonCartridge getDefaultContent(Long contentId) throws CommonCartridgeApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -246,36 +244,42 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return content;
     }
 
+    @Override
     public List getAuthoredItems(Long commonCartridgeUid) {
 	return commonCartridgeItemDao.getAuthoringItems(commonCartridgeUid);
     }
 
+    @Override
     public void createUser(CommonCartridgeUser commonCartridgeUser) {
 	commonCartridgeUserDao.saveObject(commonCartridgeUser);
     }
 
+    @Override
     public CommonCartridgeUser getUserByIDAndContent(Long userId, Long contentId) {
 
 	return commonCartridgeUserDao.getUserByUserIDAndContentID(userId, contentId);
 
     }
 
+    @Override
     public CommonCartridgeUser getUserByIDAndSession(Long userId, Long sessionId) {
 
 	return commonCartridgeUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 
     }
 
+    @Override
     public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws CommonCartridgeApplicationException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
 	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
 	} catch (Exception e) {
-	    throw new CommonCartridgeApplicationException("Exception occured while deleting files from"
-		    + " the repository " + e.getMessage());
+	    throw new CommonCartridgeApplicationException(
+		    "Exception occured while deleting files from" + " the repository " + e.getMessage());
 	}
     }
 
+    @Override
     public void saveOrUpdateCommonCartridge(CommonCartridge commonCartridge) {
 	commonCartridgeDao.saveObject(commonCartridge);
     }
@@ -284,10 +288,12 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	commonCartridgeItemDao.saveObject(item);
     }
 
+    @Override
     public void deleteCommonCartridgeItem(Long uid) {
 	commonCartridgeItemDao.removeObject(CommonCartridgeItem.class, uid);
     }
 
+    @Override
     public List<CommonCartridgeItem> getCommonCartridgeItemsBySessionId(Long sessionId) {
 	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -305,6 +311,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return items;
     }
 
+    @Override
     public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
 	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -342,6 +349,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return itemList;
     }
 
+    @Override
     public List<List<Summary>> exportByContentId(Long contentId) {
 	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(contentId);
 	List<List<Summary>> groupList = new ArrayList();
@@ -379,6 +387,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return groupList;
     }
 
+    @Override
     public CommonCartridge getCommonCartridgeBySessionId(Long sessionId) {
 	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -386,19 +395,22 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	CommonCartridge res = commonCartridgeDao.getByContentId(contentId);
 	int miniView = res.getMiniViewCommonCartridgeNumber();
 	// construct dto fields;
-	res.setMiniViewNumberStr(messageService.getMessage("label.learning.minimum.review", new Object[] { new Integer(
-		miniView) }));
+	res.setMiniViewNumberStr(
+		messageService.getMessage("label.learning.minimum.review", new Object[] { new Integer(miniView) }));
 	return res;
     }
 
+    @Override
     public CommonCartridgeSession getCommonCartridgeSessionBySessionId(Long sessionId) {
 	return commonCartridgeSessionDao.getSessionBySessionId(sessionId);
     }
 
+    @Override
     public void saveOrUpdateCommonCartridgeSession(CommonCartridgeSession resSession) {
 	commonCartridgeSessionDao.saveObject(resSession);
     }
 
+    @Override
     public void retrieveComplete(SortedSet<CommonCartridgeItem> commonCartridgeItemList, CommonCartridgeUser user) {
 	for (CommonCartridgeItem item : commonCartridgeItemList) {
 	    CommonCartridgeItemVisitLog log = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(item.getUid(),
@@ -411,6 +423,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public void setItemComplete(Long commonCartridgeItemUid, Long userId, Long sessionId) {
 	CommonCartridgeItemVisitLog log = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(commonCartridgeItemUid,
 		userId);
@@ -427,6 +440,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	commonCartridgeItemVisitDao.saveObject(log);
     }
 
+    @Override
     public void setItemAccess(Long commonCartridgeItemUid, Long userId, Long sessionId) {
 	CommonCartridgeItemVisitLog log = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(commonCartridgeItemUid,
 		userId);
@@ -443,6 +457,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws CommonCartridgeApplicationException {
 	CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -463,6 +478,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return nextUrl;
     }
 
+    @Override
     public int checkMiniView(Long toolSessionId, Long userUid) {
 	int miniView = commonCartridgeItemVisitDao.getUserViewLogCount(toolSessionId, userUid);
 	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(toolSessionId);
@@ -475,10 +491,12 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return reqView - miniView;
     }
 
+    @Override
     public CommonCartridgeItem getCommonCartridgeItemByUid(Long itemUid) {
 	return commonCartridgeItemDao.getByUid(itemUid);
     }
 
+    @Override
     public List<List<Summary>> getSummary(Long contentId) {
 	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
 	List<Summary> group = new ArrayList<Summary>();
@@ -528,6 +546,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     }
 
+    @Override
     public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
 	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
@@ -558,9 +577,10 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return map;
     }
 
+    @Override
     public List<CommonCartridgeUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
-	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao.getCommonCartridgeItemLogBySession(
-		sessionId, itemUid);
+	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao
+		.getCommonCartridgeItemLogBySession(sessionId, itemUid);
 	List<CommonCartridgeUser> userList = new ArrayList(logList.size());
 	for (CommonCartridgeItemVisitLog visit : logList) {
 	    CommonCartridgeUser user = visit.getUser();
@@ -570,6 +590,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return userList;
     }
 
+    @Override
     public void setItemVisible(Long itemUid, boolean visible) {
 	CommonCartridgeItem item = commonCartridgeItemDao.getByUid(itemUid);
 	if (item != null) {
@@ -590,15 +611,17 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -608,10 +631,12 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     /**
      * @param notebookEntry
      */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public CommonCartridgeUser getUser(Long uid) {
 	return (CommonCartridgeUser) commonCartridgeUserDao.getObject(CommonCartridgeUser.class, uid);
     }
@@ -642,6 +667,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	return contentId;
     }
 
+    @Override
     public List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file)
 	    throws UploadCommonCartridgeFileException {
 	try {
@@ -655,43 +681,45 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    item.setInitialItem(initFile);
 	    item.setImsSchema(cpConverter.getSchema());
 	    item.setOrganizationXml(cpConverter.getOrganzationXML());
-//	    // upload package
-//	    NodeKey nodeKey = processPackage(packageDirectory, initFile);
-//	    item.setFileUuid(nodeKey.getUuid());
-//	    item.setFileVersionId(nodeKey.getVersion());
-//	    item.setFileType(fileType);
-//	    item.setFileName(fileName);
+	    // // upload package
+	    // NodeKey nodeKey = processPackage(packageDirectory, initFile);
+	    // item.setFileUuid(nodeKey.getUuid());
+	    // item.setFileVersionId(nodeKey.getVersion());
+	    // item.setFileType(fileType);
+	    // item.setFileName(fileName);
 
 	    List<CommonCartridgeItem> items = cpConverter.getBasicLTIItems();
 	    return items;
 
 	} catch (ZipFileUtilException e) {
-	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.zip.file.exception") + " : "
-		    + e.toString());
+	    CommonCartridgeServiceImpl.log
+		    .error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.zip.file.exception"));
 	} catch (FileNotFoundException e) {
-	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":"
-		    + e.toString());
+	    CommonCartridgeServiceImpl.log
+		    .error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.file.not.found"));
 	} catch (IOException e) {
-	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":"
-		    + e.toString());
+	    CommonCartridgeServiceImpl.log
+		    .error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.io.exception"));
 	} catch (IMSManifestException e) {
-	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.ims.package") + ":"
-		    + e.toString());
+	    CommonCartridgeServiceImpl.log
+		    .error(messageService.getMessage("error.msg.ims.package") + ":" + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.ims.package"));
 	} catch (ImscpApplicationException e) {
-	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.ims.application") + ":"
-		    + e.toString());
+	    CommonCartridgeServiceImpl.log
+		    .error(messageService.getMessage("error.msg.ims.application") + ":" + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.ims.application"));
 	}
     }
 
+    @Override
     public CommonCartridgeConfigItem getConfigItem(String key) {
 	return commonCartridgeConfigItemDao.getConfigItemByKey(key);
     }
 
+    @Override
     public void saveOrUpdateConfigItem(CommonCartridgeConfigItem item) {
 	commonCartridgeConfigItemDao.saveOrUpdate(item);
     }
@@ -727,7 +755,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	this.commonCartridgeSessionDao = commonCartridgeSessionDao;
     }
 
-    public void setCommonCartridgeToolContentHandler(CommonCartridgeToolContentHandler commonCartridgeToolContentHandler) {
+    public void setCommonCartridgeToolContentHandler(
+	    CommonCartridgeToolContentHandler commonCartridgeToolContentHandler) {
 	this.commonCartridgeToolContentHandler = commonCartridgeToolContentHandler;
     }
 
@@ -759,6 +788,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     // ToolContentManager, ToolSessionManager methods
     // *******************************************************************************
 
+    @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	CommonCartridge toolContentObj = commonCartridgeDao.getByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -785,18 +815,19 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(CommonCartridgeImportContentVersionFilter.class);
-	    
+
 	    exportContentService.registerFileClassForImport(CommonCartridgeItem.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, "initialItem");
 
-	    Object toolPOJO = exportContentService.importToolContent(toolContentPath,
-		    commonCartridgeToolContentHandler, fromVersion, toVersion);
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, commonCartridgeToolContentHandler,
+		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof CommonCartridge)) {
 		throw new ImportToolContentException(
 			"Import Share commonCartridge tool content failed. Deserialized object is " + toolPOJO);
@@ -805,8 +836,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndContentID(
-		    new Long(newUserUid.longValue()), toolContentId);
+	    CommonCartridgeUser user = commonCartridgeUserDao
+		    .getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
 	    if (user == null) {
 		user = new CommonCartridgeUser();
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
@@ -829,10 +860,11 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }
-    
+
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
@@ -841,11 +873,13 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
+    @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
 	    throw new ToolException("Failed to create the SharedCommonCartridgeFiles tool seession");
@@ -877,10 +911,11 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getCommonCartridgeByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
@@ -889,37 +924,44 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
 	commonCartridge.setDefineLater(false);
     }
-    
+
     @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getCommonCartridgeByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = commonCartridgeSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		CommonCartridgeSession session = (CommonCartridgeSession) iter.next();
-		commonCartridgeSessionDao.delete(session);
+	if (commonCartridge == null) {
+	    CommonCartridgeServiceImpl.log
+		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (CommonCartridgeSession session : commonCartridgeSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, CommonCartridgeConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	commonCartridgeDao.delete(commonCartridge);
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Common Cartridge content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (CommonCartridgeServiceImpl.log.isDebugEnabled()) {
+	    CommonCartridgeServiceImpl.log.debug(
+		    "Removing Common Cartridge content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	CommonCartridge cartridge = commonCartridgeDao.getByContentId(toolContentId);
 	if (cartridge == null) {
-	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    CommonCartridgeServiceImpl.log
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -937,8 +979,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 		    try {
 			commonCartridgeToolContentHandler.deleteFile(item.getFileUuid());
 		    } catch (Exception e) {
-			throw new ToolException(
-				"Error while removing Common Cartridge file UUID " + item.getFileUuid(), e);
+			throw new ToolException("Error while removing Common Cartridge file UUID " + item.getFileUuid(),
+				e);
 		    }
 		}
 		commonCartridgeItemDao.removeObject(CommonCartridgeItem.class, item.getUid());
@@ -998,13 +1040,14 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -1022,10 +1065,10 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -1033,6 +1076,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
     }
 
@@ -1044,7 +1088,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
 	// the description column in 1.0.2 was longer than 255 chars, so truncate.
 	String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-	if (instructionText != null && instructionText.length() > 255) {
+	if ((instructionText != null) && (instructionText.length() > 255)) {
 	    if (CommonCartridgeServiceImpl.log.isDebugEnabled()) {
 		CommonCartridgeServiceImpl.log
 			.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
@@ -1061,8 +1105,9 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	CommonCartridge toolContentObj = getCommonCartridgeByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -1100,6 +1145,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	this.coreNotebookService = coreNotebookService;
     }
 
+    @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -1108,6 +1154,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	this.eventNotificationService = eventNotificationService;
     }
 
+    @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
@@ -1127,6 +1174,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
      *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
+    @Override
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }

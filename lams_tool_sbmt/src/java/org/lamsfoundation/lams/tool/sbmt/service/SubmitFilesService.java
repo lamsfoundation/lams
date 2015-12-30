@@ -79,7 +79,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -148,11 +147,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     private class FileDtoComparator implements Comparator<FileDetailsDTO> {
 
+	@Override
 	public int compare(FileDetailsDTO o1, FileDetailsDTO o2) {
-	    if (o1 != null && o2 != null && o1.getDateOfSubmission() != null && o2.getDateOfSubmission() != null) {
+	    if ((o1 != null) && (o2 != null) && (o1.getDateOfSubmission() != null)
+		    && (o2.getDateOfSubmission() != null)) {
 		// don't use Date.comparaTo() directly, because the date could be Timestamp or Date (depeneds the object
 		// is persist or not)
-		return o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime() > 0 ? 1 : -1;
+		return (o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime()) > 0 ? 1 : -1;
 	    } else if (o1 != null) {
 		return 1;
 	    } else {
@@ -162,21 +163,24 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     }
 
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
 	}
     }
 
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
@@ -198,7 +202,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
 	submitFilesContentDAO.saveOrUpdate(toContent);
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
@@ -210,28 +214,29 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
-	if (submitFilesContent != null) {
-	    // if session data exist and removeSessionData=false, throw an exception
-	    List submissionData = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
-	    if (!(submissionData == null || submissionData.isEmpty()) && !removeSessionData) {
-		throw new SessionDataExistsException(
-			"Delete failed: There is session data that belongs to this tool content id");
-	    } else if (submissionData != null) {
-		Iterator iter = submissionData.iterator();
-		while (iter.hasNext()) {
-		    SubmitFilesSession element = (SubmitFilesSession) iter.next();
-		    removeToolSession(element);
-		}
-	    }
-	    submitFilesContentDAO.delete(submitFilesContent);
+	if (submitFilesContent == null) {
+	    SubmitFilesService.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
 	}
+
+	for (SubmitFilesSession session : submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionID(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, SbmtConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	submitFilesContentDAO.delete(submitFilesContent);
     }
-    
+
+    @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Submit Files content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (SubmitFilesService.log.isDebugEnabled()) {
+	    SubmitFilesService.log.debug(
+		    "Removing Submit Files content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	List<SubmitFilesSession> sessions = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
@@ -255,6 +260,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
+    @Override
     public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID) {
 	return submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentID);
     }
@@ -264,6 +270,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * 
      * @throws ExportToolContentException
      */
+    @Override
     public void exportToolContent(Long toolContentId, String toPath) throws ToolException, DataMissingException {
 	SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
 	if (toolContentObj == null) {
@@ -282,18 +289,19 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
+    @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(SubmitFilesImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, sbmtToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof SubmitFilesContent)) {
-		throw new ImportToolContentException("Import Submit tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import Submit tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    SubmitFilesContent toolContentObj = (SubmitFilesContent) toolPOJO;
 
@@ -330,6 +338,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
+    @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
 	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
@@ -338,15 +347,17 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
 	return getSubmitFilesOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
-    
+
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getSubmitFilesContent(toolContentId).getTitle();
     }
-   
+
+    @Override
     public boolean isContentEdited(Long toolContentId) {
 	return getSubmitFilesContent(toolContentId).isDefineLater();
     }
-    
+
     @Override
     public void saveOrUpdateContent(SubmitFilesContent submitFilesContent) {
 	submitFilesContent.setUpdated(new Date());
@@ -401,24 +412,24 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	try {
 	    repositoryService.deleteVersion(ticket, uuid, versionID);
 	} catch (Exception e) {
-	    throw new SubmitFilesException("Exception occured while deleting files from" + " the repository "
-		    + e.getMessage());
+	    throw new SubmitFilesException(
+		    "Exception occured while deleting files from" + " the repository " + e.getMessage());
 	}
     }
 
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) {
 	// pre-condition validation
-	if (toolSessionId == null || toolContentId == null) {
-	    throw new SubmitFilesException("Fail to create a submission session"
-		    + " based on null toolSessionId or toolContentId");
+	if ((toolSessionId == null) || (toolContentId == null)) {
+	    throw new SubmitFilesException(
+		    "Fail to create a submission session" + " based on null toolSessionId or toolContentId");
 	}
 
 	SubmitFilesService.log.debug("Start to create submission session based on toolSessionId["
 		+ toolSessionId.longValue() + "] and toolContentId[" + toolContentId.longValue() + "]");
 	try {
 	    SubmitFilesContent submitContent = getSubmitFilesContent(toolContentId);
-	    if (submitContent == null || !toolContentId.equals(submitContent.getContentID())) {
+	    if ((submitContent == null) || !toolContentId.equals(submitContent.getContentID())) {
 		submitContent = new SubmitFilesContent();
 		submitContent.setContentID(toolContentId);
 	    }
@@ -431,8 +442,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    submitFilesSessionDAO.createSession(submitSession);
 	    SubmitFilesService.log.debug("Submit File session created");
 	} catch (DataAccessException e) {
-	    throw new SubmitFilesException("Exception occured when lams is creating" + " a submission Session: "
-		    + e.getMessage(), e);
+	    throw new SubmitFilesException(
+		    "Exception occured when lams is creating" + " a submission Session: " + e.getMessage(), e);
 	}
 
     }
@@ -509,17 +520,17 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getSubmitFilesOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     @Override
     public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
 
-	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
 	    throw new SubmitFilesException("Could not find upload file: " + uploadFile);
 	}
 
@@ -562,22 +573,22 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      */
     private NodeKey processFile(FormFile file) {
 	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
 		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
-		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
-			+ e.getMessage());
+		throw new SubmitFilesException(
+			"FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    } catch (FileNotFoundException e) {
-		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
-			+ e.getMessage());
+		throw new SubmitFilesException(
+			"FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    } catch (RepositoryCheckedException e) {
-		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
-			+ e.getMessage());
+		throw new SubmitFilesException(
+			"FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    } catch (IOException e) {
-		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
-			+ e.getMessage());
+		throw new SubmitFilesException(
+			"FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    }
 	}
 	return node;
@@ -589,6 +600,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long,
      *      java.lang.Long)
      */
+    @Override
     public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale) {
 	List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
 	SortedSet details = new TreeSet(this.new FileDtoComparator());
@@ -608,6 +620,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * This method save SubmissionDetails list into a map container: key is user id, value is a list container, which
      * contains all <code>FileDetailsDTO</code> object belong to this user.
      */
+    @Override
     public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale) {
 	List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
 	if (list != null) {
@@ -619,8 +632,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 		SubmissionDetails submissionDetails = (SubmissionDetails) iterator.next();
 		SubmitUser learner = submissionDetails.getLearner();
 		if (learner == null) {
-		    SubmitFilesService.log.error("Could not find learer for special submission item:"
-			    + submissionDetails);
+		    SubmitFilesService.log
+			    .error("Could not find learer for special submission item:" + submissionDetails);
 		    return null;
 		}
 		SubmitUserDTO submitUserDTO = new SubmitUserDTO(learner);
@@ -640,6 +653,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
+    @Override
     public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale) {
 	SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
 	return new FileDetailsDTO(details, currentLocale != null ? NumberFormat.getInstance(currentLocale) : null);
@@ -650,10 +664,12 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * 
      * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsersBySession(java.lang.Long)
      */
+    @Override
     public List<SubmitUser> getUsersBySession(Long sessionID) {
 	return submitUserDAO.getUsersBySession(sessionID);
     }
 
+    @Override
     public void updateMarks(Long reportID, Float marks, String comments, FormFile markFile)
 	    throws InvalidParameterException, RepositoryCheckedException {
 
@@ -664,7 +680,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    report.setMarks(marks);
 
 	    // If there is a new file, delete the existing and add the mark file
-	    if (markFile != null && !StringUtils.isEmpty(markFile.getFileName())) {
+	    if ((markFile != null) && !StringUtils.isEmpty(markFile.getFileName())) {
 
 		// Delete the existing
 		if (report.getMarkFileUUID() != null) {
@@ -689,6 +705,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     }
 
+    @Override
     public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID) {
 	SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
 	if (report != null) {
@@ -700,26 +717,29 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
     }
 
+    @Override
     public IVersionedNode downloadFile(Long uuid, Long versionID) throws SubmitFilesException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
 	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
 	    return node;
 	} catch (AccessDeniedException ae) {
-	    throw new SubmitFilesException("AccessDeniedException occured while trying to download file "
-		    + ae.getMessage());
+	    throw new SubmitFilesException(
+		    "AccessDeniedException occured while trying to download file " + ae.getMessage());
 	} catch (FileException fe) {
 	    throw new SubmitFilesException("FileException occured while trying to download file " + fe.getMessage());
 	} catch (ItemNotFoundException ie) {
-	    throw new SubmitFilesException("ItemNotFoundException occured while trying to download file "
-		    + ie.getMessage());
+	    throw new SubmitFilesException(
+		    "ItemNotFoundException occured while trying to download file " + ie.getMessage());
 	}
     }
 
+    @Override
     public SubmitFilesSession getSessionById(Long sessionID) {
 	return submitFilesSessionDAO.getSessionByID(sessionID);
     }
 
+    @Override
     public boolean releaseMarksForSession(Long sessionID) {
 	List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
 	Iterator iter = list.iterator();
@@ -779,6 +799,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return true;
     }
 
+    @Override
     public void finishSubmission(Long sessionID, Integer userID) {
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
 	learner.setFinished(true);
@@ -794,8 +815,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     @SuppressWarnings("unchecked")
     public void sendMarksToGradebook(SubmitUser user, Long toolSessionID) {
 	submissionDetailsDAO.getSubmissionDetailsBySession(toolSessionID);
-	List<SubmissionDetails> detailsList = submissionDetailsDAO.getBySessionAndLearner(toolSessionID, user
-		.getUserID());
+	List<SubmissionDetails> detailsList = submissionDetailsDAO.getBySessionAndLearner(toolSessionID,
+		user.getUserID());
 	if (detailsList != null) {
 	    Float totalMark = null;
 	    for (SubmissionDetails details : detailsList) {
@@ -821,6 +842,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * 
      * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
      */
+    @Override
     public Long getToolDefaultContentIdBySignature(String toolSignature) {
 	Long contentId = null;
 	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -837,6 +859,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * 
      * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#createDefaultContent(java.lang.Long)
      */
+    @Override
     public SubmitFilesContent createDefaultContent(Long contentID) {
 	if (contentID == null) {
 	    String error = "Could not retrieve default content id for this tool";
@@ -864,6 +887,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return defaultContent;
     }
 
+    @Override
     public List getSubmitFilesSessionByContentID(Long contentID) {
 	List learners = submitFilesSessionDAO.getSubmitFilesSessionByContentID(contentID);
 	if (learners == null) {
@@ -871,7 +895,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
 	return learners;
     }
-    
+
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -881,6 +906,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
+    @Override
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
 	Date now = new Date();
 	SubmitFilesContent toolContentObj = new SubmitFilesContent();
@@ -890,8 +916,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	toolContentObj.setContentInUse(Boolean.FALSE);
 	toolContentObj.setCreated(now);
 	toolContentObj.setDefineLater(Boolean.FALSE);
-	toolContentObj.setInstruction(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	toolContentObj.setInstruction(
+		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	toolContentObj.setUpdated(now);
 	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
 	toolContentObj.setLockOnFinished(Boolean.TRUE);
@@ -910,8 +936,9 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * Set the description, throws away the title value as this is not supported in 2.0
      */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	SubmitFilesContent toolContentObj = getSubmitFilesContent(toolContentId);
 	if (toolContentObj == null) {
@@ -923,11 +950,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	toolContentObj.setReflectInstructions(description);
     }
 
+    @Override
     public SubmitUser getUserByUid(Long learnerID) {
 	return (SubmitUser) submitUserDAO.find(SubmitUser.class, learnerID);
 
     }
 
+    @Override
     public SubmitUser createSessionUser(UserDTO userDto, Long sessionID) {
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userDto.getUserID());
 	if (learner != null) {
@@ -946,11 +975,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return learner;
     }
 
+    @Override
     public SubmitUser getSessionUser(Long sessionID, Integer userID) {
 	return submitUserDAO.getLearner(sessionID, userID);
     }
 
-    public SubmitUser createContentUser(Integer userId, String firstName, String lastName, String loginName, Long contentId) {
+    public SubmitUser createContentUser(Integer userId, String firstName, String lastName, String loginName,
+	    Long contentId) {
 	SubmitUser author = submitUserDAO.getContentUser(contentId, userId);
 	if (author != null) {
 	    return author;
@@ -968,6 +999,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     }
 
+    @Override
     public SubmitUser createContentUser(UserDTO userDto, Long contentId) {
 	SubmitUser learner = submitUserDAO.getContentUser(contentId, userDto.getUserID());
 	if (learner != null) {
@@ -986,6 +1018,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     }
 
+    @Override
     public SubmitUser getContentUser(Long contentId, Integer userID) {
 	return submitUserDAO.getContentUser(contentId, userID);
     }
@@ -996,7 +1029,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submitFilesContentDAO
-     *                The submitFilesContentDAO to set.
+     *            The submitFilesContentDAO to set.
      */
     public void setSubmitFilesContentDAO(ISubmitFilesContentDAO submitFilesContentDAO) {
 	this.submitFilesContentDAO = submitFilesContentDAO;
@@ -1004,7 +1037,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submitFilesReportDAO
-     *                The submitFilesReportDAO to set.
+     *            The submitFilesReportDAO to set.
      */
     public void setSubmitFilesReportDAO(ISubmitFilesReportDAO submitFilesReportDAO) {
 	this.submitFilesReportDAO = submitFilesReportDAO;
@@ -1012,7 +1045,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submitFilesSessionDAO
-     *                The submitFilesSessionDAO to set.
+     *            The submitFilesSessionDAO to set.
      */
     public void setSubmitFilesSessionDAO(ISubmitFilesSessionDAO submitFilesSessionDAO) {
 	this.submitFilesSessionDAO = submitFilesSessionDAO;
@@ -1020,7 +1053,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submissionDetailsDAO
-     *                The submissionDetailsDAO to set.
+     *            The submissionDetailsDAO to set.
      */
     public void setSubmissionDetailsDAO(ISubmissionDetailsDAO submissionDetailsDAO) {
 	this.submissionDetailsDAO = submissionDetailsDAO;
@@ -1035,7 +1068,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param sbmtToolContentHandler
-     *                The sbmtToolContentHandler to set.
+     *            The sbmtToolContentHandler to set.
      */
     public void setSbmtToolContentHandler(IToolContentHandler sbmtToolContentHandler) {
 	this.sbmtToolContentHandler = sbmtToolContentHandler;
@@ -1050,7 +1083,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param learnerDAO
-     *                The learnerDAO to set.
+     *            The learnerDAO to set.
      */
     public void setSubmitUserDAO(ISubmitUserDAO learnerDAO) {
 	submitUserDAO = learnerDAO;
@@ -1100,6 +1133,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	this.userManagementService = userManagementService;
     }
 
+    @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -1108,6 +1142,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	this.eventNotificationService = eventNotificationService;
     }
 
+    @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
@@ -1120,6 +1155,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	this.gradebookService = gradebookService;
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getSubmitFilesOutputFactory().getSupportedDefinitionClasses(definitionType);
 
@@ -1132,14 +1168,15 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     public void setSubmitFilesOutputFactory(SubmitFilesOutputFactory submitFilesOutputFactory) {
 	this.submitFilesOutputFactory = submitFilesOutputFactory;
     }
-    
+
     // ****************** REST methods *************************
 
-    /** Used by the Rest calls to create content. 
-     * Mandatory fields in toolContentJSON: title, instructions
+    /**
+     * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions
      */
     @Override
-    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON) throws JSONException {
+    public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
+	    throws JSONException {
 
 	SubmitFilesContent content = new SubmitFilesContent();
 	Date updateDate = new Date();
@@ -1149,11 +1186,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	content.setContentID(toolContentID);
 	content.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	content.setInstruction(toolContentJSON.getString(RestTags.INSTRUCTIONS));
-	
+
 	content.setContentInUse(false);
 	content.setDefineLater(false);
-	content.setNotifyTeachersOnFileSubmit(JsonUtil.opt(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
-	content.setNotifyLearnersOnMarkRelease(JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
+	content.setNotifyTeachersOnFileSubmit(
+		JsonUtil.opt(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
+	content.setNotifyLearnersOnMarkRelease(
+		JsonUtil.opt(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
 	content.setReflectInstructions((String) JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, null));
 	content.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
@@ -1163,7 +1202,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
 	SubmitUser user = getContentUser(toolContentID, userID);
 	if (user == null) {
-	    user = createContentUser(userID, toolContentJSON.getString("firstName"), toolContentJSON.getString("lastName"),toolContentJSON.getString("loginName"), toolContentID);
+	    user = createContentUser(userID, toolContentJSON.getString("firstName"),
+		    toolContentJSON.getString("lastName"), toolContentJSON.getString("loginName"), toolContentID);
 	}
 	content.setCreatedBy(user);
 	saveOrUpdateContent(content);

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +49,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
@@ -79,8 +77,8 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Andrey Balan
  * 
  */
-public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager {
+public class SpreadsheetServiceImpl
+	implements ISpreadsheetService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
     private static Logger log = Logger.getLogger(SpreadsheetServiceImpl.class.getName());
     private SpreadsheetDAO spreadsheetDao;
     private SpreadsheetUserDAO spreadsheetUserDao;
@@ -101,11 +99,13 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     // Service method
     // *******************************************************************************
 
+    @Override
     public Spreadsheet getSpreadsheetByContentId(Long contentId) {
 	Spreadsheet rs = spreadsheetDao.getByContentId(contentId);
 	return rs;
     }
 
+    @Override
     public Spreadsheet getDefaultContent(Long contentId) throws SpreadsheetApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -120,31 +120,38 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return content;
     }
 
+    @Override
     public void saveOrUpdateUser(SpreadsheetUser spreadsheetUser) {
 	spreadsheetUserDao.saveObject(spreadsheetUser);
     }
 
+    @Override
     public void saveOrUpdateUserModifiedSpreadsheet(UserModifiedSpreadsheet userModifiedSpreadsheet) {
 	userModifiedSpreadsheetDao.saveObject(userModifiedSpreadsheet);
     }
 
+    @Override
     public SpreadsheetUser getUserByIDAndContent(Long userId, Long contentId) {
 	return spreadsheetUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
+    @Override
     public SpreadsheetUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return spreadsheetUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
+    @Override
     public List<SpreadsheetUser> getUserListBySessionId(Long sessionId) {
 	List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(sessionId);
 	return userList;
     }
 
+    @Override
     public void saveOrUpdateSpreadsheet(Spreadsheet spreadsheet) {
 	spreadsheetDao.saveObject(spreadsheet);
     }
 
+    @Override
     public List<Summary> exportForLearner(Long sessionId, SpreadsheetUser learner) {
 	SpreadsheetSession session = spreadsheetSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -205,6 +212,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	// return itemList;
     }
 
+    @Override
     public List<Summary> exportForTeacher(Long contentId) {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(contentId);
 	List<Summary> summaryList = new ArrayList<Summary>();
@@ -238,6 +246,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return summaryList;
     }
 
+    @Override
     public Spreadsheet getSpreadsheetBySessionId(Long sessionId) {
 	SpreadsheetSession session = spreadsheetSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -246,14 +255,17 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return res;
     }
 
+    @Override
     public SpreadsheetSession getSessionBySessionId(Long sessionId) {
 	return spreadsheetSessionDao.getSessionBySessionId(sessionId);
     }
 
+    @Override
     public void saveOrUpdateSpreadsheetSession(SpreadsheetSession resSession) {
 	spreadsheetSessionDao.saveObject(resSession);
     }
 
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws SpreadsheetApplicationException {
 	SpreadsheetUser user = spreadsheetUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -274,6 +286,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return nextUrl;
     }
 
+    @Override
     public List<Summary> getSummary(Long contentId) {
 
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(contentId);
@@ -293,16 +306,18 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     @Override
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, boolean getNotebookEntries) {
-	return spreadsheetUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries, coreNotebookService);
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString, boolean getNotebookEntries) {
+	return spreadsheetUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
+		getNotebookEntries, coreNotebookService);
     }
-    
+
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return spreadsheetUserDao.getCountUsersBySession(sessionId, searchString);
     }
 
-
+    @Override
     public List<StatisticDTO> getStatistics(Long contentId) {
 	List<SpreadsheetSession> sessionList = spreadsheetSessionDao.getByContentId(contentId);
 
@@ -329,6 +344,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return statisticList;
     }
 
+    @Override
     public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
 	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
@@ -359,15 +375,17 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	return map;
     }
 
+    @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
 	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
 		entryText);
     }
 
+    @Override
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -377,18 +395,21 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     /**
      * @param notebookEntry
      */
+    @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    @Override
     public SpreadsheetUser getUser(Long uid) {
 	return (SpreadsheetUser) spreadsheetUserDao.getObject(SpreadsheetUser.class, uid);
     }
 
+    @Override
     public void releaseMarksForSession(Long sessionId) {
 	List<SpreadsheetUser> users = spreadsheetUserDao.getBySessionID(sessionId);
 	for (SpreadsheetUser user : users) {
-	    if (user.getUserModifiedSpreadsheet() != null && user.getUserModifiedSpreadsheet().getMark() != null) {
+	    if ((user.getUserModifiedSpreadsheet() != null) && (user.getUserModifiedSpreadsheet().getMark() != null)) {
 		SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
 		mark.setDateMarksReleased(new Date());
 		spreadsheetMarkDao.saveObject(mark);
@@ -396,6 +417,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	}
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -437,6 +459,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	this.messageService = messageService;
     }
 
+    @Override
     public MessageService getMessageService() {
 	return messageService;
     }
@@ -504,7 +527,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(SpreadsheetImportContentVersionFilter.class);
-	
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, spreadsheetToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Spreadsheet)) {
@@ -562,10 +585,11 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	spreadsheetDao.saveObject(toContent);
     }
 
+    @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getSpreadsheetByContentId(toolContentId).getTitle();
     }
-   
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
@@ -579,26 +603,41 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public boolean isContentEdited(Long toolContentId) {
 	return getSpreadsheetByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = spreadsheetSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		SpreadsheetSession session = (SpreadsheetSession) iter.next();
-		spreadsheetSessionDao.delete(session);
+	if (spreadsheet == null) {
+	    SpreadsheetServiceImpl.log
+		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (SpreadsheetSession session : spreadsheetSessionDao.getByContentId(toolContentId)) {
+	    // this can not be done via DB cascade
+	    List<SpreadsheetUser> users = spreadsheetUserDao.getBySessionID(session.getSessionId());
+	    for (SpreadsheetUser user : users) {
+		UserModifiedSpreadsheet modified = user.getUserModifiedSpreadsheet();
+		if (modified != null) {
+		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class, modified.getUid());
+		}
+	    }
+
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, SpreadsheetConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	spreadsheetDao.delete(spreadsheet);
     }
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (log.isDebugEnabled()) {
-	    log.debug("Removing Spreadsheet contents for user ID " + userId + " and toolContentId " + toolContentId);
+	if (SpreadsheetServiceImpl.log.isDebugEnabled()) {
+	    SpreadsheetServiceImpl.log.debug(
+		    "Removing Spreadsheet contents for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	List<SpreadsheetSession> sessions = spreadsheetSessionDao.getByContentId(toolContentId);
@@ -608,8 +647,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    if (user != null) {
 		user.setSessionFinished(false);
 		if (user.getUserModifiedSpreadsheet() != null) {
-		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class, user
-			    .getUserModifiedSpreadsheet().getUid());
+		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class,
+			    user.getUserModifiedSpreadsheet().getUid());
 		}
 
 		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -617,7 +656,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		if (entry != null) {
 		    spreadsheetDao.removeObject(NotebookEntry.class, entry.getUid());
 		}
-		
+
 		spreadsheetUserDao.removeObject(SpreadsheetUser.class, user.getUid());
 	    }
 	}
@@ -658,13 +697,14 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException {
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	    throws DataMissingException, ToolException {
 	return null;
     }
 
@@ -682,10 +722,10 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -695,8 +735,9 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-	    DataMissingException {
+    @Override
+    public void setReflectiveData(Long toolContentId, String title, String description)
+	    throws ToolException, DataMissingException {
 
 	Spreadsheet toolContentObj = getSpreadsheetByContentId(toolContentId);
 	if (toolContentObj == null) {
@@ -734,6 +775,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	this.coreNotebookService = coreNotebookService;
     }
 
+    @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }
