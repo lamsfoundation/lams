@@ -66,7 +66,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
@@ -1777,19 +1776,23 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	return false;
     }
-
+    
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = scratchieSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		ScratchieSession session = (ScratchieSession) iter.next();
-		scratchieSessionDao.delete(session);
+	if (scratchie == null) {
+	    ScratchieServiceImpl.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (ScratchieSession session : scratchieSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, ScratchieConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	scratchieDao.delete(scratchie);
     }
 

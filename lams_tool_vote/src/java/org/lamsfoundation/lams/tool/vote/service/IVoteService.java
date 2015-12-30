@@ -194,9 +194,6 @@ public interface IVoteService {
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
-    void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException;
-
     void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException;
 
     void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;

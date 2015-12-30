@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -52,7 +53,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookSessionDAO;
@@ -203,10 +203,24 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	notebook.setDefineLater(false);
 	notebookDAO.saveOrUpdate(notebook);
     }
-
+    
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	if (notebook == null) {
+	    NotebookService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (NotebookSession session : (Set<NotebookSession>) notebook.getNotebookSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	notebookDAO.delete(notebook);
     }
 
     @Override

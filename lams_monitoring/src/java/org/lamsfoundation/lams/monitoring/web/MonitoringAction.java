@@ -579,13 +579,22 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException, ServletException {
-
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Integer userId = getUserId();
+	boolean permanently = WebUtil.readBooleanParam(request, "permanently", false);
+
+	if (permanently) {
+	    getMonitoringService().removeLessonPermanently(lessonId, userId);
+	    response.setContentType("text/plain;charset=utf-8");
+	    response.getWriter().print("OK");
+	    return null;
+	}
+
 	JSONObject jsonObject = new JSONObject();
 
 	try {
 	    // if this method throws an Exception, there will be no removeLesson=true in the JSON reply
-	    getMonitoringService().removeLesson(lessonId, getUserId());
+	    getMonitoringService().removeLesson(lessonId, userId);
 	    jsonObject.put("removeLesson", true);
 
 	} catch (Exception e) {

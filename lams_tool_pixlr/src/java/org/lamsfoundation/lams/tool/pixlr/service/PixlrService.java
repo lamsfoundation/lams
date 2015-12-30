@@ -255,9 +255,22 @@ public class PixlrService
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
-	// TODO Auto-generated method stub
+    public void removeToolContent(Long toolContentId) throws SessionDataExistsException, ToolException {
+	Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
+	if (pixlr == null) {
+	    PixlrService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (PixlrSession session : pixlr.getPixlrSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, PixlrConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	pixlrDAO.delete(pixlr);
     }
 
     @Override

@@ -97,7 +97,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -263,7 +262,7 @@ public class EadventureServiceImpl
 	return content;
     }
 
-    //TODO revisar
+    // TODO revisar
     /*  public List getAuthoredItems(Long eadventureUid) {
     return eadventureItemDao.getAuthoringItems(eadventureUid);
     }*/
@@ -308,7 +307,7 @@ public class EadventureServiceImpl
 	Iterator<EadventureExpression> it = eadExpressions.iterator();
 	while (it.hasNext()) {
 	    EadventureExpression expression = it.next();
-	    //    expression.setCondition_uid(condUID);
+	    // expression.setCondition_uid(condUID);
 	    eadventureExpressionDao.saveObject(expression);
 	}
     }
@@ -328,8 +327,8 @@ public class EadventureServiceImpl
 	Iterator<EadventureCondition> it = eadConditions.iterator();
 	while (it.hasNext()) {
 	    EadventureCondition cond = it.next();
-	    //   Set<EadventureExpression> expList = cond.getEadListExpression();
-	    //  cond.setEadListExpression(null);
+	    // Set<EadventureExpression> expList = cond.getEadListExpression();
+	    // cond.setEadListExpression(null);
 	    eadventureConditionDao.saveObject(cond);
 	    // saveOrUpdateEadventureExpressions(expList, cond.getUid());
 	    // cond.setEadListExpression(expList);
@@ -348,7 +347,7 @@ public class EadventureServiceImpl
 
     }
 
-    //TODO revisar!!!!!! Monitoring
+    // TODO revisar!!!!!! Monitoring
     @Override
     public List<Summary> exportBySessionId(Long sessionId, Long userId) {
 	EadventureSession session = eadventureSessionDao.getSessionBySessionId(sessionId);
@@ -361,12 +360,12 @@ public class EadventureServiceImpl
 	Eadventure ead = session.getEadventure();
 	Summary sum = new Summary(session.getSessionId(), session.getSessionName(), ead, false);
 
-	//List<EadventureUser> userList = getUserListBySessionItem(session.getSessionId(), ead.getUid());
+	// List<EadventureUser> userList = getUserListBySessionItem(session.getSessionId(), ead.getUid());
 	boolean[] existList = new boolean[1];
 	String[] reportList = new String[1];
 
 	EadventureUser eadUser = eadventureUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	//TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
+	// TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
 	EadventureItemVisitLog log = getEadventureItemLog(ead.getUid(), userId);
 	eadUser.setAccessDate(log.getAccessDate());
 	EadventureVars var = getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_REPORT);
@@ -385,14 +384,14 @@ public class EadventureServiceImpl
 	sum.setExistList(existList);
 	sum.setReportList(reportList);
 
-	//TODO ver si tiene sentido que sea una lista
+	// TODO ver si tiene sentido que sea una lista
 	ArrayList<Summary> list = new ArrayList<Summary>();
 	list.add(sum);
 
 	return list;
     }
 
-    //TODO revisar!!!!!! Monitoring
+    // TODO revisar!!!!!! Monitoring
     @Override
     public List<Summary> exportByContentId(Long contentId) {
 	Eadventure eadventure = eadventureDao.getByContentId(contentId);
@@ -410,7 +409,7 @@ public class EadventureServiceImpl
 	    int numberOfFinishedLearners = 0;
 	    int i = 0;
 	    for (EadventureUser eadUser : userList) {
-		//TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
+		// TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
 		EadventureItemVisitLog log = getEadventureItemLog(eadventure.getUid(), eadUser.getUserId());
 
 		EadventureVars var = getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_REPORT);
@@ -532,7 +531,7 @@ public class EadventureServiceImpl
 	return nextUrl;
     }
 
-    //TODO revisar!!!! monitoring
+    // TODO revisar!!!! monitoring
     @Override
     public List<Summary> getSummary(Long contentId) {
 	List<Summary> groupList = new ArrayList<Summary>();
@@ -556,7 +555,7 @@ public class EadventureServiceImpl
 	    int numberOfFinishedLearners = 0;
 	    int i = 0;
 	    for (EadventureUser eadUser : userList) {
-		//TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
+		// TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
 		EadventureItemVisitLog log = getEadventureItemLog(eadventure.getUid(), eadUser.getUserId());
 
 		EadventureVars var = getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_REPORT);
@@ -626,11 +625,11 @@ public class EadventureServiceImpl
 	    user.setAccessDate(visit.getAccessDate());
 	    userList.add(user);
 	}
-	//List<EadventureUser> userList = null;
+	// List<EadventureUser> userList = null;
 	return userList;
     }
 
-    //TODO revisar Monitoring!!!
+    // TODO revisar Monitoring!!!
     @Override
     public void setItemVisible(Long itemUid, boolean visible) {
 	/*EadventureItem item = eadventureItemDao.getByUid(itemUid);
@@ -760,7 +759,7 @@ public class EadventureServiceImpl
 	    ead.setFileName(fileName);
 
 	    // parse parameters.xml file, and create the eadParams
-	    //TODO reportar bien el error cuando no se produce xk no es un e-Ad file
+	    // TODO reportar bien el error cuando no se produce xk no es un e-Ad file
 	    HashMap<String, String> params = InputOutputReader
 		    .getOutputParameterList(packageDirectory + "//" + EadventureConstants.PARAMETERS_FILE_NAME);
 	    // chek if its a real e-adventure package
@@ -783,7 +782,8 @@ public class EadventureServiceImpl
 		EadventureServiceImpl.log.error(key + " ha sido subido con exito!!!!!!");
 
 	    }
-	    //add default params (this are not included in the params file at eAd LAMS export due to they always have to appear)
+	    // add default params (this are not included in the params file at eAd LAMS export due to they always have
+	    // to appear)
 	    eadParam.addAll(getDefaultParams());
 	    ead.setParams(eadParam);
 
@@ -822,7 +822,7 @@ public class EadventureServiceImpl
      * @return
      */
 
-    //TODO creo que vga a sobrar
+    // TODO creo que vga a sobrar
     private String findWebsiteInitialItem(String packageDirectory) {
 	File file = new File(packageDirectory);
 	if (!file.isDirectory()) {
@@ -927,7 +927,7 @@ public class EadventureServiceImpl
 	// set EadventureToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Eadventure.newInstance(toolContentObj, toolContentId);
 	try {
-	    //TODO revisar!!
+	    // TODO revisar!!
 	    exportContentService.registerFileClassForExport(Eadventure.class.getName(), "fileUuid", "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, eadventureToolContentHandler,
 		    rootPath);
@@ -944,7 +944,7 @@ public class EadventureServiceImpl
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(EadventureImportContentVersionFilter.class);
 
-	    //TODO revisar
+	    // TODO revisar
 	    exportContentService.registerFileClassForImport(Eadventure.class.getName(), "fileUuid", "fileVersionId",
 		    "fileName", "fileType", null, "initialItem");
 
@@ -970,13 +970,13 @@ public class EadventureServiceImpl
 		user.setEadventure(toolContentObj);
 	    }
 	    toolContentObj.setCreatedBy(user);
-	    //TODO revisar!! que no falte nada al objeto de EAD
+	    // TODO revisar!! que no falte nada al objeto de EAD
 	    // reset all eadventureItem createBy user
 	    /*Set<EadventureItem> items = toolContentObj.getEadventureItems();
 	    for (EadventureItem item : items) {
 	    item.setCreateBy(user);
 	    }*/
-	    //TODO ver si esto es correcto:
+	    // TODO ver si esto es correcto:
 	    Set par = toolContentObj.getParams();
 	    List listPar = new ArrayList(par);
 	    for (Object o : listPar) {
@@ -1048,7 +1048,7 @@ public class EadventureServiceImpl
 	Eadventure toContent = Eadventure.newInstance(eadventure, toContentId);
 	eadventureDao.saveObject(toContent);
 
-	//TODO no hace nada... pero comprobar que no de problema
+	// TODO no hace nada... pero comprobar que no de problema
 	// save eadventure items as well
 	/*Set items = toContent.getEadventureItems();
 	if (items != null) {
@@ -1078,7 +1078,7 @@ public class EadventureServiceImpl
     public boolean isContentEdited(Long toolContentId) {
 	return getEadventureByContentId(toolContentId).isDefineLater();
     }
-
+    
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	for (EadventureSession session : eadventureSessionDao.getByContentId(toolContentId)) {
@@ -1089,19 +1089,23 @@ public class EadventureServiceImpl
 
 	return false;
     }
-
+    
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Eadventure eadventure = eadventureDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = eadventureSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		EadventureSession session = (EadventureSession) iter.next();
-		eadventureSessionDao.delete(session);
+	if (eadventure == null) {
+	    EadventureServiceImpl.log
+		    .warn("Can not remove the tool content as it does not exist. ID: " + toolContentId);
+	}
+	
+	for (EadventureSession session : eadventureSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, EadventureConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	eadventureDao.delete(eadventure);
     }
 
@@ -1215,7 +1219,7 @@ public class EadventureServiceImpl
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -1265,7 +1269,7 @@ public class EadventureServiceImpl
 	    // Eadventure Items. They are ordered on the screen by create date so they need to be saved in the right
 	    // order.
 	    // So read them all in first, then go through and assign the dates in the correct order and then save.
-	    //TODO nos cargamos la parte de los items.... comprobar que se pase todo bien y no de ning�n problema
+	    // TODO nos cargamos la parte de los items.... comprobar que se pase todo bien y no de ning�n problema
 	    /* Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
 	    SortedMap<Integer, EadventureItem> items = new TreeMap<Integer, EadventureItem>();
 	    if (urls != null) {
@@ -1434,7 +1438,7 @@ public class EadventureServiceImpl
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
 
-    //TODO Resultado de la actualizaci�n a la brach de release 2.3.5, ver si afecta!!!
+    // TODO Resultado de la actualizaci�n a la brach de release 2.3.5, ver si afecta!!!
 
     /*public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
     return getEadventureOutputFactory().getSupportedDefinitionClasses(definitionType);
@@ -1478,7 +1482,7 @@ public class EadventureServiceImpl
 	    Set eadV = visitLog.getEadventureVars();
 	    if (!eadV.isEmpty()) {
 		List eadventureVars = new ArrayList<EadventureVars>(eadV);
-		//TODO comprobar si no lo tengo que meter con comparator para que salga en orden
+		// TODO comprobar si no lo tengo que meter con comparator para que salga en orden
 		Iterator<EadventureExpression> it = condition.getEadListExpression().iterator();
 		String previousOp = null;
 		while (it.hasNext()) {
@@ -1513,11 +1517,11 @@ public class EadventureServiceImpl
 		    }
 		}
 	    } else {
-		//There aren't vars set for this user and session
+		// There aren't vars set for this user and session
 		result = false;
 	    }
 	} else {
-	    //there is no such a condition
+	    // there is no such a condition
 	    result = false;
 	}
 
@@ -1526,7 +1530,7 @@ public class EadventureServiceImpl
 
     private boolean checkExpression(EadventureExpression expr, List eadventureVars) {
 	EadventureVars firstVar = getVarByName(expr.getFirstOp().getName(), eadventureVars);
-	//	    firstVar.setType(expr.getFirstOp().getType());
+	// firstVar.setType(expr.getFirstOp().getType());
 	EadventureVars secVar = null;
 	String operator = expr.getExpresionOp();
 	String value = expr.getValueIntroduced();
@@ -1586,25 +1590,29 @@ public class EadventureServiceImpl
 
     }
 
-    //TODO IMPORRRRRRRRRRRRRRRTANTE!!!!!!!!!!!!!!! el par�metro toolContentID que estamos pasando es realmente toolSessionID!!!!
-    //@Override
+    // TODO IMPORRRRRRRRRRRRRRRTANTE!!!!!!!!!!!!!!! el par�metro toolContentID que estamos pasando es realmente
+    // toolSessionID!!!!
+    // @Override
     @Override
     public boolean setAppletInput(String name, String value, String userId, String toolContentID) {
-	//TODO restart when  
+	// TODO restart when
 	EadventureServiceImpl.log.error("EEEEEEEEEEEEEEEEEE " + name);
 	EadventureServiceImpl.log.error("EEEEEEEEEEEEEEEEEE " + value);
-	//EadventureServiceImpl.log.error("USER ID "+ userId);
+	// EadventureServiceImpl.log.error("USER ID "+ userId);
 	EadventureServiceImpl.log.error("TOOL SESION ID " + toolContentID);
 	EadventureServiceImpl.log.error("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOEEEEEEEEEEEEEEEE");
 
-	//TODO Ahora recuperamos la session para sacar el EAD!!! pero a�adir el toolContentId para que sea mas sencillo!!!
-	//TODO user va a sobrar!! con el userID que ya se nos pasa por par�metro vamos sobraos!!					
-	//EadventureUser user = eadventureUserDao.getUserByUserIDAndContentID(Long.parseLong(userId), Long.parseLong(toolContentID));
-	//EadventureUser user = eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolContentID));
-	//eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolSessionID));
+	// TODO Ahora recuperamos la session para sacar el EAD!!! pero a�adir el toolContentId para que sea mas
+	// sencillo!!!
+	// TODO user va a sobrar!! con el userID que ya se nos pasa por par�metro vamos sobraos!!
+	// EadventureUser user = eadventureUserDao.getUserByUserIDAndContentID(Long.parseLong(userId),
+	// Long.parseLong(toolContentID));
+	// EadventureUser user = eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId),
+	// Long.parseLong(toolContentID));
+	// eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolSessionID));
 	EadventureServiceImpl.log.error("USER ID " + userId);
 	EadventureSession eadSession = eadventureSessionDao.getSessionBySessionId(Long.parseLong(toolContentID));
-	//Eadventure ead = eadventureDao.getByContentId(Long.parseLong(toolContentID));
+	// Eadventure ead = eadventureDao.getByContentId(Long.parseLong(toolContentID));
 	EadventureItemVisitLog log = eadventureItemVisitDao.getEadventureItemLog(eadSession.getEadventure().getUid(),
 		Long.parseLong(userId));
 	EadventureVars var = eadventureVarsDao.getEadventureVars(log.getUid(), name);
@@ -1612,7 +1620,7 @@ public class EadventureServiceImpl
 	    var = new EadventureVars();
 	    var.setName(name);
 	    var.setVisitLog(log);
-	    //Get the type from the params list
+	    // Get the type from the params list
 	    var.setType(eadventureParamDao.getEadventureParamTypeByNameAndEadContentID(name,
 		    eadSession.getEadventure().getUid()));
 	}
@@ -1626,7 +1634,7 @@ public class EadventureServiceImpl
 	return changeButton;
     }
 
-    //@Override
+    // @Override
     @Override
     public void setReportInput(String name, String value, String userId, String toolSessionID) {
 	// TODO Auto-generated method stub
@@ -1638,7 +1646,7 @@ public class EadventureServiceImpl
 	return null;
     }
 
-    //@Override
+    // @Override
     @Override
     public EadventureItemVisitLog getEadventureItemLog(Long itemUid, Long userId) {
 

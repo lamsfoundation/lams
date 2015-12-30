@@ -80,7 +80,6 @@ import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
@@ -527,13 +526,14 @@ public class ForumService
     public ForumUser getUserByUserAndSession(Long userId, Long sessionId) {
 	return forumUserDao.getByUserIdAndSessionId(userId, sessionId);
     }
-    
+
     @Override
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
-		boolean getNotebookEntries) {
-	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries, coreNotebookService);
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString, boolean getNotebookEntries) {
+	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
+		coreNotebookService);
     }
-        
+
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return forumUserDao.getCountUsersBySession(sessionId, searchString);
@@ -884,23 +884,26 @@ public class ForumService
 	forum.setContentInUse(false);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Forum forum = forumDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List list = forumToolSessionDao.getByContentId(toolContentId);
-	    Iterator iter = list.iterator();
-	    while (iter.hasNext()) {
-		ForumToolSession session = (ForumToolSession) iter.next();
-		forumToolSessionDao.delete(session);
+	if (forum == null) {
+	    ForumService.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (ForumToolSession session : (List<ForumToolSession>) forumToolSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, ForumConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
 	forumDao.delete(forum);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (ForumService.log.isDebugEnabled()) {
 	    ForumService.log.debug(
@@ -1618,8 +1621,10 @@ public class ForumService
 	forum.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 
 	forum.setAllowAnonym(JsonUtil.opt(toolContentJSON, "allowAnonym", Boolean.FALSE));
-	forum.setAllowEdit(JsonUtil.opt(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default entry in the db
-	forum.setAllowNewTopic(JsonUtil.opt(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the default entry in the db
+	forum.setAllowEdit(JsonUtil.opt(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default
+										      // entry in the db
+	forum.setAllowNewTopic(JsonUtil.opt(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the
+											      // default entry in the db
 	forum.setAllowRateMessages(JsonUtil.opt(toolContentJSON, "allowRateMessages", Boolean.FALSE));
 	forum.setAllowRichEditor(JsonUtil.opt(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
 	forum.setAllowUpload(JsonUtil.opt(toolContentJSON, "allowUpload", Boolean.FALSE));
@@ -1628,7 +1633,8 @@ public class ForumService
 	forum.setLimitedMaxCharacters(JsonUtil.opt(toolContentJSON, "limitedMaxCharacters", Boolean.TRUE));
 	forum.setLimitedMinCharacters(JsonUtil.opt(toolContentJSON, "limitedMinCharacters", Boolean.FALSE));
 	forum.setLockWhenFinished(JsonUtil.opt(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
-	forum.setMaxCharacters(JsonUtil.opt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the default entry in the db.
+	forum.setMaxCharacters(JsonUtil.opt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the
+										      // default entry in the db.
 	forum.setMaximumRate(JsonUtil.opt(toolContentJSON, "maximumRate", 0));
 	forum.setMaximumReply(JsonUtil.opt(toolContentJSON, "maximumReply", 0));
 	forum.setMinCharacters(JsonUtil.opt(toolContentJSON, "minCharacters", 0));

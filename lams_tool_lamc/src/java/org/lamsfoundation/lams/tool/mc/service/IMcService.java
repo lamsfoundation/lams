@@ -128,9 +128,6 @@ public interface IMcService {
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
-    void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException;
-
     boolean existsSession(Long toolSessionId);
 
     void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;

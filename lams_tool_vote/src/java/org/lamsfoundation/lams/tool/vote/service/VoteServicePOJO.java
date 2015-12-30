@@ -66,7 +66,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
@@ -1192,44 +1191,24 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeToolContent(Long toolContentID, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
-
-	if (toolContentID == null) {
-	    VoteServicePOJO.logger.error("toolContentID is null");
-	    throw new ToolException("toolContentID is missing");
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	VoteContent voteContent = voteContentDAO.getVoteContentByContentId(toolContentId);
+	if (voteContent == null) {
+	    VoteServicePOJO.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
 	}
 
-	VoteContent voteContent = voteContentDAO.getVoteContentByContentId(toolContentID);
-
-	if (voteContent != null) {
-	    Iterator sessionIterator = voteContent.getVoteSessions().iterator();
-	    while (sessionIterator.hasNext()) {
-		if (removeSessionData == false) {
-		    VoteServicePOJO.logger.error("removeSessionData is false, throwing SessionDataExistsException.");
-		    throw new SessionDataExistsException();
-		}
-
-		VoteSession voteSession = (VoteSession) sessionIterator.next();
-
-		Iterator sessionUsersIterator = voteSession.getVoteQueUsers().iterator();
-		while (sessionUsersIterator.hasNext()) {
-		    VoteQueUsr voteQueUsr = (VoteQueUsr) sessionUsersIterator.next();
-
-		    Iterator sessionUsersAttemptsIterator = voteQueUsr.getVoteUsrAttempts().iterator();
-		    while (sessionUsersAttemptsIterator.hasNext()) {
-			VoteUsrAttempt voteUsrAttempt = (VoteUsrAttempt) sessionUsersAttemptsIterator.next();
-			voteUsrAttemptDAO.removeVoteUsrAttempt(voteUsrAttempt);
-		    }
-		}
+	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getVoteSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
-	    // removed all existing responses of toolContent with toolContentID
-	    voteContentDAO.removeVoteById(toolContentID);
-	} else {
-	    VoteServicePOJO.logger.error("Warning!!!, We should have not come here. voteContent is null.");
-	    throw new ToolException("toolContentID is missing");
 	}
+
+	voteContentDAO.delete(voteContent);
     }
 
     @SuppressWarnings("unchecked")

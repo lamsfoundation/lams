@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -56,7 +57,6 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.leaderselection.dao.ILeaderselectionDAO;
 import org.lamsfoundation.lams.tool.leaderselection.dao.ILeaderselectionSessionDAO;
@@ -198,9 +198,24 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
 	leaderselectionDAO.saveOrUpdate(content);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Leaderselection content = leaderselectionDAO.getByContentId(toolContentId);
+	if (content == null) {
+	    LeaderselectionService.logger
+		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+	for (LeaderselectionSession session : (Set<LeaderselectionSession>) content.getLeaderselectionSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, LeaderselectionConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	leaderselectionDAO.delete(content);
     }
 
     @Override

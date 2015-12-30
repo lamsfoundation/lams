@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -62,7 +63,6 @@ import org.lamsfoundation.lams.tool.bbb.util.BbbException;
 import org.lamsfoundation.lams.tool.bbb.util.BbbUtil;
 import org.lamsfoundation.lams.tool.bbb.util.Constants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -195,9 +195,22 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
-	// TODO Auto-generated method stub
+    public void removeToolContent(Long toolContentId) throws ToolException {
+	Bbb bbb = getBbbByContentId(toolContentId);
+	if (bbb == null) {
+	    BbbService.logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (BbbSession session : bbb.getBbbSessions()) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, Constants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
+	    }
+	}
+
+	bbbDAO.delete(bbb);
     }
 
     @Override

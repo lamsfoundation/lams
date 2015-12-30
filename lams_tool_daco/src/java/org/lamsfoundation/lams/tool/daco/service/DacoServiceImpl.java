@@ -77,7 +77,6 @@ import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -777,13 +776,18 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     }
 
     @Override
-    public void removeToolContent(Long toolContentId, boolean removeSessionData)
-	    throws SessionDataExistsException, ToolException {
+    public void removeToolContent(Long toolContentId) throws ToolException {
 	Daco daco = dacoDao.getByContentId(toolContentId);
-	if (removeSessionData) {
-	    List<DacoSession> list = dacoSessionDao.getByContentId(toolContentId);
-	    for (DacoSession session : list) {
-		dacoSessionDao.deleteBySessionId(session.getSessionId());
+	if (daco == null) {
+	    DacoServiceImpl.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    return;
+	}
+
+	for (DacoSession session : dacoSessionDao.getByContentId(toolContentId)) {
+	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, DacoConstants.TOOL_SIGNATURE);
+	    for (NotebookEntry entry : entries) {
+		coreNotebookService.deleteEntry(entry);
 	    }
 	}
 	dacoDao.removeObject(Daco.class, daco.getUid());

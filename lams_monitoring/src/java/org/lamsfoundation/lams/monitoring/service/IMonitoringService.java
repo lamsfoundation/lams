@@ -342,7 +342,12 @@ public interface IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    void removeLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    void removeLesson(long lessonId, Integer userId) throws SecurityException;
+
+    /**
+     * Removes the lesson and all referenced resources (learning design, tool content etc.) from the database. 
+     */
+    void removeLessonPermanently(long lessonId, Integer userId) throws SecurityException;
 
     /**
      * Set the gate to open to let all the learners through. This learning service is triggerred by the system
