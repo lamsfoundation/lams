@@ -24,6 +24,7 @@ ALTER TABLE tl_laqa11_session ADD CONSTRAINT FK_tl_laqa11_session_1 FOREIGN KEY 
 REFERENCES `tl_laqa11_content` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+ALTER TABLE tl_laqa11_usr_resp MODIFY COLUMN qa_que_content_id BIGINT(20) DEFAULT NULL;
 ALTER TABLE tl_laqa11_usr_resp DROP FOREIGN KEY FK_tl_laqa11_usr_resp_2;
 ALTER TABLE tl_laqa11_usr_resp ADD CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (`qa_que_content_id`)
 REFERENCES `tl_laqa11_que_content` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
