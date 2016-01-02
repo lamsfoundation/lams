@@ -274,6 +274,7 @@
 				    <connection-property name="characterEncoding">utf8</connection-property>
 				    <connection-property name="useUnicode">true</connection-property>
 				    <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
+				    <connection-property name="useSSL">false</connection-property>
 				   
 				    <!-- Properties below are used only for embedded MySQL server -->
 				    <connection-property name="server.basedir">@db.location@</connection-property>
