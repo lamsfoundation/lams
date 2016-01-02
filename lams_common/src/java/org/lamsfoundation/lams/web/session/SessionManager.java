@@ -91,6 +91,13 @@ public class SessionManager {
 	return sessionId == null ? null : SessionManager.sessionContainer.get(sessionId);
     }
 
+    /**
+     * Returns number of sessions stored in the container.
+     */
+    public static int getSessionCount() {
+	return sessionContainer.size();
+    }
+
     public static void setServletContext(ServletContext servletContext) {
 	SessionManager.servletContext = servletContext;
     }

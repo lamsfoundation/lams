@@ -466,6 +466,13 @@
 			org.lamsfoundation.lams.rest.ToolContentRestServlet
 		</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>RuntimeStatsServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.RuntimeStatsServlet
+		</servlet-class>
+	</servlet>
  	
  	<servlet-mapping>
  		<servlet-name>LearningDesignRestServlet</servlet-name>
@@ -631,6 +638,10 @@
 		<servlet-name>BogoPogoServlet</servlet-name>
 		<url-pattern>/BogoPogo</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>RuntimeStatsServlet</servlet-name>
+		<url-pattern>/runtimeStats</url-pattern>
+	</servlet-mapping>
 
 	<mime-mapping>
 		<extension>csv</extension>
@@ -770,7 +781,8 @@
 			<url-pattern>/forgotPasswordChange.jsp</url-pattern>
 			<url-pattern>/forgotPasswordProc.jsp</url-pattern>			
 			<url-pattern>/signup/*</url-pattern>
-			<url-pattern>/rest/*</url-pattern> 
+			<url-pattern>/rest/*</url-pattern>
+			<url-pattern>/runtimeStats</url-pattern>
 			<!-- Static resources -->
 			<url-pattern>/css/*</url-pattern>
 			<url-pattern>/errorpages/*</url-pattern>
