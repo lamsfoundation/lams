@@ -38,8 +38,9 @@ public class SessionManager {
     private static final Map<String, HttpSession> sessionContainer = new ConcurrentHashMap<String, HttpSession>();
     private ThreadLocal<String> currentSessionIdContainer = new ThreadLocal<String>();
 
-    // various classes need to have to access to it
+    // various classes need to have to access these
     private static ServletContext servletContext;
+    private static String jvmRoute;
 
     /**
      * This class initialize method called by Spring framework.
@@ -104,5 +105,13 @@ public class SessionManager {
 
     public static ServletContext getServletContext() {
 	return SessionManager.servletContext;
+    }
+
+    public static String getJvmRoute() {
+        return jvmRoute;
+    }
+
+    public static void setJvmRoute(String jvmRoute) {
+        SessionManager.jvmRoute = jvmRoute;
     }
 }
