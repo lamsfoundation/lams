@@ -20,19 +20,10 @@
  */
 package org.lamsfoundation.lams.integration.security;
 
-import io.undertow.Handlers;
-import io.undertow.server.HandlerWrapper;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.session.Session;
-import io.undertow.servlet.ServletExtension;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.handlers.ServletRequestContext;
-import io.undertow.servlet.spec.HttpSessionImpl;
-
 import java.security.AccessController;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -46,9 +37,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import io.undertow.Handlers;
+import io.undertow.server.session.Session;
+import io.undertow.servlet.ServletExtension;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.handlers.ServletRequestContext;
+import io.undertow.servlet.spec.HttpSessionImpl;
+
 /**
- * Allows access to LAMS WARs if an user logged in. It puts user Account into shared session so SsoConsumer in other
- * WARs can use it.
+ * Allows access to LAMS WARs when an user logs in.
  * 
  * @author Marcin Cieslak
  *
@@ -64,51 +61,50 @@ public class SsoHandler implements ServletExtension {
 	SessionManager.setServletContext(servletContext);
 
 	// run when request and response were already parsed, but before security handlers
-	deploymentInfo.addOuterHandlerChainWrapper(new HandlerWrapper() {
-	    @Override
-	    public HttpHandler wrap(final HttpHandler handler) {
-		// just forward all requests except one for logging in
-		return Handlers.path().addPrefixPath("/", handler).addExactPath("/j_security_check", new HttpHandler() {
-		    @Override
-		    public void handleRequest(HttpServerExchange exchange) throws Exception {
-			ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
-			HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
+	deploymentInfo.addOuterHandlerChainWrapper(handler -> {
+	    // just forward all requests except one for logging in
+	    return Handlers.path().addPrefixPath("/", handler).addExactPath("/j_security_check", exchange -> {
+		ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+		HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
 
-			// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs 
-			HttpSession session = request.getSession();
+		// initialise jvmRoute for runtime statistics servlet
+		if (SessionManager.getJvmRoute() == null) {
+		    SsoHandler.setJvmRoute(request);
+		}
 
-			// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
-			String redirectURL = request.getParameter("redirectURL");
-			if (!StringUtils.isBlank(redirectURL)) {
-			    SsoHandler.handleRedirectBack(context, redirectURL);
-			}
-			
-			/* Fetch UserDTO before completing request so putting it later in session is done ASAP
-			 * Response is sent in another thread and if UserDTO is not present in session when browser completes redirect,
-			 * it results in error. Winning this race is the easiest option.
-			 */
-			UserDTO userDTO = null;
-			String login = request.getParameter("j_username");
-			if (!StringUtils.isBlank(login)) {
-			    User user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
-			    if (user != null) {
-				userDTO = user.getUserDTO();
-			    }
-			}
+		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs 
+		HttpSession session = request.getSession();
 
-			// store session so UniversalLoginModule can access it
-			SessionManager.startSession(request);
-			// do the logging in UniversalLoginModule or cache
-			handler.handleRequest(exchange);
+		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
+		String redirectURL = request.getParameter("redirectURL");
+		if (!StringUtils.isBlank(redirectURL)) {
+		    SsoHandler.handleRedirectBack(context, redirectURL);
+		}
 
-			if (!StringUtils.isBlank(login) && login.equals(request.getRemoteUser())) {
-			    session.setAttribute(AttributeNames.USER, userDTO);
-			}
-
-			SessionManager.endSession();
+		/* Fetch UserDTO before completing request so putting it later in session is done ASAP
+		 * Response is sent in another thread and if UserDTO is not present in session when browser completes redirect,
+		 * it results in error. Winning this race is the easiest option.
+		 */
+		UserDTO userDTO = null;
+		String login = request.getParameter("j_username");
+		if (!StringUtils.isBlank(login)) {
+		    User user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
+		    if (user != null) {
+			userDTO = user.getUserDTO();
 		    }
-		});
-	    }
+		}
+
+		// store session so UniversalLoginModule can access it
+		SessionManager.startSession(request);
+		// do the logging in UniversalLoginModule or cache
+		handler.handleRequest(exchange);
+
+		if (!StringUtils.isBlank(login) && login.equals(request.getRemoteUser())) {
+		    session.setAttribute(AttributeNames.USER, userDTO);
+		}
+
+		SessionManager.endSession();
+	    });
 	});
     }
 
@@ -127,6 +123,28 @@ public class SsoHandler implements ServletExtension {
 	    }
 
 	    session.setAttribute(SsoHandler.SESSION_KEY, redirectURL);
+	}
+    }
+
+    /**
+     * Memorises jvmRoute if it is already set.
+     */
+    protected static void setJvmRoute(HttpServletRequest request) {
+	// if previous requests has not created a session, cookies will be null
+	Cookie[] cookies = request.getCookies();
+	if (cookies == null) {
+	    return;
+	}
+
+	for (Cookie cookie : cookies) {
+	    if (cookie.getName().equals("JSESSIONID")) {
+		// look for jvmRoute
+		int index = cookie.getValue().indexOf('.');
+		if (index > 0) {
+		    SessionManager.setJvmRoute(cookie.getValue().substring(index + 1));
+		    return;
+		}
+	    }
 	}
     }
 

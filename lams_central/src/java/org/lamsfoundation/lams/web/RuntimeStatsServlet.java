@@ -29,13 +29,8 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.ThreadMXBean;
 import java.util.Date;
-import java.util.Set;
 
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanOperationInfo;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -43,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 
@@ -102,10 +96,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 	        System.out.println("  " + attr.getName() + "\n");
 	    }
 	    }
-	    
-	    ObjectName engineName = new ObjectName("jboss.web:type=Engine");
-	    String jvmRoute = (String) server.getAttribute(engineName, "jvmRoute");
-	    */
+	     */
 
 	    ObjectName dataSourceName = new ObjectName(
 		    "jboss.as.expr:subsystem=datasources,data-source=lams-ds,statistics=pool");
@@ -115,8 +106,8 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    if (activeCount > 0) {
 		resp.append(" - DB connection established");
 	    }
-	    //  resp.append("\nServer : ").append(jvmRoute).append("\n");
-	    resp.append("\nCurrent Sessions : ").append(SessionManager.getSessionCount()).append("\n");
+	    resp.append("\nServer : ").append(SessionManager.getJvmRoute()).append("\n");
+	    resp.append("Current Sessions : ").append(SessionManager.getSessionCount()).append("\n");
 	    resp.append("Time of Request : ").append(date);
 	} catch (Exception e) {
 	    RuntimeStatsServlet.log.error("Error while getting short runtime stats", e);
@@ -130,9 +121,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 
 	MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 	try {
-	    //ObjectName engineName = new ObjectName("jboss.web:type=Engine");
-	    //String jvmRoute = (String) server.getAttribute(engineName, "jvmRoute");
-	    //resp.append("jvmRoute: ").append(jvmRoute).append("\n");
+	    resp.append("jvmRoute: ").append(SessionManager.getJvmRoute()).append("\n");
 
 	    MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
 	    MemoryUsage memoryUsage = memoryBean.getHeapMemoryUsage();
@@ -154,13 +143,14 @@ public class RuntimeStatsServlet extends HttpServlet {
 		    .append(threadBean.getThreadCount()).append("/").append(threadBean.getPeakThreadCount())
 		    .append("\n");
 
-	    /*
+	    /* Connector statistics do not seem to be present for WF 8.
+	     * They should be available in WF 9+ (WFLY-4420).
 	    ObjectName connectorName = new ObjectName("jboss.as.expr:subsystem=io,worker=default");
 	    Integer busyThreads = (Integer) server.getAttribute(connectorName, "ioThreads");
 	    Integer maxThreads = (Integer) server.getAttribute(connectorName, "taskMaxThreads");
 	    resp.append("IO threads [io/task max]: ").append(busyThreads).append("/").append(maxThreads).append("\n");
 	    */
-	    
+
 	    resp.append("Active sessions : ").append(SessionManager.getSessionCount()).append("\n");
 
 	    ObjectName dataSourceName = new ObjectName(
