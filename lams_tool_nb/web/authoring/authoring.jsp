@@ -3,14 +3,19 @@
 
 <%@ include file="/includes/taglibs.jsp"%>
 
-<%@ page
-	import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 
 <lams:html>
 <lams:head>
 	<lams:headItems />
 	<title><fmt:message key="activity.title" />
 	</title>
+	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 
 	<script type="text/javascript">
 		function init(){

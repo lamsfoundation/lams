@@ -204,6 +204,8 @@ public class NbLearnerAction extends LamsDispatchAction {
     	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
     	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
     	request.setAttribute("title", nbContent.getTitle());
+    	request.setAttribute("allowComments", nbContent.isAllowComments());
+    	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
     	
         // get the existing reflection entry
     	NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, NoticeboardConstants.TOOL_SIGNATURE, getUserID(request).intValue());

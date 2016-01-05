@@ -78,6 +78,7 @@ public class NbAuthoringForm extends ActionForm {
 	private String defineLater;
 	
 	private boolean allowComments;
+	private boolean commentsLikeAndDislike;
 	private boolean reflectOnActivity;
 	private String reflectInstructions;
 
@@ -101,6 +102,12 @@ public class NbAuthoringForm extends ActionForm {
     }
     public void setAllowComments(boolean allowComments) {
         this.allowComments = allowComments;
+    }
+    public boolean isCommentsLikeAndDislike() {
+        return commentsLikeAndDislike;
+    }
+    public void setCommentsLikeAndDislike(boolean commentsLikeAndDislike) {
+        this.commentsLikeAndDislike = commentsLikeAndDislike;
     }
     public boolean getReflectOnActivity() {
     	return reflectOnActivity;
@@ -202,6 +209,7 @@ public class NbAuthoringForm extends ActionForm {
 		setTitle(nbContent.getTitle());
 		setBasicContent(nbContent.getContent());
 		setAllowComments(nbContent.isAllowComments());
+		setCommentsLikeAndDislike(nbContent.isCommentsLikeAndDislike());
 		setReflectOnActivity(nbContent.getReflectOnActivity());
 		setReflectInstructions(nbContent.getReflectInstructions());
 	}
@@ -211,6 +219,7 @@ public class NbAuthoringForm extends ActionForm {
 		nbContent.setTitle(getTitle());
 	    nbContent.setContent(getBasicContent());
 		nbContent.setAllowComments(isAllowComments());
+		nbContent.setCommentsLikeAndDislike(isCommentsLikeAndDislike());
 	    if (defineLater == null || defineLater.length() == 0) {
 	    	// ie. If defineLater is null or empty, this means we are in authoring
 			nbContent.setReflectOnActivity(getReflectOnActivity());

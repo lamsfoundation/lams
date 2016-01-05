@@ -25,7 +25,9 @@ pedagogical_planner_url,
 help_url,
 language_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+allow_comments,
+comments_like_dislike
 )
 VALUES
 (
@@ -52,5 +54,7 @@ NULL,
 'http://wiki.lamsfoundation.org/display/lamsdocs/lanb11',
 'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources',
 NOW(),
-NOW()
+NOW(),
+0,
+0
 );
