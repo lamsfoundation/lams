@@ -25,12 +25,9 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 

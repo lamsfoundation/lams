@@ -30,9 +30,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * <p>

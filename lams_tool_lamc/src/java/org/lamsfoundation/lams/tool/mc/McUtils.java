@@ -24,10 +24,7 @@ package org.lamsfoundation.lams.tool.mc;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.web.McAuthoringForm;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Common MCQ utility functions live here.

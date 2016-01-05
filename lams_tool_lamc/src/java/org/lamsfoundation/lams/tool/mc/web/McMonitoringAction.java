@@ -36,11 +36,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -49,10 +53,12 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
@@ -92,8 +98,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();
 
 	repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
-
-	String toolContentID = mcMonitoringForm.getToolContentID();
 
 	// generate DTO for All sessions
 	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
@@ -274,6 +278,69 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	request.setAttribute(McAppConstants.USER_ATTEMPTS, userAttempts);
 	request.setAttribute(McAppConstants.TOOL_SESSION_ID, user.getMcSession().getMcSessionId());
 	return (userAttempts == null || userAttempts.isEmpty()) ? null : mapping.findForward(McAppConstants.USER_MASTER_DETAIL);
+    }
+    
+    /**
+     * Return paged users for jqGrid.
+     */
+    public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	McSession session = mcService.getMcSessionById(sessionId);
+	//find group leader, if any
+	McQueUsr groupLeader = session.getGroupLeader();
+	
+	// Getting the params passed in from the jqGrid
+	int page = WebUtil.readIntParam(request, AttributeNames.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, AttributeNames.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, AttributeNames.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, AttributeNames.PARAM_SIDX, true);
+	if (sortBy == "") {
+	    sortBy = "userName";
+	}
+	String searchString = WebUtil.readStrParam(request, "userName", true);
+
+	List<McUserMarkDTO> userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder,
+		searchString);
+	int countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
+
+	int totalPages = new Double(Math.ceil(new Integer(countVisitLogs).doubleValue()
+		/ new Integer(rowLimit).doubleValue())).intValue();
+	
+	JSONArray rows = new JSONArray();
+	int i = 1;
+	for (McUserMarkDTO userDto : userDtos) {
+
+	    JSONArray visitLogData = new JSONArray();
+	    Long userUid = Long.parseLong(userDto.getQueUsrId());
+	    visitLogData.put(userUid);
+	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+	    if (groupLeader != null && groupLeader.getUid().equals(userUid)) {
+		fullName += " (" + mcService.getLocalizedMessage("label.monitoring.group.leader") + ")";
+	    }
+	    
+	    visitLogData.put(fullName);
+	    Long totalMark = (userDto.getTotalMark() == null) ? 0 : userDto.getTotalMark();
+	    visitLogData.put(totalMark);
+
+	    JSONObject userRow = new JSONObject();
+	    userRow.put("id", i++);
+	    userRow.put("cell", visitLogData);
+
+	    rows.put(userRow);
+	}
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("total", totalPages);
+	responseJSON.put("page", page);
+	responseJSON.put("records", countVisitLogs);
+	responseJSON.put("rows", rows);
+	    
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responseJSON.toString());
+	return null;
     }
     
     public ActionForward saveUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,

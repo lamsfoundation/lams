@@ -22,16 +22,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
