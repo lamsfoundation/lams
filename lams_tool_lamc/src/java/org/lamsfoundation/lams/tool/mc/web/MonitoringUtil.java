@@ -30,25 +30,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
-import org.lamsfoundation.lams.tool.mc.McMonitoredUserDTO;
-import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
-import org.lamsfoundation.lams.tool.mc.McStringComparator;
+import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -121,8 +118,19 @@ public class MonitoringUtil implements McAppConstants {
      * @param mcService
      */
     protected static void setupAllSessionsData(HttpServletRequest request, McContent content, IMcService mcService) {
-	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = mcService.buildGroupsMarkData(content, false);
-	request.setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
+	
+	//set up sessionDTOs list
+	Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	sessions.addAll(content.getMcSessions());
+	List<SessionDTO> sessionDtos = new LinkedList<SessionDTO>();
+	for (McSession session : sessions) {
+	    SessionDTO sessionDto = new SessionDTO();
+	    sessionDto.setSessionId(session.getMcSessionId());
+	    sessionDto.setSessionName(session.getSession_name());
+	    
+	    sessionDtos.add(sessionDto);
+	}
+	request.setAttribute(SESSION_DTOS, sessionDtos);
 
 	request.setAttribute(HR_COLUMN_COUNT, new Integer(content.getMcQueContents().size() + 2).toString());
 

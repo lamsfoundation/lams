@@ -24,10 +24,7 @@ package org.lamsfoundation.lams.tool.mc;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.web.McAuthoringForm;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Common MCQ utility functions live here.
@@ -67,6 +64,7 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(MAP_QUESTIONS_CONTENT);
 	request.getSession().removeAttribute(IS_REMOVE_CONTENT);
 	request.getSession().removeAttribute(IS_REVISITING_USER);
+	request.getSession().removeAttribute(USER);
 	request.getSession().removeAttribute(TOOL_CONTENT_UID);
 	request.getSession().removeAttribute(TOOL_SESSION_ID);
 	request.getSession().removeAttribute(USER_ID);

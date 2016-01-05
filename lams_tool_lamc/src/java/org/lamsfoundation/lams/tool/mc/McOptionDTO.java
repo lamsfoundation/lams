@@ -22,7 +22,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 
 /**

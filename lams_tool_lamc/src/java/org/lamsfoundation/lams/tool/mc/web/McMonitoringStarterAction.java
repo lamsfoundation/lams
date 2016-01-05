@@ -25,9 +25,7 @@ package org.lamsfoundation.lams.tool.mc.web;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +38,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
@@ -85,7 +82,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	}
 
 	McContent mcContent = service.getMcContent(new Long(toolContentID));
-	mcGeneralMonitoringDTO.setToolContentID(toolContentID.toString());
+	mcGeneralMonitoringDTO.setToolContentID(toolContentID);
 	mcGeneralMonitoringDTO.setActivityTitle(mcContent.getTitle());
 	mcGeneralMonitoringDTO.setActivityInstructions(mcContent.getInstructions());
 	mcGeneralMonitoringDTO.setCurrentMonitoringTab("summary");

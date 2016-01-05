@@ -264,6 +264,7 @@ public interface McAppConstants {
     public static final String LIST_GROUPING_DATA = "listGroupingData";
     public static final String LEARNER_NAME = "learnerName";
     public static final String LIST_MONITORED_MARKS_CONTAINER_DTO = "listMonitoredMarksContainerDto";
+    public static final String SESSION_DTOS = "sessionDtos";
     public static final String TIMEZONE = "timeZone";
 
     public static final String QUESTION_LISTING_MODE = "questionListingMode";

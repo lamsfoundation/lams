@@ -30,13 +30,13 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -106,6 +106,13 @@ public interface IMcService {
     McQueContent getQuestionByUid(Long uid);
 
     McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
+    
+    List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
+
+    int getCountPagedUsersBySession(Long sessionId, String searchString);
+    
+    String getLocalizedMessage(String key);
 
     List<McQueContent> getQuestionsByContentUid(final Long mcContentId) throws McApplicationException;
 
@@ -175,7 +182,7 @@ public interface IMcService {
     List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
     
     /**
-     * Returns userMarksDtos grouped by sessions.
+     * Returns userMarksDtos grouped by sessions. Used *only* for export portfolio.
      * 
      * @param mcContent
      * @param isFullAttemptDetailsRequired
