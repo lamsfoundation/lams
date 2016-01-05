@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 
-<%@ page import="org.lamsfoundation.lams.comments.util.CommentConstants"%>
+<%@ page import="org.lamsfoundation.lams.comments.CommentConstants"%>
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 

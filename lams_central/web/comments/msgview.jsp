@@ -53,25 +53,15 @@
 			</tr>
 			<tr>
 				<td>
-					<c:if test = '${sessionMap.mode == "learner"}'>
-					<!-- Simplify interface with only 1 level of reply. Back end supports multiple levels. -->
-					<c:choose>
-					<c:when test="${commentDto.level==1}">
-						<c:set var="replytopic">
-							<html:rewrite page="/comments/newReplyTopic.do?sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}" />
-						</c:set>
-					</c:when>
-					<c:otherwise>
-						<c:set var="replytopic">
-							<html:rewrite page="/comments/newReplyTopic.do?sessionMapID=${sessionMapID}&parentUid=${commentDto.threadNum}" />
-						</c:set>		
-					</c:otherwise>
-					</c:choose>
+					<c:if test = '${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
+					<c:set var="replytopic">
+						<html:rewrite page="/comments/newReplyTopic.do?sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}" />
+					</c:set>
 					<a href="#" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="comment">Reply</a>
 					&middot; 
 					</c:if>
 					
-					<c:if test='${(sessionMap.mode == "teacher") || commentDto.author }'>
+					<c:if test='${((sessionMap.mode == "teacher") || commentDto.author) && not sessionMap.readOnly }'>
 						<c:set var="edittopic">
 						<html:rewrite page="/comments/editTopic.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}" />
 						</c:set>
@@ -79,7 +69,7 @@
 					&middot; 
 					</c:if>
 
-					<c:if test='${sessionMap.mode == "teacher"}'>
+					<c:if test='${sessionMap.mode == "teacher" && not sessionMap.readOnly}'>
 					<!--  call the hide action -->
 					<c:choose>
 						<c:when test="${hidden}">
@@ -103,20 +93,24 @@
 					<span id="msglikeCount${commentDto.comment.uid}">${commentDto.comment.likeCount}</span> <fmt:message key="label.likes"/>
 					<c:if test = '${sessionMap.mode == "learner"}'>
 						<span id="msgvote${commentDto.comment.uid}">
-						<c:choose> 
-						<c:when test="${empty commentDto.comment.vote}">
+						<c:choose>
+						<c:when test="${empty commentDto.comment.vote && not sessionMap.readOnly}">
 							<span class="fa fa-thumbs-up fa-lg fa-faded" title="<fmt:message key="label.like"/>"
 								onclick="javascript:likeEntry(${commentDto.comment.uid});" id="msglikebutton${commentDto.comment.uid}"></span>
+							<c:if test='${sessionMap.likeAndDislike}'> 
 							&nbsp;<span class="fa fa-thumbs-down fa-lg fa-flip-horizontal fa-faded" title="<fmt:message key="label.dislike"/>"
 							onclick="javascript:dislikeEntry(${commentDto.comment.uid});" id="msgdislikebutton${commentDto.comment.uid}"></span>
+							</c:if>
 						</c:when>
 						<c:when test="${commentDto.comment.vote == 1}">
 							<span class="fa fa-thumbs-o-up fa-lg" title="<fmt:message key="label.like"/>"
 							id="msglikebutton${commentDto.comment.uid}"/>
 						</c:when>
 						<c:otherwise>
+							<c:if test='${sessionMap.likeAndDislike}'> 
 							<span class="fa fa-thumbs-o-down fa-lg fa-flip-horizontal" title="<fmt:message key="label.dislike"/>"
-							id="msgdislikebutton${commentDto.comment.uid}">
+							id="msgdislikebutton${commentDto.comment.uid}"></span>
+							</c:if>
 						</c:otherwise>
 						</c:choose>
 						</span>

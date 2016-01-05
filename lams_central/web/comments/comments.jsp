@@ -51,7 +51,7 @@
 	<body>
 			<h2><fmt:message key="heading.comments"/></h2>
 		
-			<c:if test='${sessionMap.mode == "learner"}'>
+			<c:if test='${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
 			<%@ include file="new.jsp"%>
 			</c:if>
 			

@@ -40,10 +40,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.comments.Comment;
+import org.lamsfoundation.lams.comments.CommentConstants;
 import org.lamsfoundation.lams.comments.CommentLike;
 import org.lamsfoundation.lams.comments.dto.CommentDTO;
 import org.lamsfoundation.lams.comments.service.ICommentService;
-import org.lamsfoundation.lams.comments.util.CommentConstants;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -139,6 +139,8 @@ public class CommentAction extends Action {
         int externalType;
         String externalSignature;
         String mode;
+        boolean likeAndDislike;
+        boolean readOnly;
 
  	// refresh forum page, not initial enter
  	if (sessionMapID != null) {
@@ -155,16 +157,20 @@ public class CommentAction extends Action {
  	    externalId = WebUtil.readLongParam(request, CommentConstants.ATTR_EXTERNAL_ID);
  	    externalType = WebUtil.readIntParam(request, CommentConstants.ATTR_EXTERNAL_TYPE);
  	    externalSignature = WebUtil.readStrParam(request, CommentConstants.ATTR_EXTERNAL_SIG);
+ 	    likeAndDislike = WebUtil.readBooleanParam(request, CommentConstants.ATTR_LIKE_AND_DISLIKE);
+ 	    readOnly = WebUtil.readBooleanParam(request, CommentConstants.ATTR_READ_ONLY);
  	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_ID, externalId);
  	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_TYPE, externalType);
  	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_SIG, externalSignature);
+ 	    sessionMap.put(CommentConstants.ATTR_LIKE_AND_DISLIKE, likeAndDislike);
+ 	    sessionMap.put(CommentConstants.ATTR_READ_ONLY, readOnly);
      	
  	    mode = request.getParameter(AttributeNames.ATTR_MODE);
  	    sessionMap.put(AttributeNames.ATTR_MODE, mode != null ? mode : ToolAccessMode.LEARNER.toString());
  	}
  	
  	User user = getCurrentUser(request);
- 	if ( externalType != CommentConstants.TYPE_TOOL )
+ 	if ( externalType != Comment.EXTERNAL_TYPE_TOOL )
  	    throwException("Unknown comment type ", user.getLogin(), externalId, externalType, externalSignature );
 
         Comment rootComment = getCommentService().createOrGetRoot(externalId, externalType, externalSignature,  user);
@@ -223,6 +229,8 @@ public class CommentAction extends Action {
 	
 	Long lastMsgSeqId = WebUtil.readLongParam(request, CommentConstants.PAGE_LAST_ID, true);
 	Integer pageSize = WebUtil.readIntParam(request, CommentConstants.PAGE_SIZE, true);
+	if ( pageSize == null || pageSize == 0 ) 
+	    pageSize = CommentConstants.DEFAULT_PAGE_SIZE;
 	
 	setupViewTopicPagedDTOList(request, externalId, externalType, externalSignature, sessionMap, user, lastMsgSeqId, pageSize);
 

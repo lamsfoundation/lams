@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.comments.dao.ICommentDAO;
 import org.lamsfoundation.lams.comments.dao.ICommentLikeDAO;
 import org.lamsfoundation.lams.comments.dao.ICommentSessionDAO;
 import org.lamsfoundation.lams.comments.dto.CommentDTO;
-import org.lamsfoundation.lams.comments.util.CommentConstants;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -52,6 +51,8 @@ public class CommentService implements ICommentService {
 
     private static Logger log = Logger.getLogger(CommentService.class);
 
+    private static final String MODULE_NAME = "Comments";
+
     // Services
     private IUserManagementService userService;
     private MessageService messageService;
@@ -64,7 +65,6 @@ public class CommentService implements ICommentService {
     public List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature, Long lastCommentSeqId, Integer pageSize, Integer userId) {
 
 	long lastThreadMessageUid = lastCommentSeqId != null ? lastCommentSeqId.longValue() : 0L;
-	Integer usePagingSize = pageSize != null ? pageSize : CommentConstants.DEFAULT_PAGE_SIZE;
 	
 	// hidden root of all the threads!
 	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
@@ -74,7 +74,7 @@ public class CommentService implements ICommentService {
 	    return new ArrayList<CommentDTO>();
 	}
 
-	SortedSet<Comment> comments =  commentDAO.getNextThreadByThreadId(rootTopic.getUid(), lastThreadMessageUid, usePagingSize, userId);
+	SortedSet<Comment> comments =  commentDAO.getNextThreadByThreadId(rootTopic.getUid(), lastThreadMessageUid, pageSize, userId);
 	return getSortedCommentDTO(comments);
     }
     
@@ -197,7 +197,7 @@ public class CommentService implements ICommentService {
 		    userId = comment.getCreatedBy().getUserId().longValue();
 		    loginName = comment.getCreatedBy().getLogin();
 		}
-		getAuditService().logChange(CommentConstants.MODULE_NAME, userId, loginName,
+		getAuditService().logChange(MODULE_NAME, userId, loginName,
 			    comment.getBody(), newBody);
 	    }
 	    
