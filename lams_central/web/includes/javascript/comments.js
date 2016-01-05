@@ -29,7 +29,12 @@
        		} else {
     			var loadString = "viewTopicThread.do?&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
 				$(threadDiv).load(loadString, function() {
-					$('#msg'+commentUid).focus();
+					// expand up to the reply - in case it is buried down in a lot of replies
+					// don't need to do this if we have started a new thread.
+					if ( threadUid != commentUid ) {
+						$('#tree' + threadUid).treetable("reveal",commentUid);
+						$('#msg'+commentUid).focus();
+					}
 					highlightMessage();
 					resizeIframe();
 				});

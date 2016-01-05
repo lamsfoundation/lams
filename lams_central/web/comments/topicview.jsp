@@ -1,4 +1,4 @@
-<%@ page import="org.lamsfoundation.lams.comments.util.CommentConstants"%>
+<%@ page import="org.lamsfoundation.lams.comments.CommentConstants"%>
 
 <c:set var="maxThreadUid" value="0"/>
 <c:set var="messageTablename" value=""/>
@@ -101,9 +101,12 @@
 			1);		
 		$( '#msglikebutton'+commentUid ).removeClass( 'fa-thumbs-up fa-faded' ).addClass( 'fa-thumbs-o-up' );
 		$( '#msglikebutton'+commentUid ).prop( 'onclick', null );
+		<c:if test='${sessionMap.likeAndDislike}'> 
 		$( '#msgdislikebutton'+commentUid ).css( "display", "none" );
+		</c:if>
 	}
 
+	<c:if test='${sessionMap.likeAndDislike}'> 
 	function dislikeEntry(commentUid) {
 		updateLike(commentUid, 
 			'<html:rewrite page="/comments/dislike.do"/>?sessionMapID=${sessionMapID}&commentUid='+commentUid,
@@ -112,6 +115,7 @@
 		$( '#msgdislikebutton'+commentUid ).prop( 'onclick', null );
 		$( '#msglikebutton'+commentUid ).css( "display", "none" );
 	}
+	</c:if>
 
 </script>
 

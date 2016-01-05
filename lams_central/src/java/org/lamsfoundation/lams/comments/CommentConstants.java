@@ -21,15 +21,10 @@
  */ 
  
 /* $Id$ */ 
-package org.lamsfoundation.lams.comments.util;
+package org.lamsfoundation.lams.comments;
 
 public class CommentConstants {
 
-    public static final String MODULE_NAME = "Comments";
-
-    // type of comments - initially only 1 - tool comments! Found in ATTR_EXTERNAL_TYPE
-    public static final int TYPE_TOOL = 1;
-    
     public static final String ATTR_EXTERNAL_ID = "externalID";
     public static final String ATTR_EXTERNAL_SIG = "externalSig";
     public static final String ATTR_EXTERNAL_TYPE = "externalType";
@@ -45,6 +40,8 @@ public class CommentConstants {
     public static final String ATTR_ERR_MESSAGE = "errMessage";
     public static final String ATTR_HIDE_FLAG = "hideFlag";
     public static final String ATTR_STATUS = "status";
+    public static final String ATTR_LIKE_AND_DISLIKE = "likeAndDislike";
+    public static final String ATTR_READ_ONLY = "readOnly";
 
     // for paging long topics & inlining reply
     public static final String PAGE_LAST_ID = "pageLastId";
