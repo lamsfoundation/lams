@@ -777,13 +777,20 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	Integer oldMark = userAttempt.getMark();
 	int oldTotalMark = mcUsrAttemptDAO.getUserTotalMark(userUid);
 
+	int totalMark = (oldMark == null) ? oldTotalMark + newMark : (oldTotalMark - oldMark) + newMark;
+
+	//update mark for one particular question
 	userAttempt.setMark(newMark);
 	mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
+	
+	//update user's total mark
+	McQueUsr user = userAttempt.getMcQueUsr();
+	user.setLastAttemptTotalMark(totalMark);
+	updateMcQueUsr(user);
 
 	// propagade changes to Gradebook
-	int totalMark = (oldMark == null) ? oldTotalMark + newMark : (oldTotalMark - oldMark) + newMark;
 	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, false);
-
+	
 	// record mark change with audit service
 	auditService.logMarkChange(McAppConstants.MY_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(),
 		userAttempt.getMcQueUsr().getUsername(), "" + oldMark, "" + totalMark);
