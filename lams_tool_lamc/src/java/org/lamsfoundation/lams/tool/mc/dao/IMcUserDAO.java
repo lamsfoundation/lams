@@ -22,6 +22,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 
 /**
@@ -42,11 +45,11 @@ public interface IMcUserDAO {
      *            an identifier for the McQueUsr.
      * @return the persistent instance of a McQueUsr or null if not found
      */
-    public McQueUsr getMcUserByUID(Long uid);
+    McQueUsr getMcUserByUID(Long uid);
 
-    public McQueUsr getMcUserBySession(Long userId, Long sessionUid);
+    McQueUsr getMcUserBySession(Long userId, Long sessionUid);
 
-    public void saveMcUser(McQueUsr mcUser);
+    void saveMcUser(McQueUsr mcUser);
 
     /**
      * <p>
@@ -56,7 +59,7 @@ public interface IMcUserDAO {
      * @param nbUser
      *            The instance of McQueUsr to persist.
      */
-    public void updateMcUser(McQueUsr mcUser);
+    void updateMcUser(McQueUsr mcUser);
 
     /**
      * <p>
@@ -66,8 +69,13 @@ public interface IMcUserDAO {
      * @param nbUser
      *            The instance of McQueUsr to delete.
      */
-    public void removeMcUser(McQueUsr mcUser);
+    void removeMcUser(McQueUsr mcUser);
 
     /** Get the max, min and average mark (in that order) for a session */
-    public Integer[] getMarkStatisticsForSession(Long sessionUid);
+    Integer[] getMarkStatisticsForSession(Long sessionUid);
+
+    List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
+
+    int getCountPagedUsersBySession(Long sessionId, String searchString);
 }

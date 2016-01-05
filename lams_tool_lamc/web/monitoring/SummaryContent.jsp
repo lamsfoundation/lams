@@ -35,36 +35,39 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
-		<c:forEach var="sessionMarkDto" items="${listMonitoredMarksContainerDto}" varStatus="status">
+		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		
-			jQuery("#group${sessionMarkDto.sessionId}").jqGrid({
-				datatype: "local",
-				rowNum: 10000,
+			jQuery("#group${sessionDto.sessionId}").jqGrid({
+				datatype: "json",
+				url: "<c:url value='/monitoring.do'/>?dispatch=getPagedUsers&toolSessionID=${sessionDto.sessionId}",
 				height: 'auto',
 				width: 630,
 				shrinkToFit: ${isShrinkToFit},
-				
-			   	colNames:['#',
+				pager: 'pager-${sessionDto.sessionId}',
+				rowList:[10,20,30,40,50,100],
+				rowNum:10,
+				viewrecords:true,
+			   	caption: "${sessionDto.sessionName}",
+			   	colNames:[
 						'userUid',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
 					    "<fmt:message key="label.monitoring.summary.total" />"],
-					    
 			   	colModel:[
-			   		{name:'id',index:'id', width:20, sorttype:"int"},
 			   		{name:'userUid',index:'userUid', width:0, hidden: true},
-			   		{name:'userName',index:'userName', width:200},
-			   		{name:'total',index:'total', width:50,align:"right",sorttype:"int"}		
+			   		{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }},
+			   		{name:'total',index:'total', width:50,align:"right",sorttype:"int", search:false}		
 			   	],
-			   	
-			   	multiselect: false,
-			   	caption: "${sessionMarkDto.sessionName}",
+			   	loadError: function(xhr,st,err) {
+			   		jQuery("#group${sessionDto.sessionId}").clearGridData();
+			   		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			   	},
 			  	onSelectRow: function(rowid) { 
 			  	    if(rowid == null) { 
 			  	    	rowid=0; 
 			  	    } 
-			   		var userUid = jQuery("#group${sessionMarkDto.sessionId}").getCell(rowid, 'userUid');
+			   		var userUid = jQuery("#group${sessionDto.sessionId}").getCell(rowid, 'userUid');
 					var userMasterDetailUrl = '<c:url value="/monitoring.do"/>';
-		  	        jQuery("#userSummary${sessionMarkDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
+		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
 		  	        	userMasterDetailUrl,
 		  	        	{
@@ -73,20 +76,14 @@
 		  	       		}
 		  	       	);
 	  	  		} 
-			}).hideCol("userId").hideCol("sessionId");
-			
-   	        <c:forEach var="userMarkEntity" items="${sessionMarkDto.userMarks}" varStatus="i">
-   	     		<c:set var="mcUserMarkDTO" scope="request" value="${userMarkEntity.value}"/>
-   	     		jQuery("#group${sessionMarkDto.sessionId}").addRowData(${i.index + 1}, {
-   	   	     		id:"${i.index + 1}",
-   	   	     		userUid:"${mcUserMarkDTO.queUsrId}",
-   	   	     		userName:"${fn:escapeXml(mcUserMarkDTO.fullName)} <c:if test='${mcUserMarkDTO.userGroupLeader}'>( <fmt:message key='label.monitoring.group.leader' />)</c:if>",
-   	   	     		total:"${mcUserMarkDTO.totalMark}"
-   	   	   	    });
-	        </c:forEach>
+			})
+			.jqGrid('filterToolbar', { 
+ 	 			searchOnEnter: false
+ 	 		})
+ 	 		.navGrid("#pager-${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false});
 	        
 	        var oldValue = 0;
-			jQuery("#userSummary${sessionMarkDto.sessionId}").jqGrid({
+			jQuery("#userSummary${sessionDto.sessionId}").jqGrid({
 				datatype: "local",
 				rowNum: 10000,
 				gridstate:"hidden",
@@ -122,7 +119,7 @@
   					}
 					
 					// get maxGrade attribute which was set in masterDetailLoadUp.jsp
-					var maxGrade = jQuery("table#userSummary${sessionMarkDto.sessionId} tr#" + iRow 
+					var maxGrade = jQuery("table#userSummary${sessionDto.sessionId} tr#" + iRow 
 							              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
 					if (+val > +maxGrade) {
 						return maxGrade;
@@ -131,11 +128,11 @@
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
   					var intRegex = /^\d+$/;
   					if (!intRegex.test(val)) {
-  						jQuery("#userSummary${sessionMarkDto.sessionId}").restoreCell(iRow,iCol); 
+  						jQuery("#userSummary${sessionDto.sessionId}").restoreCell(iRow,iCol); 
   					} else {
-   						var parentSelectedRowId = jQuery("#group${sessionMarkDto.sessionId}").getGridParam("selrow");
-  						var previousTotal =  eval(jQuery("#group${sessionMarkDto.sessionId}").getCell(parentSelectedRowId, 'total'));
-  						jQuery("#group${sessionMarkDto.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
+   						var parentSelectedRowId = jQuery("#group${sessionDto.sessionId}").getGridParam("selrow");
+  						var previousTotal =  eval(jQuery("#group${sessionDto.sessionId}").getCell(parentSelectedRowId, 'total'));
+  						jQuery("#group${sessionDto.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
   					}
 				},	  		
   				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
@@ -143,7 +140,7 @@
   					if (!intRegex.test(val)) {
   						return {nan:true};
   					} else {
-  						var userAttemptUid = jQuery("#userSummary${sessionMarkDto.sessionId}").getCell(rowid, 'userAttemptUid');
+  						var userAttemptUid = jQuery("#userSummary${sessionDto.sessionId}").getCell(rowid, 'userAttemptUid');
   						return {userAttemptUid:userAttemptUid};		  				  		
   				  	}
   				}
@@ -170,9 +167,12 @@
 
 </script>
 
-<h1><c:out value="${mcGeneralMonitoringDTO.activityTitle}" escapeXml="true"/></h1>
+<h1>
+	<c:out value="${mcGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
+</h1>
+
 <div class="instructions space-top">
- <c:out value="${mcGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
+	<c:out value="${mcGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
 </div>
 <%@ include file="parts/advanceQuestions.jsp"%>
 
@@ -205,19 +205,20 @@
 		<%@ include file="masterDetailLoadUp.jsp"%>
 	</div>
 		
-	<c:forEach var="sessionMarkDto" items="${listMonitoredMarksContainerDto}" varStatus="status">
+	<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 			
 		<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
 			<c:if test="${isGroupedActivity}">
 				<div style="padding-bottom: 5px; font-size: small;">
-					<B><fmt:message key="group.label" /></B> ${sessionMarkDto.sessionName}
+					<B><fmt:message key="group.label" /></B> ${sessionDto.sessionName}
 				</div>
 			</c:if>
 					
-			<table id="group${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+			<table id="group${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+			<div id="pager-${sessionDto.sessionId}" class="scroll"></div>
 			
 			<div style="margin-top: 10px; width:99%;">
-				<table id="userSummary${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				<table id="userSummary${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 			</div>
 		</div>
 				

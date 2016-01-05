@@ -75,6 +75,12 @@ public class AttributeNames {
     public static final String PARAM_EXT_LMS_ID = "extlmsid";
     public static final String PARAM_CREATE_DATE_TIME = "createDateTime";
     public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
+    
+    // jqGrid parameters
+    public static final String PARAM_PAGE = "page";
+    public static final String PARAM_ROWS = "rows";
+    public static final String PARAM_SIDX = "sidx";
+    public static final String PARAM_SORD = "sord";
 
     public static final String PARAM_LIB = "library";
 

@@ -416,6 +416,22 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    "Exception occured when lams is getting the mc QueUsr by uid." + e.getMessage(), e);
 	}
     }
+    
+    @Override
+    public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
+	    String searchString) {
+	return mcUserDAO.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
+    }
+
+    @Override
+    public int getCountPagedUsersBySession(Long sessionId, String searchString) {
+	return mcUserDAO.getCountPagedUsersBySession(sessionId, searchString);
+    }
+    
+    @Override
+    public String getLocalizedMessage(String key) {
+	return messageService.getMessage(key);
+    }
 
     @Override
     public void saveUserAttempt(McQueUsr user, List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO) {
