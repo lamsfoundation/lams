@@ -145,10 +145,10 @@ public class MonitoringAction extends Action {
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, ResourceConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, ResourceConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, ResourceConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, ResourceConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, AttributeNames.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, AttributeNames.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, AttributeNames.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, AttributeNames.PARAM_SIDX, true);
 	if (sortBy == "") {
 	    sortBy = "userName";
 	}
