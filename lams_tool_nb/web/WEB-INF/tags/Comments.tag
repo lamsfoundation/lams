@@ -7,6 +7,9 @@
 <%@ attribute name="height" required="false" rtexprvalue="true"%>
 <%@ attribute name="width" required="false" rtexprvalue="true"%>
 <%@ attribute name="mode" required="false" rtexprvalue="true"%>
+<%@ attribute name="likeAndDislike" required="false" rtexprvalue="true"%>
+<%@ attribute name="readOnly" required="false" rtexprvalue="true"%>
+
 
 <c:if test="${empty width}">
 	<c:set var="width" value="100%" />
@@ -21,7 +24,15 @@
 	<c:set var="modeStr">&mode=${mode}</c:set>
 </c:if>
 
-<iframe id="commentFrame" class="commentFrame" src="/lams/comments/comments.do?externalID=${toolSessionId}&externalSig=${toolSignature}&externalType=1${modeStr}" style="width: ${width}; height: ${height};"></iframe>
+<c:if test="${empty likeAndDislike}">
+	<c:set var="likeAndDislike" value="false" />
+</c:if>
+
+<c:if test="${empty readOnly}">
+	<c:set var="readOnly" value="false" />
+</c:if>
+
+<iframe id="commentFrame" class="commentFrame" src="/lams/comments/comments.do?externalID=${toolSessionId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}" style="width: ${width}; height: ${height};"></iframe>
 
 <script>
 function resizeCommentFrame(pixels){

@@ -76,7 +76,10 @@ public class NoticeboardContent implements Serializable {
     
     /** nullable persistent field */
     private boolean allowComments;
-
+    
+    /** nullable persistent field */
+    private boolean commentsLikeAndDislike;
+    
     /** persistent field */
     private Set<NoticeboardSession> nbSessions = new HashSet<NoticeboardSession>();
 
@@ -87,7 +90,7 @@ public class NoticeboardContent implements Serializable {
     /** full constructor */
     public NoticeboardContent(Long nbContentId, String title, String content, boolean defineLater,
 	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId, 
-	    Date dateCreated, Date dateUpdated, boolean allowComments) {
+	    Date dateCreated, Date dateUpdated, boolean allowComments, boolean commentsLikeAndDislike) {
 	this.nbContentId = nbContentId;
 	this.title = title;
 	this.content = content;
@@ -99,6 +102,7 @@ public class NoticeboardContent implements Serializable {
 	this.dateCreated = dateCreated;
 	this.dateUpdated = dateUpdated;
 	this.allowComments = allowComments;
+	this.commentsLikeAndDislike = commentsLikeAndDislike;
     }
 
     /**
@@ -118,6 +122,7 @@ public class NoticeboardContent implements Serializable {
 	this.dateCreated = dateCreated;
 	this.dateUpdated = null;
 	this.allowComments = false;
+	this.commentsLikeAndDislike = false;
     }
 
     /**
@@ -218,6 +223,22 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
+     * @hibernate.property column="comments_like_dislike" length="1"
+     */
+
+    public boolean isCommentsLikeAndDislike() {
+	return commentsLikeAndDislike;
+    }
+
+    /**
+     * @param commentsLikeAndDislike
+     *            The commentsLikeAndDislike to set.
+     */
+    public void setCommentsLikeAndDislike(boolean commentsLikeAndDislike) {
+	this.commentsLikeAndDislike = commentsLikeAndDislike;
+    }
+    
+    /**
      * @hibernate.property column="nb_content_id" length="20" not-null="true"
      */
 
@@ -298,7 +319,7 @@ public class NoticeboardContent implements Serializable {
 	    RepositoryCheckedException {
 	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(),
 		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(), nb.isContentInUse(),
-		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments());
+		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments(), nb.isCommentsLikeAndDislike());
 
 	return newContent;
     }
