@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 /**
  * DTO that holds users attempt history data for jsp purposes
  * 
