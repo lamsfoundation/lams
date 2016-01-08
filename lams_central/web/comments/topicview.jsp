@@ -1,6 +1,7 @@
 <%@ page import="org.lamsfoundation.lams.comments.CommentConstants"%>
 
 <c:set var="maxThreadUid" value="0"/>
+<c:set var="minThreadLike" value="-1"/>
 <c:set var="messageTablename" value=""/>
 <c:set var="indent" value="30"/>
 
@@ -125,6 +126,9 @@
 	
 	<c:if test='${(msgLevel <= 1)}'>
 		<c:set var="maxThreadUid" value="${commentDto.comment.uid}"/>
+		<c:if test="${minThreadLike == -1 || minThreadLike > commentDto.comment.likeCount}">
+			<c:set var="minThreadLike" value="${commentDto.comment.likeCount}"/>
+		</c:if>
 	</c:if>
 
 	<c:choose>
@@ -165,7 +169,7 @@
 
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
 	<div class="float-right">
-	<c:set var="more"><html:rewrite page="/comments/viewTopic.do?pageLastId=${maxThreadUid}&sessionMapID=${sessionMapID}" /></c:set>
+	<c:set var="more"><html:rewrite page="/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}" /></c:set>
 	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>
 	</div>
 </c:if>
