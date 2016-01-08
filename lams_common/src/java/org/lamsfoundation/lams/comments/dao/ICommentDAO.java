@@ -22,8 +22,9 @@ public interface ICommentDAO {
      */
     public abstract Comment getRootTopic(Long externalId, Integer externalIdType, String externalSignature);
 
-    public abstract SortedSet<Comment> getThreadByThreadId(Long threadCommentId, Integer userId);
+    public abstract SortedSet<Comment> getThreadByThreadId(Long threadCommentId, Integer sortBy, Integer userId);
 
-    public abstract SortedSet<Comment> getNextThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId, Integer numberOfThreads, Integer userId);
+    public abstract SortedSet<Comment> getNextThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId, 
+	    Integer numberOfThreads, Integer sortBy, String extraSortParam, Integer userId);
 
 }

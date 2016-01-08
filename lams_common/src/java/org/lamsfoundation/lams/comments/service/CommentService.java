@@ -62,7 +62,8 @@ public class CommentService implements ICommentService {
     private ICommentLikeDAO commentLikeDAO;
 
     @Override
-    public List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature, Long lastCommentSeqId, Integer pageSize, Integer userId) {
+    public List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature, Long lastCommentSeqId, 
+	    Integer pageSize, Integer sortBy, String extraSortParam, Integer userId) {
 
 	long lastThreadMessageUid = lastCommentSeqId != null ? lastCommentSeqId.longValue() : 0L;
 	
@@ -74,7 +75,7 @@ public class CommentService implements ICommentService {
 	    return new ArrayList<CommentDTO>();
 	}
 
-	SortedSet<Comment> comments =  commentDAO.getNextThreadByThreadId(rootTopic.getUid(), lastThreadMessageUid, pageSize, userId);
+	SortedSet<Comment> comments =  commentDAO.getNextThreadByThreadId(rootTopic.getUid(), lastThreadMessageUid, pageSize, sortBy, extraSortParam, userId);
 	return getSortedCommentDTO(comments);
     }
     
@@ -90,8 +91,8 @@ public class CommentService implements ICommentService {
 	return msgDtoList;
     }
 
-    public List<CommentDTO> getThread( Long threadId, Integer userId ) {	
-	SortedSet<Comment> comments =  commentDAO.getThreadByThreadId(threadId, userId);
+    public List<CommentDTO> getThread( Long threadId, Integer sortBy, Integer userId ) {	
+	SortedSet<Comment> comments =  commentDAO.getThreadByThreadId(threadId, sortBy, userId);
 	return getSortedCommentDTO(comments);
     }
 

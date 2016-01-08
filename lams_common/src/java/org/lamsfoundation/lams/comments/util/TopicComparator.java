@@ -88,8 +88,8 @@ public class TopicComparator implements Comparator<Comment> {
 	}
 
 	// If Level = 1 then "top" so sort newest first. Otherwise sort oldest first.
-	private int compareUids(int compareLevel, Comment c1, Comment c2) {
-	    if ( compareLevel <= 1 )
+	protected int compareUids(int compareLevel, Comment c1, Comment c2) {
+	    if ( compareLevel <= 2 )
 		return  c1.getUid() < c2.getUid() ? 1 : -1;
 	    else 
 		return  c1.getUid() > c2.getUid() ? 1 : -1;

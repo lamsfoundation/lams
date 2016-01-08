@@ -33,8 +33,13 @@ import org.lamsfoundation.lams.util.MessageService;
 
 public interface ICommentService {
 
+    public static final Integer SORT_BY_DATE = 0;
+    public static final Integer SORT_BY_LIKE = 1;
+
+
     /** Gets the comments for a tool, based on the tool session and the tool's id. Allows for paging */
-    List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature, Long lastMsgSeqId, Integer pageSize, Integer userId);
+    List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature, Long lastMsgSeqId, 
+	    Integer pageSize, Integer sortBy, String extraSortParam, Integer userId);
 
     /** Saves a comment - either creating a whole tree one if there is no parent or saving under the given parent. */
     Comment createReply(Long parentId, String replyText, User user);
@@ -49,7 +54,7 @@ public interface ICommentService {
     /**
      * Get one complete thread within a topic Note that the return type is DTO.
      */
-    List<CommentDTO> getThread( Long threadId, Integer userId );
+    List<CommentDTO> getThread( Long threadId, Integer sortBy, Integer userId );
     
     /** Get a single comment. Note that the return type is DTO */
     CommentDTO getComment(Long commentUid);
@@ -62,10 +67,6 @@ public interface ICommentService {
 	
     /** Update the hidden / not hidden flag */
     Comment hideComment(Long commentUid, User user, boolean status);
-    /**
-     * Get the id of the root topic of this comment. 
-     */
-//    public Long getRootTopicId(Long commentId);//
     
     /* Utility calls for the Action */
     MessageService getMessageService();
