@@ -44,7 +44,7 @@
 	</html:form>
 	
 	<c:if test="${allowComments}">
-		<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"  likeAndDislike="${likeAndDislike}" readOnly="true"/>
+		<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"  likeAndDislike="${likeAndDislike}" readOnly="true" pageSize="10" sortBy="1"/>
 	</c:if>	
 	
 </div>
