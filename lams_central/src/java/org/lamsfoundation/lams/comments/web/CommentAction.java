@@ -141,6 +141,8 @@ public class CommentAction extends Action {
         String mode;
         boolean likeAndDislike;
         boolean readOnly;
+        Integer pageSize;
+        Integer sortBy;
 
  	// refresh forum page, not initial enter
  	if (sessionMapID != null) {
@@ -149,6 +151,8 @@ public class CommentAction extends Action {
  	    externalType = (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE);
  	    externalSignature = (String) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SIG);
  	    mode = (String) sessionMap.get(AttributeNames.ATTR_MODE);
+ 	    pageSize = (Integer) sessionMap.get(CommentConstants.PAGE_SIZE);
+ 	   sortBy = (Integer) sessionMap.get(CommentConstants.ATTR_SORT_BY);
 
  	} else {
  	    sessionMap = new SessionMap<String, Object>();
@@ -159,12 +163,21 @@ public class CommentAction extends Action {
  	    externalSignature = WebUtil.readStrParam(request, CommentConstants.ATTR_EXTERNAL_SIG);
  	    likeAndDislike = WebUtil.readBooleanParam(request, CommentConstants.ATTR_LIKE_AND_DISLIKE);
  	    readOnly = WebUtil.readBooleanParam(request, CommentConstants.ATTR_READ_ONLY);
+ 	    pageSize = WebUtil.readIntParam(request,  CommentConstants.PAGE_SIZE, true);
+ 	    if ( pageSize == null )
+ 		pageSize = CommentConstants.DEFAULT_PAGE_SIZE;
+ 	    sortBy = (Integer) WebUtil.readIntParam(request, CommentConstants.ATTR_SORT_BY, true);
+ 	    if ( sortBy == null )
+ 		sortBy = ICommentService.SORT_BY_DATE;
+ 	    
  	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_ID, externalId);
  	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_TYPE, externalType);
  	    sessionMap.put(CommentConstants.ATTR_EXTERNAL_SIG, externalSignature);
  	    sessionMap.put(CommentConstants.ATTR_LIKE_AND_DISLIKE, likeAndDislike);
  	    sessionMap.put(CommentConstants.ATTR_READ_ONLY, readOnly);
-     	
+     	    sessionMap.put(CommentConstants.PAGE_SIZE, pageSize);
+ 	    sessionMap.put(CommentConstants.ATTR_SORT_BY, sortBy);
+
  	    mode = request.getParameter(AttributeNames.ATTR_MODE);
  	    sessionMap.put(AttributeNames.ATTR_MODE, mode != null ? mode : ToolAccessMode.LEARNER.toString());
  	}
@@ -175,7 +188,7 @@ public class CommentAction extends Action {
 
         Comment rootComment = getCommentService().createOrGetRoot(externalId, externalType, externalSignature,  user);
         sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
- 	return viewTopicImpl(mapping, form, request, response, sessionMap);
+ 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy);
     }
 
     private void throwException(String msg, String loginName, Long externalId, Integer externalType, String externalSignature) throws ServletException {
@@ -196,7 +209,8 @@ public class CommentAction extends Action {
     
     /**
      * Display the comments for a given external id (usually tool session id). The session comments will be 
-     * arranged by Tree structure and loaded thread by thread (with paging).
+     * arranged by Tree structure and loaded thread by thread (with paging). This may set a new value of sort by, so 
+     * make sure the session is updated.
      * 
      * @param mapping
      * @param form
@@ -210,12 +224,16 @@ public class CommentAction extends Action {
 
 	String sessionMapID = WebUtil.readStrParam(request, CommentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
- 	return viewTopicImpl(mapping, form, request, response, sessionMap);
+	Integer pageSize = WebUtil.readIntParam(request, CommentConstants.PAGE_SIZE, true);
+	Integer sortBy = WebUtil.readIntParam(request, CommentConstants.ATTR_SORT_BY, true);
+	if ( sortBy != null )
+	    sessionMap.put( CommentConstants.ATTR_SORT_BY, sortBy);
+ 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy);
 
     }
     
     private ActionForward viewTopicImpl(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, SessionMap<String, Object> sessionMap) {
+	    HttpServletResponse response, SessionMap<String, Object> sessionMap, Integer pageSize, Integer sortBy) {
 
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
 	Integer externalType = (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE);
@@ -228,12 +246,20 @@ public class CommentAction extends Action {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	
 	Long lastMsgSeqId = WebUtil.readLongParam(request, CommentConstants.PAGE_LAST_ID, true);
-	Integer pageSize = WebUtil.readIntParam(request, CommentConstants.PAGE_SIZE, true);
-	if ( pageSize == null || pageSize == 0 ) 
-	    pageSize = CommentConstants.DEFAULT_PAGE_SIZE;
-	
-	setupViewTopicPagedDTOList(request, externalId, externalType, externalSignature, sessionMap, user, lastMsgSeqId, pageSize);
+	String currentLikeCount = WebUtil.readStrParam(request, CommentConstants.ATTR_LIKE_COUNT, true);
 
+	if ( pageSize == null )
+	    pageSize = (Integer) sessionMap.get(CommentConstants.PAGE_SIZE);	
+	if ( sortBy == null )
+	    sortBy = (Integer) sessionMap.get(CommentConstants.ATTR_SORT_BY);	
+
+	List<CommentDTO> msgDtoList = commentService.getTopicThread(externalId, externalType, externalSignature, lastMsgSeqId, pageSize, sortBy, currentLikeCount, user.getUserID());
+	updateMessageFlag(msgDtoList, user.getUserID());
+	request.setAttribute(CommentConstants.ATTR_COMMENT_THREAD, msgDtoList);
+	
+	// transfer SessionMapID as well
+	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	
 	return mapping.findForward("success");
     }
 
@@ -241,18 +267,6 @@ public class CommentAction extends Action {
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapId = WebUtil.readStrParam(request, CommentConstants.ATTR_SESSION_MAP_ID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapId);
-    }
-
-    private void setupViewTopicPagedDTOList(HttpServletRequest request, Long externalId, Integer externalType, String externalSignature,
-	    SessionMap<String, Object> sessionMap, UserDTO user, Long lastMsgSeqId, Integer pageSize) {
-
-	// get root topic list
-	List<CommentDTO> msgDtoList = commentService.getTopicThread(externalId, externalType, externalSignature, lastMsgSeqId, pageSize, user.getUserID());
-	updateMessageFlag(msgDtoList, user.getUserID());
-	request.setAttribute(CommentConstants.ATTR_COMMENT_THREAD, msgDtoList);
-
-	// transfer SessionMapID as well
-	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
     }
 
     /**
@@ -275,7 +289,11 @@ public class CommentAction extends Action {
 	// get forum user and forum
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Long threadId = WebUtil.readLongParam(request, CommentConstants.ATTR_THREAD_ID, true);
-	List<CommentDTO> msgDtoList = commentService.getThread(threadId, user.getUserID());
+	Integer sortBy = WebUtil.readIntParam(request, CommentConstants.ATTR_SORT_BY, true);
+	if ( sortBy != null )
+	    sessionMap.put( CommentConstants.ATTR_SORT_BY, sortBy);
+
+	List<CommentDTO> msgDtoList = commentService.getThread(threadId, sortBy, user.getUserID());
 	updateMessageFlag(msgDtoList, user.getUserID());
 	request.setAttribute(CommentConstants.ATTR_COMMENT_THREAD, msgDtoList);
 

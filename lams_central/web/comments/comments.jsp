@@ -39,8 +39,27 @@
 
 		<script type="text/javascript">
 			$(document).ready(function(){
-				scrollDoneCallback();
+			    scrollDoneCallback();
+			    
+   				$('#sortMenu').change(function(){
+			        var url = "<lams:LAMSURL />/comments/viewTopic.do?sessionMapID=${sessionMapID}&sortBy="+$(this).find("option:selected").attr('value');
+			        reloadScroll(url);
+			    });
 			});
+			
+			function refreshComments(){
+				var reqIDVar = new Date();
+				reloadScroll('<lams:LAMSURL />/comments/viewTopic.do?sessionMapID=${sessionMapID}&reqUid='+reqIDVar.getTime());
+			}
+
+			function reloadScroll(url) {
+				$('#newcomments').children().remove();
+				$('.scroll').load(url, function() {
+					$('.scroll').data('jscroll', null);
+					$('.scroll').jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:false,callback:scrollDoneCallback});
+					resizeIframe();
+				});
+			}
 			
 			function scrollDoneCallback() {
 				resizeIframe();				
@@ -54,6 +73,12 @@
 			<c:if test='${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
 			<%@ include file="new.jsp"%>
 			</c:if>
+
+			
+			<select id="sortMenu" name="sortMenu">
+    			<option value='0' <c:if test='${sessionMap.sortBy == 0}'>selected</c:if>><fmt:message key="label.newest.first"/></option>
+    			<option value='1' <c:if test='${sessionMap.sortBy == 1}'>selected</c:if>><fmt:message key="label.top.comments"/></option>
+			</select>
 			
 			<div id="newcomments"></div>			
 

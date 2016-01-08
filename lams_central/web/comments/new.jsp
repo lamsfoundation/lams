@@ -62,11 +62,6 @@
 		return false;
 	}
 	
-	function refreshTopic(){
-		var reqIDVar = new Date();
-		location.href= '<html:rewrite page="/comments/comments.do?externalType=${sessionMap.externalType}&externalSig=${sessionMap.externalSig}&externalID=${sessionMap.externalID}&sessionMapID=${sessionMapID}&reqUid=" />'+reqIDVar.getTime();
-	}
-	
 </script>
 
 <div class="comment-entry">
@@ -76,7 +71,7 @@
 	
 	<div class="space-bottom">
 	<div class="left-buttons">
-			<a href="javascript:refreshTopic();" class="button"> <fmt:message key="label.refresh" /> </a>
+			<a href="javascript:refreshComments();" class="button"> <fmt:message key="label.refresh" /> </a>
 	</div>
 	<div class="right-buttons">
 		<a href="#" onclick="javascript:clearNewForm();" class="button">
