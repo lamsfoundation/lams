@@ -1,5 +1,3 @@
-<%@ tag import="org.lamsfoundation.lams.comments.CommentConstants"%> 
-
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
@@ -34,10 +32,6 @@
 
 <c:if test="${empty readOnly}">
 	<c:set var="readOnly" value="false" />
-</c:if>
-
-<c:if test="${empty pageSize}">
-	<c:set var="pageSize" value="<%= CommentConstants.DEFAULT_PAGE_SIZE %>" />
 </c:if>
 
 <c:if test="${empty sortBy}">
