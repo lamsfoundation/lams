@@ -185,9 +185,11 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         	request.setAttribute("reflectEntry", notebookEntry.getEntry());
         }
         request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
-	    request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
+	request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
+	request.setAttribute("allowComments", nbContent.isAllowComments());
+	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
 	    
-	    Boolean userFinished = (nbUser!=null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
+	Boolean userFinished = (nbUser!=null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
         request.setAttribute("userFinished", userFinished);
 	    
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()

@@ -1,3 +1,4 @@
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
 <%@ include file="/includes/taglibs.jsp"%>
 
 
@@ -65,6 +66,10 @@
 			</div>
 		</c:if>
 
+		<c:if test="${allowComments}">
+			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" />
+		</c:if>
+
 		<div class="space-bottom-top align-right">
 			<c:if test="${not NbLearnerForm.readOnly}">
 				<c:choose>
@@ -95,6 +100,7 @@
 			</c:if>
 		</div>
 	</html:form>
+	
 </div>
 
 

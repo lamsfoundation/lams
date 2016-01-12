@@ -41,6 +41,7 @@
        <list>
        		<value>/org/lamsfoundation/lams/applicationContext.xml</value>
 			<value>/org/lamsfoundation/lams/toolApplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/comments/commentsContext.xml</value>
 			<value>/org/lamsfoundation/lams/contentrepository/applicationContext.xml</value>
 			<value>/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml</value>
 			<value>/org/lamsfoundation/lams/learning/learningApplicationContext.xml</value>

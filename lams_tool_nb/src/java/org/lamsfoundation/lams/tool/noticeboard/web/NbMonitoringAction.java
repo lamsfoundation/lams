@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                input=".monitoringContent" validate="false" parameter="method"
  * @struts:action-forward name="monitorPage" path="/monitoring/monitoring.jsp"
  * @struts:action-forward name="monitorReflectionPage" path="/monitoring/reflection.jsp"
+ * @struts:action-forward name="monitorCommentsPage" path="/monitoring/comments.jsp"
  * ----------------XDoclet Tags--------------------
  */
 public class NbMonitoringAction extends LamsDispatchAction {
@@ -119,13 +120,15 @@ public class NbMonitoringAction extends LamsDispatchAction {
         
         Set sessions = content.getNbSessions();
         Iterator i = sessions.iterator();
-        Map map = new HashMap();
+        Map numUsersMap = new HashMap();
+        Map sessionIdMap = new HashMap();
         List<ReflectionDTO> reflections = new ArrayList<ReflectionDTO>();
         while (i.hasNext())
         {
         	NoticeboardSession session = (NoticeboardSession) i.next();
             int numUsersInSession = nbService.getNumberOfUsersInSession(session);
-            map.put(session.getNbSessionName(), new Integer(numUsersInSession));
+            numUsersMap.put(session.getNbSessionName(), new Integer(numUsersInSession));
+            sessionIdMap.put(session.getNbSessionName(), session.getNbSessionId());
             // Get list of users that have made a reflection entry 
             if (content.getReflectOnActivity()) {
             	List sessionUsers = nbService.getUsersBySession(session.getNbSessionId());
@@ -143,16 +146,19 @@ public class NbMonitoringAction extends LamsDispatchAction {
             	}
             }
         }
-        monitorForm.setGroupStatsMap(map);
+        monitorForm.setGroupStatsMap(numUsersMap);
+        monitorForm.setSessionIdMap(sessionIdMap);
         
         boolean isGroupedActivity = nbService.isGroupedActivity(toolContentId);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
-        
+
         // Set reflection statistics, if reflection is set
         request.setAttribute("reflectOnActivity", content.getReflectOnActivity());
         request.setAttribute("reflectInstructions", content.getReflectInstructions());
         request.setAttribute("reflections", reflections);
-        
+
+	request.setAttribute("allowComments", content.isAllowComments());
+
         String currentTab = WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
    		monitorForm.setCurrentTab(currentTab != null? currentTab : SUMMARY_TABID);
         request.setAttribute(FORM, monitorForm);
@@ -178,5 +184,15 @@ public class NbMonitoringAction extends LamsDispatchAction {
     	
     	return mapping.findForward(NoticeboardConstants.MONITOR_REFLECTION_PAGE);
     }
-   
+
+    public ActionForward viewComments (
+		ActionMapping mapping,
+		ActionForm form,
+		HttpServletRequest request,
+		HttpServletResponse response) throws NbApplicationException
+    {
+	request.setAttribute(NoticeboardConstants.TOOL_SESSION_ID, request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
+	return mapping.findForward(NoticeboardConstants.MONITOR_COMMENTS_PAGE);
+    }
+
 }

@@ -2,6 +2,7 @@
 
 <!-- ========== Advanced Tab ========== -->
 
+<lams:CommentsAuthor/>
 
 <p class="small-space-top">
 	<html:checkbox property="reflectOnActivity" value="1"
