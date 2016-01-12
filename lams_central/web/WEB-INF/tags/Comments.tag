@@ -1,5 +1,3 @@
-<%@ tag import="org.lamsfoundation.lams.comments.CommentConstants"%> 
-
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
