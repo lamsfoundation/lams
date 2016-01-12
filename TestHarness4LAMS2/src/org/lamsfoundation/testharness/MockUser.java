@@ -106,7 +106,7 @@ public class MockUser {
 	    }
 	    Map<String, Object> params = new HashMap<String, Object>();
 	    params.put(MockUser.USERNAME, username);
-	    params.put(MockUser.PASSWORD, MockUser.sha1(password));
+	    params.put(MockUser.PASSWORD, password);
 	    resp = (WebResponse) new Call(wc, test, username + " login", fillForm(resp, 0, params)).execute();
 	    if (!MockUser.checkPageContains(resp, MockUser.INDEX_PAGE_FLAG)) {
 		MockUser.log.debug(resp.getText());
@@ -115,8 +115,6 @@ public class MockUser {
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	} catch (SAXException e) {
-	    throw new RuntimeException(e);
-	} catch (NoSuchAlgorithmException e) {
 	    throw new RuntimeException(e);
 	}
     }
@@ -146,8 +144,8 @@ public class MockUser {
 	}
     }
 
-    protected WebForm fillForm(WebResponse resp, int formIndex, Map<String, Object> params) throws SAXException,
-	    IOException {
+    protected WebForm fillForm(WebResponse resp, int formIndex, Map<String, Object> params)
+	    throws SAXException, IOException {
 	WebForm[] forms = resp.getForms();
 	if ((forms == null) || (forms.length <= formIndex)) {
 	    MockUser.log.debug(resp.getText());
@@ -166,8 +164,8 @@ public class MockUser {
 		} else if (value instanceof UploadFileSpec[]) {
 		    form.setParameter(entry.getKey(), (UploadFileSpec[]) entry.getValue());
 		} else {
-		    throw new TestHarnessException("Unsupported parameter value type:"
-			    + entry.getValue().getClass().getName());
+		    throw new TestHarnessException(
+			    "Unsupported parameter value type:" + entry.getValue().getClass().getName());
 		}
 	    }
 	}
