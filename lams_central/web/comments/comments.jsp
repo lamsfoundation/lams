@@ -86,16 +86,16 @@
 				<fmt:message key="label.no.comments"/>
 			</c:if>
 					
-			<c:if test="${! empty commentThread}">
 			<div class="space-bottom">
 			<div class="scroll" >
+			<c:if test="${! empty commentThread}">
 			<%@ include file="topicview.jsp"%>
+			</c:if>
 			</div>
 			</div>
 			<script>
 				$('.scroll').jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:false,callback:scrollDoneCallback});
 			</script>
-			</c:if>
 					
 	</body>
 </lams:html>
