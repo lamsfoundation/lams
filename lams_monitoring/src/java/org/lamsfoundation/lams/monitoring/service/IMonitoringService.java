@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -345,7 +346,7 @@ public interface IMonitoringService {
     void removeLesson(long lessonId, Integer userId) throws SecurityException;
 
     /**
-     * Removes the lesson and all referenced resources (learning design, tool content etc.) from the database. 
+     * Removes the lesson and all referenced resources (learning design, tool content etc.) from the database.
      */
     void removeLessonPermanently(long lessonId, Integer userId) throws SecurityException;
 
@@ -674,13 +675,13 @@ public interface IMonitoringService {
      *            Activity id of the branchingActivity
      */
     SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException;
-    
+
     /**
      * Get all the users records where the user has attempted the given activity, but has not completed it yet. Uses the
      * progress records to determine the users.
      */
     List<User> getLearnersAttemptedActivity(Activity activity);
-    
+
     /**
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
@@ -718,9 +719,9 @@ public interface IMonitoringService {
     Integer getCountLearnersFromProgress(Long lessonId, String searchPhrase);
 
     /**
-     * Get number of learners who are at the given activity at the moment.
+     * Get number of learners who are at the given activities at the moment.
      */
-    Integer getCountLearnersCurrentActivity(Activity activity);
+    Map<Long, Integer> getCountLearnersCurrentActivities(Long[] activityIds);
 
     /**
      * Get number of learners who finished the given lesson.

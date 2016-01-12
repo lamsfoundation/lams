@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -65,15 +67,15 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + " where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
     private final static String COUNT_ATTEMPTED_ACTIVITY = "select count(*) from LearnerProgress prog, "
-	    + " Activity act join prog.attemptedActivities attAct " + " where act.id = :activityId and "
+	    + " Activity act join prog.attemptedActivities attAct where act.id = :activityId and "
 	    + " index(attAct) = act";
 
     private final static String COUNT_COMPLETED_ACTIVITY = "select count(*) from LearnerProgress prog, "
-	    + " Activity act join prog.completedActivities compAct " + " where act.id = :activityId and "
+	    + " Activity act join prog.completedActivities compAct where act.id = :activityId and "
 	    + " index(compAct) = act";
 
-    private final static String COUNT_CURRENT_ACTIVITY = "select count(*) from LearnerProgress prog WHERE "
-	    + " prog.currentActivity = :activity";
+    private final static String COUNT_CURRENT_ACTIVITY = "select prog.currentActivity.activityId, count(prog) "
+	    + "from LearnerProgress prog WHERE prog.currentActivity.activityId IN (:activityIds) GROUP BY prog.currentActivity.activityId";
 
     private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
@@ -308,10 +310,23 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	return ((Number) value).intValue();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Integer getNumUsersCurrentActivity(Activity activity) {
-	Object value = getSession().createQuery(LearnerProgressDAO.COUNT_CURRENT_ACTIVITY)
-		.setEntity("activity", activity).uniqueResult();
-	return ((Number) value).intValue();
+    public Map<Long, Integer> getNumUsersCurrentActivities(Long[] activityIds) {
+	List<Object[]> resultQuery = getSession().createQuery(LearnerProgressDAO.COUNT_CURRENT_ACTIVITY)
+		.setParameterList("activityIds", activityIds).list();
+	Map<Long, Integer> result = new TreeMap<Long, Integer>();
+	// put all requested activity IDs into the result
+	for (Long activityId : activityIds) {
+	    result.put(activityId, 0);
+	}
+	// update only the existing ones
+	for (Object[] entry : resultQuery) {
+	    // for some reason entry can be null
+	    if (entry != null) {
+		result.put((Long) entry[0], ((Long) entry[1]).intValue());
+	    }
+	}
+	return result;
     }
 }

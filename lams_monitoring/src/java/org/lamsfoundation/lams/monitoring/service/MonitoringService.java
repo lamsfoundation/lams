@@ -2410,10 +2410,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public List<User> getLearnersAttemptedActivity(Activity activity){
+    public List<User> getLearnersAttemptedActivity(Activity activity) {
 	return learnerProgressDAO.getLearnersAttemptedActivity(activity);
     }
-    
+
     @Override
     public List<User> getLearnersAttemptedOrCompletedActivity(Activity activity) throws LessonServiceException {
 	return lessonService.getLearnersAttemptedOrCompletedActivity(activity);
@@ -2452,8 +2452,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public Integer getCountLearnersCurrentActivity(Activity activity) {
-	return learnerProgressDAO.getNumUsersCurrentActivity(activity);
+    public Map<Long, Integer> getCountLearnersCurrentActivities(Long[] activityIds) {
+	return learnerProgressDAO.getNumUsersCurrentActivities(activityIds);
     }
 
     @Override
