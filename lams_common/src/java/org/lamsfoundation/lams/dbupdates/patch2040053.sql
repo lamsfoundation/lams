@@ -2,7 +2,7 @@
 SET AUTOCOMMIT = 0;
 
 -- LDEV-3631 	Simple Commenting Widget
-CREATE TABLE lams_comment_session (
+CREATE TABLE IF NOT EXISTS lams_comment_session (
   `uid` bigint(20) NOT NULL AUTO_INCREMENT,
   `external_id` bigint(20) DEFAULT NULL,
   `external_id_type` int(1) DEFAULT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE lams_comment_session (
   UNIQUE INDEX `comment_ext_sig_user` (`external_id`,`external_id_type`,`external_signature`)
 );
 
-CREATE TABLE lams_comment (
+CREATE TABLE IF NOT EXISTS lams_comment (
   `uid` bigint(20) NOT NULL AUTO_INCREMENT,
   `session_id` bigint(20) NOT NULL,
   `body` text DEFAULT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE lams_comment (
   CONSTRAINT `FK_comment_thread` FOREIGN KEY (`thread_comment_uid`) REFERENCES `lams_comment` (`uid`)
 );
 
-CREATE TABLE lams_comment_likes (
+CREATE TABLE IF NOT EXISTS lams_comment_likes (
   `uid` bigint(20) NOT NULL AUTO_INCREMENT,
   `comment_uid` bigint(20) NOT NULL,
   `user_id` bigint(20) NOT NULL,
