@@ -131,7 +131,6 @@ public class MonitoringAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     // Class level constants - Struts forward
     // ---------------------------------------------------------------------
-    private static final String PREVIEW_DELETED_REPORT_SCREEN = "previewdeleted";
     private static final String NOT_SUPPORTED_SCREEN = "notsupported";
     private static final String TIME_CHART_SCREEN = "timeChart";
     private static final String ERROR = "error";
@@ -813,8 +812,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    for (User learner : learners) {
 		learnersJSON.put(WebUtil.userToJSON(learner));
 	    }
-
-	    learnerCount = getMonitoringService().getCountLearnersCurrentActivity(activity);
+	    learnerCount = getMonitoringService().getCountLearnersCurrentActivities(new Long[] { activityId })
+		    .get(activityId);
 	}
 
 	JSONObject responseJSON = new JSONObject();
@@ -1099,7 +1098,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	JSONObject responseJSON = new JSONObject();
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
-	String contentFolderId = learningDesign.getContentFolderID();
 
 	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 
@@ -1219,6 +1217,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseJSON.put("searchedLearnerFound", searchedLearnerProgress != null);
 	}
 
+	// Fetch number of learners at each activity
+	Long[] activityIds = new Long[activities.size()];
+	int index = 0;
+	for (Activity activity : activities) {
+	    activityIds[index++] = activity.getActivityId();
+	}
+	Map<Long, Integer> learnerCounts = getMonitoringService().getCountLearnersCurrentActivities(activityIds);
+
 	JSONArray activitiesJSON = new JSONArray();
 	for (Activity activity : activities) {
 	    Long activityId = activity.getActivityId();
@@ -1264,25 +1270,18 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 
 	    // find few latest users and count of all users for each activity
-	    int learnerCount = 0;
+	    int learnerCount = learnerCounts.get(activityId);
 	    if (activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity()) {
 		// go through hidden children of complex activities and take them into account
-		learnerCount += getMonitoringService().getCountLearnersCurrentActivity(activity);
 		Set<Activity> children = parentToChildren.get(activityId);
 		if (children != null) {
 		    for (Activity child : children) {
-			learnerCount += getMonitoringService().getCountLearnersCurrentActivity(child);
+			learnerCount += learnerCounts.get(child.getActivityId());
 		    }
 		}
 	    } else {
 		List<User> latestLearners = getMonitoringService().getLearnersLatestByActivity(activity.getActivityId(),
 			MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT, null);
-		if (latestLearners.size() < MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT) {
-		    // if there are less learners than the limit, we already know the size
-		    learnerCount = latestLearners.size();
-		} else {
-		    learnerCount = getMonitoringService().getCountLearnersCurrentActivity(activity);
-		}
 
 		if ((searchedLearnerProgress != null) && (searchedLearnerProgress.getCurrentActivity() != null)
 			&& activity.getActivityId()
@@ -1390,7 +1389,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON);
 	return null;
-
     }
 
     public ActionForward releaseGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,

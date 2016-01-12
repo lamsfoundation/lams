@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -718,9 +719,9 @@ public interface IMonitoringService {
     Integer getCountLearnersFromProgress(Long lessonId, String searchPhrase);
 
     /**
-     * Get number of learners who are at the given activity at the moment.
+     * Get number of learners who are at the given activities at the moment.
      */
-    Integer getCountLearnersCurrentActivity(Activity activity);
+    Map<Long, Integer> getCountLearnersCurrentActivities(Long[] activityIds);
 
     /**
      * Get number of learners who finished the given lesson.

@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.lesson.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -186,7 +187,7 @@ public interface ILearnerProgressDAO {
     Integer getNumUsersCompletedLesson(Long lessonId);
 
     /**
-     * Get number of learners who are at the given activity at the moment.
+     * Get number of learners who are at the given activities at the moment.
      */
-    Integer getNumUsersCurrentActivity(Activity activity);
+    Map<Long, Integer> getNumUsersCurrentActivities(Long[] activityIds);
 }
