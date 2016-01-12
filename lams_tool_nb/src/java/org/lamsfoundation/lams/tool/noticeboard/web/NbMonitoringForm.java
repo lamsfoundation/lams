@@ -72,6 +72,7 @@ public class NbMonitoringForm extends ActionForm {
 	private String contentEditable;
 	private Integer totalLearners;
 	private Map groupStatsMap;
+	private Map sessionIdMap;
 
 	/**
      * @return Returns the parametersToAppend.
@@ -153,5 +154,11 @@ public class NbMonitoringForm extends ActionForm {
 	}
 	public void setTotalLearners(Integer totalLearners) {
 		this.totalLearners = totalLearners;
+	}
+	public Map getSessionIdMap() {
+	    return sessionIdMap;
+	}
+	public void setSessionIdMap(Map sessionIdMap) {
+	    this.sessionIdMap = sessionIdMap;
 	}
 }

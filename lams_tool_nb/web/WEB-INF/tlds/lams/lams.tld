@@ -481,5 +481,13 @@
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
 	</tag-file>
+   	<tag-file>
+       <name>Comments</name>
+       <path>/WEB-INF/tags/Comments.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>CommentsAuthor</name>
+       <path>/WEB-INF/tags/CommentsAuthor.tag</path>
+   	</tag-file>
 
 </taglib>
