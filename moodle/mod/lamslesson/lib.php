@@ -49,7 +49,7 @@ define('LAMSLESSON_PARAM_SERVERID', 'sid');
 define('LAMSLESSON_PARAM_TIMESTAMP', 'ts');
 define('LAMSLESSON_PARAM_HASH', 'hash');
 define('LAMSLESSON_PARAM_METHOD', 'method');
-define('LAMSLESSON_PARAM_COURSEID', 'courseId');
+define('LAMSLESSON_PARAM_COURSEID', 'courseid');
 define('LAMSLESSON_PARAM_COURSENAME', 'courseName');
 define('LAMSLESSON_PARAM_COUNTRY', 'country');
 define('LAMSLESSON_PARAM_LANG', 'lang');

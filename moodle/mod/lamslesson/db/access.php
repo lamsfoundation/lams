@@ -50,6 +50,16 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
+    'mod/lamslesson:addinstance' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'admin' => CAP_ALLOW
+        )
+    ),
+
     'mod/lamslesson:participate' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
