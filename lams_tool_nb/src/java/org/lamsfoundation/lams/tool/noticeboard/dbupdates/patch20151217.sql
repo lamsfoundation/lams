@@ -5,11 +5,11 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- LDEV-3640 Add necessary cascades
 
-ALTER TABLE tl_lanb11_session DROP FOREIGN KEY FK_tl_lanb11_session_1;
+ALTER IGNORE TABLE tl_lanb11_session DROP FOREIGN KEY FK_tl_lanb11_session_1;
 ALTER TABLE tl_lanb11_session ADD CONSTRAINT FK_tl_lanb11_session_1 FOREIGN KEY (`nb_content_uid`)
 REFERENCES `tl_lanb11_content` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE tl_lanb11_user DROP FOREIGN KEY FK_tl_lanb11_user_1;
+ALTER IGNORE TABLE tl_lanb11_user DROP FOREIGN KEY FK_tl_lanb11_user_1;
 ALTER TABLE tl_lanb11_user ADD CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (`nb_session_uid`)
 REFERENCES `tl_lanb11_session` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
 
