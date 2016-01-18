@@ -40,10 +40,9 @@
        			if ( ! newCommentDiv || ! newThreadDiv ) {
        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
    				} else if ( commentUid ) {
-       				var loadString = '<html:rewrite page="/comments/viewTopicThread.do?sessionMapID="/>' + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
+       				var loadString = '<lams:LAMSURL />comments/viewTopicThread.do?sessionMapID=' + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
 					$(newThreadDiv).load(loadString, function() {
 						highlightMessage();
-						resizeIframe();
 					});
 					clearNewForm();
 				} else if ( response.errMessage ) {
@@ -65,7 +64,7 @@
 </script>
 
 <div class="comment-entry">
-<form id="newForm" method="GET" action="<html:rewrite page="/comments/newComment.do"/>">
+<form id="newForm" method="GET" action="<lams:LAMSURL />comments/newComment.do">
 	<textarea rows="3" cols="80" id="newFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH+2%>" name="body" class="comment"></textarea>
 	<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}"/>
 	

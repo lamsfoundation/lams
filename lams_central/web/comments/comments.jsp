@@ -42,14 +42,14 @@
 			    scrollDoneCallback();
 			    
    				$('#sortMenu').change(function(){
-			        var url = "<lams:LAMSURL />/comments/viewTopic.do?sessionMapID=${sessionMapID}&sortBy="+$(this).find("option:selected").attr('value');
+			        var url = "<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&sortBy="+$(this).find("option:selected").attr('value');
 			        reloadScroll(url);
 			    });
 			});
 			
 			function refreshComments(){
 				var reqIDVar = new Date();
-				reloadScroll('<lams:LAMSURL />/comments/viewTopic.do?sessionMapID=${sessionMapID}&reqUid='+reqIDVar.getTime());
+				reloadScroll('<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&reqUid='+reqIDVar.getTime());
 			}
 
 			function reloadScroll(url) {
@@ -57,12 +57,10 @@
 				$('.scroll').load(url, function() {
 					$('.scroll').data('jscroll', null);
 					$('.scroll').jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:false,callback:scrollDoneCallback});
-					resizeIframe();
 				});
 			}
 			
 			function scrollDoneCallback() {
-				resizeIframe();				
 			}
 		</script>		
 		

@@ -54,17 +54,13 @@
 			<tr>
 				<td>
 					<c:if test = '${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
-					<c:set var="replytopic">
-						<html:rewrite page="/comments/newReplyTopic.do?sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}" />
-					</c:set>
+					<c:set var="replytopic"><lams:LAMSURL />comments/newReplyTopic.do?sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}</c:set>
 					<a href="#" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="comment">Reply</a>
 					&middot; 
 					</c:if>
 					
 					<c:if test='${((sessionMap.mode == "teacher") || commentDto.author) && not sessionMap.readOnly }'>
-						<c:set var="edittopic">
-						<html:rewrite page="/comments/editTopic.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}" />
-						</c:set>
+						<c:set var="edittopic"><lams:LAMSURL />comments/editTopic.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}</c:set>
 						<a href="#" onclick="javascript:createEdit(${commentDto.comment.uid}, '${edittopic}');" class="comment">Edit</a> 
 					&middot; 
 					</c:if>
@@ -74,16 +70,12 @@
 					<c:choose>
 						<c:when test="${hidden}">
 							<!--  display a show link  -->
-							<c:set var="hideURL">
-								<html:rewrite page="/comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=false" />
-							</c:set>
+							<c:set var="hideURL"><lams:LAMSURL />comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=false</c:set>
 							<html:link href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" styleClass="comment"><fmt:message key="label.show" /></html:link>
 						</c:when>
 						<c:otherwise>
 							<!--  display a hide link -->
-							<c:set var="hideURL">
-								<html:rewrite page="/comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=true" />
-							</c:set>
+							<c:set var="hideURL"><lams:LAMSURL />comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=true"</c:set>
 							<html:link href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" styleClass="comment"><fmt:message key="label.hide" /></html:link>
 						</c:otherwise>
 					</c:choose>

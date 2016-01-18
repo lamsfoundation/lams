@@ -18,7 +18,7 @@
 </c:if>
 
 <c:if test="${empty height}">
-	<c:set var="height" value="470px" />
+	<c:set var="height" value="auto" />
 </c:if>
 
 <c:set var="modeStr" value=""/>
@@ -38,11 +38,10 @@
 	<c:set var="sortBy" value="0" /> <!-- 0: date, 1: likes -->
 </c:if>
 
-<iframe id="commentFrame" class="commentFrame" src="/lams/comments/comments.do?externalID=${toolSessionId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}" style="width: ${width}; height: ${height};"></iframe>
-
+<div id="commentFrame" class="commentFrame"  style="width: ${width}; height: ${height};"></div>
 <script>
-function resizeCommentFrame(pixels){
-	pixels+=40;
-    document.getElementById('commentFrame').style.height=pixels+"px";
-}
+$(document).ready(function(){
+	var url='<lams:LAMSURL/>comments/comments.do?externalID=${toolSessionId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}';
+	$('#commentFrame').load(url);
+});
 </script>
