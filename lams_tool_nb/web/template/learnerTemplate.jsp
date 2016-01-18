@@ -14,6 +14,7 @@
 <lams:head>
 	<lams:css />
 	<title><fmt:message key="activity.title"/></title>
+	<script src="${lams}includes/javascript/jquery.js"></script>
 </lams:head>
 
 <body class="stripes">

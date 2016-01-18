@@ -45,7 +45,7 @@
 					// make sure the old edit form is gone, so the user won't try to submit it again
 					$('#edit').remove();
 				}
-				reloadThread(response);
+				reloadThread(response,'<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
     		});
 		} // end validateBodyText
 		return false;
@@ -58,7 +58,7 @@
 </script>
 
 <div class="comment-entry">
-<form id="editForm" method="GET" action="<html:rewrite page="/comments/updateTopicInline.do"/>">
+<form id="editForm" method="GET" action="<lams:LAMSURL />comments/updateTopicInline.do">
 	<textarea rows="3" cols="80" id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH+2%>" name="body" class="comment">${comment.comment.body}</textarea>
 	<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}"/>
 	<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>

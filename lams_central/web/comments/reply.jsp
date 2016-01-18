@@ -44,7 +44,7 @@
         		// the user won't try to submit it again
 				$('#reply').remove();
 				}
-			reloadThread(response);
+			reloadThread(response,'<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
 			});
 		} // end validateBodyText
 	return false;
@@ -57,7 +57,7 @@
 </script>
 
 <div class="comment-entry">
-<form id="replyForm" method="GET" action="<html:rewrite page="/comments/replyTopicInline.do"/>">
+<form id="replyForm" method="GET" action="<lams:LAMSURL />comments/replyTopicInline.do">
 	<textarea rows="3" cols="80" id="replyFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH+2%>" name="body" class="comment"></textarea>
 	<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}"/>
 	<input type="hidden" id="parentUid" name="parentUid" value="${parentUid}"/>

@@ -42,9 +42,7 @@
 			var parentDiv = document.getElementById('msg'+commentUid);
 			parentDiv.appendChild(replyDiv);
 			
-			$(replyDiv).load(url, function() {
-				resizeIframe();
-			});
+			$(replyDiv).load(url);
 		}
 	}
 	
@@ -61,9 +59,7 @@
 			var parentDiv = document.getElementById('msg'+commentUid);
 			parentDiv.appendChild(editDiv);
 
-			$(editDiv).load(url, function() {
-				resizeIframe();
-			});
+			$(editDiv).load(url);
 		}
 	}
 
@@ -74,7 +70,7 @@
 		    url: url
 		})
 	    .done(function (response) {
-			reloadThread(response);
+			reloadThread(response, '<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
 	    });
 	}
 
@@ -98,7 +94,7 @@
 		
 	function likeEntry(commentUid) {
 		updateLike(commentUid,
-			'<html:rewrite page="/comments/like.do"/>?sessionMapID=${sessionMapID}&commentUid='+commentUid,
+			'<lams:LAMSURL />comments/like.do?sessionMapID=${sessionMapID}&commentUid='+commentUid,
 			1);		
 		$( '#msglikebutton'+commentUid ).removeClass( 'fa-thumbs-up fa-faded' ).addClass( 'fa-thumbs-o-up' );
 		$( '#msglikebutton'+commentUid ).prop( 'onclick', null );
@@ -110,7 +106,7 @@
 	<c:if test='${sessionMap.likeAndDislike}'> 
 	function dislikeEntry(commentUid) {
 		updateLike(commentUid, 
-			'<html:rewrite page="/comments/dislike.do"/>?sessionMapID=${sessionMapID}&commentUid='+commentUid,
+			'<lams:LAMSURL />comments/dislike.do?sessionMapID=${sessionMapID}&commentUid='+commentUid,
 			 -1);		
 		$( '#msgdislikebutton'+commentUid ).removeClass( 'fa-thumbs-down fa-faded' ).addClass( 'fa-thumbs-o-down' );
 		$( '#msgdislikebutton'+commentUid ).prop( 'onclick', null );
@@ -169,7 +165,7 @@
 
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
 	<div class="float-right">
-	<c:set var="more"><html:rewrite page="/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}" /></c:set>
+	<c:set var="more"><lams:LAMSURL />/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}</c:set>
 	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>
 	</div>
 </c:if>
