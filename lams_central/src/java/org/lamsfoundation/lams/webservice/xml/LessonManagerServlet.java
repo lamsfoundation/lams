@@ -192,7 +192,7 @@ public class LessonManagerServlet extends HttpServlet {
 		
 	    } else if (method.equals(CentralConstants.METHOD_CLONE)) {
 		lsId = new Long(lsIdStr);
-		Long lessonId = cloneLesson(serverId, datetime, hashValue, username, lsId, courseId);
+		Long lessonId = cloneLesson(serverId, datetime, hashValue, username, lsId, courseId, country, lang);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());		
@@ -413,14 +413,16 @@ public class LessonManagerServlet extends HttpServlet {
     }
     
     private Long cloneLesson(String serverId, String datetime, String hashValue, String username, long lsId,
-	    String courseId) throws RemoteException {
+	    String courseId, String countryIsoCode, String langIsoCode) throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    
 	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	    Integer creatorId = userMap.getUser().getUserId();
 
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap.getSid(),
-		    courseId);
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    if (orgMap == null) {
 		LessonManagerServlet.log.debug("No course exists for: " + courseId + ". Can't delete any lessons.");
 		throw new Exception("Course with courseId: " + courseId + " could not be found");
@@ -428,8 +430,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    Organisation organisation = orgMap.getOrganisation();
 
 	    // clone lesson
-	    Long newLessonId = monitoringService.cloneLesson(lsId, userMap.getUser().getUserId(), true, true, null,
-		    null, organisation);
+	    Long newLessonId = monitoringService.cloneLesson(lsId, creatorId, true, true, null, null, organisation);
 	    // store information which extServer has started the lesson
 	    LessonManagerServlet.integrationService.createExtServerLessonMap(newLessonId, serverMap);
 
