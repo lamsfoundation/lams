@@ -756,12 +756,13 @@ public interface IMonitoringService {
      * Same as cloneLessons method, except it clones only one lesson.
      * 
      * @param lessonId
+     * @param creatorId
      * @param addAllStaff
      * @param addAllLearners
      * @param staffIds
      * @param learnerIds
      * @param group
-     * @return cloned lesson's id
+     * @return
      * @throws MonitoringServiceException
      */
     Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
