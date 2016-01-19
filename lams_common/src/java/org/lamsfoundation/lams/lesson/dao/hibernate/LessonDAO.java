@@ -57,6 +57,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + "and lesson.startDateTime is not null and lesson.startDateTime < ?";
     private final static String COUNT_ACTIVE_LEARNERS = "select count(distinct progress.user.id)" + " from "
 	    + LearnerProgress.class.getName() + " progress" + " where progress.lesson.id = :lessonId";
+    private final static String LOAD_ACTIVE_LEARNERS = "select distinct progress.user from "
+	    + LearnerProgress.class.getName() + " progress where progress.lesson.id = :lessonId";
     private final static String FIND_LESSON_FOR_ACTIVITY = "select lesson from " + Lesson.class.getName() + " lesson, "
 	    + Activity.class.getName() + " activity "
 	    + " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
@@ -66,8 +68,6 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + Lesson.STARTED_STATE + " " + "and l.organisation.organisationId = ? " + " order by l.lessonName";
     private final static String LESSONS_BY_GROUP = "from " + Lesson.class.getName()
 	    + " where organisation.organisationId=? and lessonStateId <= 6";
-    private final static String LESSON_BY_SESSION_ID = "select lesson from Lesson lesson, ToolSession session where "
-	    + "session.lesson=lesson and session.toolSessionId=:toolSessionID";
 
     private final static String LOAD_LEARNERS_BY_LESSON = "FROM Lesson AS lesson "
 	    + "INNER JOIN lesson.lessonClass AS lessonClass INNER JOIN lessonClass.groups AS groups "
@@ -102,12 +102,6 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 		.setFetchMode("learnerProgresses", FetchMode.JOIN).uniqueResult();
     }
 
-    /** Get all the lessons in the database. This includes the disabled lessons. */
-    @Override
-    public List getAllLessons() {
-	return loadAll(Lesson.class);
-    }
-
     /**
      * Gets all lessons that are active for a learner.
      * 
@@ -125,34 +119,12 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     }
 
     /**
-     * Gets all lessons that are active for a learner, in a given organisation
-     * 
-     * @param learnerId
-     *            a User that identifies the learner.
-     * @param organisationId
-     *            the desired organisation.
-     * @return a List with all active lessons in it.
-     */
-    @Override
-    public List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationId) {
-
-	Query query = getSession().getNamedQuery("activeLessons");
-	query.setInteger("userId", learnerId);
-	query.setInteger("organisationId", organisationId);
-	List result = query.list();
-	return result;
-    }
-
-    /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public List getActiveLearnerByLesson(long lessonId) {
-
-	Query query = getSession().getNamedQuery("activeLearners");
-	query.setLong("lessonId", lessonId);
-	List result = query.list();
-	return result;
+    public List<User> getActiveLearnerByLesson(long lessonId) {
+	return getSession().createQuery(LessonDAO.LOAD_ACTIVE_LEARNERS).setLong("lessonId", lessonId).list();
     }
 
     /**
@@ -256,23 +228,6 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     }
 
     /**
-     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return disabled
-     * lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
-     * 
-     * @param user
-     *            a User that identifies the teacher/staff member.
-     * @return a List with all appropriate lessons in it.
-     */
-    @Override
-    public List getLessonsForMonitoring(int userID, int organisationID) {
-	Query query = getSession().getNamedQuery("lessonsForMonitoring");
-	query.setInteger("userId", userID);
-	query.setInteger("organisationId", organisationID);
-	List result = query.list();
-	return result;
-    }
-
-    /**
      * Get all the preview lessons more with the creation date before the given date.
      * 
      * @param startDate
@@ -354,16 +309,6 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @SuppressWarnings("unchecked")
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return (List<User>) this.doFindByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId", sessionId);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonDetailsFromSessionID(java.lang.Long)
-     */
-    @Override
-    public Lesson getLessonFromSessionID(Long toolSessionID) {
-	Query query = getSession().createQuery(LessonDAO.LESSON_BY_SESSION_ID);
-	query.setLong("toolSessionID", toolSessionID);
-	return (Lesson) query.uniqueResult();
     }
 
     /**

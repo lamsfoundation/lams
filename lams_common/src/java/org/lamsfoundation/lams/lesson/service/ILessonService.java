@@ -414,25 +414,6 @@ public interface ILessonService {
     List<User> getMonitorsByToolSessionId(Long sessionId);
 
     /**
-     * Gets all lessons that are active for a learner, in a given organisation
-     * 
-     * @param learnerId
-     *            a User that identifies the learner.
-     * @param organisationId
-     *            the desired organisation.
-     * @return a List with all active lessons in it.
-     */
-    List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId);
-
-    /**
-     * Gets lesson details for tools based on toolSessionID
-     * 
-     * @param sessionID
-     * @return
-     */
-    LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID);
-
-    /**
      * Check if preceding lessons have been completed and the given lesson is available to the user.
      */
     boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId);

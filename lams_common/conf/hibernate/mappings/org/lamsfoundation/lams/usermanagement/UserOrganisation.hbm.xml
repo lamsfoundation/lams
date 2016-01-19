@@ -107,11 +107,11 @@
 <sql-query name="userOrganisationsNotById">
 	<return alias="userOrganisation" class="org.lamsfoundation.lams.usermanagement.UserOrganisation" />
 	SELECT {userOrganisation.*}
-	  FROM lams_user_organisation {userOrganisation}, lams_organisation o
-	  WHERE {userOrganisation}.user_id = :userId
-	    AND {userOrganisation}.organisation_id != :orgId 
-	    AND o.organisation_id = {userOrganisation}.organisation_id 
-	    AND o.parent_organisation_id != :orgId
+	  FROM lams_user_organisation AS {userOrganisation}
+	  JOIN lams_organisation AS o ON {userOrganisation}.user_id = :userId
+	  	AND {userOrganisation}.organisation_id != :orgId
+	  	AND o.parent_organisation_id != :orgId
+	  	AND o.organisation_id = {userOrganisation}.organisation_id
 </sql-query>
 
 </hibernate-mapping>

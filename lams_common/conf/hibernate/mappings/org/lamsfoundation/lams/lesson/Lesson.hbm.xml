@@ -154,113 +154,32 @@
 
 	</class>
 	
-	<sql-query name="lessonsForMonitoringByUser">
-		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
-		SELECT DISTINCT {lesson.*}
-		  FROM lams_lesson {lesson},
-		    lams_grouping,
-		    lams_group,
-		    lams_user_group,
-		    lams_learning_design
-		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
-		    AND (lams_grouping.staff_group_id = lams_group.group_id)
-		    AND (lams_group.group_id = lams_user_group.group_id)
-		    AND NOT ({lesson}.lesson_state_id = 7)		    
-		    AND (lams_user_group.user_id = :userId)
-		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
-		    AND (lams_learning_design.copy_type_id=2)
-		    
-		UNION
-		
-		SELECT DISTINCT {lesson.*}
-		  FROM lams_lesson {lesson}
-		  WHERE ({lesson}.user_id = :userId)
-		    AND ({lesson}.class_grouping_id IS NULL)
-		    AND NOT ({lesson}.lesson_state_id = 7)		    
-	</sql-query>
-	
 	<sql-query name="monitorsByToolSessionId">
 		<return alias="user" class="org.lamsfoundation.lams.usermanagement.User" />
 		SELECT DISTINCT {user.*}
-		  FROM lams_lesson,
-		    lams_grouping,
-		    lams_group,
-		    lams_user_group,
-		    lams_learning_design,
-		    lams_tool_session,
-		    lams_user {user}
-		  WHERE (lams_lesson.class_grouping_id = lams_grouping.grouping_id)
-		    AND (lams_grouping.staff_group_id = lams_group.group_id)
-		    AND (lams_group.group_id = lams_user_group.group_id)
-		    AND ({user}.user_id = lams_user_group.user_id)
-		    AND (lams_tool_session.tool_session_id = :sessionId)
-		    AND (lams_tool_session.lesson_id = lams_lesson.lesson_id)
-		    AND (lams_lesson.learning_design_id = lams_learning_design.learning_design_id)
-		    AND (lams_learning_design.copy_type_id=2)	    
-	</sql-query>
-
-	<sql-query name="lessonsForMonitoring">
-		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
-		SELECT DISTINCT {lesson.*}
-		  FROM lams_lesson {lesson},
-		    lams_grouping,
-		    lams_group,
-		    lams_user_group,
-		    lams_learning_design
-		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
-		    AND (lams_grouping.staff_group_id = lams_group.group_id)
-		    AND (lams_group.group_id = lams_user_group.group_id)
-		    AND NOT ({lesson}.lesson_state_id = 7)		    
-		    AND (lams_user_group.user_id = :userId)
-		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
-		    AND (lams_learning_design.copy_type_id=2)
-		    AND ({lesson}.organisation_id = :organisationId)
-	</sql-query>
-
-	<sql-query name="activeLessons">
-		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
-		SELECT DISTINCT {lesson.*}
-		  FROM lams_lesson {lesson},
-		    lams_grouping,
-		    lams_group,
-		    lams_user_group,
-		    lams_learning_design
-		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
-		    AND (lams_grouping.grouping_id = lams_group.grouping_id)
-		    AND (lams_group.group_id = lams_user_group.group_id)
-		    AND ({lesson}.lesson_state_id IN (3,5))		    
-		    AND (lams_user_group.user_id = :userId)
-		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
-		    AND (lams_learning_design.copy_type_id=2)
-		    AND (lams_group.group_id != lams_grouping.staff_group_id)
-		    AND ({lesson}.organisation_id = :organisationId)
+		  FROM lams_lesson AS l
+		  JOIN lams_grouping AS ging ON l.class_grouping_id = ging.grouping_id
+		  JOIN lams_group AS g ON ging.staff_group_id = g.group_id
+		  JOIN lams_user_group AS ug ON g.group_id = ug.group_id
+		  JOIN lams_user AS {user} ON {user}.user_id = ug.user_id
+		  JOIN lams_learning_design AS ld ON ld.copy_type_id = 2
+		  	AND l.learning_design_id = ld.learning_design_id
+		  JOIN lams_tool_session AS s ON s.tool_session_id = :sessionId
+		  	AND s.lesson_id = l.lesson_id   
 	</sql-query>
 
 	<sql-query name="activeLessonsAllOrganisations">
 		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
 		SELECT DISTINCT {lesson.*}
-		  FROM lams_lesson {lesson},
-		    lams_grouping,
-		    lams_group,
-		    lams_user_group,
-		    lams_learning_design
-		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
-		    AND (lams_grouping.grouping_id = lams_group.grouping_id)
-		    AND (lams_group.group_id = lams_user_group.group_id)
-		    AND ({lesson}.lesson_state_id IN (3,5))		    
-		    AND (lams_user_group.user_id = :userId)
-		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
-		    AND (lams_learning_design.copy_type_id=2)
-		    AND (lams_group.group_id != lams_grouping.staff_group_id)
-	</sql-query>
-	
-	<sql-query name="activeLearners">
-		<return alias="learner" class="org.lamsfoundation.lams.usermanagement.User" />
-		SELECT DISTINCT {learner.*}
-		  FROM lams_user {learner},
-		       lams_learner_progress
-		  WHERE ({learner}.user_id = lams_learner_progress.user_id)
-		  AND   (lams_learner_progress.lesson_id  = :lessonId)
+		  FROM lams_lesson AS {lesson}
+		  JOIN lams_learning_design AS ld ON ld.copy_type_id = 2
+		  	AND {lesson}.learning_design_id = ld.learning_design_id
+		  JOIN lams_grouping AS ging ON {lesson}.lesson_state_id IN (3,5)
+		  	AND {lesson}.class_grouping_id = ging.grouping_id
+		  JOIN lams_group AS g ON ging.grouping_id = g.grouping_id
+		  	AND g.group_id != ging.staff_group_id
+		  JOIN lams_user_group AS ug ON ug.user_id = :userId
+		  	AND g.group_id = ug.group_id
 	</sql-query>
 
 	<sql-query name="learnerLessonsByOrgAndUserWithCompletedFlag">
@@ -275,17 +194,18 @@
 		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications,
 		       (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,
 		        l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish
-		  FROM (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi)
-		    LEFT JOIN lams_learner_progress lp ON lp.user_id = ug.user_id AND lp.lesson_id = l.lesson_id
-		  WHERE l.learning_design_id = ld.learning_design_id
-		    AND ld.copy_type_id != 3
-			AND l.organisation_id = :orgId
-			AND l.class_grouping_id = g.grouping_id
-			AND l.lesson_state_id != 7
-			AND ug.group_id = g.group_id
-			AND ug.user_id = :userId
-			AND gi.grouping_id = g.grouping_id
-			AND g.group_id != gi.staff_group_id
+		  FROM lams_lesson AS l
+		  JOIN lams_learning_design AS ld ON l.organisation_id = :orgId
+		  	AND ld.copy_type_id != 3
+		  	AND l.lesson_state_id != 7
+		  	AND l.learning_design_id = ld.learning_design_id
+		  JOIN lams_group AS g ON l.class_grouping_id = g.grouping_id
+		  JOIN lams_user_group AS ug ON ug.user_id = :userId
+		  	AND ug.group_id = g.group_id
+		  JOIN lams_grouping AS gi ON gi.grouping_id = g.grouping_id
+		  	AND g.group_id != gi.staff_group_id
+		  LEFT JOIN lams_learner_progress AS lp ON lp.user_id = ug.user_id
+		  	AND lp.lesson_id = l.lesson_id
 	</sql-query>
 	
 	<sql-query name="staffLessonsByOrgAndUserWithCompletedFlag">
@@ -300,17 +220,18 @@
 		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications,
 		       (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,
 		        l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish
-		  FROM (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi)
-		    LEFT JOIN lams_learner_progress lp ON lp.user_id = ug.user_id AND lp.lesson_id = l.lesson_id
-		  WHERE l.learning_design_id = ld.learning_design_id
-		    AND ld.copy_type_id != 3
-			AND l.organisation_id = :orgId
-			AND l.class_grouping_id = g.grouping_id
-			AND l.lesson_state_id != 7
-			AND ug.group_id = g.group_id
-			AND ug.user_id = :userId
-			AND gi.grouping_id = g.grouping_id
-			AND g.group_id = gi.staff_group_id
+		  FROM lams_lesson AS l
+		  JOIN lams_learning_design AS ld ON l.organisation_id = :orgId
+		  	AND ld.copy_type_id != 3
+		  	AND l.lesson_state_id != 7
+		  	AND l.learning_design_id = ld.learning_design_id
+		  JOIN lams_group AS g ON l.class_grouping_id = g.grouping_id
+		  JOIN lams_user_group AS ug ON ug.user_id = :userId
+		  	AND ug.group_id = g.group_id
+		  JOIN lams_grouping AS gi ON gi.grouping_id = g.grouping_id
+		  	AND g.group_id = gi.staff_group_id
+		  LEFT JOIN lams_learner_progress AS lp ON lp.user_id = ug.user_id
+		  	AND lp.lesson_id = l.lesson_id
 	</sql-query>
 	
 	<sql-query name="allLessonsByOrgAndUserWithCompletedFlag">
@@ -325,26 +246,27 @@
 		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications,
 		       (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,
 		       l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish
-		  FROM (lams_lesson l, lams_learning_design ld)
-		    LEFT JOIN lams_learner_progress lp ON lp.user_id = :userId AND lp.lesson_id = l.lesson_id
-		  WHERE l.learning_design_id = ld.learning_design_id
-		    AND ld.copy_type_id != 3
-			AND l.organisation_id = :orgId
-			AND l.lesson_state_id != 7
+		  FROM lams_lesson AS l
+		  JOIN lams_learning_design AS ld ON ld.copy_type_id != 3
+		  	AND l.lesson_state_id != 7
+		  	AND l.organisation_id = :orgId
+		  	AND l.learning_design_id = ld.learning_design_id
+		  LEFT JOIN lams_learner_progress lp ON lp.user_id = :userId
+		    AND lp.lesson_id = l.lesson_id
 	</sql-query>
 	
 	<sql-query name="lessonsByOrgAndUserWithChildOrgs">
  		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
  		SELECT DISTINCT {lesson.*}
- 			FROM (lams_lesson {lesson}, lams_learning_design ld, lams_group g, lams_user_group ug, lams_organisation lo)
- 			WHERE {lesson}.learning_design_id = ld.learning_design_id
-				AND ld.copy_type_id != 3
-				AND ({lesson}.organisation_id = lo.organisation_id)
-				AND (lo.organisation_id = :orgId or lo.parent_organisation_id = :orgId)
-				AND {lesson}.class_grouping_id = g.grouping_id
-				AND {lesson}.lesson_state_id != 7
-				AND ug.group_id = g.group_id
-				AND ug.user_id = :userId
+ 		  FROM lams_lesson AS {lesson}
+ 		  JOIN lams_learning_design AS ld ON ld.copy_type_id != 3
+ 			AND {lesson}.lesson_state_id != 7
+ 			AND {lesson}.learning_design_id = ld.learning_design_id
+ 		  JOIN lams_organisation AS lo ON {lesson}.organisation_id = lo.organisation_id
+ 		  	AND (lo.organisation_id = :orgId OR lo.parent_organisation_id = :orgId)
+ 		  JOIN lams_group AS g ON {lesson}.class_grouping_id = g.grouping_id
+ 		  JOIN lams_user_group AS ug ON ug.user_id = :userId
+ 		  	AND ug.group_id = g.group_id
 	</sql-query>
 	
 </hibernate-mapping>
