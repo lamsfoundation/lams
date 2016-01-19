@@ -47,9 +47,6 @@ public interface ILessonDAO extends IBaseDAO {
      */
     Lesson getLesson(Long lessonId);
 
-    /** Get all the lessons in the database. This includes the disabled lessons. */
-    List getAllLessons();
-
     Lesson getLessonWithJoinFetchedProgress(Long lessonId);
 
     /**
@@ -60,17 +57,6 @@ public interface ILessonDAO extends IBaseDAO {
      * @return a Set with all active lessons in it.
      */
     List getActiveLessonsForLearner(User learner);
-
-    /**
-     * Gets all lessons that are active for a learner, in a given organisation
-     * 
-     * @param learnerId
-     *            a User that identifies the learner.
-     * @param organisationId
-     *            the desired organisation .
-     * @return a List with all active lessons in it.
-     */
-    List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationID);
 
     /**
      * Saves or Updates a Lesson.
@@ -104,16 +90,6 @@ public interface ILessonDAO extends IBaseDAO {
      * @return List The list of Lessons for the given user
      */
     List getLessonsCreatedByUser(Integer userID);
-
-    /**
-     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return disabled
-     * lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
-     * 
-     * @param user
-     *            a User that identifies the teacher/staff member.
-     * @return a List with all appropriate lessons in it.
-     */
-    List getLessonsForMonitoring(int userID, int organisationID);
 
     /**
      * Returns the all the learners that have started the requested lesson.
@@ -216,12 +192,4 @@ public interface ILessonDAO extends IBaseDAO {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     List<User> getMonitorsByToolSessionId(Long sessionId);
-
-    /**
-     * Gets lesson for tools based on toolSessionID
-     * 
-     * @param sessionID
-     * @return
-     */
-    Lesson getLessonFromSessionID(Long toolSessionID);
 }

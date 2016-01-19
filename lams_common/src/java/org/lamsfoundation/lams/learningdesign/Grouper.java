@@ -75,7 +75,7 @@ public abstract class Grouper {
      * @param learners
      *            the list of learners that the teacher requested.
      */
-    public abstract void doGrouping(Grouping grouping, String groupName, List learners) throws GroupingException;
+    public abstract void doGrouping(Grouping grouping, String groupName, List<User> learners) throws GroupingException;
 
     /**
      * Do the grouping for a single learner. Should call setCommonMessageService() before calling this method. If you
@@ -103,7 +103,8 @@ public abstract class Grouper {
      * @throws GroupingException
      *             if the group does not exist.
      */
-    public abstract void doGrouping(Grouping chosenGrouping, Long groupId, List learners) throws GroupingException;
+    public abstract void doGrouping(Grouping chosenGrouping, Long groupId, List<User> learners)
+	    throws GroupingException;
 
     /**
      * Get the default group name prefix
@@ -137,22 +138,27 @@ public abstract class Grouper {
 
 	while (iter.hasNext() && !groupFound) {
 	    Group group = (Group) iter.next();
-	    if ((groupID == null) || groupID.equals(group.getGroupId())) {
+
+	    if (groupID == null || groupID.equals(group.getGroupId())) {
+
 		groupFound = groupID != null;
+
 		if (group.mayBeDeleted()) {
+
 		    boolean removed = group.getUsers().removeAll(learners);
 		    if (removed) {
-			if (Grouper.log.isDebugEnabled()) {
-			    Grouper.log
-				    .debug("Removed " + learners.size() + " users from group " + group.getGroupName());
+			if (log.isDebugEnabled()) {
+			    log.debug("Removed " + learners.size() + " users from group " + group.getGroupName());
 			}
 		    }
+
 		} else {
 		    String error = "Tried to remove a group which cannot be removed (tool sessions probably exist). Group "
 			    + group + " grouping " + grouping + ". Not removing the group.";
-		    Grouper.log.error(error);
+		    log.error(error);
 		    throw new GroupingException(error);
 		}
+
 	    }
 	}
     }
@@ -173,8 +179,8 @@ public abstract class Grouper {
      */
     public Group createGroup(Grouping grouping, String name) throws GroupingException {
 	String trimmedName = name.trim();
-	if ((trimmedName == null) || (trimmedName.length() == 0)) {
-	    Grouper.log.warn("Tried to add a group with no name to grouping " + grouping + ". Not creating group.");
+	if (trimmedName == null || trimmedName.length() == 0) {
+	    log.warn("Tried to add a group with no name to grouping " + grouping + ". Not creating group.");
 	    return null;
 	}
 	Set emptySet = new HashSet();
@@ -187,24 +193,23 @@ public abstract class Grouper {
 
 	if (newGroup == null) {
 	    // what, still not unique? Okay try sticking a number on the end. Try 5 times then give up
-	    Grouper.log.warn("Having trouble creating a unique name for a group. Have tried " + trimmedName);
+	    log.warn("Having trouble creating a unique name for a group. Have tried " + trimmedName);
 	    int attempt = 1;
-	    while ((newGroup == null) && (attempt < 5)) {
+	    while (newGroup == null && attempt < 5) {
 		newGroup = Group.createLearnerGroup(grouping, trimmedName + " " + new Integer(attempt).toString(),
 			emptySet);
 	    }
 	    if (newGroup == null) {
 		String error = "Unable to create a unique name for a group. Tried 5 variations on " + trimmedName
 			+ " now giving up.";
-		Grouper.log.error(error);
+		log.error(error);
 		throw new GroupingException(error);
 
 	    }
 	}
 
-	if (newGroup != null) {
+	if (newGroup != null)
 	    grouping.getGroups().add(newGroup);
-	}
 
 	return newGroup;
 
@@ -237,8 +242,8 @@ public abstract class Grouper {
 		if (group.mayBeDeleted()) {
 
 		    // all okay so we can delete
-		    if (Grouper.log.isDebugEnabled()) {
-			Grouper.log.warn("Deleting group " + group.getGroupName() + " for grouping " + grouping);
+		    if (log.isDebugEnabled()) {
+			log.warn("Deleting group " + group.getGroupName() + " for grouping " + grouping);
 		    }
 		    iter.remove();
 		    groupDeleted = true;
@@ -246,15 +251,16 @@ public abstract class Grouper {
 		} else {
 		    String error = "Tried to remove a group which cannot be removed (tool sessions probably exist). Group "
 			    + group + " grouping " + grouping + ". Not removing the group.";
-		    Grouper.log.error(error);
+		    log.error(error);
 		    throw new GroupingException(error);
 		}
 	    }
 	}
 
 	if (!groupDeleted) {
-	    Grouper.log.warn("Tried to remove a group " + groupID + " but the group does not exist for grouping "
-		    + grouping + ".");
+	    log.warn("Tried to remove a group " + groupID + " but the group does not exist for grouping " + grouping
+		    + ".");
 	}
     }
+
 }
