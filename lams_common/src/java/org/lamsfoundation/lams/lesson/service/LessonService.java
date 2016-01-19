@@ -672,20 +672,6 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationId) {
-	return lessonDAO.getActiveLessonsForLearner(learnerId, organisationId);
-    }
-
-    @Override
-    public LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID) {
-	Lesson lesson = this.lessonDAO.getLessonFromSessionID(toolSessionID);
-	if (lesson != null) {
-	    return lesson.getLessonDetails();
-	}
-	return null;
-    }
-
-    @Override
     public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId) {
 	Lesson lesson = getLesson(lessonId);
 	if (lesson != null) {

@@ -59,6 +59,8 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    + "and lesson.startDateTime is not null and lesson.startDateTime < ?";
     private final static String COUNT_ACTIVE_LEARNERS = "select count(distinct progress.user.id)" + " from "
 	    + LearnerProgress.class.getName() + " progress" + " where progress.lesson.id = :lessonId";
+    private final static String LOAD_ACTIVE_LEARNERS = "select distinct progress.user from "
+	    + LearnerProgress.class.getName() + " progress where progress.lesson.id = :lessonId";
     private final static String FIND_LESSON_FOR_ACTIVITY = "select lesson from " + Lesson.class.getName() + " lesson, "
 	    + Activity.class.getName() + " activity "
 	    + " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
@@ -110,12 +112,6 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	});
     }
 
-    /** Get all the lessons in the database. This includes the disabled lessons. */
-    @Override
-    public List getAllLessons() {
-	return getHibernateTemplate().loadAll(Lesson.class);
-    }
-
     /**
      * Gets all lessons that are active for a learner.
      * 
@@ -141,50 +137,17 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     }
 
     /**
-     * Gets all lessons that are active for a learner, in a given organisation
-     * 
-     * @param learnerId
-     *            a User that identifies the learner.
-     * @param organisationId
-     *            the desired organisation.
-     * @return a List with all active lessons in it.
-     */
-    @Override
-    public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId) {
-	List lessons = null;
-
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    @Override
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("activeLessons");
-		query.setInteger("userId", learnerId);
-		query.setInteger("organisationId", organisationId);
-		List result = query.list();
-		return result;
-	    }
-	});
-	return lessons;
-    }
-
-    /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public List getActiveLearnerByLesson(final long lessonId) {
-	List learners = null;
-
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	learners = (List) hibernateTemplate.execute(new HibernateCallback() {
+    public List<User> getActiveLearnerByLesson(final long lessonId) {
+	return (List<User>) new HibernateTemplate(this.getSessionFactory()).execute(new HibernateCallback() {
 	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("activeLearners");
-		query.setLong("lessonId", lessonId);
-		List result = query.list();
-		return result;
+		return session.createQuery(LessonDAO.LOAD_ACTIVE_LEARNERS).setLong("lessonId", lessonId).list();
 	    }
 	});
-	return learners;
     }
 
     /**
@@ -309,32 +272,6 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     }
 
     /**
-     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return disabled
-     * lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
-     * 
-     * @param user
-     *            a User that identifies the teacher/staff member.
-     * @return a List with all appropriate lessons in it.
-     */
-    @Override
-    public List getLessonsForMonitoring(final int userID, final int organisationID) {
-	List lessons = null;
-
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
-	    @Override
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("lessonsForMonitoring");
-		query.setInteger("userId", userID);
-		query.setInteger("organisationId", organisationID);
-		List result = query.list();
-		return result;
-	    }
-	});
-	return lessons;
-    }
-
-    /**
      * Get all the preview lessons more with the creation date before the given date.
      * 
      * @param startDate
@@ -436,26 +373,11 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getMonitorsByToolSessionId(Long)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return this.getHibernateTemplate().findByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId",
 		sessionId);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonDetailsFromSessionID(java.lang.Long)
-     */
-    @Override
-    public Lesson getLessonFromSessionID(final Long toolSessionID) {
-	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-	return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
-	    @Override
-	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.createQuery(LessonDAO.LESSON_BY_SESSION_ID);
-		query.setLong("toolSessionID", toolSessionID);
-		return query.uniqueResult();
-	    }
-	});
     }
 
     /**
