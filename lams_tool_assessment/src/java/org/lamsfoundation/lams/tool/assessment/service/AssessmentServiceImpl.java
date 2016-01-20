@@ -561,8 +561,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	float maxMark = question.getGrade();
 	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    boolean isMarkNullified = false;
+	    float totalGrade = 0;
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		if (option.getAnswerBoolean()) {
+		    totalGrade += option.getGrade();
 		    mark += option.getGrade() * maxMark;
 
 		    // if option of "incorrect answer nullifies mark" is ON check if selected answer has a zero grade
@@ -572,6 +574,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    }
 		}
 	    }
+	    // set it so front end knows whether the question was answered correctly/partly/incorrectly even if mark=0
+	    question.setAnswerTotalGrade(totalGrade);
 
 	    if (isMarkNullified) {
 		mark = 0;
