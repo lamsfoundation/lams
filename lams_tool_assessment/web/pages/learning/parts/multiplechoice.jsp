@@ -71,15 +71,15 @@
 <c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 	<div class="question-feedback">
 		<c:choose>
-			<c:when test="${question.mark == question.defaultGrade}">
+			<c:when test="${question.answerTotalGrade >= 1}">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</c:when>
-			<c:when test="${question.mark > 0}">
+			<c:when test="${question.answerTotalGrade > 0}">
 				<c:out value="${question.feedbackOnPartiallyCorrect}" escapeXml="false" />
 			</c:when>
-			<c:when test="${question.mark <= 0}">
+			<c:otherwise>
 				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
-			</c:when>		
+			</c:otherwise>		
 		</c:choose>
 	</div>
 </c:if>
