@@ -45,7 +45,7 @@ public interface IChatMessageDAO extends IBaseDAO {
 
     ChatMessage getByUID(Long uid);
 
-    List getLatest(ChatSession chatSession, int max);
+    List getLatest(ChatSession chatSession, Integer max, boolean orderAsc);
 
     Map<Long, Integer> getCountBySession(Long chatUID);
 

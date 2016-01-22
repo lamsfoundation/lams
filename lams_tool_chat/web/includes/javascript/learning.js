@@ -1,71 +1,72 @@
-// for chat users to be indetified by different colours
-var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704", "#004272", "#CD322B", "#254806"];
-// only Monitor can send a personal message
-var selectedUser = null;
-// last message in chat window
-var lastMessageUid = null;
-var pollInProgress = false;
+$(document).ready(function() {
+	messageDiv = $("#messages");
+	rosterDiv = $("#roster");
+	sendToUserSpan = $('#sendToUser');
+	sendToEveryoneSpan = $('#sendToEveryone');
+	sendMessageArea = $('#sendMessageArea');
+	sendMessageButton = $('#sendMessageButton');
 
-function updateChat() {
-	if (!pollInProgress) {
-		// synchronise: if polling takes too long, don't try to do it again
-		pollInProgress = true;
-		$.ajax({
-			  url      : LEARNING_ACTION,
-			  data     : {'dispatch'       : 'getChatContent',
-					  	  'toolSessionID'  : TOOL_SESSION_ID,
-					  	  'lastMessageUid' : lastMessageUid
-					  	 },
-			  cache    : false,
-			  dataType : 'json',
-			  success  : handleUpdateChatResult,
-			  complete : function(){
-				  pollInProgress = false;
-			  }
-			});
-	}
-}
+	// react to Enter key
+	sendMessageArea.keydown(function(e) {
+		if (e.which == 13) {
+			e.preventDefault();
+			sendMessage();
+		}
+	});
+});
 
-function handleUpdateChatResult(result) {
-  if (result.lastMessageUid) {
-	  messageDiv.html('');
-	  // all messasges need to be written out, not only new ones,
-	  // as old ones could have been edited or hidden by Monitor
-	  
-	  jQuery.each(result.messages, function(){
+
+	// for chat users to be indetified by different colours
+var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704", "#004272", "#CD322B", "#254806"],
+	// only Monitor can send a personal message
+	selectedUser = null,
+	// init the connection with server using server URL but with different protocol
+	websocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
+
+websocket.onmessage = function(e){
+	// create JSON object
+	var input = JSON.parse(e.data);
+	// clear old messages
+	messageDiv.html('');
+	
+	// all messasges need to be written out, not only new ones,
+	// as old ones could have been edited or hidden by Monitor
+	jQuery.each(input.messages, function(){
 		var container = $('<div />',{
 			'class' : 'message ' + (this.type == 'chat' ? 'private_message' : '')
-			});
+		});
 		$('<div />',{
 			'class' : 'messageFrom',
 			'text'  : this.from
-		  }).css('color' , getColour(this.from)).appendTo(container);
+		}).css('color' , getColour(this.from)).appendTo(container);
 		$('<span />',{
 			'text'  : this.body
-		  }).appendTo(container);
-		
+		}).appendTo(container);
+			
 		container.appendTo(messageDiv);
-	  });
-	  
-	  lastMessageUid = result.lastMessageUid;
-	  messageDiv.scrollTop(messageDiv.prop('scrollHeight'));
-  }
+	});
   
-  rosterDiv.html('');
-  jQuery.each(result.roster, function(index, value){
-	var userDiv = $('<div />', {
-		'class' : (value == selectedUser ? 'selected' : 'unselected'),
-		'text'  : value
-	}).css('color', getColour(value))
-	 .appendTo(rosterDiv);
-	
-	// only Monitor can send a personal message
-	if (MODE == 'teacher') {
-		userDiv.click(function(){
-			userSelected($(this));
-		});
-	}
-  });
+	// move to the bottom
+	messageDiv.scrollTop(messageDiv.prop('scrollHeight'));
+	rosterDiv.html('');
+	jQuery.each(input.roster, function(index, value){
+		var userDiv = $('<div />', {
+			'class' : (value == selectedUser ? 'selected' : 'unselected'),
+			'text'  : value
+		}).css('color', getColour(value))
+		  .appendTo(rosterDiv);
+			
+			// only Monitor can send a personal message
+		if (MODE == 'teacher') {
+			userDiv.click(function(){
+				userSelected($(this));
+			});
+		}
+	});
+}
+
+websocket.onerror = function(e){
+	alert("Error estabilishing connection to server: " + e.data);
 }
 
 function userSelected(userDiv) {
@@ -91,18 +92,15 @@ function sendMessage() {
 	sendMessageArea.val('');
 	
 	// only Monitor can send a personal message
-	var isPrivate = MODE == 'teacher' && selectedUser;
+	var isPrivate = MODE == 'teacher' && selectedUser,
+		output = {
+			 'toolSessionID' : TOOL_SESSION_ID,
+		  	 'toUser'   : isPrivate ? selectedUser : '',
+		  	 'message'  : isPrivate ? '[' + selectedUser + '] ' + message : message
+		};
 	
-	$.ajax({
-		  url     : LEARNING_ACTION,
-		  data    : {'dispatch' : 'sendMessage',
-				  	 'toolSessionID' : TOOL_SESSION_ID,
-				  	 'message'  : isPrivate ? '[' + selectedUser + '] ' + message : message,
-				  	 'user'     : isPrivate ? selectedUser : null
-				  	},
-		  cache   : false,
-		  success : updateChat
-		});
+	// send it to server
+	websocket.send(JSON.stringify(output)); 
 }
 
 function getColour(nick) {

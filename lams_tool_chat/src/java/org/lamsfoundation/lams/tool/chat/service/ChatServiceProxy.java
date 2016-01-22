@@ -31,49 +31,43 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
 /**
- * <p>This class act as the proxy between web layer and service layer. It is
- * designed to decouple the presentation logic and business logic completely.
- * In this way, the presentation tier will no longer be aware of the changes in
- * service layer. Therefore we can feel free to switch the business logic
- * implementation.</p>
+ * <p>
+ * This class act as the proxy between web layer and service layer. It is designed to decouple the presentation logic
+ * and business logic completely. In this way, the presentation tier will no longer be aware of the changes in service
+ * layer. Therefore we can feel free to switch the business logic implementation.
+ * </p>
  */
 
 public class ChatServiceProxy {
 
-	public static final IChatService getChatService(ServletContext servletContext)
-    {
-        return (IChatService)getChatDomainService(servletContext);
+    public static final IChatService getChatService(ServletContext servletContext) {
+	return (IChatService) ChatServiceProxy.getChatDomainService(servletContext);
     }
-	
-	private static Object getChatDomainService(ServletContext servletContext)
-	{
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-	    return wac.getBean("chatService");
-	}
-	
-	 /*
-     * Return the chat tool version of tool session manager implementation. 
-     * It will delegate to the Spring helper method to retrieve the proper 
-     * bean from Spring bean factory.
-     * @param servletContext the servletContext for current application
-     * @return noticeboard service object.*/
-    public static final ToolSessionManager getChatSessionManager(ServletContext servletContext)
-    {
-        return (ToolSessionManager)getChatDomainService(servletContext);
+
+    private static Object getChatDomainService(ServletContext servletContext) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+	return wac.getBean("chatService");
     }
-     
-    
+
+    /*
+    * Return the chat tool version of tool session manager implementation. 
+    * It will delegate to the Spring helper method to retrieve the proper 
+    * bean from Spring bean factory.
+    * @param servletContext the servletContext for current application
+    * @return noticeboard service object.*/
+    public static final ToolSessionManager getChatSessionManager(ServletContext servletContext) {
+	return (ToolSessionManager) ChatServiceProxy.getChatDomainService(servletContext);
+    }
+
     /*
      * Return the chat tool version of tool content manager implementation. 
      * It will delegate to the Spring helper method to retrieve the proper 
      * bean from Spring bean factory.
      * @param servletContext the servletContext for current application
      * @return noticeboard service object. */
-    public static final ToolContentManager getChatContentManager(ServletContext servletContext)
-    {
-        return (ToolContentManager)getChatDomainService(servletContext);
+    public static final ToolContentManager getChatContentManager(ServletContext servletContext) {
+	return (ToolContentManager) ChatServiceProxy.getChatDomainService(servletContext);
     }
 
 }

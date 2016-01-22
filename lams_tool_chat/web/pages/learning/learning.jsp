@@ -1,33 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="includes/javascript/learning.js"></script>	
 <script type="text/javascript">
-	var MODE = "${MODE}";
-	var TOOL_SESSION_ID = '${param.toolSessionID}';
-	var LEARNING_ACTION = "<c:url value='/learning.do'/>";
-	var MESSAGE_POLL_INTERVAL = 2 * 1000; // poll every 2 seconds
-	
-	$(document).ready(function() {
-		messageDiv = $("#messages");
-		rosterDiv = $("#roster");
-		sendToUserSpan = $('#sendToUser');
-		sendToEveryoneSpan = $('#sendToEveryone');
-		sendMessageArea = $('#sendMessageArea');
-		sendMessageButton = $('#sendMessageButton');
-		
-		updateChat();
-		setInterval(updateChat, MESSAGE_POLL_INTERVAL);
-
-		// react to Enter key
-		sendMessageArea.keydown(function(e) {
-			if (e.which == 13) {
-				e.preventDefault();
-				sendMessage();
-			}
-		});
-	});
+	var MODE = "${MODE}",
+		TOOL_SESSION_ID = '${param.toolSessionID}',
+		APP_URL = '<lams:WebAppURL />',
+		LEARNING_ACTION = "<c:url value='/learning.do'/>";
 </script>
+<script type="text/javascript" src="includes/javascript/learning.js"></script>	
 
 <div id="content">
 	<h1>

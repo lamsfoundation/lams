@@ -21,7 +21,7 @@
 		<fileset dir="../lams_build/lib">
 			<include name="**/*.jar" />
 		</fileset>
-		<!-- Same list as in projects' .classpath file references to WIldFly modules.
+		<!-- Same list as in projects' .classpath file references to WildFly modules.
 			 They need to be exactly listed as **/*.jar would load other versions of JARs
 			 that are also present in lams_build/lib.
 		-->
@@ -51,6 +51,7 @@
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
 			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
 			<include name="org/jdom/main/jdom-*.jar" />
+			<include name="javax/websocket/api/main/jboss-websocket-api*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
@@ -169,7 +170,7 @@
                <compilerarg line="-encoding utf-8"/>
         </javac>
         
-		<echo>${ant.project.name}: Copying additional non-Java sources</echo>
+		<echo>${ant.project.name}: Copying additional non-Java resources</echo>
 	 	<copy todir="${basedir}/build/classes/java" overwrite="true">
 			<fileset dir="${src.java.dir}">
 				<include name="**/*.xml"/>
@@ -284,7 +285,7 @@
 	</target>
 
 	
-	<target name="_build-war" depends="_build-webdoclet, _build-manifest, _copy-language, _copy-jsp">
+	<target name="_build-war" depends="_build-webdoclet, _build-manifest, _copy-language, _copy-jsp, _copy-libs">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
 		
@@ -416,7 +417,9 @@
 				<exclude name="WEB-INF/validation.xml"/>
 			</fileset>
 	 	</copy>
-		
+	</target>
+	
+	<target name="_copy-libs">
 		<echo>${ant.project.name}: Copying additional libraries</echo>
 	 	<copy todir="${basedir}/build/war/assembly/WEB-INF/lib" flatten="true" verbose="true">
 			<fileset dir="${basedir}/lib" erroronmissingdir="false">
@@ -424,5 +427,4 @@
 			</fileset>
 	 	</copy>
 	</target>
-	
 </project>
