@@ -261,7 +261,7 @@ public class ChatService
 
 	chatDAO.delete(chat);
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
@@ -499,10 +499,11 @@ public class ChatService
      * Stores information when users with given UIDs were last seen in their Chat session.
      */
     @Override
-    public void updateUserPresence(Map<Long, Date> presence) {
-	for (Long userUid : presence.keySet()) {
-	    ChatUser chatUser = chatUserDAO.getByUID(userUid);
-	    chatUser.setLastPresence(presence.get(userUid));
+    public void updateUserPresence(Long toolSessionId, Set<String> activeUsers) {
+	Date currentTime = new Date();
+	for (String userName : activeUsers) {
+	    ChatUser chatUser = getUserByNicknameAndSessionID(userName, toolSessionId);
+	    chatUser.setLastPresence(currentTime);
 	    saveOrUpdateChatUser(chatUser);
 	}
     }
@@ -619,8 +620,8 @@ public class ChatService
     }
 
     @Override
-    public List getLastestMessages(ChatSession chatSession, int max) {
-	return chatMessageDAO.getLatest(chatSession, max);
+    public List getLastestMessages(ChatSession chatSession, Integer max, boolean orderAsc) {
+	return chatMessageDAO.getLatest(chatSession, max, orderAsc);
     }
 
     public IAuditService getAuditService() {

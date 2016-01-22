@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -120,7 +121,7 @@ public interface IChatService {
      */
     public ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID);
 
-    public void updateUserPresence(Map<Long, Date> presence);
+    public void updateUserPresence(Long toolSessionId, Set<String> activeUsers);
 
     /**
      * 
@@ -165,7 +166,7 @@ public interface IChatService {
      */
     public ChatMessage getMessageByUID(Long messageUID);
 
-    public List<ChatMessage> getLastestMessages(ChatSession chatSession, int max);
+    public List<ChatMessage> getLastestMessages(ChatSession chatSession, Integer max, boolean orderAsc);
 
     public void auditEditMessage(ChatMessage chatMessage, String messageBody);
 
