@@ -17,21 +17,6 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<%-- It contains users info divided into sessions. --%>
 	<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
-	<c:choose>
-		<%-- Record list comes from different sources, depending on the including page. --%>
-		<c:when test="${includeMode=='learning'}">
-			<c:set var="recordList" value="${sessionMap.recordList}" />
-		</c:when>
-		<c:otherwise>
-				<c:forEach var="userGroup" items="${monitoringSummary}">
-					<c:forEach var="user" items="${userGroup.users}">
-						<c:if test="${param.userUid==user.uid}">
-							<c:set var="recordList" value="${user.records}" />
-						</c:if>
-					</c:forEach>
-				</c:forEach>
-		</c:otherwise>
-	</c:choose>
 
 	<lams:css style="tabbed" />
 	<%-- To enable the table to have maximum height.  --%>
@@ -50,6 +35,20 @@
 </lams:head>
 <body class="tabpart">
 	
+	<c:choose>
+		<%-- Record list comes from different sources, depending on the including page. --%>
+		<c:when test="${includeMode=='learning'}">
+			<c:set var="recordList" value="${sessionMap.recordList}" />
+		</c:when>
+		<c:otherwise>
+			<c:forEach var="user" items="${monitoringSummary.users}">
+				<c:if test="${param.userId==user.userId}">
+					<c:set var="recordList" value="${user.records}" />
+				</c:if>
+			</c:forEach>
+		</c:otherwise>
+	</c:choose>
+
 	<table id="horizontalListTable" class="alternative-color" cellspacing="0">
 		<%-- Each column is one record. This is pure data - header was done in the including page.  --%>
 		<tr>

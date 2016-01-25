@@ -94,7 +94,7 @@
 						<c:url var="showRecordsUrl" value='/learning/diplayHorizontalRecordList.do'>
 							<c:param name="sessionMapID" value="${sessionMapID}" />
 							<c:if test="${includeMode=='monitoring'}">
-								<c:param name="userUid" value="${user.uid}" />
+								<c:param name="userId" value="${user.userId}" />
 							</c:if>
 							<c:param name="includeMode" value="${includeMode}" />
 						</c:url>
