@@ -115,7 +115,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			ExportServlet.logger.error(error);
 			throw new DacoApplicationException(error);
 		}
-		List<MonitoringSummarySessionDTO> monitoringSummary = service.getMonitoringSummary(daco.getContentId(),
+		List<MonitoringSummarySessionDTO> monitoringSummary = service.getExportPortfolioSummary(daco.getContentId(),
 				DacoConstants.MONITORING_SUMMARY_MATCH_ALL);
 		sessionMap.put(DacoConstants.ATTR_MONITORING_SUMMARY, monitoringSummary);
 		sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
@@ -160,7 +160,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			}
 		}
 		if (anyRecordsAvailable) {
-			writeResponseToFile(basePath + "/pages/monitoring/listRecords.jsp?sessionMapID=" + sessionMap.getSessionID()
+			writeResponseToFile(basePath + "/pages/export/listRecords.jsp?sessionMapID=" + sessionMap.getSessionID()
 					+ "&includeMode=exportportfolio", learnerDirectory, "allRecords.html", cookies);
 		}
 	}
@@ -196,7 +196,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 
 		sessionMap.put(DacoConstants.ATTR_DACO, daco);
-		List<List<DacoAnswer>> records = service.getDacoAnswersByUserUid(user.getUid());
+		List<List<DacoAnswer>> records = service.getDacoAnswersByUser(user);
 		new File(directory, "files").mkdir();
 
 		for (List<DacoAnswer> record : records) {

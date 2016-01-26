@@ -1,20 +1,19 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
-<lams:html> 
+<lams:html>
 <lams:head>
-		<%-- This page/learning/listRecords.jsp page modifies its content depending on the page it was included from. --%>
+		<%-- This page modifies its content depending on the page it was included from. --%>
 		<c:if test="${not empty param.includeMode}">
 			<c:set var="includeMode" value="${param.includeMode}" />
 		</c:if>
-		<c:if test="${empty includeMode}">
-			<c:set var="includeMode" value="monitoring" />
-		</c:if>
+		<lams:css localLinkPath="../../" />
+		<link rel="StyleSheet" href="../daco.css" type="text/css" />
 		<c:if test="${not empty param.sessionMapID}">
 			<c:set var="sessionMapID" value="${param.sessionMapID}" />
 		</c:if>
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-		<c:set var="userGroup" value="${sessionMap.monitoringSummary}" />
+		<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
 			
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/prototype.js"></script>					
 		<%@ include file="/common/header.jsp"%>
@@ -35,29 +34,21 @@
 	<div id="header-no-tabs">
 	</div>
 	<div id="content">
-
-			<div style="float: right; margin-left: 10px; padding-top: 4px" class="help">
-				<%-- Switch between the horizontal and vertical views --%>
-				<c:url var="changeViewUrl" value='/monitoring/changeView.do'>
-					<c:param name="sessionMapID" value="${sessionMapID}" />
-					<c:param name="toolSessionID" value="${toolSessionID}" />
-					<c:param name="userId" value="${userId}" />
-					<c:param name="sort" value="${sort}" />
-				</c:url>
-				<img src="${tool}includes/images/uparrow.gif" title="<fmt:message key="label.common.view.change" />"
-				 onclick="javascript:document.location.href='${changeViewUrl}'" />
-			</div>
-
-			<c:if test="${sessionMap.isGroupedActivity}">
-			<h2  style="display: inline"><fmt:message key="label.monitoring.group" />: ${userGroup.sessionName}</h2>
-			</c:if>
-			<div class="float-right"><a href="#" onclick="javascript:self.close()" class="button"><fmt:message key="label.monitoring.close" /></a></div>
-			<c:forEach var="user" items="${userGroup.users}">
+		<c:forEach var="userGroup" items="${monitoringSummary}">
+			<c:forEach var="user" items="${userGroup.users}" varStatus="userStatus">
+				<c:if test="${empty userUid || userUid==user.uid}">
 					<table cellpadding="0" class="alternative-color">
 						<tr>
 							<th><fmt:message key="label.monitoring.fullname" /></th>
 							<th><fmt:message key="label.monitoring.recordcount" /></th>
 						</tr>
+						<c:if test="${userStatus.first || userUid==user.uid}">
+							<tr>
+								<td colspan="3" style="height: 20px; font-weight: bold; text-align: center">
+									<fmt:message key="label.monitoring.group" />: ${userGroup.sessionName}
+								</td>
+							</tr>
+						</c:if>
 						<tr>
 							<td style="height: 20px;">
 								 <c:out value="${user.fullName}" escapeXml="true"/>
@@ -67,11 +58,14 @@
 							</td>
 						</tr>
 					</table>
+					<%-- for each user his record list is displayed --%>
 					<c:if test="${not empty user.records}">
 						<c:set var="recordList" value="${user.records}" />
 						<%@ include file="/pages/learning/listRecords.jsp" %>
 					</c:if>
+				</c:if>
 			</c:forEach>
+		</c:forEach>
 	</div>
 	<div id="footer">
 	</div>

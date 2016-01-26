@@ -24,4 +24,9 @@ public interface DacoAnswerDAO extends DAO {
      * @return number of records for that user
      */
     Integer getUserRecordCount(Long userId, Long sessionId);
+    
+    /**
+     * Gets the number of records entered by users in this session.
+     */
+    Integer getSessionRecordCount(Long sessionId);
 }

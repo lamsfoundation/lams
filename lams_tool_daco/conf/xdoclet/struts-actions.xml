@@ -140,6 +140,15 @@
 <action path="/monitoring/changeView" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="changeView">
 	<forward name="success" path="/pages/monitoring/listRecords.jsp" />
 </action>
+<action path="/monitoring/getQuestionSummaries" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="getQuestionSummaries">
+	<forward name="success" path="/pages/monitoring/questionSummaries.jsp" />
+</action>
+<action path="/monitoring/statistic" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="statistic">
+	<forward name="success" path="/pages/monitoring/statistics.jsp" />
+</action>
+<action path="/monitoring/getUsers" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="getUsers" >
+</action>
+
 <!--  ========= Export to spreadsheet =============== -->
 <action path="/monitoring/exportToSpreadsheet" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
 	validate="false" input="/pages/export/exportToSpreadsheet.jsp" parameter="exportToSpreadsheet" scope="request">

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.daco.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 
 public interface DacoSessionDAO extends DAO {
@@ -34,5 +35,7 @@ public interface DacoSessionDAO extends DAO {
 	List<DacoSession> getByContentId(Long toolContentId);
 
 	void deleteBySessionId(Long toolSessionId);
+	
+	List<MonitoringSummarySessionDTO> statistics(Long toolContentUid);
 
 }
