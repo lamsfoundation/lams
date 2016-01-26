@@ -483,7 +483,7 @@
                 </host>
             </server>
             <servlet-container name="default" default-encoding="UTF-8">
-                <jsp-config/>
+                <jsp-config x-powered-by="false"/>
                 <websockets/>
             </servlet-container>
             <handlers>
