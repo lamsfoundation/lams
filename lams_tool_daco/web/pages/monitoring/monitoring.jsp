@@ -6,7 +6,7 @@
 
 <lams:html>
 	<lams:head>
-		<%@ include file="/common/tabbedheader.jsp" %>
+		<%@ include file="/common/jqueryheader.jsp" %>
 		
 		<script>
 			var currentTab = "${monitoringCurrentTab}";
@@ -22,7 +22,7 @@
 			<fmt:message key="label.common.heading" />
 		</h1>
 	<div id="header">
-		<lams:Tabs>
+		<lams:Tabs control="true">
 			<lams:Tab id="1" key="label.common.summary" />
 			<lams:Tab id="2" key="tab.monitoring.edit.activity" />			
 			<lams:Tab id="3" key="tab.monitoring.statistics" />
@@ -38,5 +38,6 @@
 	<div id="footer"></div>
 	
 	</div>
-	</body>
+</div>
+</body>
 </lams:html>

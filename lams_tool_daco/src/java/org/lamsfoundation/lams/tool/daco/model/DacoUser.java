@@ -254,4 +254,8 @@ public class DacoUser implements Cloneable {
 	public void setAnswers(Set<DacoAnswer> answers) {
 		this.answers = answers;
 	}
+	
+	public String getFullName() {
+	   return new StringBuilder(getLastName()).append(" ").append(getFirstName()).toString();
+	}
 }

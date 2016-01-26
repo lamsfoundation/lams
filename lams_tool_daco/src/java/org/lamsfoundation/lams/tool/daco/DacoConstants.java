@@ -110,7 +110,7 @@ public class DacoConstants {
 
     public static final String LEARNING_VIEW_VERTICAL = "vertical";
 
-    // monitoring summary query match
+    // monitoring summary query match & user data return
     public static final Long MONITORING_SUMMARY_MATCH_ALL = null;
 
     public static final Long MONITORING_SUMMARY_MATCH_NONE = -1L;
@@ -120,6 +120,10 @@ public class DacoConstants {
     public static final String USER_ID = "userId";
 
     public static final String USER_FULL_NAME = "userFullName";
+
+    public static final String NOTEBOOK_ENTRY = "notebookEntry";
+
+    public static final String RECORD_COUNT = "recordCount";
 
     // for parameters' name
 
@@ -179,6 +183,8 @@ public class DacoConstants {
     public static final String ATTR_LEARNING_VIEW = "learningView";
 
     public static final String ATTR_QUESTION_SUMMARIES = "questionSummaries";
+
+    public static final String ATTR_SESSION_SUMMARIES = "sessionSummaries";
 
     public static final String ATTR_TOTAL_RECORD_COUNT = "totalRecordCount";
     
@@ -300,4 +306,12 @@ public class DacoConstants {
     public static final String KEY_LABEL_EXPORT_FILE_TITLE = "label.export.file.title";
 
     public static final String KEY_LABEL_EXPORT_FILE_ANSWER_DATE = "label.export.file.answer.date";
+    
+    // paging and sorting
+    public static final String ATTR_SORT = "sort";
+    public static final int SORT_BY_NO = 0;
+    public static final int SORT_BY_USER_NAME_ASC = 1;
+    public static final int SORT_BY_USER_NAME_DESC = 2;
+    public static final int SORT_BY_NUM_RECORDS_ASC = 3;
+    public static final int SORT_BY_NUM_RECORDS_DESC = 4;
 }

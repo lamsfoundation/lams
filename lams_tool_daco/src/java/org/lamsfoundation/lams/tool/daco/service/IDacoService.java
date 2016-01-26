@@ -133,13 +133,13 @@ public interface IDacoService {
     void deleteDacoRecord(List<DacoAnswer> record);
 
     /**
-     * Return all reource questions within the given toolSessionID.
+     * Return all answers for a given user, grouped by record.
      * 
-     * @param sessionId
+     * @param user
      * 
      * @return
      */
-    List<List<DacoAnswer>> getDacoAnswersByUserUid(Long userUid);
+    List<List<DacoAnswer>> getDacoAnswersByUser(DacoUser user);
 
     /**
      * Get daco which is relative with the special toolSession.
@@ -272,9 +272,9 @@ public interface IDacoService {
      * @return number of records in that group
      */
     Integer getGroupRecordCount(MonitoringSummarySessionDTO monitoringSummary);
-
+    
     /**
-     * Creates summary that is later used in the monitoring.
+     * Creates summary that is later used in the monitoring. Does not include users.
      * 
      * @param contentId
      *                ID of Daco for which the summary should be created
@@ -286,7 +286,33 @@ public interface IDacoService {
      */
     List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
 
+    /** Get the detailed records for a user (userId != null) or group (userId == null). SessionId should
+     * always be set.
+     */
+    MonitoringSummarySessionDTO getAnswersAsRecords(final Long sessionId, final Long userId, int sorting);
+
     /**
+     * Creates summary that is later used in the export portfolio. 
+     * 
+     * @param contentId
+     *                ID of Daco for which the summary should be created
+     * @param userUid
+     *                ID of the user for who the summary details should be created; <code>null</code> if the summary
+     *                details should be created for all users; <code>< 0 </code> if the summary details should be
+     *                created for noone
+     * @return list of monitoring summaries, one for each session
+     */
+    List<MonitoringSummarySessionDTO> getExportPortfolioSummary(Long contentId, Long userUid);
+
+    /** Get a paged user list for monitoring */
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, 
+	    String searchString, boolean getNotebookEntries);
+    int getCountUsersBySession(final Long sessionId, String searchString);
+
+    /** Get the basic statistics for all sessions. Used by Monitoring */
+    List<MonitoringSummarySessionDTO> getSessionStatistics(Long toolContentUid);
+    
+  /**
      * Get how many records has the given user posted.
      * 
      * @param userID

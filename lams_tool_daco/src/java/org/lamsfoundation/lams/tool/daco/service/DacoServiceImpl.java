@@ -248,8 +248,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     }
 
     @Override
-    public List<List<DacoAnswer>> getDacoAnswersByUserUid(Long userUid) {
-	DacoUser user = getUser(userUid);
+    public List<List<DacoAnswer>> getDacoAnswersByUser(DacoUser user) {
 	Set<DacoAnswer> answers = user.getAnswers();
 	List<List<DacoAnswer>> result = new LinkedList<List<DacoAnswer>>();
 	if ((answers != null) && (answers.size() > 0)) {
@@ -443,6 +442,64 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	List<MonitoringSummarySessionDTO> result = new ArrayList<MonitoringSummarySessionDTO>(sessions.size());
 	Daco daco = getDacoByContentId(contentId);
 	for (DacoSession session : sessions) {
+	    // for each session a monitoring summary is created but don't include users as the paging fetches them
+	    MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(),
+		    session.getSessionName());
+	    result.add(monitoringRecordList);
+	}
+	return result;
+    }
+
+    @Override
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, 
+	    String searchString, boolean getNotebookEntries) {
+	return dacoUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, 
+		getNotebookEntries, coreNotebookService);
+    }
+
+    public int getCountUsersBySession(final Long sessionId, String searchString) { 
+	return dacoUserDao.getCountUsersBySession( sessionId, searchString);
+    }
+
+    public List<MonitoringSummarySessionDTO> getSessionStatistics(Long toolContentUid) {
+	return dacoSessionDao.statistics(toolContentUid);	
+    }
+    
+    public MonitoringSummarySessionDTO getAnswersAsRecords(final Long sessionId, final Long userId, int sorting)
+    {
+	DacoSession session = dacoSessionDao.getSessionBySessionId(sessionId);
+	MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(),  session.getSessionName());
+	
+	List<MonitoringSummaryUserDTO> monitoringUsers = new ArrayList<MonitoringSummaryUserDTO>();
+	if ( userId == null ) {
+	    List<DacoUser> users = dacoUserDao.getBySessionId(sessionId, sorting);
+	    for ( DacoUser user : users ) {
+		monitoringUsers.add(getAnswersAsRecordsForUser(user));	    
+	    }
+	} else {
+	    monitoringUsers.add(getAnswersAsRecordsForUser(getUserByUserIdAndSessionId(userId, sessionId)));
+	}
+	
+	monitoringRecordList.setUsers(monitoringUsers);
+	return monitoringRecordList;
+    }
+    
+    // called by getAnswersAsRecords
+    private MonitoringSummaryUserDTO getAnswersAsRecordsForUser(DacoUser user) {
+	MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(),
+		user.getUserId().intValue(), user.getFullName(),
+		user.getLoginName());
+	List<List<DacoAnswer>> records = getDacoAnswersByUser(user);
+	monitoringUser.setRecords(records);
+	monitoringUser.setRecordCount(records.size());
+	return monitoringUser;
+    }
+    
+    public List<MonitoringSummarySessionDTO> getExportPortfolioSummary(Long contentId, Long userUid) {
+	List<DacoSession> sessions = dacoSessionDao.getByContentId(contentId);
+	List<MonitoringSummarySessionDTO> result = new ArrayList<MonitoringSummarySessionDTO>(sessions.size());
+	Daco daco = getDacoByContentId(contentId);
+	for (DacoSession session : sessions) {
 	    // for each session a monitoring summary is created
 	    MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(),
 		    session.getSessionName());
@@ -450,9 +507,9 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    List<MonitoringSummaryUserDTO> monitoringUsers = new ArrayList<MonitoringSummaryUserDTO>(users.size());
 	    for (DacoUser user : users) {
 		MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(),
-			user.getUserId().intValue(), user.getLastName() + " " + user.getFirstName(),
+			user.getUserId().intValue(), user.getFullName(),
 			user.getLoginName());
-		List<List<DacoAnswer>> records = getDacoAnswersByUserUid(user.getUid());
+		List<List<DacoAnswer>> records = getDacoAnswersByUser(user);
 		/*
 		 * If the user provided as "userUid" matches current user UID, the summary is filled with additional
 		 * data. NULL matches all users. UID < 0 matches no users, so only the brief description of users is
@@ -525,15 +582,13 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     @Override
     public void notifyTeachersOnLearnerEntry(Long sessionId, DacoUser dacoUser) {
-	String userName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
-	String message = getLocalisedMessage("event.learnerentry.body", new Object[] { userName });
+	String message = getLocalisedMessage("event.learnerentry.body", new Object[] { dacoUser.getFullName() });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
     @Override
     public void notifyTeachersOnRecordSumbit(Long sessionId, DacoUser dacoUser) {
-	String userName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
-	String message = getLocalisedMessage("event.recordsubmit.body", new Object[] { userName });
+	String message = getLocalisedMessage("event.recordsubmit.body", new Object[] { dacoUser.getFullName() });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
@@ -590,7 +645,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
-	//no actions required
+	// no actions required
     }
 
     @Override
@@ -790,6 +845,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	dacoDao.removeObject(Daco.class, daco.getUid());
     }
 
