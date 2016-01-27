@@ -216,16 +216,13 @@ public class NbAuthoringForm extends ActionForm {
 	
 	public void copyValuesIntoNbContent(NoticeboardContent nbContent)
 	{
-		nbContent.setTitle(getTitle());
+	    nbContent.setTitle(getTitle());
 	    nbContent.setContent(getBasicContent());
-		nbContent.setAllowComments(isAllowComments());
-		nbContent.setCommentsLikeAndDislike(isCommentsLikeAndDislike());
-	    if (defineLater == null || defineLater.length() == 0) {
-	    	// ie. If defineLater is null or empty, this means we are in authoring
-			nbContent.setReflectOnActivity(getReflectOnActivity());
-			nbContent.setReflectInstructions(getReflectInstructions());
-			nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
-	    }
+	    nbContent.setAllowComments(isAllowComments());
+	    nbContent.setCommentsLikeAndDislike(isCommentsLikeAndDislike());
+	    nbContent.setReflectOnActivity(getReflectOnActivity());
+	    nbContent.setReflectInstructions(getReflectInstructions());
+	    nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
 	}
 	
 	public String getCurrentTab() {
