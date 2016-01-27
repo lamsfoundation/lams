@@ -72,9 +72,7 @@
 				<!-- start tabs -->
 				<lams:Tabs control="true">
 					<lams:Tab id="1" key="label.authoring.heading.basic" />
-					<c:if test="${formBean.defineLater != 'true'}">
-						<lams:Tab id="2" key="label.authoring.heading.advanced" />
-					</c:if>
+					<lams:Tab id="2" key="label.authoring.heading.advanced" />
 				</lams:Tabs>
 				<!-- end tab buttons -->
 			</div>
@@ -94,10 +92,8 @@
 				<!--  Set up tabs  -->
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic"
 					page="basic.jsp" />
-				<c:if test="${formBean.defineLater != 'true'}">
-					<lams:TabBody id="2" titleKey="label.authoring.heading.advanced"
+				<lams:TabBody id="2" titleKey="label.authoring.heading.advanced"
 						page="advance.jsp" />
-				</c:if>
 
 				<!-- Button Row -->
 				<html:hidden property="method" value="save" />
