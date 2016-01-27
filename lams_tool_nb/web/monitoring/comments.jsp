@@ -14,6 +14,7 @@
 <lams:html>
 <lams:head>
 	<lams:css />
+	<script src="${lams}includes/javascript/jquery.js"></script>
 	<title><fmt:message key="activity.title"/></title>
 </lams:head>
 
