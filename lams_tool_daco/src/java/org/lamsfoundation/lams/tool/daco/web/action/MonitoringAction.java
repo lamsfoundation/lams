@@ -403,10 +403,13 @@ public class MonitoringAction extends Action {
 					log.error("exportToSpreadsheet encountered '" + e + "' while parsing checkbox answer; answer was " + answerString);
 				    }
 				    answerIndex++;
-				    answer = record.get(answerIndex);
-				    currentQuestion = answer.getQuestion();
-				    answerString = answer.getAnswer();
-				} while (currentQuestion.equals(question));
+				    // LDEV-3648 If the checkbox is the last entry, then there won't be any more answers so don't trigger an out of bounds exception!
+				    if ( answerIndex < record.size() ) {
+					answer = record.get(answerIndex);
+					currentQuestion = answer.getQuestion();
+					answerString = answer.getAnswer();
+				    }
+				} while (answerIndex < record.size() && currentQuestion.equals(question));
 				// we went one answer too far, so we go back
 				answerIndex--;
 				cell = (cellStringBuilder.length() > 1 
