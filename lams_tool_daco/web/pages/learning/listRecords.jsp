@@ -211,8 +211,14 @@
 												<c:when test="${question.type==4}">
 													<c:set var="date">
 														<c:if test="${not empty answer.answer}">
+															<c:set var="dateString" value="${answer.answer}" />
+															<%
+															  String answer = (String) pageContext.getAttribute("dateString");
+															  pageContext.setAttribute("parsedDate", 
+																  new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(answer));
+															%>
 															<%-- To display a date a single textfield with formatted date is used. --%>
-															<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
+															<lams:Date value="${parsedDate}" type="date" style="medium"/>
 														</c:if>
 													</c:set>
 													<input type="text" size="20" readonly="readonly" value="${date}" />
