@@ -75,7 +75,7 @@
 						</c:when>
 						<c:otherwise>
 							<!--  display a hide link -->
-							<c:set var="hideURL"><lams:LAMSURL />comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=true"</c:set>
+							<c:set var="hideURL"><lams:LAMSURL />comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=true</c:set>
 							<html:link href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" styleClass="comment"><fmt:message key="label.hide" /></html:link>
 						</c:otherwise>
 					</c:choose>
