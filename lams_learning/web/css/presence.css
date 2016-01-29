@@ -1,15 +1,5 @@
-/*
-*************************************************
-LAMS 2.2
-Date modified:  29/04/2009
-
-*************************************************
-Presence stylesheet
-********************************************** */
-
-#presenceUserListings {
-	margin: 5px;
-	padding: 2px;
+.startHidden {
+	display: none;
 }
 
 #presenceChat {
@@ -20,15 +10,6 @@ Presence stylesheet
 	z-index: 10;
 }
 
-#presenceChatWarning {
-	position: absolute;
-	width: 400px;
-	right: 18px;
-	z-index: 10;
-	padding: 10px 10px 10px 40px;
-	margin: 0px;
-}
-
 #presenceChatTabs {
 	position: absolute;
 	bottom: 0px;
@@ -37,70 +18,54 @@ Presence stylesheet
 	height: 260px;
 }
 
+#presenceChatTabs li a {
+	border-bottom: none;
+}
+
+#presenceChatTabs li .ui-icon-close {
+	margin-top: 5px;
+	cursor: pointer;
+}
+
 #presenceChatRoster {
 	position: absolute;
 	right: 0pt;
 	bottom: 0pt;
 	width: 25%;
 	height: 100%;
+	background-color: #FFFFFF;
+	border: #AAAAAA thin solid;
+}
+
+#presenceUserCount {
+	height: 23px;
+	border-bottom: #AAAAAA thin solid;
+	text-align: center;
+	padding-top: 7px;
+	cursor: pointer;
 }
 
 #presenceUserListings{
+	padding: 5px;
 	height: 255px;
 	overflow-x: hidden;
 	overflow-y: scroll;
 }
 
-#minMaxIcon{
-	position:absolute;
-	top: 0px;
-	right:0px;
-}
-
-#tabsHolder {
-	float: left;
-	width: 90%;
-	overflow:hidden;
-}
-
-#leftSliderDiv {
-	float: left;
-	width: 5%;
-	text-align: left;
-}
-
-#rightSliderDiv {
-	float: left;
-	width: 5%;
-	text-align: right;
-}
-
-.smallImage {
-	width: 16px;
-	height: 16px;
-	border: none;
-}
-
-.startHidden {
-	display: none;
-}
-
 .presenceListing {
-	width:"100%";
+	cursor: pointer;
 }
 
 .presenceListing:hover {
-	width:"100%";
 	background-color: #CBDBFF;
-	cursor: pointer;
 }
 
 .presenceListingNewMessage {
 	background-color: #88FF99;
 }
 
-.presenceTabNewMessage {
-	text-decoration: underline;
+.presenceTabNewMessage a {
+	text-decoration: underline !important;
 }
 
 .presenceMessage {
@@ -111,26 +76,15 @@ Presence stylesheet
 	font-weight: bold;
 }
 
-.presenceMessageEmote {
-	font-style: italic;
-	padding-bottom: 4px;
-}
-
-.chatPanel {
-	width: 95%;
-	height: 220px;
-}
-
 .messageArea {
 	width: 100%;
-	height: 80%;
+	height: 190px;
 	overflow-x: hidden;
 	overflow-y: scroll;
 }
 
 .sendArea {
-	width: 100%;
-	height: 20%;
+	width: 95%;
 }
 
 .messageInput {
@@ -140,20 +94,4 @@ Presence stylesheet
 	
 .sendButton {
 	float: left;
-}
-
-table.tabLabelTable {
-	width: auto;
-}
-
-.ui-tabs .ui-tabs-nav li.ui-tabs-active a{
-	cursor: pointer;
-}
-
-#presenceChatRoster li {
-	width: 100%;
-}
-
-#presenceChatRoster li a{
-	width: 83%;
 }

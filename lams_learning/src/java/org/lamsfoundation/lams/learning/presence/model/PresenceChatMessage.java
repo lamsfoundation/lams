@@ -23,7 +23,7 @@
 
 /* $Id$ */
 
-package org.lamsfoundation.lams.presence.model;
+package org.lamsfoundation.lams.learning.presence.model;
 
 import java.util.Date;
 
