@@ -30,6 +30,8 @@ package org.lamsfoundation.lams.tool.sbmt.dto;
  */
 public class StatisticDTO {
 
+    	private long sessionId;
+    	private String sessionName;
 	private int notMarkedCount;
 	private int markedCount;
 	private int totalUploadedFiles;
@@ -51,5 +53,17 @@ public class StatisticDTO {
 	}
 	public void setTotalUploadedFiles(int totalUploadedFiles) {
 		this.totalUploadedFiles = totalUploadedFiles;
+	}
+	public String getSessionName() {
+	    return sessionName;
+	}
+	public void setSessionName(String sessionName) {
+	    this.sessionName = sessionName;
+	}
+	public long getSessionId() {
+	    return sessionId;
+	}
+	public void setSessionId(long sessionId) {
+	    this.sessionId = sessionId;
 	}
 }

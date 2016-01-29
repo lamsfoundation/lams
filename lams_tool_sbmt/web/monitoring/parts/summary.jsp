@@ -12,6 +12,8 @@
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery.tablesorter.pager.css" rel="stylesheet">
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -30,6 +32,95 @@
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+	    
+		$(".tablesorter").tablesorter({
+			theme: 'blue',
+		    sortInitialOrder: 'desc',
+            sortList: [[0]],
+            widgets: [ "resizable", "filter" ],
+            headers: { 1: { filter: false}, 2: { filter: false }, 3: { sorter: false, filter: false} }, 
+            widgetOptions: {
+            	resizable: true,
+            	// include column filters 
+                filter_columnFilters: true, 
+                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_searchDelay: 700 
+            }
+		});
+		
+		$(".tablesorter").each(function() {
+			$(this).tablesorterPager({
+				savePages: false,
+				ajaxUrl : "<c:url value='/monitoring.do'/>?method=getUsers&sessionMapID=${sessionMapID}&toolContentID=${param.toolContentID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
+				ajaxProcessing: function (data, table) {
+					if (data && data.hasOwnProperty('rows')) {
+			    		var rows = [],
+			            json = {};
+			    		
+						for (i = 0; i < data.rows.length; i++){
+							var userData = data.rows[i];
+
+							rows += '<tr>';
+							rows += '<td>'
+							rows += userData["fullName"];
+							rows += '</td>';
+							rows += '<td align="center">'
+							rows += userData["numFiles"];
+							rows += '</td>';
+							
+							rows += '<td align="center">';
+							if ( userData["marked"] ) {
+								rows += '<fmt:message key="label.yes"/>';
+							} else {
+								rows += '<fmt:message key="label.no"/>';
+							}
+							if ( userData["numFiles"] > 0 ) {
+								rows += ' [<a href=\"javascript:viewMark('+userData["userID"]+','+$(table).attr("data-session-id")+');\"><fmt:message key="label.monitoring.Mark.button" /></a>]';
+							} 
+							rows += '</td>';
+
+							<c:if test="${reflectOn}">
+							rows += '<td>';
+							if ( userData["reflection"] ) {
+								rows += userData["reflection"];
+							} else {
+								rows += '-';
+							}
+							rows += '</td>';
+							</c:if>
+							
+							rows += '</tr>';
+						}
+			            
+						json.total = data.total_rows;
+						json.rows = $(rows);
+						return json;
+			            
+			    	}
+				},					
+			    container: $(this).next(".pager"),
+			    output: '{startRow} to {endRow} ({totalRows})',
+			    // css class names of pager arrows
+			    cssNext: '.tablesorter-next', // next page arrow
+				cssPrev: '.tablesorter-prev', // previous page arrow
+				cssFirst: '.tablesorter-first', // go to first page arrow
+				cssLast: '.tablesorter-last', // go to last page arrow
+				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
+				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
+				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
+				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
+				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+			})
+		});
+  	})
+</script>
+
 
 <script type="text/javascript">
 	function launchPopup(url, title) {
@@ -93,9 +184,11 @@
 	<span id="messageArea"></span>
 </td></tr>
 </table>
-<c:forEach var="element" items="${sessionUserMap}">
-	<c:set var="sessionDto" value="${element.key}" />
-	<c:set var="userlist" value="${element.value}" />
+<c:if test="${empty sessions}">
+	<fmt:message key="label.no.user.available" />
+</c:if>
+
+<c:forEach var="sessionDto" items="${sessions}">
 
 		<c:if test="${isGroupedActivity}">
 			<h1>
@@ -105,67 +198,50 @@
 		</c:if>
 		<br/>
 		
-		<table cellpadding="0" class="alternative-color">
-		<c:forEach var="user" items="${userlist}" varStatus="status">
-			
-			<c:if test="${status.first}">
+		<div class="tablesorter-holder">
+		<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
+			<thead>
 				<tr>
 					<th>
 						<fmt:message key="monitoring.user.fullname"/>
 					</th>
-					<th align="center">
+					<th  width="15%" align="center">
 						<fmt:message key="monitoring.user.submittedFiles"/>
 					</th>
-					<c:if test="${user.hasRefection}">
+					<th width="15%" align="center">
+						<fmt:message key="monitoring.marked.question"/>
+					</th>
+					<c:if test="${reflectOn}">			
 						<th align="center">
 							<fmt:message key="monitoring.user.reflection"/>
 						</th>
 					</c:if>
-					<th align="center">
-						<fmt:message key="monitoring.marked.question"/>
-					</th>
 				</tr>
-			</c:if>		
-			<tr>
-				<td><c:out value="${user.firstName}" /> 
-					<c:out value="${user.lastName}" />
-				</td>
-				<!-- LDEV-2194 -->
-				<td align="center"><c:out value="${fn:length(user.filesUploaded)}" /></td>
-				
-				<c:if test="${user.hasRefection}">
-				<td align="center">
-						<c:set var="viewReflection">
-							<c:url value="/monitoring.do?method=viewReflection&toolSessionID=${sessionDto.sessionID}&userUid=${user.userUid}"/>
-						</c:set>
-						<html:link href="javascript:launchPopup('${viewReflection}')">
-							<fmt:message key="label.view" />
-						</html:link>
-				</td>
-				</c:if>				
-				<td align="center">
-					<c:choose>
-					<c:when test="${user.anyFilesMarked}">
-						<fmt:message key="label.yes"/>
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.no"/>
-					</c:otherwise>
-					</c:choose>
-				[<html:link
-					href="javascript:viewMark(${user.userID},${sessionDto.sessionID});"
-					property="Mark" >
-					<fmt:message key="label.monitoring.Mark.button" />
-				</html:link>]</td>
-			</tr>
-		</c:forEach>
-		<c:if test="${empty userlist}">
-			<tr>
-				<td colspan="3"><fmt:message key="label.no.user.available" />
-				</td>
-			</tr>
-		</c:if>
+			</thead>
+			<tbody>
+			</tbody>
 		</table>
+		
+		<!-- pager -->
+		<div class="pager">
+			<form>
+				<img class="tablesorter-first"/>
+				<img class="tablesorter-prev"/>
+				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+				<img class="tablesorter-next"/>
+				<img class="tablesorter-last"/>
+				<select class="pagesize">
+					<option selected="selected" value="10">10</option>
+					<option value="20">20</option>
+					<option value="30">30</option>
+					<option value="40">40</option>
+					<option value="50">50</option>
+					<option value="100">100</option>
+				</select>
+			</form>
+		</div>
+		</div>
+		
 		<table>
 		  <tr>
 			<td align="center"><html:link href="javascript:viewAllMarks(${sessionDto.sessionID});"

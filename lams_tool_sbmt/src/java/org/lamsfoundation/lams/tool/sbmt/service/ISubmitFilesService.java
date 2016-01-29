@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -268,6 +269,29 @@ public interface ISubmitFilesService {
      */
     public SubmitUser getUserByUid(Long uid);
 
+    /**
+     * Get a paged, optionally sorted and filtered, list of users.
+     * Will return List<[SubmitUser, Integer1, Integer2, String], [SubmitUser, Integer1, Integer2, String], ... , [SubmitUser, Integer1, Integer2, String]>
+     * where Integer1 is the number of files uploaded, Integer2 is the number of files marked 
+     * and String is the notebook entry. No notebook entries needed? Will return null in their place.
+     * @return
+     */
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, boolean getNotebookEntries);
+
+    /**
+     * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports filtering.
+     * @return
+     */
+    int getCountUsersBySession(Long sessionId, String searchString);
+
+    /**
+     * Get the basic statistics for all the sessions for one activity.
+     * @param contentId
+     * @return
+     */
+    List<StatisticDTO> getStatisticsBySession(final Long contentId);
+    
+    
     public IEventNotificationService getEventNotificationService();
 
     /**

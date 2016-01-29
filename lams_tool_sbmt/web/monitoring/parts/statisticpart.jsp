@@ -3,18 +3,20 @@
 
 <%-- If you change this file, remember to update the copy made for CNG-12 --%>
 
-<c:forEach var="element" items="${statisticList}">
-	<c:set var="sessionName" value="${element.key.sessionName}" />
-	<c:set var="statistic" value="${element.value}" />
-	<table cellpadding="0">
-		<c:if test="${isGroupedActivity}">
-			<tr>
-				<th colspan="2">
-					<fmt:message key="label.session.name" />: <c:out value="${sessionName}" />
-				</th>
-			</tr>
-		</c:if>
-		
+<c:if test="${empty statisticList}">
+	<fmt:message key="label.no.user.available" />
+</c:if>
+
+<c:forEach var="statistic" items="${statisticList}">
+
+	<c:if test="${isGroupedActivity}">
+		<h1>
+			<fmt:message key="label.session.name" />: 
+			<c:out value="${statistic.sessionName}" />
+		</h1>
+	</c:if>
+
+	<table  class="alternative-color">
 		<tr>
 			<td>
 				<fmt:message key="monitoring.statistic.marked" />

@@ -45,6 +45,14 @@ public class SbmtConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
+    public static final String ATTR_USER_FULLNAME = "fullName";
+
+    public static final String ATTR_USER_REFLECTION = "reflection";
+    
+    public static final String ATTR_USER_NUM_FILE = "numFiles";
+
+    public static final String ATTR_USER_FILE_MARKED = "marked";
+
     public static final String SUCCESS = "success";
 
     public static final String ATTR_FINISH_LOCK = "finishLock";
@@ -82,4 +90,13 @@ public class SbmtConstants {
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARKED_FILE = "notify_learners_on_marked_file";
 
     public static final String SUBMITTED_ITEMS_DEFINITION_NAME = "submitted.items.output.definition.sbmt";
+    
+    public static final int SORT_BY_NO = 1;
+    public static final int SORT_BY_USERNAME_ASC = 2;
+    public static final int SORT_BY_USERNAME_DESC = 3;
+    public static final int SORT_BY_MARKED_ASC = 4;
+    public static final int SORT_BY_MARKED_DESC = 5;
+    public static final int SORT_BY_NUM_FILES_ASC = 6;
+    public static final int SORT_BY_NUM_FILES_DESC = 7;
+    
 }
