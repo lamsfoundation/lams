@@ -28,19 +28,21 @@ package org.lamsfoundation.lams.tool.sbmt.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -50,6 +52,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.DynaActionForm;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -103,6 +108,18 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
     }
 
+    private class StatisticComparator implements Comparator<StatisticDTO> {
+	public int compare(StatisticDTO o1, StatisticDTO o2) {
+	    if (o1 != null && o2 != null) {
+		return o1.getSessionName().compareTo(o2.getSessionName());
+	    } else if (o1 != null) {
+		return 1;
+	    } else {
+		return -1;
+	    }
+	}
+    }
+
     /**
      * Default ActionForward for Monitor
      */
@@ -115,10 +132,9 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
-	// List userList = submitFilesService.getUsers(sessionID);
 	List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
 	summary(request, submitFilesSessionList);
-	statistic(request, submitFilesSessionList);
+	statistic(request, contentID);
 
 	// instruction
 	SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
@@ -129,6 +145,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute(SbmtConstants.AUTHORING_DTO, authorDto);
 	request.setAttribute(SbmtConstants.PAGE_EDITABLE, persistContent.isContentInUse());
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
+	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, persistContent.isReflectOnActivity());
 
 	//set SubmissionDeadline, if any
 	if (persistContent.getSubmissionDeadline() != null) {
@@ -146,6 +163,70 @@ public class MonitoringAction extends LamsDispatchAction {
 	return mapping.findForward("success");
     }
 
+    /** Ajax call to populate the tablesorter */
+    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+	    throws JSONException, IOException {
+
+	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	Integer sortByNumFiles = WebUtil.readIntParam(request, "column[1]", true);
+	Integer sortByMarked = WebUtil.readIntParam(request, "column[2]", true);
+	String searchString = request.getParameter("fcol[0]"); 
+
+	int sorting = SbmtConstants.SORT_BY_NO;
+	if ( sortByName != null ) {
+	    sorting = sortByName.equals(0) ? SbmtConstants.SORT_BY_USERNAME_ASC : SbmtConstants.SORT_BY_USERNAME_DESC; 
+	} else if ( sortByNumFiles !=null ) {
+	    sorting = sortByNumFiles.equals(0) ? SbmtConstants.SORT_BY_NUM_FILES_ASC : SbmtConstants.SORT_BY_NUM_FILES_DESC; 
+	} else if ( sortByMarked !=null ) {
+	    sorting = sortByMarked.equals(0) ? SbmtConstants.SORT_BY_MARKED_ASC : SbmtConstants.SORT_BY_MARKED_DESC; 
+	}
+
+	//return user list according to the given sessionID
+	ISubmitFilesService service = getSubmitFilesService();
+	SubmitFilesContent spreadsheet = service.getSubmitFilesContent(contentId);
+	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString, spreadsheet.isReflectOnActivity());
+
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", service.getCountUsersBySession(sessionID, searchString));
+
+	for (Object[] userAndReflection : users) {
+
+	    JSONObject responseRow = new JSONObject();
+
+	    SubmitUser user = (SubmitUser) userAndReflection[0];
+	    responseRow.put(SbmtConstants.ATTR_USER_UID, user.getUid());
+	    responseRow.put(SbmtConstants.USER_ID, user.getUserID());
+	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
+
+	    if ( userAndReflection.length > 1 ) {
+		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, userAndReflection[1]);
+	    }
+	    
+	    if ( userAndReflection.length > 2 ) {
+		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer)userAndReflection[2] > 0);
+	    }
+	    
+	    if ( userAndReflection.length > 3 ) {
+		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[3]);
+	    }
+
+	    rows.put(responseRow);
+	}
+	    
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;	
+
+    }
+
     /**
      * AJAX call to refresh statistic page.
      * 
@@ -157,16 +238,20 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward doStatistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	
 	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	submitFilesService = getSubmitFilesService();
-
-	// List userList = submitFilesService.getUsers(sessionID);
-	List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
-	statistic(request, submitFilesSessionList);
-
+	statistic(request, contentID);
+	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
 	return mapping.findForward("statistic");
-
     }
+
+    private void statistic(HttpServletRequest request, Long contentID) {
+	SortedSet<StatisticDTO> statistics = new TreeSet<StatisticDTO>(new StatisticComparator());
+	statistics.addAll(submitFilesService.getStatisticsBySession(contentID));
+	request.setAttribute("statisticList", statistics);
+    }
+
 
     /**
      * Release mark
@@ -255,7 +340,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		    int count = 0;
 
 		    cell = row.createCell(count++);
-		    cell.setCellValue(dto.getOwner().getFirstName() + " " + dto.getOwner().getLastName());
+		    cell.setCellValue(dto.getOwner().getFullName());
 
 		    ++count;
 
@@ -419,63 +504,13 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Save statistic information into request
-     * 
-     * @param request
-     * @param submitFilesSessionList
-     */
-    private void statistic(HttpServletRequest request, List submitFilesSessionList) {
-	Iterator it;
-	Map<SessionDTO, StatisticDTO> sessionStatisticMap = new TreeMap<SessionDTO, StatisticDTO>(
-		this.new SessionComparator());
-
-	// build a map with all users in the submitFilesSessionList
-	it = submitFilesSessionList.iterator();
-	while (it.hasNext()) {
-
-	    SubmitFilesSession sfs = (SubmitFilesSession) it.next();
-	    Long sessionID = sfs.getSessionID();
-	    String sessionName = sfs.getSessionName();
-
-	    // return FileDetailsDTO list according to the given sessionID
-	    Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
-	    Iterator iter = userFilesMap.values().iterator();
-	    Iterator dtoIter;
-	    int notMarkedCount = 0;
-	    int markedCount = 0;
-	    while (iter.hasNext()) {
-		List list = (List) iter.next();
-		dtoIter = list.iterator();
-		while (dtoIter.hasNext()) {
-		    FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-		    if (dto.getMarks() == null) {
-			notMarkedCount++;
-		    } else {
-			markedCount++;
-		    }
-		}
-	    }
-	    StatisticDTO statisticDto = new StatisticDTO();
-	    SessionDTO sessionDto = new SessionDTO();
-	    statisticDto.setMarkedCount(markedCount);
-	    statisticDto.setNotMarkedCount(notMarkedCount);
-	    statisticDto.setTotalUploadedFiles(markedCount + notMarkedCount);
-	    sessionDto.setSessionID(sessionID);
-	    sessionDto.setSessionName(sessionName);
-	    sessionStatisticMap.put(sessionDto, statisticDto);
-	}
-
-	request.setAttribute("statisticList", sessionStatisticMap);
-    }
-
-    /**
      * Save Summary information into HttpRequest.
      * 
      * @param request
      * @param submitFilesSessionList
      */
     private void summary(HttpServletRequest request, List submitFilesSessionList) {
-	Map<SessionDTO, List> sessionUserMap = new TreeMap<SessionDTO, List>(this.new SessionComparator());
+	SortedSet<SessionDTO> sessions = new TreeSet<SessionDTO>(this.new SessionComparator());
 
 	// build a map with all users in the submitFilesSessionList
 	Iterator it = submitFilesSessionList.iterator();
@@ -486,38 +521,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Long sessionID = sfs.getSessionID();
 	    sessionDto.setSessionID(sessionID);
 	    sessionDto.setSessionName(sfs.getSessionName());
-
-	    boolean hasReflect = sfs.getContent().isReflectOnActivity();
-	    Map<SubmitUser, FileDetailsDTO> userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID,
-		    request.getLocale());
-
-	    // construct LearnerDTO list
-	    List<SubmitUser> userList = submitFilesService.getUsersBySession(sessionID);
-	    List<SubmitUserDTO> learnerList = new ArrayList<SubmitUserDTO>();
-	    for (SubmitUser user : userList) {
-		SubmitUserDTO learnerDto = new SubmitUserDTO(user);
-		learnerDto.setHasRefection(hasReflect);
-
-		learnerDto.setAnyFilesMarked(false);
-		List<FileDetailsDTO> files = (List<FileDetailsDTO>) userFilesMap.get(user);
-		if (files != null && files.size() > 0) {
-			// LDEV-2194 showing number of uploaded files
-			learnerDto.setFilesUploaded(files);
-		    for (FileDetailsDTO file : files) {
-			if (file.getMarks() != null && file.getMarks().trim().length() > 0) {
-			    learnerDto.setAnyFilesMarked(true);
-			    break;
-			}
-		    }
-		}
-
-		learnerList.add(learnerDto);
-	    }
-	    sessionUserMap.put(sessionDto, learnerList);
+	    sessions.add(sessionDto);
 	}
 
 	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-	request.setAttribute("sessionUserMap", sessionUserMap);
+	request.setAttribute("sessions", sessions);
     }
 
     public ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,

@@ -91,6 +91,7 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
@@ -980,6 +981,23 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return submitUserDAO.getLearner(sessionID, userID);
     }
 
+    @Override
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString, boolean getNotebookEntries) {
+	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
+		getNotebookEntries, coreNotebookService);
+    }
+
+    @Override
+    public int getCountUsersBySession(Long sessionId, String searchString) {
+	return submitUserDAO.getCountUsersBySession(sessionId, searchString);
+    }
+
+    @Override
+    public List<StatisticDTO> getStatisticsBySession(final Long contentId) {
+	return submitUserDAO.getStatisticsBySession(contentId);
+    }
+    
     public SubmitUser createContentUser(Integer userId, String firstName, String lastName, String loginName,
 	    Long contentId) {
 	SubmitUser author = submitUserDAO.getContentUser(contentId, userId);
