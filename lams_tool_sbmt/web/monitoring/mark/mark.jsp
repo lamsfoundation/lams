@@ -15,10 +15,6 @@
 		function updateMark(detailId,reportId,sessionId,userId){
 			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
-		function closeAndRefreshParentMonitoringWindow() {
-			refreshParentMonitoringWindow();
-			window.close();
-		}  			
 	</script>
 </lams:head>
 <body class="stripes">
@@ -32,7 +28,7 @@
 					</c:forEach>
 					<tr>
 						<td colspan="2">
-							<html:link href="javascript:closeAndRefreshParentMonitoringWindow();" property="submit" styleClass="button">
+							<html:link href="javascript:window.close();" property="submit" styleClass="button">
 								<fmt:message key="label.monitoring.done.button" />
 							</html:link>
 						</td>
