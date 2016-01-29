@@ -269,9 +269,8 @@ public class LearnerAction extends DispatchAction {
 	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
 	if (content.isNotifyTeachersOnFileSubmit()) {
 
-	    String fullName = learner.getLastName() + " " + learner.getFirstName();
 	    String message = submitFilesService
-		    .getLocalisedMessage("event.file.submit.body", new Object[] { fullName });
+		    .getLocalisedMessage("event.file.submit.body", new Object[] { learner.getFullName() });
 	    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID, message, false);
 	}
 	

@@ -180,4 +180,8 @@ public class SubmitUser implements Serializable, Cloneable {
     public void setContentID(Long contentID) {
 	this.contentID = contentID;
     }
+
+    public String getFullName() {
+	return new StringBuilder(getLastName()).append(" ").append(getFirstName()).toString();
+    }
 }

@@ -244,4 +244,7 @@ public class SubmitUserDTO implements Serializable{
 	public void setAnyFilesMarked(boolean anyFilesMarked) {
 		this.anyFilesMarked = anyFilesMarked;
 	}
+	public String getFullName() {
+	    	return new StringBuilder(getLastName()).append(" ").append(getFirstName()).toString();
+	}
 }
