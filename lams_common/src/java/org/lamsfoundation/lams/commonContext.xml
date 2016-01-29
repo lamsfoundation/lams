@@ -226,11 +226,6 @@
 		<property name="baseDAO"><ref bean="baseDAO" /></property>
 	</bean>
 	
-	<!--  Presence Chat Service -->
-	<bean id="presenceChatService" class="org.lamsfoundation.lams.presence.service.PresenceChatService">
-		<property name="presenceChatDAO"><ref bean="presenceChatDAO" /></property>
-	</bean>
-	
 	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="coreNotebookServiceTarget"/></property>
@@ -505,11 +500,6 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	<bean id="ratingCriteriaDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingCriteriaDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
-	
-	<!-- Presence Chat related beans -->
-	<bean id="presenceChatDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	

@@ -23,40 +23,35 @@
 
 /* $Id$ */
 
-package org.lamsfoundation.lams.presence.service;
+package org.lamsfoundation.lams.learning.presence.service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.presence.dao.IPresenceChatDAO;
-import org.lamsfoundation.lams.presence.model.PresenceChatMessage;
-import org.lamsfoundation.lams.presence.model.PresenceChatUser;
+import org.lamsfoundation.lams.learning.presence.dao.IPresenceChatDAO;
+import org.lamsfoundation.lams.learning.presence.model.PresenceChatMessage;
+import org.lamsfoundation.lams.learning.presence.model.PresenceChatUser;
 
 public class PresenceChatService implements IPresenceChatService {
-
-    private static Logger log = Logger.getLogger(PresenceChatService.class);
 
     private IPresenceChatDAO presenceChatDAO;
 
     @Override
-    public PresenceChatMessage createPresenceChatMessage(Long lessonId, String from, String to, Date dateSent,
-	    String message) {
+    public void createPresenceChatMessage(Long lessonId, String from, String to, Date dateSent, String message) {
 	PresenceChatMessage presenceChatMessage = new PresenceChatMessage(lessonId, from, to, dateSent, message);
-
-	saveOrUpdatePresenceChatMessage(presenceChatMessage);
-	return presenceChatMessage;
+	presenceChatDAO.insertOrUpdate(presenceChatMessage);
     }
 
     /**
      * Stores information when users with given UIDs were last seen in their Chat session.
      */
     @Override
-    public void updateUserPresence(Long lessonId, Map<String, Date> presence) {
-	for (String nickname : presence.keySet()) {
-	    PresenceChatUser rosterEntry = new PresenceChatUser(nickname, lessonId, presence.get(nickname));
-	    presenceChatDAO.saveOrUpdate(rosterEntry);
+    public void updateUserPresence(Long lessonId, Set<String> users) {
+	Date now = new Date();
+	for (String nickname : users) {
+	    PresenceChatUser rosterEntry = new PresenceChatUser(nickname, lessonId, now);
+	    presenceChatDAO.insertOrUpdate(rosterEntry);
 	}
     }
 
@@ -67,33 +62,13 @@ public class PresenceChatService implements IPresenceChatService {
     }
 
     @Override
-    public PresenceChatMessage getMessageById(Long id) {
-	return presenceChatDAO.getMessageById(id);
-    }
-
-    @Override
-    public List<PresenceChatMessage> getMessagesByLessonId(Long lessonId) {
-	return presenceChatDAO.getMessagesByLessonId(lessonId);
+    public List<PresenceChatMessage> getNewMessages(Long lessonId, Date lastCheck) {
+	return presenceChatDAO.getNewMessages(lessonId, lastCheck);
     }
 
     @Override
     public List<PresenceChatMessage> getMessagesByConversation(Long lessonId, String from, String to) {
 	return presenceChatDAO.getMessagesByConversation(lessonId, from, to);
-    }
-
-    @Override
-    public List<PresenceChatMessage> getNewMessages(Long lessonId, String from, String to, Long lastMessageUid,
-	    Date lastCheck) {
-	return presenceChatDAO.getNewMessages(lessonId, from, to, lastMessageUid, lastCheck);
-    }
-
-    @Override
-    public void saveOrUpdatePresenceChatMessage(PresenceChatMessage presenceChatMessage) {
-	presenceChatDAO.saveOrUpdate(presenceChatMessage);
-    }
-
-    public IPresenceChatDAO getPresenceChatMessageDAO() {
-	return this.presenceChatDAO;
     }
 
     public void setPresenceChatDAO(IPresenceChatDAO presenceChatDAO) {

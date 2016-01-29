@@ -23,25 +23,25 @@
 
 /* $Id$ */
 
-package org.lamsfoundation.lams.presence.dao;
+package org.lamsfoundation.lams.learning.presence.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-import org.lamsfoundation.lams.presence.model.PresenceChatMessage;
-import org.lamsfoundation.lams.presence.model.PresenceChatUser;
+import org.lamsfoundation.lams.learning.presence.model.PresenceChatMessage;
+import org.lamsfoundation.lams.learning.presence.model.PresenceChatUser;
 
-public interface IPresenceChatDAO {
+public interface IPresenceChatService {
+    final long PRESENCE_IDLE_TIMEOUT = 15 * 1000;
 
-    void saveOrUpdate(Object object);
+    void createPresenceChatMessage(Long lessonId, String from, String to, Date dateSent, String message);
 
-    PresenceChatMessage getMessageById(Long id);
-
-    List<PresenceChatMessage> getMessagesByLessonId(Long lessonId);
+    List<PresenceChatMessage> getNewMessages(Long lessonId, Date lastCheck);
 
     List<PresenceChatMessage> getMessagesByConversation(Long lessonId, String from, String to);
 
-    List<PresenceChatMessage> getNewMessages(Long lessonId, String from, String to, Long lastMessageUid, Date lastCheck);
+    void updateUserPresence(Long lessonId, Set<String> users);
 
-    List<PresenceChatUser> getUsersByLessonIdAndLastPresence(Long lessonId, Date oldestLastPresence);
+    List<PresenceChatUser> getUsersActiveByLessonId(Long lessonId);
 }
