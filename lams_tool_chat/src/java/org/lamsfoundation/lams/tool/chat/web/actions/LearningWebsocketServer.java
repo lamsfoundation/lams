@@ -99,13 +99,14 @@ public class LearningWebsocketServer {
 			    if (sessionWebsockets.isEmpty()) {
 				entryIterator.remove();
 				LearningWebsocketServer.rosters.remove(toolSessionId);
+				lastSendTimes.remove(toolSessionId);
 			    }
 			}
 		    }
 
 		    Thread.sleep(SendWorker.CHECK_INTERVAL);
 		} catch (InterruptedException e) {
-		    LearningWebsocketServer.log.warn("Stopping Chat worker thread");
+		    LearningWebsocketServer.log.warn("Interrupted Chat worker thread");
 		    stopFlag = true;
 		} catch (Exception e) {
 		    // error caught, but carry on
