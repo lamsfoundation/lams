@@ -447,7 +447,7 @@
                 </host>
             </server>
             <servlet-container name="default" default-encoding="UTF-8">
-                <jsp-config x-powered-by="false"/>
+                <jsp-config x-powered-by="false" development="true" />
                 <websockets/>
             </servlet-container>
             <handlers>
