@@ -76,7 +76,7 @@ j_security_login_page
 							}
 							
 							function isBrowserNotCompatible() {
-								if(ie7 || ie8 || ie9 || ie10 ) return false; // IE8-IE10
+								if(ie10 || ie11) return false; // IE10-IE11
 								else if(saf4) return false; //Safari4
 								else if(chrome) return false; //Chrome
 								else if(ie5xwin || ie5 || ie4 || ie5mac || ie5x || ie6) return true;
