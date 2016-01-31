@@ -2702,6 +2702,7 @@ GeneralLib = {
 		$.ajax({
 			type : 'POST',
 			url : LAMS_URL + 'authoring/author.do',
+			async: false,
 			data : {
 				'method' : 'saveLearningDesignImage',
 				'learningDesignID' : layout.ld.learningDesignID,

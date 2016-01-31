@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -97,7 +96,7 @@ public class LearningDesignService implements ILearningDesignService {
 
     /**********************************************
      * Setter/Getter Methods
-     * *******************************************/
+     *******************************************/
     /**
      * Set i18n MessageService
      */
@@ -142,7 +141,7 @@ public class LearningDesignService implements ILearningDesignService {
 
     /**********************************************
      * Service Methods
-     * *******************************************/
+     *******************************************/
 
     /**
      * Get the learning design DTO, suitable to send to Flash via WDDX
@@ -232,8 +231,8 @@ public class LearningDesignService implements ILearningDesignService {
 	ArrayList<LearningLibraryDTO> libraries = new ArrayList<LearningLibraryDTO>();
 	while (iterator.hasNext()) {
 	    LearningLibrary learningLibrary = iterator.next();
-	    List<Activity> templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary
-		    .getLearningLibraryId());
+	    List<Activity> templateActivities = activityDAO
+		    .getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
 
 	    if ((templateActivities != null) & (templateActivities.size() == 0)) {
 		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId()
@@ -278,10 +277,10 @@ public class LearningDesignService implements ILearningDesignService {
 		    toolDTO.setToolId(libraryActivityDTO.getToolID());
 		}
 		toolDTO.setLearningLibraryId(learningLibrary.getLearningLibraryID());
-		toolDTO.setToolDisplayName(isParallel ? learningLibrary.getTitle() : libraryActivityDTO
-			.getActivityTitle());
-		toolDTO.setActivityCategoryID(isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO
-			.getActivityCategoryID());
+		toolDTO.setToolDisplayName(
+			isParallel ? learningLibrary.getTitle() : libraryActivityDTO.getActivityTitle());
+		toolDTO.setActivityCategoryID(
+			isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO.getActivityCategoryID());
 
 		if (libraryActivityDTO.getToolID() == null) {
 		    String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
@@ -377,7 +376,8 @@ public class LearningDesignService implements ILearningDesignService {
 	// construct absolute filePath to SVG
 	String earFolder = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 	if (StringUtils.isBlank(earFolder)) {
-	    log.error("Unable to get path to the LAMS Server URL from the configuration table. SVG image creation failed");
+	    log.error(
+		    "Unable to get path to the LAMS Server URL from the configuration table. SVG image creation failed");
 	    return null;
 	}
 	String directoryToStoreFile = FileUtil.getFullPath(earFolder, "lams-www.war\\secure\\learning-design-images");
@@ -391,7 +391,7 @@ public class LearningDesignService implements ILearningDesignService {
 	String fileExtension;
 	if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) {
 	    fileExtension = ".svg";
-	} else if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY){
+	} else if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY) {
 	    // mark it as a special version of SVG as it contains icons that refer to LAMS Community server
 	    fileExtension = ".export.svg";
 	} else {
@@ -402,7 +402,8 @@ public class LearningDesignService implements ILearningDesignService {
 
 	// check if SVG exists and up-to-date
 	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
-	boolean isSvgOutdated = new Date(file.lastModified()).before(learningDesign.getLastModifiedDateTime());
+	boolean isSvgOutdated = (((file.lastModified() / 1000) + 1)
+		- (learningDesign.getLastModifiedDateTime().getTime() / 1000)) < 0;
 	if (!file.exists() || isSvgOutdated) {
 	    // generate new SVG image and save it to the file system
 	    SVGGenerator svgGenerator = new SVGGenerator();
