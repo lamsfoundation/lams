@@ -1,8 +1,6 @@
 <%-- This is for AJAX call to refresh statistic page  --%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-12 --%>
-
 <c:if test="${empty statisticList}">
 	<fmt:message key="label.no.user.available" />
 </c:if>

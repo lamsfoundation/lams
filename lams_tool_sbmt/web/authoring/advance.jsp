@@ -1,7 +1,5 @@
 <%@include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-12 --%>
-
 <!-- Advance Tab Content -->
 
 <p class="small-space-top">

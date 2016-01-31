@@ -3,8 +3,6 @@
 
 <%@include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-12 --%>
-
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <lams:html>
