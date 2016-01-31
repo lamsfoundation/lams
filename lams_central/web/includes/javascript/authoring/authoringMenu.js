@@ -442,27 +442,20 @@ var MenuLib = {
 			
 			// set viewBox so content is nicely aligned
 			var width = crop.x2 - crop.x + 2,
-				height = crop.y2 - crop.y + 2,
-				svg = $('svg', crop.canvasClone).attr({
-					'width'               : width,
-					'height'              : height
-				})[0];
-			
+				height = crop.y2 - crop.y + 2;
+				svg = $('svg', crop.canvasClone)[0];
+				
 			// need to set attributes using pure JS as jQuery sets them with lower case, which is unacceptable in SVG
 			svg.setAttribute('viewBox', crop.x + ' ' + crop.y + ' ' + width + ' ' + height);
 			svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
-			svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-			svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+			svg.setAttribute('width', width);
+			svg.setAttribute('height', height);
 			
 			
 			// reset any cursor=pointer styles
 			$('*[style*="cursor"]', svg).css('cursor', 'default');
 			
-			
 			imageCode = crop.canvasClone.html();
-			// otherwise there will be syntax erros in IE11
-			imageCode = imageCode.replace(/xmlns:NS1=\"\"/, '');
-			imageCode = imageCode.replace(/NS1:xmlns:xlink=\"http:\/\/www\.w3\.org\/1999\/xlink\"/, '');
 		}
 		
 		if (download) {
@@ -490,13 +483,16 @@ var MenuLib = {
 	 */
 	getCanvasCrop : function(){
 		var canvasClone = canvas.clone();
-		// Snap does not add this and it's needed by Firefox
-		$('svg', canvasClone).attr('xmlns:xlink', 'http://www.w3.org/1999/xlink');
 		// remove the rubbish bin icon
 		canvasClone.find('#rubbishBin').remove();
+		// IE needs this. There are 2 xmlns declarations and no xmlns:xlink
+		// jQuery attr() or prop() do not work
+		var canvasHTML = canvasClone.html().replace(/xmlns="http:\/\/www.w3.org\/2000\/svg"/g, '').replace('systemLanguage=""','')
+										   .replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ');
+		canvasClone.html(canvasHTML);
 		// create HTML5 canvas element and fill it with SVG code using canvg library
 		var workspace = $('<canvas />')[0];
-		canvg(workspace, canvasClone.html());
+		canvg(workspace, canvasHTML);
 
 		// trim the image from white space
 		var ctx = workspace.getContext('2d'),
