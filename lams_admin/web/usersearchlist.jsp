@@ -35,7 +35,7 @@
 </div>
 
 <p align="right">
-	<input class="button" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit' />
+	<input class="button" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user.do?method=edit'" />
 </p>
 
 <p align="right">
