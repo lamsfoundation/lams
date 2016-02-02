@@ -294,9 +294,6 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      * @return Returns the toolSessions.
      */
     public Set getToolSessions() {
-	if (toolSessions == null) {
-	    setToolSessions(new TreeSet(new ActivityOrderComparator()));
-	}
 	return toolSessions;
     }
 
