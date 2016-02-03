@@ -56,11 +56,12 @@ public class TaskListConstants {
 	public static final String ATTR_DELETED_CONDITION_LIST = "deleteConditionList";
 	public static final String ATT_LEARNING_OBJECT = "cpPackage";
 	public static final String ATTR_RESOURCE_REVIEW_URL = "taskListItemReviewUrl";
-	public static final String ATTR_RESOURCE = "taskList";
+	public static final String ATTR_TASKLIST = "taskList";
 	public static final String ATTR_RUN_AUTO = "runAuto";
 	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-	public static final String ATTR_SUMMARY_LIST = "summaryList";
+	public static final String ATTR_MONITOR_VERIFICATION_REQUIRED = "monitorVerificationRequired";
+	public static final String ATTR_SESSION_DTOS = "sessionDtos";
 	public static final String ATTR_ITEM_SUMMARY = "itemSummary";
 	public static final String ATTR_ITEM_SUMMARY_LIST = "itemSummaryList";
 	public static final String ATTR_USER_LIST = "userList";

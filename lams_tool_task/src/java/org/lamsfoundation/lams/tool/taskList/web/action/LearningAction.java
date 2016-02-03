@@ -350,7 +350,7 @@ public class LearningAction extends Action {
 
 	}
 
-	sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
+	sessionMap.put(TaskListConstants.ATTR_TASKLIST, taskList);
 
 	return mapping.findForward(TaskListConstants.SUCCESS);
     }
@@ -481,7 +481,7 @@ public class LearningAction extends Action {
 	item.setCreateBy(taskListUser);
 
 	// setting SequenceId
-	TaskList taskList = (TaskList) sessionMap.get(TaskListConstants.ATTR_RESOURCE);
+	TaskList taskList = (TaskList) sessionMap.get(TaskListConstants.ATTR_TASKLIST);
 	Set<TaskListItem> taskListItems = taskList.getTaskListItems();
 	int maxSeq = 0;
 	for (TaskListItem dbItem : taskListItems) {

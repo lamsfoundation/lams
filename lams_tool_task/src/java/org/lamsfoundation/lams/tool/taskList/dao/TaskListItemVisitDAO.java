@@ -35,32 +35,37 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
  */
 public interface TaskListItemVisitDAO extends DAO {
 
-	/**
-	 * Returns TaskListItemVisitLog which corresponds to specified taskListItemUid and userId.
-	 * 
-	 * @param itemUid specified taskListItemUid
-	 * @param userId specified userId
-	 * @return TaskListItemVisitLog wich corresponds to specified taskListItemUid and userId
-	 */
-	public TaskListItemVisitLog getTaskListItemLog(Long itemUid,Long userId);
-	
-	/**
-	 * Return list of taskListItemVisitLogs which corresponds to specified sessionId and itemUid
-	 * 
-	 * @param sessionId specified sessionId
-	 * @param itemUid specified itemUid
-	 * @return list of taskListItemVisitLogs which corresponds to specified sessionId and itemUid
-	 */
-	public List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId,Long itemUid);
-	
+    /**
+     * Returns TaskListItemVisitLog which corresponds to specified taskListItemUid and userId.
+     * 
+     * @param itemUid
+     *            specified taskListItemUid
+     * @param userId
+     *            specified userId
+     * @return TaskListItemVisitLog wich corresponds to specified taskListItemUid and userId
+     */
+    TaskListItemVisitLog getTaskListItemLog(Long itemUid, Long userId);
 
-	/**
-	 * 
-	 * 
-	 * @param toolSessionId
-	 * @param userUid
-	 * @return
-	 */
-	public int getTasksCompletedCountByUser(Long toolSessionId ,Long userUid); 
+    /**
+     * Return list of taskListItemVisitLogs which corresponds to specified sessionId and itemUid
+     * 
+     * @param sessionId
+     *            specified sessionId
+     * @param itemUid
+     *            specified itemUid
+     * @return list of taskListItemVisitLogs which corresponds to specified sessionId and itemUid
+     */
+    List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId, Long itemUid);
+
+    /**
+     * 
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    int getCountCompletedTasksByUser(Long toolSessionId, Long userId);
+    
+    int getCountCompletedTasksBySessionAndItem(Long toolSessionId, Long itemUid);
 
 }

@@ -23,8 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.dao;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**
@@ -35,29 +37,72 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
  */
 public interface TaskListUserDAO extends DAO {
 
-	/**
-	 * Returns user with the specified userID and sessionId.
-	 * 
-	 * @param userID specified userID
-	 * @param sessionId specified sessionId
-	 * @return user with the specified userID and sessionId
-	 */
-	TaskListUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
+    /**
+     * Returns user with the specified userID and sessionId.
+     * 
+     * @param userID
+     *            specified userID
+     * @param sessionId
+     *            specified sessionId
+     * @return user with the specified userID and sessionId
+     */
+    TaskListUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
 
-	/**
-	 * Returns user with the specified userID and contentId.
-	 * 
-	 * @param userId specified userID
-	 * @param contentId specified contentId
-	 * @return user with the specified userID and contentId
-	 */
-	TaskListUser getUserByUserIDAndContentID(Long userId, Long contentId);
+    /**
+     * Returns user with the specified userID and contentId.
+     * 
+     * @param userId
+     *            specified userID
+     * @param contentId
+     *            specified contentId
+     * @return user with the specified userID and contentId
+     */
+    TaskListUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
-	/**
-	 * Returns list of users corresponds to specified sessionId.
-	 * 
-	 * @param sessionId specified sessionId
-	 * @return list of users corresponds to specified sessionId
-	 */
-	List<TaskListUser> getBySessionID(Long sessionId);
+    /**
+     * Returns list of users corresponds to specified sessionId.
+     * 
+     * @param sessionId
+     *            specified sessionId
+     * @return list of users corresponds to specified sessionId
+     */
+    List<TaskListUser> getBySessionID(Long sessionId);
+
+    /**
+     * Returns paged users for jqGrid based on sessionId.
+     * 
+     * @param sessionId
+     * @param page
+     * @param size
+     * @param sortBy
+     * @param sortOrder
+     * @param searchString
+     * @return
+     */
+    Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+    
+    /**
+     * Returns paged users for jqGrid based on sessionId and taskListItemUid.
+     * 
+     * @param sessionId
+     * @param taskListItemUid
+     * @param page
+     * @param size
+     * @param sortBy
+     * @param sortOrder
+     * @param searchString
+     * @return
+     */
+    Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+
+    /**
+     * Returns total number of users in a specified session.
+     * 
+     * @param sessionId
+     * @param searchString
+     * @return
+     */
+    int getCountPagedUsersBySession(Long sessionId, String searchString);
 }
