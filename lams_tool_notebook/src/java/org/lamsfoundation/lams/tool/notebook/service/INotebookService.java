@@ -25,13 +25,14 @@
 package org.lamsfoundation.lams.tool.notebook.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.notebook.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
-import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -164,5 +165,14 @@ public interface INotebookService {
      * @return
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
+
+    /** Will return List<[NotebookUser, String, Date, Date]>
+     * where the String is the notebook entry, the first date is the create date and the second date is the modified date. 
+     */
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
+    int getCountUsersBySession(final Long sessionId, String searchString);
+    
+    /** Get the statistics for monitoring */
+    List<StatisticDTO> getStatisticsBySession(final Long contentId) ;
 
 }
