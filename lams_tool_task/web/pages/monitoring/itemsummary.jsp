@@ -1,17 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="item" value="${itemSummary.taskListItem}" />
+
 <lams:html>
 	<lams:head>
-		<title><fmt:message key="label.learning.title" />
-		</title>
+		<title><fmt:message key="label.learning.title" /></title>
 		<%@ include file="/common/header.jsp"%>
-		<c:set var="item" value="${itemSummary.taskListItem}" />
 	</lams:head>
 	
 	<body class="stripes">
-	
 		<div id="content">
 
 			<h2>
@@ -73,10 +70,11 @@
 			<br>
 			<br>
 			
-			
 			<c:forEach var="groupSummary" items="${itemSummary.groupSummaries}">
 				<c:if test="${isGroupedActivity}">
-					<h1><fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}	</h1>
+					<h1>
+						<fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}
+					</h1>
 				</c:if>
 				
 				<table cellpadding="0" class="alternative-color" >
@@ -91,14 +89,12 @@
 						<th width="20%">
 							<fmt:message key="label.monitoring.tasksummary.time.and.date" />
 						</th>
-						
 						<c:if test="${item.commentsAllowed || item.filesAllowed}">
 							<th width="45%" align="center">
 								<fmt:message key="label.monitoring.tasksummary.comments.files" />
 							</th>
 						</c:if>			
 					</tr>
-				
 				
 					<c:forEach var="visitLogSummary" items="${groupSummary.taskListItemVisitLogSummaries}">
 					
@@ -123,7 +119,7 @@
 								<lams:Date value="${visitLogSummary.date}" />
 							</td>
 										
-							<c:if test="${item.commentsAllowed  || item.filesAllowed}">
+							<c:if test="${item.commentsAllowed || item.filesAllowed}">
 								<td>
 								
 									<ul>
@@ -154,10 +150,7 @@
 					</c:forEach>
 				</table>
 			
-			
 			</c:forEach>
-	
-	
 		</div>
 		<!--closes content-->
 	
