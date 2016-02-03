@@ -118,7 +118,9 @@ public class CoreNotebookService implements ICoreNotebookService {
      * notebook entries (the Strings) are needed.
      * 
      * Finally, as it will be returning the notebook entry as a separate field in select clause, set up the sql -> java
-     * object translation using ".addScalar("notebookEntry", Hibernate.STRING)".
+     * object translation using ".addScalar("notebookEntry", Hibernate.STRING)" if includeDateModified = false or 
+     * .addScalar("notebookEntry", Hibernate.STRING).addScalar("notebookCreateDate", Hibernate.DATE).addScalar("notebookModifiedDate", Hibernate.DATE)
+     *  if  includeDates = true.
      * 
      * @param sessionIdString
      *            Session identifier, usually the toolSessionId
@@ -126,11 +128,13 @@ public class CoreNotebookService implements ICoreNotebookService {
      *            Tool's string signature (without any quotes) e.g. lantbk11
      * @param userIdString
      *            User identifier field string e.g.
+     * @param includeDates
+     * 		  if true, SQL should also return the date modified as well as the notebook entry
      * @return String[] { partial select string, join clause }
      * 
      */
     @Override
-    public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString) {
+    public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString, boolean includeDates) {
 	StringBuilder buf = new StringBuilder(" LEFT JOIN lams_notebook_entry entry ON entry.external_id=");
 	buf.append(sessionIdString);
 	buf.append(" AND entry.external_id_type=");
@@ -139,7 +143,16 @@ public class CoreNotebookService implements ICoreNotebookService {
 	buf.append(toolSignature);
 	buf.append("\" AND entry.user_id=");
 	buf.append(userIdString);
-	return new String[] { ", entry.entry notebookEntry ", buf.toString() };
+	String[] retValue = new String[2];
+	retValue[0] = includeDates ? ", entry.entry notebookEntry, entry.create_date notebookCreateDate, entry.last_modified notebookModifiedDate " : ", entry.entry notebookEntry ";
+	retValue[1] = buf.toString();
+	return retValue;
+    }
+
+
+    @Override
+    public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString) {
+	return getNotebookEntrySQLStrings(sessionIdString, toolSignature, userIdString, false);
     }
 
     @Override

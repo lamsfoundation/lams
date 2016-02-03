@@ -41,6 +41,7 @@ public interface ICoreNotebookService {
     List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID);
 
     String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString);
+    String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString, boolean includeDates);
 
     List<NotebookEntry> getEntry(Long id, Integer idType, String signature);
 

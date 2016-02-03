@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -45,6 +46,7 @@ public class DateUtil
 
 	public static final String WDDX_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 	public static final String LAMS_FLASH_FORMAT = "dd/M/yyyy h:mm a";
+	private static final DateFormat JSON_DATE_OUTPUT_FORMATTER = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
 
 	/**
      * Convert your local time to Universal Time Coordinator.
@@ -180,6 +182,14 @@ public class DateUtil
     public static Date convertFromLAMSFlashFormat(String dateString) throws ParseException
     {  
     	return convertFromString(dateString, LAMS_FLASH_FORMAT);
+    }
+
+    
+    /**
+     *  Convert a date to a String for sending to the client via JSON. 
+     */
+    public static String convertToStringForJSON(Date date) {
+	return JSON_DATE_OUTPUT_FORMATTER.format(date);
     }
 
 }

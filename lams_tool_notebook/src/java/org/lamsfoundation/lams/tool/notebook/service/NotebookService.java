@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookSessionDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookUserDAO;
+import org.lamsfoundation.lams.tool.notebook.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
@@ -468,7 +469,19 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     private String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
+    
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
+	return notebookUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, coreNotebookService);
+    }
+    
+    public int getCountUsersBySession(final Long sessionId, String searchString) {
+	return notebookUserDAO.getCountUsersBySession(sessionId, searchString);
+    }
 
+    public List<StatisticDTO> getStatisticsBySession(final Long contentId) {
+	return notebookUserDAO.getStatisticsBySession(contentId);
+    }
+    
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
@@ -680,5 +693,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	// nb.setConditions(conditions);
 
     }
+    
+  
 
 }
