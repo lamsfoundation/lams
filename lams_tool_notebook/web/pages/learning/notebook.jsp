@@ -104,7 +104,7 @@
 		<c:if test="${not empty teachersComment}">
 			<br><br>
 			<h3>
-				<fmt:message key="label.learning.comment" />
+				<fmt:message key="label.comment" />
 			</h3>
 			<lams:out value="${teachersComment}" escapeHtml="true"/>
 		</c:if>

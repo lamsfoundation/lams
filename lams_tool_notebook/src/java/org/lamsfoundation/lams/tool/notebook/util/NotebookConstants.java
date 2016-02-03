@@ -60,8 +60,24 @@ public interface NotebookConstants {
     public static final String ERROR_MSG_CONDITION = "error.condition";
     public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
     public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
+    public static final String PARAM_ENTRY = "entry";
+    public static final String PARAM_NAME = "userName";
+    public static final String PARAM_MODIFIED_DATE = "lastEdited";
+    public static final String PARAM_COMMENT = "comment";
+    public static final String PARAM_COMMENT_SORT = "commentsort"; // used to trigger sorting on comments
     
     //  for submission deadline
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+    
+    // monitor sorting
+    public static final int SORT_BY_NO = 1;
+    public static final int SORT_BY_USERNAME_ASC = 2;
+    public static final int SORT_BY_USERNAME_DESC = 3;
+    public static final int SORT_BY_DATE_ASC = 4;
+    public static final int SORT_BY_DATE_DESC = 5;
+    public static final int SORT_BY_COMMENT_ASC = 6;
+    public static final int SORT_BY_COMMENT_DESC = 7;
+    public static final String ASC = "asc";
+    public static final String DESC = "desc";
 }
