@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -95,8 +96,12 @@ public class SessionListener implements HttpSessionListener {
 	if (session != null) {
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
 	    if (userDTO != null) {
-		Principal principal = new SimplePrincipal(userDTO.getLogin());
+		String login = userDTO.getLogin();
+		Principal principal = new SimplePrincipal(login);
 		SessionListener.authenticationManager.flushCache(principal);
+		// remove obsolete mappings to session
+		// the session is either already invalidated or will be very soon by another module
+		SessionManager.removeSession(login, false);
 	    }
 	}
     }

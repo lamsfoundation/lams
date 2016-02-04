@@ -96,11 +96,16 @@ public class SsoHandler implements ServletExtension {
 
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
+
 		// do the logging in UniversalLoginModule or cache
 		handler.handleRequest(exchange);
 
 		if (!StringUtils.isBlank(login) && login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
+		    // remove an existing session for the given user
+		    SessionManager.removeSession(login, true);
+		    // register current session as the only one for the given user
+		    SessionManager.addSession(login, session);
 		}
 
 		SessionManager.endSession();
