@@ -191,9 +191,9 @@ public class DateUtil
     }
 
     
-    private static final int TYPE_BOTH = 1;
-    private static final int TYPE_DATE = 2;
-    private static final int TYPE_TIME = 3;
+    public static final int TYPE_BOTH = 1;
+    public static final int TYPE_DATE = 2;
+    public static final int TYPE_TIME = 3;
 
     /** 
      * Equivalent of <LAMS:Date value="value"/>. Use for processing a date to send to the client via JSON.
