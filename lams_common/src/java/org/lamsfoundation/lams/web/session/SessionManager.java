@@ -35,7 +35,8 @@ public class SessionManager {
 
     // singleton
     private static SessionManager sessionManager;
-    private static final Map<String, HttpSession> sessionContainer = new ConcurrentHashMap<String, HttpSession>();
+    private static final Map<String, HttpSession> sessionIdMapping = new ConcurrentHashMap<String, HttpSession>();
+    private static final Map<String, HttpSession> loginMapping = new ConcurrentHashMap<String, HttpSession>();
     private ThreadLocal<String> currentSessionIdContainer = new ThreadLocal<String>();
 
     // various classes need to have to access these
@@ -60,12 +61,12 @@ public class SessionManager {
     }
 
     /**
-     * Proxy to a HTTP session.
+     * Stores session in current thread and mapping so other modules can refer to it.
      */
     public static void startSession(HttpServletRequest request) {
 	HttpSession session = request.getSession();
 	String sessionId = session.getId();
-	SessionManager.sessionContainer.put(sessionId, session);
+	SessionManager.sessionIdMapping.put(sessionId, session);
 	SessionManager.sessionManager.currentSessionIdContainer.set(sessionId);
     }
 
@@ -75,6 +76,33 @@ public class SessionManager {
      */
     public static void endSession() {
 	SessionManager.sessionManager.currentSessionIdContainer.set(null);
+    }
+
+    /**
+     * Registeres the session for the given user.
+     */
+    public static void addSession(String login, HttpSession session) {
+	SessionManager.loginMapping.put(login, session);
+    }
+
+    /**
+     * Unregisteres the session for the given user.
+     */
+    public static void removeSession(String login, boolean invalidate) {
+	HttpSession session = SessionManager.loginMapping.get(login);
+	if (session != null) {
+	    SessionManager.loginMapping.remove(login);
+	    SessionManager.sessionIdMapping.remove(session.getId());
+
+	    if (invalidate) {
+		try {
+		    session.invalidate();
+		} catch (IllegalStateException e) {
+		    System.out.println("SessionMananger invalidation exception");
+		    // if it was already invalidated, do nothing
+		}
+	    }
+	}
     }
 
     /**
@@ -89,14 +117,14 @@ public class SessionManager {
      * Get system session by given session id.
      */
     public static HttpSession getSession(String sessionId) {
-	return sessionId == null ? null : SessionManager.sessionContainer.get(sessionId);
+	return sessionId == null ? null : SessionManager.sessionIdMapping.get(sessionId);
     }
 
     /**
      * Returns number of sessions stored in the container.
      */
     public static int getSessionCount() {
-	return sessionContainer.size();
+	return SessionManager.sessionIdMapping.size();
     }
 
     public static void setServletContext(ServletContext servletContext) {
@@ -108,10 +136,10 @@ public class SessionManager {
     }
 
     public static String getJvmRoute() {
-        return jvmRoute;
+	return SessionManager.jvmRoute;
     }
 
     public static void setJvmRoute(String jvmRoute) {
-        SessionManager.jvmRoute = jvmRoute;
+	SessionManager.jvmRoute = jvmRoute;
     }
 }
