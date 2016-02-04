@@ -181,10 +181,10 @@
 			   		{name:'id',index:'id', width:10, hidden: true, search: false},
 			   		{name:'userUid',index:'userUid', width:0, hidden: true, search: false},
 			   		{name:'userName',index:'userName', width:200},
-			   		{name:'lastEdited',index:'lastEdited', width:120, search: false, sortable: false},		
+			   		{name:'lastEdited',index:'lastEdited', width:120, search: false},		
 			   		{name:'entry',index:'entry', hidden: true, width:0, search: false},	
 			   		{name:'commentsort',index:'commentsort', width:40, search: false },
-			   		{name:'comment',index:'comment', hidden: true, width:0, search: false }		
+			   		{name:'comment',index:'comment', hidden: true, width:0, search: false}		
 			   	],
 			   	
 			   	multiselect: false,

@@ -168,8 +168,8 @@ public interface INotebookService {
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
 
-    /** Will return List<[NotebookUser, String, Date, Date]>
-     * where the String is the notebook entry, the first date is the create date and the second date is the modified date. 
+    /**
+     * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date. 
      */
     List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
     int getCountUsersBySession(final Long sessionId, String searchString);
