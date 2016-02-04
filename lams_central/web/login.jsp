@@ -1,3 +1,4 @@
+<%@page import="org.springframework.web.context.request.SessionScope"%>
 <%@ page language="java" pageEncoding="UTF-8"
 	contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
@@ -5,6 +6,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
+<%@ page import="org.lamsfoundation.lams.web.session.SessionManager"%>
 
 <%-- Attributes in request come from sysadmin LoginAs action
 	 while in session from LoginRequestServlet
@@ -168,7 +170,7 @@ j_security_login_page
 	<c:otherwise>
 		<%
 			// invalidate session so a new user can be logged in
-			session.invalidate();
+			SessionManager.removeSession((String) pageContext.getAttribute("login"), true);
 		%>
 		<lams:head>
 			<lams:css/>
