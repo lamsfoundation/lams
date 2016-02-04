@@ -2,10 +2,10 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 <c:set var="taskList" value="${sessionMap.taskList}"/>
-
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
-<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+
+<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
 <style media="screen,projection" type="text/css">
@@ -47,7 +47,7 @@
 				datatype: "json",
 				url: "<c:url value='/monitoring/getPagedUsers.do'/>?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}",
 				height: 'auto',
-				shrinkToFit: false,
+				shrinkToFit: ${(200 + ((sessionMap.monitorVerificationRequired? 1 : 0)*130) + fn:length(sessionDto.taskListItems)*100) < 800},
 				width: '800',
 				pager: 'pager-${sessionDto.sessionId}',
 				rowList:[10,20,30,40,50,100],
@@ -68,7 +68,7 @@
 			   		{name:'userUid',index:'userUid', width:0, hidden: true}
 			   		,{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }}
 			   		<c:forEach var="item" items="${sessionDto.taskListItems}" varStatus="status">
-			   			,{name:'item${status.index}',index:'total${status.index}', width:100,sorttype:"int", search:false, align:"center"}
+			   			,{name:'item${status.index}',index:'item${status.index}', width:100, sortable:false, search:false, align:"center"}
 			   		</c:forEach>
 			   		<c:if test="${sessionMap.monitorVerificationRequired}">
 			   			,{name:'monitorVerificationRequired',index:'monitorVerificationRequired', width:130, sortable:false, search:false, align:"center"}
@@ -102,8 +102,8 @@
 		$(window).bind('resize', resizeFunc);
 	});
 
-	function summaryTask(taskUid){
-		var myUrl = "<c:url value="/monitoring/itemSummary.do"/>?toolContentID=${toolContentID}&taskListItemUid=" + taskUid;
+	function summaryTask(itemUid){
+		var myUrl = "<c:url value="/monitoring/itemSummary.do"/>?toolContentID=${toolContentID}&itemUid=" + itemUid;
 		launchPopup(myUrl,"LearnerView");
 	}
 	
@@ -139,7 +139,7 @@
 
 <c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 			
-	<div id="jqgrid-parent" style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
+	<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
 		<c:if test="${sessionMap.isGroupedActivity}">
 			<div style="padding-bottom: 5px; font-size: small;">
 				<B><fmt:message key="monitoring.label.group" /></B> ${sessionDto.sessionName}
@@ -150,7 +150,7 @@
 		<div id="pager-${sessionDto.sessionId}"></div>
 	</div>
 				
-</c:forEach>	
+</c:forEach>
 				
 <br/>
 <c:if test="${taskList.reflectOnActivity && not empty sessionMap.reflectList}">
@@ -158,5 +158,5 @@
 </c:if>
 
 <%@include file="parts/advanceoptions.jsp"%>
-<%@include file="daterestriction.jsp"%>
+<%@include file="parts/daterestriction.jsp"%>
 				

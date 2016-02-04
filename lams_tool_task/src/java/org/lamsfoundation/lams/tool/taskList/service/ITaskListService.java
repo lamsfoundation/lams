@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.util.MessageService;
 /**
  * Interface that defines the contract that all TaskLisk service providers must follow.
  * 
- * @author Dapeng.Ni
  * @author Andrey Balan
  */
 public interface ITaskListService {
@@ -239,6 +238,14 @@ public interface ITaskListService {
      *            id of a session during which it occured
      */
     void setItemAccess(Long taskListItemUid, Long userId, Long sessionId);
+    
+    /**
+     * Get all available sessions for contentId.
+     * 
+     * @param contentId
+     * @return
+     */
+    List<TaskListSession> getSessionsByContentId(Long contentId);
 
     /**
      * Get taskList toolSession by toolSessionId
@@ -246,14 +253,14 @@ public interface ITaskListService {
      * @param sessionId
      * @return
      */
-    TaskListSession getTaskListSessionBySessionId(Long sessionId);
+    TaskListSession getSessionBySessionId(Long sessionId);
 
     /**
      * Save or update taskList session.
      * 
      * @param resSession
      */
-    void saveOrUpdateTaskListSession(TaskListSession resSession);
+    void saveOrUpdateSession(TaskListSession resSession);
 
     /**
      * If success return next activity's url, otherwise return null.
@@ -359,19 +366,6 @@ public interface ITaskListService {
      * @return
      */
     List<SessionDTO> getSummary(Long contentId);
-
-    /**
-     * Return task summary for the specified TaskListItem. Used in monitoring.
-     * 
-     * @param contentId
-     *            toolContenId
-     * @param taskListItemUid
-     *            specified TaskListItem uid
-     * @param isExportProcessing
-     *            true if this method called for export, false otherwise
-     * @return
-     */
-    ItemSummary getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing);
     
     NotebookEntry getEntry(Long sessionId, Integer userId);
     

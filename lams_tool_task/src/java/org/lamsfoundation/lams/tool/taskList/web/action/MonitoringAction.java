@@ -26,6 +26,9 @@ package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -47,12 +50,14 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -68,6 +73,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static String TOOL_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
+	    + TaskListConstants.TOOL_SIGNATURE + "/";
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
@@ -88,7 +95,6 @@ public class MonitoringAction extends Action {
 	if (param.equals("setVerifiedByMonitor")) {
 	    return setVerifiedByMonitor(mapping, form, request, response);
 	}
-
 	if (param.equals("setSubmissionDeadline")) {
 	    return setSubmissionDeadline(mapping, form, request, response);
 	}
@@ -121,6 +127,7 @@ public class MonitoringAction extends Action {
 	sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	sessionMap.put(TaskListConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
 	if (taskList.getSubmissionDeadline() != null) {
 	    Date submissionDeadline = taskList.getSubmissionDeadline();
@@ -144,13 +151,34 @@ public class MonitoringAction extends Action {
     private ActionForward itemSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	ITaskListService service = getTaskListService();
+	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Long taskListItemId = WebUtil.readLongParam(request, TaskListConstants.ATTR_TASK_LIST_ITEM_UID);
-	ItemSummary ItemSummary = service.getItemSummary(contentId, taskListItemId, false);
+	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
+	
+	TaskListItem item = service.getTaskListItemByUid(itemUid);
+	
+	// create sessionList depending on whether the item was created by author or by learner
+	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
+	if (item.isCreateByAuthor()) {
+	    List<TaskListSession> sessionList = service.getSessionsByContentId(contentId);
+	    for (TaskListSession session : sessionList) {
+		SessionDTO sessionDto = new SessionDTO(session);
+		sessionDtos.add(sessionDto);
+	    }
+		
+	} else {
+	    TaskListSession userSession = item.getCreateBy().getSession();
+	    SessionDTO sessionDto = new SessionDTO(userSession);
+	    sessionDtos.add(sessionDto);
+	}
 
-	request.setAttribute(TaskListConstants.ATTR_ITEM_SUMMARY, ItemSummary);
-	request.setAttribute(TaskListConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
+	request.setAttribute(TaskListConstants.ATTR_SESSION_DTOS, sessionDtos);
+	request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM, item);
+	
 	return mapping.findForward(TaskListConstants.SUCCESS);
     }
 
@@ -160,7 +188,6 @@ public class MonitoringAction extends Action {
     public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	ITaskListService service = getTaskListService();
-	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + TaskListConstants.TOOL_SIGNATURE + "/";
 	
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -203,15 +230,14 @@ public class MonitoringAction extends Action {
 
 	    JSONArray userData = new JSONArray();
 	    userData.put(userDto.getUserId());
-//	    userData.put(sessionId);
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
 	    userData.put(fullName);
 	    
 	    Set<Long> completedTaskUids = userDto.getCompletedTaskUids();
 	    for (TaskListItem item : items) {
 		String completionImage = completedTaskUids.contains(item.getUid())
-			? "<img src='" + serverUrl + "/includes/images/completeitem.gif' border='0'>"
-			: "<img src='" + serverUrl + "/includes/images/dash.gif' border='0'>";
+			? "<img src='" + TOOL_URL + "/includes/images/completeitem.gif' border='0'>"
+			: "<img src='" + TOOL_URL + "/includes/images/dash.gif' border='0'>";
 		userData.put(completionImage);
 	    }
 
@@ -219,7 +245,7 @@ public class MonitoringAction extends Action {
 		String label = StringEscapeUtils.escapeHtml(service.getMessage("label.confirm"));
 
 		String verificationStatus = userDto.isVerifiedByMonitor()
-			? "<img src='" + serverUrl + "/includes/images/tick.gif' border='0'>"
+			? "<img src='" + TOOL_URL + "/includes/images/tick.gif' border='0'>"
 			: "<a id='verif-" + userDto.getUserId()
 				+ "' href='javascript:;' onclick='return setVerifiedByMonitor(this, "
 				+ userDto.getUserId() + ");'>" + label + "</a>";
@@ -251,12 +277,8 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	ITaskListService service = getTaskListService();
 	
-	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	TaskList tasklist = (TaskList) sessionMap.get(TaskListConstants.ATTR_TASKLIST);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
 
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, AttributeNames.PARAM_PAGE);
@@ -269,45 +291,103 @@ public class MonitoringAction extends Action {
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
 	// Get the user list from the db
-	Collection<TaskListUserDTO> userDtos = service.getPagedUsersBySessionAndItem(sessionId, questionUid, page - 1,
+	Collection<TaskListUserDTO> userDtos = service.getPagedUsersBySessionAndItem(sessionId, itemUid, page - 1,
 		rowLimit, sortBy, sortOrder, searchString);
 	int countSessionUsers = service.getCountPagedUsersBySession(sessionId, searchString);
 
 	int totalPages = new Double(
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
+	
+	//date formatters
+	DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
+	HttpSession ss = SessionManager.getSession();
+	UserDTO monitorDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	TimeZone monitorTimeZone = monitorDto.getTimeZone();
+	
+	//get all comments and attachments
+	TaskListItem item = service.getTaskListItemByUid(itemUid);
+	Set<TaskListItemComment> itemComments = item.getComments();
+	Set<TaskListItemAttachment> itemAttachments = item.getAttachments();
+	String label = StringEscapeUtils.escapeHtml(service.getMessage("label.download"));
 
+	int i = 0;
 	JSONArray rows = new JSONArray();
-	int i = 1;
-//	for (TaskListUserDTO userDto : userDtos) {
+	for (TaskListUserDTO userDto : userDtos) {
+	    
+	    JSONArray userData = new JSONArray();
+	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+	    userData.put(fullName);
+	    
+	    String completionImage = userDto.isCompleted()
+		    ? "<img src='" + TOOL_URL + "/includes/images/completeitem.gif' border='0'>"
+		    : "<img src='" + TOOL_URL + "/includes/images/dash.gif' border='0'>";
+	    userData.put(completionImage);
+	    
+	    String accessDate = (userDto.getAccessDate() == null) ? "" : dateFormatter.format(DateUtil
+		    .convertToTimeZoneFromDefault(monitorTimeZone, userDto.getAccessDate()));
+	    userData.put(accessDate);
+
+	    // fill up with comments and attachments made by this user
+	    if (item.isCommentsAllowed() || item.isFilesAllowed()) {
+		String commentsFiles = "<ul>";
+		
+		ArrayList<String> userComments = new ArrayList<String>();
+		for (TaskListItemComment comment : itemComments) {
+		    if (userDto.getUserId().equals(comment.getCreateBy().getUserId())) {
+			userComments.add(comment.getComment());
+		    }
+		}
+		if (!userComments.isEmpty()) {
+		    commentsFiles += "<li>";
+		    for (String userComment : userComments) {
+			commentsFiles += StringEscapeUtils.escapeHtml(userComment);
+		    }    
+		    commentsFiles += "</li>";
+		}
+
+		ArrayList<TaskListItemAttachment> userAttachments = new ArrayList<TaskListItemAttachment>();
+		for (TaskListItemAttachment attachment : itemAttachments) {
+		    if (userDto.getUserId().equals(attachment.getCreateBy().getUserId())) {
+			userAttachments.add(attachment);
+		    }
+		}
+		if (!userAttachments.isEmpty()) {
+		    commentsFiles += "<li>";
+		    for (TaskListItemAttachment userAttachment : userAttachments) {
+			commentsFiles += StringEscapeUtils.escapeHtml(userAttachment.getFileName()) + " ";
+			commentsFiles += "<a href='" + TOOL_URL + "/download/?uuid=" + userAttachment.getFileUuid()
+				+ "&versionID=" + userAttachment.getFileVersionId() + "&preferDownload=true'>" + label + "</a>";
+		    }
+		    commentsFiles += "</li>";
+		}		
+		
+		commentsFiles += "</ul>";
+		
+		
+//		
+//		<c:forEach var="attachment" items="${visitLogSummary.attachments}">
+//			<li>
+//				<c:out value="${attachment.fileName}" />
 //
-//	    Long questionResultUid = userDto.getQuestionResultUid();
-//	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+//				<c:set var="downloadURL">
+//					<html:rewrite page="/download/?uuid=${attachment.fileUuid}&versionID=${attachment.fileVersionId}&preferDownload=true" />
+//				</c:set>
+//				<html:link href="${downloadURL}">
+//					<fmt:message key="label.download" />
+//				</html:link>
 //
-//	    JSONArray userData = new JSONArray();
-//	    if (questionResultUid != null) {
-//		AssessmentQuestionResult questionResult = service.getAssessmentQuestionResultByUid(questionResultUid);
-//
-//		userData.put(questionResultUid);
-//		userData.put(questionResult.getMaxMark());
-//		userData.put(fullName);
-//		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
-//		userData.put(questionResult.getMark());
-//
-//	    } else {
-//		userData.put("");
-//		userData.put("");
-//		userData.put(fullName);
-//		userData.put("-");
-//		userData.put("-");
-//	    }
-//
-//	    JSONObject userRow = new JSONObject();
-//	    userRow.put("id", i++);
-//	    userRow.put("cell", userData);
-//
-//	    rows.put(userRow);
-//	}
+//			</li>
+//		</c:forEach>
+		userData.put(commentsFiles);
+	    }
+	    
+	    JSONObject userRow = new JSONObject();
+	    userRow.put("id", i++);
+	    userRow.put("cell", userData);
+
+	    rows.put(userRow);
+	}
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("total", totalPages);
@@ -384,7 +464,7 @@ public class MonitoringAction extends Action {
     private ITaskListService getTaskListService() {
 	WebApplicationContext wac = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ITaskListService) wac.getBean(TaskListConstants.RESOURCE_SERVICE);
+	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
 
 }

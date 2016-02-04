@@ -23,7 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
+import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -86,18 +88,13 @@ public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskLi
 		    
 		    " WHERE session.session_id = :sessionId " +
 		    " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
-		    " ORDER BY " + 
-		    " CASE " +
-			" WHEN :sortBy='userName' THEN CONCAT(user.last_name, ' ', user.first_name) " +
-			" WHEN :sortBy='grade' THEN visitLog.complete " +
-		    " END " + sortOrder;
+		    " ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 
 	SQLQuery query = getSession().createSQLQuery(LOAD_USERS);
 	query.setLong("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setString("searchString", searchString);
-	query.setString("sortBy", sortBy);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
@@ -130,7 +127,7 @@ public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskLi
     public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	
-	String LOAD_USERS = "SELECT user.user_id, CONCAT(user.last_name, ' ', user.first_name), visitLog.complete" +
+	String LOAD_USERS = "SELECT user.user_id, CONCAT(user.last_name, ' ', user.first_name), visitLog.complete, visitLog.access_date" +
 		    " FROM tl_latask10_user user" + 
 		    " INNER JOIN tl_latask10_session session" +
 		    " ON user.session_uid=session.uid" +
@@ -144,7 +141,8 @@ public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskLi
 		    " ORDER BY " + 
 		    " CASE " +
 			" WHEN :sortBy='userName' THEN CONCAT(user.last_name, ' ', user.first_name) " +
-			" WHEN :sortBy='grade' THEN question_result.mark " +
+			" WHEN :sortBy='completed' THEN visitLog.complete " +
+			" WHEN :sortBy='accessDate' THEN visitLog.access_date " +
 		    " END " + sortOrder;
 
 	SQLQuery query = getSession().createSQLQuery(LOAD_USERS);
@@ -164,12 +162,14 @@ public class TaskListUserDAOHibernate extends BaseDAOHibernate implements TaskLi
 
 		Long userId = ((Number) element[0]).longValue();
 		String fullName = (String) element[1];
-		Integer isCompleted = element[2] == null ? 0 : ((Number) element[2]).intValue();
+		boolean isCompleted = element[2] == null ? false : new Boolean(((Byte) element[2]).intValue() == 1);
+		Date accessDate = element[3] == null ? null : new Date(((Timestamp) element[3]).getTime());
 
 		TaskListUserDTO userDto = new TaskListUserDTO();
 		userDto.setUserId(userId);
 		userDto.setFullName(fullName);
-		userDto.setCompleted(Boolean.parseBoolean(isCompleted.toString()));
+		userDto.setCompleted(isCompleted);
+		userDto.setAccessDate(accessDate);;
 
 		userDtos.add(userDto);
 	    }	    
