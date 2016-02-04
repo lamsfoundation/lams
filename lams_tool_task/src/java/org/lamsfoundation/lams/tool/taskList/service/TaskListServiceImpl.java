@@ -220,14 +220,19 @@ public class TaskListServiceImpl
     public TaskListItem getTaskListItemByUid(Long itemUid) {
 	return taskListItemDao.getByUid(itemUid);
     }
+    
+    @Override
+    public List<TaskListSession> getSessionsByContentId(Long contentId) {
+	return taskListSessionDao.getByContentId(contentId);
+    }
 
     @Override
-    public TaskListSession getTaskListSessionBySessionId(Long sessionId) {
+    public TaskListSession getSessionBySessionId(Long sessionId) {
 	return taskListSessionDao.getSessionBySessionId(sessionId);
     }
 
     @Override
-    public void saveOrUpdateTaskListSession(TaskListSession resSession) {
+    public void saveOrUpdateSession(TaskListSession resSession) {
 	taskListSessionDao.saveObject(resSession);
     }
 
@@ -343,21 +348,27 @@ public class TaskListServiceImpl
 	return summaryList;
     }
 
-    @Override
-    public ItemSummary getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing) {
-
-	TaskListItem taskListItem = taskListItemDao.getByUid(taskListItemUid);
+    /*
+     * Return task summary for the specified TaskListItem. Used in monitoring.
+     * 
+     * @param contentId
+     *            toolContenId
+     * @param item
+     *            specified TaskListItem
+     * @return
+     */
+    private ItemSummary exportItem(Long contentId, TaskListItem item) {
 
 	ItemSummary itemSummary = new ItemSummary();
-	itemSummary.setTaskListItem(taskListItem);
+	itemSummary.setTaskListItem(item);
 	List<GroupSummary> groupSummaries = itemSummary.getGroupSummaries();
 
-	// create sessionList depending on if taskListItem created be author or created during learning
+	// create sessionList depending on if item created be author or created during learning
 	List<TaskListSession> sessionList = new ArrayList<TaskListSession>();
-	if (taskListItem.isCreateByAuthor()) {
+	if (item.isCreateByAuthor()) {
 	    sessionList = taskListSessionDao.getByContentId(contentId);
 	} else {
-	    TaskListSession userSession = taskListItem.getCreateBy().getSession();
+	    TaskListSession userSession = item.getCreateBy().getSession();
 	    sessionList.add(userSession);
 	}
 
@@ -373,7 +384,7 @@ public class TaskListServiceImpl
 		TaskListItemVisitLogSummary taskListItemVisitLogSummary = new TaskListItemVisitLogSummary();
 		taskListItemVisitLogSummary.setUser(user);
 
-		TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(taskListItem.getUid(),
+		TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(),
 			user.getUserId());
 		// If TaskListItemVisitLog exists then fill up taskSummaryItem otherwise put false in a completed field
 		if (visitLog != null) {
@@ -383,14 +394,14 @@ public class TaskListServiceImpl
 		    }
 
 		    // fill up with comments and attachments made by this user
-		    Set<TaskListItemComment> itemComments = taskListItem.getComments();
+		    Set<TaskListItemComment> itemComments = item.getComments();
 		    for (TaskListItemComment comment : itemComments) {
 			if (user.getUserId().equals(comment.getCreateBy().getUserId())) {
 			    taskListItemVisitLogSummary.getComments().add(comment);
 			}
 		    }
 
-		    Set<TaskListItemAttachment> itemAttachments = taskListItem.getAttachments();
+		    Set<TaskListItemAttachment> itemAttachments = item.getAttachments();
 		    for (TaskListItemAttachment attachment : itemAttachments) {
 			if (user.getUserId().equals(attachment.getCreateBy().getUserId())) {
 			    taskListItemVisitLogSummary.getAttachments().add(attachment);
@@ -400,24 +411,19 @@ public class TaskListServiceImpl
 		    taskListItemVisitLogSummary.setCompleted(false);
 		}
 
-		// if we're doing export then fill up all itemSummaries with reflection information
-		if (isExportProcessing) {
-
-		    NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-		    ReflectDTO reflectDTO = new ReflectDTO(user);
-		    if (notebookEntry == null) {
-			reflectDTO.setFinishReflection(false);
-			reflectDTO.setReflect(null);
-		    } else {
-			reflectDTO.setFinishReflection(true);
-			reflectDTO.setReflect(notebookEntry.getEntry());
-		    }
-		    reflectDTO.setReflectInstructions(session.getTaskList().getReflectInstructions());
-
-		    taskListItemVisitLogSummary.setReflectDTO(reflectDTO);
+		// fill up all itemSummaries with reflection information
+		NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		ReflectDTO reflectDTO = new ReflectDTO(user);
+		if (notebookEntry == null) {
+		    reflectDTO.setFinishReflection(false);
+		    reflectDTO.setReflect(null);
+		} else {
+		    reflectDTO.setFinishReflection(true);
+		    reflectDTO.setReflect(notebookEntry.getEntry());
 		}
+		reflectDTO.setReflectInstructions(session.getTaskList().getReflectInstructions());
+		taskListItemVisitLogSummary.setReflectDTO(reflectDTO);
 
 		groupSummary.getTaskListItemVisitLogSummaries().add(taskListItemVisitLogSummary);
 	    }
@@ -485,7 +491,7 @@ public class TaskListServiceImpl
 
 	List<ItemSummary> itemSummaries = new ArrayList<ItemSummary>();
 	for (TaskListItem item : itemList) {
-	    itemSummaries.add(getItemSummary(contentId, item.getUid(), true));
+	    itemSummaries.add(exportItem(contentId, item));
 	}
 
 	return itemSummaries;
@@ -500,7 +506,7 @@ public class TaskListServiceImpl
 
 	List<ItemSummary> itemSummaries = new ArrayList<ItemSummary>();
 	for (TaskListItem item : itemList) {
-	    itemSummaries.add(getItemSummary(contentId, item.getUid(), true));
+	    itemSummaries.add(exportItem(contentId, item));
 	}
 
 	// get rid of information that doesn't belong to the current user

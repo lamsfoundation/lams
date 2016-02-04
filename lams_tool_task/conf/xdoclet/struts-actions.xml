@@ -258,13 +258,10 @@
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="getPagedUsers" >
 		</action>
-		
-		<action path="/monitoring/viewReflection"
+		<action path="/monitoring/getPagedUsersByItem"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/parts/notebook.jsp" />
+			parameter="getPagedUsersByItem" >
 		</action>
-		
 		<action path="/monitoring/setSubmissionDeadline"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="setSubmissionDeadline" >

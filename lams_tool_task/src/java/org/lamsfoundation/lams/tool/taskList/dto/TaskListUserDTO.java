@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.tool.taskList.dto;
 
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -10,6 +11,8 @@ public class TaskListUserDTO {
     
     private Set<Long> completedTaskUids = new LinkedHashSet<Long>();
     private boolean completed;
+    // item complete date. Used in monitoring summary page
+    private Date accessDate;
 
     public Long getUserId() {
 	return userId;
@@ -44,6 +47,13 @@ public class TaskListUserDTO {
     }
     public void setCompleted(boolean completed) {
 	this.completed = completed;
+    }
+    
+    public Date getAccessDate() {
+	return accessDate;
+    }
+    public void setAccessDate(Date accessDate) {
+	this.accessDate = accessDate;
     }
 
 }

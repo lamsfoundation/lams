@@ -62,7 +62,7 @@ public class TaskListServiceProxy {
 
     private static Object getTaskListDomainService(ServletContext servletContext) {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        return wac.getBean(TaskListConstants.RESOURCE_SERVICE);
+        return wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
     
 }

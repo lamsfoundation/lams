@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.taskList.dto;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 
 /**
  * List contains following element: <br>
@@ -48,7 +48,9 @@ public class SessionDTO {
 
     private int[] visitNumbers;
 
-    public SessionDTO() {
+    public SessionDTO(TaskListSession session) {
+	this.sessionId = session.getSessionId();
+	this.sessionName = session.getSessionName();
     }
 
     /**

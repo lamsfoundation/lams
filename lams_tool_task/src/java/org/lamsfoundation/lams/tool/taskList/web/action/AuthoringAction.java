@@ -235,7 +235,7 @@ public class AuthoringAction extends Action {
 	taskListItemList.clear();
 	taskListItemList.addAll(items);
 
-	sessionMap.put(TaskListConstants.ATTR_RESOURCE_FORM, taskListForm);
+	sessionMap.put(TaskListConstants.ATTR_TASKLIST_FORM, taskListForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	return mapping.findForward(TaskListConstants.SUCCESS);
@@ -255,7 +255,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_RESOURCE_FORM);
+	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_TASKLIST_FORM);
 
 	TaskListForm taskListForm = (TaskListForm) form;
 	try {
@@ -619,7 +619,7 @@ public class AuthoringAction extends Action {
     private ITaskListService getTaskListService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
-	return (ITaskListService) wac.getBean(TaskListConstants.RESOURCE_SERVICE);
+	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
 
     /**
@@ -630,10 +630,10 @@ public class AuthoringAction extends Action {
      */
     private SortedSet<TaskListItem> getTaskListItemList(SessionMap sessionMap) {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
-		.get(TaskListConstants.ATTR_RESOURCE_ITEM_LIST);
+		.get(TaskListConstants.ATTR_TASKLIST_ITEM_LIST);
 	if (list == null) {
 	    list = new TreeSet<TaskListItem>(new TaskListItemComparator());
-	    sessionMap.put(TaskListConstants.ATTR_RESOURCE_ITEM_LIST, list);
+	    sessionMap.put(TaskListConstants.ATTR_TASKLIST_ITEM_LIST, list);
 	}
 	return list;
     }
@@ -671,7 +671,7 @@ public class AuthoringAction extends Action {
      * @return
      */
     private List getDeletedTaskListItemList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
+	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_TASKLIST_ITEM_LIST);
     }
 
     /**
