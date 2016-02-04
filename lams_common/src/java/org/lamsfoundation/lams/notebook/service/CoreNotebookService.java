@@ -111,7 +111,8 @@ public class CoreNotebookService implements ICoreNotebookService {
      * alias of notebookEntry) and the sql join clause, which should go with any other join clauses.
      * 
      * To make sure it always returns the same number of objects add the select clause like this:
-     * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
+     * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry"); or
+     * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry, NULL notebookModifiedDate"); or
      * 
      * Then if there is isn't a notebookEntry to return, it still returns a notebookEntry column, which translates to
      * null. So you can return a collection like List<Object[UserObject, String]> irrespective of whether or not the
@@ -119,7 +120,7 @@ public class CoreNotebookService implements ICoreNotebookService {
      * 
      * Finally, as it will be returning the notebook entry as a separate field in select clause, set up the sql -> java
      * object translation using ".addScalar("notebookEntry", Hibernate.STRING)" if includeDateModified = false or 
-     * .addScalar("notebookEntry", Hibernate.STRING).addScalar("notebookCreateDate", Hibernate.DATE).addScalar("notebookModifiedDate", Hibernate.DATE)
+     * .addScalar("notebookEntry", Hibernate.STRING).addScalar("notebookModifiedDate", Hibernate.DATE)
      *  if  includeDates = true.
      * 
      * @param sessionIdString
@@ -144,7 +145,9 @@ public class CoreNotebookService implements ICoreNotebookService {
 	buf.append("\" AND entry.user_id=");
 	buf.append(userIdString);
 	String[] retValue = new String[2];
-	retValue[0] = includeDates ? ", entry.entry notebookEntry, entry.create_date notebookCreateDate, entry.last_modified notebookModifiedDate " : ", entry.entry notebookEntry ";
+	retValue[0] = includeDates 
+		? ", entry.entry notebookEntry, (CASE WHEN entry.last_modified IS NULL THEN entry.create_date ELSE entry.last_modified END) notebookModifiedDate " 
+		: ", entry.entry notebookEntry ";
 	retValue[1] = buf.toString();
 	return retValue;
     }
