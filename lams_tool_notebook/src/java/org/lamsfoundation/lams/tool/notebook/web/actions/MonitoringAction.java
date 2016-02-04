@@ -158,7 +158,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    
 	    if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
 		Date modifiedDate = (Date) userAndReflection[2];
-		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE, DateUtil.convertToStringForJSON(modifiedDate));
+		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE, DateUtil.convertToStringForJSON(modifiedDate, request.getLocale()));
 	    } else {
 		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE,noEntry);
 	    }
