@@ -112,7 +112,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	setupService();
 	Long toolSessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
-	// TODO fix modified date - sorts on creation date at the moment due to database.
 	boolean hasSearch = WebUtil.readBooleanParam(request,  "_search", false);
 	String searchString = hasSearch ? request.getParameter(NotebookConstants.PARAM_NAME) : null;
 	int page = WebUtil.readIntParam(request, "page");
@@ -157,15 +156,9 @@ public class MonitoringAction extends LamsDispatchAction {
 		responseRow.put(NotebookConstants.PARAM_COMMENT,  user.getTeachersComment());
 	    }
 	    
-	    Date modifiedDate = null;
-	    if ( userAndReflection.length > 3 && userAndReflection[3] != null) {
-		modifiedDate = (Date) userAndReflection[3];
-	    } else if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
-		modifiedDate = (Date) userAndReflection[2];
-	    }
-	    if ( modifiedDate != null ) {
-		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE,
-			DateUtil.convertToStringForJSON(modifiedDate));
+	    if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
+		Date modifiedDate = (Date) userAndReflection[2];
+		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE, DateUtil.convertToStringForJSON(modifiedDate, request.getLocale()));
 	    } else {
 		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE,noEntry);
 	    }

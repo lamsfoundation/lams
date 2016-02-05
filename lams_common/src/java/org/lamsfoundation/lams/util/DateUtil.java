@@ -30,7 +30,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
+
+import javax.servlet.http.HttpSession;
+
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -46,7 +53,6 @@ public class DateUtil
 
 	public static final String WDDX_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 	public static final String LAMS_FLASH_FORMAT = "dd/M/yyyy h:mm a";
-	private static final DateFormat JSON_DATE_OUTPUT_FORMATTER = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
 
 	/**
      * Convert your local time to Universal Time Coordinator.
@@ -185,11 +191,82 @@ public class DateUtil
     }
 
     
-    /**
-     *  Convert a date to a String for sending to the client via JSON. 
+    public static final int TYPE_BOTH = 1;
+    public static final int TYPE_DATE = 2;
+    public static final int TYPE_TIME = 3;
+
+    /** 
+     * Equivalent of <LAMS:Date value="value"/>. Use for processing a date to send to the client via JSON.
+     * Locale comes from request.getLocale();
+     * Same as calling convertToStringForJSON(value, DateFormat.MEDIUM, TYPE_BOTH, locale)
+     * @param value
+     * @param locale
+     * @return
      */
-    public static String convertToStringForJSON(Date date) {
-	return JSON_DATE_OUTPUT_FORMATTER.format(date);
+    public static String convertToStringForJSON(Date value, Locale locale) {
+	return convertToStringForJSON(value, DateFormat.MEDIUM, TYPE_BOTH, locale);
     }
+
+    /** 
+     * Equivalent of <LAMS:Date value="value" style="short|full|medium" type="date|time|both"/>. Use for processing a date to send to the client via JSON.
+     * Locale comes from request.getLocale();
+     * @param value
+     * @param style DateFormat.MEDIUM, DateFormat.SHORT, DateFormat.FULL
+     * @param type TYPE_BOTH (both data and time), TYPE_DATE or TYPE_TIME
+     * @param locale
+     * @return
+     */
+    public static String convertToStringForJSON(Date value, Integer style, Locale locale) {
+	return convertToStringForJSON(value, style, TYPE_BOTH, locale);
+    }
+
+    
+    /** 
+     * Equivalent of <LAMS:Date value="value" type="date|time|both"/>. Use for processing a date to send to the client via JSON.
+     * Locale comes from request.getLocale();
+     * @param value
+     * @param type TYPE_BOTH (both data and time), TYPE_DATE or TYPE_TIME
+     * @param locale
+     * @return
+     */
+    public static String convertToStringForJSON(Date value, Integer style, Integer type, Locale locale) {
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	TimeZone tz = user.getTimeZone();
+
+	int dateStyle, timeStyle;
+	switch (style) {
+	case DateFormat.SHORT:
+	    dateStyle = DateFormat.SHORT;
+	    timeStyle = DateFormat.SHORT;
+	    break;
+	case DateFormat.FULL:
+	    dateStyle = DateFormat.LONG;
+	    timeStyle = DateFormat.FULL;
+	    break;
+	default:
+	    dateStyle = DateFormat.LONG;
+	    timeStyle = DateFormat.MEDIUM;
+	}
+
+	DateFormat df = null;
+	switch (type) {
+	case TYPE_DATE:
+	    df = DateFormat.getDateInstance(dateStyle, locale);
+	    break;
+	case TYPE_TIME:
+	    df = DateFormat.getTimeInstance(timeStyle, locale);
+	    break;
+	default:
+	    df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
+	}
+
+	if (tz != null)
+	    df.setTimeZone(tz);
+
+	return df.format(value);
+    }
+	
 
 }

@@ -62,9 +62,7 @@ public interface INotebookUserDAO extends IBaseDAO{
 	 */
 	NotebookUser getByUID(Long uid);
 	
-	/** Will return List<[NotebookUser, String, Date, Date]>
-	 * where the String is the notebook entry, the first date is the create date and the second date is the modified date. 
-	 * No notebook entries needed? Will return in their place.
+	/** Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date. 
 	 */
 	List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
 		 ICoreNotebookService coreNotebookService);
