@@ -100,9 +100,7 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 	}
 	
 	@SuppressWarnings("unchecked")
-	/** Will return List<[NotebookUser, String, Date, Date]>
-	 * where the String is the notebook entry, the first date is the create date and the second date is the modified date. 
-	 * No notebook entries needed? Will return in their place.
+	/** Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date. 
 	 */
 	public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
 		ICoreNotebookService coreNotebookService) {
@@ -115,10 +113,10 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 		sortingOrder = "user.last_name DESC, user.first_name DESC";
 		break;
 	    case NotebookConstants.SORT_BY_DATE_ASC:
-		sortingOrder = "notebookCreateDate ASC";
+		sortingOrder = "notebookModifiedDate ASC";
 		break;
 	    case NotebookConstants.SORT_BY_DATE_DESC:
-		sortingOrder = "notebookCreateDate DESC";
+		sortingOrder = "notebookModifiedDate DESC";
 		break;
 	    case NotebookConstants.SORT_BY_COMMENT_ASC:
 		sortingOrder = "user.teachers_comment ASC";
@@ -149,7 +147,6 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 	    SQLQuery query =  getSession().createSQLQuery(queryText.toString());
 	    query.addEntity("user", NotebookUser.class)
 		.addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("notebookCreateDate", TimestampType.INSTANCE)
 		.addScalar("notebookModifiedDate", TimestampType.INSTANCE)
 	    	.setLong("sessionId", sessionId.longValue())
 	    	.setFirstResult(page * size)
