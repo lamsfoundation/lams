@@ -274,6 +274,11 @@
 	</script>
 </lams:head>
 <body onresize="javascript:GeneralLib.resizePaper()">
+	<%-- "loading..." screen, gets removed on page full load --%>
+	<div id="loadingOverlay">
+		<img src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+	</div>
+	
 	<div id="toolbar" class="ui-corner-all">
 		<div id="newButton" class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false, false)">
 			<fmt:message key="authoring.fla.page.menu.new" />

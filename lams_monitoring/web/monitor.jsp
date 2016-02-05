@@ -169,12 +169,21 @@
 			initSequenceTab();
 			initLearnersTab();
 			refreshMonitor();
+			
+			// remove "loading..." screen
+			$('#loadingOverlay').remove();
 		});
 	</script>
 	<!-- Some settings need to be done in the script first and only then this file can be included -->
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 </lams:head>
 <body data-enhance="false">
+
+<%-- "loading..." screen, gets removed on page full load --%>
+<div id="loadingOverlay">
+	<img src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+</div>
+
 <div id="tabs">
 	<!-- Tab names -->
 	<ul>
