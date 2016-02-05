@@ -19,6 +19,19 @@ a.ygtvspacer {
 	margin-right: 3px;
 }
 
+#loadingOverlay {
+	width: 99%;
+	height: 99%;
+	z-index: 2000;
+	position: absolute;
+	background-color: #FFFFFF;
+	text-align: center;
+}
+
+#loadingOverlay img {
+	margin-top: 35%;
+}
+
 div.dialogContainer, .ldChoiceDependentCanvasElement, 
 .dialog-no-title .ui-dialog-titlebar {
 	display: none;
@@ -35,7 +48,6 @@ div.dialogTitle {
 	font-weight: bold;
 	text-align: center;
 }
-
 
 
 div.propertiesDialogContainer .ui-dialog-titlebar {

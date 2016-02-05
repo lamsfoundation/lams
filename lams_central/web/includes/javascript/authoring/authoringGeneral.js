@@ -24,6 +24,9 @@ $(document).ready(function() {
 	if (initLearningDesignID) {
 		GeneralLib.openLearningDesign(+initLearningDesignID);
 	}
+	
+	// remove "loading..." screen
+	$('#loadingOverlay').remove();
 });
 
 

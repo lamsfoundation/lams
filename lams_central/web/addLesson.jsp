@@ -49,10 +49,18 @@
 			initClassTab();
 			initAdvancedTab();
 			initConditionsTab();
+			
+			// remove "loading..." screen
+			$('#loadingOverlay').remove();
 		});
 	</script>
 </lams:head>
 <body>
+<%-- "loading..." screen, gets removed on page full load --%>
+<div id="loadingOverlay">
+	<img src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+</div>
+
 <div id="tabs">
 	<a id="addButton" href="#" onClick="javascript:addLesson()">
 		<fmt:message key="button.add.now" />
