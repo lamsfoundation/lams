@@ -169,12 +169,21 @@
 			initSequenceTab();
 			initLearnersTab();
 			refreshMonitor();
+			
+			// remove "loading..." screen
+			$('#loadingOverlay').remove();
 		});
 	</script>
 	<!-- Some settings need to be done in the script first and only then this file can be included -->
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 </lams:head>
 <body data-enhance="false">
+
+<%-- "loading..." screen, gets removed on page full load --%>
+<div id="loadingOverlay">
+	<img src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+</div>
+
 <div id="tabs">
 	<!-- Tab names -->
 	<ul>
@@ -569,7 +578,7 @@
 					<table id="classLearnerTable">
 						<tr>
 							<td class="dialogTitle" colspan="6">
-					<fmt:message key="lesson.learners"/>
+								<fmt:message key="lesson.learners"/>
 							</td>
 						</tr>
 						<tr>
@@ -613,7 +622,7 @@
 									<span class="ui-icon ui-icon-seek-next"></span>
 							</td>
 							<td class="navCell sortCell" 
-				  		  title="<fmt:message key='learner.group.sort.button'/>"
+								title="<fmt:message key='learner.group.sort.button'/>" 
 								onClick="javascript:sortClassList('Learner')">
 									<span class="ui-icon ui-icon-triangle-1-n"></span>
 							</td>
@@ -628,10 +637,10 @@
 					<table id="classMonitorTable">
 						<tr>
 							<td class="dialogTitle" colspan="6">
-					<fmt:message key="lesson.monitors"/>
-				</td>
-			</tr>
-			<tr>
+								<fmt:message key="lesson.monitors"/>
+							</td>
+						</tr>
+						<tr>
 							<td id="classMonitorSearchRow" colspan="6">&nbsp;</td>
 						</tr>
 						<tr>
@@ -657,16 +666,16 @@
 								title="<fmt:message key='learner.group.forward.10'/>"
 								onClick="javascript:shiftClassList('Monitor', 10)">
 									<span class="ui-icon ui-icon-seek-next"></span>
-				</td>
+							</td>
 							<td class="navCell sortCell" 
 								title="<fmt:message key='learner.group.sort.button'/>" 
 								onClick="javascript:sortClassList('Monitor')">
 									<span class="ui-icon ui-icon-triangle-1-n"></span>
-				</td>
-			</tr>
-			<tr>
+							</td>
+						</tr>
+						<tr>
 							<td class="dialogList" colspan="6">
-				</td>
+							</td>
 						</tr>
 					</table>
 				</td>
