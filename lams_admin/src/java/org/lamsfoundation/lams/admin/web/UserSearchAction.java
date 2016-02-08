@@ -24,101 +24,132 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.DynaActionForm;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author jliew
- *
- */
-
-/**
- * struts doclets
  * 
- * @struts:action path="/usersearch"
- *                name="UserSearchForm"
- *                input=".usersearchlist"
- *                scope="request"
- *                validate="false"
+ * @struts:action path="/usersearch" parameter="dispatch" input=".usersearchlist" scope="request" validate="false"
  *
- * @struts:action-forward name="usersearchlist"
- *                        path=".usersearchlist"
+ * @struts:action-forward name="usersearchlist" path=".usersearchlist"
  */
-public class UserSearchAction extends Action {
-	
-	private static Logger log = Logger.getLogger(UserSearchAction.class);
-	private static IUserManagementService service;
-	private static MessageService messageService;
+public class UserSearchAction extends LamsDispatchAction {
 
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		if (service == null) {
-			service = AdminServiceProxy.getService(getServlet().getServletContext());
-		}
-		if (messageService == null) {
-			messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		}
-		DynaActionForm userSearchForm = (DynaActionForm)form;
-		
-		if(!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())){
-			log.debug("user not sysadmin or global group admin");
-			ActionMessages errors = new ActionMessages();
-			errors.add("authorisation",new ActionMessage("error.authorisation"));
-			saveErrors(request,errors);
-			request.setAttribute("isSysadmin",false);
-			return mapping.findForward("usersearchlist");
-		}
-		
-		Boolean showAll = (Boolean)userSearchForm.get("showAll");
-		Boolean searched = (Boolean)userSearchForm.get("searched");
-		String term = ((String)userSearchForm.getString("term")).trim();
-		
-		if (searched) {
-			List userList = new ArrayList();
-			if (showAll) {
-				Map<String, Object> objectProperties = new HashMap<String,Object>();
-				objectProperties.put("disabledFlag",false);
-				userList = service.findByProperties(User.class,objectProperties);
-			} else {
-				userList = service.searchUserSingleTerm(term);
-			}
-			if (userList.isEmpty()) {
-				ActionMessages messages = new ActionMessages();
-				messages.add("results",new ActionMessage("msg.results.none"));
-				saveMessages(request,messages);
-			}
-			
-			request.setAttribute("userList", userList);
-			String[] args = { new Integer(userList.size()).toString() };
-			request.setAttribute("numUsers", messageService.getMessage("label.number.of.users", args));
-		}
-		
-		userSearchForm.set("showAll", false);
-		userSearchForm.set("searched", true);
-		
-		return mapping.findForward("usersearchlist");
+    private static Logger log = Logger.getLogger(UserSearchAction.class);
+    private static IUserManagementService service;
+    private static MessageService messageService;
+
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	initServices();
+
+	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	    log.debug("user not sysadmin or global group admin");
+
+	    request.setAttribute("errorName", "UserSearchAction authorisation");
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
+	    return mapping.findForward("error");
 	}
-	
+
+	return mapping.findForward("usersearchlist");
+    }
+
+    /**
+     * Returns list of paged users.
+     */
+    public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	initServices();
+
+	// the organisation type of the children
+	String searchString = WebUtil.readStrParam(request, "fcol[1]", true);
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
+	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
+	Integer isSort3 = WebUtil.readIntParam(request, "column[2]", true);
+	Integer isSort4 = WebUtil.readIntParam(request, "column[3]", true);
+	Integer isSort5 = WebUtil.readIntParam(request, "column[4]", true);
+
+	String sortBy = "userId";
+	String sortOrder = "DESC";
+	if (isSort1 != null) {
+	    sortBy = "userId";
+	    sortOrder = isSort1.equals(0) ? "ASC" : "DESC";
+
+	} else if (isSort2 != null) {
+	    sortBy = "login";
+	    sortOrder = isSort2.equals(0) ? "ASC" : "DESC";
+
+	} else if (isSort3 != null) {
+	    sortBy = "firstName";
+	    sortOrder = isSort3.equals(0) ? "ASC" : "DESC";
+
+	} else if (isSort4 != null) {
+	    sortBy = "lastName";
+	    sortOrder = isSort4.equals(0) ? "ASC" : "DESC";
+
+	} else if (isSort5 != null) {
+	    sortBy = "email";
+	    sortOrder = isSort5.equals(0) ? "ASC" : "DESC";
+	}
+
+	List<UserDTO> userDtos = service.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
+
+	JSONObject responcedata = new JSONObject();
+	responcedata.put("total_rows", service.getCountUsers(searchString));
+
+	JSONArray rows = new JSONArray();
+	for (UserDTO userDto: userDtos) {
+
+	    JSONObject responseRow = new JSONObject();
+	    responseRow.put("userId", userDto.getUserID());
+	    responseRow.put("login", StringEscapeUtils.escapeHtml(userDto.getLogin()));
+	    String firstName = userDto.getFirstName() == null ? "" : userDto.getFirstName();
+	    responseRow.put("firstName", StringEscapeUtils.escapeHtml(firstName));
+	    String lastName = userDto.getLastName() == null ? "" : userDto.getLastName();
+	    responseRow.put("lastName", StringEscapeUtils.escapeHtml(lastName));
+	    String email = userDto.getEmail() == null ? "" : userDto.getEmail();
+	    responseRow.put("email", StringEscapeUtils.escapeHtml(email));
+
+	    rows.put(responseRow);
+	}
+	responcedata.put("rows", rows);
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responcedata.toString()));
+	return null;
+    }
+
+    private void initServices() {
+	if (service == null) {
+	    service = AdminServiceProxy.getService(getServlet().getServletContext());
+	}
+	if (messageService == null) {
+	    messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+	}
+    }
+
 }

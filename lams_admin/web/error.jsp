@@ -62,11 +62,10 @@ if (exception != null) {
 </form>
 
 <script type="text/javascript">
-
-if(window.top != null)
-	document.getElementById("errorForm").target = "_parent";
-document.getElementById("errorForm").submit();
-
+	if (window.top != null) {
+		document.getElementById("errorForm").target = "_parent";
+	}
+	document.getElementById("errorForm").submit();
 </script>
 </body>
 </lams:html>
