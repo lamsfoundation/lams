@@ -35,7 +35,6 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * @author jliew
- * 
  */
 public class UserOrganisationDAO extends BaseDAO implements IUserOrganisationDAO {
 

@@ -479,6 +479,14 @@ public interface IUserManagementService {
     Integer getCountUsers();
 
     Integer getCountUsers(Integer authenticationMethodId);
+    
+    /**
+     * Count total number of users excluding disabled ones and applying searchString filter.
+     * 
+     * @param searchString
+     * @return
+     */
+    int getCountUsers(String searchString);
 
     List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
 
@@ -531,6 +539,18 @@ public interface IUserManagementService {
      * @return list of Users
      */
     List getAllUsers();
+    
+    /**
+     * Get all users (paged), except for disabled users.
+     * 
+     * @param page
+     * @param size
+     * @param sortBy
+     * @param sortOrder
+     * @param searchString filters results by course name. It can be null and then doesn't affect results
+     * @return paged list of users
+     */
+    List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString);
 
     /**
      * Get all users, except for disabled users and users that are members of filteredOrg.

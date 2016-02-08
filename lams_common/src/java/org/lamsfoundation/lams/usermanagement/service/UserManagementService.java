@@ -40,10 +40,12 @@ import java.util.Vector;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
+import org.lamsfoundation.lams.usermanagement.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
@@ -101,55 +103,18 @@ public class UserManagementService implements IUserManagementService {
     private IRoleDAO roleDAO;
 
     private IOrganisationDAO organisationDAO;
+    
+    private IUserDAO userDAO;
 
     private IUserOrganisationDAO userOrganisationDAO;
 
     protected MessageService messageService;
 
     private static IAuditService auditService;
-
-    private IAuditService getAuditService() {
-	if (UserManagementService.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
-	}
-	return UserManagementService.auditService;
-    }
-
-    /**
-     * Set i18n MessageService
-     */
-    public void setMessageService(MessageService messageService) {
-	this.messageService = messageService;
-    }
-
-    /**
-     * Get i18n MessageService
-     */
-    public MessageService getMessageService() {
-	return messageService;
-    }
-
-    public void setBaseDAO(IBaseDAO baseDAO) {
-	this.baseDAO = baseDAO;
-    }
-
-    public void setGroupDAO(IGroupDAO groupDAO) {
-	this.groupDAO = groupDAO;
-    }
-
-    public void setRoleDAO(IRoleDAO roleDAO) {
-	this.roleDAO = roleDAO;
-    }
-
-    public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
-	this.organisationDAO = organisationDAO;
-    }
-
-    public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
-	this.userOrganisationDAO = userOrganisationDAO;
-    }
+    
+    // ---------------------------------------------------------------------
+    // Service Methods
+    // ---------------------------------------------------------------------
 
     public void save(Object object) {
 	try {
@@ -1108,12 +1073,19 @@ public class UserManagementService implements IUserManagementService {
 	String message = messageService.getMessage("audit.user.create", args);
 	getAuditService().log(moduleName, message);
     }
-
+    
+    @Override
     public Integer getCountUsers() {
-	String query = "select count(u) from User u";
+	String query = "SELECT count(u) FROM User u";
 	return getFindIntegerResult(query);
     }
+    
+    @Override
+    public int getCountUsers(String searchString) {
+	return userDAO.getCountUsers(searchString);
+    }
 
+    @Override
     public Integer getCountUsers(Integer authenticationMethodId) {
 	String query = "select count(u) from User u " + "where u.authenticationMethod.authenticationMethodId="
 		+ authenticationMethodId;
@@ -1128,11 +1100,13 @@ public class UserManagementService implements IUserManagementService {
 	return null;
     }
 
+    @Override
     public List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin) {
 	List list = organisationDAO.getActiveCourseIdsByUser(userId, isSysadmin);
 	return populateCollapsedOrgDTOs(list, isSysadmin);
     }
 
+    @Override
     public List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin) {
 	List list = organisationDAO.getArchivedCourseIdsByUser(userId, isSysadmin);
 	return populateCollapsedOrgDTOs(list, isSysadmin);
@@ -1164,6 +1138,7 @@ public class UserManagementService implements IUserManagementService {
 	return dtoList;
     }
 
+    @Override
     public List searchUserSingleTerm(String term) {
 	term = StringEscapeUtils.escapeSql(term);
 	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
@@ -1173,6 +1148,7 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List searchUserSingleTerm(String term, Integer filteredOrgId) {
 	term = StringEscapeUtils.escapeSql(term);
 	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
@@ -1183,6 +1159,7 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List searchUserSingleTerm(String term, Integer orgId, Integer filteredOrgId) {
 	term = StringEscapeUtils.escapeSql(term);
 	String query = "select uo.user from UserOrganisation uo where (uo.user.login like '%" + term + "%'"
@@ -1195,6 +1172,7 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List searchUserSingleTerm(String term, Integer orgId, boolean includeChildOrgs) {
 	term = StringEscapeUtils.escapeSql(term);
 	String whereClause = "";
@@ -1210,11 +1188,18 @@ public class UserManagementService implements IUserManagementService {
 	return list;
     }
 
+    @Override
     public List getAllUsers() {
 	String query = "from User u where u.disabledFlag=0 order by u.login";
 	return baseDAO.find(query);
     }
+    
+    @Override
+    public List getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
+	return userDAO.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
+    }
 
+    @Override
     public List getAllUsers(Integer filteredOrgId) {
 	String query = "from User u where u.disabledFlag=0 and u.userId not in"
 		+ " (select uo.user.userId from UserOrganisation uo where uo.organisation.organisationId="
@@ -1222,11 +1207,13 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.find(query);
     }
 
+    @Override
     public List getAllUsersWithEmail(String email) {
 	String query = "from User u where u.email=\'" + email + "\' order by u.login";
 	return baseDAO.find(query);
     }
 
+    @Override
     public List getUsersFromOrganisation(Integer orgId, Integer filteredOrgId) {
 	String query = "select uo.user from UserOrganisation uo where uo.organisation.organisationId=" + orgId
 		+ " and uo.user.userId not in (select uo.user.userId from UserOrganisation uo"
@@ -1234,6 +1221,7 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.find(query);
     }
 
+    @Override
     public boolean canEditGroup(Integer userId, Integer orgId) {
 	if (isUserSysAdmin() || isUserGlobalGroupAdmin()) {
 	    return true;
@@ -1263,5 +1251,49 @@ public class UserManagementService implements IUserManagementService {
     public User getUserDTOByOpenidURL(String openidURL) {
 	List results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
 	return results.isEmpty() ? null : (User) results.get(0);
+    }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
+
+    /**
+     * Set i18n MessageService
+     */
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public void setBaseDAO(IBaseDAO baseDAO) {
+	this.baseDAO = baseDAO;
+    }
+
+    public void setGroupDAO(IGroupDAO groupDAO) {
+	this.groupDAO = groupDAO;
+    }
+
+    public void setRoleDAO(IRoleDAO roleDAO) {
+	this.roleDAO = roleDAO;
+    }
+
+    public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
+	this.organisationDAO = organisationDAO;
+    }
+    
+    public void setUserDAO(IUserDAO userDAO) {
+	this.userDAO = userDAO;
+    }
+
+    public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
+	this.userOrganisationDAO = userOrganisationDAO;
+    }
+
+    private IAuditService getAuditService() {
+	if (UserManagementService.auditService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
+	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
+	}
+	return UserManagementService.auditService;
     }
 }
