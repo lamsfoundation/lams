@@ -439,16 +439,13 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     @Override
     public SortedMap<SurveySession, Integer> getStatistic(Long contentId) {
 	SortedMap<SurveySession, Integer> result = new TreeMap<SurveySession, Integer>(new SurveySessionComparator());
-	List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
-	if (sessionList == null) {
-	    return result;
+	
+	List<Object[]> stats = surveyUserDao.getStatisticsBySession(contentId);
+	for ( Object[] stat : stats) {
+	    SurveySession session = (SurveySession) stat[0];
+	    Integer numUsers = (Integer) stat[1];
+	    result.put(session,numUsers);
 	}
-
-	for (SurveySession session : sessionList) {
-	    List<SurveyUser> users = getSessionUsers(session.getSessionId());
-	    result.put(session, users != null ? users.size() : 0);
-	}
-
 	return result;
 
     }

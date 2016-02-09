@@ -40,4 +40,6 @@ public interface SurveyUserDAO extends DAO {
     List<Object[]> getUsersForTablesorter(final Long sessionId, final Long questionId, int page, int size,
 	    int sorting, String searchString);
     int getCountUsersBySession(final Long sessionId, String searchString);
+    
+    public List<Object[]> getStatisticsBySession(final Long contentId);
 }
