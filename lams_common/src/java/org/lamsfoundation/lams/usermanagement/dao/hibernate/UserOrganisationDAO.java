@@ -32,7 +32,6 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @author jliew
- * 
  */
 @Repository
 public class UserOrganisationDAO extends LAMSBaseDAO implements IUserOrganisationDAO {

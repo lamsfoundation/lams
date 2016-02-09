@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
+import org.lamsfoundation.lams.usermanagement.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
@@ -100,55 +101,18 @@ public class UserManagementService implements IUserManagementService {
     private IRoleDAO roleDAO;
 
     private IOrganisationDAO organisationDAO;
+    
+    private IUserDAO userDAO;
 
     private IUserOrganisationDAO userOrganisationDAO;
 
     protected MessageService messageService;
 
     private static IAuditService auditService;
-
-    private IAuditService getAuditService() {
-	if (UserManagementService.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
-	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
-	}
-	return UserManagementService.auditService;
-    }
-
-    /**
-     * Set i18n MessageService
-     */
-    public void setMessageService(MessageService messageService) {
-	this.messageService = messageService;
-    }
-
-    /**
-     * Get i18n MessageService
-     */
-    public MessageService getMessageService() {
-	return messageService;
-    }
-
-    public void setBaseDAO(IBaseDAO baseDAO) {
-	this.baseDAO = baseDAO;
-    }
-
-    public void setGroupDAO(IGroupDAO groupDAO) {
-	this.groupDAO = groupDAO;
-    }
-
-    public void setRoleDAO(IRoleDAO roleDAO) {
-	this.roleDAO = roleDAO;
-    }
-
-    public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
-	this.organisationDAO = organisationDAO;
-    }
-
-    public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
-	this.userOrganisationDAO = userOrganisationDAO;
-    }
+    
+    // ---------------------------------------------------------------------
+    // Service Methods
+    // ---------------------------------------------------------------------
 
     @Override
     public void save(Object object) {
@@ -1132,11 +1096,16 @@ public class UserManagementService implements IUserManagementService {
 	String message = messageService.getMessage("audit.user.create", args);
 	getAuditService().log(moduleName, message);
     }
-
+    
     @Override
     public Integer getCountUsers() {
-	String query = "select count(u) from User u";
+	String query = "SELECT count(u) FROM User u";
 	return getFindIntegerResult(query);
+    }
+    
+    @Override
+    public int getCountUsers(String searchString) {
+	return userDAO.getCountUsers(searchString);
     }
 
     @Override
@@ -1247,6 +1216,11 @@ public class UserManagementService implements IUserManagementService {
 	String query = "from User u where u.disabledFlag=0 order by u.login";
 	return baseDAO.find(query);
     }
+    
+    @Override
+    public List getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
+	return userDAO.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
+    }
 
     @Override
     public List getAllUsers(Integer filteredOrgId) {
@@ -1303,5 +1277,49 @@ public class UserManagementService implements IUserManagementService {
     public User getUserDTOByOpenidURL(String openidURL) {
 	List results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
 	return results.isEmpty() ? null : (User) results.get(0);
+    }
+    
+    // ---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    // ---------------------------------------------------------------------
+
+    /**
+     * Set i18n MessageService
+     */
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public void setBaseDAO(IBaseDAO baseDAO) {
+	this.baseDAO = baseDAO;
+    }
+
+    public void setGroupDAO(IGroupDAO groupDAO) {
+	this.groupDAO = groupDAO;
+    }
+
+    public void setRoleDAO(IRoleDAO roleDAO) {
+	this.roleDAO = roleDAO;
+    }
+
+    public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
+	this.organisationDAO = organisationDAO;
+    }
+    
+    public void setUserDAO(IUserDAO userDAO) {
+	this.userDAO = userDAO;
+    }
+
+    public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
+	this.userOrganisationDAO = userOrganisationDAO;
+    }
+
+    private IAuditService getAuditService() {
+	if (UserManagementService.auditService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
+	}
+	return UserManagementService.auditService;
     }
 }

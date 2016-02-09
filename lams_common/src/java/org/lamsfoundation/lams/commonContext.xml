@@ -48,6 +48,7 @@
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="roleDAO"><ref bean="roleDAO"/></property>
 		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
+		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>	
@@ -461,6 +462,10 @@
 	
 	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
