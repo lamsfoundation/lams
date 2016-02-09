@@ -465,7 +465,7 @@
 	</bean>
 	
 	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
