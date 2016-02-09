@@ -11,7 +11,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.masukomi.aspirin.core.MailQue;
+import org.masukomi.aspirin.Aspirin;
 
 /**
  * A class that handles emails
@@ -47,8 +47,8 @@ public class Emailer {
      */
     public static Session getMailSession(Properties properties) {
 	Session session;
-	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration
-		.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
+	boolean useInternalSMTPServer = Boolean
+		.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 	if (!useInternalSMTPServer) {
 	    String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
 	    properties.put("mail.smtp.host", smtpServer);
@@ -107,12 +107,12 @@ public class Emailer {
      *            whether the message is of HTML content-type or plain text
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
-	    boolean isHtmlFormat, Properties mailServerConfig) throws AddressException, MessagingException,
-	    UnsupportedEncodingException {
+	    boolean isHtmlFormat, Properties mailServerConfig)
+		    throws AddressException, MessagingException, UnsupportedEncodingException {
 
 	Session session = Emailer.getMailSession(mailServerConfig);
-	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration
-		.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
+	boolean useInternalSMTPServer = Boolean
+		.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 
 	MimeMessage message = new MimeMessage(session);
 	message.setFrom(new InternetAddress(from, fromPerson));
@@ -123,9 +123,7 @@ public class Emailer {
 	message.addHeader("Content-Type", contentType);
 
 	if (useInternalSMTPServer) {
-	    MailQue myMailQue = new MailQue();
-	    myMailQue.queMail(message);
-
+	    Aspirin.add(message);
 	} else {
 	    Transport.send(message);
 	}

@@ -2,7 +2,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css style="main" />
