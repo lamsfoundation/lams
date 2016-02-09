@@ -1,6 +1,6 @@
 <%@ include file="/taglibs.jsp"%>
 
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<c:set var="title" scope="session"><tiles:getAsString name="title"/></c:set>

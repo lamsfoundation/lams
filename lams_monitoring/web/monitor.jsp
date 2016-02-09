@@ -6,7 +6,7 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <lams:html>
 <lams:head>
 

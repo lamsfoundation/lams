@@ -2,7 +2,7 @@
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<html:base/>

@@ -7,7 +7,7 @@
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<c:choose>

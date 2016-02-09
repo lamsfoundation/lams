@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="title.import" /></title>
