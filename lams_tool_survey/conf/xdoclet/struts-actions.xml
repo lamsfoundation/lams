@@ -261,7 +261,16 @@
 			parameter="listAnswers" >
 			<forward name="success" path="/pages/monitoring/listanswers.jsp" />
 		</action>
+		<action path="/monitoring/getAnswersJSON"
+			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
+			parameter="getAnswersJSON" >
+		</action>
 		
+		<action path="/monitoring/listReflections"
+			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
+			parameter="listReflections">
+			<forward name="success" path="/pages/monitoring/listreflections.jsp" />
+		</action>
 		<action path="/monitoring/viewReflection"
 			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
 			parameter="viewReflection">

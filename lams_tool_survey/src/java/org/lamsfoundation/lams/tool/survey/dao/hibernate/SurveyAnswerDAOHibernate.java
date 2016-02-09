@@ -45,6 +45,11 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 	    + SurveyAnswer.class.getName() + " AS r "
 	    + "WHERE r.user.session.sessionId=? AND r.surveyQuestion.uid=? AND r.answerText<>''";
 
+    private static final String GET_COUNT_RESPONSES_FOR_SESSION_QUESTION_CHOICE = "SELECT COUNT(*) FROM "
+	    + SurveyAnswer.class.getName() + " AS r "
+	    + " WHERE r.user.session.sessionId=? AND r.surveyQuestion.uid=? "
+	    + " AND ( r.answerChoices like ? OR r.answerChoices like ? )";
+
     @Override
     public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
 	List list = getHibernateTemplate().find(GET_LEARNER_ANSWER, new Object[] { questionUid, userUid });
@@ -96,4 +101,22 @@ public class SurveyAnswerDAOHibernate extends BaseDAOHibernate implements Survey
 	}
 	return ((Number) list.get(0)).intValue();
     }
+    
+    /** Get a count of the number of times this particular choice has been selected for this question. */
+    @SuppressWarnings("rawtypes")
+    public Integer getAnswerCount(Long sessionId, Long questionId, String choice) {
+	
+	String choice1 = choice+"&%";
+	String choice2 = "%&"+choice1;
+
+	String sql = GET_COUNT_RESPONSES_FOR_SESSION_QUESTION_CHOICE;
+	List list = getHibernateTemplate().find(sql,
+		new Object[] { sessionId, questionId, choice1, choice2 });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
+    }
+
+
 }
