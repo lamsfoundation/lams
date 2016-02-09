@@ -31,6 +31,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
+import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 
 public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUserDAO {
@@ -140,6 +141,22 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	    return 0;
 	}
 	return ((Number) list.get(0)).intValue();
+    }
+    
+    private static final String GET_STATISTICS = "SELECT session.*, COUNT(*) numUsers "
+		+ "  FROM tl_lasurv11_session session, tl_lasurv11_survey survey, tl_lasurv11_user user "
+		+ "  WHERE survey.content_id = :contentId and session.survey_uid = survey.uid  and user.session_uid = session.uid "
+		+ "  GROUP BY session.session_id";
+ 
+    @SuppressWarnings("unchecked")
+    /** Returns < [surveySession, numUsers] ...  [surveySession, numUsers]> */
+    public List<Object[]> getStatisticsBySession(final Long contentId) {
+
+	SQLQuery query = getSession().createSQLQuery(GET_STATISTICS);
+	query.addEntity(SurveySession.class)
+		.addScalar("numUsers", Hibernate.INTEGER)
+		.setLong("contentId", contentId);
+	return query.list();
     }
 
 }
