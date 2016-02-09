@@ -1,17 +1,17 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 
-<c:if test="${empty summaryList}">
+<c:if test="${empty sessionDtos}">
 	<div align="center">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 	</div>
 </c:if>
 
 <c:out value="${sessionMap.isGroupedActivity}"/>
-<c:forEach var="summary" items="${summaryList}">
+<c:forEach var="sessionDto" items="${sessionDtos}">
 	<%-- display group name on first row--%>
-	<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>	
+	<h1><fmt:message key="monitoring.label.group" /> ${sessionDto.sessionName}	</h1>	
 		
 	<table cellspacing="3" class="alternative-color small-space-top">
 		<tr>
@@ -26,7 +26,7 @@
 			</th>
 		</tr>
 		
-		<c:forEach var="item" items="${summary.taskListItems}" varStatus="status">
+		<c:forEach var="item" items="${sessionDto.taskListItems}" varStatus="status">
 	
 			<c:if test="${item.uid == -1}">
 				<tr>
@@ -46,7 +46,7 @@
 						<c:out value="${item.createBy.loginName}" escapeXml="true"/>
 					</td>
 					<td align="center">
-						${summary.visitNumbers[status.index]}
+						${sessionDto.visitNumbers[status.index]}
 					</td>
 				</tr>
 			</c:if>
@@ -54,6 +54,3 @@
 	
 	</table>	
 </c:forEach>
-	
-	
-
