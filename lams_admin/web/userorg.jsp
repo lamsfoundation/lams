@@ -1,10 +1,28 @@
 <%@ include file="/taglibs.jsp"%>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
+<style>
+	.listBoundingBox {
+		border:thin solid #c1c1c1;
+		margin-left:5px;
+	}
+	p {
+		margin-left:5px;
+	}
+	.listScrollable {
+		margin:5px; 
+		height:250px; 
+		overflow-y:auto;
+	}
+	.floatRight {
+		float:right;
+		margin-top:5px;
+	}
+</style>
+
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 <script>
 	var removedUsers = [];
 
-	<!--
 	jQuery(document).ready(function() {
 		jQuery("div#existing").load(
 			"user/basiclist.do", 
@@ -109,27 +127,7 @@
 		});
 		return true;
 	}
-	//-->
 </script>
-
-<style>
-.listBoundingBox {
-	border:thin solid #c1c1c1;
-	margin-left:5px;
-}
-p {
-	margin-left:5px;
-}
-.listScrollable {
-	margin:5px; 
-	height:250px; 
-	overflow-y:auto;
-}
-.floatRight {
-	float:right;
-	margin-top:5px;
-}
-</style>
 
 <h4 class="align-left">
 	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
