@@ -152,55 +152,16 @@
 			<c:if test="${queStatus.last}">
 				</table>
 			</c:if>
-				<%-- Reflection list  --%>
-				<c:if test="${sessionMap.survey.reflectOnActivity && queStatus.last}">
-					<c:set var="userList" value="${sessionMap.reflectList[surveySession.sessionId]}"/>
-					<c:forEach var="user" items="${userList}" varStatus="refStatus">
-						<c:if test="${refStatus.first}">
-							<table cellpadding="0"  class="alternative-color">
-							<tr>
-								<td colspan="5">
-									<h2><fmt:message key="title.reflection"/>	</h2>
-								</td>
-							</tr>
-							<tr>
-								<th colspan="2">
-									<fmt:message key="monitoring.user.fullname"/>
-								</th>
-								<th colspan="2">
-									<fmt:message key="monitoring.label.user.loginname"/>
-								</th>
-								<th>
-									<fmt:message key="monitoring.user.reflection"/>
-								</th>
-							</tr>
-						</c:if>
-						<tr>
-							<td colspan="2">
-								<c:out value="${user.fullName}" escapeXml="true"/>
-							</td>
-							<td colspan="2">
-								<c:out value="${user.loginName}" escapeXml="true"/>
-							</td>
-							<td >
-								<c:set var="viewReflection">
-									<c:url value="/monitoring/viewReflection.do?toolSessionID=${surveySession.sessionId}&userUid=${user.userUid}"/>
-								</c:set>
-								<html:link href="javascript:launchPopup('${viewReflection}')">
-									<fmt:message key="label.view" />
-								</html:link>
-							</td>
-						</tr>
-						<c:if test="${refStatus.last}">
-							</table>
-						</c:if>
-					</c:forEach>
-				</c:if>
-
 		</c:forEach>
 			<table>		
 					<tr>
 						<td >
+							<c:if test="${sessionMap.survey.reflectOnActivity}">
+								<c:set var="listReflections"><c:url value="/monitoring/listReflections.do?toolSessionID=${surveySession.sessionId}"/></c:set>
+								<html:link href="javascript:launchPopup('${listReflections}')" styleClass="button">
+									<fmt:message key="page.title.monitoring.view.reflection" />
+								</html:link>
+							</c:if>	
 							<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="button">
 									<fmt:message key="label.monitoring.button.export.excel" />
 							</html:link>

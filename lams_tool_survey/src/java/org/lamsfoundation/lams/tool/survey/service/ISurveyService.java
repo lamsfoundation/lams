@@ -280,6 +280,16 @@ public interface ISurveyService {
      */
     Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
+    /**
+     * Get Reflect DTO set for session. Called by getReflectList(contentId, setEntry) so has same 
+     * effect as calling getReflectList(contentId, setEntry)
+     * and pulling out a single session.
+     * 
+     * @param contentId
+     * @return
+     */
+    Set<ReflectDTO> getReflectList(Long sessionId, boolean setEntry, boolean hasReflection);
+    
     void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser);
 
     /**
@@ -301,4 +311,14 @@ public interface ISurveyService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /** Gets the Answer information for the monitoring listAnswers tablesorter. 
+     * Will return List<[SurveyUser, String, String], [SurveyUser, String, String], ... , [SurveyUser, String, String]>
+     * where the first String is answer choices (for multiple choice) and the second String is the answer text for
+     * free entry choice.
+     */
+  List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId,
+	    int page, int size, int sorting, String searchString);
+    int getCountUsersBySession(final Long sessionId, String searchString);
+
 }
