@@ -217,6 +217,7 @@ public class MonitoringAction extends Action {
 
 	//return user list according to the given sessionID
 	ISurveyService service = getSurveyService();
+	SurveyQuestion question = service.getQuestion(questionUid);
 	List<Object[]> users = service.getQuestionAnswersForTablesorter(sessionId, questionUid, page, size, sorting, searchString);
 	
 	JSONArray rows = new JSONArray();
@@ -234,7 +235,19 @@ public class MonitoringAction extends Action {
 		responseRow.put("choices", SurveyWebUtils.getChoiceList((String)userAndAnswers[1]));
 	    } 
 	    if ( userAndAnswers.length > 2 && userAndAnswers[2] != null) {
-		responseRow.put("answerText", (String)userAndAnswers[2]); // was escaped before storing in database
+		// Data is handled differently in learner depending on whether it is an extra text added
+		// to a multiple choice, or a free text entry. So need to handle the output differently.
+		// See learner/result.jsp and its handling of question.type == 3 vs question.appendText 
+		String answer;
+		if ( question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY )  {
+		    // don't escape as it was escaped & BR'd before saving
+		    answer = (String)userAndAnswers[2];
+		} else {
+		    // need to escape it, as it isn't escaped in the database
+		    answer = StringEscapeUtils.escapeHtml((String)userAndAnswers[2]);
+		    answer.replaceAll("\n", "<br>");
+		}
+		responseRow.put("answerText", answer);
 	    } 
 	    rows.put(responseRow);
 	}
