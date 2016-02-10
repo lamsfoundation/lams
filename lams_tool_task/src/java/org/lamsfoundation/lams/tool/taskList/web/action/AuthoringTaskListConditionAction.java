@@ -114,7 +114,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_RESOURCE_FORM);
+	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_TASKLIST_FORM);
 
 	TaskListForm taskListForm = (TaskListForm) form;
 	try {
@@ -328,7 +328,7 @@ public class AuthoringTaskListConditionAction extends Action {
     private ITaskListService getTaskListService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
-	return (ITaskListService) wac.getBean(TaskListConstants.RESOURCE_SERVICE);
+	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
 
     /**
@@ -355,10 +355,10 @@ public class AuthoringTaskListConditionAction extends Action {
      */
     private SortedSet<TaskListItem> getTaskListItemList(SessionMap sessionMap) {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
-		.get(TaskListConstants.ATTR_RESOURCE_ITEM_LIST);
+		.get(TaskListConstants.ATTR_TASKLIST_ITEM_LIST);
 	if (list == null) {
 	    list = new TreeSet<TaskListItem>(new TaskListItemComparator());
-	    sessionMap.put(TaskListConstants.ATTR_RESOURCE_ITEM_LIST, list);
+	    sessionMap.put(TaskListConstants.ATTR_TASKLIST_ITEM_LIST, list);
 	}
 	return list;
     }

@@ -350,7 +350,7 @@ public class LearningAction extends Action {
 
 	}
 
-	sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
+	sessionMap.put(TaskListConstants.ATTR_TASKLIST, taskList);
 
 	return mapping.findForward(TaskListConstants.SUCCESS);
     }
@@ -399,7 +399,7 @@ public class LearningAction extends Action {
 
 	// auto run mode, when use finish the only one taskList item, mark it as complete then finish this activity as
 	// well.
-	String taskListItemUid = request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID);
+	String taskListItemUid = request.getParameter(TaskListConstants.PARAM_ITEM_UID);
 	if (taskListItemUid != null) {
 	    doComplete(request);
 	    // NOTE:So far this flag is useless(31/08/2006).
@@ -481,7 +481,7 @@ public class LearningAction extends Action {
 	item.setCreateBy(taskListUser);
 
 	// setting SequenceId
-	TaskList taskList = (TaskList) sessionMap.get(TaskListConstants.ATTR_RESOURCE);
+	TaskList taskList = (TaskList) sessionMap.get(TaskListConstants.ATTR_TASKLIST);
 	Set<TaskListItem> taskListItems = taskList.getTaskListItems();
 	int maxSeq = 0;
 	for (TaskListItem dbItem : taskListItems) {
@@ -533,7 +533,7 @@ public class LearningAction extends Action {
 	comment.setCreateDate(new Timestamp(new Date().getTime()));
 
 	// persist TaskListItem changes in DB
-	Long itemUid = new Long(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
+	Long itemUid = new Long(request.getParameter(TaskListConstants.PARAM_ITEM_UID));
 	TaskListItem dbItem = service.getTaskListItemByUid(itemUid);
 	Set<TaskListItemComment> dbComments = dbItem.getComments();
 	dbComments.add(comment);
@@ -589,7 +589,7 @@ public class LearningAction extends Action {
 	TaskListItemAttachment att = service.uploadTaskListItemFile(file, taskListUser);
 
 	// persist TaskListItem changes in DB
-	Long itemUid = new Long(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
+	Long itemUid = new Long(request.getParameter(TaskListConstants.PARAM_ITEM_UID));
 	TaskListItem dbItem = service.getTaskListItemByUid(itemUid);
 	Set<TaskListItemAttachment> dbAttachments = dbItem.getAttachments();
 	dbAttachments.add(att);
@@ -690,7 +690,7 @@ public class LearningAction extends Action {
     private ITaskListService getTaskListService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
-	return (ITaskListService) wac.getBean(TaskListConstants.RESOURCE_SERVICE);
+	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
 
     private TaskListUser getCurrentUser(ITaskListService service, Long sessionId) {
@@ -701,7 +701,7 @@ public class LearningAction extends Action {
 	TaskListUser taskListUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
 
 	if (taskListUser == null) {
-	    TaskListSession session = service.getTaskListSessionBySessionId(sessionId);
+	    TaskListSession session = service.getSessionBySessionId(sessionId);
 	    taskListUser = new TaskListUser(user, session);
 	    service.createUser(taskListUser);
 	}
@@ -764,7 +764,7 @@ public class LearningAction extends Action {
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	Long taskListItemUid = new Long(request.getParameter(TaskListConstants.PARAM_RESOURCE_ITEM_UID));
+	Long taskListItemUid = new Long(request.getParameter(TaskListConstants.PARAM_ITEM_UID));
 	ITaskListService service = getTaskListService();
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO

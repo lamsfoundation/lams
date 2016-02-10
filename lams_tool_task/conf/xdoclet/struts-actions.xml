@@ -254,18 +254,14 @@
 			parameter="setVerifiedByMonitor">
 			<forward name="success" redirect="true" path="/monitoring/summary.do" />
 		</action>
-		<action path="/monitoring/listuser"
+		<action path="/monitoring/getPagedUsers"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
-			parameter="listuser" >
-			<forward name="success" path="/pages/monitoring/userlist.jsp" />
+			parameter="getPagedUsers" >
 		</action>
-		
-		<action path="/monitoring/viewReflection"
+		<action path="/monitoring/getPagedUsersByItem"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/parts/notebook.jsp" />
+			parameter="getPagedUsersByItem" >
 		</action>
-		
 		<action path="/monitoring/setSubmissionDeadline"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
 			parameter="setSubmissionDeadline" >

@@ -25,87 +25,93 @@
 package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
+
 /**
  * TaskList
- * @author Dapeng Ni
+ * 
+ * @author Andrey Balan
  *
- * @hibernate.class  table="tl_latask10_item_log"
- *
+ * @hibernate.class table="tl_latask10_item_log"
  */
 public class TaskListItemVisitLog {
 
-	private Long uid;
-	private TaskListUser user;
-	private TaskListItem taskListItem;
-	private boolean complete;
-	private Date accessDate;
-	private Long sessionId;
-	
-	/**
-	 * @hibernate.property column="access_date"
-	 * @return
-	 */
-	public Date getAccessDate() {
-		return accessDate;
-	}
-	public void setAccessDate(Date accessDate) {
-		this.accessDate = accessDate;
-	}
-	/**
-	 * @hibernate.many-to-one  column="taskList_item_uid"
- 	 * cascade="none"
-	 * @return
-	 */
-	public TaskListItem getTaskListItem() {
-		return taskListItem;
-	}
-	public void setTaskListItem(TaskListItem item) {
-		this.taskListItem = item;
-	}
-	
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * @return Returns the log Uid.
-	 */
-	public Long getUid() {
-		return uid;
-	}
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-	/**
-	 * @hibernate.many-to-one  column="user_uid"
- 	 * cascade="save-update"
-	 * @return
-	 */
-	public TaskListUser getUser() {
-		return user;
-	}
-	public void setUser(TaskListUser user) {
-		this.user = user;
-	}
-	/**
-	 * @hibernate.property column="complete"
-	 * @return
-	 */
-	public boolean isComplete() {
-		return complete;
-	}
-	public void setComplete(boolean complete) {
-		this.complete = complete;
-	}
-	/**
-	 * @hibernate.property column="session_id"
-	 * @return
-	 */
-	public Long getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
-	}
+    private Long uid;
+    private TaskListUser user;
+    private TaskListItem taskListItem;
+    private boolean complete;
+    private Date accessDate;
+    private Long sessionId;
 
+    /**
+     * @hibernate.property column="access_date"
+     * @return
+     */
+    public Date getAccessDate() {
+	return accessDate;
+    }
 
-	
-	
+    public void setAccessDate(Date accessDate) {
+	this.accessDate = accessDate;
+    }
+
+    /**
+     * @hibernate.many-to-one column="taskList_item_uid" cascade="none"
+     * @return
+     */
+    public TaskListItem getTaskListItem() {
+	return taskListItem;
+    }
+
+    public void setTaskListItem(TaskListItem item) {
+	this.taskListItem = item;
+    }
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @return Returns the log Uid.
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * @hibernate.many-to-one column="user_uid" cascade="save-update"
+     * @return
+     */
+    public TaskListUser getUser() {
+	return user;
+    }
+
+    public void setUser(TaskListUser user) {
+	this.user = user;
+    }
+
+    /**
+     * @hibernate.property column="complete"
+     * @return
+     */
+    public boolean isComplete() {
+	return complete;
+    }
+
+    public void setComplete(boolean complete) {
+	this.complete = complete;
+    }
+
+    /**
+     * @hibernate.property column="session_id"
+     * @return
+     */
+    public Long getSessionId() {
+	return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+	this.sessionId = sessionId;
+    }
+
 }
