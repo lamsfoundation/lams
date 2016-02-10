@@ -6,7 +6,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css style="tabbed" />
+		<lams:css style="main" />
 
 		<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 		<%-- user for  surveysurveyitem.js --%>

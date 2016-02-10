@@ -15,7 +15,7 @@
 
 <lams:html>
 <lams:head>
-	<lams:css style="tabbed"/>
+	<lams:css style="main"/>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<title><fmt:message key="activity.title" /></title>

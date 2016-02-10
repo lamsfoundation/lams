@@ -10,10 +10,10 @@
 <!-- ********************  CSS ********************** -->
 <c:choose>
 	<c:when test="${not empty localLinkPath}">
-		<lams:css localLinkPath="${localLinkPath}"  style="tabbed"/>
+		<lams:css localLinkPath="${localLinkPath}"  style="main"/>
 	</c:when>
 	<c:otherwise>
-		<lams:css style="tabbed"/>
+		<lams:css style="main"/>
 	</c:otherwise>
 </c:choose>
 

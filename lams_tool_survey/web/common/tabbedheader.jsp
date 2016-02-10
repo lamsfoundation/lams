@@ -4,7 +4,7 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
  	<!-- ********************  CSS ********************** -->
-	<lams:css style="tabbed"/>
+	<lams:css style="main"/>
 
 
  	<!-- ********************  javascript ********************** -->

@@ -5,7 +5,7 @@
 
  	<!-- ********************  CSS ********************** -->
 	<link href="<c:url value='/includes/css/daco.css'/>" rel="stylesheet" type="text/css">
-	<lams:css style="tabbed"/>
+	<lams:css style="main"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css"> 
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css"> 
 
