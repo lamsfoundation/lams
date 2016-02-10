@@ -43,7 +43,7 @@ public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements Scr
 
 	private static final String FIND_FIRST_SCRATCHED_ANSWER_BY_SESSION_AND_ITEM = "SELECT r.scratchieAnswer from "
 			+ ScratchieAnswerVisitLog.class.getName()
-			+ " as r where r.sessionId=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc;";
+			+ " as r where r.sessionId=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc";
 
 	private static final String FIND_BY_SESSION = "from " + ScratchieAnswerVisitLog.class.getName()
 			+ " as r where r.sessionId=? order by r.accessDate asc";
