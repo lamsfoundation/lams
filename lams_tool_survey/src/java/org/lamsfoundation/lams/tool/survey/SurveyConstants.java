@@ -169,6 +169,8 @@ public class SurveyConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
     
     public static final String ATTR_COUNT_FINISHED_USERS = "countFinishedUser";
+    
+    public static final String ATTR_REFLECTION = "notebookEntry";
 
     public static final int SORT_BY_DEAFAULT = 0;
     public static final int SORT_BY_ANSWER_ASC = 1;

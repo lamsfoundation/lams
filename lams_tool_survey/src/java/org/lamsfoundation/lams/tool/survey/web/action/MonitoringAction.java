@@ -58,6 +58,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
@@ -108,8 +109,8 @@ public class MonitoringAction extends Action {
 	if (param.equals("listReflections")) {
 	    return listReflections(mapping, form, request, response);
 	}
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
+	if (param.equals("getReflectionsJSON")) {
+	    return getReflectionsJSON(mapping, form, request, response);
 	}
 
 	if (param.equals("exportSurvey")) {
@@ -222,18 +223,18 @@ public class MonitoringAction extends Action {
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
 
-	for (Object[] userAndReflection : users) {
+	for (Object[] userAndAnswers: users) {
 
 	    JSONObject responseRow = new JSONObject();
 	    
-	    SurveyUser user = (SurveyUser) userAndReflection[0];
+	    SurveyUser user = (SurveyUser) userAndAnswers[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 
-	    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put("choices", SurveyWebUtils.getChoiceList((String)userAndReflection[1]));
+	    if ( userAndAnswers.length > 1 && userAndAnswers[1] != null) {
+		responseRow.put("choices", SurveyWebUtils.getChoiceList((String)userAndAnswers[1]));
 	    } 
-	    if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put("answerText", StringEscapeUtils.escapeHtml((String)userAndReflection[2]));
+	    if ( userAndAnswers.length > 2 && userAndAnswers[2] != null) {
+		responseRow.put("answerText", (String)userAndAnswers[2]); // was escaped before storing in database
 	    } 
 	    rows.put(responseRow);
 	}
@@ -251,39 +252,53 @@ public class MonitoringAction extends Action {
 	ISurveyService service = getSurveyService();
 	Survey survey = service.getSurveyBySessionId(sessionId);
 	
-	Set<ReflectDTO> reflectList = getSurveyService().getReflectList(sessionId, false, survey.isReflectOnActivity());
-	request.setAttribute(SurveyConstants.ATTR_REFLECT_LIST, reflectList);
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
     
-    private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    private ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	Long uid = WebUtil.readLongParam(request, SurveyConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	String searchString = request.getParameter("fcol[0]"); 
+	
+	int sorting = SurveyConstants.SORT_BY_DEAFAULT;
+	if ( sortByName != null ) 
+	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC; 
 
+	//return user list according to the given sessionID
 	ISurveyService service = getSurveyService();
-	SurveyUser user = service.getUser(uid);
-	NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SurveyConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+	List<Object[]> users = service.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString);
+	
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
 
-	SurveySession session = service.getSurveySessionBySessionId(sessionID);
+	for (Object[] userAndReflection : users) {
 
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
+	    JSONObject responseRow = new JSONObject();
+	    
+	    SurveyUser user = (SurveyUser) userAndReflection[0];
+	    responseRow.put(SurveyConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+
+	    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
+		String reflection = StringEscapeUtils.escapeHtml((String)userAndReflection[1]);
+		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
+	    }
+		
+	    rows.put(responseRow);
 	}
-	refDTO.setReflectInstrctions(session.getSurvey().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
-	return mapping.findForward("success");
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
     }
-
+    
     /**
      * Export Excel format survey data.
      * 

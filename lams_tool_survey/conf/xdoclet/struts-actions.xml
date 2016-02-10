@@ -271,10 +271,9 @@
 			parameter="listReflections">
 			<forward name="success" path="/pages/monitoring/listreflections.jsp" />
 		</action>
-		<action path="/monitoring/viewReflection"
+		<action path="/monitoring/getReflectionsJSON"
 			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/notebook.jsp" />
+			parameter="getReflectionsJSON">
 		</action>
 		
 		<action path="/monitoring/exportSurvey"

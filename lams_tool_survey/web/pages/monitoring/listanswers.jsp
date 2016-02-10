@@ -84,7 +84,12 @@
 								
 							<c:if test="${question.appendText || question.type==3}">
 							rows += '<td>';
-							rows += userData["answerText"];
+							if ( userData["answerText"] ) {
+								rows += userData["answerText"];
+							} else {
+								rows += '-';
+							}
+ 
 							rows += '</td>';
 							</c:if>
 															
@@ -114,7 +119,7 @@
   	})
 </script>
 </lams:head>
-<body>
+<body class="stripes">
 		<div id="content">
 		<h1>
 			<fmt:message key="title.chart.report"/>

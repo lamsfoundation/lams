@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
@@ -143,6 +144,50 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	return ((Number) list.get(0)).intValue();
     }
     
+    @SuppressWarnings("unchecked")
+    /** Will return List<[SurveyUser, String (notebook entry)], [SurveyUser, String (notebook entry)], ... , [SurveyUser, String (notebook entry)]>
+     */
+    public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString, ICoreNotebookService coreNotebookService) {
+	String sortingOrder;
+	switch (sorting) {
+	case SurveyConstants.SORT_BY_NAME_ASC:
+	    sortingOrder = "user.last_name ASC, user.first_name ASC";
+	    break;
+	case SurveyConstants.SORT_BY_NAME_DESC:
+	    sortingOrder = "user.last_name DESC, user.first_name DESC";
+	    break;
+	default:
+	    sortingOrder = "user.uid";
+	}
+
+	// If the session uses notebook, then get the sql to join across to get the entries
+	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
+		SurveyConstants.TOOL_SIGNATURE, "user.user_id");
+
+	// Basic select for the user records
+	StringBuilder queryText = new StringBuilder();
+	queryText.append("SELECT user.* ");
+	queryText.append(notebookEntryStrings[0]);
+	queryText.append(" FROM tl_lasurv11_user user ");
+	queryText
+		.append(" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId ");
+
+	// Add the notebook join
+	queryText.append(notebookEntryStrings[1]);
+
+	// If filtering by name add a name based where clause
+	buildNameSearch(searchString, queryText);
+
+	// Now specify the sort based on the switch statement above.
+	queryText.append(" ORDER BY " + sortingOrder);
+
+	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	query.addEntity("user", SurveyUser.class).addScalar("notebookEntry", Hibernate.STRING)
+		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+	return query.list();
+    }
+
     private static final String GET_STATISTICS = "SELECT session.*, COUNT(*) numUsers "
 		+ "  FROM tl_lasurv11_session session, tl_lasurv11_survey survey, tl_lasurv11_user user "
 		+ "  WHERE survey.content_id = :contentId and session.survey_uid = survey.uid  and user.session_uid = session.uid "
