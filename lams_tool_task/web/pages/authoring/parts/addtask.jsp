@@ -38,7 +38,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css style="tabbed" />
+		<lams:css style="main" />
 
 	</lams:head>
 	<body class="tabpart">

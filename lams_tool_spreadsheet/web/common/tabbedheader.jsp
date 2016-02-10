@@ -5,7 +5,7 @@
 
  <!-- ********************  CSS ********************** -->
 <link href="<html:rewrite page='/includes/css/spreadsheet.css'/>" rel="stylesheet" type="text/css">
-<lams:css style="tabbed"/>
+<lams:css style="main"/>
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

@@ -5,7 +5,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css style="tabbed" />
+		<lams:css style="main" />
 		<script type="text/javascript">
 		   <%-- user for  rsrcresourceitem.js --%>
 		   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";

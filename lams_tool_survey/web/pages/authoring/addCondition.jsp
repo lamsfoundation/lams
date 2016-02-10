@@ -6,7 +6,7 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-		<lams:css style="tabbed" />
+		<lams:css style="main" />
 		<script type="text/javascript"> 
 			function callHideConditionMessage() {
 				try {

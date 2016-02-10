@@ -14,7 +14,7 @@
 		</title>
 		<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
 		<lams:headItems />
-		<lams:css style="tabbed" />
+		<lams:css style="main" />
 		
 		<script type="text/javascript"> 
 			function callHideConditionMessage() {

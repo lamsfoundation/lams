@@ -5,7 +5,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css style="tabbed" />
+		<lams:css style="main" />
 		
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>

@@ -4,7 +4,7 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
  <!-- ********************  CSS ********************** -->
-<lams:css style="tabbed"/>
+<lams:css style="main"/>
 <link href="<html:rewrite page='/includes/css/peerreview.css'/>" rel="stylesheet" type="text/css">
 
 <!-- ********************  javascript ********************** -->

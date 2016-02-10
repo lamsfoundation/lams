@@ -13,7 +13,7 @@
 			<fmt:message key="activity.title" />
 		</title>
 		<lams:headItems />
-		<lams:css style="tabbed" />
+		<lams:css style="main" />
 		<script type="text/javascript"> 
 			function callHideConditionMessage() {
 				try {

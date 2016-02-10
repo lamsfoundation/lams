@@ -5,7 +5,7 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-	<lams:css style="tabbed" />
+	<lams:css style="main" />
 	<!-- To use in external script files. -->
 	<script type="text/javascript">
 	   var msgShowAdditionalOptions = "<fmt:message key='label.authoring.basic.additionaloptions.show' />";

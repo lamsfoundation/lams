@@ -7,7 +7,7 @@
         <%@ include file="/common/header.jsp"%>
         <%@ include file="/includes/jsp/qaWizardCommon.jsp"%>
         
-        <lams:css style="tabbed" />		
+        <lams:css style="main" />		
         <link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>

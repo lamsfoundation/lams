@@ -18,7 +18,7 @@
 	<%-- It contains users info divided into sessions. --%>
 	<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
 
-	<lams:css style="tabbed" />
+	<lams:css style="main" />
 	<%-- To enable the table to have maximum height.  --%>
 	<style type="text/css">
 		html,body {
