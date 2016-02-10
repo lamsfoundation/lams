@@ -1455,6 +1455,39 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	ExcelCell[][] fourthPageData = rowList.toArray(new ExcelCell[][] {});
 	dataToExport.put(getMessage("label.spss.analysis"), fourthPageData);
+	
+	// ======================================================= Burning questions page
+	// =======================================
+	
+	if (scratchie.isBurningQuestionsEnabled()) {
+	    rowList = new LinkedList<ExcelCell[]>();
+
+	    row = new ExcelCell[1];
+	    row[0] = new ExcelCell(getMessage("label.burning.questions"), true);
+	    rowList.add(row);
+	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+
+	    List<BurningQuestionDTO> burningQuestionDtos = getBurningQuestionDtos(scratchie);
+	    for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
+		ScratchieItem item = burningQuestionDto.getItem();
+		row = new ExcelCell[1];
+		row[0] = new ExcelCell(item.getTitle(), false);
+		rowList.add(row);
+		
+		Map<String, String> groupNameToBurningQuestion = burningQuestionDto.getGroupNameToBurningQuestion();
+		for (String groupName : groupNameToBurningQuestion.keySet()) {
+		    String burningQuestion = groupNameToBurningQuestion.get(groupName);
+		    row = new ExcelCell[2];
+		    row[0] = new ExcelCell(groupName, false);
+		    row[1] = new ExcelCell(burningQuestion, false);
+		    rowList.add(row);
+		}
+		rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	    }
+
+	    ExcelCell[][] fifthPageData = rowList.toArray(new ExcelCell[][] {});
+	    dataToExport.put(getMessage("label.burning.questions"), fifthPageData);
+	}
 
 	return dataToExport;
     }
