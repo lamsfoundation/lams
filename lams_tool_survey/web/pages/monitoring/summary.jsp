@@ -157,7 +157,7 @@
 					<tr>
 						<td >
 							<c:if test="${sessionMap.survey.reflectOnActivity}">
-								<c:set var="listReflections"><c:url value="/monitoring/listReflections.do?toolSessionID=${surveySession.sessionId}"/></c:set>
+								<c:set var="listReflections"><c:url value="/pages/monitoring/listreflections.jsp?toolSessionID=${surveySession.sessionId}"/></c:set>
 								<html:link href="javascript:launchPopup('${listReflections}')" styleClass="button">
 									<fmt:message key="page.title.monitoring.view.reflection" />
 								</html:link>

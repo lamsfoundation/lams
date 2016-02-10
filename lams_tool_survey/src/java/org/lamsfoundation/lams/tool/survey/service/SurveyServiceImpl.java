@@ -40,7 +40,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
@@ -241,36 +240,35 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
 	for (SurveySession session : sessionList) {
 	    Long sessionId = session.getSessionId();
-	    boolean hasReflection = session.getSurvey().isReflectOnActivity();
-	    Set<ReflectDTO> list = getReflectList(sessionId, setEntry, hasReflection);
+	    boolean hasRefection = session.getSurvey().isReflectOnActivity();
+	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+	    // get all users in this session
+	    List<SurveyUser> users = surveyUserDao.getBySessionID(sessionId);
+	    for (SurveyUser user : users) {
+		ReflectDTO ref = new ReflectDTO(user);
+
+		if (setEntry) {
+		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+			    SurveyConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		    if (entry != null) {
+			ref.setReflect(entry.getEntry());
+		    }
+		}
+
+		ref.setHasRefection(hasRefection);
+		list.add(ref);
+	    }
 	    map.put(sessionId, list);
 	}
 
 	return map;
     }
 
-    @Override
-    public Set<ReflectDTO> getReflectList(Long sessionId, boolean setEntry, boolean hasReflection) {
-	Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-	// get all users in this session
-	List<SurveyUser> users = surveyUserDao.getBySessionID(sessionId);
-	for (SurveyUser user : users) {
-	    ReflectDTO ref = new ReflectDTO(user);
-
-	    if (setEntry) {
-		NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			SurveyConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if (entry != null) {
-		    ref.setReflect(entry.getEntry());
-		}
-	    }
-
-	    ref.setHasRefection(hasReflection);
-	    list.add(ref);
-	}
-	return list;
+    public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString) {
+	return surveyUserDao.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString, coreNotebookService);
     }
-
+	    
     @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {

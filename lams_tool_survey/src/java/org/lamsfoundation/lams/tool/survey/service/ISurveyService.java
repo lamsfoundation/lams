@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
@@ -280,16 +281,9 @@ public interface ISurveyService {
      */
     Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
-    /**
-     * Get Reflect DTO set for session. Called by getReflectList(contentId, setEntry) so has same 
-     * effect as calling getReflectList(contentId, setEntry)
-     * and pulling out a single session.
-     * 
-     * @param contentId
-     * @return
-     */
-    Set<ReflectDTO> getReflectList(Long sessionId, boolean setEntry, boolean hasReflection);
-    
+    List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString);
+	    
     void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser);
 
     /**
