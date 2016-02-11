@@ -142,6 +142,7 @@ import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * Export tool content service bean.
@@ -482,6 +483,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    // exporting XML
 	    XStream designXml = new XStream(new SunUnsafeReflectionProvider());
+	    designXml.addPermission(AnyTypePermission.ANY);
 	    designXml.toXML(ldDto, ldFile);
 	    ldFile.close();
 
@@ -556,6 +558,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    // serialize tool xml into local file.
 	    XStream toolXml = new XStream(new SunUnsafeReflectionProvider());
+	    toolXml.addPermission(AnyTypePermission.ANY);
 	    FileConverter fileConverter = null;
 	    if (!fileHandleClassList.isEmpty()) {
 		fileConverter = new FileConverter(toolXml);
@@ -902,6 +905,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	Object toolPOJO = null;
 	// change xml to Tool POJO
 	XStream toolXml = new XStream(new SunUnsafeReflectionProvider());
+	toolXml.addPermission(AnyTypePermission.ANY);
 	FileConverter fileConverter = null;
 	if (!fileHandleClassList.isEmpty()) {
 	    fileConverter = new FileConverter(toolXml);

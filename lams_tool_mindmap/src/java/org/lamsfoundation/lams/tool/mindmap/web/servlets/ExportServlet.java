@@ -176,9 +176,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), 
 		    mindmap.getUid(), rootNodeModel, mindmapUser);
 
-	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
-	    xstream.alias("branch", NodeModel.class);
-	    String mindmapContent = xstream.toXML(currentNodeModel);
+	    String mindmapContent = mindmapService.getXStream().toXML(currentNodeModel);
 
 	    try {
 		File mindmapFile = new File(path);
