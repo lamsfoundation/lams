@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.survey.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 
 public interface SurveyAnswerDAO extends DAO {
@@ -39,7 +38,11 @@ public interface SurveyAnswerDAO extends DAO {
      * @return
      */
     List<SurveyAnswer> getSessionAnswer(Long sessionId, Long questionUid);
+    
+    /** Get a count of the number of times this particular choice has been selected for this question. */
+    Integer getAnswerCount(Long sessionId, Long questionUid, String choice);
 
+    
     List<SurveyAnswer> getByToolContentIdAndUserId(Long toolContentId, Long userId);
 
     List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid, int page, int size,

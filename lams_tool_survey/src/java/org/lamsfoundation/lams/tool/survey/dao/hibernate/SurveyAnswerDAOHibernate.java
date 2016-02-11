@@ -48,6 +48,11 @@ public class SurveyAnswerDAOHibernate extends LAMSBaseDAO implements SurveyAnswe
 	    + SurveyAnswer.class.getName() + " AS r "
 	    + "WHERE r.user.session.sessionId=? AND r.surveyQuestion.uid=? AND r.answerText<>''";
 
+    private static final String GET_COUNT_RESPONSES_FOR_SESSION_QUESTION_CHOICE = "SELECT COUNT(*) FROM "
+	    + SurveyAnswer.class.getName() + " AS r "
+	    + " WHERE r.user.session.sessionId=? AND r.surveyQuestion.uid=? "
+	    + " AND ( r.answerChoices like ? OR r.answerChoices like ? )";
+
     @Override
     public SurveyAnswer getAnswer(Long questionUid, Long userUid) {
 	List list = doFind(GET_LEARNER_ANSWER, new Object[] { questionUid, userUid });
@@ -69,26 +74,26 @@ public class SurveyAnswerDAOHibernate extends LAMSBaseDAO implements SurveyAnswe
 		new Object[] { toolContentId, userId });
     }
 
-	@Override
-	public List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid, final int page,
-			final int size, final int sorting) {
-		String sortingOrder = "";
-		switch (sorting) {
-		case SurveyConstants.SORT_BY_DEAFAULT:
-			sortingOrder = "r.updateDate";
-			break;
-		case SurveyConstants.SORT_BY_ANSWER_ASC:
-			sortingOrder = "r.answerText ASC";
-			break;
-		case SurveyConstants.SORT_BY_ANSWER_DESC:
-			sortingOrder = "r.answerText DESC";
-			break;
-		}
-		final String sqlQuery = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder;
-
-		return (List<String>) getSession().createQuery(sqlQuery).setLong("sessionId", sessionId.longValue())
-				.setLong("questionUid", questionUid.longValue()).setFirstResult(page * size).setMaxResults(size).list();
+    @Override
+    public List<String> getOpenResponsesForTablesorter(final Long sessionId, final Long questionUid, int page,
+	    int size, int sorting) {
+	String sortingOrder = "";
+	switch (sorting) {
+	case SurveyConstants.SORT_BY_DEAFAULT:
+	    sortingOrder = "r.updateDate";
+	    break;
+	case SurveyConstants.SORT_BY_ANSWER_ASC:
+	    sortingOrder = "r.answerText ASC";
+	    break;
+	case SurveyConstants.SORT_BY_ANSWER_DESC:
+	    sortingOrder = "r.answerText DESC";
+	    break;
 	}
+	String sqlQuery = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder;
+
+	return getSession().createQuery(sqlQuery).setLong("sessionId", sessionId.longValue())
+		.setLong("questionUid", questionUid.longValue()).setFirstResult(page * size).setMaxResults(size).list();
+    }
 
     @Override
     public int getCountResponsesBySessionAndQuestion(final Long sessionId, final Long questionId) {
@@ -100,4 +105,21 @@ public class SurveyAnswerDAOHibernate extends LAMSBaseDAO implements SurveyAnswe
 	}
 	return ((Number) list.get(0)).intValue();
     }
+    
+    /** Get a count of the number of times this particular choice has been selected for this question. */
+    @SuppressWarnings("rawtypes")
+    public Integer getAnswerCount(Long sessionId, Long questionId, String choice) {
+	
+	String choice1 = choice+"&%";
+	String choice2 = "%&"+choice1;
+
+	String sql = GET_COUNT_RESPONSES_FOR_SESSION_QUESTION_CHOICE;
+	List list = doFind(sql, new Object[] { sessionId, questionId, choice1, choice2 });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
+    }
+
+
 }

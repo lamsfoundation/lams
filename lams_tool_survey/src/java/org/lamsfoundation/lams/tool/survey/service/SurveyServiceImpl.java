@@ -265,6 +265,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return map;
     }
 
+    public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString) {
+	return surveyUserDao.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString, coreNotebookService);
+    }
+	    
     @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
@@ -330,6 +335,18 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
+    public List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId,
+	    int page, int size, int sorting, String searchString) {
+
+	return surveyUserDao.getUsersForTablesorter(sessionId, questionId, page, size, sorting, searchString);
+    }
+
+    @Override
+    public int getCountUsersBySession(final Long sessionId, String searchString) {
+	return surveyUserDao.getCountUsersBySession(sessionId, searchString);
+    }
+    
+    @Override
     public void updateAnswerList(List<SurveyAnswer> answerList) {
 	for (SurveyAnswer ans : answerList) {
 	    surveyAnswerDao.saveObject(ans);
@@ -341,69 +358,48 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	SurveyQuestion question = surveyQuestionDao.getByUid(questionUid);
 	AnswerDTO answerDto = new AnswerDTO(question);
 
-	// get question all answer from this session
-	List<SurveyAnswer> answsers = surveyAnswerDao.getSessionAnswer(sessionId, questionUid);
+	// create a map to hold Option UID and the counts for that choice
+	Map<Long, Integer> optMap = new HashMap<Long, Integer>();
 
-	// create a map to hold Option UID and sequenceID(start from 0);
-	Map<String, Integer> optMap = new HashMap<String, Integer>();
-	Set<SurveyOption> options = answerDto.getOptions();
-	int idx = 0;
-	for (SurveyOption option : options) {
-	    optMap.put(option.getUid().toString(), idx);
-	    idx++;
-	}
-
-	// initial a array to hold how many time chose has been done for a option or open text.
-	int numberAvailableOptions = options.size();
-	// for appendText and open Text Entry will be the last one of choose[] array.
-	if (answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)) {
-	    numberAvailableOptions++;
-	}
-
-	int[] choiceArray = new int[numberAvailableOptions];
-	Arrays.fill(choiceArray, 0);
-
-	// sum up all option and open text (if has) have been selected count list
+	// total number of answers - used for the percentage calculations
 	int numberAnswers = 0;
-	if (answsers != null) {
-	    for (SurveyAnswer answer : answsers) {
-		String[] choiceList = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
-		for (String optUid : choiceList) {
-		    // if option has been chosen, the relative index of choose[] array will increase.
-		    if (optMap.containsKey(optUid)) {
-			choiceArray[optMap.get(optUid)]++;
-			numberAnswers++;
-		    }
-		}
-		// handle appendText or Open Text Entry
-		if ((answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY))
-			&& !StringUtils.isBlank(answer.getAnswerText())) {
-		    choiceArray[numberAvailableOptions - 1]++;
-		    numberAnswers++;
-		}
-	    }
+
+	// go through all the choices and find out how many options for the choices.
+	Set<SurveyOption> options = answerDto.getOptions();
+	for (SurveyOption option : options) {
+	    Long optUid = option.getUid();
+	    int numChoice = surveyAnswerDao.getAnswerCount(sessionId, questionUid, optUid.toString());
+	    optMap.put(optUid, numChoice);
+	    numberAnswers += numChoice;
 	}
-	// caculate the percentage of answer response
-	idx = 0;
+
+	Integer numFreeChoice = null;
+	if ( answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) ) {
+	    numFreeChoice = getCountResponsesBySessionAndQuestion(sessionId, questionUid);
+	    numberAnswers += numFreeChoice;
+	}
+
+	// calculate the percentage of answer response
 	if (numberAnswers == 0) {
 	    numberAnswers = 1;
 	}
 	for (SurveyOption option : options) {
-	    double percentage = ((double) choiceArray[idx] / (double) numberAnswers) * 100d;
+	    int count = optMap.get(option.getUid());
+	    double percentage = ((double) count / (double) numberAnswers) * 100d;
 	    option.setResponse(percentage);
 	    option.setResponseFormatStr(new Long(Math.round(percentage)).toString());
-	    option.setResponseCount(choiceArray[idx]);
-	    idx++;
+	    option.setResponseCount(count);
 	}
-	if (answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)) {
-	    double percentage = ((double) choiceArray[idx] / (double) numberAnswers) * 100d;
+	if (numFreeChoice != null) {
+	    double percentage = ((double) numFreeChoice / (double) numberAnswers) * 100d;
 	    answerDto.setOpenResponse(percentage);
 	    answerDto.setOpenResponseFormatStr(new Long(Math.round(percentage)).toString());
-	    answerDto.setOpenResponseCount(choiceArray[idx]);
+	    answerDto.setOpenResponseCount(numFreeChoice);
 	}
 
 	return answerDto;
     }
+
 
     @Override
     public List<String> getOpenResponsesForTablesorter(final Long qaSessionId, final Long questionId, int page,
@@ -442,16 +438,13 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     @Override
     public SortedMap<SurveySession, Integer> getStatistic(Long contentId) {
 	SortedMap<SurveySession, Integer> result = new TreeMap<SurveySession, Integer>(new SurveySessionComparator());
-	List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
-	if (sessionList == null) {
-	    return result;
+	
+	List<Object[]> stats = surveyUserDao.getStatisticsBySession(contentId);
+	for ( Object[] stat : stats) {
+	    SurveySession session = (SurveySession) stat[0];
+	    Integer numUsers = (Integer) stat[1];
+	    result.put(session,numUsers);
 	}
-
-	for (SurveySession session : sessionList) {
-	    List<SurveyUser> users = getSessionUsers(session.getSessionId());
-	    result.put(session, users != null ? users.size() : 0);
-	}
-
 	return result;
 
     }

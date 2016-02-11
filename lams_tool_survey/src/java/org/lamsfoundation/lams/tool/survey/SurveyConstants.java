@@ -65,6 +65,8 @@ public class SurveyConstants {
     
     public static final String ATTR_USER = "user";
 
+    public static final String ATTR_USER_NAME = "userName";
+
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.survey.item.title.blank";
 
@@ -118,8 +120,6 @@ public class SurveyConstants {
 
     public static final String ATTR_QUESTION_LIST = "questionList";
 
-    public static final String ATTR_ANSWER_LIST = "answerList";
-
     public static final String ATTR_QUESTION = "question";
 
     public static final String ATTR_DELETED_QUESTION_LIST = "deletedQuestionList";
@@ -170,9 +170,13 @@ public class SurveyConstants {
     
     public static final String ATTR_COUNT_FINISHED_USERS = "countFinishedUser";
     
+    public static final String ATTR_REFLECTION = "notebookEntry";
+
     public static final int SORT_BY_DEAFAULT = 0;
     public static final int SORT_BY_ANSWER_ASC = 1;
     public static final int SORT_BY_ANSWER_DESC = 2;
+    public static final int SORT_BY_NAME_ASC = 3;
+    public static final int SORT_BY_NAME_DESC = 4;
     
     // POSITION
     public static int POSITION_INSIDE = 0;
