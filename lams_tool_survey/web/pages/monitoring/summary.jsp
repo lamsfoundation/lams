@@ -95,7 +95,7 @@
 						<img src='<c:out value="${tool}"/>includes/images/piechart.gif'
 							title="<fmt:message key='message.view.pie.chart'/>"
 							style="cursor: pointer; width: 30px; border: none"
-							onclick="javascript:drawChart('pie', 'chartDiv${queStatus.index}', '${chartURL}')"> 
+							onclick="javascript:drawChart('pie', 'chartDiv${surveySession.sessionId}_${queStatus.index}', '${chartURL}')"> 
 					</c:if>
 					</div>
 				</th>
@@ -120,7 +120,7 @@
 				</tr>
 			</c:forEach>
 			<tr>
-				<td id="chartDiv${queStatus.index}" style="height: 220px; display: none" colspan="2">
+				<td id="chartDiv${surveySession.sessionId}_${queStatus.index}" style="height: 220px; display: none" colspan="2">
 				</td>
 			</tr>
 			<c:if test="${question.appendText}">
