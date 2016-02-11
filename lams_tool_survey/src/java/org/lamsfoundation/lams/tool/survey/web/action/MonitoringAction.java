@@ -28,12 +28,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -41,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -53,18 +52,17 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
-import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
-import org.lamsfoundation.lams.tool.survey.util.SurveyUserComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -89,7 +87,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 	String param = mapping.getParameter();
 
 	if (param.equals("summary")) {
@@ -99,9 +97,15 @@ public class MonitoringAction extends Action {
 	if (param.equals("listAnswers")) {
 	    return listAnswers(mapping, form, request, response);
 	}
+	if (param.equals("getAnswersJSON")) {
+	    return getAnswersJSON(mapping, form, request, response);
+	}
 
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
+	if (param.equals("listReflections")) {
+	    return listReflections(mapping, form, request, response);
+	}
+	if (param.equals("getReflectionsJSON")) {
+	    return getReflectionsJSON(mapping, form, request, response);
 	}
 
 	if (param.equals("exportSurvey")) {
@@ -144,7 +148,7 @@ public class MonitoringAction extends Action {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ISurveyService service = getSurveyService();
 
-	// get summary
+	// get summary 
 	SortedMap<SurveySession, List<AnswerDTO>> summary = service.getSummary(contentId);
 
 	// get survey
@@ -153,16 +157,12 @@ public class MonitoringAction extends Action {
 	// get statistic
 	SortedMap<SurveySession, Integer> statis = service.getStatistic(contentId);
 
-	// get refection list
-	Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId, false);
-
 	// cache into sessionMap
 	sessionMap.put(SurveyConstants.ATTR_SUMMARY_LIST, summary);
 	sessionMap.put(SurveyConstants.ATTR_STATISTIC_LIST, statis);
 	sessionMap.put(SurveyConstants.PAGE_EDITABLE, new Boolean(SurveyWebUtils.isSurveyEditable(survey)));
 	sessionMap.put(SurveyConstants.ATTR_SURVEY, survey);
 	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
-	sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, relectList);
 	sessionMap.put(SurveyConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
 	// check if there is submission deadline
@@ -189,52 +189,124 @@ public class MonitoringAction extends Action {
 
 	// get user list
 	ISurveyService service = getSurveyService();
-
-	SortedMap<SurveyUser, AnswerDTO> userAnswerMap = new TreeMap<SurveyUser, AnswerDTO>(new SurveyUserComparator());
-	// get all users with their answers whatever they answer or not
-	List<SurveyUser> users = service.getSessionUsers(sessionId);
-	for (SurveyUser user : users) {
-	    List<AnswerDTO> questionAnswers = service.getQuestionAnswers(sessionId, user.getUid());
-	    for (AnswerDTO questionAnswer : questionAnswers) {
-		if (questionUid.equals(questionAnswer.getUid())) {
-		    userAnswerMap.put(user, questionAnswer);
-		    break;
-		}
-	    }
-	}
-	// set all attribute to request for show
-	request.setAttribute(SurveyConstants.ATTR_ANSWER_LIST, userAnswerMap);
-
+	SurveyQuestion question = service.getQuestion(questionUid);
+	request.setAttribute(SurveyConstants.ATTR_QUESTION, question);
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
+    private ActionForward getAnswersJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
 
-    private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	String searchString = request.getParameter("fcol[0]"); 
+	
+	int sorting = SurveyConstants.SORT_BY_DEAFAULT;
+	if ( sortByName != null ) 
+	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC; 
 
-	Long uid = WebUtil.readLongParam(request, SurveyConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
+	//return user list according to the given sessionID
 	ISurveyService service = getSurveyService();
-	SurveyUser user = service.getUser(uid);
-	NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SurveyConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+	SurveyQuestion question = service.getQuestion(questionUid);
+	List<Object[]> users = service.getQuestionAnswersForTablesorter(sessionId, questionUid, page, size, sorting, searchString);
+	
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
 
-	SurveySession session = service.getSurveySessionBySessionId(sessionID);
+	for (Object[] userAndAnswers: users) {
 
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
+	    JSONObject responseRow = new JSONObject();
+	    
+	    SurveyUser user = (SurveyUser) userAndAnswers[0];
+	    responseRow.put(SurveyConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+
+	    if ( userAndAnswers.length > 1 && userAndAnswers[1] != null) {
+		responseRow.put("choices", SurveyWebUtils.getChoiceList((String)userAndAnswers[1]));
+	    } 
+	    if ( userAndAnswers.length > 2 && userAndAnswers[2] != null) {
+		// Data is handled differently in learner depending on whether it is an extra text added
+		// to a multiple choice, or a free text entry. So need to handle the output differently.
+		// See learner/result.jsp and its handling of question.type == 3 vs question.appendText 
+		String answer;
+		if ( question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY )  {
+		    // don't escape as it was escaped & BR'd before saving
+		    answer = (String)userAndAnswers[2];
+		} else {
+		    // need to escape it, as it isn't escaped in the database
+		    answer = StringEscapeUtils.escapeHtml((String)userAndAnswers[2]);
+		    answer = answer.replaceAll("\n", "<br>");
+		}
+		responseRow.put("answerText", answer);
+	    } 
+	    rows.put(responseRow);
 	}
-	refDTO.setReflectInstrctions(session.getSurvey().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
-	return mapping.findForward("success");
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
     }
 
+    private ActionForward listReflections(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	
+	ISurveyService service = getSurveyService();
+	Survey survey = service.getSurveyBySessionId(sessionId);
+	
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	return mapping.findForward(SurveyConstants.SUCCESS);
+    }
+    
+    private ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	String searchString = request.getParameter("fcol[0]"); 
+	
+	int sorting = SurveyConstants.SORT_BY_DEAFAULT;
+	if ( sortByName != null ) 
+	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC; 
+
+	//return user list according to the given sessionID
+	ISurveyService service = getSurveyService();
+	List<Object[]> users = service.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString);
+	
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
+
+	for (Object[] userAndReflection : users) {
+
+	    JSONObject responseRow = new JSONObject();
+	    
+	    SurveyUser user = (SurveyUser) userAndReflection[0];
+	    responseRow.put(SurveyConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+
+	    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
+		String reflection = StringEscapeUtils.escapeHtml((String)userAndReflection[1]);
+		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
+	    }
+		
+	    rows.put(responseRow);
+	}
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
+    }
+    
     /**
      * Export Excel format survey data.
      * 

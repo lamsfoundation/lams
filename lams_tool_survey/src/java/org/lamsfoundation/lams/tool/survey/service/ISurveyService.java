@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
@@ -280,6 +281,9 @@ public interface ISurveyService {
      */
     Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
+    List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString);
+	    
     void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser);
 
     /**
@@ -301,4 +305,14 @@ public interface ISurveyService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /** Gets the Answer information for the monitoring listAnswers tablesorter. 
+     * Will return List<[SurveyUser, String, String], [SurveyUser, String, String], ... , [SurveyUser, String, String]>
+     * where the first String is answer choices (for multiple choice) and the second String is the answer text for
+     * free entry choice.
+     */
+  List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId,
+	    int page, int size, int sorting, String searchString);
+    int getCountUsersBySession(final Long sessionId, String searchString);
+
 }

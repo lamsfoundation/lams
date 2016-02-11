@@ -14,32 +14,9 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
-
+</lams:head>
 <script type="text/javascript">
 
-	<c:set var="numOptions">${fn:length(question.options)}</c:set>
-	<c:set var="filterOptions" value="{ sorter: false, filter: false}"/>
-    <c:forEach var="option" items="${question.options}" varStatus="optStatus">
-    	<c:choose>
-    	<c:when test="${optStatus.first}">
-	    	<c:set var="filterString">${optStatus.count}:${filterOptions}</c:set>
-	    </c:when>
-	    <c:otherwise>
-	    	<c:set var="filterString">${filterString}, ${optStatus.count}:${filterOptions}</c:set>
-	    </c:otherwise>
-	    </c:choose>
-    </c:forEach>
-    <c:if test="${question.appendText || question.type==3}">
-    	<c:choose> 
-    	<c:when test="${numOptions gt 0}">
-	    	<c:set var="filterString">${filterString}, ${numOptions+1}:${filterOptions}</c:set>
-	    </c:when>
-	    <c:otherwise>
-	    	<c:set var="filterString">1:${filterOptions}</c:set>
-	    </c:otherwise>
-	    </c:choose>
-    </c:if>
-	
 	$(document).ready(function(){
 	    
 		$(".tablesorter").tablesorter({
@@ -47,7 +24,7 @@
 		    sortInitialOrder: 'desc',
             sortList: [[0]],
             widgets: [ "resizable", "filter" ],
-            headers: { ${filterString} }, 
+            headers: { 1: { sorter: false, filter: false} }, 
             widgetOptions: {
             	resizable: true,
             	// include column filters 
@@ -60,7 +37,7 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/monitoring/getAnswersJSON.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${question.uid}&toolSessionID=" + $(this).attr('data-session-id'),
+				ajaxUrl : "<c:url value='/monitoring/getReflectionsJSON.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -74,25 +51,14 @@
 							rows += userData["userName"];
 							rows += '</td>';
 
-						    <c:forEach var="option" items="${question.options}">
-								rows += '<td align="center" width="30px">';
-								if ( $.inArray('${option.uid}',userData.choices) > -1 ) {
-									rows += '<img src="${tool}/includes/images/tick_red.gif" title="<fmt:message key="message.learner.choose.answer"/>">';
-								}
-								rows += '</td>';
-						    </c:forEach>
-								
-							<c:if test="${question.appendText || question.type==3}">
 							rows += '<td>';
-							if ( userData["answerText"] ) {
-								rows += userData["answerText"];
+							if ( userData["notebookEntry"] ) {
+								rows += userData["notebookEntry"];
 							} else {
 								rows += '-';
 							}
- 
 							rows += '</td>';
-							</c:if>
-															
+													
 							rows += '</tr>';
 						}
 			            
@@ -118,67 +84,16 @@
 		});
   	})
 </script>
-</lams:head>
 <body class="stripes">
-		<div id="content">
-		<h1>
-			<fmt:message key="title.chart.report"/>
-		</h1>
-
-		<h2><fmt:message key="label.question"/></h2>
-
-		<table  class="tablesorter-blue" cellspacing="0">
-		<tr>
-			<th colspan="2" class="first"><c:out value="${question.description}" escapeXml="false"/></th>
-		</tr>
-		<c:forEach var="option" items="${question.options}" varStatus="optStatus">
-			<tr>
-				<td  width="100px">
-					<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
-				</td>
-				<td>
-					<c:out value="${option.description}" escapeXml="true"/>
-				</td>
-			</tr>
-		</c:forEach>
-		<c:if test="${question.appendText ||question.type == 3}">
-			<tr>
-				<td  width="100px">
-					<fmt:message key="label.open.response"/>
-				</td>
-				<td>&nbsp;</td>
-			</tr>
-		</c:if>
-		</table>
-
-		<h2><fmt:message key="label.answer"/></h2>
-
-		<c:choose>
-			<c:when test="${!(question.appendText || question.type==3)}">
-				<c:set var="nameWidth">width="25%"</c:set>
-			</c:when>
-			<c:otherwise>
-				<c:set var="nameWidth"></c:set>
-			</c:otherwise>
-		</c:choose>
+	<div id="content">
+		<h1><fmt:message key="title.reflection"/></h1>
 
 		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${toolSessionID}">
+		<table class="tablesorter" data-session-id="${param.toolSessionID}">
 			<thead>
 				<tr>
- 					<th align="left" ${nameWidth}>
-						<fmt:message key="label.learner"/>
-					</th>
-					<c:forEach var="option" items="${question.options}" varStatus="optStatus">
-					<th>
-						<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
-					</th>
-					</c:forEach>
-					<c:if test="${question.appendText || question.type == 3}">
-					<th>
-						<fmt:message key="label.open.response"/>
-					</th>
-					</c:if>
+					<th><fmt:message key="monitoring.user.fullname"/></th>
+					<th><fmt:message key="monitoring.user.reflection"/></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -204,7 +119,7 @@
 			</form>
 		</div>
 		</div>
-		
+				
 	</div>
 </body>
 </lams:html>
