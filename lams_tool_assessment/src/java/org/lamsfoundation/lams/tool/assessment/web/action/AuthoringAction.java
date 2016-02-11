@@ -91,6 +91,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * @author Andrey Balan
@@ -1338,6 +1339,7 @@ public class AuthoringAction extends Action {
 		}
 		// exporting XML
 		XStream designXml = new XStream(new SunUnsafeReflectionProvider());
+		designXml.addPermission(AnyTypePermission.ANY);
 		String resultedXml = designXml.toXML(questionsToExport);
 
 		response.setContentType("application/x-download");

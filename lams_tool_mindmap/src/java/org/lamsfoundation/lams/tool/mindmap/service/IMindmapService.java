@@ -36,6 +36,9 @@ import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
+
 /**
  * Defines the services available to the web layer from the Mindmap Service
  */
@@ -94,7 +97,7 @@ public interface IMindmapService {
     public List getAuthorRootNodeByMindmapId(Long mindmapId);
 
     public List getAuthorRootNodeBySessionId(Long sessionId);
-    
+
     public List getAuthorRootNodeByMindmapSession(Long mindmapId, Long toolSessionId);
 
     public List getRootNodeByMindmapIdAndUserId(Long mindmapId, Long userId);
@@ -102,7 +105,7 @@ public interface IMindmapService {
     public List getRootNodeByMindmapIdAndSessionId(Long mindmapId, Long sessionId);
 
     public List getMindmapNodeByParentId(Long parentId, Long mindmapId);
-    
+
     public List getMindmapNodeByParentIdMindmapIdSessionId(Long parentId, Long mindmapId, Long sessionId);
 
     public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId);
@@ -129,7 +132,9 @@ public interface IMindmapService {
     public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId);
 
     public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId);
-    
+
     // Outputs
     public int getNumNodes(Long learnerId, Long toolSessionId);
+    
+    public XStream getXStream();
 }

@@ -69,6 +69,9 @@ import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapException;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
+import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NotifyRequestModel;
+import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NotifyResponseModel;
+import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.PollResponseModel;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -90,6 +93,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     private static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
+    private final XStream xstream = new XStream(new SunUnsafeReflectionProvider());
+
     private IMindmapDAO mindmapDAO = null;
     private IMindmapSessionDAO mindmapSessionDAO = null;
     private IMindmapUserDAO mindmapUserDAO = null;
@@ -107,6 +112,12 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     public MindmapService() {
 	super();
+
+	xstream.addPermission(AnyTypePermission.ANY);
+	xstream.alias("branch", NodeModel.class);
+	xstream.alias("response", NotifyResponseModel.class);
+	xstream.alias("action", NotifyRequestModel.class);
+	xstream.alias("pollResponse", PollResponseModel.class);
     }
 
     /* Methods from ToolSessionManager */
@@ -516,8 +527,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    NodeModel currentNodeModel = getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), mindmap.getUid(),
 		    rootNodeModel, null);
 
-	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
-	    xstream.alias("branch", NodeModel.class);
 	    mindmapContent = xstream.toXML(currentNodeModel);
 	}
 
@@ -559,10 +568,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    if (mindmapContent != null) {
 		MindmapUser mindmapUser = null;
 
-		XStream xstream = new XStream(new SunUnsafeReflectionProvider());
-		// allow parsing all classes
-		xstream.addPermission(AnyTypePermission.ANY);
-		xstream.alias("branch", NodeModel.class);
 		NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
 		NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();
 		List<NodeModel> branches = rootNodeModel.getBranch();
@@ -1060,5 +1065,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	saveOrUpdateMindmapNode(rootMindmapNode);
 	saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, content, null);
 	saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, content, null);
+    }
+
+    public XStream getXStream() {
+	return xstream;
     }
 }

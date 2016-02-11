@@ -154,9 +154,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		    .getText(), rootMindmapNode.getColor(), mindmapUserName));
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
 		    mindmapId, rootNodeModel, null);
-	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
-	    xstream.alias("branch", NodeModel.class);
-	    String mindmapContent = xstream.toXML(currentNodeModel);
+
+	    String mindmapContent = mindmapService.getXStream().toXML(currentNodeModel);
 
 	    try {
 		response.setContentType("text/xml");
@@ -299,9 +298,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	
 	if (!mindmap.isMultiUserMode()) {
 	    // Saving Mindmap data to XML
-	    XStream xstream = new XStream(new SunUnsafeReflectionProvider());
-	    xstream.alias("branch", NodeModel.class);
-	    NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
+
+	    NodeModel rootNodeModel = (NodeModel) mindmapService.getXStream().fromXML(mindmapContent);
 	    NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();
 	    List<NodeModel> branches = rootNodeModel.getBranch();
 
