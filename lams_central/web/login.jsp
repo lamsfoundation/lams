@@ -4,12 +4,17 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration"%>
-<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ page import="org.lamsfoundation.lams.web.session.SessionManager"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.dto.UserDTO" %>
 
 <%-- Attributes in request come from sysadmin LoginAs action
 	 while in session from LoginRequestServlet
+	 
+	 <c:set var="login" value="${empty requestScope.login ? sessionScope.login : requestScope.login}" scope="page" />
+<c:set var="password" value="${empty requestScope.password ? sessionScope.password : requestScope.password}" scope="page" />
+	 
 --%>
 <c:if test="${empty requestScope.login}">
 	<c:set var="login" value="${sessionScope.login}" />
@@ -168,10 +173,6 @@ j_security_login_page
 	<%-- This is version for integrations and LoginAs authentication. --%>
 	
 	<c:otherwise>
-		<%
-			// invalidate session so a new user can be logged in
-			SessionManager.removeSession((String) pageContext.getAttribute("login"), true);
-		%>
 		<lams:head>
 			<lams:css/>
 			<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
@@ -193,6 +194,10 @@ j_security_login_page
 			</div>
 			<div id="footer">
 			</div>
+		<%
+			// invalidate session so a new user can be logged in
+			SessionManager.removeSession(((UserDTO) SessionManager.getSession().getAttribute("user")).getLogin(), true);
+		%>
 			<script type="text/javascript">
 				// submit the hidden form
 				document.forms[0].submit();
