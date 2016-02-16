@@ -329,14 +329,14 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="createEvent">PROPAGATION_REQUIRED</prop>
-				<prop key="deleteEvent">PROPAGATION_REQUIRED</prop>
+				<prop key="eventExists">PROPAGATION_REQUIRED</prop>
 				<prop key="sendMessage">PROPAGATION_REQUIRED</prop>
+				<prop key="resendMessages">PROPAGATION_REQUIRED</prop>
 				<prop key="notifyLessonMonitors">PROPAGATION_REQUIRED</prop>
 				<prop key="subscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="unsubscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="trigger*">PROPAGATION_REQUIRED</prop>
-				<prop key="getEventsToResend*">PROPAGATION_REQUIRED</prop>
-				<prop key="saveEvent">PROPAGATION_SUPPORTS</prop>
+				<prop key="isSubscribed">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

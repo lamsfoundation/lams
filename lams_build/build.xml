@@ -433,24 +433,6 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/org/xbill/dns/main" overwrite="true" verbose="true">
-			<fileset dir="lib/aspirin">
-				<include name="dnsjava-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/xbill/dns/main/module.xml"
-			  file="lib/aspirin/dnsjava.module.xml" overwrite="true" verbose="true" />
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/aspirin/main" overwrite="true" verbose="true">
-			<fileset dir="lib/aspirin">
-				<include name="aspirin.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/aspirin/main/module.xml"
-			  file="lib/aspirin/aspirin.module.xml" overwrite="true" verbose="true" />
-
-		
-		
 		<copy todir="${server.home}/modules/system/layers/base/javax/wsdl4j/api/1.5" overwrite="true" verbose="true">
 			<fileset dir="lib/axis">
 				<include name="wsdl4j-*.jar" />

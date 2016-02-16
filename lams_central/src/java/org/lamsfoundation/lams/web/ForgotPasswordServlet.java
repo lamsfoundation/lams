@@ -22,7 +22,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
@@ -116,12 +115,9 @@ public class ForgotPasswordServlet extends HttpServlet {
 
 	String SMPTServer = Configuration.get("SMTPServer");
 	String supportEmail = Configuration.get("LamsSupportEmail");
-	boolean useInternalSMTPServer = Boolean
-		.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 	User user = null;
 
-	if ((!useInternalSMTPServer && ((SMPTServer == null) || SMPTServer.equals(""))) || (supportEmail == null)
-		|| supportEmail.equals("")) {
+	if ((SMPTServer == null) || SMPTServer.equals("") || (supportEmail == null) || supportEmail.equals("")) {
 	    // Validate SMTP not set up
 	    languageKey = ForgotPasswordServlet.SMTP_SERVER_NOT_SET;
 	} else {

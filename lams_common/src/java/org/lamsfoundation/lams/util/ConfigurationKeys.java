@@ -48,8 +48,6 @@ public class ConfigurationKeys {
 
     public static String SMTP_SERVER = "SMTPServer";
 
-    public static String USE_INTERNAL_SMTP_SERVER = "InternalSMTPServer";
-
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
     /**

@@ -24,14 +24,13 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.actions;
 
-import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.commons.codec.binary.Base64;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -73,6 +72,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
     /**
      * Default method when no dispatch parameter is specified.
      */
+    @Override
     protected abstract ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception;
 
@@ -116,7 +116,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	WikiPage currentPage = wikiService.getWikiPageByUid(currentPageUid);
 
 	// Check if the content is different
-	if (!currentPage.getCurrentWikiContent().getBody().equals(wikiForm.getWikiBody()) || !currentPage.getTitle().equals(wikiForm.getTitle())) {
+	if (!currentPage.getCurrentWikiContent().getBody().equals(wikiForm.getWikiBody())
+		|| !currentPage.getTitle().equals(wikiForm.getTitle())) {
 
 	    // Set up the wiki user if this is a tool session (learner)
 	    // Also set the editable flag here
@@ -128,7 +129,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	    // Setting the editable flag based on call origin
 	    ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	    if (mode == null || mode == ToolAccessMode.TEACHER) {
+	    if ((mode == null) || (mode == ToolAccessMode.TEACHER)) {
 
 		// Author/Monitor/Live edit
 		// If no editable flag came in the form (as in learner), set
@@ -148,12 +149,12 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    wikiService.updateWikiPage(wikiForm, currentPage, user);
 
 	    // Send edit notifications
-	    if (toolSessionID != null && user != null) {
+	    if ((toolSessionID != null) && (user != null)) {
 		notifyWikiChange(toolSessionID, "notify.pageEdited.subject", "notify.pageEdited.body", user, request);
 	    }
 
 	}
-	
+
 	// Make sure the current page is set correctly then return to the wiki
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
     }
@@ -169,8 +170,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
      */
     public ActionForward revertPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Long revertPageContentVersion = new Long(WebUtil.readLongParam(request,
-		WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
+	Long revertPageContentVersion = new Long(
+		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
 	// set up wikiService
@@ -200,9 +201,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Updating the wikiPage, setting a null user which indicated this
 	// change was made in author
 	wikiService.updateWikiPage(wikiForm, currentPage, user);
-	
+
 	// Send revert notifications
-	if (toolSessionID != null && user != null) {
+	if ((toolSessionID != null) && (user != null)) {
 	    notifyWikiChange(toolSessionID, "notify.pageEdited.subject", "notify.pageEdited.body", user, request);
 	}
 
@@ -220,8 +221,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
      */
     public ActionForward comparePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Long revertPageContentVersion = new Long(WebUtil.readLongParam(request,
-		WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
+	Long revertPageContentVersion = new Long(
+		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
 	// set up wikiService
@@ -239,8 +240,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Do the compariason
 	String diff = wikiService.comparePages(compareContent.getBody(), currentContent.getBody());
 
-	request.setAttribute(WikiConstants.ATTR_COMPARE_VERSIONS, compareContent.getVersion().toString() + "-"
-		+ currentContent.getVersion().toString());
+	request.setAttribute(WikiConstants.ATTR_COMPARE_VERSIONS,
+		compareContent.getVersion().toString() + "-" + currentContent.getVersion().toString());
 	request.setAttribute(WikiConstants.ATTR_COMPARE_TITLE, currentWikiPage.getTitle());
 	request.setAttribute(WikiConstants.ATTR_COMPARE_STRING, diff);
 
@@ -258,8 +259,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
      */
     public ActionForward viewPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Long revertPageContentVersion = new Long(WebUtil.readLongParam(request,
-		WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
+	Long revertPageContentVersion = new Long(
+		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
 	// set up wikiService
@@ -374,7 +375,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// Setting the editable flag based on call origin
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	if (mode == null || mode == ToolAccessMode.TEACHER) {
+	if ((mode == null) || (mode == ToolAccessMode.TEACHER)) {
 	    // Author/Monitor/Live edit
 	    // If no editable flag came in the form (as in learner), set false
 	    if (wikiForm.getNewPageIsEditable() == null) {
@@ -391,12 +392,12 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// inserting the wiki page, null user and session indicates that this
 	// page was saved in author
 	Long currentPageUid = wikiService.insertWikiPage(wikiForm, wiki, user, session);
-	
+
 	// Send adding page notifications
-	if (toolSessionID != null && user != null) {
+	if ((toolSessionID != null) && (user != null)) {
 	    notifyWikiChange(toolSessionID, "notify.pageAdded.subject", "notify.pageAdded.body", user, request);
 	}
-	
+
 	// go to the new wiki page
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
     }
@@ -418,7 +419,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Get the session information for notifications
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	WikiUser user = getCurrentUser(toolSessionID);
-	
+
 	// set up wikiService
 	if (wikiService == null) {
 	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
@@ -429,9 +430,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Updating the wikiPage, setting a null user which indicated this
 	// change was made in author
 	wikiService.markWikiPageAsDeleted(wikiPage);
-	
+
 	// Send removed page notifications
-	if (toolSessionID != null && user != null) {
+	if ((toolSessionID != null) && (user != null)) {
 	    notifyWikiChange(toolSessionID, "notify.pageRemoved.subject", "notify.pageRemoved.body", user, request);
 	}
 
@@ -439,7 +440,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	return this.returnToWiki(mapping, form, request, response, currentPageUid);
 
     }
-    
+
     /**
      * Restore a page previously marked as removed.
      */
@@ -451,7 +452,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Get the session information for notifications
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	WikiUser user = getCurrentUser(toolSessionID);
-	
+
 	// set up wikiService
 	if (wikiService == null) {
 	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
@@ -461,9 +462,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// Updating the wikiPage
 	wikiService.restoreWikiPage(wikiPage);
-	
+
 	// Send removed page notifications
-	if (toolSessionID != null && user != null) {
+	if ((toolSessionID != null) && (user != null)) {
 	    notifyWikiChange(toolSessionID, "notify.pageRestored.subject", "notify.pageRestored.body", user, request);
 	}
 
@@ -497,14 +498,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	IEventNotificationService notificationService = wikiService.getEventNotificationService();
-
-	// first check whether the event exists and create it if it doesnt
-	if (!notificationService.eventExists(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-		toolSessionID)) {
-	    boolean isHtmlFormat = false;
-	    notificationService.createEvent(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-		    toolSessionID, null, null, isHtmlFormat);
-	}
+	notificationService.createEvent(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		toolSessionID, null, null, false);
 
 	// Get whether the user is subscribed
 	boolean subscribed = notificationService.isSubscribed(WikiConstants.TOOL_SIGNATURE,
@@ -522,7 +517,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	// return to the wiki page
-	return returnToWiki(mapping, (WikiPageForm) form, request, response, currentPageUid);
+	return returnToWiki(mapping, form, request, response, currentPageUid);
 
     }
 
@@ -538,10 +533,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	IEventNotificationService notificationService = wikiService.getEventNotificationService();
 
-	String subject = wikiService.getLocalisedMessage(subjectLangKey, new Object[] { wikiSession
-		    .getSessionName() });
+	String subject = wikiService.getLocalisedMessage(subjectLangKey, new Object[] { wikiSession.getSessionName() });
 	String fullName = wikiUser.getFirstName() + " " + wikiUser.getLastName();
-	
+
 	// Notify all the monitors
 	if (wikiSession.getWiki().isNotifyUpdates()) {
 	    boolean isHtmlFormat = false;
@@ -550,7 +544,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    for (User monitor : monitors) {
 		Integer monitorUserId = monitor.getUserId();
 		String contentFolderId = wikiService.getLearnerContentFolder(toolSessionID, monitorUserId.longValue());
-		
+
 		String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
 			+ "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString()
 			+ "&contentFolderID=" + contentFolderId;
@@ -563,8 +557,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 		String body = wikiService.getLocalisedMessage(bodyLangKey,
 			new Object[] { fullName, wikiSession.getSessionName(), link });
 
-		notificationService.sendMessage(null, monitorUserId,
-			IEventNotificationService.DELIVERY_METHOD_MAIL, subject, body, isHtmlFormat);
+		notificationService.sendMessage(null, monitorUserId, IEventNotificationService.DELIVERY_METHOD_MAIL,
+			subject, body, isHtmlFormat);
 	    }
 
 	}
@@ -573,20 +567,19 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	if (notificationService.eventExists(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
 		toolSessionID)) {
 
-	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
-	    	+ "/learning.do?mode=learner&toolSessionID=" + toolSessionID.toString();
-	    
+	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE + "/learning.do?mode=learner&toolSessionID="
+		    + toolSessionID.toString();
+
 	    String hash = relativePath + "," + toolSessionID.toString() + ",l";
 	    hash = new String(Base64.encodeBase64(hash.getBytes()));
-	    
-	    String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" +
-            		"h=" + hash;
-            
-            String body = wikiService.getLocalisedMessage(bodyLangKey, new Object[] { fullName,
-            	    wikiSession.getSessionName(), link });
-	
-	    notificationService.trigger(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID,
-		    subject, body);
+
+	    String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" + "h=" + hash;
+
+	    String body = wikiService.getLocalisedMessage(bodyLangKey,
+		    new Object[] { fullName, wikiSession.getSessionName(), link });
+
+	    notificationService.trigger(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		    toolSessionID, subject, body);
 	}
     }
 
@@ -596,14 +589,14 @@ public abstract class WikiPageAction extends LamsDispatchAction {
     private void revertJavascriptTokenReplacement(WikiPageForm form) {
 	String encodedWikiBody = form.getNewPageWikiBody();
 	if (encodedWikiBody != null) {
-	    form.setNewPageWikiBody(encodedWikiBody.replace(WikiConstants.JAVASCRIPT_REPLACE_TOKEN,
-		    WikiConstants.JAVASCRIPT_TOKEN));
+	    form.setNewPageWikiBody(
+		    encodedWikiBody.replace(WikiConstants.JAVASCRIPT_REPLACE_TOKEN, WikiConstants.JAVASCRIPT_TOKEN));
 	}
 
 	encodedWikiBody = form.getWikiBody();
 	if (encodedWikiBody != null) {
-	    form.setWikiBody(encodedWikiBody.replace(WikiConstants.JAVASCRIPT_REPLACE_TOKEN,
-		    WikiConstants.JAVASCRIPT_TOKEN));
+	    form.setWikiBody(
+		    encodedWikiBody.replace(WikiConstants.JAVASCRIPT_REPLACE_TOKEN, WikiConstants.JAVASCRIPT_TOKEN));
 	}
     }
 }
