@@ -19,7 +19,6 @@
     <dependencies>
       <module name="org.javassist" export="true" />
       <module name="org.apache.poi" export="true" />
-      <module name="org.apache.aspirin" export="true" />
       <module name="org.apache.axis" export="true" />
       <module name="org.apache.batik" export="true" />
       <module name="net.sf.cglib" export="true" />

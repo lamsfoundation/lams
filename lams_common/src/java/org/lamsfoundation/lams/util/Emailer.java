@@ -11,7 +11,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.masukomi.aspirin.core.MailQue;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * A class that handles emails
@@ -34,8 +34,7 @@ public class Emailer {
     public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat)
 	    throws AddressException, MessagingException, UnsupportedEncodingException {
 	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
-	Properties properties = new Properties();
-	Emailer.send(subject, to, supportEmail, body, isHtmlFormat, properties);
+	Emailer.send(subject, to, "", supportEmail, "", body, isHtmlFormat);
     }
 
     /**
@@ -45,47 +44,23 @@ public class Emailer {
      * @param properties
      * @return
      */
-    public static Session getMailSession(Properties properties) {
-	Session session;
-	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration
-		.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
-	if (!useInternalSMTPServer) {
-	    String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
-	    properties.put("mail.smtp.host", smtpServer);
-	}
+    public static Session getMailSession() {
+	String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
+	Properties properties = new Properties();
+	properties.put("mail.smtp.host", smtpServer);
 
 	String smtpAuthUser = Configuration.get(ConfigurationKeys.SMTP_AUTH_USER);
 	String smtpAuthPass = Configuration.get(ConfigurationKeys.SMTP_AUTH_PASSWORD);
-	if (!useInternalSMTPServer && (smtpAuthUser != null) && !smtpAuthUser.trim().equals("")) {
+	Session session = null;
+	if (StringUtils.isBlank(smtpAuthUser)) {
+	    session = Session.getInstance(properties);
+	} else {
 	    properties.setProperty("mail.smtp.submitter", smtpAuthUser);
 	    properties.setProperty("mail.smtp.auth", "true");
 	    SMTPAuthenticator auth = new SMTPAuthenticator(smtpAuthUser, smtpAuthPass);
 	    session = Session.getInstance(properties, auth);
-	} else {
-	    session = Session.getInstance(properties);
 	}
 	return session;
-    }
-
-    /**
-     * Send email to recipients
-     * 
-     * @param subject
-     *            the subject of the email
-     * @param to
-     *            the email of the recipient
-     * @param from
-     *            the email to source the email from
-     * @param body
-     *            the body of the email
-     * @param isHtmlFormat
-     *            whether the message is of HTML content-type or plain text
-     */
-    public static void send(String subject, String to, String from, String body, boolean isHtmlFormat,
-	    Properties mailServerConfig) throws AddressException, MessagingException, UnsupportedEncodingException {
-
-	Emailer.send(subject, to, "", from, "", body, isHtmlFormat, mailServerConfig);
-
     }
 
     /**
@@ -107,12 +82,8 @@ public class Emailer {
      *            whether the message is of HTML content-type or plain text
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
-	    boolean isHtmlFormat, Properties mailServerConfig) throws AddressException, MessagingException,
-	    UnsupportedEncodingException {
-
-	Session session = Emailer.getMailSession(mailServerConfig);
-	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration
-		.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
+	    boolean isHtmlFormat) throws AddressException, MessagingException, UnsupportedEncodingException {
+	Session session = Emailer.getMailSession();
 
 	MimeMessage message = new MimeMessage(session);
 	message.setFrom(new InternetAddress(from, fromPerson));
@@ -122,12 +93,6 @@ public class Emailer {
 	String contentType = (isHtmlFormat) ? "text/html;charset=UTF-8" : "text/plain;charset=UTF-8";
 	message.addHeader("Content-Type", contentType);
 
-	if (useInternalSMTPServer) {
-	    MailQue myMailQue = new MailQue();
-	    myMailQue.queMail(message);
-
-	} else {
-	    Transport.send(message);
-	}
+	Transport.send(message);
     }
 }

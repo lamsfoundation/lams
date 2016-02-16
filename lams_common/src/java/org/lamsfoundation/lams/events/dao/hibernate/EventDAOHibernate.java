@@ -11,13 +11,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
 
-    protected static final String GET_EVENT_QUERY = "FROM " + Event.class.getName()
+    private static final String GET_EVENT_QUERY = "FROM " + Event.class.getName()
 	    + " AS e WHERE e.scope=? AND e.name=? AND e.eventSessionId=? AND e.failTime IS NULL";
 
-    protected static final String GET_EVENTS_TO_RESEND_QUERY = "SELECT DISTINCT e FROM " + Event.class.getName()
-	    + " AS e, Subscription AS s WHERE s.event = e AND (e.failTime IS NOT NULL OR "
-	    + "(s.periodicity > 0 AND (NOW()- s.lastOperationTime >= s.periodicity)))";
-    
+    private static final String GET_EVENTS_TO_RESEND_QUERY = "SELECT DISTINCT e FROM " + Event.class.getName()
+	    + " AS e INNER JOIN e.subscriptions AS subscription WHERE (e.failTime IS NOT NULL OR "
+	    + "(subscription.periodicity > 0 AND subscription.lastOperationTime IS NOT NULL "
+	    + "AND (NOW()- subscription.lastOperationTime >= subscription.periodicity)))";
+
     @SuppressWarnings("unchecked")
     public Event getEvent(String scope, String name, Long sessionId) throws InvalidParameterException {
 	List<Event> events = (List<Event>) doFind(EventDAOHibernate.GET_EVENT_QUERY,

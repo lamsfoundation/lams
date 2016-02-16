@@ -1,7 +1,7 @@
 package org.lamsfoundation.lams.events;
 
 import java.security.InvalidParameterException;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -44,10 +44,17 @@ public interface IEventNotificationService {
     static final long PERIODICITY_MONTHLY = IEventNotificationService.PERIODICITY_WEEKLY * 4;
 
     /**
+     * Period after which the thread gives up on attempting to resend messages. Currently - 2 days.
+     */
+    static final long RESEND_TIME_LIMIT = 2 * 24 * 60 * 60 * 1000;
+
+    /**
      * Allows sending mail to users using the configured SMTP server. Currently it is the only delivery method
      * available.
      */
-    static final AbstractDeliveryMethod DELIVERY_METHOD_MAIL = DeliveryMethodMail.getInstance();
+    static final DeliveryMethodMail DELIVERY_METHOD_MAIL = DeliveryMethodMail.getInstance();
+
+    static final Set<AbstractDeliveryMethod> availableDeliveryMethods = new HashSet<AbstractDeliveryMethod>(2);
 
     /**
      * Creates an event and saves it into the database.
@@ -68,30 +75,8 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope was <code>null</code> or name was blank
      */
-    abstract boolean createEvent(String scope, String name, Long eventSessionId, String defaultSubject,
-	    String defaultMessage, boolean isHtmlFormat) throws InvalidParameterException;
-
-    /**
-     * Saves an event into the database.
-     */
-	void saveEvent(Event event);
-	
-    
-    /**
-     * Deletes an event.
-     * 
-     * @param scope
-     *            scope of the event
-     * @param name
-     *            name of the event
-     * @param eventSessionId
-     *            session ID of the event
-     * @return <code>true</code> if the event existed and was deleted
-     * @throws InvalidParameterException
-     *             if scope was <code>null</code> or name was blank
-     */
-    abstract boolean deleteEvent(String scope, String name, Long eventSessionId)
-	    throws InvalidParameterException;;
+    void createEvent(String scope, String name, Long eventSessionId, String defaultSubject, String defaultMessage,
+	    boolean isHtmlFormat) throws InvalidParameterException;
 
     /**
      * Checks if event with the given parameters exists in the database.
@@ -106,23 +91,14 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope was <code>null</code> or name was blank
      */
-    abstract boolean eventExists(String scope, String name, Long eventSessionId)
-	    throws InvalidParameterException;
+    boolean eventExists(String scope, String name, Long eventSessionId) throws InvalidParameterException;
 
-    
-    /**
-     * Returns Event that are to be resend by QuartzJob
-     * @return events to resend
-     */
-    List<Event> getEventsToResend();
-    
-    
     /**
      * Gets the available delivery methods that can be used when subscribing an user to an event.
      * 
      * @return set of available delivery methods in the system
      */
-    abstract Set<AbstractDeliveryMethod> getAvailableDeliveryMethods();
+    Set<AbstractDeliveryMethod> getAvailableDeliveryMethods();
 
     /**
      * Checks if an user is subscribed to the given event.
@@ -140,8 +116,21 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope or user ID were <code>null</code>, name was blank or event does not exist
      */
-    abstract boolean isSubscribed(String scope, String name, Long eventSessionId, Long userId)
-	    throws InvalidParameterException;
+    boolean isSubscribed(String scope, String name, Long eventSessionId, Long userId) throws InvalidParameterException;
+
+    /**
+     * Notify lesson monitors with the specified message
+     * 
+     * @param sessionId
+     *            tool session to which monitors belong
+     * @param message
+     *            message to be sent
+     * @isHtmlFormat whether email is required to of HTML format
+     * @return
+     */
+    boolean notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat);
+
+    void resendMessages();
 
     /**
      * Sends a single message to the given users.If it fails, an event is created for the needs of the resending
@@ -161,8 +150,8 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if userId or delivery method are <code>null</code>
      */
-    abstract boolean sendMessage(Integer fromUserId, Integer toUserId, AbstractDeliveryMethod deliveryMethod,
-	    String subject, String message, boolean isHtmlFormat) throws InvalidParameterException;
+    boolean sendMessage(Integer fromUserId, Integer toUserId, AbstractDeliveryMethod deliveryMethod, String subject,
+	    String message, boolean isHtmlFormat) throws InvalidParameterException;
 
     /**
      * 
@@ -184,18 +173,8 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if userId array or delivery method are <code>null</code>
      */
-    abstract boolean sendMessage(Integer fromUserId, Integer[] toUserIds, AbstractDeliveryMethod deliveryMethod,
-	    String subject, String message, boolean isHtmlFormat) throws InvalidParameterException;
-    
-    /**
-     * Notify lesson monitors with the specified message 
-     * 
-     * @param sessionId tool session to which monitors belong 
-     * @param message message to be sent
-     * @isHtmlFormat whether email is required to of HTML format
-     * @return
-     */
-    boolean notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat);
+    boolean sendMessage(Integer fromUserId, Integer[] toUserIds, AbstractDeliveryMethod deliveryMethod, String subject,
+	    String message, boolean isHtmlFormat) throws InvalidParameterException;
 
     /**
      * Registeres an user for notification of the event. If a subscription with given user ID and delivery method
@@ -216,7 +195,7 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope, userId or delivery method are <code>null</code>, or name is blank
      */
-    abstract boolean subscribe(String scope, String name, Long eventSessionId, Integer userId,
+    void subscribe(String scope, String name, Long eventSessionId, Integer userId,
 	    AbstractDeliveryMethod deliveryMethod, Long periodicity) throws InvalidParameterException;
 
     /**
@@ -231,7 +210,7 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope is <code>null</code> or name is blank
      */
-    abstract boolean trigger(String scope, String name, Long eventSessionId) throws InvalidParameterException;
+    void trigger(String scope, String name, Long eventSessionId) throws InvalidParameterException;
 
     /**
      * Triggers the event with the default subject and message, modifying placeholders (<code>{0}, {1}, {2}</code>...)
@@ -250,7 +229,7 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope is <code>null</code> or name is blank
      */
-    abstract boolean trigger(String scope, String name, Long eventSessionId, Object[] parameterValues)
+    void trigger(String scope, String name, Long eventSessionId, Object[] parameterValues)
 	    throws InvalidParameterException;
 
     /**
@@ -270,7 +249,7 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope is <code>null</code> or name is blank
      */
-    abstract boolean trigger(String scope, String name, Long eventSessionId, String subject, String message)
+    void trigger(String scope, String name, Long eventSessionId, String subject, String message)
 	    throws InvalidParameterException;
 
     /**
@@ -288,7 +267,7 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope or userId are <code>null</code> or name is blank
      */
-    abstract boolean triggerForSingleUser(String scope, String name, Long eventSessionId, Integer userId)
+    void triggerForSingleUser(String scope, String name, Long eventSessionId, Integer userId)
 	    throws InvalidParameterException;
 
     /**
@@ -311,8 +290,8 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope or userId are <code>null</code> or name is blank
      */
-    boolean triggerForSingleUser(String scope, String name, Long eventSessionId, Integer userId,
-	    Object[] parameterValues) throws InvalidParameterException;
+    void triggerForSingleUser(String scope, String name, Long eventSessionId, Integer userId, Object[] parameterValues)
+	    throws InvalidParameterException;
 
     /**
      * Notifies only a single user of the event using the given subject and message. Does not set the event as
@@ -333,8 +312,8 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope or userId are <code>null</code> or name is blank
      */
-    abstract boolean triggerForSingleUser(String scope, String name, Long eventSessionId, Integer userId,
-	    String subject, String message) throws InvalidParameterException;
+    void triggerForSingleUser(String scope, String name, Long eventSessionId, Integer userId, String subject,
+	    String message) throws InvalidParameterException;
 
     /**
      * Unregister an user from notification of the event.
@@ -350,8 +329,7 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope or userId are <code>null</code> or name is blank
      */
-    abstract boolean unsubscribe(String scope, String name, Long eventSessionId, Integer userId)
-	    throws InvalidParameterException;
+    void unsubscribe(String scope, String name, Long eventSessionId, Integer userId) throws InvalidParameterException;
 
     /**
      * Unregister delivery method of the user from notification of the event.
@@ -369,7 +347,6 @@ public interface IEventNotificationService {
      * @throws InvalidParameterException
      *             if scope, userId or delivery method are <code>null</code> or name is blank
      */
-    abstract boolean unsubscribe(String scope, String name, Long eventSessionId, Integer userId,
+    void unsubscribe(String scope, String name, Long eventSessionId, Integer userId,
 	    AbstractDeliveryMethod deliveryMethod) throws InvalidParameterException;
-
 }
