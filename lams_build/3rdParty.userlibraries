@@ -37,7 +37,6 @@
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-aop-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/spring/aopalliance.jar"/>
         <archive path="/lams_build/lib/xstream/xstream-1.5.0-SNAPSHOT.jar" source="/3rdParty_sources/xstream"/>
-        <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/joda/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
         <archive path="/lams_build/lib/quartz/quartz-2.2.1.jar" source="/3rdParty_sources/quartz"/>
         <archive path="/lams_build/lib/lucene/lucene-core-4.10.2.jar" source="/3rdParty_sources/lucene"/>
         <archive path="/lams_build/lib/lucene/lucene-analyzers-common-4.10.2.jar" source="/3rdParty_sources/lucene"/>

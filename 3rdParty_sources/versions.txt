@@ -27,8 +27,6 @@ jdom 1.1.2
 
 JSP API 2.3
 
-Joda Time 2.1
-
 lucene 2.4.0
 contains lucene-snowball 2.4.0
 
