@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +60,6 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -102,8 +100,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * @author Andrey Balan
  */
-public class ImageGalleryServiceImpl
-	implements IImageGalleryService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
+public class ImageGalleryServiceImpl implements IImageGalleryService, ToolContentManager, ToolSessionManager {
 
     private final static String MEDIUM_FILENAME_PREFIX = "medium_";
 
@@ -145,7 +142,7 @@ public class ImageGalleryServiceImpl
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
-    
+
     private IRatingService ratingService;
 
     private IEventNotificationService eventNotificationService;
@@ -210,12 +207,12 @@ public class ImageGalleryServiceImpl
     public void saveOrUpdateImageGalleryItem(ImageGalleryItem image) {
 	imageGalleryItemDao.saveObject(image);
     }
-    
+
     @Override
     public void deleteImage(Long toolSessionId, Long imageUid) {
 	ImageGallery imageGallery = getImageGalleryBySessionId(toolSessionId);
 	ImageGalleryItem image = getImageGalleryItemByUid(imageUid);
-	
+
 	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
 	imageList.remove(image);
 	imageGallery.setImageGalleryItems(imageList);
@@ -345,7 +342,7 @@ public class ImageGalleryServiceImpl
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
-    
+
     @Override
     public ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId) {
 
@@ -355,30 +352,30 @@ public class ImageGalleryServiceImpl
 
 	return ratingCriteria;
     }
-    
+
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
     }
-    
+
     @Override
     public int getCountItemsRatedByUser(Long toolContentId, Integer userId) {
 	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
     }
-    
+
     @Override
     public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
 	List<RatingCriteria> ratingCriterias = ratingService.getCriteriasByToolContentId(toolContentId);
 	return ratingCriterias;
     }
-    
+
     @Override
     public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias,
 	    Long toolContentId) {
 	ratingService.saveRatingCriterias(request, oldCriterias, toolContentId);
     }
-    
+
     @Override
     public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingService.isCommentsEnabled(toolContentId);
@@ -402,7 +399,7 @@ public class ImageGalleryServiceImpl
 	    // one new group for one session.
 	    group = new ArrayList<Summary>();
 	    Set<ImageGalleryItem> groupImages = getImagesForGroup(imageGallery, session.getSessionId());
-		
+
 	    List<ItemRatingDTO> itemRatingDtos = null;
 	    if (imageGallery.isAllowRank()) {
 		// create itemIds list
@@ -468,15 +465,15 @@ public class ImageGalleryServiceImpl
 	for (ImageGallerySession session : sessionList) {
 	    // one new group for one session.
 	    group = new ArrayList<UserImageContributionDTO>();
-//	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
+	    //	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
 
 	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(session.getSessionId());
 	    for (ImageGalleryUser user : users) {
-		
+
 		//create UserContribution
 		UserImageContributionDTO userContribution = new UserImageContributionDTO(session.getSessionName(),
 			user);
-		
+
 		if (imageGallery.isAllowVote()) {
 		    int numberOfVotesForImage = imageVoteDao.getNumImageVotesByImageUid(image.getUid(),
 			    session.getSessionId());
@@ -496,11 +493,11 @@ public class ImageGalleryServiceImpl
 
 		    // ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(image.getUid(),
 		    // user.getUserId());
-//		    if (rating != null) {
-//			userContribution.setRating(rating.getRating());
-//		    }
+		    //		    if (rating != null) {
+		    //			userContribution.setRating(rating.getRating());
+		    //		    }
 		}
-		
+
 		group.add(userContribution);
 	    }
 
@@ -566,10 +563,10 @@ public class ImageGalleryServiceImpl
 
 	    List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
 
-//	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
-//	    UserImageContributionDTO userContribution = createUserContribution(image, user, session, ratingForGroup);
-//	    userContribution.setImage(image);
-//	    userContributionList.add(userContribution);
+	    //	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
+	    //	    UserImageContributionDTO userContribution = createUserContribution(image, user, session, ratingForGroup);
+	    //	    userContribution.setImage(image);
+	    //	    userContributionList.add(userContribution);
 	    imageList.add(userContributionList);
 	}
 
@@ -589,16 +586,16 @@ public class ImageGalleryServiceImpl
 	    dbImages.addAll(imageGallery.getImageGalleryItems());
 	    for (ImageGalleryItem image : dbImages) {
 		List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
-//		Object[] ratingForGroup = getRatingForGroup(image.getUid(), imageSession.getSessionId());
+		//		Object[] ratingForGroup = getRatingForGroup(image.getUid(), imageSession.getSessionId());
 
-//		List<ImageGalleryUser> userList = imageGalleryUserDao.getBySessionID(imageSession.getSessionId());
-//		for (ImageGalleryUser user : userList) {
-//		    UserImageContributionDTO userContribution = createUserContribution(image, user, imageSession,
-//			    ratingForGroup);
-//		    userContribution.setImage(image);
-//		    userContributionList.add(userContribution);
-//		}
-//		imageList.add(userContributionList);
+		//		List<ImageGalleryUser> userList = imageGalleryUserDao.getBySessionID(imageSession.getSessionId());
+		//		for (ImageGalleryUser user : userList) {
+		//		    UserImageContributionDTO userContribution = createUserContribution(image, user, imageSession,
+		//			    ratingForGroup);
+		//		    userContribution.setImage(image);
+		//		    userContributionList.add(userContribution);
+		//		}
+		//		imageList.add(userContributionList);
 
 	    }
 
@@ -793,7 +790,7 @@ public class ImageGalleryServiceImpl
 	toolContentObj = ImageGallery.newInstance(toolContentObj, toolContentId);
 	Set<ImageGalleryItem> images = toolContentObj.getImageGalleryItems();
 	for (ImageGalleryItem image : images) {
-	    
+
 	    //convert file extension to lower case
 	    String fileName = image.getFileName();
 	    String[] fileNameParts = fileName.split("\\.");
@@ -837,7 +834,7 @@ public class ImageGalleryServiceImpl
 	try {
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(ImageGalleryImportContentVersionFilter.class);
-		
+
 	    exportContentService.registerFileClassForImport(ImageGalleryAttachment.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, null);
 
@@ -926,7 +923,7 @@ public class ImageGalleryServiceImpl
 		}
 	    }
 	}
-	
+
 	imageGalleryDao.saveObject(toContent);
     }
 
@@ -934,7 +931,7 @@ public class ImageGalleryServiceImpl
     public String getToolContentTitle(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).getTitle();
     }
-    
+
     @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
@@ -948,7 +945,7 @@ public class ImageGalleryServiceImpl
     public boolean isContentEdited(Long toolContentId) {
 	return getImageGalleryByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	for (ImageGallerySession session : imageGallerySessionDao.getByContentId(toolContentId)) {
@@ -956,10 +953,10 @@ public class ImageGalleryServiceImpl
 		return true;
 	    }
 	}
-	
+
 	return false;
     }
-    
+
     @Override
     public void removeToolContent(Long toolContentId) throws ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
@@ -993,7 +990,7 @@ public class ImageGalleryServiceImpl
 		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
-	
+
 	Iterator<ImageGalleryItem> itemIterator = gallery.getImageGalleryItems().iterator();
 	while (itemIterator.hasNext()) {
 	    ImageGalleryItem item = itemIterator.next();
@@ -1035,7 +1032,7 @@ public class ImageGalleryServiceImpl
 	}
 
     }
-    
+
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	ImageGallerySession session = new ImageGallerySession();
@@ -1096,34 +1093,10 @@ public class ImageGalleryServiceImpl
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return imageGalleryOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	ImageGallery toolContentObj = getImageGalleryByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     /* =================================================================================== */

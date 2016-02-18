@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.mindmap.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +45,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -77,7 +75,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.thoughtworks.xstream.XStream;
@@ -88,8 +85,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  * An implementation of the IMindmapService interface. As a requirement, all LAMS tool's service bean must implement
  * ToolContentManager and ToolSessionManager.
  */
-public class MindmapService implements ToolSessionManager, ToolContentManager, IMindmapService,
-	ToolContentImport102Manager, ToolRestManager {
+public class MindmapService implements ToolSessionManager, ToolContentManager, IMindmapService, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
@@ -777,47 +773,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	this.auditService = auditService;
     }
 
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Mindmap
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Mindmap mindmap = new Mindmap();
-	mindmap.setContentInUse(Boolean.FALSE);
-	mindmap.setCreateBy(new Long(user.getUserID().longValue()));
-	mindmap.setCreateDate(now);
-	mindmap.setDefineLater(Boolean.FALSE);
-	mindmap.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	mindmap.setLockOnFinished(Boolean.TRUE);
-	mindmap.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	mindmap.setToolContentId(toolContentId);
-	mindmap.setUpdateDate(now);
-	// mindmap.setAllowRichEditor(Boolean.FALSE);
-	// leave as empty, no need to set them to anything.
-	// setMindmapSessions(Set mindmapSessions);
-	mindmapDAO.saveOrUpdate(mindmap);
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	MindmapService.logger.warn(
-		"Setting the reflective field on a mindmap. This doesn't make sense as the mindmap is for reflection and we don't reflect on reflection!");
-	Mindmap mindmap = getMindmapByContentId(toolContentId);
-	if (mindmap == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	mindmap.setInstructions(description);
-    }
-
     // =========================================================================================
     /* Used by Spring to "inject" the linked objects */
 
@@ -1067,6 +1022,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, content, null);
     }
 
+    @Override
     public XStream getXStream() {
 	return xstream;
     }

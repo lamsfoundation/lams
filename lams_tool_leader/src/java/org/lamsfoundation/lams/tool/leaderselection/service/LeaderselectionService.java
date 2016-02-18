@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -50,7 +49,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -77,8 +75,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class LeaderselectionService implements ToolSessionManager, ToolContentManager, ILeaderselectionService,
-	ToolContentImport102Manager, ToolRestManager {
+public class LeaderselectionService
+	implements ToolSessionManager, ToolContentManager, ILeaderselectionService, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(LeaderselectionService.class.getName());
 
@@ -232,7 +230,7 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
 	}
 
 	for (LeaderselectionSession session : (Set<LeaderselectionSession>) selection.getLeaderselectionSessions()) {
-	    if (session.getGroupLeader() != null && session.getGroupLeader().getUserId().equals(userId.longValue())) {
+	    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUserId().equals(userId.longValue())) {
 		session.setGroupLeader(null);
 		leaderselectionSessionDAO.update(session);
 	    }
@@ -493,25 +491,6 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
 	} catch (LoginException e) {
 	    throw new LeaderselectionException("Login failed." + e.getMessage());
 	}
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Leaderselection leaderselection = getContentByContentId(toolContentId);
-	if (leaderselection == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	leaderselection.setInstructions(description);
     }
 
     // =========================================================================================

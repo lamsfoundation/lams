@@ -29,7 +29,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +48,6 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -93,8 +91,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.service.ITaskListService
  */
-public class TaskListServiceImpl
-	implements ITaskListService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
+public class TaskListServiceImpl implements ITaskListService, ToolContentManager, ToolSessionManager {
     private static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
     private TaskListDAO taskListDao;
     private TaskListItemDAO taskListItemDao;
@@ -220,7 +217,7 @@ public class TaskListServiceImpl
     public TaskListItem getTaskListItemByUid(Long itemUid) {
 	return taskListItemDao.getByUid(itemUid);
     }
-    
+
     @Override
     public List<TaskListSession> getSessionsByContentId(Long contentId) {
 	return taskListSessionDao.getByContentId(contentId);
@@ -300,17 +297,18 @@ public class TaskListServiceImpl
 	    }
 	}
     }
-    
+
     @Override
     public Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	return taskListUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
     }
-    
+
     @Override
-    public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
-	return taskListUserDao.getPagedUsersBySessionAndItem(sessionId, taskListItemUid, page, size, sortBy, sortOrder, searchString);
+    public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page,
+	    int size, String sortBy, String sortOrder, String searchString) {
+	return taskListUserDao.getPagedUsersBySessionAndItem(sessionId, taskListItemUid, page, size, sortBy, sortOrder,
+		searchString);
     }
 
     @Override
@@ -338,7 +336,8 @@ public class TaskListServiceImpl
 		TaskListItem item = itemList.get(j);
 
 		// retreiving TaskListItemVisitLog for current taskList and user
-		visitNumbers[j] = taskListItemVisitDao.getCountCompletedTasksBySessionAndItem(toolSessionId, item.getUid());
+		visitNumbers[j] = taskListItemVisitDao.getCountCompletedTasksBySessionAndItem(toolSessionId,
+			item.getUid());
 	    }
 
 	    SessionDTO summary = new SessionDTO(toolSessionId, session.getSessionName(), itemList, visitNumbers);
@@ -432,7 +431,7 @@ public class TaskListServiceImpl
 
 	return itemSummary;
     }
-    
+
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer userId) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -443,7 +442,7 @@ public class TaskListServiceImpl
 	    return list.get(0);
 	}
     }
-    
+
     @Override
     public List<ReflectDTO> getReflectList(Long contentId) {
 	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
@@ -617,7 +616,7 @@ public class TaskListServiceImpl
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
@@ -1016,28 +1015,6 @@ public class TaskListServiceImpl
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
-    }
-
-    // *******************************************************************************
-    // Methods implementing ToolContentImport102Manager
-    // *******************************************************************************
-
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	TaskList toolContentObj = getTaskListByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     // *****************************************************************************

@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
@@ -46,7 +45,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -64,9 +62,7 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -76,8 +72,8 @@ import org.lamsfoundation.lams.util.WebUtil;
  * @author mtruong
  * 
  */
-public class NoticeboardServicePOJO implements INoticeboardService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, ToolRestManager {
+public class NoticeboardServicePOJO
+	implements INoticeboardService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
     private ILearnerService learnerService;
@@ -539,37 +535,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
-    }
-
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	NoticeboardContent toolContentObj = new NoticeboardContent();
-	String content = WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY));
-	toolContentObj.setContent(content);
-	toolContentObj.setContentInUse(false);
-	toolContentObj.setCreatorUserId(user.getUserID().longValue());
-	toolContentObj.setDateCreated(now);
-	toolContentObj.setDateUpdated(now);
-	toolContentObj.setDefineLater(false);
-	toolContentObj.setNbContentId(toolContentId);
-	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	toolContentObj.setReflectOnActivity(false);
-	nbContentDAO.saveNbContent(toolContentObj);
-    }
-
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	NoticeboardContent toolContentObj = retrieveNoticeboard(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     @Override

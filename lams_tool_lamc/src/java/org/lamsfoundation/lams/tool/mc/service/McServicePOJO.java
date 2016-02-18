@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +37,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.servlet.http.HttpSession;
 
@@ -67,7 +65,6 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -104,10 +101,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -119,8 +113,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class McServicePOJO implements IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
-	ToolRestManager, McAppConstants {
+public class McServicePOJO
+	implements IMcService, ToolContentManager, ToolSessionManager, ToolRestManager, McAppConstants {
     private static Logger logger = Logger.getLogger(McServicePOJO.class.getName());
 
     private IMcContentDAO mcContentDAO;
@@ -416,10 +410,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    "Exception occured when lams is getting the mc QueUsr by uid." + e.getMessage(), e);
 	}
     }
-    
+
     @Override
-    public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
-	    String searchString) {
+    public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
+	    String sortOrder, String searchString) {
 	return mcUserDAO.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
     }
 
@@ -427,7 +421,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     public int getCountPagedUsersBySession(Long sessionId, String searchString) {
 	return mcUserDAO.getCountPagedUsersBySession(sessionId, searchString);
     }
-    
+
     @Override
     public String getLocalizedMessage(String key) {
 	return messageService.getMessage(key);
@@ -782,7 +776,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	//update mark for one particular question
 	userAttempt.setMark(newMark);
 	mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
-	
+
 	//update user's total mark
 	McQueUsr user = userAttempt.getMcQueUsr();
 	user.setLastAttemptTotalMark(totalMark);
@@ -790,7 +784,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	// propagade changes to Gradebook
 	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, false);
-	
+
 	// record mark change with audit service
 	auditService.logMarkChange(McAppConstants.MY_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(),
 		userAttempt.getMcQueUsr().getUsername(), "" + oldMark, "" + totalMark);
@@ -1742,113 +1736,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	this.mcOutputFactory = mcOutputFactory;
     }
 
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Chat
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	McContent toolContentObj = new McContent();
-	toolContentObj.setCreatedBy(user.getUserID().longValue());
-	toolContentObj.setCreationDate(now);
-	toolContentObj.setDefineLater(false);
-	toolContentObj.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	toolContentObj.setReflect(false);
-	toolContentObj.setReflectionSubject(null);
-	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-
-	toolContentObj.setContent(null);
-	toolContentObj.setUpdateDate(now);
-	toolContentObj.setMcContentId(toolContentId);
-	toolContentObj.setQuestionsSequenced(false);
-	toolContentObj.setShowMarks(false);
-	toolContentObj.setRandomize(false);
-	toolContentObj.setUseSelectLeaderToolOuput(false);
-	toolContentObj.setPrefixAnswersWithLetters(true);
-	toolContentObj.setDisplayAnswers(false);
-	// I can't find a use for setShowReport anywhere
-	toolContentObj.setShowReport(false);
-
-	try {
-	    Boolean bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_Q_ALLOW_REDO);
-	    toolContentObj.setRetries(bool != null ? bool : false);
-
-	    bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_Q_FEEDBACK);
-	    // toolContentObj.setShowFeedback(bool!=null?bool:false);
-
-	    Integer minPassMark = WDDXProcessor.convertToInteger(importValues,
-		    ToolContentImport102Manager.CONTENT_Q_MIN_PASSMARK);
-	    toolContentObj.setPassMark(minPassMark != null ? minPassMark : new Integer(0));
-
-	    // leave as empty, no need to set them to anything.
-	    // setMcUploadedFiles(Set mcSessions);
-	    // setMcSessions(Set mcSessions);
-
-	    mcContentDAO.saveMcContent(toolContentObj);
-
-	    // set up questions
-	    Vector questions = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_Q_QUESTION_INFO);
-	    if (questions != null) {
-
-		Iterator iter = questions.iterator();
-		while (iter.hasNext()) {
-		    Hashtable questionMap = (Hashtable) iter.next();
-		    create102Question(questionMap, toolContentObj);
-		}
-
-	    }
-
-	} catch (WDDXProcessorConversionException e) {
-	    McServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	mcContentDAO.saveMcContent(toolContentObj);
-    }
-
-    private void create102Question(Hashtable questionMap, McContent toolContentObj)
-	    throws WDDXProcessorConversionException {
-	McQueContent question = new McQueContent();
-	question.setDisplayOrder(
-		WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_Q_ORDER));
-
-	question.setFeedback((String) questionMap.get(ToolContentImport102Manager.CONTENT_Q_FEEDBACK));
-	question.setQuestion(
-		WebUtil.convertNewlines((String) questionMap.get(ToolContentImport102Manager.CONTENT_Q_QUESTION)));
-
-	// In 1.0.2 all questions are implicitly assumed to be 1 and be of equal weight
-	question.setMark(new Integer(1));
-
-	String correctAnswer = (String) questionMap.get(ToolContentImport102Manager.CONTENT_Q_ANSWER);
-
-	Vector candidates = (Vector) questionMap.get(ToolContentImport102Manager.CONTENT_Q_CANDIDATES);
-	if (candidates != null) {
-	    Iterator candIterator = candidates.iterator();
-	    while (candIterator.hasNext()) {
-		Hashtable candidate = (Hashtable) candIterator.next();
-		String optionText = (String) candidate.get(ToolContentImport102Manager.CONTENT_Q_ANSWER);
-		if ((optionText != null) && (optionText.length() > 0)) {
-		    // 1.0.2 has a display order but 2.0 doesn't ToolContentImport102Manager.CONTENT_Q_ORDER
-		    McOptsContent options = new McOptsContent();
-		    options.setCorrectOption((correctAnswer != null) && correctAnswer.equals(optionText));
-		    options.setMcQueOptionText(optionText);
-		    options.setMcQueContent(question);
-		    question.getMcOptionsContents().add(options);
-		}
-	    }
-	}
-
-	toolContentObj.getMcQueContents().add(question);
-	question.setMcContent(toolContentObj);
-	question.setMcContentId(toolContentObj.getUid());
-    }
-
     @Override
     public List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID) {
 	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
@@ -1901,24 +1788,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
 
 	return reflectionsContainerDTO;
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	McContent toolContentObj = null;
-	if (toolContentId != null) {
-	    toolContentObj = getMcContent(toolContentId);
-	}
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflect(true);
-	toolContentObj.setReflectionSubject(description);
     }
 
     @Override

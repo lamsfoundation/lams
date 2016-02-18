@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.wiki.service;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +48,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -78,15 +76,13 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * An implementation of the IWikiService interface.
  * 
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
-public class WikiService
-	implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager, ToolRestManager {
+public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(WikiService.class.getName());
 
@@ -878,56 +874,6 @@ public class WikiService
 	    }
 	}
 	return adds;
-    }
-
-    /*
-     * ===============Methods implemented from ToolContentImport102Manager ===============
-     */
-
-    /**
-     * Import the data for a 1.0.2 Wiki
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Wiki wiki = new Wiki();
-	wiki.setContentInUse(Boolean.FALSE);
-	wiki.setCreateBy(new Long(user.getUserID().longValue()));
-	wiki.setCreateDate(now);
-	wiki.setDefineLater(Boolean.FALSE);
-	wiki.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	wiki.setLockOnFinished(Boolean.TRUE);
-	wiki.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	wiki.setToolContentId(toolContentId);
-	wiki.setUpdateDate(now);
-	wiki.setAllowLearnerAttachImages(Boolean.TRUE);
-	wiki.setAllowLearnerCreatePages(Boolean.TRUE);
-	wiki.setAllowLearnerInsertLinks(Boolean.TRUE);
-	wiki.setReflectOnActivity(Boolean.FALSE);
-	wiki.setReflectInstructions(null);
-	wiki.setMaximumEdits(0);
-	wiki.setMinimumEdits(0);
-
-	wikiDAO.saveOrUpdate(wiki);
-    }
-
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	WikiService.logger.warn(
-		"Setting the reflective field on a wiki. This doesn't make sense as the wiki is for reflection and we don't reflect on reflection!");
-	Wiki wiki = getWikiByContentId(toolContentId);
-	if (wiki == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	wiki.setInstructions(description);
     }
 
     // =========================================================================================

@@ -30,7 +30,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,6 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -80,7 +78,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.ims.SimpleCommonCartridgeCon
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
-import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemInstruction;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemVisitLog;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
@@ -94,8 +91,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
@@ -104,8 +99,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * @author Andrey Balan
  * 
  */
-public class CommonCartridgeServiceImpl
-	implements ICommonCartridgeService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
+public class CommonCartridgeServiceImpl implements ICommonCartridgeService, ToolContentManager, ToolSessionManager {
     static Logger log = Logger.getLogger(CommonCartridgeServiceImpl.class.getName());
 
     private CommonCartridgeDAO commonCartridgeDao;
@@ -1082,54 +1076,6 @@ public class CommonCartridgeServiceImpl
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    private CommonCartridgeItemInstruction createInstruction(Hashtable instructionEntry)
-	    throws WDDXProcessorConversionException {
-
-	Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry,
-		ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-
-	// the description column in 1.0.2 was longer than 255 chars, so truncate.
-	String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-	if ((instructionText != null) && (instructionText.length() > 255)) {
-	    if (CommonCartridgeServiceImpl.log.isDebugEnabled()) {
-		CommonCartridgeServiceImpl.log
-			.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
-				+ instructionText + "\'");
-	    }
-	    instructionText = instructionText.substring(0, 255);
-	}
-
-	CommonCartridgeItemInstruction instruction = new CommonCartridgeItemInstruction();
-	instruction.setDescription(instructionText);
-	instruction.setSequenceId(instructionOrder);
-
-	return instruction;
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	CommonCartridge toolContentObj = getCommonCartridgeByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     /* =================================================================================== */
