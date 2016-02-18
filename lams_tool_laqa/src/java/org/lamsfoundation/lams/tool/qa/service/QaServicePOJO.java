@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.qa.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +60,6 @@ import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -99,10 +97,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -113,8 +108,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
-	ToolRestManager, QaAppConstants {
+public class QaServicePOJO
+	implements IQaService, ToolContentManager, ToolSessionManager, ToolRestManager, QaAppConstants {
     private static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 
     private IQaContentDAO qaDAO;
@@ -1238,81 +1233,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    /*
-     * ===============Methods implemented from ToolContentImport102Manager ===============
-     */
-
-    /**
-     * Import the data for a 1.0.2 Chat
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	QaContent toolContentObj = new QaContent();
-	toolContentObj.setCreatedBy(user.getUserID().longValue());
-	toolContentObj.setCreationDate(now);
-	toolContentObj.setDefineLater(false);
-	toolContentObj.setInstructions(null);
-	toolContentObj.setReflect(false);
-	toolContentObj.setReflectionSubject(null);
-	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	toolContentObj.setQaContentId(toolContentId);
-	toolContentObj.setUpdateDate(now);
-	toolContentObj.setQuestionsSequenced(false); // there is only 1
-	// question
-	toolContentObj.setContent(null);
-	toolContentObj.setReportTitle(null);
-	toolContentObj.setMonitoringReportTitle(null);
-	// in LAMS 2.0
-	toolContentObj.setLockWhenFinished(true);
-	toolContentObj.setNoReeditAllowed(false);
-	toolContentObj.setShowOtherAnswers(true);
-	toolContentObj.setAllowRateAnswers(false);
-	toolContentObj.setNotifyTeachersOnResponseSubmit(false);
-
-	Boolean bool;
-	try {
-	    bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_SHOW_USER);
-	    toolContentObj.setUsernameVisible(bool != null ? bool : false);
-	} catch (WDDXProcessorConversionException e) {
-	    QaServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	// leave as empty, no need to set them to anything.
-	// setQaSessions(Set qaSessions);
-
-	// set up question from body
-	QaQueContent question = new QaQueContent();
-	String content = WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY));
-	question.setQuestion(content);
-	question.setDisplayOrder(1);
-	question.setQaContent(toolContentObj);
-	toolContentObj.getQaQueContents().add(question);
-
-	qaDAO.saveOrUpdateQa(toolContentObj);
-
-    }
-
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	QaContent qaContent = null;
-	if (toolContentId != null) {
-	    qaContent = getQaContent(toolContentId.longValue());
-	}
-	if (qaContent == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	qaContent.setReflect(true);
-	qaContent.setReflectionSubject(description);
     }
 
     // =========================================================================================

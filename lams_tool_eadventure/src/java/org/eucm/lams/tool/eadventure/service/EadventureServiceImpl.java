@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +89,6 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -103,10 +101,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
@@ -115,8 +110,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * @author Dapeng.Ni
  * 
  */
-public class EadventureServiceImpl
-	implements IEadventureService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
+public class EadventureServiceImpl implements IEadventureService, ToolContentManager, ToolSessionManager {
     static Logger log = Logger.getLogger(EadventureServiceImpl.class.getName());
 
     private EadventureDAO eadventureDao;
@@ -1078,7 +1072,7 @@ public class EadventureServiceImpl
     public boolean isContentEdited(Long toolContentId) {
 	return getEadventureByContentId(toolContentId).isDefineLater();
     }
-    
+
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	for (EadventureSession session : eadventureSessionDao.getByContentId(toolContentId)) {
@@ -1089,7 +1083,7 @@ public class EadventureServiceImpl
 
 	return false;
     }
-    
+
     @Override
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Eadventure eadventure = eadventureDao.getByContentId(toolContentId);
@@ -1097,7 +1091,7 @@ public class EadventureServiceImpl
 	    EadventureServiceImpl.log
 		    .warn("Can not remove the tool content as it does not exist. ID: " + toolContentId);
 	}
-	
+
 	for (EadventureSession session : eadventureSessionDao.getByContentId(toolContentId)) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, EadventureConstants.TOOL_SIGNATURE);
@@ -1221,164 +1215,6 @@ public class EadventureServiceImpl
     public void forceCompleteUser(Long toolSessionId, User user) {
 	// no actions required
     }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Eadventure toolContentObj = new Eadventure();
-
-	try {
-	    toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	    toolContentObj.setContentId(toolContentId);
-	    toolContentObj.setContentInUse(Boolean.FALSE);
-	    toolContentObj.setCreated(now);
-	    toolContentObj.setDefineLater(Boolean.FALSE);
-	    toolContentObj.setInstructions(
-		    WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setUpdated(now);
-	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
-	    toolContentObj.setReflectInstructions(null);
-
-	    Boolean bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_FILE);
-	    bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL);
-	    bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL);
-	    toolContentObj.setLockWhenFinished(Boolean.FALSE);
-
-	    /*
-	     * unused entries from 1.0.2 [directoryName=] no equivalent in 2.0 [runtimeSubmissionStaffFile=true] no
-	     * equivalent in 2.0 [contentShowUser=false] no equivalent in 2.0 [isHTML=false] no equivalent in 2.0
-	     * [showbuttons=false] no equivalent in 2.0 [isReusable=false] not used in 1.0.2 (would be lock when
-	     * finished)
-	     */
-	    EadventureUser ruser = new EadventureUser();
-	    ruser.setUserId(new Long(user.getUserID().longValue()));
-	    ruser.setFirstName(user.getFirstName());
-	    ruser.setLastName(user.getLastName());
-	    ruser.setLoginName(user.getLogin());
-	    createUser(ruser);
-	    toolContentObj.setCreatedBy(ruser);
-
-	    // Eadventure Items. They are ordered on the screen by create date so they need to be saved in the right
-	    // order.
-	    // So read them all in first, then go through and assign the dates in the correct order and then save.
-	    // TODO nos cargamos la parte de los items.... comprobar que se pase todo bien y no de ning�n problema
-	    /* Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
-	    SortedMap<Integer, EadventureItem> items = new TreeMap<Integer, EadventureItem>();
-	    if (urls != null) {
-	    Iterator iter = urls.iterator();
-	    while (iter.hasNext()) {
-	        Hashtable urlMap = (Hashtable) iter.next();
-	        Integer itemOrder = WDDXProcessor.convertToInteger(urlMap,
-	    	    ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-	        EadventureItem item = new EadventureItem();
-	        item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-	        item.setCreateBy(ruser);
-	        item.setCreateByAuthor(true);
-	        item.setHide(false);
-	    
-	        Vector instructions = (Vector) urlMap
-	    	    .get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
-	        if (instructions != null && instructions.size() > 0) {
-	    	item.setItemInstructions(new HashSet());
-	    	Iterator insIter = instructions.iterator();
-	    	while (insIter.hasNext()) {
-	    	    item.getItemInstructions().add(createInstruction((Hashtable) insIter.next()));
-	    	}
-	        }
-	    
-	        String eadventureType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
-	        if (ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(eadventureType)) {
-	    	item.setType(EadventureConstants.RESOURCE_TYPE_URL);
-	    	item.setUrl((String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_URL));
-	    	item.setOpenUrlNewWindow(false);
-	        } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_WEBSITE.equals(eadventureType)) {
-	    	item.setType(EadventureConstants.RESOURCE_TYPE_WEBSITE);
-	        } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(eadventureType)) {
-	    	item.setType(EadventureConstants.RESOURCE_TYPE_FILE);
-	        } else {
-	    	throw new ToolException("Invalid eadventure type. Type was " + eadventureType);
-	        }
-	    
-	        items.put(itemOrder, item);
-	    }
-	    }
-	    
-	    Iterator iter = items.values().iterator();
-	    Date itemDate = null;
-	    while (iter.hasNext()) {
-	    if (itemDate != null) {
-	        try {
-	    	Thread.sleep(1000);
-	        } catch (Exception e) {
-	        }
-	    }
-	    itemDate = new Date();
-	    
-	    EadventureItem item = (EadventureItem) iter.next();
-	    item.setCreateDate(itemDate);
-	    toolContentObj.getEadventureItems().add(item);
-	    }*/
-
-	} catch (WDDXProcessorConversionException e) {
-	    EadventureServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	eadventureDao.saveObject(toolContentObj);
-
-    }
-
-    // TODO comprobar que no hay problema por quitar esto
-    /*private EadventureItemInstruction createInstruction(Hashtable instructionEntry)
-        throws WDDXProcessorConversionException {
-    
-    Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry,
-    	ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-    
-    // the description column in 1.0.2 was longer than 255 chars, so truncate.
-    String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-    if (instructionText != null && instructionText.length() > 255) {
-        if (EadventureServiceImpl.log.isDebugEnabled()) {
-    	EadventureServiceImpl.log
-    		.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
-    			+ instructionText + "\'");
-        }
-        instructionText = instructionText.substring(0, 255);
-    }
-    
-    EadventureItemInstruction instruction = new EadventureItemInstruction();
-    instruction.setDescription(instructionText);
-    instruction.setSequenceId(instructionOrder);
-    
-    return instruction;
-    }*/
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Eadventure toolContentObj = getEadventureByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
-    }
-
-    /* =================================================================================== */
 
     public IExportToolContentService getExportContentService() {
 	return exportContentService;

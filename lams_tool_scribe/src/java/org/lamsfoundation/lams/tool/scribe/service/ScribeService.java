@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.scribe.service;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +46,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -70,9 +68,6 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
  * An implementation of the IScribeService interface.
@@ -80,8 +75,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class ScribeService implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager,
-	ToolRestManager, IScribeService {
+public class ScribeService implements ToolSessionManager, ToolContentManager, ToolRestManager, IScribeService {
 
     private static Logger logger = Logger.getLogger(ScribeService.class.getName());
 
@@ -569,72 +563,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	} else {
 	    return list.get(0);
 	}
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Scribe
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Scribe scribe = new Scribe();
-	scribe.setContentInUse(Boolean.FALSE);
-	scribe.setCreateBy(new Long(user.getUserID().longValue()));
-	scribe.setCreateDate(now);
-	scribe.setDefineLater(Boolean.FALSE);
-	scribe.setInstructions(null);
-	scribe.setReflectInstructions(null);
-	scribe.setReflectOnActivity(Boolean.FALSE);
-	scribe.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	scribe.setToolContentId(toolContentId);
-	scribe.setUpdateDate(now);
-	scribe.setAutoSelectScribe(true);
-
-	try {
-	    Boolean isReusable = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_REUSABLE);
-	    scribe.setLockOnFinished(isReusable != null ? !isReusable.booleanValue() : true);
-	} catch (WDDXProcessorConversionException e) {
-	    ScribeService.logger.error("Unable to content for activity " + scribe.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + scribe.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	String headingList = (String) importValues.get(ToolContentImport102Manager.CONTENT_BODY);
-	if ((headingList != null) && (headingList.length() > 0)) {
-	    String[] headings = headingList.split("\\^");
-	    Set<ScribeHeading> set = new HashSet<ScribeHeading>();
-	    for (int i = 0; i < headings.length; i++) {
-		ScribeHeading sHeading = new ScribeHeading();
-		sHeading.setDisplayOrder(i);
-		sHeading.setHeadingText(WebUtil.convertNewlines(headings[i]));
-		sHeading.setScribe(scribe);
-		set.add(sHeading);
-	    }
-	    scribe.setScribeHeadings(set);
-	}
-
-	// leave as empty, no need to set them to anything.
-	// setScribeSessions(Set scribeSessions);
-	scribeDAO.saveOrUpdate(scribe);
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Scribe scribe = getScribeByContentId(toolContentId);
-	if (scribe == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	scribe.setReflectOnActivity(Boolean.TRUE);
-	scribe.setReflectInstructions(description);
     }
 
     // =========================================================================================

@@ -27,8 +27,6 @@ package org.lamsfoundation.lams.tool.pixlr.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -41,7 +39,6 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -66,7 +63,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -75,8 +71,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class PixlrService
-	implements ToolSessionManager, ToolContentManager, IPixlrService, ToolContentImport102Manager {
+public class PixlrService implements ToolSessionManager, ToolContentManager, IPixlrService {
 
     private static Logger logger = Logger.getLogger(PixlrService.class.getName());
 
@@ -590,51 +585,6 @@ public class PixlrService
     @Override
     public void saveOrUpdatePixlrConfigItem(PixlrConfigItem item) {
 	pixlrConfigItemDAO.saveOrUpdate(item);
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Pixlr
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Pixlr pixlr = new Pixlr();
-	pixlr.setContentInUse(Boolean.FALSE);
-	pixlr.setCreateBy(new Long(user.getUserID().longValue()));
-	pixlr.setCreateDate(now);
-	pixlr.setDefineLater(Boolean.FALSE);
-	pixlr.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	pixlr.setLockOnFinished(Boolean.TRUE);
-	pixlr.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	pixlr.setToolContentId(toolContentId);
-	pixlr.setUpdateDate(now);
-	pixlr.setReflectOnActivity(Boolean.FALSE);
-	// leave as empty, no need to set them to anything.
-	// setPixlrAttachments(Set pixlrAttachments);
-	// setPixlrSessions(Set pixlrSessions);
-	pixlrDAO.saveOrUpdate(pixlr);
-    }
-
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	PixlrService.logger.warn(
-		"Setting the reflective field on a pixlr. This doesn't make sense as the pixlr is for reflection and we don't reflect on reflection!");
-	Pixlr pixlr = getPixlrByContentId(toolContentId);
-	if (pixlr == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	pixlr.setInstructions(description);
     }
 
     // =========================================================================================

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +55,6 @@ import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -84,8 +82,8 @@ import org.lamsfoundation.lams.util.MessageService;
 /**
  * @author Andrey Balan
  */
-public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, ToolRestManager {
+public class PeerreviewServiceImpl
+	implements IPeerreviewService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(PeerreviewServiceImpl.class.getName());
 
     private PeerreviewDAO peerreviewDao;
@@ -93,7 +91,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     private PeerreviewUserDAO peerreviewUserDao;
 
     private PeerreviewSessionDAO peerreviewSessionDao;
-    
+
     // tool service
     private PeerreviewToolContentHandler peerreviewToolContentHandler;
 
@@ -110,7 +108,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
-    
+
     private IRatingService ratingService;
 
     private SortedSet<Long> creatingUsersForSessionIds;
@@ -118,7 +116,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     PeerreviewServiceImpl() {
 	creatingUsersForSessionIds = Collections.synchronizedSortedSet(new TreeSet<Long>());
     }
-    
+
     // *******************************************************************************
     // Service method
     // *******************************************************************************
@@ -185,7 +183,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     public void saveOrUpdatePeerreviewSession(PeerreviewSession resSession) {
 	peerreviewSessionDao.saveObject(resSession);
     }
-    
+
     @Override
     public void markUserFinished(Long toolSessionId, Long userId) {
 	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
@@ -260,13 +258,13 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 
 	return reflections;
     }
-    
+
     @Override
     public List<PeerreviewUser> getUsersForTablesorter(final Long toolSessionId, final Long excludeUserId, int page,
 	    int size, int sorting) {
 	return peerreviewUserDao.getUsersForTablesorter(toolSessionId, excludeUserId, page, size, sorting);
-    }    
-    
+    }
+
     @Override
     public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId, excludeUserId);
@@ -298,17 +296,17 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     public PeerreviewUser getUser(Long uid) {
 	return (PeerreviewUser) peerreviewUserDao.getObject(PeerreviewUser.class, uid);
     }
-    
+
     @Override
     public List<PeerreviewUser> getUsersBySession(Long toolSessionId) {
 	return peerreviewUserDao.getBySessionID(toolSessionId);
     }
-    
+
     @Override
     public List<PeerreviewUser> getUsersByContent(Long toolContentId) {
 	return peerreviewUserDao.getByContentId(toolContentId);
     }
-    
+
     @Override
     public boolean createUsersFromLesson(Long toolSessionId) throws Throwable {
 	// can we change lesson's class?
@@ -318,21 +316,21 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	try {
 	    boolean wasNotInSetAlready = creatingUsersForSessionIds.add(toolSessionId);
 	    if (!wasNotInSetAlready) {
-//		log.debug("Peer Review: Already processing session " + toolSessionId);
+		//		log.debug("Peer Review: Already processing session " + toolSessionId);
 		return false;
 	    }
 
-//	    log.debug("Peer Review: Processing session " + toolSessionId);
+	    //	    log.debug("Peer Review: Processing session " + toolSessionId);
 	    long start = System.currentTimeMillis();
 	    int usersAdded = 0;
 
 	    PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
 	    Integer numberPotentialLearners = toolService.getCountUsersForActivity(toolSessionId);
-//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": getCountUsersForActivity took: "
-//		    + (System.currentTimeMillis() - start) + "ms. numLearners "+numberPotentialLearners);
+	    //	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": getCountUsersForActivity took: "
+	    //		    + (System.currentTimeMillis() - start) + "ms. numLearners "+numberPotentialLearners);
 	    List<Long> sessionUserIds = peerreviewUserDao.getUserIdsBySessionID(toolSessionId);
-//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": getUserIdsBySessionID took: "
-//		    + (System.currentTimeMillis() - start) + "ms.");
+	    //	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": getUserIdsBySessionID took: "
+	    //		    + (System.currentTimeMillis() - start) + "ms.");
 	    boolean needsUpdate = sessionUserIds.size() != numberPotentialLearners.intValue();
 
 	    if (needsUpdate) {
@@ -347,8 +345,8 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 		}
 	    }
 
-//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update needsUpdate "+needsUpdate+" took: "
-//		    + (System.currentTimeMillis() - start) + "ms. Added " + usersAdded);
+	    //	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update needsUpdate "+needsUpdate+" took: "
+	    //		    + (System.currentTimeMillis() - start) + "ms. Added " + usersAdded);
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    return true;
 	} catch (Throwable e) {
@@ -356,12 +354,12 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	    String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
 	    PeerreviewServiceImpl.log
 		    .error("Exception thrown creating Peer Review users for session " + toolSessionId + " user id: "
-		    + (currentUser != null ? currentUser.getUserId().toString() : "null") + "; " + message, e);
+			    + (currentUser != null ? currentUser.getUserId().toString() : "null") + "; " + message, e);
 	    e.printStackTrace();
 	    throw (e);
-	} 
+	}
     }
-	    
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -393,7 +391,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
@@ -446,11 +444,11 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
 	    if (toolContentObj.getRatingCriterias() != null) {
-		    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
-			criteria.setToolContentId(toolContentId);
-		    }
+		for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+		    criteria.setToolContentId(toolContentId);
 		}
-	    
+	    }
+
 	    // reset the user
 	    PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
 		    toolContentId);
@@ -523,15 +521,19 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	List<PeerreviewSession> list = peerreviewSessionDao.getByContentId(toolContentId);
 	Iterator<PeerreviewSession> iter = list.iterator();
 	while (iter.hasNext()) {
-	    PeerreviewSession session = (PeerreviewSession) iter.next();
-	    if ( peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L) == 0) {
-		log.debug("Peer Review isReadOnly called. Returning true. Count of users for session id "+session.getSessionId()+" is "+peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L));
+	    PeerreviewSession session = iter.next();
+	    if (peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L) == 0) {
+		PeerreviewServiceImpl.log
+			.debug("Peer Review isReadOnly called. Returning true. Count of users for session id "
+				+ session.getSessionId() + " is "
+				+ peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L));
 		return true;
 	    } else {
-		log.debug("Peer Review isReadOnly called. Count of users for session id "+session.getSessionId()+" is 0");
+		PeerreviewServiceImpl.log.debug("Peer Review isReadOnly called. Count of users for session id "
+			+ session.getSessionId() + " is 0");
 	    }
 	}
-	log.debug("Peer Review isReadOnly called. Returning false.");
+	PeerreviewServiceImpl.log.debug("Peer Review isReadOnly called. Returning false.");
 	return false;
     }
 
@@ -618,23 +620,23 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	}
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<RatingCriteria> getRatingCriterias(Long toolContentId) {
 	return ratingService.getCriteriasByToolContentId(toolContentId);
     }
-    
+
     @Override
     public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias,
 	    Long toolContentId) {
 	ratingService.saveRatingCriterias(request, oldCriterias, toolContentId);
     }
-    
+
     @Override
     public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingService.isCommentsEnabled(toolContentId);
     }
-    
+
     @Override
     public int getCommentsMinWordsLimit(Long toolContentId) {
 	return ratingService.getCommentsMinWordsLimit(toolContentId);
@@ -645,30 +647,30 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
     }
-    
+
     @Override
     public ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId) {
 	return ratingService.getRatingCriteriaDtoWithActualRatings(contentId, itemId);
     }
-    
+
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem) {
 	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired,
 		userId);
-	
+
 	if (isCountUsersRatedEachItem) {
 	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, itemIds,
 		    userId.intValue());
-	    
+
 	    for (ItemRatingDTO itemRatingDTO : itemRatingDTOs) {
 		Long itemId = itemRatingDTO.getItemId();
-		
+
 		int countUsersRatedEachItem = itemIdToRatedUsersCountMap.get(itemId).intValue();
 		itemRatingDTO.setCountUsersRatedEachItem(countUsersRatedEachItem);
 	    }
 	}
-	
+
 	return itemRatingDTOs;
     }
 
@@ -707,27 +709,6 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	// no actions required
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Peerreview toolContentObj = getPeerreviewByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     @Override
@@ -778,7 +759,7 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
-    
+
     public void setRatingService(IRatingService ratingService) {
 	this.ratingService = ratingService;
     }

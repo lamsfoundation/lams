@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -59,7 +58,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -101,8 +99,8 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * @author Andrey Balan
  */
-public class ScratchieServiceImpl implements IScratchieService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, ToolRestManager {
+public class ScratchieServiceImpl
+	implements IScratchieService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(ScratchieServiceImpl.class.getName());
 
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
@@ -1455,10 +1453,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	ExcelCell[][] fourthPageData = rowList.toArray(new ExcelCell[][] {});
 	dataToExport.put(getMessage("label.spss.analysis"), fourthPageData);
-	
+
 	// ======================================================= Burning questions page
 	// =======================================
-	
+
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    rowList = new LinkedList<ExcelCell[]>();
 
@@ -1473,7 +1471,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		row = new ExcelCell[1];
 		row[0] = new ExcelCell(item.getTitle(), false);
 		rowList.add(row);
-		
+
 		Map<String, String> groupNameToBurningQuestion = burningQuestionDto.getGroupNameToBurningQuestion();
 		for (String groupName : groupNameToBurningQuestion.keySet()) {
 		    String burningQuestion = groupNameToBurningQuestion.get(groupName);
@@ -1809,7 +1807,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	return false;
     }
-    
+
     @Override
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
@@ -1940,30 +1938,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	// as long as there is no individual results in Scratchie tool (but rather one for entire group) there is no
 	// need to copyAnswersFromLeader()
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Scratchie toolContentObj = getScratchieByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     /* =================================================================================== */

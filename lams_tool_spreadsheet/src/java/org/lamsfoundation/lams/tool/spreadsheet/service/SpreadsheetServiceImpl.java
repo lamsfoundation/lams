@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.spreadsheet.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +41,6 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -77,8 +75,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Andrey Balan
  * 
  */
-public class SpreadsheetServiceImpl
-	implements ISpreadsheetService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
+public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentManager, ToolSessionManager {
     private static Logger log = Logger.getLogger(SpreadsheetServiceImpl.class.getName());
     private SpreadsheetDAO spreadsheetDao;
     private SpreadsheetUserDAO spreadsheetUserDao;
@@ -311,7 +308,7 @@ public class SpreadsheetServiceImpl
 	return spreadsheetUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
 		getNotebookEntries, coreNotebookService);
     }
-    
+
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return spreadsheetUserDao.getCountUsersBySession(sessionId, searchString);
@@ -737,26 +734,6 @@ public class SpreadsheetServiceImpl
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Spreadsheet toolContentObj = getSpreadsheetByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     /* =================================================================================== */

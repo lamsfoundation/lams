@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -62,7 +61,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -113,8 +111,8 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * @author Andrey Balan
  */
-public class AssessmentServiceImpl implements IAssessmentService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, ToolRestManager {
+public class AssessmentServiceImpl
+	implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -291,18 +289,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public List<AssessmentUser> getUsersBySession(Long toolSessionID) {
 	return assessmentUserDao.getBySessionID(toolSessionID);
     }
-    
+
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
     }
-    
+
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return assessmentUserDao.getCountUsersBySession(sessionId, searchString);
     }
-    
+
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
@@ -426,12 +424,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
 	if (lastResult != null) {
-	    
+
 	    // don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
 	    if (lastResult.getFinishDate() == null) {
 		return;
-		
-	    // mark previous attempt as not the latest anymore
+
+		// mark previous attempt as not the latest anymore
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -775,7 +773,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
-    
+
     @Override
     public AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid) {
 	return assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
@@ -861,7 +859,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public AssessmentQuestion getAssessmentQuestionByUid(Long questionUid) {
 	return assessmentQuestionDao.getByUid(questionUid);
     }
-    
+
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId) {
 	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
@@ -870,14 +868,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	for (AssessmentSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
 	    SessionDTO sessionDto = new SessionDTO(sessionId, session.getSessionName());
-	    
+
 	    //for statistics tab
 	    int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
 	    sessionDto.setNumberLearners(countUsers);
-	    
+
 	    sessionDtos.add(sessionDto);
 	}
-	
+
 	return sessionDtos;
     }
 
@@ -992,13 +990,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	return userSummary;
     }
-    
+
     @Override
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	QuestionSummary questionSummary = new QuestionSummary();
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
 	questionSummary.setQuestion(question);
-	
+
 	return questionSummary;
     }
 
@@ -1867,6 +1865,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return getAssessmentByContentId(toolContentId).isDefineLater();
     }
 
+    @Override
     public boolean isReadOnly(Long toolContentId) {
 	for (AssessmentSession session : assessmentSessionDao.getByContentId(toolContentId)) {
 	    if (!session.getAssessmentUsers().isEmpty()) {
@@ -1875,31 +1874,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	return false;
     }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Assessment toolContentObj = getAssessmentByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-    }
-
-    /* =================================================================================== */
 
     public IExportToolContentService getExportContentService() {
 	return exportContentService;

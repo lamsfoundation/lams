@@ -25,8 +25,6 @@
 package org.lamsfoundation.lams.tool.videoRecorder.service;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -40,7 +38,6 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -71,7 +68,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * An implementation of the IVideoRecorderService interface.
@@ -79,8 +75,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class VideoRecorderService
-	implements ToolSessionManager, ToolContentManager, IVideoRecorderService, ToolContentImport102Manager {
+public class VideoRecorderService implements ToolSessionManager, ToolContentManager, IVideoRecorderService {
 
     private static Logger logger = Logger.getLogger(VideoRecorderService.class.getName());
 
@@ -385,7 +380,7 @@ public class VideoRecorderService
 		return true;
 	    }
 	}
-	
+
 	return false;
     }
 
@@ -589,44 +584,6 @@ public class VideoRecorderService
 	VideoRecorderUser videoRecorderUser = new VideoRecorderUser(user, videoRecorderSession);
 	saveOrUpdateVideoRecorderUser(videoRecorderUser);
 	return videoRecorderUser;
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 VideoRecorder
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	VideoRecorder videoRecorder = new VideoRecorder();
-	videoRecorder.setContentInUse(Boolean.FALSE);
-	videoRecorder.setCreateBy(new Long(user.getUserID().longValue()));
-	videoRecorder.setCreateDate(now);
-	videoRecorder.setDefineLater(Boolean.FALSE);
-	videoRecorder.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	videoRecorder.setLockOnFinished(Boolean.TRUE);
-	videoRecorder.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	videoRecorder.setToolContentId(toolContentId);
-	videoRecorder.setUpdateDate(now);
-	videoRecorderDAO.saveOrUpdate(videoRecorder);
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	VideoRecorderService.logger.warn(
-		"Setting the reflective field on a videoRecorder. This doesn't make sense as the videoRecorder is for reflection and we don't reflect on reflection!");
-	VideoRecorder videoRecorder = getVideoRecorderByContentId(toolContentId);
-	if (videoRecorder == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	videoRecorder.setInstructions(description);
     }
 
     // =========================================================================================

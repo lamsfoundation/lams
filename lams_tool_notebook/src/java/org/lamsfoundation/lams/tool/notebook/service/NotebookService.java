@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.notebook.service;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -46,7 +45,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -69,7 +67,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -78,8 +75,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class NotebookService implements ToolSessionManager, ToolContentManager, INotebookService,
-	ToolContentImport102Manager, ToolRestManager {
+public class NotebookService implements ToolSessionManager, ToolContentManager, INotebookService, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(NotebookService.class.getName());
 
@@ -204,7 +200,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	notebook.setDefineLater(false);
 	notebookDAO.saveOrUpdate(notebook);
     }
-    
+
     @Override
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Notebook notebook = notebookDAO.getByContentId(toolContentId);
@@ -481,58 +477,22 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     private String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
-    
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
-	return notebookUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, coreNotebookService);
+
+    @Override
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+	    String searchString) {
+	return notebookUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
+		coreNotebookService);
     }
-    
+
+    @Override
     public int getCountUsersBySession(final Long sessionId, String searchString) {
 	return notebookUserDAO.getCountUsersBySession(sessionId, searchString);
     }
 
+    @Override
     public List<StatisticDTO> getStatisticsBySession(final Long contentId) {
 	return notebookUserDAO.getStatisticsBySession(contentId);
-    }
-    
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Notebook
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Notebook notebook = new Notebook();
-	notebook.setContentInUse(Boolean.FALSE);
-	notebook.setCreateBy(new Long(user.getUserID().longValue()));
-	notebook.setCreateDate(now);
-	notebook.setDefineLater(Boolean.FALSE);
-	notebook.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	notebook.setLockOnFinished(Boolean.TRUE);
-	notebook.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	notebook.setToolContentId(toolContentId);
-	notebook.setUpdateDate(now);
-	notebook.setAllowRichEditor(Boolean.FALSE);
-	// leave as empty, no need to set them to anything.
-	// setNotebookSessions(Set notebookSessions);
-	notebookDAO.saveOrUpdate(notebook);
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	NotebookService.logger.warn(
-		"Setting the reflective field on a notebook. This doesn't make sense as the notebook is for reflection and we don't reflect on reflection!");
-	Notebook notebook = getNotebookByContentId(toolContentId);
-	if (notebook == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	notebook.setInstructions(description);
     }
 
     // =========================================================================================

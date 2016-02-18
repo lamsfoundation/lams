@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +34,6 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -59,7 +57,6 @@ import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.SimpleURL;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -93,10 +90,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -107,8 +101,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  */
-public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, VoteAppConstants, ToolRestManager {
+public class VoteServicePOJO
+	implements IVoteService, ToolContentManager, ToolSessionManager, VoteAppConstants, ToolRestManager {
     private static Logger logger = Logger.getLogger(VoteServicePOJO.class.getName());
 
     private IVoteContentDAO voteContentDAO;
@@ -1508,87 +1502,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	}
 
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	VoteContent toolContentObj = new VoteContent();
-	toolContentObj.setCreatedBy(user.getUserID().longValue());
-	toolContentObj.setCreationDate(now);
-	toolContentObj.setDefineLater(false);
-	toolContentObj.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	toolContentObj.setReflectionSubject(null);
-	toolContentObj.setReflect(false);
-	toolContentObj.setUseSelectLeaderToolOuput(false);
-	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-
-	toolContentObj.setContent(null);
-	toolContentObj.setUpdateDate(now);
-	toolContentObj.setVoteContentId(toolContentId);
-	toolContentObj.setLockOnFinish(false);
-	toolContentObj.setShowResults(true);
-
-	try {
-	    Boolean bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_VOTE_ALLOW_POLL_NOMINATIONS);
-	    toolContentObj.setAllowText(bool != null ? bool : false);
-
-	    bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
-	    toolContentObj.setLockOnFinish(bool != null ? bool : true);
-
-	    Integer maxCount = WDDXProcessor.convertToInteger(importValues,
-		    ToolContentImport102Manager.CONTENT_VOTE_MAXCHOOSE);
-	    toolContentObj.setMaxNominationCount(maxCount != null ? maxCount.toString() : "1");
-
-	    Integer minCount = WDDXProcessor.convertToInteger(importValues,
-		    ToolContentImport102Manager.CONTENT_VOTE_MINCHOOSE);
-	    toolContentObj.setMinNominationCount(minCount != null ? minCount.toString() : "1");
-
-	} catch (WDDXProcessorConversionException e) {
-	    VoteServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	// leave as empty, no need to set them to anything.
-	// setVoteSessions(Set voteSessions);
-
-	// set up question from body
-	Vector nominations = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_VOTE_NOMINATIONS);
-	if (nominations != null) {
-	    Iterator iter = nominations.iterator();
-	    int order = 1;
-	    while (iter.hasNext()) {
-		String element = (String) iter.next();
-		VoteQueContent nomination = new VoteQueContent(element, toolContentObj);
-		nomination.setDisplayOrder(order++);
-		toolContentObj.getVoteQueContents().add(nomination);
-	    }
-	}
-
-	voteContentDAO.saveVoteContent(toolContentObj);
-    }
-
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	VoteContent toolContentObj = null;
-	if (toolContentId != null) {
-	    toolContentObj = getVoteContent(toolContentId);
-	}
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflect(Boolean.TRUE.booleanValue());
-	toolContentObj.setReflectionSubject(description);
     }
 
     @Override

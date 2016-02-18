@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -72,7 +70,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -114,10 +111,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
  * 
@@ -125,8 +119,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * 
  * @version $Revision$
  */
-public class ForumService
-	implements IForumService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager, ToolRestManager {
+public class ForumService implements IForumService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static final Logger log = Logger.getLogger(ForumService.class);
 
     // DAO variables
@@ -1205,144 +1198,12 @@ public class ForumService
 	return MessageDTO.getMessageDTO(messageDao.getBySession(sessionID));
     }
 
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Forum
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Forum toolContentObj = new Forum();
-
-	try {
-
-	    toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-
-	    toolContentObj.setAllowAnonym(Boolean.FALSE);
-	    toolContentObj.setAllowEdit(Boolean.TRUE); // this is the default value
-	    toolContentObj.setAllowNewTopic(Boolean.TRUE);
-	    toolContentObj.setAllowRichEditor(Boolean.FALSE);
-	    toolContentObj.setAllowUpload(Boolean.TRUE); // this is the default value
-	    toolContentObj.setAllowRateMessages(Boolean.FALSE); // this is the default value
-	    toolContentObj.setContentId(toolContentId);
-	    toolContentObj.setContentInUse(Boolean.FALSE);
-	    toolContentObj.setCreated(now);
-	    toolContentObj.setDefineLater(Boolean.FALSE);
-	    toolContentObj.setInstructions(
-		    WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setMaxCharacters(5000); // this is the default value
-	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
-	    toolContentObj.setReflectInstructions(null);
-
-	    // lockOnFinsh = ! isReusable
-	    Boolean bool = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
-	    toolContentObj.setLockWhenFinished(bool != null ? !bool.booleanValue() : false);
-	    toolContentObj.setMaximumReply(0);
-	    toolContentObj.setMinimumReply(0);
-	    toolContentObj.setUpdated(now);
-
-	    // unused entries from 1.0.2
-	    // isNewTopicAllowed - not actually used in 1.0.2
-	    // durationInDays - no equivalent in 2.0
-	    // isPostingModerated - no equivalent in 2.0
-	    // isPostingNotified - no equivalent in 2.0
-	    // contentShowUser - no equivalent in 2.0
-	    // isHTML - no equivalent in 2.0
-	    // terminationType=moderator - no equivalent in 2.0
-
-	    ForumUser forumUser = new ForumUser();
-	    forumUser.setUserId(new Long(user.getUserID().longValue()));
-	    forumUser.setFirstName(user.getFirstName());
-	    forumUser.setLastName(user.getLastName());
-	    forumUser.setLoginName(user.getLogin());
-	    createUser(forumUser);
-	    toolContentObj.setCreatedBy(forumUser);
-
-	    // leave as empty, no need to set them to anything.
-	    // toolContentObj.setAttachments(attachments);
-	    forumDao.saveOrUpdate(toolContentObj);
-
-	    // topics in the XML file are ordered using the "number" field, not in their order in the vector.
-	    TreeMap<Integer, Map> messageMaps = new TreeMap<Integer, Map>();
-	    Vector topics = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_MB_TOPICS);
-	    Date msgDate = null;
-	    if (topics != null) {
-		Iterator iter = topics.iterator();
-		while (iter.hasNext()) {
-		    Hashtable messageMap = (Hashtable) iter.next();
-		    Integer order = WDDXProcessor.convertToInteger(messageMap,
-			    ToolContentImport102Manager.CONTENT_MB_TOPIC_NUMBER);
-		    messageMaps.put(order, messageMap);
-		}
-
-		iter = messageMaps.values().iterator();
-		while (iter.hasNext()) {
-
-		    Map messageMap = (Map) iter.next();
-
-		    Message message = new Message();
-		    message.setIsAuthored(true);
-
-		    // topics are ordered by date, so I need to try to assign each entry a different date. Won't work if
-		    // this is too quick.
-		    if (msgDate != null) {
-			try {
-			    Thread.sleep(1000);
-			} catch (Exception e) {
-			}
-		    }
-		    msgDate = new Date();
-
-		    message.setCreated(msgDate);
-		    message.setCreatedBy(forumUser);
-		    message.setUpdated(msgDate);
-		    message.setLastReplyDate(msgDate);
-		    message.setSubject((String) messageMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-		    message.setBody(WebUtil.convertNewlines(
-			    (String) messageMap.get(ToolContentImport102Manager.CONTENT_MB_TOPIC_MESSAGE)));
-		    // ignore the old subject field - it wasn't updated by the old interface.
-		    message.setHideFlag(Boolean.FALSE);
-		    message.setIsAnonymous(Boolean.FALSE);
-
-		    createRootTopic(toolContentObj.getUid(), (ForumToolSession) null, message);
-
-		}
-	    }
-
-	} catch (WDDXProcessorConversionException e) {
-	    ForumService.log.error("Unable to content for activity " + toolContentObj.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-    }
-
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Forum toolContentObj = getForumByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
-    }
-
     /**
      * Sends marks straight to gradebook from a forum report
      * 
      * @param user
      * @param toolSessionID
      */
-    @SuppressWarnings("unchecked")
     public void sendMarksToGradebook(ForumUser user, Long toolSessionID) {
 
 	List<MessageDTO> messages = getMessagesByUserUid(user.getUid(), toolSessionID);

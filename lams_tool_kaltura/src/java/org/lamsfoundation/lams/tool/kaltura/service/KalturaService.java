@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.kaltura.service;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +42,6 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -84,8 +82,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class KalturaService
-	implements ToolSessionManager, ToolContentManager, IKalturaService, ToolContentImport102Manager {
+public class KalturaService implements ToolSessionManager, ToolContentManager, IKalturaService {
 
     private static Logger logger = Logger.getLogger(KalturaService.class.getName());
 
@@ -650,30 +647,6 @@ public class KalturaService
     @Override
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Kaltura
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-    }
-
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	KalturaService.logger.warn(
-		"Setting the reflective field on a kaltura. This doesn't make sense as the kaltura is for reflection and we don't reflect on reflection!");
-	Kaltura kaltura = getKalturaByContentId(toolContentId);
-	if (kaltura == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	kaltura.setInstructions(description);
     }
 
     // =========================================================================================

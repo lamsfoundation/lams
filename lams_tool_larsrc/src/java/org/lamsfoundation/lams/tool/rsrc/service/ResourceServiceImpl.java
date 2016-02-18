@@ -31,8 +31,6 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -41,9 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -72,7 +68,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -108,18 +103,14 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
  * @author Dapeng.Ni
  */
-public class ResourceServiceImpl implements IResourceService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager, ToolRestManager {
+public class ResourceServiceImpl implements IResourceService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(ResourceServiceImpl.class.getName());
 
     private ResourceDAO resourceDao;
@@ -583,14 +574,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	}
 	return userList;
     }
-    
+
     @Override
     public List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString) {
 	return resourceItemVisitDao.getPagedVisitLogsBySessionAndItem(sessionId, itemUid, page, size, sortBy, sortOrder,
 		searchString);
     }
-    
+
     @Override
     public int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString) {
 	return resourceItemVisitDao.getCountVisitLogsBySessionAndItem(sessionId, itemUid, searchString);
@@ -1114,168 +1105,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	//no actions required
-    }
-
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Resource toolContentObj = new Resource();
-
-	try {
-	    toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	    toolContentObj.setContentId(toolContentId);
-	    toolContentObj.setContentInUse(Boolean.FALSE);
-	    toolContentObj.setCreated(now);
-	    toolContentObj.setDefineLater(Boolean.FALSE);
-	    toolContentObj.setInstructions(
-		    WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	    toolContentObj.setUpdated(now);
-	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
-	    toolContentObj.setReflectInstructions(null);
-
-	    toolContentObj.setRunAuto(Boolean.FALSE);
-	    Boolean bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_FILE);
-	    toolContentObj.setAllowAddFiles(bool != null ? bool : Boolean.TRUE);
-	    bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL);
-	    toolContentObj.setAllowAddUrls(bool != null ? bool : Boolean.TRUE);
-	    Integer minToComplete = WDDXProcessor.convertToInteger(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_MIN_NUMBER_COMPLETE);
-	    toolContentObj.setMiniViewResourceNumber(minToComplete != null ? minToComplete.intValue() : 0);
-	    bool = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_URL_RUNTIME_LEARNER_SUBMIT_URL);
-	    toolContentObj.setLockWhenFinished(Boolean.FALSE);
-	    toolContentObj.setRunAuto(Boolean.FALSE);
-
-	    // leave as empty, no need to set them to anything.
-	    // toolContentObj.setAttachments(attachments);
-
-	    /*
-	     * unused entries from 1.0.2 [directoryName=] no equivalent in 2.0 [runtimeSubmissionStaffFile=true] no
-	     * equivalent in 2.0 [contentShowUser=false] no equivalent in 2.0 [isHTML=false] no equivalent in 2.0
-	     * [showbuttons=false] no equivalent in 2.0 [isReusable=false] not used in 1.0.2 (would be lock when
-	     * finished)
-	     */
-	    ResourceUser ruser = new ResourceUser();
-	    ruser.setUserId(new Long(user.getUserID().longValue()));
-	    ruser.setFirstName(user.getFirstName());
-	    ruser.setLastName(user.getLastName());
-	    ruser.setLoginName(user.getLogin());
-	    createUser(ruser);
-	    toolContentObj.setCreatedBy(ruser);
-
-	    // Resource Items. They are ordered on the screen by create date so they need to be saved in the right
-	    // order.
-	    // So read them all in first, then go through and assign the dates in the correct order and then save.
-	    Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
-	    SortedMap<Integer, ResourceItem> items = new TreeMap<Integer, ResourceItem>();
-	    if (urls != null) {
-		Iterator iter = urls.iterator();
-		while (iter.hasNext()) {
-		    Hashtable urlMap = (Hashtable) iter.next();
-		    Integer itemOrder = WDDXProcessor.convertToInteger(urlMap,
-			    ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-		    ResourceItem item = new ResourceItem();
-		    item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-		    item.setCreateBy(ruser);
-		    item.setCreateByAuthor(true);
-		    item.setHide(false);
-
-		    Vector instructions = (Vector) urlMap
-			    .get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
-		    if ((instructions != null) && (instructions.size() > 0)) {
-			item.setItemInstructions(new HashSet());
-			Iterator insIter = instructions.iterator();
-			while (insIter.hasNext()) {
-			    item.getItemInstructions().add(createInstruction((Hashtable) insIter.next()));
-			}
-		    }
-
-		    String resourceType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
-		    if (ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(resourceType)) {
-			item.setType(ResourceConstants.RESOURCE_TYPE_URL);
-			item.setUrl((String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_URL));
-			item.setOpenUrlNewWindow(false);
-		    } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_WEBSITE.equals(resourceType)) {
-			item.setType(ResourceConstants.RESOURCE_TYPE_WEBSITE);
-		    } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(resourceType)) {
-			item.setType(ResourceConstants.RESOURCE_TYPE_FILE);
-			item.setOpenUrlNewWindow(false);
-		    } else {
-			throw new ToolException("Invalid shared resources type. Type was " + resourceType);
-		    }
-
-		    items.put(itemOrder, item);
-		}
-	    }
-
-	    Iterator iter = items.values().iterator();
-	    Date itemDate = null;
-	    while (iter.hasNext()) {
-		if (itemDate != null) {
-		    try {
-			Thread.sleep(1000);
-		    } catch (Exception e) {
-		    }
-		}
-		itemDate = new Date();
-
-		ResourceItem item = (ResourceItem) iter.next();
-		item.setCreateDate(itemDate);
-		toolContentObj.getResourceItems().add(item);
-	    }
-
-	} catch (WDDXProcessorConversionException e) {
-	    ResourceServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	resourceDao.saveObject(toolContentObj);
-
-    }
-
-    private ResourceItemInstruction createInstruction(Hashtable instructionEntry)
-	    throws WDDXProcessorConversionException {
-
-	Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry,
-		ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-
-	// the description column in 1.0.2 was longer than 255 chars, so truncate.
-	String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-	if ((instructionText != null) && (instructionText.length() > 255)) {
-	    if (ResourceServiceImpl.log.isDebugEnabled()) {
-		ResourceServiceImpl.log
-			.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
-				+ instructionText + "\'");
-	    }
-	    instructionText = instructionText.substring(0, 255);
-	}
-
-	ResourceItemInstruction instruction = new ResourceItemInstruction();
-	instruction.setDescription(instructionText);
-	instruction.setSequenceId(instructionOrder);
-
-	return instruction;
-    }
-
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Resource toolContentObj = getResourceByContentId(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     @Override

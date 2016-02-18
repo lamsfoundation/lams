@@ -31,7 +31,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -72,7 +71,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -103,14 +101,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.dao.DataAccessException;
 
 /**
  * @author Manpreet Minhas
  */
-public class SubmitFilesService implements ToolContentManager, ToolSessionManager, ISubmitFilesService,
-	ToolContentImport102Manager, ToolRestManager {
+public class SubmitFilesService
+	implements ToolContentManager, ToolSessionManager, ISubmitFilesService, ToolRestManager {
 
     private static Logger log = Logger.getLogger(SubmitFilesService.class);
 
@@ -914,55 +911,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return toolService.isGroupedActivity(toolContentID);
     }
 
-    /* ===============Methods implemented from ToolContentImport102Manager =============== */
-
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	SubmitFilesContent toolContentObj = new SubmitFilesContent();
-
-	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	toolContentObj.setContentID(toolContentId);
-	toolContentObj.setContentInUse(Boolean.FALSE);
-	toolContentObj.setCreated(now);
-	toolContentObj.setDefineLater(Boolean.FALSE);
-	toolContentObj.setInstruction(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	toolContentObj.setUpdated(now);
-	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
-	toolContentObj.setLockOnFinished(Boolean.TRUE);
-	toolContentObj.setReflectOnActivity(Boolean.FALSE);
-	toolContentObj.setReflectInstructions(null);
-
-	SubmitUser suser = createContentUser(user, toolContentId);
-	toolContentObj.setCreatedBy(suser);
-
-	// leave as empty, no need to set them to anything.
-	// toolContentObj.setInstructionFiles(attachments);
-
-	submitFilesContentDAO.saveOrUpdate(toolContentObj);
-    }
-
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	SubmitFilesContent toolContentObj = getSubmitFilesContent(toolContentId);
-	if (toolContentObj == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
-    }
-
     @Override
     public SubmitUser getUserByUid(Long learnerID) {
 	return (SubmitUser) submitUserDAO.find(SubmitUser.class, learnerID);
@@ -996,8 +944,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     @Override
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
-	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
-		getNotebookEntries, coreNotebookService);
+	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
+		coreNotebookService);
     }
 
     @Override
@@ -1009,7 +957,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     public List<StatisticDTO> getStatisticsBySession(final Long contentId) {
 	return submitUserDAO.getStatisticsBySession(contentId);
     }
-    
+
     public SubmitUser createContentUser(Integer userId, String firstName, String lastName, String loginName,
 	    Long contentId) {
 	SubmitUser author = submitUserDAO.getContentUser(contentId, userId);

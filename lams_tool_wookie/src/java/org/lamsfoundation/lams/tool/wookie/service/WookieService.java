@@ -24,8 +24,6 @@
 
 package org.lamsfoundation.lams.tool.wookie.service;
 
-import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -39,7 +37,6 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -64,7 +61,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * An implementation of the IWookieService interface.
@@ -72,8 +68,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class WookieService
-	implements ToolSessionManager, ToolContentManager, IWookieService, ToolContentImport102Manager {
+public class WookieService implements ToolSessionManager, ToolContentManager, IWookieService {
 
     private static Logger logger = Logger.getLogger(WookieService.class.getName());
 
@@ -601,51 +596,6 @@ public class WookieService
     @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
-    }
-
-    /*
-     * ===============Methods implemented from ToolContentImport102Manager
-     * ===============
-     */
-
-    /**
-     * Import the data for a 1.0.2 Wookie
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Wookie wookie = new Wookie();
-	wookie.setContentInUse(Boolean.FALSE);
-	wookie.setCreateBy(user.getUserID());
-	wookie.setCreateDate(now);
-	wookie.setDefineLater(Boolean.FALSE);
-	wookie.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	wookie.setLockOnFinished(Boolean.TRUE);
-	wookie.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	wookie.setToolContentId(toolContentId);
-	wookie.setUpdateDate(now);
-	wookie.setReflectOnActivity(Boolean.FALSE);
-	wookieDAO.saveOrUpdate(wookie);
-    }
-
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	WookieService.logger.warn(
-		"Setting the reflective field on a wookie. This doesn't make sense as the wookie is for reflection and we don't reflect on reflection!");
-	Wookie wookie = getWookieByContentId(toolContentId);
-	if (wookie == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	wookie.setInstructions(description);
     }
 
     // =========================================================================================

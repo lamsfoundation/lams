@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.chat.service;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -49,7 +48,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -73,10 +71,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
  * An implementation of the IChatService interface.
@@ -84,8 +79,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class ChatService
-	implements ToolSessionManager, ToolContentManager, ToolContentImport102Manager, IChatService, ToolRestManager {
+public class ChatService implements ToolSessionManager, ToolContentManager, IChatService, ToolRestManager {
 
     private static Logger logger = Logger.getLogger(ChatService.class.getName());
 
@@ -761,63 +755,6 @@ public class ChatService
     @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
-    }
-
-    /*
-     * ===============Methods implemented from ToolContentImport102Manager ===============
-     */
-
-    /**
-     * Import the data for a 1.0.2 Chat
-     */
-    @Override
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-	Date now = new Date();
-	Chat chat = new Chat();
-	chat.setContentInUse(Boolean.FALSE);
-	chat.setCreateBy(new Long(user.getUserID().longValue()));
-	chat.setCreateDate(now);
-	chat.setDefineLater(Boolean.FALSE);
-	chat.setFilterKeywords(null);
-	chat.setFilteringEnabled(Boolean.FALSE);
-	chat.setInstructions(
-		WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	chat.setLockOnFinished(Boolean.FALSE);
-	chat.setReflectInstructions(null);
-	chat.setReflectOnActivity(Boolean.FALSE);
-	chat.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	chat.setToolContentId(toolContentId);
-	chat.setUpdateDate(now);
-
-	try {
-	    Boolean isReusable = WDDXProcessor.convertToBoolean(importValues,
-		    ToolContentImport102Manager.CONTENT_REUSABLE);
-	    chat.setLockOnFinished(isReusable != null ? !isReusable.booleanValue() : true);
-	} catch (WDDXProcessorConversionException e) {
-	    ChatService.logger.error("Unable to content for activity " + chat.getTitle()
-		    + "properly due to a WDDXProcessorConversionException.", e);
-	    throw new ToolException("Invalid import data format for activity " + chat.getTitle()
-		    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-	}
-
-	chatDAO.saveOrUpdate(chat);
-    }
-
-    /**
-     * Set the description, throws away the title value as this is not supported in 2.0
-     */
-    @Override
-    public void setReflectiveData(Long toolContentId, String title, String description)
-	    throws ToolException, DataMissingException {
-
-	Chat chat = getChatByContentId(toolContentId);
-	if (chat == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
-	}
-
-	chat.setReflectOnActivity(Boolean.TRUE);
-	chat.setReflectInstructions(description);
     }
 
     public ChatOutputFactory getChatOutputFactory() {
