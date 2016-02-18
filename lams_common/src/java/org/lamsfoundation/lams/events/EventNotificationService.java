@@ -90,10 +90,10 @@ public class EventNotificationService implements IEventNotificationService {
     }
 
     @Override
-    public boolean notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat) {
+    public void notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat) {
 	List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
 	if (monitoringUsers.isEmpty()) {
-	    return true;
+	    return;
 	}
 
 	Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
@@ -120,8 +120,8 @@ public class EventNotificationService implements IEventNotificationService {
 		.append(": ").append(lessonName).append("\n\n").append(message).append("\n\n").append(serverUrl)
 		.toString();
 
-	return sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL, emailSubject,
-		emailBody, isHtmlFormat);
+	sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL, emailSubject, emailBody,
+		isHtmlFormat);
     }
 
     /**
@@ -187,7 +187,7 @@ public class EventNotificationService implements IEventNotificationService {
     }
 
     @Override
-    public boolean sendMessage(final Integer fromUserId, final Integer[] toUserIds,
+    public void sendMessage(final Integer fromUserId, final Integer[] toUserIds,
 	    final AbstractDeliveryMethod deliveryMethod, final String subject, final String message,
 	    final boolean isHtmlFormat) throws InvalidParameterException {
 	if (toUserIds == null) {
@@ -196,25 +196,23 @@ public class EventNotificationService implements IEventNotificationService {
 	if (deliveryMethod == null) {
 	    throw new InvalidParameterException("Delivery method must not be null.");
 	}
-	boolean totalSendResult = true;
-	Event event = null;
-	for (Integer id : toUserIds) {
-	    String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
-	    if (result != null) {
-		totalSendResult = false;
-		EventNotificationService.log.warn("Error occured while sending message: " + result);
-		event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
-			String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
-		subscribe(event, id, deliveryMethod, null);
+	// create a new thread to send the messages as it can take some time
+	new Thread(() -> {
+	    Event event = null;
+	    for (Integer id : toUserIds) {
+		String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
+		if (result != null) {
+		    EventNotificationService.log.warn("Error occured while sending message: " + result);
+		    event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
+			    String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
+		    subscribe(event, id, deliveryMethod, null);
+		}
 	    }
-	}
-	if (event != null) {
-	    event.setFailTime(new Date());
-	    eventDAO.saveEvent(event);
-	}
-
-	return totalSendResult;
-
+	    if (event != null) {
+		event.setFailTime(new Date());
+		eventDAO.saveEvent(event);
+	    }
+	}).start();
     }
 
     public void setEventDAO(EventDAO eventDAO) {
@@ -295,44 +293,47 @@ public class EventNotificationService implements IEventNotificationService {
      * See {@link IEventNotificationService#trigger(String, String, Long, String, String)
      */
     private void trigger(Event event, String subject, String message) {
-	String subjectToSend = subject == null ? event.getSubject() : subject;
-	String messageToSend = message == null ? event.getMessage() : message;
+	final String subjectToSend = subject == null ? event.getSubject() : subject;
+	final String messageToSend = message == null ? event.getMessage() : message;
 
-	Event eventFailCopy = null;
-	Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
-	while (subscriptionIterator.hasNext()) {
-	    Subscription subscription = subscriptionIterator.next();
-	    if ((event.getFailTime() != null) || subscription.isEligibleForNotification()) {
-		notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
-		if (subscription.getLastOperationSuccessful()) {
-		    if (event.getFailTime() != null) {
-			subscriptionIterator.remove();
+	// create a new thread to send the messages as it can take some time
+	new Thread(() -> {
+	    Event eventFailCopy = null;
+	    Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
+	    while (subscriptionIterator.hasNext()) {
+		Subscription subscription = subscriptionIterator.next();
+		if ((event.getFailTime() != null) || subscription.isEligibleForNotification()) {
+		    notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
+		    if (subscription.getLastOperationSuccessful()) {
+			if (event.getFailTime() != null) {
+			    subscriptionIterator.remove();
+			}
+		    } else if (event.getFailTime() == null) {
+			if (eventFailCopy == null) {
+			    eventFailCopy = (Event) event.clone();
+			}
+			subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod(),
+				subscription.getPeriodicity());
 		    }
-		} else if (event.getFailTime() == null) {
-		    if (eventFailCopy == null) {
-			eventFailCopy = (Event) event.clone();
-		    }
-		    subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod(),
-			    subscription.getPeriodicity());
 		}
 	    }
-	}
-	if (event.getSubscriptions().isEmpty()) {
-	    eventDAO.deleteEvent(event);
-	} else {
-	    eventDAO.saveEvent(event);
-	}
+	    if (event.getSubscriptions().isEmpty()) {
+		eventDAO.deleteEvent(event);
+	    } else {
+		eventDAO.saveEvent(event);
+	    }
 
-	/*
-	 * if any of the notifications failed,
-	 * a copy of the event is created in order to repeat the attempt later 
-	 */
-	if (eventFailCopy != null) {
-	    eventFailCopy.setFailTime(new Date());
-	    eventFailCopy.setSubject(subjectToSend);
-	    eventFailCopy.setMessage(messageToSend);
-	    eventDAO.saveEvent(eventFailCopy);
-	}
+	    /*
+	     * if any of the notifications failed,
+	     * a copy of the event is created in order to repeat the attempt later 
+	     */
+	    if (eventFailCopy != null) {
+		eventFailCopy.setFailTime(new Date());
+		eventFailCopy.setSubject(subjectToSend);
+		eventFailCopy.setMessage(messageToSend);
+		eventDAO.saveEvent(eventFailCopy);
+	    }
+	}).start();
     }
 
     @Override
