@@ -126,9 +126,8 @@ public interface IEventNotificationService {
      * @param message
      *            message to be sent
      * @isHtmlFormat whether email is required to of HTML format
-     * @return
      */
-    boolean notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat);
+    void notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat);
 
     void resendMessages();
 
@@ -168,12 +167,10 @@ public interface IEventNotificationService {
      *            body of the message to send
      * @param isHtmlFormat
      *            whether the message is of HTML content-type or plain text
-     * @return <code>true</code> if the message was succefully send to all the users; as in the current implementation a
-     *         separate thread is used for sending messages, this method always returns <code>true</code>
      * @throws InvalidParameterException
      *             if userId array or delivery method are <code>null</code>
      */
-    boolean sendMessage(Integer fromUserId, Integer[] toUserIds, AbstractDeliveryMethod deliveryMethod, String subject,
+    void sendMessage(Integer fromUserId, Integer[] toUserIds, AbstractDeliveryMethod deliveryMethod, String subject,
 	    String message, boolean isHtmlFormat) throws InvalidParameterException;
 
     /**
