@@ -69,7 +69,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    }
 	    return null;
 	} catch (Exception e) {
-	    DeliveryMethodMail.log.error("Error while sending an email", e);
+	    DeliveryMethodMail.log.error("Error while sending an email: " + e.toString());
 	    return e.toString();
 	}
     }
