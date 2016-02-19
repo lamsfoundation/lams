@@ -37,6 +37,7 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -254,8 +255,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	public String mimeTypeFieldName;
 
-	public String filePropertyFieldName;
-
 	public String initalItemFieldName;
 
 	public NameInfo(String className, String uuidFieldName, String versionFieldName) {
@@ -265,12 +264,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	public NameInfo(String className, String uuidFieldName, String versionFieldName, String fileNameFieldName,
-		String filePropertyFieldName, String mimeTypeFieldName, String initalItemFieldName) {
+		String mimeTypeFieldName, String initalItemFieldName) {
 	    this.className = className;
 	    this.uuidFieldName = uuidFieldName;
 	    this.versionFieldName = versionFieldName;
 	    this.fileNameFieldName = fileNameFieldName;
-	    this.filePropertyFieldName = filePropertyFieldName;
 	    this.mimeTypeFieldName = mimeTypeFieldName;
 	    this.initalItemFieldName = initalItemFieldName;
 	}
@@ -604,10 +602,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     @Override
     public void registerFileClassForImport(String fileNodeClassName, String fileUuidFieldName,
-	    String fileVersionFieldName, String fileNameFieldName, String filePropertyFieldName,
-	    String mimeTypeFieldName, String initialItemFieldName) {
+	    String fileVersionFieldName, String fileNameFieldName, String mimeTypeFieldName,
+	    String initialItemFieldName) {
 	fileHandleClassList.add(this.new NameInfo(fileNodeClassName, fileUuidFieldName, fileVersionFieldName,
-		fileNameFieldName, filePropertyFieldName, mimeTypeFieldName, initialItemFieldName));
+		fileNameFieldName, mimeTypeFieldName, initialItemFieldName));
     }
 
     @Override
@@ -1386,7 +1384,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// add suffix if configuration is not set or is set to true
 	String addSuffix = Configuration.get(ConfigurationKeys.SUFFIX_IMPORTED_LD);
 	if ((addSuffix == null) || Boolean.valueOf(addSuffix)) {
-	    ld.setTitle(ImportExportUtil.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
+	    ld.setTitle(ExportToolContentService.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
 	    learningDesignDAO.update(ld);
 	    // persist
 	}
@@ -1530,7 +1528,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	ld.setLastModifiedDateTime(dto.getLastModifiedDateTime());
 	ld.setContentFolderID(dto.getContentFolderID());
-	
+
 	ld.setDesignType(dto.getDesignType());
 
 	// set learning design to transition.
@@ -1919,6 +1917,52 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 	    }
 	}
+    }
+
+    private static String generateUniqueLDTitle(WorkspaceFolder folder, String titleFromFile,
+	    ILearningDesignDAO learningDesignDAO) {
+
+	String newTitle = titleFromFile;
+	if ((newTitle == null) || (newTitle.length() == 0)) {
+	    newTitle = "unknown";
+	}
+
+	if (folder != null) {
+	    boolean dupName;
+	    List<LearningDesign> ldList = learningDesignDAO
+		    .getAllLearningDesignsInFolder(folder.getWorkspaceFolderId());
+	    int idx = 1;
+
+	    //contruct middle part of name by timestamp
+	    Calendar calendar = Calendar.getInstance();
+	    int mth = calendar.get(Calendar.MONTH) + 1;
+	    String mthStr = new Integer(mth).toString();
+	    if (mth < 10) {
+		mthStr = "0" + mthStr;
+	    }
+	    int day = calendar.get(Calendar.DAY_OF_MONTH);
+	    String dayStr = new Integer(day).toString();
+	    if (day < 10) {
+		dayStr = "0" + dayStr;
+	    }
+	    String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
+	    while (true) {
+		dupName = false;
+		for (LearningDesign eld : ldList) {
+		    if (StringUtils.equals(eld.getTitle(), newTitle)) {
+			dupName = true;
+			break;
+		    }
+		}
+		if (!dupName) {
+		    break;
+		}
+		newTitle = titleFromFile + "_" + nameMid + "_" + idx;
+		idx++;
+	    }
+	}
+
+	return newTitle;
     }
 
     // ******************************************************************
