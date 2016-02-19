@@ -5,8 +5,9 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- LDEV-3629 Use 4 bytes Unicode characters in the whole DB
 
--- Alter character set and encoding of the database and each table. Limit indexed text fields' length.
-ALTER DATABASE lams CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+-- Alter character set and encoding of the each table.
+-- The database char set needs to be altered manually as at this point we do not know its name.
+-- Limit indexed text fields' length.
 
 ALTER TABLE lams_activity_category CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE lams_activity_evaluation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
