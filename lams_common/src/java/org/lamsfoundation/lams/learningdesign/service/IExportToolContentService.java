@@ -45,8 +45,7 @@ public interface IExportToolContentService {
      * @return the full file path of exported learning design zip file.
      * @throws ExportToolContentException
      */
-    String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs)
-	    throws ExportToolContentException;
+    String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs) throws ExportToolContentException;
 
     /**
      * Export tool content.
@@ -92,8 +91,7 @@ public interface IExportToolContentService {
     void registerFileClassForExport(String fileNodeClassName, String fileUuidFieldName, String fileVersionFieldName);
 
     void registerFileClassForImport(String fileNodeClassName, String fileUuidFieldName, String fileVersionFieldName,
-	    String fileNameFieldName, String filePropertyFieldName, String mimeTypeFieldName,
-	    String initialItemFieldName);
+	    String fileNameFieldName, String mimeTypeFieldName, String initialItemFieldName);
 
     void registerImportVersionFilterClass(Class filterClass);
 
