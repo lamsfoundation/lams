@@ -385,12 +385,11 @@
         	redirect="false"
        	/>	      
 
-        <forward
-          name="learnerNotebook"
-          path="/monitoring/LearnerNotebook.jsp"
+		<forward 
+		  name="statistics"
+          path="/monitoring/Stats.jsp"
           redirect="false"
-        />
-
+		/>
 
 	    <forward
 			name="newNominationBox"

@@ -24,8 +24,6 @@ package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -34,19 +32,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionRedirect;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
@@ -73,51 +75,40 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     }
 
     public ActionForward hideOpenVote(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-
-	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
-
-	String currentUid = voteMonitoringForm.getCurrentUid();
-
-	VoteUsrAttempt voteUsrAttempt = voteService.getAttemptByUID(new Long(currentUid));
-
-	voteUsrAttempt.setVisible(false);
-	voteService.updateVoteUsrAttempt(voteUsrAttempt);
-	voteService.hideOpenVote(voteUsrAttempt);
-
-	String toolContentID = voteMonitoringForm.getToolContentID();
-	String contentFolderID = voteMonitoringForm.getContentFolderID();
-	
-	ActionRedirect redirect = new ActionRedirect(
-		mapping.findForwardConfig(VoteAppConstants.MONITORING_STARTER_REDIRECT));
-	redirect.addParameter(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
-	redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return redirect;
+	    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
+	return toggleHideShow(request, response, false);
     }
 
     public ActionForward showOpenVote(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+		    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
+	return toggleHideShow(request, response, true);
+    }
+		
+    private ActionForward toggleHideShow(HttpServletRequest request,  HttpServletResponse response, boolean show) 
+	    throws IOException, ServletException, ToolException, JSONException {
+
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
-	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+	Long currentUid = WebUtil.readLongParam(request, "currentUid");
+	VoteUsrAttempt voteUsrAttempt = voteService.getAttemptByUID(currentUid);
 
-	String currentUid = voteMonitoringForm.getCurrentUid();
-
-	VoteUsrAttempt voteUsrAttempt = voteService.getAttemptByUID(new Long(currentUid));
-	voteUsrAttempt.setVisible(true);
-
+	voteUsrAttempt.setVisible(show);
 	voteService.updateVoteUsrAttempt(voteUsrAttempt);
-	voteService.showOpenVote(voteUsrAttempt);
-
-	String toolContentID = voteMonitoringForm.getToolContentID();
-	String contentFolderID = voteMonitoringForm.getContentFolderID();
+	String nextActionMethod;
+	if ( show ) {  
+	    nextActionMethod = "hideOptionVote";
+	    voteService.showOpenVote(voteUsrAttempt);
+	} else { 
+	    nextActionMethod = "showOpenVote";
+	    voteService.hideOpenVote(voteUsrAttempt);   
+	}
 	
-	ActionRedirect redirect = new ActionRedirect(
-		mapping.findForwardConfig(VoteAppConstants.MONITORING_STARTER_REDIRECT));
-	redirect.addParameter(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
-	redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return redirect;
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("currentUid", currentUid);
+	responsedata.put("nextActionMethod", nextActionMethod);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
     }
 
     public ActionForward getVoteNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -131,43 +122,168 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 	MonitoringUtil.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
 
-	String questionUid = request.getParameter("questionUid");
-	String sessionUid = request.getParameter("sessionUid");
+	Long questionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_QUESTION_UID, false);
+	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 
-	List<VoteUsrAttempt> userAttempts;
-	//in regular case when we need info for particular session
-	if (StringUtils.isNotBlank(sessionUid)) {
-	    userAttempts = voteService.getAttemptsForQuestionContentAndSessionUid(new Long(questionUid),
-		    new Long(sessionUid));
-	    
-	//in case of All sessions
-	} else {
-	    userAttempts = voteService.getStandardAttemptsByQuestionUid(new Long(questionUid));
-	}
-	
-	List listVotedLearnersDTO = new LinkedList();
+	VoteQueContent nomination = voteService.getQuestionByUid(questionUid);
+	request.setAttribute("nominationText", nomination.getQuestion());
 
-	VoteContent voteContent = null;
-	Iterator userIterator = userAttempts.iterator();
-	while (userIterator.hasNext()) {
-	    VoteUsrAttempt voteUsrAttempt = (VoteUsrAttempt) userIterator.next();
-
-	    if (voteUsrAttempt != null) {
-		voteContent = voteUsrAttempt.getVoteQueContent().getVoteContent();
-	    }
-
-	    VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
-	    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
-	    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime());
-	    listVotedLearnersDTO.add(voteMonitoredUserDTO);
-	}
-
-	voteGeneralMonitoringDTO.setMapStudentsVoted(listVotedLearnersDTO);
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
+	request.setAttribute(VoteAppConstants.ATTR_QUESTION_UID, questionUid);
+	if ( sessionUid != null )
+	    request.setAttribute(VoteAppConstants.ATTR_SESSION_UID, sessionUid);
 	return mapping.findForward(VoteAppConstants.VOTE_NOMINATION_VIEWER);
     }
 
+    public ActionForward getVoteNominationsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
+	
+	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
+	if ( sessionUid == 0L )
+	    sessionUid = null;
+	
+	Long questionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_QUESTION_UID, false);
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	Integer sortByDate = WebUtil.readIntParam(request, "column[1]", true);
+	String searchString = request.getParameter("fcol[0]"); 
+	
+	int sorting = VoteAppConstants.SORT_BY_DEFAULT;
+	if ( sortByName != null ) 
+	    sorting = sortByName.equals(0) ? VoteAppConstants.SORT_BY_NAME_ASC : VoteAppConstants.SORT_BY_NAME_DESC; 
+	else if ( sortByDate != null )
+	    sorting = sortByDate.equals(0) ? VoteAppConstants.SORT_BY_DATE_ASC : VoteAppConstants.SORT_BY_DATE_DESC; 
+	    
+	//return user list according to the given sessionID
+	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	List<Object[]> users = voteService.getUserAttemptsForTablesorter(sessionUid, questionUid, page, size, sorting, searchString);
+	
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", voteService.getCountUsersBySession(sessionUid, questionUid, searchString));
+
+	for (Object[] userAndAnswers: users) {
+
+	    JSONObject responseRow = new JSONObject();
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml((String) userAndAnswers[1]));
+	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME, DateUtil.convertToStringForJSON((Date) userAndAnswers[2], request.getLocale()));
+	    rows.put(responseRow);
+	}
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
+    }
+
+    public ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
+	
+	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	String searchString = request.getParameter("fcol[0]"); 
+	
+	int sorting = VoteAppConstants.SORT_BY_DEFAULT;
+	if ( sortByName != null ) 
+	    sorting = sortByName.equals(0) ? VoteAppConstants.SORT_BY_NAME_ASC : VoteAppConstants.SORT_BY_NAME_DESC; 
+	    
+	//return user list according to the given sessionID
+	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	List<Object[]> users = voteService.getUserReflectionsForTablesorter(sessionUid, page, size, sorting, searchString);
+	
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", voteService.getCountUsersBySession(sessionUid, null, searchString));
+
+	for (Object[] userAndReflection: users) {
+	    JSONObject responseRow = new JSONObject();
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
+	    if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
+		String reflection = StringEscapeUtils.escapeHtml((String)userAndReflection[2]);
+		responseRow.put(VoteAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
+	    }
+	    rows.put(responseRow);
+	}
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
+    }
+
+    public ActionForward statistics(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+	
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	
+	request.setAttribute("isGroupedActivity",  voteService.isGroupedActivity(toolContentID));
+	request.setAttribute(VoteAppConstants.VOTE_STATS_DTO, voteService.getStatisticsBySession(toolContentID));
+	return mapping.findForward(VoteAppConstants.STATISTICS);
+    }
+
+    
+    public ActionForward getOpenTextNominationsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
+	
+	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
+	if ( sessionUid == 0L )
+	    sessionUid = null;
+
+	Long contentUid = WebUtil.readLongParam(request, VoteAppConstants.TOOL_CONTENT_UID, false);
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByEntry = WebUtil.readIntParam(request, "column[0]", true);
+	Integer sortByName = WebUtil.readIntParam(request, "column[1]", true);
+	Integer sortByDate = WebUtil.readIntParam(request, "column[2]", true);
+	Integer sortByVisible = WebUtil.readIntParam(request, "column[3]", true);
+	String searchStringVote = request.getParameter("fcol[0]"); 
+	String searchStringUsername = request.getParameter("fcol[1]"); 
+	
+	int sorting = VoteAppConstants.SORT_BY_DEFAULT;
+	if ( sortByEntry != null ) 
+	    sorting = sortByEntry.equals(0) ? VoteAppConstants.SORT_BY_ENTRY_ASC : VoteAppConstants.SORT_BY_ENTRY_DESC; 
+	if ( sortByName != null ) 
+	    sorting = sortByName.equals(0) ? VoteAppConstants.SORT_BY_NAME_ASC : VoteAppConstants.SORT_BY_NAME_DESC; 
+	else if ( sortByDate != null )
+	    sorting = sortByDate.equals(0) ? VoteAppConstants.SORT_BY_DATE_ASC : VoteAppConstants.SORT_BY_DATE_DESC; 
+	else if ( sortByVisible != null )
+	    sorting = sortByVisible.equals(0) ? VoteAppConstants.SORT_BY_VISIBLE_ASC : VoteAppConstants.SORT_BY_VISIBLE_DESC; 
+	    
+	//return user list according to the given sessionID
+	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	List<OpenTextAnswerDTO> users = voteService.getUserOpenTextAttemptsForTablesorter(sessionUid, contentUid, page, size, sorting, searchStringVote, searchStringUsername);
+	
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", voteService.getCountUsersForOpenTextEntries(sessionUid, contentUid, searchStringVote, searchStringUsername));
+	
+	for (OpenTextAnswerDTO userAndAttempt: users) {
+	    JSONObject responseRow = new JSONObject();
+
+	    responseRow.put("uid", userAndAttempt.getUserUid());
+	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(userAndAttempt.getFullName()));
+
+	    responseRow.put("userEntryUid", userAndAttempt.getUserEntryUid());
+	    responseRow.put("userEntry", StringEscapeUtils.escapeHtml(userAndAttempt.getUserEntry()));
+	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME, DateUtil.convertToStringForJSON(userAndAttempt.getAttemptTime(), request.getLocale()));
+	    responseRow.put("visible", userAndAttempt.isVisible());
+
+	    rows.put(responseRow);
+	}
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
+    }
+				
     public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 	IVoteService VoteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());

@@ -43,12 +43,10 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     protected String countAllUsers;
     protected String countSessionComplete;
     protected String isPortfolioExport;
-    protected String existsOpenVotes;
     protected String responseId;
 
     protected String toolContentID;
-    protected List listMonitoredAnswersContainerDto;
-    protected List listUserEntries;
+//    protected List listMonitoredAnswersContainerDto;
 
     protected List<SessionDTO> sessionDTOs;
     protected Map mapStandardNominationsContent;
@@ -229,50 +227,20 @@ public class VoteGeneralMonitoringDTO implements Comparable {
 	this.isPortfolioExport = isPortfolioExport;
     }
 
-    /**
-     * @return Returns the listMonitoredAnswersContainerDto.
-     */
-    public List getListMonitoredAnswersContainerDto() {
-	return listMonitoredAnswersContainerDto;
-    }
-
-    /**
-     * @param listMonitoredAnswersContainerDto
-     *            The listMonitoredAnswersContainerDto to set.
-     */
-    public void setListMonitoredAnswersContainerDto(List listMonitoredAnswersContainerDto) {
-	this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
-    }
-
-    /**
-     * @return Returns the listUserEntries.
-     */
-    public List getListUserEntries() {
-	return listUserEntries;
-    }
-
-    /**
-     * @param listUserEntries
-     *            The listUserEntries to set.
-     */
-    public void setListUserEntries(List listUserEntries) {
-	this.listUserEntries = listUserEntries;
-    }
-
-    /**
-     * @return Returns the existsOpenVotes.
-     */
-    public String getExistsOpenVotes() {
-	return existsOpenVotes;
-    }
-
-    /**
-     * @param existsOpenVotes
-     *            The existsOpenVotes to set.
-     */
-    public void setExistsOpenVotes(String existsOpenVotes) {
-	this.existsOpenVotes = existsOpenVotes;
-    }
+//    /**
+//     * @return Returns the listMonitoredAnswersContainerDto.
+//     */
+//    public List getListMonitoredAnswersContainerDto() {
+//	return listMonitoredAnswersContainerDto;
+//    }
+//
+//    /**
+//     * @param listMonitoredAnswersContainerDto
+//     *            The listMonitoredAnswersContainerDto to set.
+//     */
+//    public void setListMonitoredAnswersContainerDto(List listMonitoredAnswersContainerDto) {
+//	this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
+//    }
 
     /**
      * @return Returns the sessionDtos.

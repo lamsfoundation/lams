@@ -11,6 +11,36 @@
 
 		<script type="text/javascript">
 	
+			function submitOpenVote(currentUid, actionMethod) {
+
+		        var submitUid = currentUid;
+		        $.ajax({
+  					url: '<lams:WebAppURL/>/monitoring.do?dispatch='+actionMethod+'&currentUid='+submitUid,
+				}).done(function( data ) {
+					if ( data.currentUid == submitUid ) {
+						$('#entryTable').trigger('pagerUpdate');
+						return;
+						
+// 						var nextActionMethod = data.nextActionMethod;
+// 						if ( nextActionMethod ) {
+// 						$('table').trigger('pagerUpdate');
+// 							var newLink = buildShowHideLink(currentUid, nextActionMethod);
+// 							$('#link'+data.currentUid).html(newLink);
+//						}
+					}
+					alert("An error has occurred. Please reload screen! [currentUid = "+data.currentUid+" nextActionMethod="+data.nextActionMethod+"]");
+				});
+			}
+			
+			function buildShowHideLink(currentUid, actionMethod) {
+				var str = '<a href="#" onclick="javascript:submitOpenVote(\''+currentUid+'\', \''+actionMethod+'\');"  class="linkbutton">';
+				if ( actionMethod == 'hideOpenVote' ) 
+					str += '<fmt:message key="label.hide"/></a>';
+				else
+					str += '<fmt:message key="label.show"/></a>';
+				return str;
+			}
+
 			$(document).ready(function(){
 	    
 			$(".tablesorter").tablesorter({
@@ -18,7 +48,7 @@
 			    sortInitialOrder: 'desc',
 	            sortList: [[0]],
 	            widgets: [ "resizable", "filter" ],
-	            headers: { 1: { filter: false} }, 
+	            headers: { 2: { filter: false}, 3: { filter: false} }, 
 	            widgetOptions: {
 	            	resizable: true,
 	            	// include column filters 
@@ -31,7 +61,13 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getVoteNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${questionUid}&sessionUid=" + $(this).attr('data-session-id'),
+				<c:choose>
+				<c:when test="${not empty param.sessionUid}">
+				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getOpenTextNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=${param.sessionUid}&toolContentUID=${param.toolContentUID}",
+				</c:when><c:otherwise>
+				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getOpenTextNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolContentUID=${param.toolContentUID}",
+				</c:otherwise>
+				</c:choose>
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -42,6 +78,12 @@
 
 							rows += '<tr>';
 							rows += '<td>';
+							rows += userData["userEntry"]; 
+							if ( userData["visible"] == false )
+								rows += ' <em><fmt:message key="label.hidden"/></em>';							
+							rows += '</td>';
+
+							rows += '<td>';
 							rows += userData["userName"];
 							rows += '</td>';
 
@@ -49,13 +91,20 @@
 							rows += userData["attemptTime"];
 							rows += '</td>';
 
+							rows += '<td><span id="link'+userData["userEntryUid"]+'">';
+							if ( userData["visible"] ) {
+								rows += buildShowHideLink(userData["userEntryUid"], 'hideOpenVote')
+							} else {
+								rows += buildShowHideLink(userData["userEntryUid"], 'showOpenVote')
+							}
+							rows += '</span></td>';
+
 							rows += '</tr>';
 						}
 			            
 						json.total = data.total_rows;
 						json.rows = $(rows);
 						return json;
-			            
 			    	}
 				},					
 			    container: $(this).next(".pager"),
@@ -79,14 +128,23 @@
 
 	<div id="content">
 	
-		<h2><fmt:message key="label.learnersVoted"/>: <c:out value="${nominationText}" escapeXml="true"/></h2>
-
-		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${sessionUid}">
+		<h2><fmt:message key="label.learnersVoted"/>: <fmt:message key="label.openVotes"/></h2>
+		    
+   		<div class="tablesorter-holder">
+   		
+   		<c:choose>
+		<c:when test="${not empty param.sessionUid}">
+		<table id="entryTable" class="tablesorter" data-session-id="${param.sessionUid}">
+		</c:when><c:otherwise>
+		<table id="entryTable" class="tablesorter" data-session-id="${param.toolContentUID}">
+		</c:otherwise>
+		</c:choose>
 			<thead>
 				<tr>
-			       <th><fmt:message key="label.user"/></td>
-			       <th><fmt:message key="label.attemptTime"/></td>
+					<th><fmt:message key="label.vote"/></th>
+					<th> <fmt:message key="label.user"/></th>
+					<th> <fmt:message key="label.attemptTime"/></th>
+					<th style="width: 70px;"> <fmt:message key="label.visible"/></th>								  						 
 				</tr>
 			</thead>
 			<tbody>
