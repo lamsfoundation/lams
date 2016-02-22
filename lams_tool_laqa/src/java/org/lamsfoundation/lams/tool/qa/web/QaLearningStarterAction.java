@@ -181,6 +181,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	
 	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
 	boolean isUserLeader = qaService.isUserGroupLeader(user, new Long(toolSessionID));
+	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ATTR_CONTENT, qaContent);
@@ -193,6 +194,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
 	generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
 
+	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 	generalLearnerFlowDTO.setReflectionSubject(qaContent.getReflectionSubject());
 
