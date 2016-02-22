@@ -17,7 +17,7 @@
 			    sortInitialOrder: 'desc',
 	            sortList: [[0]],
 	            widgets: [ "resizable", "filter" ],
-	            headers: { 1: { filter: false} }, 
+	            headers: { 1: { filter: false, sorter: false} }, 
 	            widgetOptions: {
 	            	resizable: true,
 	            	// include column filters 
@@ -30,7 +30,7 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getVoteNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${questionUid}&sessionUid=" + $(this).attr('data-session-id'),
+				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getReflectionsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -45,7 +45,11 @@
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += userData["attemptTime"];
+							if ( userData["notebook"] ) {
+								rows += userData["notebook"];
+							} else {
+								rows += '-';
+							}
 							rows += '</td>';
 
 							rows += '</tr>';
@@ -78,14 +82,14 @@
 
 	<div id="content">
 	
-		<h2><fmt:message key="label.learnersVoted"/>: <c:out value="${nominationText}" escapeXml="true"/></h2>
+		<h1><fmt:message key="label.notebook.entries" /></h1>
 
 		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${sessionUid}">
+		<table class="tablesorter" data-session-id="${param.sessionUid}">
 			<thead>
 				<tr>
-			       <th><fmt:message key="label.user"/></td>
-			       <th><fmt:message key="label.attemptTime"/></td>
+					<th><fmt:message key="label.user"/></th>
+					<th><fmt:message key="label.reflection" /></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -111,7 +115,7 @@
 			</form>
 		</div>
 		</div>
-		
+				
 	</div>
 	<div id="footer"></div>
 </body>

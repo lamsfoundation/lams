@@ -45,8 +45,6 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 
     protected String currentUid;
 
-    protected String existsOpenVotes;
-
     protected String toolContentID;
 
     /**
@@ -152,20 +150,5 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
      */
     public void setShowOpenVote(String showOpenVote) {
 	this.showOpenVote = showOpenVote;
-    }
-
-    /**
-     * @return Returns the existsOpenVotes.
-     */
-    public String getExistsOpenVotes() {
-	return existsOpenVotes;
-    }
-
-    /**
-     * @param existsOpenVotes
-     *            The existsOpenVotes to set.
-     */
-    public void setExistsOpenVotes(String existsOpenVotes) {
-	this.existsOpenVotes = existsOpenVotes;
     }
 }
