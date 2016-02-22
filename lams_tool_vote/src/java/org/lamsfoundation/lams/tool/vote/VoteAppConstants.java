@@ -60,6 +60,7 @@ public interface VoteAppConstants {
     public static final String PREVIEW = "preview";
     public static final String LEARNER_PROGRESS = "learnerProgress";
     public static final String VOTE_NOMINATION_VIEWER = "voteNominationViewer";
+    public static final String STATISTICS = "statistics";
     public static final String LEARNER_PROGRESS_USERID = "learnerProgressUserId";
     public static final String MIN_NOMINATION_COUNT = "minNominationCount";
     public static final String MAX_NOMINATION_COUNT = "maxNominationCount";
@@ -74,8 +75,6 @@ public interface VoteAppConstants {
     public static final String CURRENT_UID = "currentUid";
     public static final String DEFAULT_VOTING_TITLE = "Voting";
     public static final String DEFAULT_VOTING_INSTRUCTIONS = "Instructions";
-    public static final String NOTEBOOK_ENTRIES_EXIST = "notebookEntriesExist";
-    public static final String NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST = "noSessionsNotebookEntriesExist";
     public static final String UUID = "uuid";
     public static final String VOTE_STATS_DTO = "voteStatsDTO";
     public static final String LIST_ALL_GROUPS_DTO = "listAllGroupsDTO";
@@ -202,7 +201,6 @@ public interface VoteAppConstants {
     public static final String ACTIVITY_TITLE = "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS = "activityInstructions";
     public static final String REMOVABLE_QUESTION_INDEX = "removableQuestionIndex";
-    public static final String EXISTS_OPEN_VOTES = "existsOpenVotes";
 
     /*
      * user actions
@@ -242,7 +240,7 @@ public interface VoteAppConstants {
     public static final String MONITORED_CONTENT_ID = "monitoredContentId";
     public static final String VALIDATION_ERROR = "validationError";
     public static final String FORM_INDEX = "formIndex";
-    public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
+//    public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
     public static final String TIMEZONE = "timeZone";
     public static final String PREVIEW_ONLY = "previewOnly";
 
@@ -250,6 +248,12 @@ public interface VoteAppConstants {
     public static final String LEARNING_MODE = "learningMode";
     public static final String EXPORT_USER_ID = "exportUserId";
     public static final String SESSION_VOTES_CHART = "Session Votes Chart";
+    
+    public static final String ATTR_QUESTION_UID = "questionUid";
+    public static final String ATTR_SESSION_UID = "sessionUid"; // not the tool session id supplied by the core
+    public static final String ATTR_USER_NAME = "userName";
+    public static final String ATTR_ATTEMPT_TIME = "attemptTime";
+
 
     /*
      * exception constants
@@ -294,4 +298,15 @@ public interface VoteAppConstants {
     // Leader selection tool Constants
     public static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
     public static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
+    
+    public static final int SORT_BY_DEFAULT = 0;
+    public static final int SORT_BY_NAME_ASC = 1;
+    public static final int SORT_BY_NAME_DESC = 2;
+    public static final int SORT_BY_DATE_ASC = 3;
+    public static final int SORT_BY_DATE_DESC = 4;
+    public static final int SORT_BY_ENTRY_ASC = 5;
+    public static final int SORT_BY_ENTRY_DESC = 6;
+    public static final int SORT_BY_VISIBLE_ASC = 7;
+    public static final int SORT_BY_VISIBLE_DESC = 8;
+
 }

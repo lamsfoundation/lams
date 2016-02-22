@@ -111,7 +111,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	    LinkedList<SessionDTO> sessionDTOs = getSessionDTOs(request, content, voteService, toolSessionID, userID);
 	    exportPortfolioDTO.setSessionDtos(sessionDTOs);
 
-	    boolean userExceptionNoToolSessions = !voteService.studentActivityOccurredStandardAndOpen(content);
+	    boolean userExceptionNoToolSessions = !voteService.studentActivityOccurredGlobal(content);
 	    exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
 	    
 	    boolean isGroupedActivity = voteService.isGroupedActivity(content.getVoteContentId());
@@ -152,7 +152,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	LinkedList<SessionDTO> sessionDTOs = getSessionDTOs(request, content, voteService, null, null);
 	exportPortfolioDTO.setSessionDtos(sessionDTOs);
 	
-	boolean userExceptionNoToolSessions = !voteService.studentActivityOccurredStandardAndOpen(content);
+	boolean userExceptionNoToolSessions = !voteService.studentActivityOccurredGlobal(content);
 	exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
 	request.getSession().setAttribute(VoteAppConstants.EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
 	

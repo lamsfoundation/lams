@@ -43,34 +43,13 @@
 </div>
 <br/>
 
-<c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
-	<c:if test="${notebookEntriesExist != 'true' }"> 			
-		<table align="center">
-			<tr> 
-				<td NOWRAP valign=top align=center> 
-					<b>  <fmt:message key="error.noLearnerActivity"/> </b>
-				</td> 
-			<tr>
-		</table>
-	</c:if>							
+<c:if test="${useSelectLeaderToolOuput}">
+	<div class="info space-bottom">
+		<fmt:message key="label.info.use.select.leader.outputs" />
+	</div>
 </c:if>
 
-<c:if test="${(voteGeneralMonitoringDTO.userExceptionNoToolSessions != 'true') }">
-
-	<c:if test="${useSelectLeaderToolOuput}">
-		<div class="info space-bottom">
-			<fmt:message key="label.info.use.select.leader.outputs" />
-		</div>
-	</c:if>
-
-	<jsp:include page="/monitoring/AllSessionsSummary.jsp" />
-					
-	<jsp:include page="/monitoring/Reflections.jsp" />
-</c:if>								
-
-<c:if test="${noSessionsNotebookEntriesExist == 'true'}">
-	<jsp:include page="/monitoring/Reflections.jsp" />
-</c:if>
+<jsp:include page="/monitoring/AllSessionsSummary.jsp" />
 		
 <%@include file="AdvanceOptions.jsp"%>
 

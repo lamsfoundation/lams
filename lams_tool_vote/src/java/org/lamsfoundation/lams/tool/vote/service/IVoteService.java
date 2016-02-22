@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -36,19 +37,21 @@ import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.SummarySessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
-import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Ozgur Demirtas
@@ -56,6 +59,13 @@ import org.lamsfoundation.lams.usermanagement.User;
  *         Interface that defines the contract Voting service provider must follow.
  */
 public interface IVoteService {
+
+    /**
+     * @return Returns the MessageService.
+     */
+    MessageService getMessageService();
+
+    /**
 
     /**
      * @param user
@@ -92,13 +102,21 @@ public interface IVoteService {
 	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO);
 
     /**
-     * Generates data for all sessions in the Monitoring Summary, including all sessions summary.
+     * Generates data for all sessions in the Export Portfolio Summary, including all sessions summary.
      * 
      * @param toolContentID
      * @return
      */
     LinkedList<SessionDTO> getSessionDTOs(Long toolContentID);
 
+    /**
+     * Generates data for all sessions in the Monitoring Summary, including all sessions summary.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    SortedSet<SummarySessionDTO> getMonitoringSessionDTOs(Long toolContentID);
+    
     List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId);
 
     List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID);
@@ -125,9 +143,9 @@ public interface IVoteService {
 
     void showOpenVote(VoteUsrAttempt voteUsrAttempt);
 
-    boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent);
+//    boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent);
 
-    int getUserEnteredVotesCountForContent(final Long voteContentUid);
+//    int getUserEnteredVotesCountForContent(final Long voteContentUid);
 
     List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionUid);
 
@@ -161,8 +179,6 @@ public interface IVoteService {
      * @return Map of display id -> nomination text.
      */
     Map<String, String> buildQuestionMap(VoteContent voteContent, Collection<String> checkedOptions);
-
-    List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long questionUid);
 
     void updateVoteUser(VoteQueUsr voteUser);
 
@@ -243,4 +259,26 @@ public interface IVoteService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /** 
+     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL. This is
+     * unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then you get
+     * the values for the whole class, not just the group.
+     * 
+     * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
+     */
+    List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
+	    int sorting, String searchString);
+	
+    int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString);
+    
+    List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
+	    String searchString);
+    
+    List<VoteStatsDTO> getStatisticsBySession(Long toolContentId);
+    
+    /** Gets the details for the open text nominations  */
+    List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page, int size,
+	    int sorting, String searchStringVote, String searchStringUsername);
+    int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote, String searchStringUsername);
 }

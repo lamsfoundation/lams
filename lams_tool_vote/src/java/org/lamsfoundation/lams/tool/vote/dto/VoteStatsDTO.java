@@ -34,28 +34,29 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ozgur Demirtas
  */
 public class VoteStatsDTO implements Comparable {
-    private String countAllUsers;
-
-    private String countSessionComplete;
+    
+    private String sessionName;
+    private Long sessionUid;
+    private Integer countAllUsers;
+    private Integer countUsersComplete;
 
     public String toString() {
-	return new ToStringBuilder(this).append("question", countAllUsers)
-		.append("countSessionComplete", countSessionComplete).toString();
+	return new ToStringBuilder(this).append("sessionName", sessionName)
+		.append("countUsersComplete", countUsersComplete).toString();
     }
 
     public int compareTo(Object o) {
 	VoteStatsDTO qaStatsDTO = (VoteStatsDTO) o;
-
 	if (qaStatsDTO == null)
 	    return 1;
 	else
-	    return 0;
+	    return sessionUid.compareTo(qaStatsDTO.getSessionUid());
     }
 
     /**
-     * @return Returns the countAllUsers.
+     * @return How many users could vote - based on the session setting in the core, not in the activity
      */
-    public String getCountAllUsers() {
+    public Integer getCountAllUsers() {
 	return countAllUsers;
     }
 
@@ -63,22 +64,33 @@ public class VoteStatsDTO implements Comparable {
      * @param countAllUsers
      *            The countAllUsers to set.
      */
-    public void setCountAllUsers(String countAllUsers) {
+    public void setCountAllUsers(Integer countAllUsers) {
 	this.countAllUsers = countAllUsers;
     }
 
-    /**
-     * @return Returns the countSessionComplete.
-     */
-    public String getCountSessionComplete() {
-	return countSessionComplete;
+    public String getSessionName() {
+        return sessionName;
     }
 
-    /**
-     * @param countSessionComplete
-     *            The countSessionComplete to set.
-     */
-    public void setCountSessionComplete(String countSessionComplete) {
-	this.countSessionComplete = countSessionComplete;
+    public void setSessionName(String sessionName) {
+        this.sessionName = sessionName;
     }
+
+    public Long getSessionUid() {
+        return sessionUid;
+    }
+
+    public void setSessionUid(Long sessionUid) {
+        this.sessionUid = sessionUid;
+    }
+
+    public Integer getCountUsersComplete() {
+        return countUsersComplete;
+    }
+
+    public void setCountUsersComplete(Integer countUsersComplete) {
+        this.countUsersComplete = countUsersComplete;
+    }
+
+ 
 }

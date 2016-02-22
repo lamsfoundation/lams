@@ -37,15 +37,15 @@ public class ExportPortfolioDTO {
     protected LinkedList<SessionDTO> sessionDtos;
 
     /**
-     * @return Returns the listMonitoredAnswersContainerDto.
+     * @return Returns the sessionDtos.
      */
     public LinkedList<SessionDTO> getSessionDtos() {
 	return sessionDtos;
     }
 
     /**
-     * @param listMonitoredAnswersContainerDto
-     *            The listMonitoredAnswersContainerDto to set.
+     * @param sessionDtos
+     *            The sessionDtos to set.
      */
     public void setSessionDtos(LinkedList<SessionDTO> sessionDTOs) {
 	this.sessionDtos = sessionDTOs;

@@ -106,7 +106,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 
     protected Map<Long, Long> mapStandardToolSessionUid;
 
-    protected List listMonitoredAnswersContainerDto;
+ //   protected List listMonitoredAnswersContainerDto;
 
     protected List listUserEntries;
 
@@ -422,7 +422,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 		.append("mapStandardUserCount: ", mapStandardUserCount)
 		.append("mapStandardQuestionUid: ", mapStandardQuestionUid)
 		.append("mapStandardToolSessionUid: ", mapStandardToolSessionUid)
-		.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
+//		.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
 		.append("listUserEntries: ", listUserEntries).append("reportViewOnly: ", reportViewOnly).toString();
     }
 
@@ -546,20 +546,20 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 	this.mapStandardUserCount = mapStandardUserCount;
     }
 
-    /**
-     * @return Returns the listMonitoredAnswersContainerDto.
-     */
-    public List getListMonitoredAnswersContainerDto() {
-	return listMonitoredAnswersContainerDto;
-    }
-
-    /**
-     * @param listMonitoredAnswersContainerDto
-     *            The listMonitoredAnswersContainerDto to set.
-     */
-    public void setListMonitoredAnswersContainerDto(List listMonitoredAnswersContainerDto) {
-	this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
-    }
+//    /**
+//     * @return Returns the listMonitoredAnswersContainerDto.
+//     */
+//    public List getListMonitoredAnswersContainerDto() {
+//	return listMonitoredAnswersContainerDto;
+//    }
+//
+//    /**
+//     * @param listMonitoredAnswersContainerDto
+//     *            The listMonitoredAnswersContainerDto to set.
+//     */
+//    public void setListMonitoredAnswersContainerDto(List listMonitoredAnswersContainerDto) {
+//	this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
+//    }
 
     /**
      * @return Returns the mapGeneralCheckedOptionsContent.
