@@ -25,6 +25,9 @@ package org.lamsfoundation.lams.tool.vote.dao;
 import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 
 /**
@@ -44,15 +47,11 @@ public interface IVoteUsrAttemptDAO {
 
     Set<String> getUserEntries(final Long voteContentUid);
 
-    int getUserEnteredVotesCountForContent(final Long voteContentUid);
-
     Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid);
 
     VoteUsrAttempt getAttemptByUID(Long uid);
 
     int getSessionEntriesCount(final Long voteSessionId);
-
-    List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long questionUid);
 
     int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
 
@@ -74,4 +73,28 @@ public interface IVoteUsrAttemptDAO {
 
     List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
     
+    // Tablesorter methods
+    /** 
+     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL. This is
+     * unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then you get
+     * the values for the whole class, not just the group.
+     * 
+     * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
+     */
+    List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
+	    int sorting, String searchString);
+	
+    /** Get the count of all possible users for getUserAttemptsForTablesorter(). Either sessionUid or questionUid may 
+     * be null but not both. */
+    int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString);
+    
+    List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
+	    String searchString, ICoreNotebookService coreNotebookService);
+    
+    List<VoteStatsDTO> getStatisticsBySession(Long toolContentId);
+    
+    /** Gets the details for the open text nominations  */
+    List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page, int size,
+	    int sorting, String searchStringVote, String searchStringUsername);
+    int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote, String searchStringUsername);
 }

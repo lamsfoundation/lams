@@ -25,12 +25,14 @@ package org.lamsfoundation.lams.tool.vote.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -71,12 +73,16 @@ import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.SessionNominationDTO;
+import org.lamsfoundation.lams.tool.vote.dto.SummarySessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -308,14 +314,6 @@ public class VoteServicePOJO
 
 	    int entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(session.getUid());
 
-	    // potentialUserCount
-	    int potentialUserCount = this.getVoteSessionPotentialLearnersCount(session.getUid());
-	    sessionDTO.setSessionUserCount(potentialUserCount);
-
-	    // completedSessionUserCount
-	    int completedSessionUserCount = voteUserDAO.getCompletedVoteUserBySessionUid(session.getUid());
-	    sessionDTO.setCompletedSessionUserCount(completedSessionUserCount);
-
 	    Long mapIndex = 1L;
 	    int totalStandardVotesCount = 0;
 
@@ -454,6 +452,96 @@ public class VoteServicePOJO
 	return sessionDTOs;
     }
 
+    @Override
+    public SortedSet<SummarySessionDTO> getMonitoringSessionDTOs(Long toolContentID) {
+
+	SortedSet<SummarySessionDTO> sessionDTOs = new TreeSet<SummarySessionDTO>();
+
+	VoteContent voteContent = this.getVoteContent(toolContentID);
+	for (VoteSession session : (Set<VoteSession>) voteContent.getVoteSessions()) {
+
+	    SummarySessionDTO sessionDTO = new SummarySessionDTO();
+	    sessionDTO.setSessionName(session.getSession_name());
+	    sessionDTO.setSessionUid(session.getUid());
+	    sessionDTO.setToolSessionId(session.getVoteSessionId());
+	    sessionDTO.setNominations(new TreeSet<SessionNominationDTO>());
+
+	    int entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(session.getUid());
+
+	    int totalStandardVotesCount = 0;
+
+	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+		
+		SessionNominationDTO nominationDTO = new SessionNominationDTO();
+		nominationDTO.setQuestionUid(question.getUid());
+		nominationDTO.setNomination(question.getQuestion());
+
+		int votesCount = voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(question.getUid(),
+			session.getUid());
+		totalStandardVotesCount += votesCount;
+
+		nominationDTO.setNumberOfVotes(votesCount);
+		nominationDTO.setPercentageOfVotes( (entriesCount != 0) ? ((votesCount * 100) / entriesCount) : 0d );
+		sessionDTO.getNominations().add(nominationDTO);
+
+	    }
+
+	    // open votes
+	    if (voteContent.isAllowText()) {
+		int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
+		Double voteRate = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / entriesCount) : 0d;
+		sessionDTO.setOpenTextNumberOfVotes(userEnteredVotesCount);
+		sessionDTO.setOpenTextPercentageOfVotes(voteRate);
+	    } else {
+		sessionDTO.setOpenTextNumberOfVotes(0);
+		sessionDTO.setOpenTextPercentageOfVotes(0D);
+	    }
+
+	    sessionDTOs.add(sessionDTO);
+	}
+
+	// All groups total
+	if (sessionDTOs.size() > 1) {
+	    SummarySessionDTO totalSessionDTO = new SummarySessionDTO();
+	    totalSessionDTO.setSessionUid(0L);
+	    totalSessionDTO.setToolSessionId(0L);
+	    totalSessionDTO.setSessionName(messageService.getMessage("label.all.groups.total"));
+	    totalSessionDTO.setNominations(new TreeSet<SessionNominationDTO>());
+
+	    HashMap<Long, SessionNominationDTO> nominationsTotals = new HashMap<Long, SessionNominationDTO>();
+	    int totalOpenVotes = 0;
+	    int totalVotes = 0;
+	    for (SummarySessionDTO sessionDTO : sessionDTOs) {
+
+		for ( SessionNominationDTO nomination : sessionDTO.getNominations() ) {
+		    Long questionUid = nomination.getQuestionUid();
+		    SessionNominationDTO dto = nominationsTotals.get(questionUid);
+		    if ( dto == null ) {
+			dto = new SessionNominationDTO();
+			dto.setQuestionUid(questionUid);
+			dto.setNomination(nomination.getNomination());
+			dto.setNumberOfVotes(0);
+			nominationsTotals.put(questionUid, dto);
+			totalSessionDTO.getNominations().add(dto);
+		    }
+		    totalVotes += nomination.getNumberOfVotes();
+		    dto.setNumberOfVotes(dto.getNumberOfVotes()+nomination.getNumberOfVotes());
+		} 
+		
+		totalVotes += sessionDTO.getOpenTextNumberOfVotes();
+		totalOpenVotes += sessionDTO.getOpenTextNumberOfVotes();
+	    }
+	    for ( SessionNominationDTO nomination : totalSessionDTO.getNominations() ) {
+		nomination.setPercentageOfVotes( (totalVotes != 0) ? ((nomination.getNumberOfVotes() * 100) / totalVotes) : 0d);
+	    }
+	    totalSessionDTO.setOpenTextNumberOfVotes(totalOpenVotes);
+	    totalSessionDTO.setOpenTextPercentageOfVotes( (totalVotes != 0) ? ((totalOpenVotes * 100) / totalVotes) : 0d);
+	    sessionDTOs.add(totalSessionDTO);
+	}
+
+	return sessionDTOs;
+    }
+
     /**
      * Get the count of all the potential learners for the vote session. This will include the people that have never
      * logged into the lesson. Not great, but it is a better estimate of how many users there will be eventually than
@@ -465,8 +553,7 @@ public class VoteServicePOJO
     private int getVoteSessionPotentialLearnersCount(Long sessionUid) {
 	VoteSession session = voteSessionDAO.getVoteSessionByUID(sessionUid);
 	if (session != null) {
-	    Set<User> potentialLearners = toolService.getAllPotentialLearners(session.getVoteSessionId().longValue());
-	    return potentialLearners != null ? potentialLearners.size() : 0;
+	    return toolService.getCountUsersForActivity(session.getVoteSessionId());
 	} else {
 	    VoteServicePOJO.logger
 		    .error("Unable to find vote session record id=" + sessionUid + ". Returning 0 users.");
@@ -924,11 +1011,6 @@ public class VoteServicePOJO
     }
 
     @Override
-    public List<VoteUsrAttempt> getStandardAttemptsByQuestionUid(final Long voteQueContentId) {
-	return voteUsrAttemptDAO.getStandardAttemptsByQuestionUid(voteQueContentId);
-    }
-
-    @Override
     public VoteUsrAttempt getAttemptByUID(Long uid) {
 	return voteUsrAttemptDAO.getAttemptByUID(uid);
     }
@@ -955,12 +1037,12 @@ public class VoteServicePOJO
 	Date attempTime = new Date(System.currentTimeMillis());
 	String timeZone = TimeZone.getDefault().getDisplayName();
 
-	//in case of free entry
+	// in case of free entry
 	if (mapGeneralCheckedOptionsContent.size() == 0) {
 	    VoteQueContent defaultContentFirstQuestion = voteQueContentDAO.getDefaultVoteContentFirstQuestion();
 	    createAttempt(defaultContentFirstQuestion, voteQueUsr, attempTime, timeZone, userEntry, voteSession);
 
-	    //if the question is selected
+	    // if the question is selected
 	} else if (voteContentUid != null) {
 	    Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
 	    while (itCheckedMap.hasNext()) {
@@ -992,11 +1074,6 @@ public class VoteServicePOJO
 		voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
 	    }
 	}
-    }
-
-    @Override
-    public int getUserEnteredVotesCountForContent(final Long voteContentUid) {
-	return voteUsrAttemptDAO.getUserEnteredVotesCountForContent(voteContentUid);
     }
 
     @Override
@@ -1074,18 +1151,6 @@ public class VoteServicePOJO
 	return !voteContent.getVoteSessions().isEmpty();
     }
 
-    @Override
-    public boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) {
-	boolean studentActivityOccurredGlobal = studentActivityOccurredGlobal(voteContent);
-
-	int userEnteredVotesCount = getUserEnteredVotesCountForContent(voteContent.getUid());
-	if ((studentActivityOccurredGlobal == true) || (userEnteredVotesCount > 0)) {
-	    return true;
-	}
-
-	// there is no votes/nominations for this content
-	return false;
-    }
 
     @Override
     public void recalculateUserAnswers(VoteContent content, Set<VoteQueContent> oldQuestions,
@@ -1525,6 +1590,48 @@ public class VoteServicePOJO
 	return voteQueContentDAO.getAllQuestionsSorted(voteContentId);
     }
 
+    
+    /******** Tablesorter methods ************/
+    /** 
+     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL. This is
+     * unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then you get
+     * the values for the whole class, not just the group.
+     * 
+     * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
+     */
+    public List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
+	    int sorting, String searchString) {
+	return voteUsrAttemptDAO.getUserAttemptsForTablesorter(sessionUid, questionUid, page, size, sorting, searchString);
+    }
+	
+    public int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString) {
+	return voteUsrAttemptDAO.getCountUsersBySession(sessionUid, questionUid, searchString);
+    }
+    
+    public List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
+	    String searchString) {
+	return voteUsrAttemptDAO.getUserReflectionsForTablesorter(sessionUid, page, size, sorting, searchString, getCoreNotebookService());
+    }
+    
+    public List<VoteStatsDTO> getStatisticsBySession(Long toolContentId) {
+
+	List<VoteStatsDTO> stats = voteUsrAttemptDAO.getStatisticsBySession(toolContentId);
+	for ( VoteStatsDTO stat : stats ) {
+	    stat.setCountAllUsers(getVoteSessionPotentialLearnersCount(stat.getSessionUid()));
+	}
+	return stats;
+    }
+    
+    /** Gets the details for the open text nominations  */
+    public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page, int size,
+	    int sorting, String searchStringVote, String searchStringUsername) {
+	return voteUsrAttemptDAO.getUserOpenTextAttemptsForTablesorter(sessionUid, contentUid, page, size, sorting, searchStringVote, searchStringUsername);
+    }
+    
+    public int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote, String searchStringUsername) {
+	return voteUsrAttemptDAO.getCountUsersForOpenTextEntries(sessionUid, contentUid, searchStringVote, searchStringUsername);
+    }
+    
     /**
      * @return Returns the toolService.
      */

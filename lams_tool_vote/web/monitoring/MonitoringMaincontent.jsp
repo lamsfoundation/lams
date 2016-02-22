@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -21,6 +20,8 @@
 	<title> <fmt:message key="label.monitoring"/> </title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+
 	<script type="text/javascript">
 	
 	   	var imgRoot="${lams}images/";
@@ -41,8 +42,16 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
+
+	    	//for statistic page change:
+    		if(tabId == 3) doStatistic();
         } 
         
+		function doStatistic(){
+			var url = '<c:url value="monitoring.do"/>?dispatch=statistics&toolContentID=${toolContentID}';
+			$("#statisticArea").load(url);
+		}
+
         function doSubmit(method) {
         	document.VoteMonitoringForm.dispatch.value=method;
         	document.VoteMonitoringForm.submit();
@@ -93,11 +102,6 @@
 			submitMethod(actionMethod);
 		}
 		
-		function submitOpenVote(currentUid, actionMethod) {
-			document.VoteMonitoringForm.currentUid.value=currentUid;
-	        submitMethod(actionMethod);
-		}
-	
 	</script>
 	
 </lams:head>
