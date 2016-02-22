@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -241,10 +242,13 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	VoteContent voteContent = this.getVoteContent(toolContentID);
 
 	int entriesCount = 0;
-	Set<VoteUsrAttempt> userEntries = null;
+	List<VoteUsrAttempt> userEntries = null;
 	if (toolSessionUid != null) {
 	    entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(toolSessionUid);
-	    userEntries = voteUsrAttemptDAO.getSessionUserEntriesSet(toolSessionUid);
+	    if ( voteContent.isAllowText() )
+		userEntries = voteUsrAttemptDAO.getSessionOpenTextUserEntries(toolSessionUid);
+	    else
+		userEntries = new ArrayList<VoteUsrAttempt>(0);
 	}
 
 	Long mapIndex = 1L;
@@ -729,7 +733,31 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     @Override
     public Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long userUid, final Long sessionUid) {
-	return voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(userUid, sessionUid);
+	List<VoteUsrAttempt> list = voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(userUid, sessionUid);
+	
+	String openAnswer = "";
+	Set<String> userEntries = new HashSet<String>();
+	if ((list != null) && (list.size() > 0)) {
+	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		VoteUsrAttempt attempt = listIterator.next();
+
+		Long questionUid = attempt.getVoteQueContent().getUid();
+		if (!questionUid.toString().equals("1")) {
+		    userEntries.add(attempt.getVoteQueContent().getQuestion());
+		} else {
+		    // this is a user entered vote
+		    if (attempt.getUserEntry().length() > 0) {
+			if ( attempt.isVisible() )
+			    userEntries.add(attempt.getUserEntry());
+			else 
+			    userEntries.add(getMessageService().getMessage("label.hidden"));
+		    }
+
+		}
+	    }
+	}
+	return userEntries;
     }
 
     @Override
