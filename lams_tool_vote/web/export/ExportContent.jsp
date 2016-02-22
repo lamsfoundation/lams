@@ -44,7 +44,10 @@
 				<c:set var="userData" scope="request" value="${questionAttempt.value}"/>
 				<tr> 
 					<td>
-						<c:out value="${openVote.question}"/> 
+						<c:out value="${openVote.question}"/>
+						<c:if test="${exportPortfolioDto.portfolioExportMode == 'teacher' && !userData.visible}">
+							<em><fmt:message key="label.hidden"/></em>
+						</c:if>
 					</td>				
 					<td>
 						<c:out value="${userData.userName}"/> 

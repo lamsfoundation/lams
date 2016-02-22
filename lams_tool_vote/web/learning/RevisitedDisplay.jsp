@@ -90,7 +90,14 @@
 		<strong> <fmt:message key="label.open.votes"/> </strong>
 		<c:forEach var="vote" items="${requestScope.listUserEntriesContent}">
 			<div>
+			<c:choose>
+			<c:when test="${vote.visible}">
 				<c:out value="${vote.userEntry}" escapeXml="true" />
+			</c:when>
+			<c:otherwise>
+				<em>(<fmt:message key="label.hidden"/>)</em>
+			</c:otherwise>
+			</c:choose>
 			</div>
 		</c:forEach>
 		<div>&nbsp;</div>

@@ -66,8 +66,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     private static final String LOAD_USER_ENTRY_RECORDS = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.userEntry=:userEntry and voteUsrAttempt.voteQueContent.uid=1 and voteUsrAttempt.voteQueUsr.voteSession.voteContent.uid=:voteContentUid";
 
-    private static final String LOAD_ENTRIES_BY_SESSION_UID = "select att from VoteUsrAttempt att, VoteQueUsr user, VoteSession ses where "
-	    + "att.voteQueUsr=user and user.voteSession=ses and ses.uid=:voteSessionUid";
+    private static final String LOAD_OPEN_TEXT_ENTRIES_BY_SESSION_UID = "select att from VoteUsrAttempt att, VoteQueUsr user, VoteSession ses where "
+	    + "att.voteQueUsr=user and user.voteSession=ses and ses.uid=:voteSessionUid and att.userEntry is not null and att.userEntry <> \'\'";
 
     private static final String COUNT_ENTRIES_BY_SESSION_ID = "select count(*) from VoteUsrAttempt att, VoteQueUsr user, VoteSession ses where "
 	    + "att.voteQueUsr=user and user.voteSession=ses and ses.uid=:voteSessionUid";
@@ -123,13 +123,9 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     }
 
     @Override
-    public Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid) {
-	List<VoteUsrAttempt> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ENTRIES_BY_SESSION_UID)
+    public List<VoteUsrAttempt> getSessionOpenTextUserEntries(final Long voteSessionUid) {
+	return (List<VoteUsrAttempt>) getSession().createQuery(VoteUsrAttemptDAO.LOAD_OPEN_TEXT_ENTRIES_BY_SESSION_UID)
 		.setLong("voteSessionUid", voteSessionUid).list();
-
-	Set<VoteUsrAttempt> sessionUserEntries = new HashSet();
-	sessionUserEntries.addAll(list);
-	return sessionUserEntries;
     }
 
     @Override
@@ -226,34 +222,12 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     }
 
     @Override
-    public Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid) {
+    public List<VoteUsrAttempt> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid) {
 
-	List<VoteUsrAttempt> list = getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
+	 return getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid.longValue()).list();
 
-	String openAnswer = "";
-	Set<String> userEntries = new HashSet<String>();
-	if ((list != null) && (list.size() > 0)) {
-	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
-	    while (listIterator.hasNext()) {
-		VoteUsrAttempt attempt = listIterator.next();
-
-		Long questionUid = attempt.getVoteQueContent().getUid();
-		if (!questionUid.toString().equals("1")) {
-		    userEntries.add(attempt.getVoteQueContent().getQuestion());
-		} else {
-		    // this is a user entered vote
-		    if (attempt.getUserEntry().length() > 0) {
-			openAnswer = attempt.getUserEntry();
-			// adding openAnswer to userEntries
-			userEntries.add(openAnswer);
-		    }
-
-		}
-	    }
-	}
-	return userEntries;
-    }
+   }
 
     @Override
     public int getSessionEntriesCount(final Long voteSessionUid) {

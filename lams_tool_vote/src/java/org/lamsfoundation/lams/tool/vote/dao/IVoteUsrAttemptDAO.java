@@ -47,7 +47,7 @@ public interface IVoteUsrAttemptDAO {
 
     Set<String> getUserEntries(final Long voteContentUid);
 
-    Set<VoteUsrAttempt> getSessionUserEntriesSet(final Long voteSessionUid);
+    List<VoteUsrAttempt> getSessionOpenTextUserEntries(final Long voteSessionUid);
 
     VoteUsrAttempt getAttemptByUID(Long uid);
 
@@ -69,7 +69,7 @@ public interface IVoteUsrAttemptDAO {
 
     Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long sessionUid);
 
-    Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid);
+    List<VoteUsrAttempt> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid);
 
     List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
     
