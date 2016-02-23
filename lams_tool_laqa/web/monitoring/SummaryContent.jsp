@@ -26,6 +26,15 @@
 		</h1>
 	</c:if>
 
+	<c:if test="${content.reflect}"> 			
+		<p class="float-right">
+		<c:set var="viewReflectionsURL"><lams:WebAppURL/>/monitoring/Reflections.jsp?toolSessionID=${groupDto.sessionId}</c:set>
+		<html:link href="javascript:launchPopup('${viewReflectionsURL}')" styleClass="button">
+			<fmt:message key="label.notebook.entries" />
+		</html:link>
+		</p>
+	</c:if>
+			  	
 	<c:forEach var="question" items="${questionDTOs}">
 		
 		<div class="tablesorter-container">
@@ -80,13 +89,9 @@
 		</div>
 		
 	</c:forEach>
-			  	
+	
 </c:forEach>
 		
-<c:if test="${content.reflect && not empty reflectionsContainerDTO}"> 							
-	<jsp:include page="/monitoring/Reflections.jsp" />
-</c:if>
-
 <%@include file="AdvanceOptions.jsp"%>
 
 <%@include file="dateRestriction.jsp"%>

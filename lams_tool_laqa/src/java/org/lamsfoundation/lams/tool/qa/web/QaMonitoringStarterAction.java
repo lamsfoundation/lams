@@ -143,11 +143,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	}
 	request.setAttribute(LIST_ALL_GROUPS_DTO, groupDTOs);
 
-	if (qaContent.isReflect()) {
-	    List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
-	    request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
-	}
-
 	// setting up the advanced summary for LDEV-1662
 	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
 
