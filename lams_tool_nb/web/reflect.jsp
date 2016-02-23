@@ -5,47 +5,58 @@
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
-	function submitForm(methodName){
+	function submitForm(methodName) {
 		var f = document.getElementById('learnerForm');
 		f.submit();
 	}
-
 </script>
 
-<div id="content">
-<h1>
-	<c:out value="${title}" escapeXml="true" />
-</h1>
+<lams:Page type="learner" title="${title}">
 
 	<html:form action="/learner" method="post" onsubmit="disableFinishButton();" styleId="learnerForm">
-	 
-		<p><lams:out value="${reflectInstructions}" escapeHtml="true"/></p>				
-			 
-		<html:textarea cols="60" rows="8" property="reflectionText" value="${reflectEntry}" styleClass="text-area"></html:textarea>
-		 
-		<div align="right" class="space-bottom-top">
+		<div class="form-group">
+			<div class="panel">
+				<lams:out value="${reflectInstructions}" escapeHtml="true" />
+			</div>
+
+			<html:textarea rows="4" property="reflectionText" value="${reflectEntry}" styleClass="form-control"
+				styleId="focusedInput"></html:textarea>
+
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="mode" />
-			<html:hidden property="method" value="finish"/>
-			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-				<span class="nextActivity">								
-					<c:choose>
-						<c:when test="${activityPosition.last}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-				</span>
+			<html:hidden property="method" value="finish" />
+
+			<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
+				<c:choose>
+					<c:when test="${activityPosition.last}">
+						<fmt:message key="button.submit" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="button.finish" />
+					</c:otherwise>
+				</c:choose>
 			</html:link>
 		</div>
-			 
+
 	</html:form>
-	
-	<c:if test="${allowComments}">
-		<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"  likeAndDislike="${likeAndDislike}" readOnly="true" pageSize="10" sortBy="1"/>
-	</c:if>	
-	
-</div>
+
+	<!-- Comments -->
+	<div class="row no-gutter">
+		<div class="col-xs-12">
+			<c:if test="${allowComments}">
+				<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}"
+					toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" readOnly="true"
+					pageSize="10" sortBy="1" />
+			</c:if>
+		</div>
+	</div>
+	<!-- End comments -->
+
+</lams:Page>
+
+<script type="text/javascript">
+	window.onload = function() {
+		document.getElementById("focusedInput").focus();
+	}
+</script>
 
