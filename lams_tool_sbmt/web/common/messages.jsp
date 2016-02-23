@@ -2,9 +2,9 @@
 
 <%-- Error Messages --%>
 <logic:messagesPresent>
-	<p class="warning">
+	<lams:Alert id="errors" type="danger" close="true">
 	        <html:messages id="error">
 	            <c:out value="${error}" escapeXml="false"/><br/>
 	        </html:messages>
-	</p>
+	</lams:Alert>
 </logic:messagesPresent>

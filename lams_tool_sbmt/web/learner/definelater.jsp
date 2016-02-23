@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 
 <%@include file="/common/taglibs.jsp"%>
 
@@ -9,13 +8,16 @@
 </lams:head>
 
 <body class="stripes">
-	<div id="content">
-		<h1>
-			<fmt:message key="activity.title" />
-		</h1>
+
+	<c:set var="title" scope="request">
+		<fmt:message key="activity.title"></fmt:message>
+	</c:set>
+
+	<lams:Page type="learner" title="${title}">
 		<lams:DefineLater />
-	</div>
-	<div id="footer"></div>
+		<div id="footer"></div>
+	</lams:Page>
+
 </body>
 </lams:html>
 
