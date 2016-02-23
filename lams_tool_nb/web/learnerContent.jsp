@@ -9,26 +9,20 @@
 			finishButton.disabled = true;
 		}
 	}
-	function submitForm(methodName){
+	function submitForm(methodName) {
 		var f = document.getElementById('learnerForm');
 		var m = document.getElementById('methodVar');
-		m.value=methodName
+		m.value = methodName
 		f.submit();
 	}
 </script>
 
-<div id="content">
-
-	<h1>
-		<c:out value="${NbLearnerForm.title}" escapeXml="true" />
-	</h1>
-
-	<p>
+<lams:Page type="learner" title="${NbLearnerForm.title}">
+	<div class="panel">
 		<c:out value="${NbLearnerForm.basicContent}" escapeXml="false" />
-	</p>
+	</div>
 
-	<html:form action="/learner" target="_self"
-		onsubmit="disableFinishButton();" styleId="learnerForm">
+	<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="learnerForm">
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="mode" />
 		<c:choose>
@@ -41,67 +35,60 @@
 		</c:choose>
 
 		<c:if test="${userFinished and reflectOnActivity}">
-			<div class="small-space-top">
-				<h2>
-					<lams:out value="${reflectInstructions}" escapeHtml="true"/>
-				</h2>
+			<div class="panel">
+				<lams:out value="${reflectInstructions}" escapeHtml="true" />
+			</div>
 
+			<div class="bg-warning" id="reflectionEntry">
 				<c:choose>
 					<c:when test="${empty reflectEntry}">
-						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-
+						<fmt:message key="message.no.reflection.available" />
 					</c:when>
-
 					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${reflectEntry}" />
-						</p>
+						<lams:out escapeHtml="true" value="${reflectEntry}" />
 					</c:otherwise>
-
 				</c:choose>
-
 			</div>
 		</c:if>
 
 		<c:if test="${allowComments}">
-			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" />
+			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}"
+				toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" />
 		</c:if>
 
-		<div class="space-bottom-top align-right">
-			<c:if test="${not NbLearnerForm.readOnly}">
-				<c:choose>
-					<c:when test="${reflectOnActivity}">
-						<html:button property="continueButton" styleClass="button"
-							onclick="submitForm('reflect')">
-							<fmt:message key="button.continue" />
-						</html:button>
-					</c:when>
-					<c:otherwise>
+
+		<c:if test="${not NbLearnerForm.readOnly}">
+			<c:choose>
+				<c:when test="${reflectOnActivity}">
+
+					<html:button property="continueButton" styleClass="btn btn-sm btn-primary pull-right"
+						onclick="submitForm('reflect')">
+						<fmt:message key="button.continue" />
+					</html:button>
+				</c:when>
+				<c:otherwise>
 
 
-						<html:link href="#nogo" property="finishButton" styleClass="button"
-							styleId="finishButton" onclick="submitForm('finish')">
-							<span class="nextActivity">
-								<c:choose>
-									<c:when test="${activityPosition.last}">
-										<fmt:message key="button.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="button.finish" />
-									</c:otherwise>
-								</c:choose>
-							</span>
-						</html:link>
-					</c:otherwise>
-				</c:choose>
-			</c:if>
-		</div>
+					<html:link href="#nogo" property="finishButton" styleClass="btn btn-primary pull-right voffset10 na"
+						onclick="submitForm('finish')">
+						<c:choose>
+							<c:when test="${activityPosition.last}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+
+					</html:link>
+				</c:otherwise>
+			</c:choose>
+		</c:if>
+
 	</html:form>
-	
-</div>
+
+</lams:Page>
+
 
 
 

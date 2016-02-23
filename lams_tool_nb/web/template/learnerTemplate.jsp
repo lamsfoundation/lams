@@ -1,13 +1,7 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-	"http://www.w3.org/TR/html4/loose.dtd">
-
+<!DOCTYPE html>
 <%@ include file="/includes/taglibs.jsp"%>
-
 <c:set var="lams">
 	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
 </c:set>
 
 <lams:html>
@@ -15,6 +9,7 @@
 	<lams:css />
 	<title><fmt:message key="activity.title"/></title>
 	<script src="${lams}includes/javascript/jquery.js"></script>
+	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
 </lams:head>
 
 <body class="stripes">
