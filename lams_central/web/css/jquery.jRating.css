@@ -53,8 +53,8 @@ p.jRatingInfos span.maxRate {
 	height: 0; 
 	clear: both;
 }
-.rating-stars-holder {width: 150px; text-align: center; float: right;}
-.rating-stars-caption {padding-top: 6px;}
+.rating-stars-holder {text-align: center;}
+.rating-stars-caption {padding-top: 6px; font-size: 12px}
 .rating-stars, .rating-stars-disabled {margin: 0px auto; min-height: 20px;}
 .add-comment {
 	background-image: url('../images/tick.png');

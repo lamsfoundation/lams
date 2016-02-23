@@ -1,35 +1,22 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
-
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
-<c:set scope="request" var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set scope="request" var="tool">
-	<lams:WebAppURL />
-</c:set>
-
 <lams:html>
 <lams:head>
 	<html:base />
 	<lams:css />
-	<title><fmt:message key="activity.title" />
-	</title>
+	<title><fmt:message key="activity.title" /></title>
 </lams:head>
-
 <body class="stripes">
+	<c:set scope="request" var="title">
+		<fmt:message key="activity.title" />
+	</c:set>
 
-	<div id="content">
+	<lams:Page type="learner" title="${title}">
+
 		<lams:DefineLater defineLaterMessageKey="error.defineLater" />
-	</div>
 
 	<div id="footer"></div>
-
+	</lams:Page>
+	
 </body>
 </lams:html>
-
-
-
-
-

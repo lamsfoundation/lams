@@ -64,7 +64,7 @@
 <%--Rating stars area---------------------------------------%>
 
 <div class="extra-controls-inner">
-<div class="rating-stars-holder">
+<div class="rating-stars-holder text-center center-block">
 
 	<c:set var="hasStartedRating" value="false"/>
 	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}">
@@ -85,9 +85,9 @@
 			</c:otherwise>
 		</c:choose>
 			
-		<h4>
+		<strong>
 			${criteriaDto.ratingCriteria.title}
-		</h4>
+		</strong>
 			
 		<c:choose>
 			<c:when test='${isItemAuthoredByUser || not isCriteriaNotRatedByUser}'>

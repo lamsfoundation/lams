@@ -1,14 +1,5 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
-
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-
 <lams:html>
 <lams:head>
 	<html:base />
@@ -32,6 +23,9 @@
 </lams:head>
 
 <body class="stripes">
+
+<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
+
 	<html:form action="/learning?validate=false" styleId="reflectionForm">
 		<html:hidden property="method" value="submitReflection"/>
 		<html:hidden property="toolSessionID" />
@@ -39,22 +33,17 @@
 		<html:hidden property="httpSessionID" />
 		<html:hidden property="totalQuestionCount" />
 
-		<div id="content">
-
-			<h1>
-				<lams:out value="${generalLearnerFlowDTO.activityTitle}" escapeHtml="true" />
-			</h1>
 
 			<p>
 				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>
+			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
 
-			<div class="space-bottom-top align-right">
+			
 				<html:link href="#nogo" property="submitReflection" styleId="finishButton"
-					onclick="javascript:submitMethod('submitReflection');return false" styleClass="button">
-					<span class="nextActivity">					
+					onclick="javascript:submitMethod('submitReflection');return false" styleClass="btn btn-primary voffset5 pull-right">
+					<div class="na">					
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
 		 						<fmt:message key="button.submit" />
@@ -63,13 +52,20 @@
 		 		 				<fmt:message key="button.endLearning" />
 		 					</c:otherwise>
 		 				</c:choose>
-		 			</span>
+		 			</div>
 				</html:link>
-			</div>
+		
 		</div>
 	</html:form>
 
 	<div id="footer"></div>
+</lams:Page>
+
+<script type="text/javascript">
+	window.onload = function() {
+		document.getElementById("focused").focus();
+	}
+</script>
 
 </body>
 </lams:html>
