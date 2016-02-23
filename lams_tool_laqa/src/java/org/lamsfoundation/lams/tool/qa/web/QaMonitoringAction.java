@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -32,10 +33,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -129,4 +134,51 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	return QaServiceProxy.getQaService(getServlet().getServletContext());
     }
     
+    /**
+     * Get Paged Reflections
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
+	
+	Long toolSessionId = WebUtil.readLongParam(request, QaAppConstants.TOOL_SESSION_ID);
+	
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
+	String searchString = request.getParameter("fcol[0]"); 
+	
+	int sorting = QaAppConstants.SORT_BY_NO;
+	if ( sortByName != null ) 
+	    sorting = sortByName.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC; 
+	    
+	//return user list according to the given sessionID
+	IQaService qaService = getQAService();
+	List<Object[]> users = qaService.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString);
+	
+	JSONArray rows = new JSONArray();
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", qaService.getCountUsersBySessionWithSearch(toolSessionId, searchString));
+
+	for (Object[] userAndReflection: users) {
+	    JSONObject responseRow = new JSONObject();
+	    responseRow.put("username", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
+	    if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
+		String reflection = StringEscapeUtils.escapeHtml((String)userAndReflection[2]);
+		responseRow.put(QaAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
+	    }
+	    rows.put(responseRow);
+	}
+	responsedata.put("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
+    }
+
 }
