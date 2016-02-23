@@ -1,36 +1,41 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" scope="request"/>
-<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request"/>
-<c:set var="mode" value="${sessionMap.mode}" scope="request"/>
-<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request"/>
-<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" scope="request"/>
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" scope="request" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request" />
+<c:set var="mode" value="${sessionMap.mode}" scope="request" />
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request" />
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" scope="request" />
 
 <lams:html>
 <lams:head>
 	<html:base />
 	<title><fmt:message key="activity.title" /></title>
-	
 	<lams:css />
 	<style media="screen,projection" type="text/css">
-		div.growlUI { background: url(check48.png) no-repeat 10px 10px }
-		div.growlUI h1, div.growlUI h2 {
-			color: white; padding: 5px 5px 5px 0px; text-align: center;
-		}
-	</style>
-	
+div.growlUI {
+	background: url(check48.png) no-repeat 10px 10px
+}
+
+div.growlUI h1, div.growlUI h2 {
+	color: white;
+	padding: 5px 5px 5px 0px;
+	text-align: center;
+	font-size: 20px;
+}
+</style>
+
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
- 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
- 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+
+
 	<script language="JavaScript" type="text/JavaScript">
 
 		var minWordsLimitLabel = '<fmt:message key="label.minimum.number.words" ><fmt:param>{0}</fmt:param></fmt:message>';
@@ -138,39 +143,49 @@
 </lams:head>
 
 <body class="stripes">
+	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
-	<div id="content">
-		<h1>
-			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true" />
-		</h1>
+		<!-- Advanced settings and notices -->
 
-		<c:if test="${not empty sessionMap.submissionDeadline}">
-			<div class="info">
-				<fmt:message key="authoring.info.teacher.set.restriction" >
-					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
-				</fmt:message>
-			</div>
-		</c:if>	
-		
-		<c:if test="${isLeadershipEnabled}">
-			<h4>
-				<fmt:message key="label.group.leader" >
-					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
-				</fmt:message>
-			</h4>
+		<c:if test="${generalLearnerFlowDTO.noReeditAllowed}">
+			<lams:Alert type="danger" id="noRedosAllowed" close="false">
+				<fmt:message key="label.noredo.enabled" />
+			</lams:Alert>
 		</c:if>
 
-		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self" styleId="learningForm">
+		<c:if test="${not empty sessionMap.submissionDeadline}">
+			<lams:Alert type="danger" id="submission-deadline" close="false">
+				<fmt:message key="authoring.info.teacher.set.restriction">
+					<fmt:param>
+						<lams:Date value="${sessionMap.submissionDeadline}" />
+					</fmt:param>
+				</fmt:message>
+			</lams:Alert>
+		</c:if>
+
+		<c:if test="${isLeadershipEnabled}">
+			<lams:Alert type="info" id="leader-enabled" close="false">
+				<fmt:message key="label.group.leader">
+					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+				</fmt:message>
+			</lams:Alert>
+		</c:if>
+
+		<!-- End advanced settings and notices -->
+
+		<!-- Form -->
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"
+			styleId="learningForm">
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
-					<html:hidden property="method" value="getNextQuestion"/>
+					<html:hidden property="method" value="getNextQuestion" />
 				</c:when>
 				<c:otherwise>
-					<html:hidden property="method" value="submitAnswersContent"/>
+					<html:hidden property="method" value="submitAnswersContent" />
 				</c:otherwise>
 			</c:choose>
-				
-			<html:hidden property="toolSessionID" styleId="tool-session-id"/>
+
+			<html:hidden property="toolSessionID" styleId="tool-session-id" />
 			<html:hidden property="userID" />
 			<html:hidden property="httpSessionID" />
 			<html:hidden property="questionIndex" />
@@ -178,32 +193,33 @@
 
 			<logic:messagesPresent>
 				<p class="warning">
-				  	<html:messages id="error" message="false"> 
-            			<c:out value="${error}" escapeXml="false"/><BR> 
-         			</html:messages> 
+					<html:messages id="error" message="false">
+						<c:out value="${error}" escapeXml="false" />
+						<BR>
+					</html:messages>
 				</p>
 			</logic:messagesPresent>
 
-			<p>
+			<div class="panel">
 				<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
-			</p>
-				
+			</div>
+
 			<c:choose>
 				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
 
 					<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
 						<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
-							<p><fmt:message key="label.feedback.seq" />
-									
-								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-									
-								<fmt:message key="label.questions.simple" /></p>
+							<p>
+								<fmt:message key="label.feedback.seq" />&nbsp;
+								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
+								<fmt:message key="label.questions.simple" />
+							</p>
 						</c:if>
 					</c:if>
-					
+
 					<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
 						<p>
-							<fmt:message key="label.questions.remaining" />
+							<fmt:message key="label.questions.remaining" />&nbsp;
 							<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
 						</p>
 					</c:if>
@@ -217,16 +233,17 @@
 						<fmt:message key="label.feedback.combined" /> &nbsp <c:out
 							value="${generalLearnerFlowDTO.remainingQuestionCount}" />
 						<fmt:message key="label.questions.simple" />
-					</c:if>						
+					</c:if>
 
 					<jsp:include page="/learning/CombinedAnswersContent.jsp" />
 				</c:otherwise>
 			</c:choose>
 
 		</html:form>
-	</div>
 
-	<div id="footer"></div>
+		<div id="footer"></div>
+
+	</lams:Page>
 
 </body>
 </lams:html>

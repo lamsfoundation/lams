@@ -41,7 +41,7 @@ public class QaQuestionDTO implements Comparable {
     public QaQuestionDTO(QaQueContent que) {
 	this.question = que.getQuestion();
 	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
-	this.feedback = que.getFeedback() != null ? que.getFeedback() : " ";
+	this.feedback = que.getFeedback() != null ? que.getFeedback() : "";
 	this.required = que.isRequired();
 	this.minWordsLimit = que.getMinWordsLimit();
 	this.uid = que.getUid();

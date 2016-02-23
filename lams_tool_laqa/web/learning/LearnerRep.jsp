@@ -1,12 +1,8 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams">
 	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
 </c:set>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
@@ -20,13 +16,12 @@
 <lams:head>
 	<html:base />
 	<title><fmt:message key="activity.title" /></title>
-	
-	<lams:css />
-	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet" />
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
-	
+	<lams:css />
+
 	<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
@@ -45,14 +40,19 @@
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 
+	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
+
 	<script type="text/javascript">
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
 		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
 		IS_DISABLED =  ${sessionMap.isDisabled};
 		
 		$(document).ready(function(){
+			
+			jQuery("time.timeago").timeago();
 			
 			$(".tablesorter").tablesorter({
 				theme: 'blue',
@@ -91,11 +91,11 @@
 								rows += '<td>';
 								
 								if (${generalLearnerFlowDTO.userNameVisible == 'true'}) {
-									rows += '<div>';
-									rows += 	'<span class="field-name">';
+									rows += '<div class="sbox-heading bg-warning">';
+									rows += 	'<div class="user">';
 									rows += 		userData["userName"];
-									rows += 	'</span> ';
-									rows += 	userData["attemptTime"];
+									rows += 	'</div> - ';
+									rows += 	userData['attemptTime'];
 									rows += '</div>';
 								}
 								
@@ -138,9 +138,9 @@
 											var averageRatingDisplayed = (isItemAuthoredByUser || !isCriteriaNotRatedByUser) ? averageRating : 0;
 											var ratingStarsClass = (IS_DISABLED || isItemAuthoredByUser || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES)  && (!hasStartedRating) || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
 								
-											rows += '<h4>';
+											rows += '<strong>';
 											rows += 	 criteriaDto.title;
-											rows += '</h4>';
+											rows += '</strong>';
 											
 											rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
 											rows += '</div>';
@@ -194,7 +194,7 @@
 										//show comments textarea and a submit button
 										} else if (! (IS_DISABLED || usesRatings && MAX_RATES>0 && countRatedItems >= MAX_RATES && !hasStartedRating)) {
 											rows += '<div id="add-comment-area-' + itemId + '">';											
-											rows +=		'<textarea name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
+											rows +=		'<textarea class="form-control" name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
 											
 											rows += 	'<div class="button add-comment add-comment-new" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'">';
 											rows += 	'</div>';
@@ -252,130 +252,154 @@
 
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${generalLearnerFlowDTO.activityTitle}" escapeXml="true" />
-		</h1>
-		
+
+	<lams:Page type="learner" title="${qaContent.title}">
+
+		<!-- Announcements and advanced settings -->
+
 		<c:if test="${not empty sessionMap.submissionDeadline}">
-			<div class="info">
-				<fmt:message key="authoring.info.teacher.set.restriction" >
-					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+			<lams:Alert id="submission-deadline" type="danger" close="false">
+				<fmt:message key="authoring.info.teacher.set.restriction">
+					<fmt:param>
+						<lams:Date value="${sessionMap.submissionDeadline}" />
+					</fmt:param>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 		</c:if>
-		
+
 		<!-- Rating limits info -->
 		<c:if test="${qaContent.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
-		
-			<div class="info">
+
+			<lams:Alert id="rating-info" type="info" close="true">
 				<c:choose>
 					<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
 						<fmt:message key="label.rate.limits.reminder">
-							<fmt:param value="${qaContent.minimumRates}"/>
-							<fmt:param value="${qaContent.maximumRates}"/>
+							<fmt:param value="${qaContent.minimumRates}" />
+							<fmt:param value="${qaContent.maximumRates}" />
 						</fmt:message>
 					</c:when>
-					
+
 					<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates eq 0}">
 						<fmt:message key="label.rate.limits.reminder.min">
-							<fmt:param value="${qaContent.minimumRates}"/>
+							<fmt:param value="${qaContent.minimumRates}" />
 						</fmt:message>
 					</c:when>
-					
+
 					<c:when test="${qaContent.minimumRates eq 0 and qaContent.maximumRates ne 0}">
 						<fmt:message key="label.rate.limits.reminder.max">
-							<fmt:param value="${qaContent.maximumRates}"/>
+							<fmt:param value="${qaContent.maximumRates}" />
 						</fmt:message>
 					</c:when>
 				</c:choose>
 				<br>
-						
+
 				<fmt:message key="label.rate.limits.topic.reminder">
-					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>"/>
+					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>" />
 				</fmt:message>
-			</div>
-			
+			</lams:Alert>
 		</c:if>
-		
+		<!-- End Announcements and advanced settings -->
+
 		<c:if test="${isLeadershipEnabled}">
 			<c:set var="fullName">
-				<c:out value="${sessionMap.groupLeader.fullname}" escapeXml="true"/>
+				<c:out value="${sessionMap.groupLeader.fullname}" escapeXml="true" />
 			</c:set>
 			<h4>
-				<fmt:message key="label.group.leader" >
-					<fmt:param>${fullName}</fmt:param> 
+				<fmt:message key="label.group.leader">
+					<fmt:param>${fullName}</fmt:param>
 				</fmt:message>
 			</h4>
 		</c:if>
 
-		<h2>
+		<h4>
 			<fmt:message key="label.learnerReport" />
-		</h2>
+		</h4>
 
+		<!-- Questions and answers -->
 		<c:forEach var="userResponse" items="${generalLearnerFlowDTO.userResponses}" varStatus="status">
-			<div class="shading-bg">
-			
-				<p>
-					<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
-					<c:out value="${userResponse.qaQuestion.question}" escapeXml="false" />
-				</p>
-	
-				<p>
-					<span class="field-name"> 
-						<c:out value="${userResponse.qaQueUser.fullname}" /> 
-					</span> 
-					-
-					<lams:Date value="${userResponse.attemptTime}" />
-				</p>
-				<div class="user-answer">
-					<c:out value="${userResponse.answer}" escapeXml="false" />
+			<div class="row no-gutter">
+				<div class="col-xs-12">
+					<div class="panel panel-default">
+						<div class="panel-heading panel-title">
+							<fmt:message key="label.question" />
+							${status.count}:
+						</div>
+						<div class="panel-body">
+							<div class="panel">
+								<c:out value="${userResponse.qaQuestion.question}" escapeXml="false" />
+							</div>
+
+							<div class="row no-gutter">
+								<!-- split if ratings are on -->
+								<c:set var="splitRow" value="col-xs-12" />
+								<c:if test="${qaContent.allowRateAnswers}">
+									<c:set var="splitRow" value="col-xs-12 col-sm-9 col-md-10 col-lg-10" />
+								</c:if>
+								<div class="${splitRow}">
+									<div class="sbox">
+										<div class="sbox-heading bg-warning">
+											<div class="user">
+												<c:out value="${userResponse.qaQueUser.fullname}" />
+											</div>
+											-
+											<time class="timeago"
+												datetime="<fmt:formatDate value='${userResponse.attemptTime}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>">
+												<lams:Date value="${userResponse.attemptTime}" />
+											</time>
+										</div>
+										<div class="sbox-body">
+											<c:out value="${userResponse.answer}" escapeXml="false" />
+										</div>
+									</div>
+
+								</div>
+								<%--Rating area---------------------------------------%>
+								<c:if test="${qaContent.allowRateAnswers}">
+									<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+									<h4 class="text-center"><fmt:message key="label.learning.rating" /></h4>
+										<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
+											maxRates="${qaContent.maximumRates}" />
+									</div>
+								</c:if>
+							</div>
+						</div>
+					</div>
 				</div>
-				
-				<%--Rating area---------------------------------------%>
-				<c:if test="${qaContent.allowRateAnswers}">
-					<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
-							maxRates="${qaContent.maximumRates}"/>
-					<br>
-				</c:if>
-				
 			</div>
 		</c:forEach>
-				
-		<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
-			<h2>
+		<!-- End questions and answers -->
+
+		<!-- Others questions -->
+
+		<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">
+			<h4>
 				<fmt:message key="label.other.answers" />
-			</h2>
-	
-			<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">			
+			</h4>
+
+			<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
 				<p>
-					<strong> <fmt:message key="label.question" /> ${status.count}: </strong>
+					<strong> <fmt:message key="label.question" /> ${status.count}:
+					</strong>
 					<c:out value="${question.question}" escapeXml="false" />
 				</p>
-				
+
 				<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
-					<div class="info rating-info">
+					<lams:Alert id="rating-info" type="info" close="false">
 						<fmt:message key="label.comment.minimum.number.words">
 							<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
 						</fmt:message>
-					</div>
+					</lams:Alert>
 				</c:if>
-				
+
 				<table class="tablesorter" data-question-uid="${question.uid}">
 					<thead>
 						<tr>
-							<th title="<fmt:message key='label.sort.by.answer'/>" >
-								<fmt:message key="label.learning.answer" />
-							</th>
+							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
 							<c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
-								<th title="<fmt:message key='label.sort.by.rating'/>">
-									<fmt:message key="label.learning.rating" />
-								</th>
+								<th title="<fmt:message key='label.sort.by.rating'/>"><fmt:message key="label.learning.rating" /></th>
 							</c:if>
 							<c:if test="${isCommentsEnabled}">
-								<th>
-									<fmt:message key="label.comment" />
-								</th>
+								<th><fmt:message key="label.comment" /></th>
 							</c:if>
 						</tr>
 					</thead>
@@ -383,97 +407,103 @@
 
 					</tbody>
 				</table>
-					
+
 				<!-- pager -->
 				<div class="pager">
 					<form>
-					   	<img class="tablesorter-first"/>
-				    	<img class="tablesorter-prev"/>
-				    	<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-				   		<img class="tablesorter-next"/>
-				    	<img class="tablesorter-last"/>
-				    	<select class="pagesize">
-				      		<option selected="selected" value="10">10</option>
-				      		<option value="20">20</option>
-				      		<option value="30">30</option>
-				      		<option value="40">40</option>
-				      		<option value="50">50</option>
-				      		<option value="100">100</option>
-				    	</select>
-				  </form>
-				</div>	
-										
+						<img class="tablesorter-first" /> <img class="tablesorter-prev" /> <span class="pagedisplay"></span>
+						<!-- this can be any element, including an input -->
+						<img class="tablesorter-next" /> <img class="tablesorter-last" /> <select class="pagesize">
+							<option selected="selected" value="10">10</option>
+							<option value="20">20</option>
+							<option value="30">30</option>
+							<option value="40">40</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+						</select>
+					</form>
+				</div>
+
 			</c:forEach>
-		</c:if>	
-			
+		</c:if>
+
+		<!-- End of others questions -->
+
+		<!-- buttons -->
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-			<html:hidden property="toolSessionID" styleId="toolSessionID"/>
-			<html:hidden property="userID" styleId="userID"/>
+			<html:hidden property="toolSessionID" styleId="toolSessionID" />
+			<html:hidden property="userID" styleId="userID" />
 			<html:hidden property="httpSessionID" />
 			<html:hidden property="totalQuestionCount" />
-				
+
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}">
 					<c:choose>
 						<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-							<html:hidden property="method" value="endLearning"/>
+							<html:hidden property="method" value="endLearning" />
 						</c:when>
 						<c:otherwise>
-							<html:hidden property="method" value="forwardtoReflection"/>
+							<html:hidden property="method" value="forwardtoReflection" />
 						</c:otherwise>
-					</c:choose>	
+					</c:choose>
 				</c:when>
-					
+
 				<c:otherwise>
 					<html:hidden property="method" />
 				</c:otherwise>
-			</c:choose>	
-				
+			</c:choose>
+
 			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
 				<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
-					<html:button property="refreshAnswers" styleClass="button" onclick="submitMethod('refreshAllResults');">
+					<html:button property="refreshAnswers" styleClass="btn btn-default voffset5 roffset5 pull-left"
+						onclick="submitMethod('refreshAllResults');">
 						<fmt:message key="label.refresh" />
 					</html:button>
 
 					<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
-						<html:button property="redoQuestions" styleClass="button" onclick="submitMethod('redoQuestions');">
+						<html:button property="redoQuestions" styleClass="btn btn-primary voffset5  pull-left"
+							onclick="submitMethod('redoQuestions');">
 							<fmt:message key="label.redo" />
 						</html:button>
-					</c:if>	
-						
-					<div class="space-bottom-top" align="right" id="learner-submit">
+					</c:if>
+
+					<div class="right-buttons voffset5" align="right" id="learner-submit">
 						<c:if test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<html:link href="#nogo" property="endLearning" styleId="finishButton"
-								onclick="javascript:submitMethod('endLearning'); return false;"
-								styleClass="button">
-								<span class="nextActivity">
+								onclick="javascript:submitMethod('endLearning'); return false;" styleClass="btn btn-primary pull-right">
+								<div class="na">
 									<c:choose>
-					 					<c:when test="${sessionMap.activityPosition.last}">
-					 						<fmt:message key="button.submit" />
-					 					</c:when>
-					 					<c:otherwise>
-					 		 				<fmt:message key="button.endLearning" />
-					 					</c:otherwise>
-					 				</c:choose>
-					 			</span>
+										<c:when test="${sessionMap.activityPosition.last}">
+											<fmt:message key="button.submit" />
+										</c:when>
+										<c:otherwise>
+											<fmt:message key="button.endLearning" />
+										</c:otherwise>
+									</c:choose>
+								</div>
 							</html:link>
 						</c:if>
 
 						<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-							<html:button property="forwardtoReflection"
-								onclick="javascript:submitMethod('forwardtoReflection');"
-								styleClass="button">
+							<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+								styleClass="btn btn-primary">
 								<fmt:message key="label.continue" />
 							</html:button>
 						</c:if>
 					</div>
 				</c:if>
 			</c:if>
-		
+
 		</html:form>
-	
-	</div>
-	<div id="footer"></div>
+		<!-- End buttons -->
+
+
+		<div id="footer"></div>
+
+		
+
+	</lams:Page>
+
 </body>
 </lams:html>

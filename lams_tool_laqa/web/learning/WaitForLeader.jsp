@@ -1,56 +1,48 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
 <lams:head>
 	<html:base />
 	<title><fmt:message key="activity.title" /></title>
-
 	<lams:css />
-
 	<script type="text/javascript">
 		function refresh() {
 			location.reload();
 		}
-		
+
 		//refresh page every 30 sec
-		setTimeout("refresh();",30000);
-    </script>
+		setTimeout("refresh();", 30000);
+	</script>
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${content.title}" escapeXml="true"/>
-		</h1>
-		
-		<h2>
+	<lams:Page type="learner" title="${content.title}">
+
+		<h4>
 			<fmt:message key="label.waiting.for.leader" />
-		</h2>
+		</h4>
 
 		<div>
 			<fmt:message key="label.users.from.group" />
 		</div>
-		
-		<div>
+
+		<ul>
 			<c:forEach var="user" items="${groupUsers}" varStatus="status">
-				<div>
-					<c:out value="${user.fullname}" escapeXml="true"/>
-				</div>
+				<li><span class="user"> <c:out value="${user.fullname}" escapeXml="true" />
+				</span></li>
 			</c:forEach>
-		</div>
-		
-		<div class="space-bottom-top align-right">
-			<html:button property="refreshButton" onclick="refresh();" styleClass="button">
+		</ul>
+
+		<div class="right-buttons">
+			<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-default voffset5">
 				<fmt:message key="label.refresh" />
 			</html:button>
 		</div>
 
-	</div>
 
-	<div id="footer">
-	</div>
+		<div id="footer">
+	</lams:Page>
 
 </body>
 </lams:html>
