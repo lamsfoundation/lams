@@ -318,13 +318,29 @@ public interface IQaService extends ToolRatingManager {
     String getLearnerContentFolder(Long toolSessionId, Long userId);
 
     /**
-     * Return reflection data for all sessions.
+     * Return reflection data for all sessions. Used for Export Portfolio. For monitoring use getUserReflectionsForTablesorter
      * 
      * @param content
      * @param userID
      * @return
      */
     List<ReflectionDTO> getReflectList(QaContent content, String userID);
+    
+    /** 
+     * 
+     * Takes the tool session id as the main input.
+     */
+
+    /**
+     * Return username and reflections for a sessions. Paged. Used for monitoring.
+     * Will return List<[username (String), fullname(String), String (notebook entry)]>
+     * 
+     * @param content
+     * @param userID
+     * @return
+     */
+    List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString);
+    int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString);
     
     /**
      * ends up populating the attempt history for all the users of all the tool sessions for a content

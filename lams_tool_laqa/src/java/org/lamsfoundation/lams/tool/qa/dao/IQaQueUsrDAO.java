@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.qa.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 
@@ -45,4 +45,10 @@ public interface IQaQueUsrDAO {
     int countSessionUser(QaSession qaSession);
 
     List getUserBySessionOnly(final QaSession qaSession);
+    
+    // Used for the user reflections tablesorter
+    List<Object[]> getUserReflectionsForTablesorter(final Long toolSessionId, int page, int size, int sorting,
+	    String searchString, ICoreNotebookService coreNotebookService);
+    int getCountUsersBySessionWithSearch(final Long toolSessionId, String searchString);
+    
 }
