@@ -667,6 +667,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return reflectionDTOs;
     }
 
+    public List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString) {
+	return qaQueUsrDAO.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString, getCoreNotebookService());
+    }
+    public int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString) {
+	return qaQueUsrDAO.getCountUsersBySessionWithSearch(toolSessionId, searchString);
+    }
+    
+
     @Override
     public List exportLearner(QaContent qaContent, boolean isUserNamesVisible, boolean isLearnerRequest,
 	    String sessionId, String userId) {
