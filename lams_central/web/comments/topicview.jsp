@@ -3,13 +3,13 @@
 <c:set var="maxThreadUid" value="0"/>
 <c:set var="minThreadLike" value="-1"/>
 <c:set var="messageTablename" value=""/>
-<c:set var="indent" value="30"/>
+<c:set var="indent" value="10"/>
 
 <c:set var="show"><fmt:message key="label.show" /></c:set>
 <c:set var="hide"><fmt:message key="label.hide" /></c:set>
 <c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
+	expanderTemplate:'<a class=\"btn btn-xs\" href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
 	clickableNodeNames:true,indent:${indent},
 	onNodeInitialized:function() {
@@ -39,7 +39,7 @@
 			var replyDiv = document.createElement("div");
 			replyDiv.id = 'reply';
 
-			var parentDiv = document.getElementById('msg'+commentUid);
+			var parentDiv = document.getElementById('pb-msg'+commentUid);
 			parentDiv.appendChild(replyDiv);
 			
 			$(replyDiv).load(url);
@@ -56,7 +56,7 @@
 			var editDiv = document.createElement("div");
 			editDiv.id = 'edit';
 
-			var parentDiv = document.getElementById('msg'+commentUid);
+			var parentDiv = document.getElementById('pb-msg'+commentUid);
 			parentDiv.appendChild(editDiv);
 
 			$(editDiv).load(url);
@@ -138,8 +138,8 @@
 			</div>
 		</c:if>
 		<c:set var="messageTablename" value="tree${commentDto.comment.uid}"/>
-		<div id="thread${commentDto.comment.uid}">
-		<table id="${messageTablename}">
+		<div id="thread${commentDto.comment.uid}" class="col-xs-12 voffset10">
+		<table id="${messageTablename}" class="col-xs-12">
 		<tr data-tt-id="${commentDto.comment.uid}"><td>	
 	</c:when>
 	<c:otherwise>
@@ -164,8 +164,8 @@
 	</c:if>
 
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-	<div class="float-right">
+	<div class="text-center">
 	<c:set var="more"><lams:LAMSURL />/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}</c:set>
-	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>
+	<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
 	</div>
 </c:if>

@@ -57,21 +57,19 @@
 	
 </script>
 
-<div class="comment-entry">
+<div class="comment-entry form-group voffset5">
 <form id="editForm" method="GET" action="<lams:LAMSURL />comments/updateTopicInline.do">
-	<textarea rows="3" cols="80" id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH+2%>" name="body" class="comment">${comment.comment.body}</textarea>
+	<textarea class="form-control"  id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH+2%>" name="body" class="comment">${comment.comment.body}</textarea>
 	<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}"/>
 	<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
 	
-	<div class="space-bottom">
-	<div class="right-buttons">
-		<a href="#" onclick="javascript:cancelEdit();" class="button">
-			<fmt:message key="label.cancel" />
-		</a>&nbsp;
-		<a href="#" onclick="javascript:editCommentSubmit();" class="button">
+	<div class="right-buttons voffset5">
+		<a href="#nogo" onclick="javascript:editCommentSubmit();" class="btn btn-xs btn-primary pull-right">
 			<fmt:message key="label.post" />
+		</a>&nbsp;
+		<a href="#nogo" onclick="javascript:cancelEdit();" class="btn btn-xs btn-primary pull-right roffset5">
+			<fmt:message key="label.cancel" />
 		</a>
-	</div>
 	</div>
 </form>
 </div>
