@@ -4,43 +4,45 @@
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
-         function submitForm(methodName){
-                var f = document.getElementById('messageForm');
-                f.submit();
-        }
+	function submitForm(methodName) {
+		var f = document.getElementById('messageForm');
+		f.submit();
+	}
 </script>
 
-<div id="content">
-	<h1>
-		<c:out value="${wikiDTO.title}" escapeXml="true"/>
-	</h1>
-
+<lams:Page type="learner" title="${wikiDTO.title}">
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
-		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
+		<html:hidden property="toolSessionID" styleId="toolSessionID" />
 		<html:hidden property="mode" value="${mode}" />
-		
-		<p class="small-space-top">
-			<lams:out value="${wikiDTO.reflectInstructions}"  escapeHtml="true"/>
-		</p>
 
-		<html:textarea cols="60" rows="8" property="entryText"
-			styleClass="text-area"></html:textarea>
+		<div class="panel">
+			<lams:out value="${wikiDTO.reflectInstructions}" escapeHtml="true" />
+		</div>
+		<div class="form-group">
+			<html:textarea styleId="focused" rows="4" property="entryText" styleClass="form-control"></html:textarea>
 
-		<div class="space-bottom-top align-right">
+
 			<html:hidden property="dispatch" value="submitReflection" />
-			<html:link href="#nogo" styleClass="button" styleId="finishButton"  onclick="submitForm('finish');return false">
-				<span class="nextActivity">
-					<c:choose>
-						<c:when test="${activityPosition.last}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-				</span>
+			<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton"
+				onclick="submitForm('finish');return false">
+				<c:choose>
+					<c:when test="${activityPosition.last}">
+						<fmt:message key="button.submit" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="button.finish" />
+					</c:otherwise>
+				</c:choose>
 			</html:link>
 		</div>
 	</html:form>
-</div>
+
+</lams:Page>
+
+	<script type="text/javascript">
+		window.onload = function() {
+			document.getElementById("focused").focus();
+		}
+	</script>
+
 
