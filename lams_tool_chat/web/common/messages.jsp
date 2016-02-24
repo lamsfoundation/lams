@@ -1,20 +1,17 @@
 <%-- Error Messages --%>
 <logic:messagesPresent>
-    <div class="error" id="errorMessages">
+		<lams:Alert id="errorMessages" type="danger" close="false">
         <html:messages id="error">
-            &nbsp&nbsp <html:img page="/images/iconWarning.gif" 
-               styleClass="icon"/>
-            &nbsp&nbsp <c:out value="${error}" escapeXml="false"/><br/>
+            <c:out value="${error}" escapeXml="false"/>
         </html:messages>
-    </div>
+    </lams:Alert>
 </logic:messagesPresent>
 
 <%-- Success Messages --%>
 <logic:messagesPresent message="true">
-    <div class="message" id="successMessages">
+    <lams:Alert id="message" type="info" close="true">
         <html:messages id="message" message="true">
-            &nbsp&nbsp <html:img page="/images/iconInformation.gif" styleClass="icon"/>
-            &nbsp&nbsp <c:out value="${message}" escapeXml="false"/><br/>
+             <c:out value="${message}" escapeXml="false"/>
         </html:messages>
-    </div>
+    </lams:Alert>
 </logic:messagesPresent>

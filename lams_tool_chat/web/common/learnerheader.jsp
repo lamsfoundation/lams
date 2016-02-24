@@ -19,6 +19,8 @@
 			<link href="${tool}includes/css/chat_rtl.css" rel="stylesheet" type="text/css">
 		</c:otherwise>
 	</c:choose>
-	<lams:css/>	
+	<lams:css/>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<tiles:insert attribute="headItems" />
 </lams:head>
