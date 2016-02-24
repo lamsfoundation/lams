@@ -448,24 +448,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportClassPortfolio(
-	    Long toolContentID) {
-
-	//construct sessionToUsers Map
-	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
-	List<SurveySession> sessions = surveySessionDao.getByContentId(toolContentID);
-	if (sessions != null) {
-	    for (SurveySession session : sessions) {
-		// get all users under this session
-		List<SurveyUser> users = surveyUserDao.getBySessionID(session.getSessionId());
-		sessionToUsersMap.put(session, users);
-	    }
-	}
-
-	return getExportSummary(sessionToUsersMap);
-    }
-
-    @Override
     public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID) {
 
 	SurveySession session = surveySessionDao.getSessionBySessionId(toolSessionID);
@@ -473,17 +455,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
 	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
 	sessionToUsersMap.put(session, users);
-
-	return getExportSummary(sessionToUsersMap);
-    }
-
-    @Override
-    public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportLearnerPortfolio(
-	    SurveyUser learner) {
-
-	Map<SurveySession, List<SurveyUser>> sessionToUsersMap = new HashMap<SurveySession, List<SurveyUser>>();
-	SurveySession session = learner.getSession();
-	sessionToUsersMap.put(session, Arrays.asList(learner));
 
 	return getExportSummary(sessionToUsersMap);
     }

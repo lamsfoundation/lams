@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
@@ -44,72 +43,51 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
-* The action servlet that provides the support for the Sequence activities. At present, this is
-* only a basic view screen that lists the user's in the sequence.
-* 
-* @struts:action path="/sequence" 
-*                parameter="method" 
-*                validate="false"
-* @struts.action-forward name = "viewSequence" path = ".viewSequence"
-*
-* @author Fiona Malikoff
-*/
+ * The action servlet that provides the support for the Sequence activities. At present, this is only a basic view
+ * screen that lists the user's in the sequence.
+ * 
+ * @struts:action path="/sequence" parameter="method" validate="false"
+ * @struts.action-forward name = "viewSequence" path = ".viewSequence"
+ *
+ * @author Fiona Malikoff
+ */
 public class SequenceAction extends LamsDispatchAction {
 
-	public static final String VIEW_SEQUENCE = "viewSequence";
-	public static final String PARAM_LEARNERS = "learners";
-	/** If localFiles = true will be written to a local file for export portfolio */
-	public static final String PARAM_LOCAL_FILES= "localFiles"; 
-	
-   /**
-     * Export Portfolio Page
-     */
-    public ActionForward exportPortfolio(ActionMapping mapping,
-                                  ActionForm form,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-        long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-
-        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId, SequenceActivity.class);
-    	return viewSequence(activity, lessonId, true, mapping, request, monitoringService);
-    }
+    public static final String VIEW_SEQUENCE = "viewSequence";
+    public static final String PARAM_LEARNERS = "learners";
+    public static final String PARAM_LOCAL_FILES = "localFiles";
 
     /**
-     * Display the view screen - to be used if we ever want direct access to the screen rather than export portfolio version.
+     * Display the view screen.
      */
-    public ActionForward viewSequence(ActionMapping mapping,
-                                  ActionForm form,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-        long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+    public ActionForward viewSequence(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
-        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId, SequenceActivity.class);
-    	return viewSequence(activity, lessonId, false, mapping, request, monitoringService);
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId,
+		SequenceActivity.class);
+	return viewSequence(activity, lessonId, false, mapping, request, monitoringService);
     }
 
-	protected ActionForward viewSequence(SequenceActivity activity, Long lessonId, boolean useLocalFiles, 
-			ActionMapping mapping, HttpServletRequest request, IMonitoringService monitoringService) throws IOException, ServletException {
+    protected ActionForward viewSequence(SequenceActivity activity, Long lessonId, boolean useLocalFiles,
+	    ActionMapping mapping, HttpServletRequest request, IMonitoringService monitoringService)
+		    throws IOException, ServletException {
 
-    	// in general the progress engine expects the activity and lesson id to be in the request,
-    	// so follow that standard.
-		request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
-		request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
-		request.setAttribute(PARAM_LOCAL_FILES, useLocalFiles);
-	    	
-		// only show the group names if this is a group based branching activity - the names
-		// are meaningless for chosen and tool based branching
-		List<User> learners = monitoringService.getLearnersAttemptedOrCompletedActivity(activity);
-		request.setAttribute(PARAM_LEARNERS, learners);
-		return mapping.findForward(VIEW_SEQUENCE);
-	}
+	// in general the progress engine expects the activity and lesson id to be in the request,
+	// so follow that standard.
+	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
+	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
+	request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
+	request.setAttribute(SequenceAction.PARAM_LOCAL_FILES, useLocalFiles);
 
- }
+	// only show the group names if this is a group based branching activity - the names
+	// are meaningless for chosen and tool based branching
+	List<User> learners = monitoringService.getLearnersAttemptedOrCompletedActivity(activity);
+	request.setAttribute(SequenceAction.PARAM_LEARNERS, learners);
+	return mapping.findForward(SequenceAction.VIEW_SEQUENCE);
+    }
+
+}

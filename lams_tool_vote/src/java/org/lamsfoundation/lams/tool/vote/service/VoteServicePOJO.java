@@ -1065,12 +1065,12 @@ public class VoteServicePOJO
 	Date attempTime = new Date(System.currentTimeMillis());
 	String timeZone = TimeZone.getDefault().getDisplayName();
 
-	// in case of free entry
+	//in case of free entry
 	if (mapGeneralCheckedOptionsContent.size() == 0) {
 	    VoteQueContent defaultContentFirstQuestion = voteQueContentDAO.getDefaultVoteContentFirstQuestion();
 	    createAttempt(defaultContentFirstQuestion, voteQueUsr, attempTime, timeZone, userEntry, voteSession);
 
-	    // if the question is selected
+	    //if the question is selected
 	} else if (voteContentUid != null) {
 	    Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
 	    while (itCheckedMap.hasNext()) {
@@ -1983,7 +1983,6 @@ public class VoteServicePOJO
 
 	VoteContent vote = new VoteContent();
 	vote.setVoteContentId(toolContentID);
-	vote.setContent(toolContentID.toString());
 	vote.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	vote.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	vote.setCreatedBy(userID);

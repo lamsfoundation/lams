@@ -40,7 +40,6 @@
 			hasContentFrame = false,
 			presenceEnabled =  false,
 			hasDialog = false,
-			enableExportPortfolio = ${enableExportPortfolio},
 			sequenceTabShowInfo = ${sequenceTabShowInfo eq true},
 			
 			LAMS_URL = '<lams:LAMSURL/>',
@@ -137,10 +136,6 @@
 				SUPPORT_ACTIVITY : '<c:out value="${SUPPORT_ACTIVITY_VAR}" />',
 				<fmt:message key="label.learner.progress.not.started" var="PROGRESS_NOT_STARTED_VAR"/>
 				PROGRESS_NOT_STARTED : '<c:out value="${PROGRESS_NOT_STARTED_VAR}" />',
-				<fmt:message key="button.export" var="EXPORT_PORTFOLIO_VAR"/>
-				EXPORT_PORTFOLIO : '<c:out value="${EXPORT_PORTFOLIO_VAR}" />',
-				<fmt:message key="button.export.learner.tooltip" var="EXPORT_PORTFOLIO_LEARNER_TOOLTIP_VAR"/>
-				EXPORT_PORTFOLIO_LEARNER_TOOLTIP : '<c:out value="${EXPORT_PORTFOLIO_LEARNER_TOOLTIP_VAR}" />',
 			    <fmt:message key="button.timechart" var="TIME_CHART_VAR"/>
 			    TIME_CHART : '<c:out value="${TIME_CHART_VAR}" />',
 			    <fmt:message key="button.timechart.tooltip" var="TIME_CHART_TOOLTIP_VAR"/>
@@ -340,16 +335,6 @@
 				<td>
 				</td>
 				<td>
-					<c:if test="${enableExportPortfolio}">
-					<input type="checkbox" id="exportAvailableField"
-						<c:if test="${lesson.learnerExportAvailable}">
-							checked="checked"
-						</c:if> 
-						/>
-						<fmt:message key="lesson.enable.portfolio"/>
-						<br />
-					</c:if>
-					
 					<input type="checkbox" id="presenceAvailableField"
 						<c:if test="${lesson.learnerPresenceAvailable}">
 							checked="checked"
@@ -420,13 +405,6 @@
 			   href="#" onClick="javascript:refreshMonitor('sequence')">
 				<fmt:message key="button.refresh"/>
 			</a>
-			<c:if test="${enableExportPortfolio}">
-				<a id="exportPortfolioButton" class="button" title="<fmt:message key='button.export.tooltip'/>"
-				   href="#"
-				   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
-						<fmt:message key="button.export"/>
-				</a>
-			</c:if>
 			<c:if test="${enableLiveEdit && lesson.liveEditEnabled}">
 				<a id="liveEditButton" class="button" title="<fmt:message key='button.live.edit.tooltip'/>"
 			       href="#"

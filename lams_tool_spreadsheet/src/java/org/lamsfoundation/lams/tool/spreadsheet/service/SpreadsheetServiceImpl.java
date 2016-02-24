@@ -94,7 +94,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private ICoreNotebookService coreNotebookService;
     private IGradebookService gradebookService;
 
-
     // *******************************************************************************
     // Service method
     // *******************************************************************************
@@ -149,101 +148,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     @Override
     public void saveOrUpdateSpreadsheet(Spreadsheet spreadsheet) {
 	spreadsheetDao.saveObject(spreadsheet);
-    }
-
-    @Override
-    public List<Summary> exportForLearner(Long sessionId, SpreadsheetUser learner) {
-	SpreadsheetSession session = spreadsheetSessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    SpreadsheetServiceImpl.log.error("Failed get SpreadsheetSession by ID [" + sessionId + "]");
-	    return null;
-	}
-
-	Spreadsheet spreadsheet = session.getSpreadsheet();
-	List<Summary> summaryList = new ArrayList<Summary>();
-
-	List<SpreadsheetUser> userList = new ArrayList<SpreadsheetUser>();
-	userList.add(learner);
-	Summary summary = new Summary(session, spreadsheet, userList);
-
-	// Fill up reflect dto
-	NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-		SpreadsheetConstants.TOOL_SIGNATURE, learner.getUserId().intValue());
-	ReflectDTO reflectDTO = new ReflectDTO(learner);
-	if (notebookEntry == null) {
-	    reflectDTO.setFinishReflection(false);
-	    reflectDTO.setReflect(null);
-	} else {
-	    reflectDTO.setFinishReflection(true);
-	    reflectDTO.setReflect(notebookEntry.getEntry());
-	}
-	reflectDTO.setReflectInstructions(session.getSpreadsheet().getReflectInstructions());
-	summary.getReflectDTOList().add(reflectDTO);
-	summaryList.add(summary);
-
-	return summaryList;
-
-	// initial spreadsheet items list
-	// List<Summary> itemList = new ArrayList();
-	// Set<SpreadsheetItem> resList = session.getSpreadsheet().getSpreadsheetItems();
-	// for(SpreadsheetItem item:resList){
-	// if(skipHide && item.isHide())
-	// continue;
-	// //if item is create by author
-	// if(item.isCreateByAuthor()){
-	// Summary sum = new Summary(session.getSessionId(), session.getSessionName(),item,false);
-	// itemList.add(sum);
-	// }
-	// }
-	//
-	// //get this session's all spreadsheet items
-	// Set<SpreadsheetItem> sessList =session.getSpreadsheetItems();
-	// for(SpreadsheetItem item:sessList){
-	// if(skipHide && item.isHide())
-	// continue;
-	//
-	// //to skip all item create by author
-	// if(!item.isCreateByAuthor()){
-	// Summary sum = new Summary(session.getSessionId(), session.getSessionName(),item,false);
-	// itemList.add(sum);
-	// }
-	// }
-
-	// return itemList;
-    }
-
-    @Override
-    public List<Summary> exportForTeacher(Long contentId) {
-	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(contentId);
-	List<Summary> summaryList = new ArrayList<Summary>();
-
-	List<SpreadsheetSession> sessionList = spreadsheetSessionDao.getByContentId(contentId);
-	// create the user list of all whom were started this task
-	for (SpreadsheetSession session : sessionList) {
-	    List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(session.getSessionId());
-	    Summary summary = new Summary(session, spreadsheet, userList);
-
-	    // Fill up reflect dto
-	    for (SpreadsheetUser user : userList) {
-		NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			SpreadsheetConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-		ReflectDTO reflectDTO = new ReflectDTO(user);
-		if (notebookEntry == null) {
-		    reflectDTO.setFinishReflection(false);
-		    reflectDTO.setReflect(null);
-		} else {
-		    reflectDTO.setFinishReflection(true);
-		    reflectDTO.setReflect(notebookEntry.getEntry());
-		}
-		reflectDTO.setReflectInstructions(session.getSpreadsheet().getReflectInstructions());
-
-		summary.getReflectDTOList().add(reflectDTO);
-	    }
-	    summaryList.add(summary);
-	}
-
-	return summaryList;
     }
 
     @Override
@@ -418,9 +322,9 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		if (mark.getMarks() != null) {
 		    Double doubleMark = new Double(mark.getMarks());
 		    gradebookService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId, false);
-		}
 	    }
 	}
+    }
 
     }
 
@@ -648,7 +552,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		coreNotebookService.deleteEntry(entry);
 	    }
 	}
-
 	spreadsheetDao.delete(spreadsheet);
     }
 

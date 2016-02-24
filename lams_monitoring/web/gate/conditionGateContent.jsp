@@ -40,7 +40,7 @@
 		<h1><fmt:message key="label.condition.gate.title"/></h1>
 		
 		<%@ include file="gateInfo.jsp" %>
-		<c:if test="${not GateForm.map.gate.gateOpen and not GateForm.map.readOnly}" >
+		<c:if test="${not GateForm.map.gate.gateOpen}" >
 			<p><fmt:message key="label.gate.you.open.message"/><br />
 			   <fmt:message key="message.gate.condition.force.pass" /></p>
 		</c:if>
@@ -48,9 +48,7 @@
 		<%@ include file="gateStatus.jsp" %>
 		<c:if test="${not GateForm.map.gate.gateOpen}" >
 			<hr />
-			<c:if test="${not GateForm.map.readOnly}" >
-				<p><fmt:message key="label.gate.open.single.learner"/></p>
-			</c:if>
+			<p><fmt:message key="label.gate.open.single.learner"/></p>
 			<html:form action="/gate?method=openGateForSingleUser" onsubmit="return onSubmitForm();" target="_self">
 			<input type="hidden" id="userId" name="userId" />
 			<table>
@@ -61,22 +59,14 @@
 		   		 </tr>
 				<tr>
 					<td width="34%">
-						<select style="width: 160px" id="forbidden" name="forbidden" size="10"
-						<c:if test="${GateForm.map.readOnly}" >
-							 disabled="disabled"
-						</c:if>
-						>
+						<select style="width: 160px" id="forbidden" name="forbidden" size="10">
 							<c:forEach var="learner" items="${GateForm.map.forbiddenLearnerList}">
 								<option value="${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></option>
 							</c:forEach>
 						</select>
 					</td >
 					<td width="33%">
-						<select style="width: 160px"  id="waiting" name="waiting" size="10"
-						<c:if test="${GateForm.map.readOnly}" >
-							 disabled="disabled"
-						</c:if>
-						>
+						<select style="width: 160px"  id="waiting" name="waiting" size="10">
 							<c:forEach var="learner" items="${GateForm.map.waitingLearnerList}">
 								<option value="${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></option>
 							</c:forEach>
@@ -90,19 +80,17 @@
 						</select>
 					</td>
 				</tr>
-				<c:if test="${not GateForm.map.readOnly}" >	
-					<tr>
-						<td>
-							<input style="width: 160px" type="submit"  class="button"  value="<fmt:message key="label.gate.allow"/>" onclick="document.pressed='forbidden'"/>
-						</td>
-						<td>
-							<input style="width: 160px" type="submit" class="button"  value="<fmt:message key="label.gate.allow"/>" onclick="document.pressed='waiting'"/>
-						</td>
-						<td>
-							 &nbsp;
-						</td>
-					</tr>
-				</c:if>
+				<tr>
+					<td>
+						<input style="width: 160px" type="submit"  class="button"  value="<fmt:message key="label.gate.allow"/>" onclick="document.pressed='forbidden'"/>
+					</td>
+					<td>
+						<input style="width: 160px" type="submit" class="button"  value="<fmt:message key="label.gate.allow"/>" onclick="document.pressed='waiting'"/>
+					</td>
+					<td>
+						 &nbsp;
+					</td>
+				</tr>
 			</table>
 			</html:form>
 		</c:if>

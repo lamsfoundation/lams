@@ -141,98 +141,81 @@ INSERT INTO lams_wkspc_fld_content_type VALUES (1,'FILE');
 INSERT INTO lams_wkspc_fld_content_type VALUES (2,'PACKAGE');
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time,pedagogical_planner_url)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time,pedagogical_planner_url)
 VALUES (1, 2, 'Grouping', 'All types of grouping including random and chosen.', 
 	'learning/grouping.do?method=performGrouping', 'learning/grouping.do?method=performGrouping', 
-	'learning/grouping.do?method=viewGrouping&mode=teacher', 'learning/groupingExportPortfolio?mode=learner', 
-	'learning/groupingExportPortfolio?mode=teacher', 
+	'learning/grouping.do?method=viewGrouping&mode=teacher',
 	'monitoring/grouping.do?method=startGrouping', 
 	'monitoring/grouping.do?method=startGrouping', now(),
 	'pedagogicalPlanner/grouping.do?method=initGrouping');
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (2, 3, 'Sync Gate', 'Gate: Synchronise Learners.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
-	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
+	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, 
+	'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (3, 4, 'Schedule Gate', 'Gate: Opens/shuts at particular times.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
-	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
+	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
+	'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
-	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
+	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
+	'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (5, 9, 'System Gate', 'Gate: Opens under system control.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
-	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
+	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
+	'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 	
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (6, 10, 'Monitor Chosen Branching', 'Select between multiple sequence activities, with the branch chosen in monitoring.', 
 	'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching', 
-	'monitoring/complexProgress.do', NULL,
-	'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/chosenBranching.do?method=assignBranch', 
+	'monitoring/complexProgress.do', 'monitoring/chosenBranching.do?method=assignBranch', 
 	'monitoring/chosenBranching.do?method=assignBranch', now());
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
-        learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
-        export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+        learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (7, 11, 'Group Based Branching', 'Select between multiple sequence activities, with the branch chosen by an existing group.',
         'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
-        'monitoring/complexProgress.do', NULL,
-        'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/groupedBranching.do?method=viewBranching',
+        'monitoring/complexProgress.do', 'monitoring/groupedBranching.do?method=viewBranching',
         'monitoring/groupedBranching.do?method=assignBranch', now());
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
-        learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
-        export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+        learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence activities, with the branch chosen on results of another activity.',
         'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
-        'monitoring/complexProgress.do', NULL, 
-        'monitoring/branchingExportPortfolio?mode=teacher', 'monitoring/toolBranching.do?method=viewBranching',
+        'monitoring/complexProgress.do', 'monitoring/toolBranching.do?method=viewBranching',
         'monitoring/toolBranching.do?method=viewBranching', now());
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
-        learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url,
-        export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+        learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (9, 8, 'Sequence', 'A sequence of activities',
         'learning/SequenceActivity.do', 'learning/SequenceActivity.do',
-        'monitoring/complexProgress.do', NULL, 
-        'monitoring/sequenceExportPortfolio?mode=teacher', 'monitoring/sequence.do?method=viewSequence',
+        'monitoring/complexProgress.do', 'monitoring/sequence.do?method=viewSequence',
         'monitoring/sequence.do?method=viewSequence', now());
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
-	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
+	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
+	'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
 VALUES (11, 15, 'Floating Activities', 'A collection of floating activities', 
-	NULL, NULL, null, 'monitoring/floatingExportPortfolio?mode=learner', 
-	'monitoring/floatingExportPortfolio?mode=teacher', 'monitoring/floating.do?method=viewFloating', 
+	NULL, NULL, null, 'monitoring/floating.do?method=viewFloating', 
 	'monitoring/floating.do?method=viewFloating', now()	);
 
 -- Supported Locales

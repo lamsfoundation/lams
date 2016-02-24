@@ -102,7 +102,7 @@ public interface IVoteService {
 	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO);
 
     /**
-     * Generates data for all sessions in the Export Portfolio Summary, including all sessions summary.
+     * Generates data for all sessions, including all sessions summary.
      * 
      * @param toolContentID
      * @return

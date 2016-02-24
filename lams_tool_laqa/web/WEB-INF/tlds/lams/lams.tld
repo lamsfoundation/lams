@@ -181,14 +181,6 @@
 
       <attribute>
          <description>Output stylesheet based on the user preferences.</description>
-         <name>localLinkPath</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-      <attribute>
-         <description>Output stylesheet based on the user preferences.</description>
          <name>style</name>
          <required>false</required>
 
@@ -456,7 +448,7 @@
 		<path>/WEB-INF/tags/Page.tag</path>
    	</tag-file>  
    	<tag-file>
-   		    <name>ImgButtonWrapper</name>
+	    <name>ImgButtonWrapper</name>
 		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>
    	</tag-file>
    	<tag-file>

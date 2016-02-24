@@ -56,7 +56,6 @@ public class LessonDetailsDTO {
     private Long learningDesignID;
     private Integer numberPossibleLearners;
     private Integer numberStartedLearners;
-    private Boolean learnerExportAvailable;
     private Boolean locked_for_edit;
     private Boolean learnerPresenceAvailable;
     private Boolean learnerImAvailable;
@@ -66,8 +65,7 @@ public class LessonDetailsDTO {
     private Boolean enabledLessonNotifications;
 
     /**
-     * Create the DTO based on the lesson. Sets up all the fields except
-     * numberStartedLearners
+     * Create the DTO based on the lesson. Sets up all the fields except numberStartedLearners
      */
     public LessonDetailsDTO(Lesson lesson) {
 	this.lessonID = lesson.getLessonId();
@@ -92,22 +90,27 @@ public class LessonDetailsDTO {
 
 	this.duration = lesson.getLearningDesign().getDuration();
 
-	this.organisationID = lesson.getOrganisation() != null ? lesson.getOrganisation().getOrganisationId() : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	this.organisationID = lesson.getOrganisation() != null ? lesson.getOrganisation().getOrganisationId()
+		: WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 
-	this.organisationName = lesson.getOrganisation() != null ? lesson.getOrganisation().getName() : WDDXTAGS.STRING_NULL_VALUE;
-
-	this.organisationDescription = lesson.getOrganisation() != null ? lesson.getOrganisation().getDescription() : WDDXTAGS.STRING_NULL_VALUE;
-
-	this.workspaceFolderID = lesson.getLearningDesign().getWorkspaceFolder() != null ? lesson.getLearningDesign().getWorkspaceFolder()
-		.getWorkspaceFolderId() : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-
-	this.contentFolderID = lesson.getLearningDesign().getContentFolderID() != null ? lesson.getLearningDesign().getContentFolderID()
+	this.organisationName = lesson.getOrganisation() != null ? lesson.getOrganisation().getName()
 		: WDDXTAGS.STRING_NULL_VALUE;
 
-	this.licenseID = lesson.getLearningDesign().getLicense() != null ? lesson.getLearningDesign().getLicense().getLicenseID()
-		: WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	this.organisationDescription = lesson.getOrganisation() != null ? lesson.getOrganisation().getDescription()
+		: WDDXTAGS.STRING_NULL_VALUE;
 
-	this.licenseText = lesson.getLearningDesign().getLicenseText() != null ? lesson.getLearningDesign().getLicenseText() : WDDXTAGS.STRING_NULL_VALUE;
+	this.workspaceFolderID = lesson.getLearningDesign().getWorkspaceFolder() != null
+		? lesson.getLearningDesign().getWorkspaceFolder().getWorkspaceFolderId()
+		: WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
+	this.contentFolderID = lesson.getLearningDesign().getContentFolderID() != null
+		? lesson.getLearningDesign().getContentFolderID() : WDDXTAGS.STRING_NULL_VALUE;
+
+	this.licenseID = lesson.getLearningDesign().getLicense() != null
+		? lesson.getLearningDesign().getLicense().getLicenseID() : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+
+	this.licenseText = lesson.getLearningDesign().getLicenseText() != null
+		? lesson.getLearningDesign().getLicenseText() : WDDXTAGS.STRING_NULL_VALUE;
 
 	this.learningDesignID = lesson.getLearningDesign().getLearningDesignId();
 
@@ -115,15 +118,13 @@ public class LessonDetailsDTO {
 	this.numberPossibleLearners = new Integer(allLearners != null ? allLearners.size() : 0);
 	this.numberStartedLearners = new Integer(0);
 
-	this.learnerExportAvailable = lesson.getLearnerExportAvailable();
-
 	this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
 	this.learnerImAvailable = lesson.getLearnerImAvailable();
 
 	this.liveEditEnabled = lesson.getLiveEditEnabled();
 
 	this.locked_for_edit = lesson.getLockedForEdit();
-	
+
 	this.isPreview = lesson.isPreviewLesson();
 	this.enabledLessonNotifications = lesson.getEnableLessonNotifications();
     }
@@ -150,7 +151,7 @@ public class LessonDetailsDTO {
     public Date getCreateDateTime() {
 	return createDateTime != null ? createDateTime : WDDXTAGS.DATE_NULL_VALUE;
     }
-    
+
     public String getCreateDateTimeStr() {
 	return createDateTimeStr != null ? createDateTimeStr : WDDXTAGS.STRING_NULL_VALUE;
     }
@@ -272,10 +273,6 @@ public class LessonDetailsDTO {
 	return numberPossibleLearners;
     }
 
-    public Boolean getLearnerExportAvailable() {
-	return learnerExportAvailable;
-    }
-
     public Boolean getLearnerPresenceAvailable() {
 	return learnerPresenceAvailable;
     }
@@ -293,15 +290,15 @@ public class LessonDetailsDTO {
     }
 
     public Boolean getLocked_for_edit() {
-        return locked_for_edit;
+	return locked_for_edit;
     }
 
     public void setLocked_for_edit(Boolean locked_for_edit) {
-        this.locked_for_edit = locked_for_edit;
+	this.locked_for_edit = locked_for_edit;
     }
 
     public Boolean getIsPreview() {
-        return isPreview;
+	return isPreview;
     }
 
     public Boolean getEnabledLessonNotifications() {
@@ -314,97 +311,93 @@ public class LessonDetailsDTO {
     }
 
     public void setIsPreview(Boolean isPreview) {
-        this.isPreview = isPreview;
+	this.isPreview = isPreview;
     }
 
     public void setLessonID(Long lessonID) {
-        this.lessonID = lessonID;
+	this.lessonID = lessonID;
     }
 
     public void setLessonName(String lessonName) {
-        this.lessonName = lessonName;
+	this.lessonName = lessonName;
     }
 
     public void setLessonDescription(String lessonDescription) {
-        this.lessonDescription = lessonDescription;
+	this.lessonDescription = lessonDescription;
     }
 
     public void setLessonStateID(Integer lessonStateID) {
-        this.lessonStateID = lessonStateID;
+	this.lessonStateID = lessonStateID;
     }
 
     public void setCreateDateTime(Date createDateTime) {
-        this.createDateTime = createDateTime;
+	this.createDateTime = createDateTime;
     }
 
     public void setStartDateTime(Date startDateTime) {
-        this.startDateTime = startDateTime;
+	this.startDateTime = startDateTime;
     }
 
     public void setScheduleStartDate(Date scheduleStartDate) {
-        this.scheduleStartDate = scheduleStartDate;
+	this.scheduleStartDate = scheduleStartDate;
     }
 
     public void setScheduleEndDate(Date scheduleEndDate) {
-        this.scheduleEndDate = scheduleEndDate;
+	this.scheduleEndDate = scheduleEndDate;
     }
 
     public void setDuration(Long duration) {
-        this.duration = duration;
+	this.duration = duration;
     }
 
     public void setOrganisationID(Integer organisationID) {
-        this.organisationID = organisationID;
+	this.organisationID = organisationID;
     }
 
     public void setOrganisationName(String organisationName) {
-        this.organisationName = organisationName;
+	this.organisationName = organisationName;
     }
 
     public void setOrganisationDescription(String organisationDescription) {
-        this.organisationDescription = organisationDescription;
+	this.organisationDescription = organisationDescription;
     }
 
     public void setWorkspaceFolderID(Integer workspaceFolderID) {
-        this.workspaceFolderID = workspaceFolderID;
+	this.workspaceFolderID = workspaceFolderID;
     }
 
     public void setContentFolderID(String contentFolderID) {
-        this.contentFolderID = contentFolderID;
+	this.contentFolderID = contentFolderID;
     }
 
     public void setLicenseID(Long licenseID) {
-        this.licenseID = licenseID;
+	this.licenseID = licenseID;
     }
 
     public void setLicenseText(String licenseText) {
-        this.licenseText = licenseText;
+	this.licenseText = licenseText;
     }
 
     public void setLearningDesignID(Long learningDesignID) {
-        this.learningDesignID = learningDesignID;
+	this.learningDesignID = learningDesignID;
     }
 
     public void setNumberPossibleLearners(Integer numberPossibleLearners) {
-        this.numberPossibleLearners = numberPossibleLearners;
-    }
-
-    public void setLearnerExportAvailable(Boolean learnerExportAvailable) {
-        this.learnerExportAvailable = learnerExportAvailable;
+	this.numberPossibleLearners = numberPossibleLearners;
     }
 
     public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
-        this.learnerPresenceAvailable = learnerPresenceAvailable;
+	this.learnerPresenceAvailable = learnerPresenceAvailable;
     }
 
     public void setLearnerImAvailable(Boolean learnerImAvailable) {
-        this.learnerImAvailable = learnerImAvailable;
+	this.learnerImAvailable = learnerImAvailable;
     }
 
     public void setLiveEditEnabled(Boolean liveEditEnabled) {
-        this.liveEditEnabled = liveEditEnabled;
+	this.liveEditEnabled = liveEditEnabled;
     }
-    
+
     public String getEncodedLessonID() {
 	return encodedLessonID;
     }

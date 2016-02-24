@@ -34,25 +34,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 <lams:head>
-	<title><fmt:message key="${pageTitleKey}" />
-	</title>
+	<title><fmt:message key="${pageTitleKey}" /></title>
+	<lams:css />
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+	<script src="${lams}includes/javascript/AC_RunActiveContent.js"
+		type="text/javascript"></script>
+	<script type="text/javascript"
+		src="${lams}includes/javascript/common.js"></script>
 
-	<%-- if localFiles == true then wanted for export portfolio and must run offline --%>
-	<c:choose>
-		<c:when test="${localFiles == true}">
-			<lams:css localLinkPath="../" />
-		</c:when>
-		<c:otherwise>
-			<lams:css />
-			<c:set var="lams">
-				<lams:LAMSURL />
-			</c:set>
-			<script src="${lams}includes/javascript/AC_RunActiveContent.js"
-				type="text/javascript"></script>
-			<script type="text/javascript"
-				src="${lams}includes/javascript/common.js"></script>
-		</c:otherwise>
-	</c:choose>
 </lams:head>
 
 <c:choose>

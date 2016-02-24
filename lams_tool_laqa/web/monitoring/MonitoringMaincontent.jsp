@@ -28,15 +28,7 @@
 	</c:set>
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 		
-	<!-- ********************  CSS ********************** -->
-	<c:choose>
-		<c:when test="${not empty localLinkPath}">
-			<lams:css localLinkPath="${localLinkPath}" style="main"/>
-		</c:when>
-		<c:otherwise>
-			<lams:css  style="main"/>
-		</c:otherwise>
-	</c:choose>
+	<lams:css  style="main"/>
 
 	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">

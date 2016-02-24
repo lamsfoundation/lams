@@ -28,14 +28,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,14 +80,8 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
-import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
-import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredAnswersDTO;
-import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
-import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
-import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaStringComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -598,239 +589,15 @@ public class QaServicePOJO
     }
 
     @Override
-    public List<ReflectionDTO> getReflectList(QaContent content, String userID) {
-
-	// reflection data for all sessions
-	List<ReflectionDTO> reflectionDTOs = new LinkedList<ReflectionDTO>();
-	Set<QaSession> sessions = new TreeSet<QaSession>(new QaSessionComparator());
-	sessions.addAll(content.getQaSessions());
-
-	if (userID == null) {
-	    // all users mode
-	    for (QaSession session : sessions) {
-
-		for (QaQueUsr user : (Set<QaQueUsr>) session.getQaQueUsers()) {
-
-		    NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE,
-			    new Integer(user.getQueUsrId().toString()));
-
-		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO();
-			reflectionDTO.setUserId(user.getQueUsrId().toString());
-			reflectionDTO.setSessionId(session.getQaSessionId().toString());
-			reflectionDTO.setUserName(user.getFullname());
-			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			Date postedDate = (notebookEntry.getLastModified() != null) ? notebookEntry.getLastModified()
-				: notebookEntry.getCreateDate();
-			reflectionDTO.setDate(postedDate);
-			// String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntry.getEntry());
-			reflectionDTOs.add(reflectionDTO);
-		    }
-		}
-	    }
-	} else {
-	    // single user mode
-	    for (QaSession session : sessions) {
-
-		for (QaQueUsr user : (Set<QaQueUsr>) session.getQaQueUsers()) {
-
-		    if (user.getQueUsrId().toString().equals(userID)) {
-			NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE,
-				new Integer(user.getQueUsrId().toString()));
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(session.getQaSessionId().toString());
-			    reflectionDTO.setUserName(user.getFullname());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    Date postedDate = (notebookEntry.getLastModified() != null)
-				    ? notebookEntry.getLastModified() : notebookEntry.getCreateDate();
-			    reflectionDTO.setDate(postedDate);
-			    // String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntry.getEntry());
-			    reflectionDTOs.add(reflectionDTO);
-			}
-		    }
-		}
-	    }
-	}
-
-	return reflectionDTOs;
+    public List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting,
+	    String searchString) {
+	return qaQueUsrDAO.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString,
+		getCoreNotebookService());
     }
 
-    public List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString) {
-	return qaQueUsrDAO.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString, getCoreNotebookService());
-    }
+    @Override
     public int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString) {
 	return qaQueUsrDAO.getCountUsersBySessionWithSearch(toolSessionId, searchString);
-    }
-    
-
-    @Override
-    public List exportLearner(QaContent qaContent, boolean isUserNamesVisible, boolean isLearnerRequest,
-	    String sessionId, String userId) {
-	List listQuestions = getAllQuestionEntries(qaContent.getUid());
-
-	List listMonitoredAnswersContainerDTO = new LinkedList();
-
-	Iterator itListQuestions = listQuestions.iterator();
-	while (itListQuestions.hasNext()) {
-	    QaQueContent qaQuestion = (QaQueContent) itListQuestions.next();
-
-	    if (qaQuestion != null) {
-		QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
-		qaMonitoredAnswersDTO.setQuestionUid(qaQuestion.getUid().toString());
-		qaMonitoredAnswersDTO.setQuestion(qaQuestion.getQuestion());
-		qaMonitoredAnswersDTO.setFeedback(qaQuestion.getFeedback());
-
-		Map questionAttemptData = exportGroupsAttemptData(qaContent, qaQuestion.getUid().toString(),
-			isUserNamesVisible, isLearnerRequest, sessionId, userId);
-		qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-		listMonitoredAnswersContainerDTO.add(qaMonitoredAnswersDTO);
-
-	    }
-	}
-	return listMonitoredAnswersContainerDTO;
-    }
-
-    @Override
-    public List<GroupDTO> exportTeacher(QaContent qaContent) {
-	List<QaQueContent> questions = getAllQuestionEntries(qaContent.getUid());
-	List<GroupDTO> groupDTOs = new LinkedList<GroupDTO>();
-	Set<QaSession> sessions = new TreeSet<QaSession>(new QaSessionComparator());
-	sessions.addAll(qaContent.getQaSessions());
-	for (QaSession session : sessions) {
-	    String sessionId = session.getQaSessionId().toString();
-	    String sessionName = session.getSession_name();
-
-	    GroupDTO groupDTO = new GroupDTO();
-	    List<QaMonitoredAnswersDTO> qaMonitoredAnswersDTOs = new LinkedList<QaMonitoredAnswersDTO>();
-
-	    if (session != null) {
-		Iterator<QaQueContent> itQuestions = questions.iterator();
-		while (itQuestions.hasNext()) {
-		    QaQueContent question = itQuestions.next();
-
-		    QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
-		    qaMonitoredAnswersDTO.setQuestionUid(question.getUid().toString());
-		    qaMonitoredAnswersDTO.setQuestion(question.getQuestion());
-		    qaMonitoredAnswersDTO.setFeedback(question.getFeedback());
-		    qaMonitoredAnswersDTO.setSessionId(sessionId);
-		    qaMonitoredAnswersDTO.setSessionName(sessionName);
-
-		    Map questionAttemptData = exportGroupsAttemptData(qaContent, question.getUid().toString(), true,
-			    false, sessionId, null);
-		    qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-		    qaMonitoredAnswersDTOs.add(qaMonitoredAnswersDTO);
-		}
-	    }
-
-	    groupDTO.setGroupData(qaMonitoredAnswersDTOs);
-	    groupDTO.setSessionName(sessionName);
-	    groupDTO.setSessionId(sessionId);
-	    groupDTOs.add(groupDTO);
-	}
-	return groupDTOs;
-    }
-
-    /**
-     * User id is needed if learnerRequest = true, as it is required to work out if the data being analysed is the
-     * current user (for not show other names) or to work out which is the user's answers (for not show all answers).
-     */
-    private Map exportGroupsAttemptData(QaContent qaContent, String questionUid, boolean isUserNamesVisible,
-	    boolean isLearnerRequest, String sessionId, String userId) {
-	List<Map<String, QaMonitoredUserDTO>> listMonitoredAttemptsContainerDTO = new LinkedList<Map<String, QaMonitoredUserDTO>>();
-
-	List<QaUsrResp> responses = new ArrayList<QaUsrResp>();
-	if (!isLearnerRequest) {
-	    /* request is for monitoring summary */
-
-	    if (qaContent.isUseSelectLeaderToolOuput()) {
-		QaSession session = getSessionById(new Long(sessionId).longValue());
-		QaQueUsr groupLeader = session.getGroupLeader();
-		if (groupLeader != null) {
-		    QaUsrResp response = getResponseByUserAndQuestion(groupLeader.getQueUsrId(), new Long(questionUid));
-		    if (response != null) {
-			responses.add(response);
-		    }
-		}
-
-	    } else {
-		responses = getResponseBySessionAndQuestion(new Long(sessionId), new Long(questionUid));
-	    }
-
-	} else {
-	    if (qaContent.isShowOtherAnswers()) {
-		responses = getResponseBySessionAndQuestion(new Long(sessionId), new Long(questionUid));
-
-	    } else {
-		QaUsrResp response = getResponseByUserAndQuestion(new Long(userId), new Long(questionUid));
-		if (response != null) {
-		    responses.add(response);
-		}
-	    }
-	}
-
-	/**
-	 * Populates all the user's attempt data of a particular tool session. User id is needed if isUserNamesVisible
-	 * is false && is learnerRequest = true, as it is required to work out if the data being analysed is the current
-	 * user.
-	 */
-	List<QaMonitoredUserDTO> qaMonitoredUserDTOs = new LinkedList<QaMonitoredUserDTO>();
-	for (QaUsrResp response : responses) {
-	    QaQueUsr user = response.getQaQueUser();
-	    if (response != null) {
-		QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
-		qaMonitoredUserDTO.setAttemptTime(response.getAttemptTime());
-		qaMonitoredUserDTO.setTimeZone(response.getTimezone());
-		qaMonitoredUserDTO.setUid(response.getResponseId().toString());
-
-		if (!isUserNamesVisible && isLearnerRequest && !userId.equals(user.getQueUsrId().toString())) {
-		    // this is not current user, put his name as blank
-		    qaMonitoredUserDTO.setUserName("        ");
-		} else {
-		    // this is current user, put his name normally
-		    qaMonitoredUserDTO.setUserName(user.getFullname());
-		}
-
-		qaMonitoredUserDTO.setQueUsrId(user.getQueUsrId().toString());
-		qaMonitoredUserDTO.setSessionId(sessionId.toString());
-		qaMonitoredUserDTO.setResponse(response.getAnswer());
-
-		// String responsePresentable = QaUtils.replaceNewLines(response.getAnswer());
-		qaMonitoredUserDTO.setResponsePresentable(response.getAnswer());
-
-		qaMonitoredUserDTO.setQuestionUid(questionUid);
-		qaMonitoredUserDTO.setVisible(new Boolean(response.isVisible()).toString());
-
-		qaMonitoredUserDTOs.add(qaMonitoredUserDTO);
-	    }
-	}
-
-	// convert To QaMonitoredUserDTOMap
-	Map<String, QaMonitoredUserDTO> sessionUsersAttempts = new TreeMap<String, QaMonitoredUserDTO>(
-		new QaStringComparator());
-	Long mapIndex = new Long(1);
-	for (QaMonitoredUserDTO data : qaMonitoredUserDTOs) {
-	    sessionUsersAttempts.put(mapIndex.toString(), data);
-	    mapIndex = mapIndex + 1;
-	}
-	listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-
-	// convertToMap
-	Map map = new TreeMap(new QaStringComparator());
-	Iterator listIterator = listMonitoredAttemptsContainerDTO.iterator();
-	Long mapIndex2 = new Long(1);
-	while (listIterator.hasNext()) {
-	    Map data = (Map) listIterator.next();
-	    map.put(mapIndex2.toString(), data);
-	    mapIndex2 = new Long(mapIndex2.longValue() + 1);
-	}
-	return map;
     }
 
     @Override

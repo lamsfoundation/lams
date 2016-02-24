@@ -292,7 +292,7 @@ public interface IDacoService {
     MonitoringSummarySessionDTO getAnswersAsRecords(final Long sessionId, final Long userId, int sorting);
 
     /**
-     * Creates summary that is later used in the export portfolio. 
+     * Creates summary that is later used in the export.
      * 
      * @param contentId
      *                ID of Daco for which the summary should be created
@@ -302,7 +302,7 @@ public interface IDacoService {
      *                created for noone
      * @return list of monitoring summaries, one for each session
      */
-    List<MonitoringSummarySessionDTO> getExportPortfolioSummary(Long contentId, Long userUid);
+    List<MonitoringSummarySessionDTO> getSummaryForExport(Long contentId, Long userUid);
 
     /** Get a paged user list for monitoring */
     List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, 

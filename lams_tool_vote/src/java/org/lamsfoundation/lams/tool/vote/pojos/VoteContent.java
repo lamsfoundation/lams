@@ -46,9 +46,6 @@ public class VoteContent implements Serializable {
     /** persistent field */
     private Long voteContentId;
 
-    /** persistent field, used for export portfolio */
-    private String content;
-
     /** nullable persistent field */
     private String title;
 
@@ -68,7 +65,7 @@ public class VoteContent implements Serializable {
 
     /** nullable persistent field */
     private long createdBy;
-    
+
     private boolean useSelectLeaderToolOuput;
 
     private boolean reflect;
@@ -89,7 +86,7 @@ public class VoteContent implements Serializable {
 
     /** persistent field */
     private Set voteSessions;
-    
+
     private Date submissionDeadline;
 
     /**
@@ -104,13 +101,12 @@ public class VoteContent implements Serializable {
     private Short externalInputsAdded;
 
     /** full constructor */
-    public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater,
-	    Date creationDate, Date updateDate, boolean allowText, boolean useSelectLeaderToolOuput, boolean reflect,
+    public VoteContent(Long voteContentId, String title, String instructions, boolean defineLater, Date creationDate,
+	    Date updateDate, boolean allowText, boolean useSelectLeaderToolOuput, boolean reflect,
 	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
 	    boolean lockOnFinish, boolean showResults, Short maxExternalInputs, Short externalInputsAdded,
 	    Set voteQueContents, Set voteSessions) {
 	this.voteContentId = voteContentId;
-	this.content = content;
 	this.title = title;
 	this.instructions = instructions;
 	this.defineLater = defineLater;
@@ -155,9 +151,9 @@ public class VoteContent implements Serializable {
      * @return the new mc content object.
      */
     public static VoteContent newInstance(VoteContent vote, Long newContentId) {
-	VoteContent newContent = new VoteContent(newContentId, vote.getContent(), vote.getTitle(),
-		vote.getInstructions(), vote.isDefineLater(), vote.getCreationDate(), vote.getUpdateDate(),
-		vote.isAllowText(), vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(),
+	VoteContent newContent = new VoteContent(newContentId, vote.getTitle(), vote.getInstructions(),
+		vote.isDefineLater(), vote.getCreationDate(), vote.getUpdateDate(), vote.isAllowText(),
+		vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(),
 		vote.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
 		vote.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(), new TreeSet(),
 		new TreeSet());
@@ -293,21 +289,6 @@ public class VoteContent implements Serializable {
     }
 
     /**
-     * @return Returns the content.
-     */
-    public String getContent() {
-	return content;
-    }
-
-    /**
-     * @param content
-     *            The content to set.
-     */
-    public void setContent(String content) {
-	this.content = content;
-    }
-
-    /**
      * @return Returns the lockOnFinish.
      */
     public boolean isLockOnFinish() {
@@ -396,20 +377,20 @@ public class VoteContent implements Serializable {
     public void setReflect(boolean reflect) {
 	this.reflect = reflect;
     }
-    
+
     /**
      * @param useSelectLeaderToolOuput
      *            The useSelectLeaderToolOuput to set.
      */
     public boolean isUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     /**
      * @return Returns the useSelectLeaderToolOuput.
      */
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**
@@ -458,12 +439,12 @@ public class VoteContent implements Serializable {
     public void setExternalInputsAdded(Short externalInputsAdded) {
 	this.externalInputsAdded = externalInputsAdded;
     }
-    
-   	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
 
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
+
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
 }

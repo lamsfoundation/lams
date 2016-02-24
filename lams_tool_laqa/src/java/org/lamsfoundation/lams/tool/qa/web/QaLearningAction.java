@@ -19,7 +19,6 @@ USA
 http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
@@ -118,13 +117,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
-	
+
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (qaQueUsr.isResponseFinalized()) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStarter"));
 	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
-	    redirect.addParameter(MODE, "learner");
+	    redirect.addParameter(QaAppConstants.MODE, "learner");
 	    return redirect;
 	}
 
@@ -142,12 +141,14 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	ActionMessages errors = new ActionMessages();
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	/* if the listing mode is QUESTION_LISTING_MODE_COMBINED populate  the answers here*/
 	if (questionListingMode.equalsIgnoreCase(QaAppConstants.QUESTION_LISTING_MODE_COMBINED)) {
 
-	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT.intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
+	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT
+		    .intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
 		// TestHarness can not send "answerX" fields, so stick to the original, unfiltered field
 		boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 		String answerParamName = "answer" + questionIndex + (isTestHarness ? "__textarea" : "");
@@ -156,15 +157,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		Integer questionIndexInteger = new Integer(questionIndex);
 		mapAnswers.put(questionIndexInteger.toString(), answer);
 		mapAnswersPresentable.put(questionIndexInteger.toString(), answer);
-		
+
 		//validate
 		ActionMessages newErrors = validateQuestionAnswer(answer, questionIndexInteger, generalLearnerFlowDTO);
 		errors.add(newErrors);
 
 		// store
 		if (errors.isEmpty()) {
-		    QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(
-			    questionIndex));
+		    QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID,
+			    new Long(questionIndex));
 		}
 	    }
 
@@ -176,12 +177,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    mapAnswersPresentable = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
 	    mapAnswersPresentable = QaLearningAction.removeNewLinesMap(mapAnswersPresentable);
 	}
-	
+
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
 	    forwardName = QaAppConstants.LOAD_LEARNER;
 	}
-	
+
 	//in case noReeditAllowed finalize response so user can't refresh the page and post answers again
 	if (errors.isEmpty() && qaContent.isNoReeditAllowed()) {
 	    qaQueUsr.setResponseFinalized(true);
@@ -211,29 +212,29 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	// notify teachers on response submit
 	if (errors.isEmpty() && qaContent.isNotifyTeachersOnResponseSubmit()) {
-	    qaService.notifyTeachersOnResponseSubmit(new Long(toolSessionID));
+	    QaLearningAction.qaService.notifyTeachersOnResponseSubmit(new Long(toolSessionID));
 	}
-	
+
 	return (mapping.findForward(forwardName));
     }
 
     public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	
+
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	QaSession session = qaService.getSessionById(toolSessionId);
+	QaSession session = QaLearningAction.qaService.getSessionById(toolSessionId);
 	QaQueUsr leader = session.getGroupLeader();
-	
+
 	boolean isLeaderResponseFinalized = leader.isResponseFinalized();
-	
+
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
 	response.setContentType("application/x-json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
     }
-    
+
     /**
      * auto saves responses
      * 
@@ -250,7 +251,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	initializeQAService();
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	 
+
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	//prohibit users from autosaving answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (qaQueUsr.isResponseFinalized()) {
@@ -264,7 +265,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	if (!qaContent.isQuestionsSequenced()) {
 
-	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT.intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
+	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT
+		    .intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
 		String newAnswer = request.getParameter("answer" + questionIndex);
 		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID,
 			new Long(questionIndex));
@@ -273,13 +275,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	} else {
 	    String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 	    String newAnswer = qaLearningForm.getAnswer();
-	    QaQueContent currentQuestion = QaLearningAction.qaService.getQuestionByContentAndDisplayOrder(new Long(
-		    currentQuestionIndex), qaContent.getUid());
+	    QaQueContent currentQuestion = QaLearningAction.qaService
+		    .getQuestionByContentAndDisplayOrder(new Long(currentQuestionIndex), qaContent.getUid());
 
 	    boolean isRequiredQuestionMissed = currentQuestion.isRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {
-		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(
-			currentQuestionIndex));
+		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID,
+			new Long(currentQuestionIndex));
 	    }
 	}
 	return null;
@@ -313,7 +315,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
@@ -330,7 +333,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO,
 		QaLearningAction.qaService);
-	
+
 	//in order to track whether redo button is pressed store this info
 	qaQueUsr.setResponseFinalized(false);
 	QaLearningAction.qaService.updateUser(qaQueUsr);
@@ -357,10 +360,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	String userID = request.getParameter("userID");
-	QaQueUsr user = qaService.getUserByIdAndSession(new Long(userID), new Long(toolSessionID));
+	QaQueUsr user = QaLearningAction.qaService.getUserByIdAndSession(new Long(userID), new Long(toolSessionID));
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
-	
+
 	// LearningUtil.storeResponses(mapAnswers, qaService, toolContentID, new Long(toolSessionID));
 	// mark response as finalised
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
@@ -374,7 +377,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	    String httpSessionID = qaLearningForm.getHttpSessionID();
 	    generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
-	    
+
 	    /** Set up the data for the view all answers screen */
 	    QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, httpSessionID, user,
 		    generalLearnerFlowDTO);
@@ -453,7 +456,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.setToolSessionID(toolSessionID);
 
 	String userID = request.getParameter("userID");
-	QaQueUsr user = qaService.getUserByIdAndSession(new Long(userID), new Long(toolSessionID));	
+	QaQueUsr user = QaLearningAction.qaService.getUserByIdAndSession(new Long(userID), new Long(toolSessionID));
 
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 
@@ -490,7 +493,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
-	
+
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
@@ -539,13 +542,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
-	
+
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (qaQueUsr.isResponseFinalized()) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStarter"));
 	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
-	    redirect.addParameter(MODE, "learner");
+	    redirect.addParameter(QaAppConstants.MODE, "learner");
 	    return redirect;
 	}
 
@@ -571,7 +574,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion) {
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 
@@ -614,7 +618,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	int intCurrentQuestionIndex = new Integer(currentQuestionIndex).intValue() + nextQuestionOffset;
 	String currentAnswer = "";
 	if (mapAnswers.size() >= intCurrentQuestionIndex) {
-	    currentAnswer = (String) mapAnswers.get(new Long(intCurrentQuestionIndex).toString());
+	    currentAnswer = mapAnswers.get(new Long(intCurrentQuestionIndex).toString());
 	}
 	generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);
 
@@ -623,7 +627,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	String totalQuestionCount = qaLearningForm.getTotalQuestionCount();
 
-	int remainingQuestionCount = new Long(totalQuestionCount).intValue() - new Integer(currentQuestionIndex).intValue() + 1;
+	int remainingQuestionCount = (new Long(totalQuestionCount).intValue()
+		- new Integer(currentQuestionIndex).intValue()) + 1;
 	String userFeedback = "";
 	if (remainingQuestionCount != 0) {
 	    userFeedback = "Remaining question count: " + remainingQuestionCount;
@@ -631,7 +636,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    userFeedback = "End of the questions.";
 	}
 	generalLearnerFlowDTO.setUserFeedback(userFeedback);
-	
+
 	generalLearnerFlowDTO.setRemainingQuestionCount("" + remainingQuestionCount);
 
 	qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
@@ -643,13 +648,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	return new Object[]{mapSequentialAnswers, errors};
+	return new Object[] { mapSequentialAnswers, errors };
     }
-    
+
     private ActionMessages validateQuestionAnswer(String newAnswer, Integer questionIndex,
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO) {
 	ActionMessages errors = new ActionMessages();
-	
+
 	Map<Integer, QaQuestionDTO> questionMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
 	QaQuestionDTO dto = questionMap.get(questionIndex);
 
@@ -657,14 +662,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	boolean isRequiredQuestionMissed = dto.isRequired() && isEmpty(newAnswer);
 	if (isRequiredQuestionMissed) {
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndex));
-	} 
+	}
 
 	boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(newAnswer, dto.getMinWordsLimit(),
 		Boolean.parseBoolean(generalLearnerFlowDTO.getAllowRichEditor()));
 	if (!isMinWordsLimitReached) {
-	    errors.add(Globals.ERROR_KEY, new ActionMessage("label.minimum.number.words", ": " + dto.getMinWordsLimit()));
+	    errors.add(Globals.ERROR_KEY,
+		    new ActionMessage("label.minimum.number.words", ": " + dto.getMinWordsLimit()));
 	}
-	
+
 	return errors;
     }
 
@@ -705,13 +711,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.setToolSessionID(toolSessionID);
 	QaSession qaSession = QaLearningAction.qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
-	
+
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (qaQueUsr.isResponseFinalized()) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStarter"));
 	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
-	    redirect.addParameter(MODE, "learner");
+	    redirect.addParameter(QaAppConstants.MODE, "learner");
 	    return redirect;
 	}
 
@@ -769,8 +775,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	qaLearningForm.resetAll();
 
-	String nextActivityUrl = QaLearningAction.qaService.leaveToolSession(new Long(toolSessionID), new Long(user
-		.getUserID().longValue()));
+	String nextActivityUrl = QaLearningAction.qaService.leaveToolSession(new Long(toolSessionID),
+		new Long(user.getUserID().longValue()));
 	response.sendRedirect(nextActivityUrl);
 
 	return null;
@@ -841,7 +847,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
-	
+
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	NotebookEntry notebookEntry = QaLearningAction.qaService.getEntry(new Long(toolSessionID),
@@ -952,24 +958,23 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.resetAll();
 	return (mapping.findForward(QaAppConstants.NOTEBOOK));
     }
-    
+
     /**
-     * populates data for summary screen, view all results screen and export
-     * portfolio.
+     * populates data for summary screen, view all results screen.
      * 
-     * User id is needed if isUserNamesVisible is false && learnerRequest is
-     * true, as it is required to work out if the data being analysed is the
-     * current user.
+     * User id is needed if isUserNamesVisible is false && learnerRequest is true, as it is required to work out if the
+     * data being analysed is the current user.
      */
     public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
 	    String httpSessionID, QaQueUsr user, GeneralLearnerFlowDTO generalLearnerFlowDTO) {
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 	Long userId = user.getQueUsrId();
 	Set<QaQueContent> questions = qaContent.getQaQueContents();
 	generalLearnerFlowDTO.setQuestions(questions);
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
-		
+
 	List<QaUsrResp> userResponses = qaService.getResponsesByUserUid(user.getUid());
 
 	//handle rating criterias
@@ -977,23 +982,24 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	boolean isCommentsEnabled = false;
 	int countRatedQuestions = 0;
 	if (qaContent.isAllowRateAnswers()) {
-	    
+
 	    // create itemIds list
 	    List<Long> itemIds = new LinkedList<Long>();
 	    for (QaUsrResp responseIter : userResponses) {
 		itemIds.add(responseIter.getResponseId());
 	    }
-	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), itemIds, true, userId);
+	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), itemIds,
+		    true, userId);
 	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTOS, itemRatingDtos);
 
 	    if (itemRatingDtos.size() > 0) {
 		commentsMinWordsLimit = itemRatingDtos.get(0).getCommentsMinWordsLimit();
 		isCommentsEnabled = itemRatingDtos.get(0).isCommentsEnabled();
 	    }
-	    
+
 	    //map itemRatingDto to corresponding response
 	    for (QaUsrResp response : userResponses) {
-		
+
 		//find corresponding itemRatingDto
 		ItemRatingDTO itemRatingDto = null;
 		for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
@@ -1002,7 +1008,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 			break;
 		    }
 		}
-		
+
 		response.setItemRatingDto(itemRatingDto);
 	    }
 
@@ -1012,59 +1018,62 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
 	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
-	
+
 	generalLearnerFlowDTO.setUserResponses(userResponses);
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
     }
-    
+
     /**
      * Refreshes user list.
      */
     public ActionForward getResponses(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	initializeQAService();
-	
+
 	// teacher timezone
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	TimeZone userTimeZone = userDto.getTimeZone();
-	
+
 	boolean isAllowRateAnswers = WebUtil.readBooleanParam(request, "isAllowRateAnswers");
 	Long qaContentId = WebUtil.readLongParam(request, "qaContentId");
-	
+
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long qaSessionId = WebUtil.readLongParam(request, "qaSessionId");
-	
+
 	//in case of monitoring we show all results. in case of learning - don't show results from the current user
 	boolean isMonitoring = WebUtil.readBooleanParam(request, "isMonitoring", false);
 	Long userId = isMonitoring ? -1 : WebUtil.readLongParam(request, "userId");
-	
+
 	//paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer sortByCol1 = WebUtil.readIntParam(request, "column[0]", true);
 	Integer sortByCol2 = WebUtil.readIntParam(request, "column[1]", true);
 	String searchString = request.getParameter("fcol[0]");
-	
+
 	int sorting = QaAppConstants.SORT_BY_NO;
-	if (sortByCol1 != null ) {
-	    if ( isMonitoring )
-		sorting = sortByCol1.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC;
-	    else 
+	if (sortByCol1 != null) {
+	    if (isMonitoring) {
+		sorting = sortByCol1.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC
+			: QaAppConstants.SORT_BY_USERNAME_DESC;
+	    } else {
 		sorting = sortByCol1.equals(0) ? QaAppConstants.SORT_BY_ANSWER_ASC : QaAppConstants.SORT_BY_ANSWER_DESC;
-		
-	} else if ( sortByCol2 != null ) {
+	    }
+
+	} else if (sortByCol2 != null) {
 	    sorting = sortByCol2.equals(0) ? QaAppConstants.SORT_BY_RATING_ASC : QaAppConstants.SORT_BY_RATING_DESC;
 	}
 
-	List<QaUsrResp> responses = qaService.getResponsesForTablesorter(qaContentId, qaSessionId, questionUid, userId, page, size,
-		sorting, searchString);
-	
+	List<QaUsrResp> responses = QaLearningAction.qaService.getResponsesForTablesorter(qaContentId, qaSessionId,
+		questionUid, userId, page, size, sorting, searchString);
+
 	JSONObject responcedata = new JSONObject();
 	JSONArray rows = new JSONArray();
 
-	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, userId, searchString));
-	
+	responcedata.put("total_rows", QaLearningAction.qaService.getCountResponsesBySessionAndQuestion(qaSessionId,
+		questionUid, userId, searchString));
+
 	// handle rating criterias - even though we may have searched on ratings earlier we can't use the average ratings
 	// calculated as they may have been averages over more than one criteria. 
 	List<ItemRatingDTO> itemRatingDtos = null;
@@ -1074,13 +1083,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    for (QaUsrResp response : responses) {
 		itemIds.add(response.getResponseId());
 	    }
-	    
+
 	    //all comments required only for monitoring
 	    boolean isCommentsByOtherUsersRequired = isMonitoring;
-	    itemRatingDtos = qaService.getRatingCriteriaDtos(qaContentId, itemIds, isCommentsByOtherUsersRequired, userId);
-	    
+	    itemRatingDtos = QaLearningAction.qaService.getRatingCriteriaDtos(qaContentId, itemIds,
+		    isCommentsByOtherUsersRequired, userId);
+
 	    // store how many items are rated
-	    int countRatedQuestions = qaService.getCountItemsRatedByUser(qaContentId, userId.intValue());
+	    int countRatedQuestions = QaLearningAction.qaService.getCountItemsRatedByUser(qaContentId,
+		    userId.intValue());
 	    responcedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	}
 
@@ -1089,23 +1100,23 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    QaQueUsr user = response.getQaQueUser();
 	    //JSONArray cell=new JSONArray();
 	    //cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
-	    
+
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("responseUid", response.getResponseId().toString());
 	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response.getAnswer()));
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
-	    
+
 	    // format attemptTime
 	    Date attemptTime = response.getAttemptTime();
 	    attemptTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone, attemptTime);
 	    responseRow.put("attemptTime", dateFormatter.format(attemptTime));
-	    
+
 	    if (isAllowRateAnswers) {
-		
+
 		//find corresponding itemRatingDto
 		ItemRatingDTO itemRatingDto = null;
-		for (ItemRatingDTO itemRatingDtoIter: itemRatingDtos) {
+		for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
 		    if (response.getResponseId().equals(itemRatingDtoIter.getItemId())) {
 			itemRatingDto = itemRatingDtoIter;
 			break;
@@ -1114,54 +1125,55 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 		boolean isItemAuthoredByUser = response.getQaQueUser().getUid().equals(userId);
 		responseRow.put("isItemAuthoredByUser", isItemAuthoredByUser);
-		
+
 		JSONArray criteriasRows = new JSONArray();
-		for (ItemRatingCriteriaDTO criteriaDto: itemRatingDto.getCriteriaDtos()) {
+		for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
 		    JSONObject criteriasRow = new JSONObject();
 		    criteriasRow.put("ratingCriteriaId", criteriaDto.getRatingCriteria().getRatingCriteriaId());
 		    criteriasRow.put("title", criteriaDto.getRatingCriteria().getTitle());
 		    criteriasRow.put("averageRating", criteriaDto.getAverageRating());
 		    criteriasRow.put("numberOfVotes", criteriaDto.getNumberOfVotes());
 		    criteriasRow.put("userRating", criteriaDto.getUserRating());
-		    
+
 		    criteriasRows.put(criteriasRow);
 		}
 		responseRow.put("criteriaDtos", criteriasRows);
-		
+
 		//handle comments
 		responseRow.put("commentsCriteriaId", itemRatingDto.getCommentsCriteriaId());
-		String commentPostedByUser = itemRatingDto.getCommentPostedByUser() == null ? "" : itemRatingDto.getCommentPostedByUser().getComment();
+		String commentPostedByUser = itemRatingDto.getCommentPostedByUser() == null ? ""
+			: itemRatingDto.getCommentPostedByUser().getComment();
 		responseRow.put("commentPostedByUser", commentPostedByUser);
 		if (itemRatingDto.getCommentDtos() != null) {
-		    
+
 		    JSONArray comments = new JSONArray();
 		    for (RatingCommentDTO commentDto : itemRatingDto.getCommentDtos()) {
 			JSONObject comment = new JSONObject();
 			comment.put("comment", StringEscapeUtils.escapeCsv(commentDto.getComment()));
-			
+
 			if (isMonitoring) {
 			    // format attemptTime
 			    Date postedDate = commentDto.getPostedDate();
 			    postedDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, postedDate);
 			    comment.put("postedDate", dateFormatter.format(postedDate));
-			    
+
 			    comment.put("userFullName", StringEscapeUtils.escapeCsv(commentDto.getUserFullName()));
 			}
-			
+
 			comments.put(comment);
 		    }
 		    responseRow.put("comments", comments);
 		}
 	    }
-	    
+
 	    rows.put(responseRow);
 	}
 	responcedata.put("rows", rows);
-	
+
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
-     }
+    }
 
     private static Map removeNewLinesMap(Map map) {
 	Map newMap = new TreeMap(new QaStringComparator());

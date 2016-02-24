@@ -309,82 +309,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<ResourceItemDTO> exportBySessionId(Long sessionId, boolean skipHide) {
-	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    ResourceServiceImpl.log.error("Failed get ResourceSession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// initial resource items list
-	List<ResourceItemDTO> itemList = new ArrayList();
-	Set<ResourceItem> resList = session.getResource().getResourceItems();
-	for (ResourceItem item : resList) {
-	    if (skipHide && item.isHide()) {
-		continue;
-	    }
-	    // if item is create by author
-	    if (item.isCreateByAuthor()) {
-		ResourceItemDTO sum = new ResourceItemDTO(item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	// get this session's all resource items
-	Set<ResourceItem> sessList = session.getResourceItems();
-	for (ResourceItem item : sessList) {
-	    if (skipHide && item.isHide()) {
-		continue;
-	    }
-
-	    // to skip all item create by author
-	    if (!item.isCreateByAuthor()) {
-		ResourceItemDTO sum = new ResourceItemDTO(item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	return itemList;
-    }
-
-    @Override
-    public List<List<ResourceItemDTO>> exportByContentId(Long contentId) {
-	Resource resource = resourceDao.getByContentId(contentId);
-	List<List<ResourceItemDTO>> groupList = new ArrayList();
-
-	// create init resource items list
-	List<ResourceItemDTO> initList = new ArrayList();
-	groupList.add(initList);
-	Set<ResourceItem> resList = resource.getResourceItems();
-	for (ResourceItem item : resList) {
-	    if (item.isCreateByAuthor()) {
-		ResourceItemDTO sum = new ResourceItemDTO(item, true);
-		initList.add(sum);
-	    }
-	}
-
-	// session by session
-	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
-	for (ResourceSession session : sessionList) {
-	    List<ResourceItemDTO> group = new ArrayList<ResourceItemDTO>();
-	    // get this session's all resource items
-	    Set<ResourceItem> sessList = session.getResourceItems();
-	    for (ResourceItem item : sessList) {
-		// to skip all item create by author
-		if (!item.isCreateByAuthor()) {
-		    ResourceItemDTO sum = new ResourceItemDTO(item, false);
-		    group.add(sum);
-		}
-	    }
-	    if (group.size() == 0) {
-		group.add(new ResourceItemDTO(null, false));
-	    }
-	    groupList.add(group);
-	}
-
-	return groupList;
-    }
-
-    @Override
     public Resource getResourceBySessionId(Long sessionId) {
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -858,7 +782,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    exportContentService.registerImportVersionFilterClass(ResourceImportContentVersionFilter.class);
 
 	    exportContentService.registerFileClassForImport(ResourceItem.class.getName(), "fileUuid", "fileVersionId",
-		    "fileName", "fileType", null, "initialItem");
+		    "fileName", "fileType", "initialItem");
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, resourceToolContentHandler,
 		    fromVersion, toVersion);

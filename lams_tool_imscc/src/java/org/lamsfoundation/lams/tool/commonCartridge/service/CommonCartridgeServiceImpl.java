@@ -306,82 +306,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
-	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    CommonCartridgeServiceImpl.log.error("Failed get CommonCartridgeSession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// initial commonCartridge items list
-	List<Summary> itemList = new ArrayList();
-	Set<CommonCartridgeItem> resList = session.getCommonCartridge().getCommonCartridgeItems();
-	for (CommonCartridgeItem item : resList) {
-	    if (skipHide && item.isHide()) {
-		continue;
-	    }
-	    // if item is create by author
-	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	// get this session's all commonCartridge items
-	Set<CommonCartridgeItem> sessList = session.getCommonCartridgeItems();
-	for (CommonCartridgeItem item : sessList) {
-	    if (skipHide && item.isHide()) {
-		continue;
-	    }
-
-	    // to skip all item create by author
-	    if (!item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	return itemList;
-    }
-
-    @Override
-    public List<List<Summary>> exportByContentId(Long contentId) {
-	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(contentId);
-	List<List<Summary>> groupList = new ArrayList();
-
-	// create init commonCartridge items list
-	List<Summary> initList = new ArrayList();
-	groupList.add(initList);
-	Set<CommonCartridgeItem> resList = commonCartridge.getCommonCartridgeItems();
-	for (CommonCartridgeItem item : resList) {
-	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(null, null, item, true);
-		initList.add(sum);
-	    }
-	}
-
-	// session by session
-	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
-	for (CommonCartridgeSession session : sessionList) {
-	    List<Summary> group = new ArrayList<Summary>();
-	    // get this session's all commonCartridge items
-	    Set<CommonCartridgeItem> sessList = session.getCommonCartridgeItems();
-	    for (CommonCartridgeItem item : sessList) {
-		// to skip all item create by author
-		if (!item.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		    group.add(sum);
-		}
-	    }
-	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
-	    }
-	    groupList.add(group);
-	}
-
-	return groupList;
-    }
-
-    @Override
     public CommonCartridge getCommonCartridgeBySessionId(Long sessionId) {
 	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -818,7 +742,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    exportContentService.registerImportVersionFilterClass(CommonCartridgeImportContentVersionFilter.class);
 
 	    exportContentService.registerFileClassForImport(CommonCartridgeItem.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, "initialItem");
+		    "fileVersionId", "fileName", "fileType", "initialItem");
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, commonCartridgeToolContentHandler,
 		    fromVersion, toVersion);

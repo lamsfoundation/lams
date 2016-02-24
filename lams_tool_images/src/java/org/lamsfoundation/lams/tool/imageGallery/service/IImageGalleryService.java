@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 /**
  * Interface that defines the contract that all ShareImageGallery service provider must follow.
  * 
- * @author Andrey Balan        
+ * @author Andrey Balan
  */
 public interface IImageGalleryService extends ToolRatingManager {
 
@@ -123,7 +123,7 @@ public interface IImageGalleryService extends ToolRatingManager {
      * @return
      */
     Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId);
-    
+
     ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
 
     /**
@@ -240,19 +240,6 @@ public interface IImageGalleryService extends ToolRatingManager {
      *            true, item is visible. False, item is invisible.
      */
     void setItemVisible(Long itemUid, boolean visible);
-
-    /**
-     * Get imageGallery item <code>Summary</code> list according to sessionId and skipHide flag.
-     * 
-     * @param sessionId
-     * @param skipHide
-     *            true, don't get imageGallery item if its <code>isHide</code> flag is true. Otherwise, get all
-     *            imageGallery item
-     * @return
-     */
-    List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user, boolean skipHide);
-
-    List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.

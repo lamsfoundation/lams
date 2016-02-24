@@ -62,7 +62,6 @@ public class EditOnFlyProcessor extends LearningDesignProcessor {
 	// everything done by endSimpleActivity
     }
 
-    /** Creates an ActivityPortfolio. */
     @Override
     public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
 	if (!activity.isFloating()) {

@@ -138,9 +138,6 @@ public class Lesson implements Serializable {
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean displayDesignImage;
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
-    private Boolean learnerExportAvailable;
-
     /** Persistent field. Defaults to FALSE - is not included in the constructor anywhere. */
     private Boolean lockedForEdit;
 
@@ -183,23 +180,22 @@ public class Lesson implements Serializable {
      */
     public Lesson(String name, String description, Date createDateTime, User user, Integer lessonStateId,
 	    Integer previousLessonStateId, LearningDesign learningDesign, Set learnerProgresses,
-	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysTolessonFinish) {
+	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
+	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
+	    Boolean learnerRestart, Integer scheduledNumberDaysTolessonFinish) {
 	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
-		enableLessonIntro, displayDesignImage, learnerExportAvailable, false, learningDesign, null, null,
-		learnerProgresses, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, learnerRestart, scheduledNumberDaysTolessonFinish);
+		enableLessonIntro, displayDesignImage, false, learningDesign, null, null, learnerProgresses,
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
+		learnerRestart, scheduledNumberDaysTolessonFinish);
     }
 
     /** full constructor */
     public Lesson(Long lessonId, String name, String description, Date createDateTime, Date startDateTime,
 	    Date endDateTime, User user, Integer lessonStateId, Integer previousLessonStateId,
-	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
-	    Boolean lockedForEdit, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation,
-	    Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish) {
+	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean lockedForEdit, LearningDesign learningDesign,
+	    LessonClass lessonClass, Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable,
+	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
+	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish) {
 	this.lessonId = lessonId;
 	this.lessonName = name;
 	this.lessonDescription = description;
@@ -211,7 +207,6 @@ public class Lesson implements Serializable {
 	this.previousLessonStateId = previousLessonStateId;
 	this.enableLessonIntro = enableLessonIntro != null ? enableLessonIntro : Boolean.FALSE;
 	this.displayDesignImage = displayDesignImage != null ? displayDesignImage : Boolean.FALSE;
-	this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
 	this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
 	this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
 	this.lockedForEdit = false;
@@ -233,20 +228,18 @@ public class Lesson implements Serializable {
      * 
      * @param user
      *            the user who want to create a lesson.
-     * @param learnerExportAvailable
-     *            should the export portfolio option be made available to the learner?
      * @param ld
      *            the learning design that this lesson is based on.
      * @return the lesson created.
      */
     public static Lesson createNewLessonWithoutClass(String lessonName, String lessonDescription, User user,
-	    LearningDesign ld, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish) {
+	    LearningDesign ld, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
+	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
+	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish) {
 	return new Lesson(lessonName, lessonDescription, new Date(System.currentTimeMillis()), user, Lesson.CREATED,
-		null, ld, new HashSet(), enableLessonIntro, displayDesignImage, learnerExportAvailable,
-		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		learnerRestart, scheduledNumberDaysToLessonFinish);
+		null, ld, new HashSet(), enableLessonIntro, displayDesignImage, learnerPresenceAvailable,
+		learnerImAvailable, liveEditEnabled, enableLessonNotifications, learnerRestart,
+		scheduledNumberDaysToLessonFinish);
     }
 
     // ---------------------------------------------------------------------
@@ -419,14 +412,6 @@ public class Lesson implements Serializable {
 	this.displayDesignImage = displayDesignImage;
     }
 
-    public Boolean getLearnerExportAvailable() {
-	return learnerExportAvailable;
-    }
-
-    public void setLearnerExportAvailable(Boolean learnerExportAvailable) {
-	this.learnerExportAvailable = learnerExportAvailable;
-    }
-
     public Boolean getLearnerPresenceAvailable() {
 	return learnerPresenceAvailable;
     }
@@ -571,8 +556,8 @@ public class Lesson implements Serializable {
      * Finished lessons.
      */
     public boolean isLessonAccessibleForLearner() {
-	return ((lessonStateId != null) && (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId
-		.equals(Lesson.FINISHED_STATE)));
+	return ((lessonStateId != null)
+		&& (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId.equals(Lesson.FINISHED_STATE)));
     }
 
     public Set<GradebookUserLesson> getGradebookUserLessons() {

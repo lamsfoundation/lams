@@ -18,16 +18,16 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.imageGallery.dto;  
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.imageGallery.dto;
 
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
- 
+
 /**
  * List contains following element: <br>
  * 
@@ -44,12 +44,9 @@ public class UserImageContributionDTO {
 
     private String sessionName;
     private int numberOfVotesForImage;
-    
+
     private ImageGalleryUser user;
     private boolean isVotedForThisImage;
-    
-    //only for export needs
-    private ImageGalleryItem image;
 
     public UserImageContributionDTO() {
     }
@@ -73,7 +70,7 @@ public class UserImageContributionDTO {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-    
+
     /**
      * Returns image number of votes.
      * 
@@ -87,7 +84,7 @@ public class UserImageContributionDTO {
      * Sets image number of votes.
      * 
      * @param numberRates
-     *                image number of rates
+     *            image number of rates
      */
     public void setNumberOfVotesForImage(int numberOfVotesForImage) {
 	this.numberOfVotesForImage = numberOfVotesForImage;
@@ -100,23 +97,12 @@ public class UserImageContributionDTO {
     public void setUser(ImageGalleryUser user) {
 	this.user = user;
     }
-    
+
     public boolean isVotedForThisImage() {
 	return isVotedForThisImage;
     }
 
     public void setVotedForThisImage(boolean isVotedForThisImage) {
 	this.isVotedForThisImage = isVotedForThisImage;
-    }    
-    
-    public ImageGalleryItem getImage() {
-	return image;
     }
-
-    public void setImage(ImageGalleryItem image) {
-	this.image = image;
-    }
-
 }
-
- 

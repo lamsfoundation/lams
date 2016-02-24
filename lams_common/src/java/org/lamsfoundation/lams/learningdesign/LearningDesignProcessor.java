@@ -37,8 +37,8 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorE
  * else.
  * 
  * This is an abstract class that implements stepping through the learning design. It is used by
- * getAllContributeActivities to build up the list of "todo" activities and can also be used by export portfolio and
- * export learning design. The implementing classes will need to implement the startBlah and endBlah methods.
+ * getAllContributeActivities to build up the list of "todo" activities and can also be used by export learning design.
+ * The implementing classes will need to implement the startBlah and endBlah methods.
  * 
  * @author Fiona Malikoff
  * 
@@ -82,13 +82,12 @@ public abstract class LearningDesignProcessor {
 
     protected void handleActivity(Activity activity) throws LearningDesignProcessorException {
 	if (activity == null) {
-	    LearningDesignProcessor.log
-		    .warn("Parsing activity method handleActivity got a null activity. Learning design was "
-			    + getDesign());
+	    LearningDesignProcessor.log.warn(
+		    "Parsing activity method handleActivity got a null activity. Learning design was " + getDesign());
 	} else {
 	    if (LearningDesignProcessor.log.isTraceEnabled()) {
-		LearningDesignProcessor.log.trace("Processing activity " + activity.getActivityId() + " "
-			+ activity.getTitle());
+		LearningDesignProcessor.log
+			.trace("Processing activity " + activity.getActivityId() + " " + activity.getTitle());
 	    }
 	    if (activity.isComplexActivity()) {
 		handleComplexActivity(activity);

@@ -84,21 +84,6 @@
 		<servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
 
 	</servlet>
-	<servlet>
-		<servlet-name>gateExportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
-
-	</servlet>
-	<servlet>
-		<servlet-name>sequenceExportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.monitoring.web.SequenceExportPortfolioServlet</servlet-class>
-
-	</servlet>
-	<servlet>
-		<servlet-name>branchingExportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.monitoring.web.BranchingExportPortfolioServlet</servlet-class>
-
-	</servlet>
 
 	<servlet>
 		<servlet-name>action</servlet-name>
@@ -135,19 +120,7 @@
 		<servlet-name>initializeLesson</servlet-name>
 		<url-pattern>/initializeLesson</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>gateExportPortfolio</servlet-name>
-		<url-pattern>/gateExportPortfolio</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>sequenceExportPortfolio</servlet-name>
-		<url-pattern>/sequenceExportPortfolio</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>branchingExportPortfolio</servlet-name>
-		<url-pattern>/branchingExportPortfolio</url-pattern>
-	</servlet-mapping>
-	
+
 	<error-page>
 		<error-code>500</error-code>
 		<location>/error.jsp</location>

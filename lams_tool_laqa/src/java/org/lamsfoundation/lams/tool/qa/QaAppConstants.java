@@ -28,14 +28,14 @@ package org.lamsfoundation.lams.tool.qa;
  * @author Ozgur Demirtas
  */
 public interface QaAppConstants {
-    
+
     public static final int SORT_BY_NO = 0;
     public static final int SORT_BY_ANSWER_ASC = 3; // learner
     public static final int SORT_BY_ANSWER_DESC = 4; // learner
     public static final int SORT_BY_USERNAME_ASC = 1; // monitoring
     public static final int SORT_BY_USERNAME_DESC = 2; // monitoring
     public static final int SORT_BY_RATING_ASC = 5; // learner & monitoring
-    public static final int SORT_BY_RATING_DESC = 6;  // learner & monitoring
+    public static final int SORT_BY_RATING_DESC = 6; // learner & monitoring
 
     public static final String MY_SIGNATURE = "laqa11";
     public static final String TOOL_CONTENT_ID = "toolContentID";
@@ -51,7 +51,6 @@ public interface QaAppConstants {
     public static final String LOAD_LEARNER = "loadLearner";
     public static final String LEARNING_STARTER = "learningStarter";
     public static final String MONITORING_STARTER = "monitoringStarter";
-    public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     public static final String VIEW_ALL_RESULTS = "viewAllResults";
     public static final String INDIVIDUAL_LEARNER_RESULTS = "individualLearnerResults";
     public static final String MAP_ALL_RESULTS_KEY = "mapAllResultsKey";
@@ -62,7 +61,6 @@ public interface QaAppConstants {
     public static final String COPY_TOOL_CONTENT = "copyToolContent";
     public static final String MAP_SEQUENTIAL_ANSWERS_KEY = "mapSequentialAnswersKey";
     public static final String TOOL_SESSION_ID = "toolSessionID";
-    public static final String EXPORT_USER_ID = "exportUserId";
     public static final String NOTEBOOK = "notebook";
     public static final String ENTRY_TEXT = "entryText";
     public static final String REFLECTIONS_CONTAINER_DTO = "reflectionsContainerDTO";
@@ -87,7 +85,6 @@ public interface QaAppConstants {
     public static final String REFLECT = "reflect";
     public static final String REFLECTION_SUBJECT = "reflectionSubject";
 
-    public static final String IS_PORTFOLIO_EXPORT = "isPortfolioExport";
     public static final String GENERAL_LEARNER_FLOW_DTO = "generalLearnerFlowDTO";
 
     public static final Long INITIAL_QUESTION_COUNT = new Long(1);
@@ -100,7 +97,6 @@ public interface QaAppConstants {
     public static final String LOAD_QUESTIONS = "load";
     public static final String LOAD_STARTER = "starter";
     public static final String LEARNING_MODE = "learningMode";
-    public static final String PORTFOLIO_EXPORT_MODE = "portfolioExportMode";
     public static final String SUCCESS = "success";
 
     /*
@@ -161,16 +157,9 @@ public interface QaAppConstants {
     public static final String IS_USERNAME_VISIBLE = "isUsernameVisible";
     public static final String CURRENT_ANSWER = "currentAnswer";
 
-    /*
-     * export portfolio constants
-     */
     public static final String MODE = "mode";
     public static final String LEARNER = "learner";
     public static final String TEACHER = "teacher";
-
-    public static final String PORTFOLIO_REPORT = "portfolioReport";
-    public static final String PORTFOLIO_REQUEST = "portfolioRequest";
-    public static final int MAX_GROUPS_COUNT = 250;
 
     /*
      * user actions
@@ -218,8 +207,7 @@ public interface QaAppConstants {
     public static final String ATTR_GROUP_USERS = "groupUsers";
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
     public static final String ATTR_GROUP_LEADER = "groupLeader";
-    
-   
+
     public static final String TIMEZONE = "timeZone";
     public static final String TIMEZONE_ID = "timeZoneId";
     /*

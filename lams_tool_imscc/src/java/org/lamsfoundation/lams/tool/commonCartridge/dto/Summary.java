@@ -30,14 +30,19 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemInstruction;
-import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeWebUtils;
 
 /**
  * List contains following element: <br>
  * 
- * <li>session_id</li> <li>session_name</li> <li>CommonCartridgeItem.uid</li> <li>CommonCartridgeItem.item_type</li> <li>
- * CommonCartridgeItem.create_by_author</li> <li>CommonCartridgeItem.is_hide</li> <li>CommonCartridgeItem.title</li> <li>
- * User.login_name</li> <li>count(commonCartridge_item_uid)</li>
+ * <li>session_id</li>
+ * <li>session_name</li>
+ * <li>CommonCartridgeItem.uid</li>
+ * <li>CommonCartridgeItem.item_type</li>
+ * <li>CommonCartridgeItem.create_by_author</li>
+ * <li>CommonCartridgeItem.is_hide</li>
+ * <li>CommonCartridgeItem.title</li>
+ * <li>User.login_name</li>
+ * <li>count(commonCartridge_item_uid)</li>
  * 
  * @author Andrey Balan
  */
@@ -53,13 +58,6 @@ public class Summary {
     private List<String> itemInstructions = new ArrayList<String>();
     private String username;
     private int viewNumber;
-
-    // following is used for export portfolio programs:
-    private String url;
-    private Long fileUuid;
-    private Long fileVersionId;
-    private String fileName;
-    private String attachmentLocalUrl;
 
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
@@ -86,45 +84,9 @@ public class Summary {
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
 	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
-	    this.url = CommonCartridgeWebUtils.protocol(item.getUrl());
-	    this.fileName = item.getFileName();
-	    this.fileUuid = item.getFileUuid();
-	    this.fileVersionId = item.getFileVersionId();
-	} else
+	} else {
 	    this.itemUid = new Long(-1);
-    }
-
-    /**
-     * Contruction method for export profolio function.
-     * 
-     * <B>Don't not set sessionId and viewNumber fields</B>
-     * 
-     * @param sessionName
-     * @param item
-     * @param isInitGroup
-     */
-    public Summary(Long sessionId, String sessionName, CommonCartridgeItem item, boolean isInitGroup) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
-	if (item != null) {
-	    this.itemUid = item.getUid();
-	    this.itemType = item.getType();
-	    this.itemCreateByAuthor = item.isCreateByAuthor();
-	    this.itemHide = item.isHide();
-	    this.itemTitle = item.getTitle();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
-	    this.url = CommonCartridgeWebUtils.protocol(item.getUrl());
-	    this.fileName = item.getFileName();
-	    this.fileUuid = item.getFileUuid();
-	    this.fileVersionId = item.getFileVersionId();
-
-	    for (CommonCartridgeItemInstruction instruction : (Set<CommonCartridgeItemInstruction>) item
-		    .getItemInstructions()) {
-		itemInstructions.add(instruction.getDescription());
-	    }
-	} else
-	    this.itemUid = new Long(-1);
-	this.isInitGroup = isInitGroup;
+	}
     }
 
     public boolean isItemCreateByAuthor() {
@@ -199,52 +161,12 @@ public class Summary {
 	this.viewNumber = viewNumber;
     }
 
-    public Long getFileUuid() {
-	return fileUuid;
-    }
-
-    public void setFileUuid(Long fileUuid) {
-	this.fileUuid = fileUuid;
-    }
-
-    public Long getFileVersionId() {
-	return fileVersionId;
-    }
-
-    public void setFileVersionId(Long fileVersionId) {
-	this.fileVersionId = fileVersionId;
-    }
-
-    public String getUrl() {
-	return url;
-    }
-
-    public void setUrl(String url) {
-	this.url = url;
-    }
-
     public boolean isInitGroup() {
 	return isInitGroup;
     }
 
     public void setInitGroup(boolean isInitGroup) {
 	this.isInitGroup = isInitGroup;
-    }
-
-    public String getAttachmentLocalUrl() {
-	return attachmentLocalUrl;
-    }
-
-    public void setAttachmentLocalUrl(String attachmentLocalUrl) {
-	this.attachmentLocalUrl = attachmentLocalUrl;
-    }
-
-    public String getFileName() {
-	return fileName;
-    }
-
-    public void setFileName(String fileName) {
-	this.fileName = fileName;
     }
 
     public List<String> getItemInstructions() {
@@ -254,5 +176,4 @@ public class Summary {
     public void setItemInstructions(List<String> itemInstructions) {
 	this.itemInstructions = itemInstructions;
     }
-
 }

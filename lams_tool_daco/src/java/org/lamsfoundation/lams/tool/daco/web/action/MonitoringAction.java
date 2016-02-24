@@ -334,7 +334,7 @@ public class MonitoringAction extends Action {
 
 	List<Object[]> rows = new LinkedList<Object[]>();
 	// We get all sessions with all users with all their records from the given Daco content
-	List<MonitoringSummarySessionDTO> monitoringSummary = service.getExportPortfolioSummary(daco.getContentId(), null);
+	List<MonitoringSummarySessionDTO> monitoringSummary = service.getSummaryForExport(daco.getContentId(), null);
 	// Get current user's locale to format numbers properly
 	Locale monitoringUserLocale = null;
 	HttpSession ss = SessionManager.getSession();

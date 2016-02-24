@@ -60,6 +60,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
     private static Logger logger = Logger.getLogger(McMonitoringStarterAction.class.getName());
     private static IMcService service;
 
+    @SuppressWarnings("unchecked")
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 	initializeMcService();
@@ -94,7 +95,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	 */
 	List<McQuestionDTO> listQuestionContentDTO = new LinkedList<McQuestionDTO>();
 	Long mapIndex = new Long(1);
-	for (McQueContent question : (Set<McQueContent>)mcContent.getMcQueContents()) {
+	for (McQueContent question : (Set<McQueContent>) mcContent.getMcQueContents()) {
 	    McQuestionDTO mcContentDTO = new McQuestionDTO();
 
 	    if (question != null) {
@@ -125,13 +126,11 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	mcMonitoringForm.setCurrentTab("1");
 	mcGeneralMonitoringDTO.setCurrentTab("1");
 
-	mcGeneralMonitoringDTO.setIsPortfolioExport(new Boolean(false).toString());
-
 	/* this section is needed for Edit Activity screen, from here... */
 	mcGeneralAuthoringDTO.setActivityTitle(mcGeneralMonitoringDTO.getActivityTitle());
 	mcGeneralAuthoringDTO.setActivityInstructions(mcGeneralMonitoringDTO.getActivityInstructions());
 	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
+
 	McMonitoringAction monitoringAction = new McMonitoringAction();
 	monitoringAction.repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
 
@@ -171,7 +170,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	return (mapping.findForward(LOAD_MONITORING_CONTENT));
     }
-    
+
     // *************************************************************************************
     // Private method
     // *************************************************************************************

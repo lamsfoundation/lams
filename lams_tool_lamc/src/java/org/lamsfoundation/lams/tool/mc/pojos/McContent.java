@@ -47,9 +47,6 @@ public class McContent implements Serializable {
     /** persistent field */
     private Long mcContentId;
 
-    /** persistent field, used for export portfolio */
-    private String content;
-
     /** nullable persistent field */
     private String title;
 
@@ -83,11 +80,11 @@ public class McContent implements Serializable {
     private boolean displayAnswers;
 
     private boolean showMarks;
-    
+
     private boolean useSelectLeaderToolOuput;
-    
+
     private boolean prefixAnswersWithLetters;
-    
+
     /** nullable persistent field */
     private Date submissionDeadline;
 
@@ -103,14 +100,13 @@ public class McContent implements Serializable {
     private Set mcSessions;
 
     /** full constructor */
-    public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater,
-	    Date creationDate, Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark,
-	    boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks,
-	    boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries, boolean reflect,
-	    String reflectionSubject, Set mcQueContents, Set mcSessions) {
-	
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, Date creationDate,
+	    Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark, boolean showReport,
+	    boolean randomize, boolean displayAnswers, boolean showMarks, boolean useSelectLeaderToolOuput,
+	    boolean prefixAnswersWithLetters, boolean retries, boolean reflect, String reflectionSubject,
+	    Set mcQueContents, Set mcSessions) {
+
 	this.mcContentId = mcContentId;
-	this.content = content;
 	this.title = title;
 	this.instructions = instructions;
 	this.defineLater = defineLater;
@@ -156,11 +152,11 @@ public class McContent implements Serializable {
      * @return the new mc content object.
      */
     public static McContent newInstance(McContent mc, Long newContentId) {
-	McContent newContent = new McContent(newContentId, mc.getContent(), mc.getTitle(), mc.getInstructions(),
-		mc.isDefineLater(), mc.getCreationDate(), mc.getUpdateDate(), mc.isQuestionsSequenced(),
-		mc.getCreatedBy(), mc.getPassMark(), mc.isShowReport(), mc.isRandomize(), mc.isDisplayAnswers(),
-		mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(), mc.isPrefixAnswersWithLetters(), mc.isRetries(),
-		mc.isReflect(), mc.getReflectionSubject(), new TreeSet(), new TreeSet());
+	McContent newContent = new McContent(newContentId, mc.getTitle(), mc.getInstructions(), mc.isDefineLater(),
+		mc.getCreationDate(), mc.getUpdateDate(), mc.isQuestionsSequenced(), mc.getCreatedBy(),
+		mc.getPassMark(), mc.isShowReport(), mc.isRandomize(), mc.isDisplayAnswers(), mc.isShowMarks(),
+		mc.isUseSelectLeaderToolOuput(), mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(),
+		mc.getReflectionSubject(), new TreeSet(), new TreeSet());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
 
 	return newContent;
@@ -258,8 +254,9 @@ public class McContent implements Serializable {
     }
 
     public Set getMcQueContents() {
-	if (this.mcQueContents == null)
+	if (this.mcQueContents == null) {
 	    setMcQueContents(new HashSet());
+	}
 	return this.mcQueContents;
     }
 
@@ -268,8 +265,9 @@ public class McContent implements Serializable {
     }
 
     public Set getMcSessions() {
-	if (this.mcSessions == null)
+	if (this.mcSessions == null) {
 	    setMcSessions(new HashSet());
+	}
 	return this.mcSessions;
     }
 
@@ -277,6 +275,7 @@ public class McContent implements Serializable {
 	this.mcSessions = mcSessions;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
@@ -327,21 +326,6 @@ public class McContent implements Serializable {
     }
 
     /**
-     * @return Returns the content.
-     */
-    public String getContent() {
-	return content;
-    }
-
-    /**
-     * @param content
-     *            The content to set.
-     */
-    public void setContent(String content) {
-	this.content = content;
-    }
-
-    /**
      * @return Returns the reflect.
      */
     public boolean isReflect() {
@@ -382,34 +366,33 @@ public class McContent implements Serializable {
     public void setShowMarks(boolean showMarks) {
 	this.showMarks = showMarks;
     }
-    
-    
+
     /**
      * @return
      */
     public boolean isUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     /**
      * @param useSelectLeaderToolOuput
      */
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
-    
+
     /**
      * @return
      */
     public boolean isPrefixAnswersWithLetters() {
-        return prefixAnswersWithLetters;
+	return prefixAnswersWithLetters;
     }
 
     /**
      * @param prefixAnswersWithLetters
      */
     public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
-        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 
     /**

@@ -42,7 +42,6 @@ public interface McAppConstants {
     public static final String LOAD_MONITORING = "refreshMonitoring";
     public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY = "loadMonitoringEditActivity";
     public static final String LIST_ALL_GROUPS_DTO = "listAllGroupsDTO";
-    public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     public static final String INDIVIDUAL_REPORT = "individualReport";
     public static final String REDO_QUESTIONS = "redoQuestions";
     public static final String SINGLE_QUESTION_ANSWERS = "singleQuestionAnswers";
@@ -138,9 +137,6 @@ public interface McAppConstants {
     public static final String MAP_CORRECT_FEEDBACK_LEARNER = "mapCorrectFeedbackLearner";
     public static final String MAP_CORRECT_FEEDBACK = "mapCorrectFeedback";
     public static final String MAP_FEEDBACK_CORRECT = "mapFeedbackCorrect";
-    public static final String IS_PORTFOLIO_EXPORT = "isPortfolioExport";
-    public static final String PORTFOLIO_EXPORT_MODE = "portfolioExportMode";
-    public static final String PORTFOLIO_EXPORT_DATA_FILENAME = "portfolioExportDataFileName";
 
     public static final String SELECTED_QUESTION = "selectedQuestion";
     public static final String SELECTED_QUESTION_INDEX = "selectedQuestionIndex";
@@ -274,7 +270,6 @@ public interface McAppConstants {
 
     public static final String MODE = "mode";
     public static final String LEARNING_MODE = "learningMode";
-    public static final String EXPORT_USER_ID = "exportUserId";
     public static final String REFLECT = "reflect";
 
     /*

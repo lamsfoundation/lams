@@ -50,9 +50,9 @@ import org.lamsfoundation.lams.web.filter.LocaleFilter;
  * @author Fiona Malikoff
  */
 public class CssTag extends TagSupport {
+    private static final long serialVersionUID = -3143529984657965761L;
 
     private static final Logger log = Logger.getLogger(CssTag.class);
-    private String localLinkPath = null;
     private String style = null;
 
     private static final String LEARNER_STYLE = "learner"; // expandable
@@ -79,11 +79,7 @@ public class CssTag extends TagSupport {
 		for (String theme : themeList) {
 		    if (theme != null) {
 			theme = appendStyle(theme, rtl);
-			if (localLinkPath != null) {
-			    customStylesheetLink = generateLocalLink(theme);
-			} else {
-			    customStylesheetLink = generateLink(theme, serverURL);
-			}
+			customStylesheetLink = generateLink(theme, serverURL);
 		    }
 
 		    if (customStylesheetLink != null) {
@@ -102,16 +98,6 @@ public class CssTag extends TagSupport {
 	}
 
 	return Tag.SKIP_BODY;
-    }
-
-    private String generateLocalLink(String stylesheetName) {
-	if (localLinkPath.endsWith("/")) {
-	    return "<link href=\"" + localLinkPath + "css/" + stylesheetName
-		    + ".css\" rel=\"stylesheet\" type=\"text/css\">";
-	} else {
-	    return "<link href=\"" + localLinkPath + "/css/" + stylesheetName
-		    + ".css\" rel=\"stylesheet\" type=\"text/css\">";
-	}
     }
 
     private String appendStyle(String stylesheetName, boolean rtl) {
@@ -139,21 +125,6 @@ public class CssTag extends TagSupport {
     @Override
     public int doEndTag() {
 	return Tag.EVAL_PAGE;
-    }
-
-    /**
-     * @jsp.attribute required="false" rtexprvalue="true" description="Should the css link be a local file link? If so,
-     *                what is the path back to the 'root'. For tools' export portfolio pages, this should be set to
-     *                \"../\""
-     * 
-     * @return Returns the property.
-     */
-    public String getLocalLinkPath() {
-	return localLinkPath;
-    }
-
-    public void setLocalLinkPath(String localLinkPath) {
-	this.localLinkPath = localLinkPath;
     }
 
     /**

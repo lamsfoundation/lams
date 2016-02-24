@@ -143,7 +143,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 	voteMonitoringForm.setCurrentTab("1");
 	voteGeneralMonitoringDTO.setCurrentTab("1");
-	voteGeneralMonitoringDTO.setIsPortfolioExport(Boolean.FALSE.toString());
 
 	if (sessionDTOs.size() > 0) {
 	    VoteUtils.cleanUpUserExceptions(request);

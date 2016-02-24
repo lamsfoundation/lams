@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
-import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
@@ -76,7 +75,7 @@ public interface IQaService extends ToolRatingManager {
      * @param leader
      */
     void copyAnswersFromLeader(QaQueUsr user, QaQueUsr leader);
-    
+
     void setDefineLater(String strToolContentID, boolean value);
 
     /**
@@ -100,18 +99,19 @@ public interface IQaService extends ToolRatingManager {
     void saveOrUpdateQaContent(QaContent qa);
 
     void updateUser(QaQueUsr qaQueUsr);
-    
+
     List<QaUsrResp> getResponsesByUserUid(final Long userUid);
 
     QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId);
-    
-    List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
-    
-    List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId, final Long excludeUserId,
-	    int page, int size, int sorting, String searchString);
 
-    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId, String searchString);
-    
+    List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
+
+    List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId,
+	    final Long excludeUserId, int page, int size, int sorting, String searchString);
+
+    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+	    String searchString);
+
     /**
      * Creates or updates response with answer submitted by user.
      * 
@@ -318,15 +318,6 @@ public interface IQaService extends ToolRatingManager {
     String getLearnerContentFolder(Long toolSessionId, Long userId);
 
     /**
-     * Return reflection data for all sessions. Used for Export Portfolio. For monitoring use getUserReflectionsForTablesorter
-     * 
-     * @param content
-     * @param userID
-     * @return
-     */
-    List<ReflectionDTO> getReflectList(QaContent content, String userID);
-    
-    /** 
      * 
      * Takes the tool session id as the main input.
      */
@@ -343,22 +334,9 @@ public interface IQaService extends ToolRatingManager {
     int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString);
     
     /**
-     * ends up populating the attempt history for all the users of all the tool sessions for a content
-     * 
-     * User id is needed if isUserNamesVisible is false && is learnerRequest = true, as it is required to work out if
-     * the data being analysed is the current user.
-     */
-    List exportLearner(QaContent qaContent, boolean isUserNamesVisible, boolean isLearnerRequest, String sessionId,
-	    String userId);
-    
-    List<GroupDTO> exportTeacher(QaContent qaContent);
-
-    /**
      * notifyTeachersOnResponseSubmit
      * 
      * @param sessionId
      */
     void notifyTeachersOnResponseSubmit(Long sessionId);
-
-
 }

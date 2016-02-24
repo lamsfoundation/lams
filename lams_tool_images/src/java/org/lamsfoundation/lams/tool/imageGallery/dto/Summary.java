@@ -57,12 +57,6 @@ public class Summary {
     private int numberOfVotes;
     private ItemRatingDTO itemRatingDto;
 
-    // following is used for export portfolio programs:
-    private Long fileUuid;
-    private Long fileVersionId;
-    private String fileName;
-    private String attachmentLocalUrl;
-
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
 
@@ -87,44 +81,11 @@ public class Summary {
 	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getFirstName() + " "
-		    + item.getCreateBy().getLastName();
-	    this.fileName = item.getFileName();
-	    this.fileUuid = item.getOriginalFileUuid();
-	    this.fileVersionId = item.getFileVersionId();
+	    this.username = item.getCreateBy() == null ? ""
+		    : item.getCreateBy().getFirstName() + " " + item.getCreateBy().getLastName();
 	} else {
 	    this.itemUid = new Long(-1);
 	}
-    }
-
-    /**
-     * Contruction method for export profolio function.
-     * 
-     * <B>Don't not set sessionId and viewNumber fields</B>
-     * 
-     * @param sessionName
-     * @param item
-     * @param isInitGroup
-     */
-    public Summary(Long sessionId, String sessionName, ImageGalleryItem item, boolean isInitGroup) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
-	if (item != null) {
-	    this.itemUid = item.getUid();
-	    this.item = item;	    
-	    this.itemCreateByAuthor = item.isCreateByAuthor();
-	    this.itemHide = item.isHide();
-	    this.itemTitle = item.getTitle();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getFirstName() + " "
-		    + item.getCreateBy().getLastName();
-	    this.fileName = item.getFileName();
-	    this.fileUuid = item.getOriginalFileUuid();
-	    this.fileVersionId = item.getFileVersionId();
-
-	} else {
-	    this.itemUid = new Long(-1);
-	}
-	this.isInitGroup = isInitGroup;
     }
 
     public boolean isItemCreateByAuthor() {
@@ -158,7 +119,7 @@ public class Summary {
     public void setItemUid(Long itemUid) {
 	this.itemUid = itemUid;
     }
-    
+
     public ImageGalleryItem getItem() {
 	return item;
     }
@@ -197,8 +158,8 @@ public class Summary {
 
     public void setNumberOfVotes(int numberOfVotes) {
 	this.numberOfVotes = numberOfVotes;
-    }  
-    
+    }
+
     /**
      * @return itemRatingDto
      */
@@ -213,22 +174,6 @@ public class Summary {
 	this.itemRatingDto = itemRatingDto;
     }
 
-    public Long getFileUuid() {
-	return fileUuid;
-    }
-
-    public void setFileUuid(Long fileUuid) {
-	this.fileUuid = fileUuid;
-    }
-
-    public Long getFileVersionId() {
-	return fileVersionId;
-    }
-
-    public void setFileVersionId(Long fileVersionId) {
-	this.fileVersionId = fileVersionId;
-    }
-
     public boolean isInitGroup() {
 	return isInitGroup;
     }
@@ -236,21 +181,4 @@ public class Summary {
     public void setInitGroup(boolean isInitGroup) {
 	this.isInitGroup = isInitGroup;
     }
-
-    public String getAttachmentLocalUrl() {
-	return attachmentLocalUrl;
-    }
-
-    public void setAttachmentLocalUrl(String attachmentLocalUrl) {
-	this.attachmentLocalUrl = attachmentLocalUrl;
-    }
-
-    public String getFileName() {
-	return fileName;
-    }
-
-    public void setFileName(String fileName) {
-	this.fileName = fileName;
-    }
-
 }

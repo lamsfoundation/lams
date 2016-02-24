@@ -65,19 +65,10 @@
 		</p>
 	</c:when>
 	<c:otherwise>
-		<c:choose>
-			<%-- Indenting is different depending on the page this page is included to. --%>
-			<c:when test='${includeMode=="learning"}'>
-				<p class="hint" style="margin-left: 17px; font-weight: bold;">
-					<fmt:message key="label.learning.heading.recordcount" />: ${fn:length(recordList)}
-				</p>
-			</c:when>
-			<c:when test='${includeMode=="exportportfolio"}'>
-				<p class="hint" style="font-weight: bold;">
-					<fmt:message key="label.learning.heading.recordcount" />: ${fn:length(recordList)}
-				</p>
-			</c:when>
-		</c:choose>
+
+		<p class="hint" style="margin-left: 17px; font-weight: bold;">
+			<fmt:message key="label.learning.heading.recordcount" />: ${fn:length(recordList)}
+		</p>
 
 		<c:choose>
 			<c:when test="${horizontal}">
@@ -230,16 +221,7 @@
 														</c:when>
 														<c:otherwise>
 															<fmt:message key="label.learning.file.uploaded" />
-															<c:choose>
-																<%-- The file can be downloaded back from the server.
-																	It is done differently in learning and export portfolio modes. --%>
-																<c:when test="${includeMode=='exportportfolio'}">
-																	<a href="<c:url value='files/${answer.fileUuid}-${answer.fileName}'/>">${answer.fileName}</a>
-																</c:when>
-																<c:otherwise>
-																	<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
-																</c:otherwise>
-															</c:choose>				
+															<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
 														</c:otherwise>
 													</c:choose>
 												</c:when>

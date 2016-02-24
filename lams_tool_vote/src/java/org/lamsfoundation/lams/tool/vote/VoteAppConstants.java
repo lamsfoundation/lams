@@ -49,7 +49,6 @@ public interface VoteAppConstants {
     public static final String ALL_NOMINATIONS = "allNominations";
     public static final String LOAD_MONITORING_CONTENT = "loadMonitoring";
     public static final String MONITORING_STARTER_REDIRECT = "monitoringStarterRedirect";
-    public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     public static final String INDIVIDUAL_REPORT = "individualReport";
     public static final String EXIT_PAGE = "exitPage";
     public static final String VIEW_SUMMARY = "viewSummary";
@@ -98,7 +97,6 @@ public interface VoteAppConstants {
 
     public static final String MAX_INPUTS = "maxInputs";
 
-    public static final String EXPORT_PORTFOLIO_DTO = "exportPortfolioDto";
     public static final String NOTEBOOK = "notebook";
     public static final String ENTRY_TEXT = "entryText";
     public static final String REFLECTION_SUBJECT = "reflectionSubject";
@@ -165,8 +163,6 @@ public interface VoteAppConstants {
     public static final String MAP_VIEWONLY_QUESTION_CONTENT_LEARNER = "mapViewOnlyQuestionContentLearner";
     public static final String MAP_QUE_ATTEMPTS = "mapQueAttempts";
     public static final String LIST_USER_ENTRIES = "listUserEntries";
-    public static final String IS_PORTFOLIO_EXPORT = "isPortfolioExport";
-    public static final String PORTFOLIO_EXPORT_MODE = "portfolioExportMode";
 
     public static final String SELECTED_QUESTION = "selectedQuestion";
     public static final String SELECTED_QUESTION_INDEX = "selectedQuestionIndex";
@@ -246,9 +242,8 @@ public interface VoteAppConstants {
 
     public static final String MODE = "mode";
     public static final String LEARNING_MODE = "learningMode";
-    public static final String EXPORT_USER_ID = "exportUserId";
     public static final String SESSION_VOTES_CHART = "Session Votes Chart";
-    
+
     public static final String ATTR_QUESTION_UID = "questionUid";
     public static final String ATTR_SESSION_UID = "sessionUid"; // not the tool session id supplied by the core
     public static final String ATTR_USER_NAME = "userName";

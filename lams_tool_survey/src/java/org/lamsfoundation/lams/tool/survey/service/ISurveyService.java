@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
@@ -169,7 +168,7 @@ public interface ISurveyService {
      * @return
      */
     List<SurveyUser> getSessionUsers(Long sessionId);
-    
+
     /**
      * Get number of finished users.
      * 
@@ -205,7 +204,7 @@ public interface ISurveyService {
      * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws SurveyApplicationException;
-    
+
     /**
      * Mark user as finalized response which will signify he has submitted response.
      * 
@@ -230,13 +229,6 @@ public interface ISurveyService {
      * @return
      */
     SortedMap<SurveySession, Integer> getStatistic(Long contentId);
-
-    // ******************************************************************************************
-    // Export portfolio methods
-    // ******************************************************************************************
-    SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportLearnerPortfolio(SurveyUser learner);
-
-    SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportClassPortfolio(Long toolContentID);
 
     // This export for exporting Excel format file in Survey monitoring summary page:
     SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID);
@@ -283,7 +275,7 @@ public interface ISurveyService {
 
     List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString);
-	    
+
     void notifyTeachersOnAnswerSumbit(Long sessionId, SurveyUser surveyUser);
 
     /**
@@ -305,14 +297,15 @@ public interface ISurveyService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
-    /** Gets the Answer information for the monitoring listAnswers tablesorter. 
-     * Will return List<[SurveyUser, String, String], [SurveyUser, String, String], ... , [SurveyUser, String, String]>
-     * where the first String is answer choices (for multiple choice) and the second String is the answer text for
-     * free entry choice.
+
+    /**
+     * Gets the Answer information for the monitoring listAnswers tablesorter. Will return List<[SurveyUser, String,
+     * String], [SurveyUser, String, String], ... , [SurveyUser, String, String]> where the first String is answer
+     * choices (for multiple choice) and the second String is the answer text for free entry choice.
      */
-  List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId,
-	    int page, int size, int sorting, String searchString);
+    List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId, int page, int size, int sorting,
+	    String searchString);
+
     int getCountUsersBySession(final Long sessionId, String searchString);
 
 }

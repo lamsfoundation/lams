@@ -51,10 +51,6 @@ td#exitButtonCell {
 	width: 50px;
 }
 
-td#exportButtonCell {
-	padding: 3px 2px 5px 0px;
-}
-
 div#lessonTitleRow {
 	overflow: hidden;
 	text-overflow:ellipsis;

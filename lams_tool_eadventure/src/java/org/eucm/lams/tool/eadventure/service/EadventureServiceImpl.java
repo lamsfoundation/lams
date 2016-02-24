@@ -341,97 +341,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 
     }
 
-    // TODO revisar!!!!!! Monitoring
-    @Override
-    public List<Summary> exportBySessionId(Long sessionId, Long userId) {
-	EadventureSession session = eadventureSessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    EadventureServiceImpl.log.error("Failed get EadventureSession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// initial eadventure items list
-	List<Summary> itemList = new ArrayList();
-	Eadventure ead = session.getEadventure();
-	Summary sum = new Summary(session.getSessionId(), session.getSessionName(), ead, false);
-
-	// List<EadventureUser> userList = getUserListBySessionItem(session.getSessionId(), ead.getUid());
-	boolean[] existList = new boolean[1];
-	String[] reportList = new String[1];
-
-	EadventureUser eadUser = eadventureUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	// TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
-	EadventureItemVisitLog log = getEadventureItemLog(ead.getUid(), userId);
-	eadUser.setAccessDate(log.getAccessDate());
-	EadventureVars var = getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_REPORT);
-
-	if (var != null) {
-	    existList[0] = true;
-	    reportList[0] = var.getValue();
-	} else {
-	    existList[0] = false;
-	    reportList[0] = null;
-	}
-
-	ArrayList<EadventureUser> userList = new ArrayList<EadventureUser>();
-	userList.add(eadUser);
-	sum.setUsers(userList);
-	sum.setExistList(existList);
-	sum.setReportList(reportList);
-
-	// TODO ver si tiene sentido que sea una lista
-	ArrayList<Summary> list = new ArrayList<Summary>();
-	list.add(sum);
-
-	return list;
-    }
-
-    // TODO revisar!!!!!! Monitoring
-    @Override
-    public List<Summary> exportByContentId(Long contentId) {
-	Eadventure eadventure = eadventureDao.getByContentId(contentId);
-	List<Summary> groupList = new ArrayList();
-
-	// session by session
-	List<EadventureSession> sessionList = eadventureSessionDao.getByContentId(contentId);
-	for (EadventureSession session : sessionList) {
-
-	    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), session.getEadventure(), false);
-
-	    List<EadventureUser> userList = getUserListBySessionItem(session.getSessionId(), eadventure.getUid());
-	    boolean[] existList = new boolean[userList.size()];
-	    String[] reportList = new String[userList.size()];
-	    int numberOfFinishedLearners = 0;
-	    int i = 0;
-	    for (EadventureUser eadUser : userList) {
-		// TODO doble acceso a vistit log... (aqui y en getUserListBySessionItem)
-		EadventureItemVisitLog log = getEadventureItemLog(eadventure.getUid(), eadUser.getUserId());
-
-		EadventureVars var = getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_REPORT);
-
-		if (log.isComplete()) {
-		    numberOfFinishedLearners++;
-		}
-
-		if (var != null) {
-		    existList[i] = true;
-		    reportList[i] = var.getValue();
-		} else {
-		    existList[i] = false;
-		    reportList[i] = null;
-		}
-		i++;
-
-	    }
-	    sum.setUsers(userList);
-	    sum.setExistList(existList);
-	    sum.setReportList(reportList);
-
-	    groupList.add(sum);
-	}
-
-	return groupList;
-    }
-
     @Override
     public Eadventure getEadventureBySessionId(Long sessionId) {
 	EadventureSession session = eadventureSessionDao.getSessionBySessionId(sessionId);
@@ -940,7 +849,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 
 	    // TODO revisar
 	    exportContentService.registerFileClassForImport(Eadventure.class.getName(), "fileUuid", "fileVersionId",
-		    "fileName", "fileType", null, "initialItem");
+		    "fileName", "fileType", "initialItem");
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, eadventureToolContentHandler,
 		    fromVersion, toVersion);

@@ -1002,7 +1002,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    exportContentService.registerImportVersionFilterClass(ForumImportContentVersionFilter.class);
 
 	    exportContentService.registerFileClassForImport(Attachment.class.getName(), "fileUuid", "fileVersionId",
-		    "fileName", "fileType", null, null);
+		    "fileName", "fileType", null);
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, forumToolContentHandler,
 		    fromVersion, toVersion);
