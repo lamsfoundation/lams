@@ -84,6 +84,10 @@
    		</property>
    		<property name="messageService"><ref bean="spreadsheetMessageService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
+		<property name="gradebookService">
+			<ref bean="gradebookService" />
+		</property>
+		
     </bean>
 
     <bean id="spreadsheetService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

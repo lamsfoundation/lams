@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -91,6 +92,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
+    private IGradebookService gradebookService;
+
 
     // *******************************************************************************
     // Service method
@@ -410,8 +413,15 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
 		mark.setDateMarksReleased(new Date());
 		spreadsheetMarkDao.saveObject(mark);
+
+		// send marks to gradebook where applicable  
+		if (mark.getMarks() != null) {
+		    Double doubleMark = new Double(mark.getMarks());
+		    gradebookService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId, false);
+		}
 	    }
 	}
+
     }
 
     @Override
@@ -638,6 +648,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+
 	spreadsheetDao.delete(spreadsheet);
     }
 
@@ -760,6 +771,14 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+
+    public IGradebookService getGradebookService() {
+        return gradebookService;
+    }
+
+    public void setGradebookService(IGradebookService gradebookService) {
+        this.gradebookService = gradebookService;
     }
 
     @Override
