@@ -13,5 +13,6 @@
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 
 
