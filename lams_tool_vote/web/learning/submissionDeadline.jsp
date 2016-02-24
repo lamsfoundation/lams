@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -27,31 +25,28 @@
 
 <body class="stripes">
 
+<c:set var="title" scope="request">
+	<fmt:message key="activity.title" />
+</c:set>
+
+<lams:Page type="learner" title="${title}">
+
 	<html:form action="/learning?validate=false" method="POST">
 		<html:hidden property="dispatch" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="userID" />
-
-		<div id="content">
-
-			<h1>
-				<fmt:message key="activity.title" />
-			</h1>
 			
-			<div class="warning">
+			<lams:Alert id="submissionDeadline" type="danger" close="false">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
 					<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 			
-			<div class="space-bottom-top align-right">
-
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
 
 					<html:link href="#nogo" property="endLearning" styleId="finishButton" 
 				      onclick="javascript:submitMethod('learnerFinished');return false"
-				      styleClass="button">
-						<span class="nextActivity">
+				      styleClass="btn btn-primary voffset10 pull-right na">
 							<c:choose>
 								<c:when test="${activityPosition.last}">
 									<fmt:message key="button.submitActivity" />
@@ -60,7 +55,6 @@
 									<fmt:message key="button.endLearning" />
 								</c:otherwise>
 							</c:choose>
-						</span>
 					</html:link>
 
 				</c:if>
@@ -68,15 +62,12 @@
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
 					<html:submit property="forwardtoReflection"
 						onclick="javascript:submitMethod('forwardtoReflection');"
-						styleClass="button">
+						styleClass="btn btn-primary voffset10 pull-right">
 						<fmt:message key="label.continue" />
 					</html:submit>
 				</c:if>
 
-			</div>
-
-		</div>
 	</html:form>
-
+</lams:Page>
 </body>
 </lams:html>
