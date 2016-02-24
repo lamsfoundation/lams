@@ -96,15 +96,12 @@ public class Organisation implements Serializable, Comparable {
 
     /** persistent field */
     private Boolean enableGradebookForLearners;
-    
+
     /** persistent field */
     private Boolean enableSingleActivityLessons;
-    
+
     /** persistent field */
     private Boolean enableLiveEdit;
-    
-    /** persistent field */
-    private Boolean enableExportPortfolio;
 
     /** persistent field */
     private Date archivedDate;
@@ -122,7 +119,6 @@ public class Organisation implements Serializable, Comparable {
 	this.enableGradebookForMonitors = Boolean.FALSE;
 	this.enableSingleActivityLessons = Boolean.FALSE;
 	this.enableLiveEdit = Boolean.FALSE;
-	this.enableExportPortfolio = Boolean.FALSE;
     }
 
     public Integer getOrganisationId() {
@@ -269,17 +265,21 @@ public class Organisation implements Serializable, Comparable {
 	this.enableCourseNotifications = enableCourseNotifications;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("organisationId", getOrganisationId()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if (!(other instanceof Organisation))
+	if (!(other instanceof Organisation)) {
 	    return false;
+	}
 	Organisation castOther = (Organisation) other;
 	return new EqualsBuilder().append(this.getOrganisationId(), castOther.getOrganisationId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getOrganisationId()).toHashCode();
     }
@@ -296,6 +296,7 @@ public class Organisation implements Serializable, Comparable {
 	this.locale = locale;
     }
 
+    @Override
     public int compareTo(Object o) {
 	return name.compareToIgnoreCase(((Organisation) o).getName());
     }
@@ -333,26 +334,18 @@ public class Organisation implements Serializable, Comparable {
     }
 
     public Boolean getEnableSingleActivityLessons() {
-        return enableSingleActivityLessons;
+	return enableSingleActivityLessons;
     }
 
     public void setEnableSingleActivityLessons(Boolean enableSingleActivityLessons) {
-        this.enableSingleActivityLessons = enableSingleActivityLessons;
+	this.enableSingleActivityLessons = enableSingleActivityLessons;
     }
-    
+
     public Boolean getEnableLiveEdit() {
-        return enableLiveEdit;
+	return enableLiveEdit;
     }
 
     public void setEnableLiveEdit(Boolean enableLiveEdit) {
-        this.enableLiveEdit = enableLiveEdit;
-    }
-    
-    public Boolean getEnableExportPortfolio() {
-        return enableExportPortfolio;
-    }
-
-    public void setEnableExportPortfolio(Boolean enableExportPortfolio) {
-        this.enableExportPortfolio = enableExportPortfolio;
+	this.enableLiveEdit = enableLiveEdit;
     }
 }

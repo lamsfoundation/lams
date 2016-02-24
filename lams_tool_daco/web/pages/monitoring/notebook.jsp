@@ -11,9 +11,6 @@
 <c:set var="daco" value="${sessionMap.daco}"/>
 <c:set var="user" value="${sessionMap.user}"/>
 
-<c:if test="${param.includeMode=='exportportfolio'}">
-	<lams:css localLinkPath="../../" />
-</c:if>
 <%@ include file="/common/header.jsp"%>
 <title><fmt:message key="label.learning.title" /></title>
 </lams:head>

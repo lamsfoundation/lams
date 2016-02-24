@@ -24,28 +24,23 @@
 package org.lamsfoundation.lams.tool.rsrc.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
+import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
  * 
- * Interface that defines the contract that all ShareResource service provider must follow.
+ *         Interface that defines the contract that all ShareResource service provider must follow.
  */
 public interface IResourceService {
 
@@ -202,10 +197,10 @@ public interface IResourceService {
     List<SessionDTO> getSummary(Long contentId);
 
     List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid);
-    
-    List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
-	    String sortBy, String sortOrder, String searchString);
-    
+
+    List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+
     int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString);
 
     /**
@@ -213,22 +208,9 @@ public interface IResourceService {
      * 
      * @param itemUid
      * @param visible
-     *                true, item is visible. False, item is invisible.
+     *            true, item is visible. False, item is invisible.
      */
     void setItemVisible(Long itemUid, boolean visible);
-
-    /**
-     * Get resource item <code>ResourceItemDTO</code> list according to sessionId and skipHide flag.
-     * 
-     * @param sessionId
-     * @param skipHide
-     *                true, don't get resource item if its <code>isHide</code> flag is true. Otherwise, get all
-     *                resource item
-     * @return
-     */
-    List<ResourceItemDTO> exportBySessionId(Long sessionId, boolean skipHide);
-
-    List<List<ResourceItemDTO>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.
@@ -275,7 +257,7 @@ public interface IResourceService {
     ResourceUser getUser(Long uid);
 
     void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
      * 

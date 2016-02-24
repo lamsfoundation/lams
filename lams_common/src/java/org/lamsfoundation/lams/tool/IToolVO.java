@@ -27,58 +27,53 @@ import java.util.Date;
 
 public interface IToolVO {
 
-    public abstract String getAuthorUrl();
+    String getAuthorUrl();
 
-    public abstract void setAuthorUrl(String authorUrl);
+    void setAuthorUrl(String authorUrl);
 
-    public abstract String getHelpUrl();
+    String getHelpUrl();
 
-    public abstract void setHelpUrl(String helpUrl);
+    void setHelpUrl(String helpUrl);
 
-    public abstract Date getCreateDateTime();
+    Date getCreateDateTime();
 
-    public abstract void setCreateDateTime(Date createDateTime);
+    void setCreateDateTime(Date createDateTime);
 
-    public abstract long getDefaultToolContentId();
+    long getDefaultToolContentId();
 
-    public abstract void setDefaultToolContentId(long defaultToolContentId);
+    void setDefaultToolContentId(long defaultToolContentId);
 
-    public abstract String getDescription();
+    String getDescription();
 
-    public abstract String getExportPortfolioClassUrl();
+    Integer getGroupingSupportTypeId();
 
-    public abstract String getExportPortfolioLearnerUrl();
+    String getLanguageFile();
 
-    public abstract Integer getGroupingSupportTypeId();
+    String getLearnerPreviewUrl();
 
-    public abstract String getLanguageFile();
+    String getLearnerProgressUrl();
 
-    public abstract String getLearnerPreviewUrl();
+    String getLearnerUrl();
 
-    public abstract String getLearnerProgressUrl();
+    String getMonitorUrl();
 
-    public abstract String getLearnerUrl();
+    String getServiceName();
 
-    public abstract String getMonitorUrl();
+    boolean isSupportsGrouping();
 
-    public abstract String getServiceName();
+    String getToolDisplayName();
 
-    public abstract boolean isSupportsGrouping();
+    Long getToolId();
 
-    public abstract String getToolDisplayName();
+    String getToolIdentifier();
 
-    public abstract Long getToolId();
+    String getToolSignature();
 
-    public abstract String getToolIdentifier();
+    String getToolVersion();
 
-    public abstract String getToolSignature();
+    boolean isValid();
 
-    public abstract String getToolVersion();
+    boolean isSupportsOutputs();
 
-    public abstract boolean isValid();
-
-    public abstract boolean isSupportsOutputs();
-
-    public abstract String getExtLmsId();
-
+    String getExtLmsId();
 }

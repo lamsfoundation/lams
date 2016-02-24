@@ -65,11 +65,8 @@ import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
-import org.lamsfoundation.lams.tool.taskList.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
-import org.lamsfoundation.lams.tool.taskList.dto.TaskListItemVisitLogSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListCondition;
@@ -347,91 +344,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	return summaryList;
     }
 
-    /*
-     * Return task summary for the specified TaskListItem. Used in monitoring.
-     * 
-     * @param contentId
-     *            toolContenId
-     * @param item
-     *            specified TaskListItem
-     * @return
-     */
-    private ItemSummary exportItem(Long contentId, TaskListItem item) {
-
-	ItemSummary itemSummary = new ItemSummary();
-	itemSummary.setTaskListItem(item);
-	List<GroupSummary> groupSummaries = itemSummary.getGroupSummaries();
-
-	// create sessionList depending on if item created be author or created during learning
-	List<TaskListSession> sessionList = new ArrayList<TaskListSession>();
-	if (item.isCreateByAuthor()) {
-	    sessionList = taskListSessionDao.getByContentId(contentId);
-	} else {
-	    TaskListSession userSession = item.getCreateBy().getSession();
-	    sessionList.add(userSession);
-	}
-
-	// create the user list of all whom were started this task
-	for (TaskListSession session : sessionList) {
-
-	    GroupSummary groupSummary = new GroupSummary();
-	    groupSummary.setSessionName(session.getSessionName());
-
-	    List<TaskListUser> usersBelongToGroup = taskListUserDao.getBySessionID(session.getSessionId());
-	    for (TaskListUser user : usersBelongToGroup) {
-
-		TaskListItemVisitLogSummary taskListItemVisitLogSummary = new TaskListItemVisitLogSummary();
-		taskListItemVisitLogSummary.setUser(user);
-
-		TaskListItemVisitLog visitLog = taskListItemVisitDao.getTaskListItemLog(item.getUid(),
-			user.getUserId());
-		// If TaskListItemVisitLog exists then fill up taskSummaryItem otherwise put false in a completed field
-		if (visitLog != null) {
-		    taskListItemVisitLogSummary.setCompleted(visitLog.isComplete());
-		    if (visitLog.isComplete()) {
-			taskListItemVisitLogSummary.setDate(visitLog.getAccessDate());
-		    }
-
-		    // fill up with comments and attachments made by this user
-		    Set<TaskListItemComment> itemComments = item.getComments();
-		    for (TaskListItemComment comment : itemComments) {
-			if (user.getUserId().equals(comment.getCreateBy().getUserId())) {
-			    taskListItemVisitLogSummary.getComments().add(comment);
-			}
-		    }
-
-		    Set<TaskListItemAttachment> itemAttachments = item.getAttachments();
-		    for (TaskListItemAttachment attachment : itemAttachments) {
-			if (user.getUserId().equals(attachment.getCreateBy().getUserId())) {
-			    taskListItemVisitLogSummary.getAttachments().add(attachment);
-			}
-		    }
-		} else {
-		    taskListItemVisitLogSummary.setCompleted(false);
-		}
-
-		// fill up all itemSummaries with reflection information
-		NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			TaskListConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		ReflectDTO reflectDTO = new ReflectDTO(user);
-		if (notebookEntry == null) {
-		    reflectDTO.setFinishReflection(false);
-		    reflectDTO.setReflect(null);
-		} else {
-		    reflectDTO.setFinishReflection(true);
-		    reflectDTO.setReflect(notebookEntry.getEntry());
-		}
-		reflectDTO.setReflectInstructions(session.getTaskList().getReflectInstructions());
-		taskListItemVisitLogSummary.setReflectDTO(reflectDTO);
-
-		groupSummary.getTaskListItemVisitLogSummaries().add(taskListItemVisitLogSummary);
-	    }
-	    groupSummaries.add(groupSummary);
-	}
-
-	return itemSummary;
-    }
-
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer userId) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -468,67 +380,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
 
 	return reflectList;
-    }
-
-    @Override
-    public List<ItemSummary> exportForTeacher(Long contentId) {
-	TaskList taskList = taskListDao.getByContentId(contentId);
-	ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
-	itemList.addAll(taskList.getTaskListItems());
-
-	// retrieve all the sessions associated with this taskList
-	List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-	// create the list containing all taskListItems
-	for (TaskListSession session : sessionList) {
-	    Set<TaskListItem> newItems = session.getTaskListItems();
-	    for (TaskListItem item : newItems) {
-		if (!itemList.contains(item)) {
-		    itemList.add(item);
-		}
-	    }
-	}
-
-	List<ItemSummary> itemSummaries = new ArrayList<ItemSummary>();
-	for (TaskListItem item : itemList) {
-	    itemSummaries.add(exportItem(contentId, item));
-	}
-
-	return itemSummaries;
-    }
-
-    @Override
-    public List<ItemSummary> exportForLearner(Long sessionId, TaskListUser learner) {
-	Long contentId = getTaskListBySessionId(sessionId).getContentId();
-
-	TaskList taskList = taskListDao.getByContentId(contentId);
-	List<TaskListItem> itemList = getItemListForGroup(contentId, sessionId);
-
-	List<ItemSummary> itemSummaries = new ArrayList<ItemSummary>();
-	for (TaskListItem item : itemList) {
-	    itemSummaries.add(exportItem(contentId, item));
-	}
-
-	// get rid of information that doesn't belong to the current user
-	for (ItemSummary itemSummary : itemSummaries) {
-
-	    // get rid of groups that user doesn't belong to
-	    GroupSummary newGroupSummary = new GroupSummary();
-	    for (GroupSummary groupSummary : itemSummary.getGroupSummaries()) {
-
-		for (TaskListItemVisitLogSummary taskListItemVisitLogSummary : groupSummary
-			.getTaskListItemVisitLogSummaries()) {
-		    if (learner.equals(taskListItemVisitLogSummary.getUser())) {
-			newGroupSummary.setSessionName(groupSummary.getSessionName());
-			newGroupSummary.getTaskListItemVisitLogSummaries().add(taskListItemVisitLogSummary);
-		    }
-		}
-	    }
-	    itemSummary.getGroupSummaries().clear();
-	    itemSummary.getGroupSummaries().add(newGroupSummary);
-
-	}
-
-	return itemSummaries;
     }
 
     @Override

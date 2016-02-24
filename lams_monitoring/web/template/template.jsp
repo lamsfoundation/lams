@@ -30,21 +30,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
     <lams:head>
-       
-		<%-- if localFiles == true then wanted for export portfolio and must run offline. Gates put the value in the form, branching in the request --%>
-		<c:choose>
-		<c:when test="${not empty GateForm and GateForm.map.localFiles == true}">
-			<lams:css localLinkPath="../"/>
-		</c:when>
-		<c:when test="${localFiles}">
-			<lams:css localLinkPath="../"/>
-		</c:when>
-		<c:otherwise>
-			<lams:css/>
-		</c:otherwise>
-		</c:choose>       
-       
-	  <fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
+		<lams:css/>
+		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
     </lams:head>
     
     <body class="stripes">

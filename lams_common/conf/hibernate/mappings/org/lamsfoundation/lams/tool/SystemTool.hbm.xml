@@ -125,36 +125,6 @@
 				length="19" not-null="true"
 			</meta>
 	</property>
-
-    <property
-        name="exportPortfolioLearnerUrl"
-        type="java.lang.String"
-        column="export_pfolio_learner_url"
-        not-null="true"
-        length="65535"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="export_pfolio_learner_url"
-            length="65535"
-            not-null="false"
-        </meta>    
-    </property>
-    
-    <property
-        name="exportPortfolioClassUrl"
-        type="java.lang.String"
-        column="export_pfolio_class_url"
-        not-null="true"
-        length="65535"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="export_pfolio_class_url"
-            length="65535"
-            not-null="false"
-        </meta>    
-    </property>
  
     <property
         name="monitorUrl"

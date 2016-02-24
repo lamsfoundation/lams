@@ -97,18 +97,11 @@
 	<div id="controlFrame" class="ui-layout-west">
 		<table id="logoTable" class="progressStaticHeight" cellspacing="0">
 			<tr>
-				<td rowspan="2">
+				<td>
 					<img id="logoImage" src="<lams:LAMSURL />images/css/lams_logo.gif" />
 				</td>
 				<td id="exitButtonCell">
 					<input name="exitButton" onClick="javascript:closeWindow()" type="button" class="button progressButton" value='<fmt:message key="button.exit" />' />
-				</td>
-			</tr>
-			<tr>
-				<td id="exportButtonCell">
-					<c:if test="${portfolioEnabled}">
-						<input onClick="javascript:exportPortfolio()" type="button" class="button progressButton" value='<fmt:message key="button.export" />' />
-					</c:if>
 				</td>
 			</tr>
 		</table>

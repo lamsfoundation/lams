@@ -165,7 +165,6 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(TIMEZONE);
 	request.getSession().removeAttribute(MODE);
 	request.getSession().removeAttribute(LEARNING_MODE);
-	request.getSession().removeAttribute(EXPORT_USER_ID);
 	request.getSession().removeAttribute(MAP_INCORRECT_FEEDBACK);
 	request.getSession().removeAttribute(MAP_CORRECT_FEEDBACK);
 	request.getSession().removeAttribute(MAP_INCORRECT_FEEDBACK_LEARNER);

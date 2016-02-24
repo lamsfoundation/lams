@@ -48,77 +48,63 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
  */
 public class Summary {
 
-	private Long sessionId;
-	private String sessionName;
-	private Spreadsheet spreadsheet;
-    private List<SpreadsheetUser> users; 	
-    
-	//used for export purposes
-	private List<ReflectDTO> reflectDTOList;
-	
-	public Summary(){
-		this.reflectDTOList = new ArrayList<ReflectDTO>();
-	}
-	/**
-	 * Contruction method for monitoring summary function. 
-	 * 
-	 * <B>Don't not set isInitGroup and viewNumber fields</B>
-	 * @param sessionName
-	 * @param item
-	 * @param isInitGroup
-	 */
-	public Summary(SpreadsheetSession session, Spreadsheet spreadsheet, List<SpreadsheetUser> users){
-		this.sessionId = session.getSessionId();
-		this.sessionName = session.getSessionName();
-		this.spreadsheet = spreadsheet;
-		if (users != null) {
-			this.users = users;
-		} else {
-			this.users = new ArrayList<SpreadsheetUser>();
-		}
-		
-		this.reflectDTOList = new ArrayList<ReflectDTO>();
-	}
+    private Long sessionId;
+    private String sessionName;
+    private Spreadsheet spreadsheet;
+    private List<SpreadsheetUser> users;
 
-	public Long getSessionId() {
-		return sessionId;
+    public Summary() {
+    }
+
+    /**
+     * Contruction method for monitoring summary function.
+     * 
+     * <B>Don't not set isInitGroup and viewNumber fields</B>
+     * 
+     * @param sessionName
+     * @param item
+     * @param isInitGroup
+     */
+    public Summary(SpreadsheetSession session, Spreadsheet spreadsheet, List<SpreadsheetUser> users) {
+	this.sessionId = session.getSessionId();
+	this.sessionName = session.getSessionName();
+	this.spreadsheet = spreadsheet;
+	if (users != null) {
+	    this.users = users;
+	} else {
+	    this.users = new ArrayList<SpreadsheetUser>();
 	}
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
-	}
-	public String getSessionName() {
-		return sessionName;
-	}
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
-	public Spreadsheet getSpreadsheet() {
-		return spreadsheet;
-	}
-	public void setSpreadsheet(Spreadsheet spreadsheet) {
-		this.spreadsheet = spreadsheet;
-	}
-	public List<SpreadsheetUser> getUsers() {
-		return users;
-	}
-	public void setUsers(List<SpreadsheetUser> users) {
-		this.users = users;
-	}
-	
-	/**
-	 * Returns ReflectDTO.
-	 * 
-	 * @return ReflectDTO
-	 */
-	public List<ReflectDTO> getReflectDTOList() {
-		return reflectDTOList;
-	}
-	/**
-	 * Sets ReflectDTO.
-	 * 
-	 * @param reflectDTO ReflectDTO
-	 */
-	public void setReflectDTOList(List<ReflectDTO> reflectDTOList) {
-		this.reflectDTOList = reflectDTOList;
-	}
+    }
+
+    public Long getSessionId() {
+	return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+	this.sessionId = sessionId;
+    }
+
+    public String getSessionName() {
+	return sessionName;
+    }
+
+    public void setSessionName(String sessionName) {
+	this.sessionName = sessionName;
+    }
+
+    public Spreadsheet getSpreadsheet() {
+	return spreadsheet;
+    }
+
+    public void setSpreadsheet(Spreadsheet spreadsheet) {
+	this.spreadsheet = spreadsheet;
+    }
+
+    public List<SpreadsheetUser> getUsers() {
+	return users;
+    }
+
+    public void setUsers(List<SpreadsheetUser> users) {
+	this.users = users;
+    }
 }

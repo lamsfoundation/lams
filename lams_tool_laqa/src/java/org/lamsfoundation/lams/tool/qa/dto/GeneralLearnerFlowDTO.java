@@ -96,17 +96,14 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected Map<Integer, QaQuestionDTO> mapQuestionContentLearner;
 
-    //only for export now
-    protected List listMonitoredAnswersContainerDTO;
-    
     protected Set<QaQueContent> questions;
-    
+
     protected List<QaUsrResp> userResponses;
 
     protected String initialScreen;
 
     protected String lockWhenFinished;
-    
+
     protected boolean noReeditAllowed;
 
     protected String userUid;
@@ -243,15 +240,18 @@ public class GeneralLearnerFlowDTO implements Comparable {
 	this.questionListingMode = questionListingMode;
     }
 
+    @Override
     public int compareTo(Object o) {
 	GeneralLearnerFlowDTO gneralLearnerFlowDTO = (GeneralLearnerFlowDTO) o;
 
-	if (gneralLearnerFlowDTO == null)
+	if (gneralLearnerFlowDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return 0;
+	}
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("remainingQuestionCount: ", remainingQuestionCount)
 		.append("totalQuestionCount : ", totalQuestionCount)
@@ -259,14 +259,12 @@ public class GeneralLearnerFlowDTO implements Comparable {
 		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle)
 		.append("countSessionComplete: ", countSessionComplete).append("toolSessionID: ", toolSessionID)
 		.append("currentQuestionIndex: ", currentQuestionIndex)
-		.append("questionListingMode: ", questionListingMode)
-		.append("reportTitleLearner: ", reportTitleLearner).append("userNameVisible: ", userNameVisible)
-		.append("requestLearningReport: ", requestLearningReport)
+		.append("questionListingMode: ", questionListingMode).append("reportTitleLearner: ", reportTitleLearner)
+		.append("userNameVisible: ", userNameVisible).append("requestLearningReport: ", requestLearningReport)
 		.append("requestLearningReportProgress: ", requestLearningReportProgress)
 		.append("requestLearningReportViewOnly: ", requestLearningReportViewOnly)
 		.append("mapAnswers: ", mapAnswers).append("mapQuestions: ", mapQuestions)
-		.append("mapQuestionContentLearner: ", mapQuestionContentLearner)
-		.append("listMonitoredAnswersContainerDTO: ", listMonitoredAnswersContainerDTO).toString();
+		.append("mapQuestionContentLearner: ", mapQuestionContentLearner).toString();
     }
 
     /**
@@ -465,21 +463,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the listMonitoredAnswersContainerDTO.
-     */
-    public List getListMonitoredAnswersContainerDTO() {
-	return listMonitoredAnswersContainerDTO;
-    }
-
-    /**
-     * @param listMonitoredAnswersContainerDTO
-     *            The listMonitoredAnswersContainerDTO to set.
-     */
-    public void setListMonitoredAnswersContainerDTO(List listMonitoredAnswersContainerDTO) {
-	this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
-    }
-    
-    /**
      * @return Returns the questions.
      */
     public List<QaUsrResp> getUserResponses() {
@@ -493,7 +476,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     public void setUserResponses(List<QaUsrResp> userResponses) {
 	this.userResponses = userResponses;
     }
-    
+
     /**
      * @return Returns the questions.
      */
@@ -658,7 +641,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     public void setLockWhenFinished(String lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
     }
-    
+
     /**
      * @return Returns the noReeditAllowed.
      */

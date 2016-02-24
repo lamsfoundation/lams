@@ -451,51 +451,54 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     }
 
     @Override
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, 
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
-	return dacoUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, 
-		getNotebookEntries, coreNotebookService);
+	return dacoUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
+		coreNotebookService);
     }
 
-    public int getCountUsersBySession(final Long sessionId, String searchString) { 
-	return dacoUserDao.getCountUsersBySession( sessionId, searchString);
+    @Override
+    public int getCountUsersBySession(final Long sessionId, String searchString) {
+	return dacoUserDao.getCountUsersBySession(sessionId, searchString);
     }
 
+    @Override
     public List<MonitoringSummarySessionDTO> getSessionStatistics(Long toolContentUid) {
-	return dacoSessionDao.statistics(toolContentUid);	
+	return dacoSessionDao.statistics(toolContentUid);
     }
-    
-    public MonitoringSummarySessionDTO getAnswersAsRecords(final Long sessionId, final Long userId, int sorting)
-    {
+
+    @Override
+    public MonitoringSummarySessionDTO getAnswersAsRecords(final Long sessionId, final Long userId, int sorting) {
 	DacoSession session = dacoSessionDao.getSessionBySessionId(sessionId);
-	MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(),  session.getSessionName());
-	
+	MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(),
+		session.getSessionName());
+
 	List<MonitoringSummaryUserDTO> monitoringUsers = new ArrayList<MonitoringSummaryUserDTO>();
-	if ( userId == null ) {
+	if (userId == null) {
 	    List<DacoUser> users = dacoUserDao.getBySessionId(sessionId, sorting);
-	    for ( DacoUser user : users ) {
-		monitoringUsers.add(getAnswersAsRecordsForUser(user));	    
+	    for (DacoUser user : users) {
+		monitoringUsers.add(getAnswersAsRecordsForUser(user));
 	    }
 	} else {
 	    monitoringUsers.add(getAnswersAsRecordsForUser(getUserByUserIdAndSessionId(userId, sessionId)));
 	}
-	
+
 	monitoringRecordList.setUsers(monitoringUsers);
 	return monitoringRecordList;
     }
-    
+
     // called by getAnswersAsRecords
     private MonitoringSummaryUserDTO getAnswersAsRecordsForUser(DacoUser user) {
 	MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(),
-		user.getUserId().intValue(), user.getFullName(),
-		user.getLoginName());
+		user.getUserId().intValue(), user.getFullName(), user.getLoginName());
 	List<List<DacoAnswer>> records = getDacoAnswersByUser(user);
 	monitoringUser.setRecords(records);
 	monitoringUser.setRecordCount(records.size());
 	return monitoringUser;
     }
-    
-    public List<MonitoringSummarySessionDTO> getExportPortfolioSummary(Long contentId, Long userUid) {
+
+    @Override
+    public List<MonitoringSummarySessionDTO> getSummaryForExport(Long contentId, Long userUid) {
 	List<DacoSession> sessions = dacoSessionDao.getByContentId(contentId);
 	List<MonitoringSummarySessionDTO> result = new ArrayList<MonitoringSummarySessionDTO>(sessions.size());
 	Daco daco = getDacoByContentId(contentId);
@@ -507,8 +510,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    List<MonitoringSummaryUserDTO> monitoringUsers = new ArrayList<MonitoringSummaryUserDTO>(users.size());
 	    for (DacoUser user : users) {
 		MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(),
-			user.getUserId().intValue(), user.getFullName(),
-			user.getLoginName());
+			user.getUserId().intValue(), user.getFullName(), user.getLoginName());
 		List<List<DacoAnswer>> records = getDacoAnswersByUser(user);
 		/*
 		 * If the user provided as "userUid" matches current user UID, the summary is filled with additional

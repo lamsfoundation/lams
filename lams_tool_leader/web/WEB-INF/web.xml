@@ -114,11 +114,6 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<servlet>
-		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.leaderselection.web.servlets.ExportServlet</servlet-class>
-	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>
@@ -128,11 +123,6 @@
 	<servlet-mapping>
 		<servlet-name>Connector</servlet-name>
 		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>exportPortfolio</servlet-name>
-		<url-pattern>/exportPortfolio</url-pattern>
 	</servlet-mapping>
 
 	<error-page>

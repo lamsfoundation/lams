@@ -92,12 +92,6 @@
 	</filter-mapping>
 
 	<servlet>
-		<servlet-name>groupingExportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.learning.web.action.GroupingExportPortfolioServlet</servlet-class>
-
-	</servlet>
-
-	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
 		<init-param>
@@ -119,39 +113,11 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<servlet>
-		<description>Export Portfolio</description>
-		<display-name>Export Portfolio</display-name>
-		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.MainExportServlet</servlet-class>
-	</servlet>
-	<servlet>
-		<description>Export Portfolio Download Page</description>
-		<display-name>Export Portfolio Download</display-name>
-		<servlet-name>exportDownload</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
-	</servlet>
-
 	<!-- Optional Module Placeholder - do not remove -->
 
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>exportPortfolio</servlet-name>
-		<url-pattern>/portfolioExport</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>exportDownload</servlet-name>
-		<url-pattern>/exportDownload</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>groupingExportPortfolio</servlet-name>
-		<url-pattern>/groupingExportPortfolio</url-pattern>
 	</servlet-mapping>
 	
 	<session-config>

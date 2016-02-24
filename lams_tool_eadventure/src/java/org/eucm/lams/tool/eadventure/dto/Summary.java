@@ -24,21 +24,22 @@
 /* $Id$ */
 package org.eucm.lams.tool.eadventure.dto;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 
 import org.eucm.lams.tool.eadventure.model.Eadventure;
 import org.eucm.lams.tool.eadventure.model.EadventureUser;
-import org.eucm.lams.tool.eadventure.util.EadventureWebUtils;
 
 /**
  * List contains following element: <br>
  * 
- * <li>session_id</li> <li>session_name</li> <li>EadventureItem.uid</li> <li>
- * EadventureItem.item_type</li> <li>EadventureItem.create_by_author</li> <li>
- * EadventureItem.is_hide</li> <li>EadventureItem.title</li> <li>User.login_name</li>
+ * <li>session_id</li>
+ * <li>session_name</li>
+ * <li>EadventureItem.uid</li>
+ * <li>EadventureItem.item_type</li>
+ * <li>EadventureItem.create_by_author</li>
+ * <li>EadventureItem.is_hide</li>
+ * <li>EadventureItem.title</li>
+ * <li>User.login_name</li>
  * <li>count(eadventure_item_uid)</li>
  * 
  * @author Steve.Ni
@@ -60,18 +61,11 @@ public class Summary {
     //TODO ver que pasa con itemHide
     private boolean itemHide;
     private String itemTitle;
-   //TODO ver que pasa con item instructions
-  //  private List<String> itemInstructions = new ArrayList<String>();
+    //TODO ver que pasa con item instructions
+    //  private List<String> itemInstructions = new ArrayList<String>();
     private String username;
     //TODO Cuidado, = viewNumber y numberOfLearners....
     private int viewNumber;
-
-    // following is used for export portfolio programs:
-    private String url;
-    private Long fileUuid;
-    private Long fileVersionId;
-    private String fileName;
-    private String attachmentLocalUrl;
 
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
@@ -88,56 +82,17 @@ public class Summary {
      * @param item
      * @param isInitGroup
      */
-   public Summary(Long sessionId, String sessionName, Eadventure ead) {
+    public Summary(Long sessionId, String sessionName, Eadventure ead) {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
 	if (ead != null) {
 	    this.eadventureUid = ead.getUid();
-	    //this.itemType = ead.getType();
-	   // this.itemCreateByAuthor = ead.isCreatedByAuthor();
-	   
-	    //TODO ver que pasa con hide
-	    // this.itemHide = ead.isHide();
 	    this.itemTitle = ead.getTitle();
 	    this.username = ead.getCreatedBy() == null ? "" : ead.getCreatedBy().getLoginName();
-	  //  this.url = ead.protocol(ead.getUrl());
-	    this.fileName = ead.getFileName();
-	    this.fileUuid = ead.getFileUuid();
-	    this.fileVersionId = ead.getFileVersionId();
-	} else
+	} else {
 	    this.eadventureUid = new Long(-1);
+	}
     }
-
-    /**
-     * Contruction method for export profolio function.
-     * 
-     * <B>Don't not set sessionId and viewNumber fields</B>
-     * 
-     * @param sessionName
-     * @param item
-     * @param isInitGroup
-     */
-   public Summary(Long sessionId, String sessionName, Eadventure ead, boolean isInitGroup) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
-	if (ead != null) {
-	    this.eadventureUid = ead.getUid();
-	    //TODO ver que pasa con HIDE
-	    //this.itemHide = ead.isHide();
-	    this.itemTitle = ead.getTitle();
-	    this.username = ead.getCreatedBy() == null ? "" : ead.getCreatedBy().getLoginName();
-	   // this.url = EadventureWebUtils.protocol(item.getUrl());
-	    this.fileName = ead.getFileName();
-	    this.fileUuid = ead.getFileUuid();
-	    this.fileVersionId = ead.getFileVersionId();
-
-	    
-	} else
-	    this.eadventureUid = new Long(-1);
-	//this.isInitGroup = isInitGroup;
-    }
-
-   
 
     public boolean isItemHide() {
 	return itemHide;
@@ -154,8 +109,6 @@ public class Summary {
     public void setItemTitle(String itemTitle) {
 	this.itemTitle = itemTitle;
     }
-
-   
 
     public Long getItemUid() {
 	return eadventureUid;
@@ -189,32 +142,6 @@ public class Summary {
 	this.username = username;
     }
 
-   
-
-    public Long getFileUuid() {
-	return fileUuid;
-    }
-
-    public void setFileUuid(Long fileUuid) {
-	this.fileUuid = fileUuid;
-    }
-
-    public Long getFileVersionId() {
-	return fileVersionId;
-    }
-
-    public void setFileVersionId(Long fileVersionId) {
-	this.fileVersionId = fileVersionId;
-    }
-
-    public String getUrl() {
-	return url;
-    }
-
-    public void setUrl(String url) {
-	this.url = url;
-    }
-
     public boolean isInitGroup() {
 	return isInitGroup;
     }
@@ -223,70 +150,52 @@ public class Summary {
 	this.isInitGroup = isInitGroup;
     }
 
-    public String getAttachmentLocalUrl() {
-	return attachmentLocalUrl;
-    }
-
-    public void setAttachmentLocalUrl(String attachmentLocalUrl) {
-	this.attachmentLocalUrl = attachmentLocalUrl;
-    }
-
-    public String getFileName() {
-	return fileName;
-    }
-
-    public void setFileName(String fileName) {
-	this.fileName = fileName;
-    }
-
     public int getViewNumber() {
-        return viewNumber;
+	return viewNumber;
     }
 
     public void setViewNumber(int viewNumber) {
-        this.viewNumber = viewNumber;
+	this.viewNumber = viewNumber;
     }
 
     public boolean[] getExistList() {
-        return existList;
+	return existList;
     }
 
     public void setExistList(boolean[] existList) {
-        this.existList = existList;
+	this.existList = existList;
     }
 
     public List<EadventureUser> getUsers() {
-        return users;
+	return users;
     }
 
     public void setUsers(List<EadventureUser> users) {
-        this.users = users;
+	this.users = users;
     }
 
     public int getNumberOfLearners() {
-        return numberOfLearners;
+	return numberOfLearners;
     }
 
     public void setNumberOfLearners(int numberOfLearners) {
-        this.numberOfLearners = numberOfLearners;
+	this.numberOfLearners = numberOfLearners;
     }
 
     public int getNumberOfFinishedLearners() {
-        return numberOfFinishedLearners;
+	return numberOfFinishedLearners;
     }
 
     public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
-        this.numberOfFinishedLearners = numberOfFinishedLearners;
+	this.numberOfFinishedLearners = numberOfFinishedLearners;
     }
 
     public String[] getReportList() {
-        return reportList;
+	return reportList;
     }
 
     public void setReportList(String[] reportList) {
-        this.reportList = reportList;
+	this.reportList = reportList;
     }
-
-    
 
 }

@@ -16,15 +16,7 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<!-- ********************  CSS ********************** -->
-<c:choose>
-	<c:when test="${not empty localLinkPath}">
-		<lams:css localLinkPath="${localLinkPath}" style="main"/>
-	</c:when>
-	<c:otherwise>
-		<lams:css style="main"/>
-	</c:otherwise>
-</c:choose>
+<lams:css style="main"/>
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

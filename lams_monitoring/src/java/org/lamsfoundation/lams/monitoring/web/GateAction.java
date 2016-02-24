@@ -81,9 +81,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action-forward name="viewSynchGate" path=".viewSynchGate"
  * @struts:action-forward name="viewPermissionGate" path=".viewPermissionGate"
  * @struts:action-forward name="viewScheduleGate" path=".viewScheduleGate"
- * @struts:action-forward name="viewConditionGate" path=".viewConditionGate" ----------------XDoclet
- *                        Tags--------------------
- * 
+ * @struts:action-forward name="viewConditionGate" path=".viewConditionGate"
  */
 public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
@@ -105,8 +103,6 @@ public class GateAction extends LamsDispatchAction {
     // Gate Form fields
     private static final String ACTIVITY_FORM_FIELD = "activityId";
     private static final String TOTAL_LEARNERS_FORM_FIELD = "totalLearners";
-    public static final String READ_ONLY = "readOnly";
-    public static final String LOCAL_FILES = "localFiles";
     private static final String USER_ID = "userId";
 
     // ---------------------------------------------------------------------
@@ -164,7 +160,6 @@ public class GateAction extends LamsDispatchAction {
 	}
 
 	gateForm.set(GateAction.ACTIVITY_FORM_FIELD, gateIdLong);
-	gateForm.set(GateAction.LOCAL_FILES, Boolean.FALSE);
 
 	return findViewByGateType(mapping, gateForm, gate);
     }
@@ -226,18 +221,6 @@ public class GateAction extends LamsDispatchAction {
 	return findViewByGateType(mapping, gateForm, gate);
     }
 
-    /**
-     * Export Portfolio Page
-     */
-    public ActionForward exportPortfolio(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	DynaActionForm gateForm = (DynaActionForm) form;
-	ActionForward forward = viewGate(mapping, form, request, response);
-	gateForm.set(GateAction.READ_ONLY, Boolean.TRUE);
-	gateForm.set(GateAction.LOCAL_FILES, Boolean.TRUE);
-	return forward;
-    }
-
     // ---------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------
@@ -258,7 +241,6 @@ public class GateAction extends LamsDispatchAction {
 	lessonService = MonitoringServiceProxy.getLessonService(getServlet().getServletContext());
 
 	// reset all the other fields, so that the following code only has to set up its own values (LDEV-1237)
-	gateForm.set(GateAction.READ_ONLY, Boolean.FALSE);
 	gateForm.set("gate", null);
 	gateForm.set("waitingLearnerList", null);
 	gateForm.set("allowedToPassLearnerList", null);

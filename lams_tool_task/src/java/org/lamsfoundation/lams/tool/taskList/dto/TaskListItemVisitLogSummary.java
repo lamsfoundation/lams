@@ -18,10 +18,10 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.taskList.dto;  
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.taskList.dto;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,134 +32,121 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 
 /**
- * DTO object which is used in a task summary page in monitoring. Contains
- * partial information for <code>TaskSummary</code> object specific for
- * current user and <code>TaskLIstItem</code> object.
+ * DTO object which is used in a task summary page in monitoring. Contains partial information for
+ * <code>TaskSummary</code> object specific for current user and <code>TaskLIstItem</code> object.
  * 
  * @author Andrey Balan
  */
 public class TaskListItemVisitLogSummary {
-	
-	private TaskListUser user;
-	private boolean completed;
-	private Date date;
-	
-	private List<TaskListItemComment> comments;
-	private List<TaskListItemAttachment> attachments;
-	
-	//using only during export
-	private ReflectDTO reflectDTO;
-	
-	public TaskListItemVisitLogSummary() {
-		comments = new ArrayList<TaskListItemComment>();
-		attachments = new ArrayList<TaskListItemAttachment>();
-	}
-	
-	//  **********************************************************
-  	//		Get/Set methods
-	//  **********************************************************
-	
-	/**
-	 * Returns user whom created this TaskListItem.
-	 * 
-	 * @return user whom created this TaskListItem
-	 */
-	public TaskListUser getUser() {
-		return user;
-	}
-	/**
-	 * Returns user whom created this TaskListItem.
-	 * 
-	 * @param user user whom created this TaskListItem
-	 */
-	public void setUser(TaskListUser user) {
-		this.user = user;
-	}
-	
-	/**
-	 * Returns whether this TaskListItem was completed.
-	 * 
-	 * @return boolean showing whether this TaskListItem was completed or not
-	 */
-	public boolean getCompleted() {
-		return completed;
-	}
-	/**
-	 * Sets whether this TaskListItem was completed.
-	 * 
-	 * @param completed true if this TaskListItem was completed, false otherwise
-	 */
-	public void setCompleted(boolean completed) {
-		this.completed = completed;
-	}
-	
-	/**
-	 * Returns the date of the completion.
-	 * 
-	 * @return the date of the completion
-	 */
-	public Date getDate() {
-		return date;
-	}
-	/**
-	 * Sets the date of the completion.
-	 * 
-	 * @param date the date of the completion
-	 */
-	public void setDate(Date date) {
-		this.date = date;
-	}
-	
-	/**
-	 * Returns list of the comments done by this user for this particular TaskListItem.
-	 * 
-	 * @return list of the comments done by this user for this particular TaskListItem
-	 */
-	public List<TaskListItemComment> getComments() {
-		return comments;
-	}
-	/**
-	 * Sets list of the comments done by this user for this particular TaskListItem.
-	 * 
-	 * @param comments list of the comments done by this user for this particular TaskListItem
-	 */
-	public void setComments(List<TaskListItemComment> comments) {
-		this.comments = comments;
-	}
-	
-	/**
-	 * Returns list of the attachments uploaded by this user for this particular TaskListItem.
-	 * 
-	 * @return list of the attachments uploaded by this user for this particular TaskListItem
-	 */
-	public List<TaskListItemAttachment> getAttachments() {
-		return attachments;
-	}
-	/**
-	 * Sets list of the attachments uploaded by this user for this particular TaskListItem.
-	 * 
-	 * @param attachments list of the attachments uploaded by this user for this particular TaskListItem.
-	 */
-	public void setAttachments(List<TaskListItemAttachment> attachments) {
-		this.attachments = attachments;
-	}
-	
-	/**
-	 * Returns ReflectDTO.
-	 * 
-	 * @return ReflectDTO
-	 */
-	public ReflectDTO getReflectDTO() {
-		return reflectDTO;
-	}
-	/**
-	 * Sets ReflectDTO.
-	 * 
-	 * @param reflectDTO ReflectDTO
-	 */
-	public void setReflectDTO(ReflectDTO reflectDTO) {
-		this.reflectDTO = reflectDTO;
-	}
-	
+
+    private TaskListUser user;
+    private boolean completed;
+    private Date date;
+
+    private List<TaskListItemComment> comments;
+    private List<TaskListItemAttachment> attachments;
+
+    public TaskListItemVisitLogSummary() {
+	comments = new ArrayList<TaskListItemComment>();
+	attachments = new ArrayList<TaskListItemAttachment>();
+    }
+
+    //  **********************************************************
+    //		Get/Set methods
+    //  **********************************************************
+
+    /**
+     * Returns user whom created this TaskListItem.
+     * 
+     * @return user whom created this TaskListItem
+     */
+    public TaskListUser getUser() {
+	return user;
+    }
+
+    /**
+     * Returns user whom created this TaskListItem.
+     * 
+     * @param user
+     *            user whom created this TaskListItem
+     */
+    public void setUser(TaskListUser user) {
+	this.user = user;
+    }
+
+    /**
+     * Returns whether this TaskListItem was completed.
+     * 
+     * @return boolean showing whether this TaskListItem was completed or not
+     */
+    public boolean getCompleted() {
+	return completed;
+    }
+
+    /**
+     * Sets whether this TaskListItem was completed.
+     * 
+     * @param completed
+     *            true if this TaskListItem was completed, false otherwise
+     */
+    public void setCompleted(boolean completed) {
+	this.completed = completed;
+    }
+
+    /**
+     * Returns the date of the completion.
+     * 
+     * @return the date of the completion
+     */
+    public Date getDate() {
+	return date;
+    }
+
+    /**
+     * Sets the date of the completion.
+     * 
+     * @param date
+     *            the date of the completion
+     */
+    public void setDate(Date date) {
+	this.date = date;
+    }
+
+    /**
+     * Returns list of the comments done by this user for this particular TaskListItem.
+     * 
+     * @return list of the comments done by this user for this particular TaskListItem
+     */
+    public List<TaskListItemComment> getComments() {
+	return comments;
+    }
+
+    /**
+     * Sets list of the comments done by this user for this particular TaskListItem.
+     * 
+     * @param comments
+     *            list of the comments done by this user for this particular TaskListItem
+     */
+    public void setComments(List<TaskListItemComment> comments) {
+	this.comments = comments;
+    }
+
+    /**
+     * Returns list of the attachments uploaded by this user for this particular TaskListItem.
+     * 
+     * @return list of the attachments uploaded by this user for this particular TaskListItem
+     */
+    public List<TaskListItemAttachment> getAttachments() {
+	return attachments;
+    }
+
+    /**
+     * Sets list of the attachments uploaded by this user for this particular TaskListItem.
+     * 
+     * @param attachments
+     *            list of the attachments uploaded by this user for this particular TaskListItem.
+     */
+    public void setAttachments(List<TaskListItemAttachment> attachments) {
+	this.attachments = attachments;
+    }
 }
- 

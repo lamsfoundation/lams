@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @author Andrey Balan
  * 
- * Interface that defines the contract that all ShareCommonCartridge service provider must follow.
+ *         Interface that defines the contract that all ShareCommonCartridge service provider must follow.
  */
 public interface ICommonCartridgeService {
 
@@ -67,8 +67,8 @@ public interface ICommonCartridgeService {
     CommonCartridge getCommonCartridgeByContentId(Long contentId);
 
     /**
-     * Get a cloned copy of tool default tool content (CommonCartridge) and assign the toolContentId of that copy as the given
-     * <code>contentId</code>
+     * Get a cloned copy of tool default tool content (CommonCartridge) and assign the toolContentId of that copy as the
+     * given <code>contentId</code>
      * 
      * @param contentId
      * @return
@@ -77,7 +77,8 @@ public interface ICommonCartridgeService {
     CommonCartridge getDefaultContent(Long contentId) throws CommonCartridgeApplicationException;
 
     /**
-     * Get list of commonCartridge items by given commonCartridgeUid. These commonCartridge items must be created by author.
+     * Get list of commonCartridge items by given commonCartridgeUid. These commonCartridge items must be created by
+     * author.
      * 
      * @param commonCartridgeUid
      * @return
@@ -89,10 +90,11 @@ public interface ICommonCartridgeService {
      * 
      * @param item
      * @param file
-     * @return 
+     * @return
      * @throws UploadCommonCartridgeFileException
      */
-    List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file) throws UploadCommonCartridgeFileException;
+    List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file)
+	    throws UploadCommonCartridgeFileException;
 
     // ********** for user methods *************
     /**
@@ -208,22 +210,9 @@ public interface ICommonCartridgeService {
      * 
      * @param itemUid
      * @param visible
-     *                true, item is visible. False, item is invisible.
+     *            true, item is visible. False, item is invisible.
      */
     void setItemVisible(Long itemUid, boolean visible);
-
-    /**
-     * Get commonCartridge item <code>Summary</code> list according to sessionId and skipHide flag.
-     * 
-     * @param sessionId
-     * @param skipHide
-     *                true, don't get commonCartridge item if its <code>isHide</code> flag is true. Otherwise, get all
-     *                commonCartridge item
-     * @return
-     */
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-
-    public List<List<Summary>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.
@@ -270,7 +259,7 @@ public interface ICommonCartridgeService {
     CommonCartridgeUser getUser(Long uid);
 
     public IEventNotificationService getEventNotificationService();
-    
+
     /**
      * Get the CommonCartridge config item by key
      * 
@@ -284,15 +273,15 @@ public interface ICommonCartridgeService {
      * 
      * @param item
      */
-    public void saveOrUpdateConfigItem(CommonCartridgeConfigItem item); 
+    public void saveOrUpdateConfigItem(CommonCartridgeConfigItem item);
 
     /**
      * Gets a message from commonCartridge bundle. Same as <code><fmt:message></code> in JSP pages.
      * 
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
@@ -301,7 +290,7 @@ public interface ICommonCartridgeService {
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
      * 
      * @param sessionId
-     *                tool session ID
+     *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);

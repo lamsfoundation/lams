@@ -108,21 +108,6 @@ function initTabs(){
  * Sets up lesson tab.
  */
 function initLessonTab(){
-	// sets export portfolio availability
-	$('#exportAvailableField').change(function(){
-		var checked = $(this).is(':checked');
-		$.ajax({
-			dataType : 'xml',
-			url : LAMS_URL + 'monitoring/monitoring.do',
-			cache : false,
-			data : {
-				'method'    : 'learnerExportPortfolioAvailable',
-				'learnerExportPortfolio' : checked,
-				'lessonID'      : lessonId
-			}
-		});
-	});
-	
 	// sets presence availability
 	$('#presenceAvailableField').change(function(){
 		var checked = $(this).is(':checked');
@@ -1733,16 +1718,6 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 		// fill the placeholder, after all required variables were initialised
 		learnerProgressCellsTemplate =
 		  '<tr><td class="progressBarLabel" id="progressBarLabel;00;"><div>;11;</div>';
-		
-		if (enableExportPortfolio) {
-			learnerProgressCellsTemplate +=
-				'<a class="button" title="' 
-		+ LABELS.EXPORT_PORTFOLIO_LEARNER_TOOLTIP + '" href="#" onClick="javascript:openPopUp(\''
-		+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
-		+ lessonId + '&userID=;00;\',\'ExportPortfolio\',240,640,true)">'
-		+ LABELS.EXPORT_PORTFOLIO
-				+ '</a>';
-		}
 
 		learnerProgressCellsTemplate +=
 			'<a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'

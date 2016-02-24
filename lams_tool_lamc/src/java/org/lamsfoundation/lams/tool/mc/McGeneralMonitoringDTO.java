@@ -50,7 +50,6 @@ public class McGeneralMonitoringDTO implements Comparable {
     protected String defaultOptionContent;
     protected Integer countAllUsers;
     protected Integer countSessionComplete;
-    protected String isPortfolioExport;
     protected String groupName;
     protected String existsOpenMcs;
     protected String responseId;
@@ -73,7 +72,6 @@ public class McGeneralMonitoringDTO implements Comparable {
     protected List mapStudentsMcd;
 
     protected String contentFolderID;
-
 
     /**
      * @return Returns the userExceptionContentDoesNotExist.
@@ -253,21 +251,6 @@ public class McGeneralMonitoringDTO implements Comparable {
      */
     public void setCountSessionComplete(Integer countSessionComplete) {
 	this.countSessionComplete = countSessionComplete;
-    }
-
-    /**
-     * @return Returns the isPortfolioExport.
-     */
-    public String getIsPortfolioExport() {
-	return isPortfolioExport;
-    }
-
-    /**
-     * @param isPortfolioExport
-     *            The isPortfolioExport to set.
-     */
-    public void setIsPortfolioExport(String isPortfolioExport) {
-	this.isPortfolioExport = isPortfolioExport;
     }
 
     /**
@@ -510,13 +493,15 @@ public class McGeneralMonitoringDTO implements Comparable {
 	this.sessionUserCount = sessionUserCount;
     }
 
+    @Override
     public int compareTo(Object o) {
 	McGeneralMonitoringDTO mcGeneralMonitoringDTO = (McGeneralMonitoringDTO) o;
 
-	if (mcGeneralMonitoringDTO == null)
+	if (mcGeneralMonitoringDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return 0;
+	}
     }
 
     /**

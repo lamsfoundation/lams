@@ -1,12 +1,5 @@
 ﻿// ----- CONTROL FRAME & WINDOW MANIPULATION -----
 
-function exportPortfolio(){
-	openPopUp(APP_URL + "exportWaitingPage.jsp?mode=learner&lessonID=" + lessonId,
-			"ExportPortfolioLearner",
-			410,640,
-			"no");
-}
-
 function viewNotebookEntries(){
 	openPopUp(APP_URL + "notebook.do?method=viewAll&lessonID=" + lessonId,
 			"Notebook",

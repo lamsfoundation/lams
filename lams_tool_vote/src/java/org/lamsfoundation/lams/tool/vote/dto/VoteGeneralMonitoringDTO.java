@@ -42,11 +42,10 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     protected String activityInstructions;
     protected String countAllUsers;
     protected String countSessionComplete;
-    protected String isPortfolioExport;
     protected String responseId;
 
     protected String toolContentID;
-//    protected List listMonitoredAnswersContainerDto;
+    //    protected List listMonitoredAnswersContainerDto;
 
     protected List<SessionDTO> sessionDTOs;
     protected Map mapStandardNominationsContent;
@@ -211,36 +210,6 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     public void setCountSessionComplete(String countSessionComplete) {
 	this.countSessionComplete = countSessionComplete;
     }
-
-    /**
-     * @return Returns the isPortfolioExport.
-     */
-    public String getIsPortfolioExport() {
-	return isPortfolioExport;
-    }
-
-    /**
-     * @param isPortfolioExport
-     *            The isPortfolioExport to set.
-     */
-    public void setIsPortfolioExport(String isPortfolioExport) {
-	this.isPortfolioExport = isPortfolioExport;
-    }
-
-//    /**
-//     * @return Returns the listMonitoredAnswersContainerDto.
-//     */
-//    public List getListMonitoredAnswersContainerDto() {
-//	return listMonitoredAnswersContainerDto;
-//    }
-//
-//    /**
-//     * @param listMonitoredAnswersContainerDto
-//     *            The listMonitoredAnswersContainerDto to set.
-//     */
-//    public void setListMonitoredAnswersContainerDto(List listMonitoredAnswersContainerDto) {
-//	this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
-//    }
 
     /**
      * @return Returns the sessionDtos.
@@ -422,13 +391,15 @@ public class VoteGeneralMonitoringDTO implements Comparable {
 	this.sessionUserCount = sessionUserCount;
     }
 
+    @Override
     public int compareTo(Object o) {
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = (VoteGeneralMonitoringDTO) o;
 
-	if (voteGeneralMonitoringDTO == null)
+	if (voteGeneralMonitoringDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return 0;
+	}
     }
 
     /**

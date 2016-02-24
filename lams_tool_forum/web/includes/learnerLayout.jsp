@@ -11,14 +11,8 @@
 		<title><fmt:message key="activity.title" /></title>
 
 		<!-- ********************  CSS ********************** -->
-		<c:choose>
-			<c:when test="${not empty localLinkPath}">
-				<lams:css localLinkPath="${localLinkPath}" />
-			</c:when>
-			<c:otherwise>
-				<lams:css />
-			</c:otherwise>
-		</c:choose>
+
+		<lams:css />
 		<style media="screen,projection" type="text/css">
 			.info {
 				margin: 10px;

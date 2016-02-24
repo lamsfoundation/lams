@@ -55,7 +55,7 @@
 					authorWin = window.open('home.do?method=authorFlash','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 			} else {
 				if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('home.do?method=author') > -1) {
-					//authorWin.location = 'home.do?method=author';
+					// authorWin.location = 'home.do?method=author';
 					authorWin.focus();
 				} else {
 					authorWin = window.open('home.do?method=authorFlash','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
@@ -130,8 +130,8 @@
 		
 		/**
 		 * Method designed to open learner window from shortened LAMS learner
-		 * URLS like /lams/r/*. Works exactly the same as openLearner() method except it
-		 * opens slightly modified path "../home.do".
+		 * URLS like /lams/r/*. Works exactly the same as openLearner() method
+		 * except it opens slightly modified path "../home.do".
 		 */
 		function openLearnerShortenedUrl( lessonId ) {
 			if (isMac) {
@@ -142,19 +142,6 @@
 					learnWin.focus();
 				} else {
 					learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
-				}
-			}
-		}
-		
-		function openExportPortfolio( lessonId ) {
-			if (isMac) {
-				epWin = window.open('learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId,'epWindow','width=796,height=570,resizable,status=yes');
-			} else {
-				if (epWin && !epWin.closed ) {
-					epWin.location = 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId;		
-					ep.focus();
-				} else {
-					epWin = window.open('learning/exportWaitingPage.jsp?mode=learner&lessonID='+lessonId,'epWindow','width=796,height=570,resizable,status=yes');
 				}
 			}
 		}
@@ -267,4 +254,4 @@
 				gradebookMonLessonWin.focus();
 			}
 		}
-	//-->
+	// -->

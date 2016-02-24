@@ -203,9 +203,8 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     public ActionForward getToolOutputDefinitionsJSON(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
-	    JSONException {
-	String wddxPacket;
+	    HttpServletRequest request, HttpServletResponse response)
+		    throws ServletException, IOException, JSONException {
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolContentID = WebUtil.readLongParam(request, "toolContentID");
 	Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION;
@@ -366,8 +365,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	    flashMessage = new FlashMessage("getAvailableLicenses", licenses);
 	} catch (Exception e) {
 	    AuthoringAction.log.error("getAvailableLicenses: License details unavailable due to system error.", e);
-	    flashMessage = new FlashMessage("getAvailableLicenses", "License details unavailable due to system error :"
-		    + e.getMessage(), FlashMessage.ERROR);
+	    flashMessage = new FlashMessage("getAvailableLicenses",
+		    "License details unavailable due to system error :" + e.getMessage(), FlashMessage.ERROR);
 
 	    getAuditService().log(AuthoringAction.class.getName(), e.toString());
 	}
@@ -468,8 +467,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// get title from tool content
 	IToolVO tool = getToolService().getToolByID(toolID);
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
 	// create the LD and put it in Run Sequences folder in the given organisation
@@ -478,7 +477,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (learningDesignID != null) {
 	    User user = (User) getUserManagementService().findById(User.class, userID);
 	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
-		    null, false, false, true, false, false, true, true, false, null, null);
+		    null, false, false, false, false, true, true, false, null, null);
 	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<User>();
@@ -526,7 +525,7 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     public ActionForward saveLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, UserException, WorkspaceFolderException, IOException,
-	    ObjectExtractorException, ParseException {
+		    ObjectExtractorException, ParseException {
 	JSONObject ldJSON = new JSONObject(request.getParameter("ld"));
 
 	LearningDesign learningDesign = getAuthoringService().saveLearningDesignDetails(ldJSON);
@@ -536,8 +535,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	    Long learningDesignID = learningDesign.getLearningDesignId();
 	    if (learningDesignID != null) {
 		Gson gson = new GsonBuilder().create();
-		Vector<ValidationErrorDTO> validationDTOs = getAuthoringService().validateLearningDesign(
-			learningDesignID);
+		Vector<ValidationErrorDTO> validationDTOs = getAuthoringService()
+			.validateLearningDesign(learningDesignID);
 		String validationJSON = gson.toJson(validationDTOs);
 		responseJSON.put("validation", new JSONArray(validationJSON));
 
@@ -626,8 +625,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		writer.close();
 	    }
 	} catch (IOException e) {
-	    AuthoringAction.log.error("Error while writing " + extension.toUpperCase() + " thumbnail of LD "
-		    + learningDesignID + ".", e);
+	    AuthoringAction.log.error(
+		    "Error while writing " + extension.toUpperCase() + " thumbnail of LD " + learningDesignID + ".", e);
 	} finally {
 	    if (fos != null) {
 		try {
@@ -647,8 +646,8 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     private IAuditService getAuditService() {
 	if (AuthoringAction.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return AuthoringAction.auditService;
@@ -656,8 +655,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private IMonitoringService getMonitoringService() {
 	if (AuthoringAction.monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
 	}
 	return AuthoringAction.monitoringService;
@@ -665,8 +664,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private IUserManagementService getUserManagementService() {
 	if (AuthoringAction.userManagementService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.userManagementService = (IUserManagementService) wac
 		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 	}
@@ -675,8 +674,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public IAuthoringService getAuthoringService() {
 	if (AuthoringAction.authoringService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.authoringService = (IAuthoringService) wac
 		    .getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
 	}
@@ -685,8 +684,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public ILamsToolService getToolService() {
 	if (AuthoringAction.toolService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.toolService = (ILamsToolService) wac.getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 	}
 	return AuthoringAction.toolService;
@@ -694,8 +693,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private ILearningDesignService getLearningDesignService() {
 	if (AuthoringAction.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
 	return AuthoringAction.learningDesignService;
@@ -703,8 +702,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (AuthoringAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return AuthoringAction.securityService;

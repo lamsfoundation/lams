@@ -84,8 +84,8 @@ public class LessonJoinServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-	LessonJoinServlet.lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("lessonService");
+	LessonJoinServlet.lessonService = (ILessonService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
 
 	LessonJoinServlet.userService = (IUserManagementService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
@@ -98,8 +98,8 @@ public class LessonJoinServlet extends HttpServlet {
     }
 
     @Override
-    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
 	PrintWriter out = response.getWriter();
 	response.setContentType("text/xml");
@@ -129,23 +129,23 @@ public class LessonJoinServlet extends HttpServlet {
 	    if (StringUtils.isBlank(username)) {
 		LessonJoinServlet.log.debug("Missing parameter: " + CentralConstants.PARAM_USERNAME);
 		element.setAttribute(CentralConstants.ATTR_RESULT_CODE, "0");
-		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT, "Missing parameter: "
-			+ CentralConstants.PARAM_USERNAME);
+		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT,
+			"Missing parameter: " + CentralConstants.PARAM_USERNAME);
 	    } else if (StringUtils.isBlank(orgId)) {
 		LessonJoinServlet.log.debug("Missing parameter: " + CentralConstants.PARAM_COURSE_ID);
 		element.setAttribute(CentralConstants.ATTR_RESULT_CODE, "0");
-		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT, "Missing parameter: "
-			+ CentralConstants.PARAM_COURSE_ID);
+		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT,
+			"Missing parameter: " + CentralConstants.PARAM_COURSE_ID);
 	    } else if (StringUtils.isBlank(ldId)) {
 		LessonJoinServlet.log.debug("Missing parameter: " + CentralConstants.PARAM_LEARNING_DESIGN_ID);
 		element.setAttribute(CentralConstants.ATTR_RESULT_CODE, "0");
-		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT, "Missing parameter: "
-			+ CentralConstants.PARAM_LEARNING_DESIGN_ID);
+		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT,
+			"Missing parameter: " + CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	    } else if (StringUtils.isBlank(learnerSize)) {
 		LessonJoinServlet.log.debug("Missing parameter: " + CentralConstants.PARAM_LEARNER_SIZE);
 		element.setAttribute(CentralConstants.ATTR_RESULT_CODE, "0");
-		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT, "Missing parameter: "
-			+ CentralConstants.PARAM_LEARNER_SIZE);
+		element.setAttribute(CentralConstants.ATTR_RESULT_TEXT,
+			"Missing parameter: " + CentralConstants.PARAM_LEARNER_SIZE);
 	    }
 
 	    // authenticate integrated server
@@ -163,7 +163,8 @@ public class LessonJoinServlet extends HttpServlet {
 		if ((lessons != null) && (lessons.size() > 0)) {
 
 		    // add to first lesson where lesson size < learnerSize
-		    if (addUserToLesson(lessons, Integer.valueOf(learnerSize).intValue(), Integer.valueOf(orgId), user)) {
+		    if (addUserToLesson(lessons, Integer.valueOf(learnerSize).intValue(), Integer.valueOf(orgId),
+			    user)) {
 			// success result code
 			element.setAttribute(CentralConstants.ATTR_RESULT_CODE, "1");
 		    }
@@ -258,7 +259,6 @@ public class LessonJoinServlet extends HttpServlet {
 	String lessonDescription;
 	Boolean enableLessonIntro;
 	Boolean displayDesignImage;
-	Boolean learnerExportAvailable;
 	Boolean learnerPresenceAvailable;
 	Boolean learnerImAvailable;
 	Boolean liveEditEnabled;
@@ -279,7 +279,6 @@ public class LessonJoinServlet extends HttpServlet {
 	    lessonDescription = l.getLessonDescription();
 	    enableLessonIntro = l.isEnableLessonIntro();
 	    displayDesignImage = l.isDisplayDesignImage();
-	    learnerExportAvailable = l.getLearnerExportAvailable();
 	    learnerPresenceAvailable = l.getLearnerPresenceAvailable();
 	    learnerImAvailable = l.getLearnerImAvailable();
 	    liveEditEnabled = l.getLiveEditEnabled();
@@ -296,7 +295,6 @@ public class LessonJoinServlet extends HttpServlet {
 	    lessonDescription = ld.getDescription();
 	    enableLessonIntro = false;
 	    displayDesignImage = false;
-	    learnerExportAvailable = true;
 	    learnerPresenceAvailable = false;
 	    learnerImAvailable = false;
 	    liveEditEnabled = false;
@@ -309,10 +307,9 @@ public class LessonJoinServlet extends HttpServlet {
 		    false);
 	    staffList = getUsersFromDTOs(userDTOs);
 	}
-	Lesson lesson = LessonJoinServlet.monitoringService.initializeLesson(lessonName, lessonDescription, ldId,
-		orgId, ownerUserId, null, enableLessonIntro, displayDesignImage, learnerExportAvailable,
-		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableNotifications, learnerRestart,
-		null, null);
+	Lesson lesson = LessonJoinServlet.monitoringService.initializeLesson(lessonName, lessonDescription, ldId, orgId,
+		ownerUserId, null, enableLessonIntro, displayDesignImage, learnerPresenceAvailable, learnerImAvailable,
+		liveEditEnabled, enableNotifications, learnerRestart, null, null);
 	LessonJoinServlet.monitoringService.createLessonClassForLesson(lesson.getLessonId().longValue(), org,
 		learnerGroupName, learnerList, staffGroupName, staffList, ownerUserId);
 	LessonJoinServlet.monitoringService.startLesson(lesson.getLessonId().longValue(), ownerUserId);

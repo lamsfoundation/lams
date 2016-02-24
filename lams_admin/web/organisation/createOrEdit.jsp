@@ -152,16 +152,6 @@
 			</label>
 		</td>
 	</tr>
-	<tr>
-		<td colspan=2>
-			<html-el:checkbox property="enableExportPortfolio" styleId="enable-export-portfolio"/>			
-			<!-- to overcome nasty DynaActionForm bug (http://www.coderanch.com/t/46408/Struts/DynaValidatorActionForm-checkboxes) -->
-			<input type="hidden" name="enableExportPortfolio" value="false">
-			<label for="enable-export-portfolio">
-				<fmt:message key="config.export.portfolio"/>
-			</label>
-		</td>
-	</tr>
 	
 	<logic:notEmpty name="OrganisationForm" property="orgId">
 	<tr>

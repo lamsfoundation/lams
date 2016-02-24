@@ -71,12 +71,6 @@ public class SystemTool implements Serializable {
     private String learnerProgressUrl;
 
     /** persistent field */
-    private String exportPortfolioLearnerUrl;
-
-    /** persistent field */
-    private String exportPortfolioClassUrl;
-
-    /** persistent field */
     private String monitorUrl;
 
     /** persistent field */
@@ -102,8 +96,8 @@ public class SystemTool implements Serializable {
 
     /** full constructor */
     public SystemTool(Long systemToolId, Integer activityTypeId, String displayName, String description,
-	    String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String exportPortfolioLearnerUrl,
-	    String exportPortfolioClassUrl, String monitorUrl, String contributeUrl, String helpUrl, Date createDateTime) {
+	    String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String monitorUrl,
+	    String contributeUrl, String helpUrl, Date createDateTime) {
 	this.systemToolId = systemToolId;
 	this.activityTypeId = activityTypeId;
 	toolDisplayName = displayName;
@@ -112,8 +106,6 @@ public class SystemTool implements Serializable {
 	this.learnerUrl = learnerUrl;
 	this.learnerPreviewUrl = learnerPreviewUrl;
 	this.learnerProgressUrl = learnerProgressUrl;
-	this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
-	this.exportPortfolioClassUrl = exportPortfolioClassUrl;
 	this.monitorUrl = monitorUrl;
 	this.contributeUrl = contributeUrl;
 	this.helpUrl = helpUrl;
@@ -181,22 +173,6 @@ public class SystemTool implements Serializable {
 	this.learnerProgressUrl = learnerProgressUrl;
     }
 
-    public String getExportPortfolioLearnerUrl() {
-	return exportPortfolioLearnerUrl;
-    }
-
-    public void setExportPortfolioLearnerUrl(String exportPortfolioLearnerUrl) {
-	this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
-    }
-
-    public String getExportPortfolioClassUrl() {
-	return exportPortfolioClassUrl;
-    }
-
-    public void setExportPortfolioClassUrl(String exportPortfolioClassUrl) {
-	this.exportPortfolioClassUrl = exportPortfolioClassUrl;
-    }
-
     /**
      * @return Returns the helpUrl.
      */
@@ -206,7 +182,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param helpUrl
-     *                The helpUrl to set.
+     *            The helpUrl to set.
      */
     public void setAdminUrl(String adminUrl) {
 	this.adminUrl = adminUrl;
@@ -221,7 +197,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param createDateTime
-     *                The createDateTime to set.
+     *            The createDateTime to set.
      */
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
@@ -232,7 +208,7 @@ public class SystemTool implements Serializable {
      */
     public boolean getSupportsContribute() {
 	String contributeURL = getContributeUrl();
-	return contributeURL != null && contributeURL.trim().length() > 0;
+	return (contributeURL != null) && (contributeURL.trim().length() > 0);
     }
 
     /**
@@ -244,7 +220,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param contributeUrl
-     *                The contributUrl to set.
+     *            The contributUrl to set.
      */
     public void setContributeUrl(String contributeUrl) {
 	this.contributeUrl = contributeUrl;
@@ -259,7 +235,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param monitorUrl
-     *                The monitorUrl to set.
+     *            The monitorUrl to set.
      */
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
@@ -274,7 +250,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param helpUrl
-     *                The helpUrl to set.
+     *            The helpUrl to set.
      */
     public void setHelpUrl(String helpUrl) {
 	this.helpUrl = helpUrl;
@@ -282,8 +258,8 @@ public class SystemTool implements Serializable {
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("systemToolId", getSystemToolId()).append("activityTypeId",
-		getActivityTypeId()).toString();
+	return new ToStringBuilder(this).append("systemToolId", getSystemToolId())
+		.append("activityTypeId", getActivityTypeId()).toString();
     }
 
     @Override

@@ -195,26 +195,6 @@ public class GroupingAction extends LamsDispatchAction {
 	return mapping.findForward(GroupingAction.SHOW_GROUP);
     }
 
-    /**
-     * Do the export portfolio. Take the parameters from the standard String request parameters, don't expect attributes
-     * to be in the request
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward exportPortfolio(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	prepareGroupData(request);
-	request.setAttribute(GroupingAction.FINISHED_BUTTON, Boolean.FALSE);
-	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.TRUE);
-
-	return mapping.findForward(GroupingAction.SHOW_GROUP);
-    }
 
     /**
      * Complete the current tool activity and forward to the url of next activity in the learning design.

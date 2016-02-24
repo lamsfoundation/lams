@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $Id$ */  
+/* $Id$ */
 package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
@@ -29,20 +29,19 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 
-
 /**
  * @author Andrey Balan
  *
- * A Wrapper class for uploaded files. An Attachment cannot exist independently
- * and must belong to a TaskListItem.
+ *         A Wrapper class for uploaded files. An Attachment cannot exist independently and must belong to a
+ *         TaskListItem.
  * 
  *
  * @hibernate.class table="tl_latask10_item_attachment"
  *
  */
-public class TaskListItemAttachment implements Cloneable{
-	private static final Logger log = Logger.getLogger(TaskListItemAttachment.class);
-	
+public class TaskListItemAttachment implements Cloneable {
+    private static final Logger log = Logger.getLogger(TaskListItemAttachment.class);
+
     private Long uid;
     private Long fileUuid;
     private Long fileVersionId;
@@ -50,67 +49,65 @@ public class TaskListItemAttachment implements Cloneable{
     private String fileName;
     private Date created;
     private TaskListUser createBy;
-    
-	//*************** NON Persist Field (only for exporting) ********************
-    private String attachmentLocalUrl;
-    
+
     //  **********************************************************
-  	//		Function method for TaskListItemAttachment
+    //		Function method for TaskListItemAttachment
     //  **********************************************************
-    public Object clone(){
-    	TaskListItemAttachment taskListItemAttachment = null;
-		try {
-			taskListItemAttachment = (TaskListItemAttachment) super.clone();
-			((TaskListItemAttachment)taskListItemAttachment).setUid(null);
-			
-  			//clone ReourceUser as well
-  			if(this.createBy != null){
-  				taskListItemAttachment.setCreateBy((TaskListUser) this.createBy.clone());
-  			}
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + TaskListItemAttachment.class + " failed");
-		}
-		
-		return taskListItemAttachment;
-	}
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof TaskListItemAttachment))
-			return false;
+    @Override
+    public Object clone() {
+	TaskListItemAttachment taskListItemAttachment = null;
+	try {
+	    taskListItemAttachment = (TaskListItemAttachment) super.clone();
+	    taskListItemAttachment.setUid(null);
 
-		final TaskListItemAttachment genericEntity = (TaskListItemAttachment) o;
-
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.fileVersionId,genericEntity.fileVersionId)
-      	.append(this.fileName,genericEntity.fileName)
-      	.append(this.fileType,genericEntity.fileType)
-      	.append(this.created,genericEntity.created)
-      	.append(this.createBy,genericEntity.createBy)
-      	.isEquals();
+	    //clone ReourceUser as well
+	    if (this.createBy != null) {
+		taskListItemAttachment.setCreateBy((TaskListUser) this.createBy.clone());
+	    }
+	} catch (CloneNotSupportedException e) {
+	    TaskListItemAttachment.log.error("When clone " + TaskListItemAttachment.class + " failed");
 	}
 
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(fileVersionId).append(
-				fileName).append(fileType).append(created).append(createBy)
-				.toHashCode();
+	return taskListItemAttachment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+	if (this == o) {
+	    return true;
 	}
-	
-	//  **********************************************************
-  	//		Get/Set methods
-	//  **********************************************************
-	
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * @return Returns the log Uid.
-	 */
+	if (!(o instanceof TaskListItemAttachment)) {
+	    return false;
+	}
+
+	final TaskListItemAttachment genericEntity = (TaskListItemAttachment) o;
+
+	return new EqualsBuilder().append(this.uid, genericEntity.uid)
+		.append(this.fileVersionId, genericEntity.fileVersionId).append(this.fileName, genericEntity.fileName)
+		.append(this.fileType, genericEntity.fileType).append(this.created, genericEntity.created)
+		.append(this.createBy, genericEntity.createBy).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(uid).append(fileVersionId).append(fileName).append(fileType).append(created)
+		.append(createBy).toHashCode();
+    }
+
+    //  **********************************************************
+    //		Get/Set methods
+    //  **********************************************************
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @return Returns the log Uid.
+     */
     public Long getUid() {
-        return uid;
+	return uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     /**
@@ -118,76 +115,68 @@ public class TaskListItemAttachment implements Cloneable{
      *
      */
     public Long getFileVersionId() {
-        return fileVersionId;
+	return fileVersionId;
     }
 
     public void setFileVersionId(Long version) {
-        this.fileVersionId = version;
+	this.fileVersionId = version;
     }
 
     /**
      * @hibernate.property column="file_type"
      */
     public String getFileType() {
-        return fileType;
+	return fileType;
     }
 
     public void setFileType(String type) {
-        this.fileType = type;
+	this.fileType = type;
     }
 
     /**
      * @hibernate.property column="file_name"
      */
     public String getFileName() {
-        return fileName;
+	return fileName;
     }
 
     public void setFileName(String name) {
-        this.fileName = name;
+	this.fileName = name;
     }
 
-	/**
-	 * @hibernate.property column="file_uuid"
-	 * @return
-	 */
-	public Long getFileUuid() {
-		return fileUuid;
-	}
-
-	public void setFileUuid(Long uuid) {
-		this.fileUuid = uuid;
-	}
-	
-	/**
-	 * @hibernate.property column="create_date"
-	 * @return
-	 */
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
-	/**
-	 * @hibernate.many-to-one  column="create_by"
- 	 * cascade="save-update"
-	 * @return
-	 */
-	public TaskListUser getCreateBy() {
-		return createBy;
-	}
-
-	public void setCreateBy(TaskListUser createBy) {
-		this.createBy = createBy;
-	}
-	
-    public String getAttachmentLocalUrl() {
-        return attachmentLocalUrl;
+    /**
+     * @hibernate.property column="file_uuid"
+     * @return
+     */
+    public Long getFileUuid() {
+	return fileUuid;
     }
-    public void setAttachmentLocalUrl(String attachmentLocalUrl) {
-        this.attachmentLocalUrl = attachmentLocalUrl;
+
+    public void setFileUuid(Long uuid) {
+	this.fileUuid = uuid;
+    }
+
+    /**
+     * @hibernate.property column="create_date"
+     * @return
+     */
+    public Date getCreated() {
+	return created;
+    }
+
+    public void setCreated(Date created) {
+	this.created = created;
+    }
+
+    /**
+     * @hibernate.many-to-one column="create_by" cascade="save-update"
+     * @return
+     */
+    public TaskListUser getCreateBy() {
+	return createBy;
+    }
+
+    public void setCreateBy(TaskListUser createBy) {
+	this.createBy = createBy;
     }
 }

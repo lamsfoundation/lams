@@ -253,15 +253,6 @@ public interface IEadventureService {
     void setItemVisible(Long itemUid, boolean visible);
 
     /**
-     * Get eadventure item <code>Summary</code> list according to sessionId 
-     * 
-     * @return
-     */
-    public List<Summary> exportBySessionId(Long sessionId, Long userId);
-
-    public List<Summary> exportByContentId(Long contentId);
-
-    /**
      * Create refection entry into notebook tool.
      * 
      * @param sessionId

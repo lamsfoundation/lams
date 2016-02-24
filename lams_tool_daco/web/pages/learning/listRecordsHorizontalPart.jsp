@@ -171,14 +171,7 @@
 													</c:when>
 													<c:otherwise>
 														<fmt:message key="label.learning.file.uploaded" />
-														<c:choose>
-															<c:when test="${includeMode=='exportportfolio'}">
-																<a href="<c:url value='files/${answer.fileUuid}-${answer.fileName}'/>">${answer.fileName}</a>
-															</c:when>
-															<c:otherwise>
-																<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
-															</c:otherwise>
-														</c:choose>		
+														<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
 													</c:otherwise>
 												</c:choose>
 											</c:when>

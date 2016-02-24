@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.taskList.dto.ItemSummary;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
@@ -238,7 +237,7 @@ public interface ITaskListService {
      *            id of a session during which it occured
      */
     void setItemAccess(Long taskListItemUid, Long userId, Long sessionId);
-    
+
     /**
      * Get all available sessions for contentId.
      * 
@@ -299,27 +298,6 @@ public interface ITaskListService {
      */
     void updateEntry(NotebookEntry notebookEntry);
 
-    // ********** Export methods ***********************
-
-    /**
-     * Make an export for the specified learner.
-     * 
-     * @param sessionId
-     * @param learner
-     *            user which portfolio is being exported
-     *
-     * @return
-     */
-    List<ItemSummary> exportForLearner(Long contentUid, TaskListUser learner);
-
-    /**
-     * Make an export for the whole TaskList.
-     * 
-     * @param contentUid
-     * @return
-     */
-    List<ItemSummary> exportForTeacher(Long contentUid);
-    
     /**
      * Returns paged users for jqGrid based on sessionId.
      * 
@@ -333,7 +311,7 @@ public interface ITaskListService {
      */
     Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
-    
+
     /**
      * Returns paged users for jqGrid based on sessionId and taskListItemUid.
      * 
@@ -346,8 +324,8 @@ public interface ITaskListService {
      * @param searchString
      * @return
      */
-    Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size, String sortBy,
-	    String sortOrder, String searchString);
+    Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size,
+	    String sortBy, String sortOrder, String searchString);
 
     /**
      * Returns total number of users in a specified session.
@@ -366,9 +344,9 @@ public interface ITaskListService {
      * @return
      */
     List<SessionDTO> getSummary(Long contentId);
-    
+
     NotebookEntry getEntry(Long sessionId, Integer userId);
-    
+
     List<ReflectDTO> getReflectList(Long contentId);
 
     /**
@@ -378,7 +356,7 @@ public interface ITaskListService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Get localized message.
      * 

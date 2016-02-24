@@ -60,10 +60,9 @@ public interface IMonitoringService {
      * Intialise lesson without creating Learning Design copy, i.e. the original LD will be used.
      */
     Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID, User user,
-	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
-	    Lesson precedingLesson);
+	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
+	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
+	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
 
     /**
      * <p>
@@ -99,8 +98,6 @@ public interface IMonitoringService {
      *            display an intro page to the lesson
      * @param displayDesignImage
      *            display the design image or not
-     * @param learnerExportAvailable
-     *            should the export portfolio option be made available to the learner?
      * @param enableNotifications
      *            enable "email notifications" link for the current lesson
      * @param numberDaysToLessonFinish
@@ -110,9 +107,9 @@ public interface IMonitoringService {
      */
     Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId, Integer organisationId,
 	    Integer userID, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
-	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableNotifications, Boolean learnerRestart,
-	    Integer numberDaysToLessonFinish, Long precedingLessonId);
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Boolean enableNotifications, Boolean learnerRestart, Integer numberDaysToLessonFinish,
+	    Long precedingLessonId);
 
     /**
      * Initialize a new lesson so as to start the learning process for a normal or preview learning session. It needs to
@@ -231,8 +228,8 @@ public interface IMonitoringService {
 
     /**
      * Finish a lesson.A Finished lesson can be viewed on the monitoring interface. It should be an "inactive" lesson. A
-     * Finished lesson is listed on the learner interface but all the learner can do is view the progress bar and do an
-     * export portfolio - they cannot access any of the tool screens.
+     * Finished lesson is listed on the learner interface but all the learner can do is view the progress - they cannot
+     * access any of the tool screens.
      * 
      * @param lessonId
      * @param userId
@@ -243,20 +240,8 @@ public interface IMonitoringService {
     void finishLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
-     * Set whether or not the export portfolio button is available in learner. Sets it to FALSE if
-     * learnerExportAvailable is null. Checks that the user is a staff member of this lesson before updating.
-     * 
-     * @param lessonId
-     * @param userId
-     * @param learnerExportAvailable
-     * @return new value for learnerExportAvailable. Normally will be same as input parameter, will only be different if
-     *         the value cannot be updated for some reason.
-     */
-    Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable);
-
-    /**
-     * Set whether or not the learner presence button is available in monitor. Sets it to FALSE if
-     * learnerExportAvailable is null. Checks that the user is a staff member of this lesson before updating.
+     * Set whether or not the learner presence button is available in monitor. Checks that the user is a staff member of
+     * this lesson before updating.
      * 
      * @param lessonId
      * @param userId
@@ -267,8 +252,8 @@ public interface IMonitoringService {
     Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
 
     /**
-     * Set whether or not the learner IM button is available in monitor. Sets it to FALSE if learnerExportAvailable is
-     * null. Checks that the user is a staff member of this lesson before updating.
+     * Set whether or not the learner IM button is available in monitor. Checks that the user is a staff member of this
+     * lesson before updating.
      * 
      * @param lessonId
      * @param userId
@@ -279,8 +264,8 @@ public interface IMonitoringService {
     Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
 
     /**
-     * Set whether or not the live edit is available in monitor. Sets it to FALSE if learnerExportAvailable is null.
-     * Checks that the user is a staff member of this lesson before updating.
+     * Set whether or not the live edit is available in monitor. Checks that the user is a staff member of this lesson
+     * before updating.
      * 
      * @param lessonId
      * @param userId

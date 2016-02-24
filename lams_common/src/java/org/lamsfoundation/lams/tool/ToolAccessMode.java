@@ -30,28 +30,28 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * <p>ToolAccessMode is implemented using Ordinal-based typesafe enum pattern. 
- * It resolves the performance and potential hard coding error problems of using
- * interface to define enum type.</p>
+ * <p>
+ * ToolAccessMode is implemented using Ordinal-based typesafe enum pattern. It resolves the performance and potential
+ * hard coding error problems of using interface to define enum type.
+ * </p>
  * 
- * <p>This set of modes is a helper for tools. Some tools may want to use the same
- * code for the three versions of the learner screen (ordinary, learner progress and
- * preview) or for the two versions of export portfolio (leaner and teacher).
- * If a tool wants to do this, they should include mode=author, mode=teacher
- * and mode=learner in their url definitions, and use the helper methods
- * WebUtil.readToolAccessModeParam() and WebUtil.getToolAccessMode() to access
- * the modes.</p>
+ * <p>
+ * This set of modes is a helper for tools. Some tools may want to use the same code for the three versions of the
+ * learner screen (ordinary, learner progress and preview). If a tool wants to do this, they should include mode=author,
+ * mode=teacher and mode=learner in their url definitions, and use the helper methods WebUtil.readToolAccessModeParam()
+ * and WebUtil.getToolAccessMode() to access the modes.
+ * </p>
  * 
- * <p>As a class, it can implement any interface as we want. For now, it implements
- * serializable because we might need to set it into http session. To ensure
- * serializable works properly, <code>readResolve()</code> must be overriden.</p>
+ * <p>
+ * As a class, it can implement any interface as we want. For now, it implements serializable because we might need to
+ * set it into http session. To ensure serializable works properly, <code>readResolve()</code> must be overriden.
+ * </p>
  * 
  * 
  * @author Jacky Fang 2005-1-7
  * 
  */
-public class ToolAccessMode implements Serializable
-{
+public class ToolAccessMode implements Serializable {
 
     private final transient String name;
 
@@ -59,14 +59,13 @@ public class ToolAccessMode implements Serializable
     private static int nextOrdinal = 0;
 
     //Assign an ordinal to this tool access mode
-    private final int ordinal = nextOrdinal++;
+    private final int ordinal = ToolAccessMode.nextOrdinal++;
 
     /**
      * Private construtor to avoid instantiation
      */
-    private ToolAccessMode(String name)
-    {
-        this.name = name;
+    private ToolAccessMode(String name) {
+	this.name = name;
     }
 
     public static final ToolAccessMode AUTHOR = new ToolAccessMode("author");
@@ -74,41 +73,46 @@ public class ToolAccessMode implements Serializable
     public static final ToolAccessMode LEARNER = new ToolAccessMode("learner");
 
     //This is necessary for serialization
-    private static final ToolAccessMode[] VALUES = { AUTHOR, TEACHER, LEARNER };
+    private static final ToolAccessMode[] VALUES = { ToolAccessMode.AUTHOR, ToolAccessMode.TEACHER,
+	    ToolAccessMode.LEARNER };
 
-    public String toString() {return name;};
-    
+    @Override
+    public String toString() {
+	return name;
+    };
+
     /**
      * Overidden method to ensure it is serializable.
+     * 
      * @return the object instance
      * @throws ObjectStreamException
      */
-    Object readResolve() throws ObjectStreamException
-    {
-        return VALUES[ordinal];
+    Object readResolve() throws ObjectStreamException {
+	return ToolAccessMode.VALUES[ordinal];
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof ToolAccessMode))
-			return false;
-		return StringUtils.equals(((ToolAccessMode)obj).name,this.name);
+    @Override
+    public boolean equals(Object obj) {
+	if (!(obj instanceof ToolAccessMode)) {
+	    return false;
 	}
+	return StringUtils.equals(((ToolAccessMode) obj).name, this.name);
+    }
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(name).toHashCode();
-	}
-    
-    public boolean isTeacher(){
-    	return TEACHER.equals(this);
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(name).toHashCode();
     }
-    public boolean isLearner(){
-    	return LEARNER.equals(this);
-    }
-    public boolean isAuthor(){
-    	return AUTHOR.equals(this);
-    }
-    
 
+    public boolean isTeacher() {
+	return ToolAccessMode.TEACHER.equals(this);
+    }
+
+    public boolean isLearner() {
+	return ToolAccessMode.LEARNER.equals(this);
+    }
+
+    public boolean isAuthor() {
+	return ToolAccessMode.AUTHOR.equals(this);
+    }
 }

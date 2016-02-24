@@ -58,7 +58,7 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	boolean previewMode;
 	boolean isFloating;
 	
-	/** Create the builder. Supply all the data that will be needed to parse the design and build the portfolio entries. 
+	/** Create the builder. Supply all the data that will be needed to parse the design.. 
 	 * 
 	 * If accessMode == LEARNER then progress and user must not be null. This will create a list of portfolio objects for 
 	 * all activities that the LEARNER has completed or attempted.

@@ -114,10 +114,6 @@
 		<load-on-startup>3</load-on-startup>
 	</servlet>
 
-	<servlet>
-		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.pixlr.web.servlets.ExportServlet</servlet-class>
-	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
@@ -133,11 +129,6 @@
 	<servlet-mapping>
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>exportPortfolio</servlet-name>
-		<url-pattern>/exportPortfolio</url-pattern>
 	</servlet-mapping>
 
 	<error-page>

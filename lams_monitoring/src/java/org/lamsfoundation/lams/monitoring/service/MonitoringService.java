@@ -122,9 +122,6 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * <p>
@@ -143,16 +140,12 @@ import org.springframework.context.ApplicationContextAware;
  * @since 2/02/2005
  * @version 1.1
  */
-public class MonitoringService implements IMonitoringService, ApplicationContextAware {
+public class MonitoringService implements IMonitoringService {
 
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(MonitoringService.class);
-
-    private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
-
-    private static final String AUDIT_LEARNER_PORTFOLIO_SET = "audit.learner.portfolio.set";
 
     private static final String AUDIT_LESSON_CREATED_KEY = "audit.lesson.created";
 
@@ -187,8 +180,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private ISecurityService securityService;
 
     private Scheduler scheduler;
-
-    private ApplicationContext applicationContext;
 
     private MessageService messageService;
 
@@ -338,11 +329,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	this.activityDAO = activityDAO;
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-	this.applicationContext = applicationContext;
-    }
-
     /**
      * @param scheduler
      *            The scheduler to set.
@@ -366,9 +352,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @Override
     public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
-	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
+	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
 
 	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
 
@@ -405,8 +391,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
 	Lesson initializedLesson = initializeLesson(lessonName, lessonDescription, originalLearningDesign, user,
 		runSeqFolder, LearningDesign.COPY_TYPE_LESSON, customCSV, enableLessonIntro, displayDesignImage,
-		learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
+		learnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
 
 	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId,
@@ -427,35 +413,34 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
 
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
-		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, false, learnerPresenceAvailable,
-		learnerImAvailable, liveEditEnabled, true, false, null, null);
+		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, learnerPresenceAvailable, learnerImAvailable,
+		liveEditEnabled, true, false, null, null);
     }
 
     @Override
     public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
-	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
+	    Lesson precedingLesson) {
 	LearningDesign learningDesign = authoringService.getLearningDesign(learningDesignID);
 	if (learningDesign == null) {
 	    throw new MonitoringServiceException(
 		    "Learning design for id=" + learningDesignID + " is missing. Unable to initialize lesson.");
 	}
 	Lesson lesson = createNewLesson(lessonName, lessonDescription, user, learningDesign, enableLessonIntro,
-		displayDesignImage, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish,
-		precedingLesson);
+		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
+		enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
 	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
-		new Object[] { lessonName, learningDesign.getTitle(), learnerExportAvailable });
+		new Object[] { lessonName, learningDesign.getTitle() });
 	return lesson;
     }
 
     private Lesson initializeLesson(String lessonName, String lessonDescription, LearningDesign originalLearningDesign,
 	    User user, WorkspaceFolder workspaceFolder, int copyType, String customCSV, Boolean enableLessonIntro,
-	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
 		new Integer(copyType), user, workspaceFolder, true, null, customCSV);
@@ -470,11 +455,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 
 	Lesson lesson = createNewLesson(title, lessonDescription, user, copiedLearningDesign, enableLessonIntro,
-		displayDesignImage, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish,
-		precedingLesson);
+		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
+		enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
 	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
-		new Object[] { lessonName, copiedLearningDesign.getTitle(), learnerExportAvailable });
+		new Object[] { lessonName, copiedLearningDesign.getTitle() });
 	return lesson;
     }
 
@@ -498,8 +482,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    table.get("enableLessonIntro"));
 	    Boolean displayDesignImage = WDDXProcessor.convertToBoolean("displayDesignImage",
 		    table.get("displayDesignImage"));
-	    boolean learnerExportAvailable = WDDXProcessor.convertToBoolean("learnerExportPortfolio",
-		    table.get("learnerExportPortfolio"));
 	    boolean learnerPresenceAvailable = WDDXProcessor.convertToBoolean("enablePresence",
 		    table.get("enablePresence"));
 	    boolean learnerImAvailable = WDDXProcessor.convertToBoolean("enableIm", table.get("enableIm"));
@@ -519,9 +501,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
 	    } else {
 		newLesson = initializeLesson(title, desc, ldId, organisationId, creatorUserId, customCSV,
-			enableLessonIntro, displayDesignImage, learnerExportAvailable, learnerPresenceAvailable,
-			learnerImAvailable, liveEditEnabled, enableLessonNotifications, false,
-			scheduledNumberDaysToLessonFinish, precedingLessonId);
+			enableLessonIntro, displayDesignImage, learnerPresenceAvailable, learnerImAvailable,
+			liveEditEnabled, enableLessonNotifications, false, scheduledNumberDaysToLessonFinish,
+			precedingLessonId);
 	    }
 
 	    if (newLesson != null) {
@@ -1002,22 +984,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	// finally remove the learning design
 	lessonDAO.delete(learningDesign);
-    }
-
-    @Override
-    public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean isLearnerExportAvailable) {
-	securityService.isLessonMonitor(lessonId, userId, "set learner portfolio available", true);
-
-	isLearnerExportAvailable = (isLearnerExportAvailable != null) ? isLearnerExportAvailable : Boolean.FALSE;
-	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
-	lesson.setLearnerExportAvailable(isLearnerExportAvailable);
-	lessonDAO.updateLesson(lesson);
-
-	// audit log enabling/disabling export portfolio
-	writeAuditLog(MonitoringService.AUDIT_LEARNER_PORTFOLIO_SET,
-		new Object[] { lesson.getLessonName(), lesson.getLearnerExportAvailable() });
-
-	return lesson.getLearnerExportAvailable();
     }
 
     @Override
@@ -1974,8 +1940,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      *            the description of the lesson.
      * @param user
      *            user the user who want to create this lesson.
-     * @param learnerExportAvailable
-     *            should the export portfolio option be made available to the learner?
      * @param copiedLearningDesign
      *            the copied learning design
      * @param enableLessonNotifications
@@ -1986,13 +1950,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      */
     private Lesson createNewLesson(String lessonName, String lessonDescription, User user,
 	    LearningDesign copiedLearningDesign, Boolean enableLessonIntro, Boolean displayDesignImage,
-	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
+	    Lesson precedingLesson) {
 	Lesson newLesson = Lesson.createNewLessonWithoutClass(lessonName, lessonDescription, user, copiedLearningDesign,
-		enableLessonIntro, displayDesignImage, learnerExportAvailable, learnerPresenceAvailable,
-		learnerImAvailable, liveEditEnabled, enableLessonNotifications, learnerRestart,
-		scheduledNumberDaysToLessonFinish);
+		enableLessonIntro, displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
+		enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish);
 	if (precedingLesson != null) {
 	    HashSet precedingLessons = new HashSet();
 	    precedingLessons.add(precedingLesson);
@@ -2500,9 +2463,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 					lesson.getLessonDescription(), lesson.getLearningDesign().getLearningDesignId(),
 					group.getOrganisationId(), userDto.getUserID(), null,
 					lesson.isEnableLessonIntro(), lesson.isDisplayDesignImage(),
-					lesson.getLearnerExportAvailable(), lesson.getLearnerPresenceAvailable(),
-					lesson.getLearnerImAvailable(), lesson.getLiveEditEnabled(),
-					lesson.getEnableLessonNotifications(), lesson.getLearnerRestart(), null, null);
+					lesson.getLearnerPresenceAvailable(), lesson.getLearnerImAvailable(),
+					lesson.getLiveEditEnabled(), lesson.getEnableLessonNotifications(),
+					lesson.getLearnerRestart(), null, null);
 
 				// save LessonClasses
 				newLesson = this.createLessonClassForLesson(newLesson.getLessonId(), group,

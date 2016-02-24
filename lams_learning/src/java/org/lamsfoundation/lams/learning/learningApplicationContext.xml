@@ -69,34 +69,6 @@
 		</property>
 	</bean> 
 	
-	<bean id="exportService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="preInterceptors">
-			<list>
-				<ref bean="transactionRetryInterceptor" />			
-			</list>
-		</property>
-		<property name ="target">
-			<bean class="org.lamsfoundation.lams.learning.export.service.ExportPortfolioService">
-				<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
-				<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
-				<property name="activityDAO"><ref bean="activityDAO"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>			
-				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
-				<property name="baseDAO"><ref bean="baseDAO"/></property>
-				<property name="messageService"><ref bean="learningMessageService"/></property>
-				<property name="themeService"><ref bean="themeService"/></property>
-			</bean>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="export*">PROPAGATION_REQUIRED</prop>
-				<prop key="zipPortfolio">PROPAGATION_REQUIRED</prop>
-				<prop key="generateMainPage">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
-	</bean> 
-	
 	<bean id="presenceChatService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="preInterceptors">

@@ -176,15 +176,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
     }
 
-    private FlashMessage handleCriticalError(String methodKey, String messageKey) {
-	String message = getMonitoringService().getMessageService().getMessage(messageKey);
-	LamsDispatchAction.log.error("Error occured " + methodKey + " error ");
-	MonitoringAction.auditService = getAuditService();
-	MonitoringAction.auditService.log(MonitoringAction.class.getName() + ":" + methodKey, message);
-
-	return new FlashMessage(methodKey, message, FlashMessage.CRITICAL_ERROR);
-    }
-
     private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url)
 	    throws IOException {
 	if (url != null) {
@@ -217,7 +208,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	Integer copyType = WebUtil.readIntParam(request, "copyType", true);
 	String customCSV = request.getParameter("customCSV");
-	Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
 	Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
 	Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
@@ -230,8 +220,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	} else {
 	    try {
 		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
-			customCSV, false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-			liveEditEnabled, false, learnerRestart, null, null);
+			customCSV, false, false, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false,
+			learnerRestart, null, null);
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
@@ -321,7 +311,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean startMonitor = WebUtil.readBooleanParam(request, "startMonitor", false);
 	boolean enableLiveEdit = WebUtil.readBooleanParam(request, "liveEditEnable", false);
 	boolean notificationsEnable = WebUtil.readBooleanParam(request, "notificationsEnable", false);
-	boolean portfolioEnable = WebUtil.readBooleanParam(request, "portfolioEnable", false);
 	boolean presenceEnable = WebUtil.readBooleanParam(request, "presenceEnable", false);
 	boolean imEnable = WebUtil.readBooleanParam(request, "imEnable", false);
 	Integer splitNumberLessons = WebUtil.readIntParam(request, "splitNumberLessons", true);
@@ -389,9 +378,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Lesson lesson = null;
 	    try {
 		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
-			organisationId, userId, null, introEnable, introImage, portfolioEnable, presenceEnable,
-			imEnable, enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual,
-			precedingLessonId);
+			organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
+			notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
 
 		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
@@ -1042,7 +1030,6 @@ public class MonitoringAction extends LamsDispatchAction {
 		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
 	request.setAttribute("enableLiveEdit", organisation.getEnableLiveEdit());
-	request.setAttribute("enableExportPortfolio", organisation.getEnableExportPortfolio());
 	request.setAttribute("lesson", lessonDTO);
 
 	return mapping.findForward("monitorLesson");
@@ -1536,20 +1523,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return MonitoringAction.auditService;
     }
 
-    /**
-     * Get TimezoneService bean.
-     * 
-     * @return
-     */
-    private ITimezoneService getTimezoneService() {
-	if (MonitoringAction.timezoneService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    MonitoringAction.timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
-	}
-	return MonitoringAction.timezoneService;
-    }
-
     private ILessonService getLessonService() {
 	if (MonitoringAction.lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
@@ -1584,23 +1557,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	    MonitoringAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return MonitoringAction.userManagementService;
-    }
-
-    /**
-     * Set whether or not the export portfolio button is available in learner. Expects parameters lessonID and
-     * learnerExportPortfolio.
-     */
-    public ActionForward learnerExportPortfolioAvailable(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	Integer userID = getUserId();
-	Boolean learnerExportPortfolioAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
-	try {
-	    getMonitoringService().setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
-	} catch (SecurityException e) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	}
-	return null;
     }
 
     /**
@@ -1674,8 +1630,6 @@ public class MonitoringAction extends LamsDispatchAction {
      * Creates a list of users out of string with comma-delimited user IDs.
      */
     private List<User> parseUserList(HttpServletRequest request, String paramName, Collection<User> users) {
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(getServlet().getServletContext());
 	String userIdList = request.getParameter(paramName);
 	String[] userIdArray = userIdList.split(",");
 	List<User> result = new ArrayList<User>(userIdArray.length);

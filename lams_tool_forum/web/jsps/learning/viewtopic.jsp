@@ -19,14 +19,8 @@
 		<title><fmt:message key="activity.title" /></title>
 		
 		<!-- ********************  CSS ********************** -->
-		<c:choose>
-			<c:when test="${not empty localLinkPath}">
-				<lams:css localLinkPath="${localLinkPath}" />
-			</c:when>
-			<c:otherwise>
-				<lams:css />
-			</c:otherwise>
-		</c:choose>
+
+		<lams:css />
 		<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 		<link type="text/css" href="${tool}css/jquery.treetable.css" rel="stylesheet"/>
 		<link type="text/css" href="${tool}css/jquery.treetable.forum.css" rel="stylesheet"/>

@@ -85,7 +85,6 @@ public class NoticeboardConstants
  
     public static final String DEFINE_LATER = "defineLater";
     public static final String PAGE_EDITABLE = "isPageEditable";
-    public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     
     //used in authoring
     public static final String TOOL_CONTENT_ID = "toolContentID";  //request + session variable

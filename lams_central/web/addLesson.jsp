@@ -193,7 +193,6 @@
 				<input name="learnerRestart" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.restart" /></input><br />
 			<input name="liveEditEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.liveedit" /></input><br />
 			<input name="notificationsEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.notification" /></input><br />
-			<input name="portfolioEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.export" /></input><br />
 			<input id="presenceEnableField" name="presenceEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.presence" /></input><br />
 			<input id="imEnableField" name="imEnable" value="true" type="checkbox" disabled="disabled"><fmt:message key="label.tab.advanced.field.im" /></input><br />
 			<input id="splitLearnersField" type="checkbox"><fmt:message key="label.tab.advanced.field.split" /></input><br />

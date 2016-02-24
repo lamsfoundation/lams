@@ -182,7 +182,7 @@ public interface IMcService {
     List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
     
     /**
-     * Returns userMarksDtos grouped by sessions. Used *only* for export portfolio.
+     * Returns userMarksDtos grouped by sessions.
      * 
      * @param mcContent
      * @param isFullAttemptDetailsRequired

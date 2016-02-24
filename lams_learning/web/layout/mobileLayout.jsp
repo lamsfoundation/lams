@@ -36,24 +36,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><fmt:message key="${pageTitleKey}" />
 	</title>
 
-	<%-- if localFiles == true then wanted for export portfolio and must run offline --%>
-	<c:choose>
-		<c:when test="${localFiles == true}">
-			<lams:css localLinkPath="../" />
-		</c:when>
-		<c:otherwise>
-			<c:set var="lams">
-				<lams:LAMSURL />
-			</c:set>
-			<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
-			<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
-			
-			<script src="${lams}includes/javascript/AC_RunActiveContent.js"	type="text/javascript"></script>
-			<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
-			<script src="${lams}includes/javascript/jquery.js"></script>
-			<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
-		</c:otherwise>
-	</c:choose>
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
+	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
+	
+	<script src="${lams}includes/javascript/AC_RunActiveContent.js"	type="text/javascript"></script>
+	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/jquery.js"></script>
+	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
+
 </lams:head>
 
 <c:choose>

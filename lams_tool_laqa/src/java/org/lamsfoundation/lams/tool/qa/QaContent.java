@@ -58,9 +58,6 @@ public class QaContent implements Serializable {
     /** nullable persistent field */
     private String instructions;
 
-    /** persistent field, used for export portfolio */
-    private String content;
-
     /** nullable persistent field */
     private String reportTitle;
 
@@ -82,7 +79,7 @@ public class QaContent implements Serializable {
     private boolean questionsSequenced;
 
     private boolean lockWhenFinished;
-    
+
     private boolean noReeditAllowed;
 
     private boolean showOtherAnswers;
@@ -106,7 +103,7 @@ public class QaContent implements Serializable {
     private Date updateDate;
 
     private Date submissionDeadline;
-    
+
     private int maximumRates;
 
     private int minimumRates;
@@ -126,15 +123,14 @@ public class QaContent implements Serializable {
     };
 
     /** full constructor */
-    public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
+    public QaContent(Long qaContentId, String title, String instructions, String reportTitle,
 	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
-	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished, boolean noReeditAllowed,
-	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
-	    Set<QaQueContent> qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
-	    boolean useSelectLeaderToolOuput, int maximumRates, int minimumRates,
-	    Set<LearnerItemRatingCriteria> ratingCriterias) {
+	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished,
+	    boolean noReeditAllowed, boolean showOtherAnswers, boolean reflect, String reflectionSubject,
+	    Date creationDate, Date updateDate, Set<QaQueContent> qaQueContents, Set qaSessions,
+	    Set<QaCondition> conditions, boolean allowRichEditor, boolean useSelectLeaderToolOuput, int maximumRates,
+	    int minimumRates, Set<LearnerItemRatingCriteria> ratingCriterias) {
 	this.qaContentId = qaContentId;
-	this.content = content;
 	this.title = title;
 	this.instructions = instructions;
 	this.reportTitle = reportTitle;
@@ -172,22 +168,22 @@ public class QaContent implements Serializable {
      * @return the new qa content object.
      */
     public static QaContent newInstance(QaContent qa, Long newContentId) {
-	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
-		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(),
-		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(),
-		qa.isLockWhenFinished(), qa.isNoReeditAllowed(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
-		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
-			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput(),
-		qa.maximumRates, qa.minimumRates, new TreeSet());
+	QaContent newContent = new QaContent(newContentId, qa.getTitle(), qa.getInstructions(), qa.getReportTitle(),
+		qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(), qa.isUsernameVisible(),
+		qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(), qa.isLockWhenFinished(),
+		qa.isNoReeditAllowed(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
+		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
+		new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor(),
+		qa.isUseSelectLeaderToolOuput(), qa.maximumRates, qa.minimumRates, new TreeSet());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
-	
+
 	newContent.setRatingCriterias(qa.deepCopyRatingCriterias(newContent));
 
 	newContent.setConditions(qa.deepCopyConditions(newContent));
 	return newContent;
     }
-    
+
     public Set<LearnerItemRatingCriteria> deepCopyRatingCriterias(QaContent newQaContent) {
 
 	Set<LearnerItemRatingCriteria> newCriterias = new TreeSet<LearnerItemRatingCriteria>();
@@ -203,7 +199,7 @@ public class QaContent implements Serializable {
     public Set<QaQueContent> deepCopyQaQueContent(QaContent newQaContent) {
 	Set<QaQueContent> newQaQueContent = new TreeSet<QaQueContent>();
 	for (Iterator<QaQueContent> i = this.getQaQueContents().iterator(); i.hasNext();) {
-	    QaQueContent queContent = (QaQueContent) i.next();
+	    QaQueContent queContent = i.next();
 	    newQaQueContent.add(QaQueContent.newInstance(queContent, newQaContent));
 	}
 	return newQaQueContent;
@@ -281,10 +277,9 @@ public class QaContent implements Serializable {
     public String toString() {
 	return new ToStringBuilder(this).append("qaContentId:", getQaContentId()).append("qa title:", getTitle())
 		.append("qa instructions:", getInstructions()).append("creator user id", getCreatedBy())
-		.append("username_visible:", isUsernameVisible())
-		.append("allow to rate answers:", isAllowRateAnswers()).append("defineLater", isDefineLater())
-		.append("report_title: ", getReportTitle()).append("reflection subject: ", getReflectionSubject())
-		.toString();
+		.append("username_visible:", isUsernameVisible()).append("allow to rate answers:", isAllowRateAnswers())
+		.append("defineLater", isDefineLater()).append("report_title: ", getReportTitle())
+		.append("reflection subject: ", getReflectionSubject()).toString();
     }
 
     @Override
@@ -478,21 +473,6 @@ public class QaContent implements Serializable {
     }
 
     /**
-     * @return Returns the content.
-     */
-    public String getContent() {
-	return content;
-    }
-
-    /**
-     * @param content
-     *            The content to set.
-     */
-    public void setContent(String content) {
-	this.content = content;
-    }
-
-    /**
      * @return Returns the creationDate.
      */
     public Date getCreationDate() {
@@ -551,7 +531,7 @@ public class QaContent implements Serializable {
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
     }
-    
+
     /**
      * @return Returns the noReeditAllowed.
      */
@@ -597,7 +577,7 @@ public class QaContent implements Serializable {
     public void setShowOtherAnswers(boolean showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
     }
-    
+
     /**
      * @return
      */

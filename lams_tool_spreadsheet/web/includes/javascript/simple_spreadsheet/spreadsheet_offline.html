@@ -60,13 +60,8 @@
 <div id="source" align="center">
 
   <script>
-	var code = getURLParameter("code");
-	// code will be available as URL parameter only in case of export portfolio, otherwise get it from parent page
-	if (code == "") {
-		code = parent.document.getElementById("spreadsheet.code").value;
-	}
+	var code = parent.document.getElementById("spreadsheet.code").value;
 	loadScriptFileAndCode(code);
-	
   </script>
 
 </div>

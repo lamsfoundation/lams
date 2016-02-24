@@ -52,10 +52,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="content" value="/reflect.jsp" />	
 		<put name="contentMobile" value="/learning/mobile/reflect.jsp" />
 	</definition>
-	
-<!-- ============= Noticeboard Export Page Definitions ====================== -->	
-
-<definition name=".exportPortfolio" extends=".baseDef" >
-		<put name="content" value="/exportPortfolio.jsp" />	
-	</definition>
 </tiles-definitions>
