@@ -6,7 +6,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/hibernate-core.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
 		<attributes>
-			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/3.3/api/" />
+			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/3.3/api/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jbossweb">
@@ -20,5 +20,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jbossweb.sar/jbossweb.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
