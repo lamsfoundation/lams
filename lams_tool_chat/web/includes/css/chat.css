@@ -1,5 +1,6 @@
 /* ==================== COMMON ==================== */
 .message {
+	font-size: 12px;
 	padding-bottom: 4px;
 }
 
@@ -32,6 +33,7 @@
 	height: 260px;
 	overflow: auto;
 	border: 1px solid #999;
+	font-size: 12px;
 	font-weight: bold;
 	padding: 2px;
 }

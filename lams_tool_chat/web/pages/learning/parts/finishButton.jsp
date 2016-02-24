@@ -47,19 +47,19 @@
 <html:form action="/learning" method="post"
 	onsubmit="disableFinishButton();"  styleId="messageForm">
 	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
-	<div class="space-bottom-top align-right">
+
 		<c:choose>
 			<c:when
 				test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
 				<html:hidden property="dispatch" value="openNotebook" />
 
-				<html:submit styleClass="button">
+				<html:submit styleClass="btn btn-primary pull-right voffset10">
 					<fmt:message key="button.continue" />
 				</html:submit>
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:link href="#nogo" styleClass="button" styleId="finishButton"  onclick="submitForm('finish')">
+				<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10 na" styleId="finishButton"  onclick="submitForm('finish')">
 					 <span class="nextActivity">
 						 <c:choose>
 						 	<c:when test="${activityPosition.last}">
