@@ -448,17 +448,7 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/axis/main/module.xml"
 			  file="lib/axis/axis.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/batik/main" overwrite="true" verbose="true">
-			<fileset dir="lib/batik">
-				<include name="batik-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
-			  file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
-		
+
 		
 		
 		<copy todir="${server.home}/modules/system/layers/base/net/sf/cglib/main" overwrite="true" verbose="true">

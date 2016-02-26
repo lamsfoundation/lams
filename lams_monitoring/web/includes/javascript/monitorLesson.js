@@ -7,8 +7,6 @@ var originalSequenceCanvas = null,
 // DIV container for lesson/branching SVG
 // it gets accessed so many times it's worth to cache it here
 	sequenceCanvas = null,
-// ID of currently shown branching activity; if NULL, the whole lesson is shown
-	sequenceBranchingId = null,
 // info box show timeout
 	sequenceInfoTimeout = 10000,
 // which learner was selected in the search box
@@ -771,10 +769,8 @@ function updateSequenceTab() {
 			async : false,
 			cache : false,
 			data : {
-				'method'    : 'createLearningDesignThumbnail',
-				'svgFormat' : 1,
-				'ldId'      : ldId,
-				'branchingActivityID' : sequenceBranchingId
+				'method'    : 'getLearningDesignThumbnail',
+				'ldId'      : ldId
 			},
 			success : function(response) {
 				sequenceCanvasFirstFetch = true;
@@ -786,11 +782,8 @@ function updateSequenceTab() {
 				sequenceCanvas = $('#sequenceCanvas')
 					// remove previously set padding and dimensions, if any
 					.removeAttr('style')
-					.html(originalSequenceCanvas)
-					// if it was faded out by showBranchingSequence()
-					.fadeIn(function(){
-						resizeSequenceCanvas(width, height);
-					});
+					.html(originalSequenceCanvas);
+				resizeSequenceCanvas(width, height);
 			}
 		});
 	}
@@ -812,7 +805,6 @@ function updateSequenceTab() {
 		data : {
 			'method'    : 'getLessonProgress',
 			'lessonID'  : lessonId,
-			'branchingActivityID' : sequenceBranchingId,
 			'searchedLearnerId' : sequenceSearchedLearner
 		},		
 		success : function(response) {
@@ -883,21 +875,13 @@ function updateSequenceTab() {
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
 				
-				var isBranching = [10,11,12,13].indexOf(activity.type) > -1;
 				if (activity.url || (isBranching && !flaFormat)) {
-					var activityGroup = $('g[id="' + activity.id + '"]'),
-						dblClickFunction = 
-							// different behaviour for regular/branching activities
-							isBranching ? 
-							function(){ showBranchingSequence(activity.id); }
-							:
-							function(){  
-								// double click on activity shape to open Monitoring for this activity
-								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
-							};
-					
+					var activityGroup = $('g[id="' + activity.id + '"]');
 					activityGroup.css('cursor', 'pointer');
-					dblTap(activityGroup, dblClickFunction);
+					dblTap(activityGroup, function(){  
+						// double click on activity shape to open Monitoring for this activity
+						openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
+					});
 				}
 			});	
 			
@@ -1538,30 +1522,6 @@ function openLiveEdit(){
 			}
 		});	
 	}
-}
-
-
-/**
- * Replaces canvas with the given branchin activity contents
- */
-function showBranchingSequence(branchingActivityId){
-	sequenceBranchingId = branchingActivityId;
-	originalSequenceCanvas = null;
-	branchingEntered = true;
-	$('#closeBranchingButton').show();
-	sequenceCanvas.fadeOut(function(){
-		sequenceCanvas.html(null);
-		updateSequenceTab();
-	});
-}
-
-
-/**
- * Shows Learning Design in canvas.
- */
-function closeBranchingSequence(){
-	showBranchingSequence(null);
-	$('#closeBranchingButton').hide();
 }
 
 /**

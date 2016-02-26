@@ -497,7 +497,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	    if (AuthoringAction.log.isDebugEnabled()) {
 		AuthoringAction.log.debug("Created a single activity lesson with ID: " + lesson.getLessonId());
 	    }
+	    
+	    response.setContentType("text/plain;charset=utf-8");
+	    response.getWriter().write(learningDesignID.toString());
 	}
+	
 	return null;
     }
 

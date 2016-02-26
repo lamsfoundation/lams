@@ -23,9 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,10 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
@@ -60,7 +55,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -86,6 +80,8 @@ public class LearningDesignService implements ILearningDesignService {
 
     protected ILearningLibraryDAO learningLibraryDAO;
     protected ILoadedMessageSourceService toolActMessageService;
+
+    private static final String LD_SVG_DIR = "lams-www.war\\secure\\learning-design-images";
 
     /*
      * Default constructor
@@ -303,19 +299,6 @@ public class LearningDesignService implements ILearningDesignService {
 	return tools;
     }
 
-    @Override
-    public String createBranchingSVG(Long branchingActivityId, int imageFormat) throws IOException {
-	BranchingActivity branchingActivity = (BranchingActivity) activityDAO
-		.getActivityByActivityId(branchingActivityId);
-	Long learningDesignId = branchingActivity.getLearningDesign().getLearningDesignId();
-	return createDesignSVG(learningDesignId, branchingActivityId, imageFormat);
-    }
-
-    @Override
-    public String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws IOException {
-	return createDesignSVG(learningDesignId, null, imageFormat);
-    }
-
     private void internationaliseActivities(Collection<LibraryActivityDTO> activities) {
 	Iterator<LibraryActivityDTO> iter = activities.iterator();
 	Locale locale = LocaleContextHolder.getLocale();
@@ -366,59 +349,12 @@ public class LearningDesignService implements ILearningDesignService {
 	}
     }
 
-    private String createDesignSVG(Long learningDesignId, Long branchingActivityId, int imageFormat)
-	    throws IOException, FileNotFoundException {
-	String fileNameWithoutExtension = learningDesignId.toString();
-	if (branchingActivityId != null) {
-	    fileNameWithoutExtension += "_branching" + branchingActivityId;
-	}
-
-	// construct absolute filePath to SVG
-	String earFolder = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
-	if (StringUtils.isBlank(earFolder)) {
-	    log.error(
-		    "Unable to get path to the LAMS Server URL from the configuration table. SVG image creation failed");
-	    return null;
-	}
-	String directoryToStoreFile = FileUtil.getFullPath(earFolder, "lams-www.war\\secure\\learning-design-images");
-
-	// Check whether this dir exists
-	File svgPngDirectory = new File(directoryToStoreFile);
-	if (!svgPngDirectory.exists()) {
-	    svgPngDirectory.mkdirs();
-	}
-
-	String fileExtension;
-	if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) {
-	    fileExtension = ".svg";
-	} else if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY) {
-	    // mark it as a special version of SVG as it contains icons that refer to LAMS Community server
-	    fileExtension = ".export.svg";
-	} else {
-	    fileExtension = ".png";
-	}
-	String absoluteFilePath = FileUtil.getFullPath(directoryToStoreFile, fileNameWithoutExtension + fileExtension);
-	File file = new File(absoluteFilePath);
-
-	// check if SVG exists and up-to-date
-	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
-	boolean isSvgOutdated = (((file.lastModified() / 1000) + 1)
-		- (learningDesign.getLastModifiedDateTime().getTime() / 1000)) < 0;
-	if (!file.exists() || isSvgOutdated) {
-	    // generate new SVG image and save it to the file system
-	    SVGGenerator svgGenerator = new SVGGenerator();
-	    LearningDesignDTO ldDto = this.getLearningDesignDTO(learningDesignId, "");
-
-	    if (branchingActivityId == null) {
-		svgGenerator.generateLearningDesignDOM(ldDto, imageFormat);
-	    } else {
-		svgGenerator.generateBranchingDOM(ldDto, branchingActivityId, imageFormat);
-	    }
-
-	    FileOutputStream fileOutputStream = new FileOutputStream(file);
-	    svgGenerator.streamOutDocument(fileOutputStream);
-	}
-	return absoluteFilePath;
+    /**
+     * Gets LD SVG file path.
+     */
+    public static String getLearningDesignSVGPath(long learningDesignId) {
+	String earDirPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
+	String svgDirPath = FileUtil.getFullPath(earDirPath, LearningDesignService.LD_SVG_DIR);
+	return FileUtil.getFullPath(svgDirPath, learningDesignId + ".svg");
     }
-
 }

@@ -39,7 +39,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/canvg/canvg.js"></script> 
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
-			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=',
+			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=getLearningDesignThumbnail&ldId=',
 
 			decoderDiv = $('<div />'),
 			LABELS = {

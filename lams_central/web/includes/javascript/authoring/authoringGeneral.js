@@ -1461,7 +1461,7 @@ GeneralLib = {
 				paper.clear();
 			} else {
 				// need to set size right away for Chrome
-				paper = Snap(canvas.width() - 5, canvas.height() - 5);
+				paper = Snap(Math.max(0, canvas.width() - 5), Math.max(0, canvas.height() - 5));
 				canvas.append(paper.node);
 			}
 			// initialise filter for read-only activities in Live Edit
@@ -2083,8 +2083,8 @@ GeneralLib = {
 		
 		// -20 so Chrome does not create unnecessary scrollbars when dropping a tool template to canvas
 		// +50 so there is space for rubbish bin
-		width = Math.max(width, canvas.width()) - 20;
-		height = Math.max(height + (isReadOnlyMode ? 20 : 50), canvas.height()) - 20;
+		width = Math.max(0, width, canvas.width()) - 20;
+		height = Math.max(0, height + (isReadOnlyMode ? 20 : 50), canvas.height()) - 20;
 		
 		paper.attr({
 			'width'  : width, 
