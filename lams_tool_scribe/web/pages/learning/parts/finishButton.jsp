@@ -13,7 +13,7 @@
         }
 </script>
 
-<div class="space-bottom">
+<div class="voffset10">
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton()" styleId="messageForm">
 		<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />
 		<c:choose>
@@ -21,14 +21,14 @@
 				test="${!scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
 				<html:hidden property="dispatch" value="openNotebook" />
 
-				<html:submit styleClass="button right-buttons">
+				<html:submit styleClass="btn btn-primary pull-right">
 					<fmt:message key="button.continue" />
 				</html:submit>
 
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:link href="#nogo" styleClass="button right-buttons" styleId="finishButton" onclick="submitForm('finish')">
+				<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="submitForm('finish')">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${activityPosition.last}">

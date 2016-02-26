@@ -7,63 +7,52 @@
 	<lams:WebAppURL />
 </c:set>
 
-<script type="text/javascript"
-	src="${lams}includes/javascript/prototype.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 
 <script type="text/javascript">
-	setTimeout("refreshPage()",5000)
+	setTimeout("refreshPage()", 5000)
 
 	function refreshPage() {
-		
+
 		var url = '${tool}learning.do';
 		var params = 'dispatch=getVoteDisplay&toolSessionID=${scribeSessionDTO.sessionID}';
-		
-		var myAjax = new Ajax.Updater(
-			'voteDisplay',
-			url,
-			{
-				method: 'get',
-				parameters: params
-			});
-				
-		setTimeout("refreshPage()",5000)		
+
+		var myAjax = new Ajax.Updater('voteDisplay', url, {
+			method : 'get',
+			parameters : params
+		});
+
+		setTimeout("refreshPage()", 5000)
 	}
-	
+
 	function submitApproval() {
 		var url = '${tool}learning.do';
 		var params = 'dispatch=submitApproval&toolSessionID=${scribeSessionDTO.sessionID}';
-		
-		var myAjax = new Ajax.Updater(
-			'voteDisplay',
-			url,
-			{
-				method: 'get',
-				parameters: params
+
+		var myAjax = new Ajax.Updater('voteDisplay', url, {
+			method : 'get',
+			parameters : params
 		});
-		
+
 		// remove the Agree button.
 		document.getElementById("agreeButton").innerHTML = "";
 	}
-	
+
 	function confirmForceComplete() {
 		var message = "<fmt:message key='message.confirmForceComplete'/>";
 		if (confirm(message)) {
-			return true;			
+			return true;
 		} else {
 			return false;
 		}
 	}
 </script>
 
-<div id="content">
+<lams:Page type="learner" title="${scribeDTO.title}">
 
-	<h1>
-		<c:out value="${scribeDTO.title}" escapeXml="true" />
-	</h1>
-
-	<p>
-		<c:out value="${scribeDTO.instructions}" escapeXml="false"/>
-	</p>
+	<div class="panel">
+		<c:out value="${scribeDTO.instructions}" escapeXml="false" />		
+	</div>
 
 	<html:form action="learning">
 		<html:hidden property="dispatch" value="submitReport"></html:hidden>
@@ -74,65 +63,90 @@
 			<%@include file="/pages/parts/voteDisplay.jsp"%>
 		</div>
 
-		<h2>
+		<h4>
+			<abbr class="pull-right hidden-xs" title="<fmt:message key="message.scribeInstructions2" />&nbsp;<fmt:message key="message.scribeInstructions3" />"><i
+										class="fa fa-question-circle text-info"></i></abbr>
 			<fmt:message key="heading.report" />
-		</h2>
+		</h4>
+		<c:set var="counter" value="0"/>
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
-			<div class="shading-bg">
-				<p>
-					<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false"/>
-				</p>
+		<c:set var="counter" value="${counter + 1}"/>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="panel panel-default">
+						<div class="panel-heading panel-title">
+							<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
+						</div>
+						<div class="panel-body">
+
+							<c:if test="${not empty reportDTO.entryText}">
+								<div class="panel-warning panel-body bg-warning">
+									<abbr class="pull-right hidden-xs" title="<fmt:message key="label.what.others.see" />"><i
+										class="fa fa-xs fa-question-circle text-info"></i></abbr>
+
+									<c:set var="entry">
+										<lams:out value="${reportDTO.entryText}" escapeHtml="true" />
+									</c:set>
+									<c:out value="${entry}" escapeXml="false" />
+								</div>
+							</c:if>
+
+							<c:if test="${not scribeUserDTO.finishedActivity}">
+								<html:textarea styleId="report-${counter}" property="report(${reportDTO.uid})" rows="6" value="${reportDTO.entryText}"
+									styleClass="form-control voffset5"></html:textarea>
+							</c:if>
 
 
-				<c:if test="${not empty reportDTO.entryText}">
-					<ul>
-						<li>
-							<p>
-								<c:set var="entry">
-									<lams:out value="${reportDTO.entryText}" escapeHtml="true"/>
-								</c:set>
-								<c:out value="${entry}" escapeXml="false"/>
-							</p>
-						</li>
-					</ul>
-				</c:if>
-
-				<c:if test="${not scribeUserDTO.finishedActivity}">
-					<html:textarea property="report(${reportDTO.uid})" rows="7"
-						cols="20" value="${reportDTO.entryText}" style="width: 100%;"></html:textarea>
-				</c:if>
+						</div>
+					</div>
+				</div>
 			</div>
 		</c:forEach>
 
 		<c:if test="${not scribeUserDTO.finishedActivity}">
-			<html:submit styleClass="button small-space-bottom">
-				<fmt:message key="button.submitReport" />
-			</html:submit>
+			<div class="row">
+				<div class="col-xs-12" id="submitReportBtn">
+					<html:submit styleClass="btn btn-sm btn-default pull-right">
+						<fmt:message key="button.submitReport" />
+					</html:submit>
+				</div>
+			</div>
 		</c:if>
+
 
 	</html:form>
 
 	<hr>
 
-	<div class="space-bottom-top">
-		<html:form action="learning" onsubmit="return confirmForceComplete();">
-			<html:hidden property="dispatch" value="forceCompleteActivity" />
-			<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />
-			<html:hidden property="mode" />
 
-			<div class="right-buttons">
-				<html:submit styleClass="button">
-					<fmt:message key="button.forceComplete" />
-				</html:submit>
-			</div>
-		</html:form>
+	<html:form action="learning" onsubmit="return confirmForceComplete();">
+		<html:hidden property="dispatch" value="forceCompleteActivity" />
+		<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />
+		<html:hidden property="mode" />
 
-		<span id="agreeButton"> <c:if
-				test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
-				<a id="agreeButton" class="button" onclick="submitApproval();">
-					<fmt:message key="button.agree" /> </a>
-			</c:if> </span>
-	</div>
-</div>
+		<div id="forceCompleteBtn">
+			<html:submit styleClass="btn btn-primary pull-right">
+				<fmt:message key="button.forceComplete" />
+			</html:submit>
+		</div>
+	</html:form>
 
-<div id="footer"></div>
+	<c:if test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
+		<div id="agreeButton">
+			<a id="agreeButton" class="btn btn-success pull-left" onclick="submitApproval();"> <fmt:message
+					key="button.agree" />
+			</a>
+		</div>
+	</c:if>
+
+	<div id="footer"></div>
+
+</lams:Page>
+
+
+<script type="text/javascript">
+	window.onload = function() {
+		document.getElementById("report-1").focus();
+	}
+</script>
+
