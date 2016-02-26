@@ -44,6 +44,15 @@ LAMS Learner Style
 .roffset10 {
   margin-right: 10px;
 }
+.loffset2 {
+  margin-left: 2px;
+}
+.loffset5 {
+  margin-left: 5px;
+}
+.loffset10 {
+  margin-left: 10px;
+}
 /* Comments/Forum classes */
 .msg .panel-heading {
   padding: 3px;
@@ -79,7 +88,8 @@ LAMS Learner Style
   border-radius: 0px;
   box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
 }
-.panel-learner-page-title {
+.panel-learner-page-title,
+.panel-admin-page-title {
   -moz-border-bottom-colors: none;
   -moz-border-left-colors: none;
   -moz-border-right-colors: none;
@@ -91,6 +101,11 @@ LAMS Learner Style
   border-width: 3px 0 0;
   color: inherit;
   min-height: 48px;
+}
+.panel-admin-page {
+  border-radius: 0px;
+  box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
+  margin-top: 20px;
 }
 body.stripes {
   background: url('/lams/images/css/light-fabric.jpg');

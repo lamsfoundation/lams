@@ -28,24 +28,24 @@
 		</script>
 	</lams:head>
 
-	<body class="stripes">
-			<div id="content">
-			<h1>
-				<fmt:message key="title.import" />
-			</h1>
+<c:set var="title" scope="request">
+	<fmt:message key="title.import" />
+</c:set>
 
-				<h2>
+	<body class="stripes">
+			<lams:Page type="admin" title="${title}">
+
+				<div class="panel">
 					<fmt:message key="title.import.instruction" />
-				</h2>
-				<p>
-					&nbsp;
-				</p>
+				</div>
+
 				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data" id="importForm">
 					<p>
-						<fmt:message key="label.ld.zip.file" />
+						<label for="UPLOAD_FILE"><fmt:message key="label.ld.zip.file" /></label>
 						<input type="hidden" name="customCSV" id="customCSV" value="${customCSV}" />
 						<input type="file" name="UPLOAD_FILE" id="UPLOAD_FILE"/>
-						<a href="javascript:;" class="button" onclick="verifyAndSubmit();"><span class="import"><fmt:message key="button.import" /></span></a>
+						<a href="javascript:;" class="btn btn-primary pull-right voffset10" onclick="verifyAndSubmit();"><fmt:message key="button.import" /> 
+						&nbsp;<i class="fa fa-sm fa-upload"></i></a>
 					</p>
 				</form>
 
@@ -56,5 +56,6 @@
 			<div id="footer">
 			</div>
 			<!--closes footer-->
+</lams:Page>			
 	</body>
 </lams:html>
