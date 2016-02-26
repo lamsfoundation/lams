@@ -1,32 +1,27 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
-	$(function() {
-		$("#leaderSelectionDialog").dialog({
-			bgiframe: true,
-			autoOpen: ${isSelectLeaderActive},
-			height: 500,
-			width: 400,
-			modal: true,
-			buttons: {
-				'<fmt:message key="label.yes.become.leader" />': function() {
-			        $.ajax({
-			        	async: false,
-			            url: '<c:url value="/learning.do"/>',
-			            data: 'dispatch=becomeLeader&toolSessionID=${toolSessionID}',
-			            type: 'post',
-			            success: function (json) {
-			            	location.reload();
-			            }
-			       	});
-				},
-				
-				'<fmt:message key="label.no" />': function() {
-					$(this).dialog('close');
-				}
-			}
+
+		$(window).load(function(){
+			$("#leaderSelectionDialog").modal({
+				show: ${isSelectLeaderActive},
+				keyboard: true
+			});
+			
 		});
-	});
+
+		function leaderSelection() {
+	        $.ajax({
+	        	async: false,
+	            url: '<c:url value="/learning.do"/>',
+	            data: 'dispatch=becomeLeader&toolSessionID=${toolSessionID}',
+	            type: 'post',
+	            success: function (json) {
+	            	location.reload();
+	            }
+	       	});			
+		}
+		
 
     function finishActivity(){
     	document.getElementById("finishButton").disabled = true;
@@ -34,20 +29,16 @@
     }
 </script>
 
-<c:set var="contentTitle">
-  <c:out value="${content.title}" escapeXml="true"/>
-</c:set>
 
-<div id="content">
-	<h1>
-		<c:out value="${contentTitle}" escapeXml="false"/>
-	</h1>
-	
+<lams:Page type="learner" title="${content.title}">
+
+
 	<h4>
-		<fmt:message key="label.group.leader" />
+		<fmt:message key="label.group.leader" />&nbsp;
+		
 		<c:choose>
 			<c:when test="${not empty groupLeader}">
-				<c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true"/>
+				<mark><c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true" /></mark>
 			</c:when>
 			<c:otherwise>
 				<i><fmt:message key="label.no.leader.yet" /></i>
@@ -58,53 +49,82 @@
 	<div>
 		<fmt:message key="label.users.from.group" />
 	</div>
-		
-	<div>
-		<ul>
-			<c:forEach var="user" items="${groupUsers}" varStatus="status">
-				<li>
-					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
-				</li>
-			</c:forEach>
-		</ul>
-	</div>
 
-	<div class="space-bottom-top align-right">
-		<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="finishActivity()">
-			<span class="nextActivity">
-				<c:choose>
-					<c:when test="${activityPosition.last}">
-						<fmt:message key="button.submit" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="button.finish" />
-					</c:otherwise>
-				</c:choose>
-			</span>
-		</html:link>
-	</div>
-
-</div>
-<c:set var="title">
-	<c:out value="${contentTitle}" escapeXml="true"/>
-</c:set>
-<div id="leaderSelectionDialog" title="${title}" class="dialog">
-	<div style="font-weight:bold; margin: 10px 0 20px;">
-		<c:out value="${content.instructions}" escapeXml="false"/>
-		<br>
-		<fmt:message key="label.are.you.going.to.be.leader" />
-	</div>
-		
-	<div>
-		<fmt:message key="label.users.from.group" />
-	</div>
-		
-	<div style="text-align: right;">
+	<div id="usersInGroup" class="voffset10">
 		<c:forEach var="user" items="${groupUsers}" varStatus="status">
-			<div>
-				<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+			<div id="user-${user.userId}">
+				<div class="user voffset2 loffset10">
+					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+				</div>
 			</div>
 		</c:forEach>
 	</div>
+
+
+	<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="finishActivity()">
+		<span class="nextActivity"> <c:choose>
+				<c:when test="${activityPosition.last}">
+					<fmt:message key="button.submit" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="button.finish" />
+				</c:otherwise>
+			</c:choose>
+		</span>
+	</html:link>
+
+</lams:Page>
+
+
+<c:set var="title">
+	<c:out value="" escapeXml="true" />
+</c:set>
+<div id="leaderSelectionDialog" class="modal fade">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<div class="modal-title" id="exampleModalLabel">${content.title}</div>
+			</div>
+			<div class="modal-body">
+				<!-- begin -->
+				<div class="panel" id="leaderInstructions">
+					<c:out value="${content.instructions}" escapeXml="false" />
+				</div>
+				<div class="lead">
+					<fmt:message key="label.are.you.going.to.be.leader" />
+				</div>
+
+				<div class="voffset10">
+					<fmt:message key="label.users.from.group" />
+				</div>
+
+				<div id="usersInGroup" class="voffset10">
+					<c:forEach var="user" items="${groupUsers}" varStatus="status">
+						<div id="user-${user.userId}" class="voffset2">
+							<div class="user loffset10" id="user-${user.userId}">
+								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+							</div>
+						</div>
+					</c:forEach>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button onclick="leaderSelection();" class="btn btn-sm btn-primary">
+					<fmt:message key="label.yes.become.leader" />
+				</button>
+				<button data-dismiss="modal" class="btn btn-sm btn-primary">
+					<fmt:message key="label.no" />
+				</button>
+
+			</div>
+
+			<!-- ends -->
+		</div>
+	</div>
 </div>
+</div>
+
 
