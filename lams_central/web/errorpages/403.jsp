@@ -1,5 +1,4 @@
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
@@ -10,29 +9,26 @@
 <!DOCTYPE html>
 
 <lams:html>
-	<lams:head>
-		<title><fmt:message key="403.title" /></title>
-		<lams:css />
-	</lams:head>
+<lams:head>
+	<title><fmt:message key="403.title" /></title>
+	<lams:css />
+</lams:head>
 
-	<body class="stripes">
+<body class="stripes">
 
-		<div id="content">
+	<c:set var="title">
+		<fmt:message key="403.title" />
+	</c:set>
 
-			<h1>
-				<fmt:message key="403.title" />
-			</h1>
+	<lams:Page type="admin" title="${title}"></lams:Page>
 
-<!-- 
-			<p class="space-bottom">
+
+	<lams:Alert id="403" class="danger" close="false"></
 				<fmt:message key="403.message" />
-			</p>
- -->
-		</div>
-		<!--closes content-->
+	</lams:Alert>
+	
+	<div id="footer"></div>
+	<!--closes footer-->
 
-		<div id="footer"></div>
-		<!--closes footer-->
-
-	</body>
+</body>
 </lams:html>

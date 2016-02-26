@@ -136,12 +136,16 @@
 </lams:head>
 
 <body class="stripes">
-<div id="content">
-	<div id="errorArea" class="warning" >
+
+<c:set var="title" scope="request">
+	<fmt:message key="label.questions.choice.title" />
+</c:set>
+
+<lams:Page type="admin" title="${title}">
+
+	<lams:Alert id="errorArea" type="danger" close="false">
 		<fmt:message key="label.questions.choice.missing" />
-	</div>
-	
-	<h2><fmt:message key="label.questions.choice.title" /></h2>
+	</lams:Alert>
 	
 	<input id="selectAll" type="checkbox" /><fmt:message key="label.questions.choice.select.all" /><br /><br />
 			       
@@ -237,12 +241,13 @@
 			</c:if>
 		</c:forEach>
 		
-		<div id="buttonsDiv">
-			<input class="button" value='<fmt:message key="button.cancel"/>' type="button" onClick="javascript:window.close()" />
-			<input class="button" value='<fmt:message key="label.ok"/>'      type="button" onClick="javascript:submitForm()" />			
+		<div id="buttonsDiv" class="voffset10 pull-right">
+			<input class="btn btn-default" value='<fmt:message key="button.cancel"/>' type="button" onClick="javascript:window.close()" />
+			<input class="btn btn-primary" value='<fmt:message key="label.ok"/>'      type="button" onClick="javascript:submitForm()" />			
 		</div>
 	</form>
-</div>   
+
 <div id="footer"></div>
+</lams:Page>
 </body>
 </lams:html>

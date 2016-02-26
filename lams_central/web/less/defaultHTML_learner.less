@@ -44,9 +44,6 @@ LAMS Learner Style
   
 }
 
-
-
-
 /* Spacer classes */
 .voffset2 {
 	margin-top: @xs-space;
@@ -72,6 +69,18 @@ LAMS Learner Style
 	margin-right: @lg-space;
 }
 
+
+.loffset2 {
+	margin-left: @xs-space;
+}
+
+.loffset5 {
+	margin-left: @md-space;
+}
+
+.loffset10 {
+	margin-left: @lg-space;
+}
 
 /* Comments/Forum classes */
 
@@ -118,7 +127,7 @@ LAMS Learner Style
 	box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
 }
 
-.panel-learner-page-title {
+.panel-learner-page-title, .panel-admin-page-title {
 	-moz-border-bottom-colors: none;
 	-moz-border-left-colors: none;
 	-moz-border-right-colors: none;
@@ -130,6 +139,12 @@ LAMS Learner Style
 	border-width: 3px 0 0;
 	color: inherit;
 	min-height: 48px;
+}
+
+.panel-admin-page {
+	border-radius: 0px;
+	box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
+	margin-top: 20px;
 }
 
 body.stripes {
