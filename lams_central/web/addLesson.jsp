@@ -28,7 +28,7 @@
 			users = ${users},
 			
 			LAMS_URL = '<lams:LAMSURL/>',
-			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&svgFormat=1&ldId=',
+			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=getLearningDesignThumbnail&ldId=',
 			
 			CANVAS_RESIZE_OPTION_NONE = 0,
 			CANVAS_RESIZE_OPTION_FIT = 1,

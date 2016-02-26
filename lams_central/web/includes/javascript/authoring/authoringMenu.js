@@ -363,18 +363,11 @@ var MenuLib = {
 			imageCode = crop.workspace.toDataURL("image/png");
 		}
 		if (download) {
-			var anchor = $('a', layout.exportImageDialog);
-			if (layout.conf.supportsDownloadAttribute) {
-				anchor.attr({
-					'href'	   : imageCode,
-					'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.png'
-				});
-			} else {
-				anchor.attr({
-					'href'	   : LD_THUMBNAIL_URL_BASE + layout.ld.learningDesignID 
-								 + '&svgFormat=2&download=true&_=' + new Date().getTime()
-				});
-			}
+			$('a', layout.exportImageDialog).attr({
+				'href'	   : imageCode,
+				'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.png'
+			});
+
 			layout.exportImageDialog.dialog('open');
 		} else {
 			return imageCode;
@@ -468,7 +461,7 @@ var MenuLib = {
 			} else {
 				anchor.attr({
 					'href'	   : LD_THUMBNAIL_URL_BASE + layout.ld.learningDesignID
-								 + '&svgFormat=1&download=true&_=' + new Date().getTime()
+								 + '&download=true&_=' + new Date().getTime()
 				});
 			}
 			layout.exportImageDialog.dialog('open');

@@ -59,8 +59,6 @@ public class CentralConstants {
 
     public static final String PARAM_METHOD = "method";
     
-    public static final String PARAM_SVG_FORMAT = "svgFormat";
-
     public static final String PARAM_MODE = "mode";
 
     public static final String PARAM_FILEPATH = "filePath";

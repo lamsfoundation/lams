@@ -43,8 +43,8 @@ function initButtons(containerId) {
 
 	$(".ui-button", container).button();
 	$(".split-ui-button", container).each(function(){
-		var buttonContainer = $(this);
-		var buttons = buttonContainer.children();
+		var buttonContainer = $(this),
+			buttons = buttonContainer.children();
 		
 		buttons.first().button()
 			   .next().button({
@@ -423,10 +423,32 @@ function closeAddSingleActivityLessonDialog(action) {
 				'toolID' : dialog.dialog('option', 'toolID'),
 				'toolContentID' : dialog.dialog('option', 'toolContentID'),
 				'contentFolderID' : dialog.dialog('option', 'contentFolderID')
+			},
+			// create LD SVG
+			success : function(learningDesignID) {
+				// check if the LD was created successfully
+				if (learningDesignID) {
+					var frame = $('iframe', dialog);
+					// disable previous onload handler, set in showAddSingleActivityLessonDialog()
+					frame.off('load').load(function(){
+						// disable current onload handler as closing the dialog reloads the iframe
+						frame.off('load');
+						
+						// call svgGenerator.jsp code to store LD SVG on the server
+						var win = frame[0].contentWindow || frame[0].contentDocument;
+						win.GeneralLib.saveLearningDesignImage();
+						
+						closeDialog(id, true);
+					});
+					// load svgGenerator.jsp to render LD SVG
+					frame.attr('src', LAMS_URL + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+											   + learningDesignID);
+				}
 			}
 		});
+	} else {
+		closeDialog(id, false);
 	}
-	closeDialog(id, save);
 }
 
 
@@ -480,7 +502,7 @@ function removeLesson(lessonID) {
 				async : false,
 				url : LAMS_URL + "monitoring/monitoring.do",
 				data : "method=removeLesson&lessonID=" + lessonID,
-				type : "post",
+				type : "POST",
 				success : function(json) {
 					if (json.removeLesson == true) {
 						loadOrgTab(null, true);

@@ -29,8 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.batik.transcoder.TranscoderException;
-import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
@@ -83,14 +81,14 @@ public interface ILearningDesignService {
 	    throws IOException;
 
     public LearningLibrary getLearningLibrary(Long learningLibraryId);
-    
+
     /**
      * Gets all existing learning library groups.
      */
     public List<LearningLibraryGroup> getLearningLibraryGroups();
-    
+
     public void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups);
-    
+
     /**
      * Set valid flag to learning library.
      * 
@@ -99,21 +97,5 @@ public interface ILearningDesignService {
      */
     public void setValid(Long learningLibraryId, boolean valid);
 
-    /**
-     * Creates learning design SVG/PNG file. Also stores it into the file system for caching.
-     * 
-     * @param learningDesignId
-     *            source learning design for the outcome image
-     * @param imageFormat
-     *            it can be either SVGGenerator.OUTPUT_FORMAT_SVG or SVGGenerator.OUTPUT_FORMAT_PNG
-     * @return
-     * @throws JDOMException
-     * @throws IOException
-     * @throws TranscoderException
-     */
-    String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws IOException;
-
-    String createBranchingSVG(Long branchingActivityId, int imageFormat) throws IOException;
-    
     public List<ToolDTO> getToolDTOs(boolean includeParallel, String userName) throws IOException;
 }

@@ -127,7 +127,6 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.VersionUtil;
-import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -487,14 +486,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    //generate SVG image
 	    String destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
-	    String svgPath = service.createLearningDesignSVG(learningDesignId,
-		    SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY);
+	    String svgPath = LearningDesignService.getLearningDesignSVGPath(learningDesignId);
 	    File svgFile = new File(svgPath);
 	    if (svgFile.canRead()) {
 		FileUtils.copyFile(svgFile, new File(destinationPath));
-		// remove the file as its icons refer to LAMS Community server instead of local resources
-		// and should not be used in Monitoring
-		svgFile.delete();
 	    }
 
 	    log.debug("Learning design xml export success");

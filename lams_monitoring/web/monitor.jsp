@@ -412,12 +412,6 @@
 					<fmt:message key='button.live.edit'/>
 				</a>
 			</c:if>
-			<a class="button" title="<fmt:message key='button.close.branching.tooltip'/>"
-			  id="closeBranchingButton"
-			  href="#"
-			  onClick="javascript:closeBranchingSequence()">
-				<fmt:message key='button.close.branching'/>
-			</a>
 			<span id="sequenceSearchPhraseClear"
 				 class="ui-icon ui-icon-circle-close"
 				 onClick="javascript:sequenceClearSearchPhrase(true)"

@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -53,6 +52,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
+import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -70,7 +70,6 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
@@ -186,12 +185,6 @@ public class HomeAction extends DispatchAction {
 		if (lesson.isDisplayDesignImage()) {
 		    Long learningDesignId = lesson.getLearningDesign().getLearningDesignId();
 		    req.setAttribute(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignId);
-
-		    if (lesson.getLearnerProgresses().isEmpty()) {
-			// create svg, png files on the server
-			getLearningDesignService().createLearningDesignSVG(learningDesignId,
-				SVGGenerator.OUTPUT_FORMAT_SVG);
-		    }
 		}
 		return mapping.findForward("lessonIntro");
 	    }
@@ -410,20 +403,10 @@ public class HomeAction extends DispatchAction {
 	return null;
     }
 
-    public ActionForward createLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws JDOMException, IOException, TranscoderException {
+    public ActionForward getLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+	    HttpServletResponse res) throws JDOMException, IOException {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	Integer format = WebUtil.readIntParam(req, CentralConstants.PARAM_SVG_FORMAT, true);
-	format = format == null ? SVGGenerator.OUTPUT_FORMAT_SVG : format;
-	Long branchingActivityId = WebUtil.readLongParam(req, "branchingActivityID", true);
 	boolean download = WebUtil.readBooleanParam(req, "download", false);
-	String imagePath = null;
-	if (branchingActivityId == null) {
-	    imagePath = getLearningDesignService().createLearningDesignSVG(learningDesignId, format);
-	} else {
-	    imagePath = getLearningDesignService().createBranchingSVG(branchingActivityId, format);
-	}
-
 	// should the image be downloaded or a part of page?
 	if (download) {
 	    String name = getLearningDesignService()
@@ -435,8 +418,10 @@ public class HomeAction extends DispatchAction {
 	} else {
 	    res.setContentType("image/svg+xml");
 	}
-	OutputStream output = res.getOutputStream();
+
+	String imagePath = LearningDesignService.getLearningDesignSVGPath(learningDesignId);
 	FileInputStream input = new FileInputStream(imagePath);
+	OutputStream output = res.getOutputStream();
 	IOUtils.copy(input, output);
 	IOUtils.closeQuietly(input);
 	IOUtils.closeQuietly(output);

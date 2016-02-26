@@ -8,7 +8,6 @@
         <archive path="/lams_build/lib/autopatch/autopatch-1.4.2-lams.jar"/>
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
         <archive javadoc="http://ws.apache.org/axis/java/apiDocs/" path="/lams_build/lib/axis/axis.jar"/>
-        <archive path="/lams_build/lib/batik/batik-1.7.jar" source="/3rdParty_sources/batik"/>
         <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-validator.jar"/>
