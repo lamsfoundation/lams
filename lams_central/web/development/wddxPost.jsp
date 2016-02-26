@@ -3,8 +3,8 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
+
 <lams:html>
 <lams:head>
 <title>Send WDDX Packet To Server</title>

@@ -19,8 +19,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt 
 --%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
+        
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
