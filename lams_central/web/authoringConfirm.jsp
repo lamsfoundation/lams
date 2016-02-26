@@ -38,25 +38,24 @@
 </lams:head>
 <body class="stripes">
 
-	<div id="content" align="center">
+	<c:set var="title">
+		<fmt:message key="authoring.msg.save.success" />
+	</c:set>
+	
+	<lams:Page type="admin" title="${title}">
 
-		<h1>
-			<fmt:message key="authoring.msg.save.success" />
-		</h1>
-		<div class="space-bottom-top">
+		<div class="voffset10 text-center">
 			<html:link href="javascript:;" onclick="javascript:location.href='${param.reEditUrl}'"
-				property="reedit" styleClass="button">
-				<span class="editForm"><fmt:message key="label.authoring.re.edit" /></span>
+				property="reedit" styleClass="btn btn-primary roffset10">
+				<fmt:message key="label.authoring.re.edit" />&nbsp;<i class="fa fa-pencil-square-o"></i>
 			</html:link>
 			<html:link href="javascript:;" onclick="javascript:closeWindow();" property="close"
-				styleClass="button">
-				<span class="close"><fmt:message key="label.authoring.close" /></span>
+				styleClass="btn btn-primary">
+				<fmt:message key="label.authoring.close" />&nbsp;<i class="fa fa-times-circle-o"></i>
 			</html:link>
 		</div>
 
-	</div>
-
 	<div id="footer"></div>
-
+</lams:Page>
 </body>
 </lams:html>
