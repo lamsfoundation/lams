@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div id="content">
+<lams:Page type="learner" title="${scribeDTO.title}">
 
 	<%@ include file="parts/reportBody.jsp"%>
 
@@ -11,3 +11,5 @@
 </div>
 
 <div id="footer"></div>
+
+</lams:Page>

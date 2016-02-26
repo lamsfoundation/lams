@@ -1,15 +1,19 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div id="content">
-	<h1>
-		<fmt:message key="activity.title" />
-	</h1>
+<c:set var="title" scope="request">
+	<fmt:message key="activity.title" />
+</c:set>
+<c:set var="msg" scope="request">
+	<fmt:message key="message.waitForScribe" />
+</c:set>
+
+<lams:Page type="learner" title="${title}">
 	<p>
-		<fmt:message key="message.waitForScribe" />
+		<c:out value="${msg}"/>
 	</p>
 
-	<div align="right" class="space-bottom-top">
-		<a href="javascript:location.reload(true);" class="button"><fmt:message
-	key="button.try.again" /> </a></div>
-</div>
+
+		<a href="javascript:location.reload(true);" class="btn btn-primary voffset10 pull-right"><fmt:message
+	key="button.try.again" /> </a>
+</lams:Page>
 

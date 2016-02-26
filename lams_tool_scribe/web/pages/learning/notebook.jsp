@@ -10,25 +10,21 @@
         }
 </script>
 
-<div id="content">
-
-	<h1>
-		<c:out value="${scribeDTO.title}" escapeXml="true"/>
-	</h1>
+<lams:Page type="learner" title="${scribeDTO.title}">
 
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="dispatch" value="submitReflection" />
 		<html:hidden property="scribeUserUID" />
 
-		<p>
+		<div class="panel">
 			<lams:out value="${scribeDTO.reflectInstructions}" escapeHtml="true"/>
-		</p>
+		</div>
 
-		<html:textarea cols="60" rows="8" property="entryText"
-			styleClass="text-area"></html:textarea>
+		<html:textarea rows="5" styleId="focused" property="entryText"
+			styleClass="form-control"></html:textarea>
 
-		<div class="space-bottom-top align-right">
-			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+		
+			<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
 				<span class="nextActivity">
 					<c:choose>
 	 					<c:when test="${activityPosition.last}">
@@ -40,8 +36,14 @@
 	 				</c:choose>
 	 			</span>
 			</html:link>
-		</div>
 
 	</html:form>
-</div>
+</lams:Page>
+
+
+<script type="text/javascript">
+	window.onload = function() {
+		document.getElementById("focused").focus();
+	}
+</script>
 
