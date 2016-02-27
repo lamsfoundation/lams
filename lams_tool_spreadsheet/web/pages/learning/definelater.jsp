@@ -8,13 +8,11 @@
 	<meta http-equiv="refresh" content="60">
 </lams:head>
 
+<c:set var="title"><fmt:message key="activity.title"/></c:set>
+
 <body class="stripes">
-	<div id="content">
-		<h1>
-			<fmt:message key="activity.title" />
-		</h1>
+	<lams:Page type="learner" title="${title}">
 		<lams:DefineLater />
-	</div>
-	<div id="footer"></div>
+	</lams:Page>
 </body>
 </lams:html>

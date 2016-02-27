@@ -21,15 +21,12 @@
 
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
+	<lams:Page type="learner" title="${sessionMap.title}">
 	
 	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="userID" />
 		<html:hidden property="sessionMapID" />
-
-		<div id="content">
-			<h1>
-				<c:out value="${sessionMap.title}" escapeXml="true"/>
-			</h1>
 
 			<%@ include file="/common/messages.jsp"%>
 
@@ -41,8 +38,7 @@
 				styleClass="text-area" />
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="nextActivity">
+				<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${sessionMap.activityPosition.last}">
 								<fmt:message key="label.submit" />
@@ -51,11 +47,10 @@
 								<fmt:message key="label.finished" />
 							</c:otherwise>
 						</c:choose>
-					</span>
 				</html:link>
 			</div>
-		</div>
 	</html:form>
+	</lams:Page>
 
 	<div id="footer">
 	</div>

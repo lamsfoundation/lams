@@ -20,7 +20,8 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="spreadsheet" value="${sessionMap.spreadsheet}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
-
+	<c:set var="language" value="${pageContext.response.locale.language}" />
+	
 	<script type="text/javascript">
 	<!--
 		function finishSession(){
@@ -50,13 +51,9 @@
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${spreadsheet.title}" escapeXml="true"/>
-		</h1>
-
+	<lams:Page type="learner" title="${spreadsheet.title}">
 		<p>
-			<c:out value="</c:out> ${spreadsheet.instructions}" escapeXml="false"/>
+			<c:out value="${spreadsheet.instructions}" escapeXml="false"/>
 		</p>
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
@@ -121,76 +118,97 @@
 			<br>
 		</c:if>		
 		
-		<iframe
-			id="externalSpreadsheet" name="externalSpreadsheet" src="<html:rewrite page='/includes/javascript/simple_spreadsheet/spreadsheet_offline.html'/>?lang=<%=request.getLocale().getLanguage()%>"
-			style="width:99%;" frameborder="no" height="385px"
-			scrolling="no">
-		</iframe>
-		
-		<c:if test="${(mode != 'teacher') && (spreadsheet.learnerAllowedToSave) && !(sessionMap.lockOnFinish && sessionMap.userFinished)}">
-			<div class="space-bottom-top align-right">
-				<html:button property="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" styleClass="button">
-					<fmt:message key="label.save" />
-				</html:button>
+		<div class="row no-gutter">
+			<div class="col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+					<iframe
+						id="externalSpreadsheet" name="externalSpreadsheet" src="<html:rewrite page='/includes/javascript/simple_spreadsheet/spreadsheet_offline.html'/>?lang=${language}"
+						style="width:99%;" frameborder="no" height="385px"
+						scrolling="no">
+						</iframe>
+				
+					<c:if test="${(mode != 'teacher') && (spreadsheet.learnerAllowedToSave) && !(sessionMap.lockOnFinish && sessionMap.userFinished)}">
+						<div class="space-bottom-top align-right">
+							<html:button property="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" styleClass="btn btn-primary voffset10 pull-right">
+								<fmt:message key="label.save" />
+							</html:button>
+						</div>
+					</c:if>		
+					</div>
+				</div>
 			</div>
-		</c:if>		
+		</div>
+
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h3><fmt:message key="title.reflection" /></h3>
-				  <p>
-					<strong><lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}"/></strong>
-				  </p>
+			<div class="row no-gutter">
+				<div class="col-xs-12">
+					<div class="panel panel-default">
+						<div class="panel-heading panel-title">
+							<fmt:message key="title.reflection" />
+						</div>
+						<div class="panel-body">
+							<div class="reflectionInstructions">
+								<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
+							</div>
+							<div class="panel">
+								<lams:out value="${QaLearningForm.entryText}" escapeHtml="true" />
+							</div>
 
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}"/>
-						</p>
-					</c:otherwise>
-				</c:choose>
+							<c:if test="${hasEditRight}">
+								<html:button property="forwardtoReflection" styleClass="btn btn-default pull-left"
+									onclick="submitMethod('forwardtoReflection');">
+									<fmt:message key="label.edit" />
+								</html:button>
+							</c:if>
+							
+							<c:choose>
+								<c:when test="${empty sessionMap.reflectEntry}">
+									<p><em> <fmt:message key="message.no.reflection.available" /></em>	</p>
+								</c:when>
+								<c:otherwise>
+									<p>	<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}"/> </p>
+								</c:otherwise>
+							</c:choose>
 
-				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
+							<c:if test="${mode != 'teacher'}">
+								<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default voffset10 pull-left">
+								<fmt:message key="label.edit" />
+								</html:button>
+							</c:if>
+							
+						</div>
+					</div>
+				</div>
 			</div>
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">				
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button">
-							<span class="nextActivity">
-								<c:choose>
-				 					<c:when test="${sessionMap.activityPosition.last}">
-				 						<fmt:message key="label.submit" />
-				 					</c:when>
-				 					<c:otherwise>
-				 		 				<fmt:message key="label.finished" />
-				 					</c:otherwise>
-				 				</c:choose>
-				 			</span>
+						<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="return finishSession()">
+							<c:choose>
+			 					<c:when test="${sessionMap.activityPosition.last}">
+			 						<fmt:message key="label.submit" />
+			 					</c:when>
+			 					<c:otherwise>
+			 		 				<fmt:message key="label.finished" />
+			 					</c:otherwise>
+			 				</c:choose>
 						</html:link>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</c:if>
 
-	</div>
+	</lams:Page>
 	<!--closes content-->
 
 	<div id="footer">
