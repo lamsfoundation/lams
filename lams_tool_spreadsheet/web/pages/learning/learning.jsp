@@ -52,25 +52,25 @@
 <body class="stripes">
 
 	<lams:Page type="learner" title="${spreadsheet.title}">
-		<p>
-			<c:out value="${spreadsheet.instructions}" escapeXml="false"/>
-		</p>
-
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-				<div class="info">
-					<c:choose>
-						<c:when test="${sessionMap.userFinished}">
-							<fmt:message key="message.activityLocked" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="message.warnLockOnFinish" />
-						</c:otherwise>
-					</c:choose>
-				</div>
+			<lams:Alert type="danger" id="lockWhenFinished" close="false">
+				<c:choose>
+					<c:when test="${sessionMap.userFinished}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+			</lams:Alert>
 		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
 		
+		<p>
+			<c:out value="${spreadsheet.instructions}" escapeXml="false"/>
+		</p>
+
 		<html:form action="learning/saveUserSpreadsheet" method="post" styleId="learningForm" enctype="multipart/form-data">
 			<html:hidden property="spreadsheet.code" styleId="spreadsheet.code"/>	
 		</html:form>
