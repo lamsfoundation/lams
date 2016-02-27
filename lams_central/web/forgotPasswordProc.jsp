@@ -15,10 +15,22 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 
 <%
-String languageKey = StringEscapeUtils.escapeHtml(request.getParameter("languageKey"));
-String stateStr = request.getParameter("state");
-String emailStr = request.getParameter("emailSent");
+	String languageKey = StringEscapeUtils.escapeHtml(request
+			.getParameter("languageKey"));
+	String stateStr = request.getParameter("state");
+	String emailStr = request.getParameter("emailSent");
 %>
+
+<c:set var="languageKey" scope="request">
+	<%=languageKey%>
+</c:set>
+<c:set var="stateStr" scope="request">
+	<%=stateStr%>
+</c:set>
+<c:set var="emailStr" scope="request">
+	<%=emailStr%>
+</c:set>
+
 
 <!DOCTYPE html>
 <lams:html>
@@ -41,49 +53,34 @@ String emailStr = request.getParameter("emailSent");
 	};
 </script>
 
+<c:set var="title">
+	<fmt:message key="title.forgot.password" />
+</c:set>
+
 <body class="stripes">
-	<div id="page">
-		<!--main box 'page'-->
-
-		<div id="header-no-tabs"></div>
-		<div id="content" align="center">
-			<h1 class="no-tabs-below">
-				<fmt:message key="label.forgot.password.confirm" />
-			</h1>
+	<lams:Page type="admin" title="${title}">
+		<h4>
+			<fmt:message key="label.forgot.password.confirm" />
+		</h4>
 
 
-			<%
-	    	if (stateStr.equals("0")) {
-	    %>
-			<p class="warning">
-				<%
-	    	} else {
-	    %>
-				<p class="info">
-					<% 
-	    	}
-	    %>
-					<fmt:message key="<%=languageKey%>" />
+		<c:set var="type" value="info" />
+		<c:if test="${stateStr == 0}">
+			<c:set var="type" value="danger" />
+		</c:if>
+		
+		<lams:Alert id="output" type="${type}" close="false">
 
-					<%
-	   		if (emailStr!=null && !emailStr.equals(""))
-		    {
-		    	out.print(emailStr);
-		    }
-		%>
-				</p>
+			<fmt:message key="${languageKey}" />
 
-				<br>
-				<html:button property="cancel" styleClass="button" onclick="javascript:toHome();">
-					<fmt:message key="label.ok" />
-				</html:button>
-		</div>
+		</lams:Alert>
 
-		<div id="footer">
-			<div id="footer"></div>
-			<!--closes footer-->
+		<html:button property="cancel" styleClass="btn btn-primary pull-right voffset10" onclick="javascript:toHome();">
+			<fmt:message key="label.ok" />
+		</html:button>
 
-		</div>
+
+	</lams:Page>
 </body>
 
 </lams:html>
