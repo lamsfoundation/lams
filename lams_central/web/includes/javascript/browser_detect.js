@@ -179,6 +179,7 @@ ie7=(ie&&(nu.substring(0,1)==7));
 ie8=(ie&&(nu.substring(0,1)==8));
 ie9=(ie&&(nu.substring(0,1)==9));
 ie10=(ie&&(nu.substring(0,2)==10));
+ie11=(ie&&(nu.substring(0,2)==11));
 // default to get number from navigator app version.
 if(!nu) 
 {
