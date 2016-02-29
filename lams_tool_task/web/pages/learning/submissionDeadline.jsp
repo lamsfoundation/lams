@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-        
+
 
 <%@include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
@@ -9,69 +9,74 @@
 
 	<script type="text/javascript">
 	<!--
-		function finishSession(){
+		function finishSession() {
 			document.getElementById("finishButton").disabled = true;
-			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
+			document.location.href = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 			return false;
 		}
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+		function continueReflect() {
+			document.location.href = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		
-	-->        
-    </script>
+
+		-->
+	</script>
 </lams:head>
 
 <body class="stripes">
-	<div id="content">
-		<h1>
-			<c:out value="${sessionMap.title}"/>
-		</h1>
+	<lams:Page type="learner" title="${sessionMap.title}">
 
-		<div class="warning">
-			<fmt:message key="authoring.info.teacher.set.restriction" >
-				<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+		<lams:Alert id="submissionDeadline" type="danger" close="false">
+			<fmt:message key="authoring.info.teacher.set.restriction">
+				<fmt:param>
+					<lams:Date value="${sessionMap.submissionDeadline}" />
+				</fmt:param>
 			</fmt:message>
-		</div>	
-		
+		</lams:Alert>
+
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h2>${sessionMap.reflectInstructions}</h2>
-			
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em>
-								<fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p> <lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />  </p>				
-					</c:otherwise>
-				</c:choose>
-				
-				<html:button property="FinishButton"
-					onclick="return continueReflect()" styleClass="button">
-					<fmt:message key="label.edit" />
-				</html:button>											
+
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="panel panel-default">
+						<div class="panel-heading-sm">
+							<div class="panel-title">${sessionMap.reflectInstructions}</div>
+						</div>
+						<div class="panel-body">
+							<c:choose>
+								<c:when test="${empty sessionMap.reflectEntry}">
+									<fmt:message key="message.no.reflection.available" />
+								</c:when>
+								<c:otherwise>
+									<div class="panel">
+										<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+									</div>
+								</c:otherwise>
+							</c:choose>
+
+							<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default voffset5">
+								<fmt:message key="label.edit" />
+							</html:button>
+
+
+						</div>
+					</div>
+				</div>
 			</div>
+
 		</c:if>
 
-		<div class="space-bottom-top align-right">
+		<div class="voffset10">
 			<c:choose>
-				<c:when
-					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-					<html:link href="#nogo" property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
+				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+					<html:link href="#nogo" property="FinishButton" onclick="return continueReflect()"
+						styleClass="btn btn-primary pull-right ">
 						<fmt:message key="label.continue" />
 					</html:link>
 				</c:when>
 				<c:otherwise>
-					<html:link href="#nogo" property="FinishButton" styleId="finishButton"
-						onclick="return finishSession()" styleClass="button">
-						<span class="nextActivity">
-							<c:choose>
+					<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()"
+						styleClass="btn btn-primary pull-right na">
+						<span class="nextActivity"> <c:choose>
 								<c:when test="${sessionMap.activityPosition.last}">
 									<fmt:message key="label.submit" />
 								</c:when>
@@ -84,10 +89,9 @@
 				</c:otherwise>
 			</c:choose>
 		</div>
-	</div>
-	<div id="footer">
-	</div>
-	<!--closes footer-->
 
+		<div id="footer"></div>
+		<!--closes footer-->
+	</lams:Page>
 </body>
 </lams:html>

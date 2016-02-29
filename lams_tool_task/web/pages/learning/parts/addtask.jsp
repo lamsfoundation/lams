@@ -4,44 +4,40 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-	</lams:head>
-	<body>
+<lams:head>
+	<%@ include file="/common/header.jsp"%>
+</lams:head>
+<body>
 
 
-		<html:form action="/learning/saveNewTask" method="post" styleId="taskListItemForm">
-			<html:hidden property="mode"/>
-			<html:hidden property="sessionMapID"/>
+	<html:form action="/learning/saveNewTask" method="post" styleId="taskListItemForm">
+		<html:hidden property="mode" />
+		<html:hidden property="sessionMapID" />
 
-			<div class="field-name-alternative-color space-top">
-				<fmt:message key="label.learning.new.task.details" />
-			</div>
-			<%@ include file="/common/messages.jsp"%>
+		<h5>
+			<fmt:message key="label.learning.new.task.details" />
+		</h5>
+		<%@ include file="/common/messages.jsp"%>
 
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.resource.title.input" />
-			</div>
+		<div class="form-group">
+			<label for="taskTitle"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
+			<html:text styleId="taskTitle" property="title" styleClass="form-control" tabindex="1" />
+		</div>
+		<div class="form-group">
+			<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
+			<lams:STRUTS-textarea rows="5" tabindex="2" styleId="description" styleClass="form-control" property="description" />
+		</div>
+	</html:form>
 
-			<html:text property="title" size="40" tabindex="1" />
-
-			<div class="field-name space-top">
-				<fmt:message key="label.learning.comment.or.instruction" />
-			</div>
-
-			<lams:STRUTS-textarea rows="5" cols="20" tabindex="4" styleClass="text-area"
-				property="description" />
-				
-		</html:form>
-		
+	<div class="form-group">
 		<lams:ImgButtonWrapper>
-			<a href="#" onclick="taskListItemForm.submit();" class="button-add-item">
-				<fmt:message key="button.add" /> 
+			<a href="javascript:;" onclick="window.parent.hideMessage();" class="btn btn-sm btn-default"> <fmt:message
+					key="label.cancel" />
 			</a>
-			<a href="javascript:;" onclick="window.parent.hideMessage();" class="button space-left">
-				<fmt:message key="label.cancel" />
+			<a href="#" onclick="taskListItemForm.submit();" class="btn btn-sm btn-default"> <fmt:message key="button.add" />
 			</a>
 		</lams:ImgButtonWrapper>
-		
-	</body>
+	</div>
+
+</body>
 </lams:html>
