@@ -51,6 +51,9 @@
 	<definition name="tiles:/header:learner" path="/common/learnerheader.jsp">
 		<put name="headItems" value="/common/empty.jsp" type="page" />
 	</definition>
+	<definition name="tiles:/header:definelater" path="/common/definelaterheader.jsp">
+		<put name="headItems" value="/common/empty.jsp" type="page" />
+	</definition>
 	<!-- End: Headers -->
 
 
@@ -92,6 +95,7 @@
 	</definition>
 	
 	<definition name="tiles:/learning/defineLater" extends="tiles:/layout:learning">
+		<put name="header" value="tiles:/header:definelater"  type="definition" />
 		<put name="body" value="/pages/learning/defineLater.jsp" />
 	</definition>
 	
