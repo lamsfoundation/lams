@@ -24,12 +24,8 @@
 	
 	<body class="stripes">
 	
-			<div id="content">
+			<lams:Page type="learner" title="${gmapDTO.title}">
 			
-			<h1>
-				<c:out value="${gmapDTO.title}" escapeXml="true"/>
-			</h1>
-		
 			<html:form action="/learning" method="post">
 				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 				<html:hidden property="markersXML" />
@@ -44,9 +40,8 @@
 		
 				<div class="space-bottom-top align-right">
 					<html:hidden property="dispatch" value="submitReflection" />
-					<html:link href="#nogo" styleClass="button" styleId="finishButton" 
+					<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton" 
 				          onclick="javascript:document.learningForm.submit();return false">
-						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${activityPosition.last}">
 			 						<fmt:message key="button.submit" />
@@ -55,12 +50,11 @@
 			 		 				<fmt:message key="button.finish" />
 			 					</c:otherwise>
 				 			</c:choose>
-			 			</span>
 					</html:link>
 				</div>
 			</html:form>
 				
-			</div>
+			</lams:Page>
 			<div class="footer"></div>
 	</body>
 </lams:html>
