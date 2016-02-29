@@ -2662,13 +2662,18 @@ GeneralLib = {
 									this.draw();
 								});
 								
+								// create the updated LD image
+								var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
+								if (!svgSaveSuccessful) {
+									alert(LABELS.SVG_SAVE_ERROR);
+									return;
+								}
+								
 								// set as not modified so dialog will not prompt user on close
 								GeneralLib.setModified(false);
-								// create the updated LD image
-								GeneralLib.saveLearningDesignImage();
 								
 								// close the Live Edit dialog
-								alert('Changes were successfully applied.');
+								alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
 								window.parent.closeDialog('dialogFlashlessAuthoring');
 							}
 						});
@@ -2677,7 +2682,11 @@ GeneralLib = {
 						return;
 					}
 					
-					GeneralLib.saveLearningDesignImage();
+					var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
+					if (!svgSaveSuccessful) {
+						alert(LABELS.SVG_SAVE_ERROR);
+						return;
+					}
 					
 					if (response.validation.length == 0) {
 						alert(LABELS.SAVE_SUCCESSFUL);
@@ -2702,6 +2711,7 @@ GeneralLib = {
 	 * Stores SVG LD thumbnail on server.
 	 */
 	saveLearningDesignImage : function() {
+		var result = false;
 		$.ajax({
 			type : 'POST',
 			url : LAMS_URL + 'authoring/author.do',
@@ -2709,10 +2719,14 @@ GeneralLib = {
 			data : {
 				'method' : 'saveLearningDesignImage',
 				'learningDesignID' : layout.ld.learningDesignID,
-				'extension' : 'SVG',
 				'image' : MenuLib.exportSVG()
+			},
+			success : function(){
+				result = true;
 			}
 		});
+		
+		return result;
 	},
 	
 
