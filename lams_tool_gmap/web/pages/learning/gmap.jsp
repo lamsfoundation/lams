@@ -31,10 +31,10 @@
 
 		<div class="container-fluid">
 		<div class="row no-gutter">
-			<div class="col-sm-10">
+			<div class="col-sm-9">
 				<div id="map_canvas" style="height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
 			</div>
-			<div class="col-sm-2">
+			<div class="col-sm-3">
 				<div id="usersidebar"></div>		
 			</div>	
 		</div>
