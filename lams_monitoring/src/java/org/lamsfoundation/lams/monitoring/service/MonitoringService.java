@@ -2449,12 +2449,12 @@ public class MonitoringService implements IMonitoringService {
 		    if (userDto != null) {
 			if ((!addAllStaff && (staffIds.length > 0)) || addAllStaff) {
 			    // create staff LessonClass
-			    String staffGroupName = group.getName() + " Staff";
+			    String staffGroupName = group.getName() + " staff";
 			    List<User> staffUsers = createStaffGroup(group.getOrganisationId(), addAllStaff, staffIds);
 
 			    if ((!addAllLearners && (learnerIds.length > 0)) || addAllLearners) {
 				// create learner LessonClass for lesson
-				String learnerGroupName = group.getName() + " Learners";
+				String learnerGroupName = group.getName() + " learners";
 				List<User> learnerUsers = createLearnerGroup(group.getOrganisationId(), addAllLearners,
 					learnerIds);
 

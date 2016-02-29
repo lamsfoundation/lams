@@ -488,7 +488,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		    Role.LEARNER, false, true);
 	    learnerList.addAll(learnerVector);
 	    getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
-		    organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
+		    organisation.getName() + " learners", learnerList, organisation.getName() + " staff", staffList,
 		    userID);
 
 	    getMonitoringService().startLesson(lesson.getLessonId(), userID);
