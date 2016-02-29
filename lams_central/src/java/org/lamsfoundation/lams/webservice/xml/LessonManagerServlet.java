@@ -604,7 +604,7 @@ public class LessonManagerServlet extends HttpServlet {
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, false, true);
 	learnerList.addAll(learnerVector);
 	LessonManagerServlet.monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
-		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
+		organisation.getName() + " learners", learnerList, organisation.getName() + " staff", staffList,
 		creator.getUserId());
 
     }

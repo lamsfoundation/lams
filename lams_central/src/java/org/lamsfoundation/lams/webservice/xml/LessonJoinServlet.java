@@ -301,8 +301,8 @@ public class LessonJoinServlet extends HttpServlet {
 	    enableNotifications = false;
 	    learnerRestart = false;
 	    ownerUserId = ld.getUser().getUserId();
-	    learnerGroupName = org.getName() + " Learners";
-	    staffGroupName = org.getName() + " Staff";
+	    learnerGroupName = org.getName() + " learners";
+	    staffGroupName = org.getName() + " staff";
 	    Vector userDTOs = LessonJoinServlet.userService.getUsersFromOrganisationByRole(orgId, Role.MONITOR, false,
 		    false);
 	    staffList = getUsersFromDTOs(userDTOs);
