@@ -429,11 +429,10 @@ ActivityDraw = {
 							    'stroke' : layout.colors.activityBorder,
 								'fill' : layout.colors.grouping
 							 }),
-			icon = paper.image('../images/grouping.gif', x + 47, y + 2, 30, 30),
 			label = paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
 						 .attr(layout.defaultTextAttributes);
 		
-		this.items = paper.g(shape, icon, label);
+		this.items = paper.g(shape, label);
 		if (this.readOnly) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
