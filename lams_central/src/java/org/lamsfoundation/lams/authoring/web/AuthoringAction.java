@@ -38,7 +38,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -497,11 +496,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	    if (AuthoringAction.log.isDebugEnabled()) {
 		AuthoringAction.log.debug("Created a single activity lesson with ID: " + lesson.getLessonId());
 	    }
-	    
+
 	    response.setContentType("text/plain;charset=utf-8");
 	    response.getWriter().write(learningDesignID.toString());
 	}
-	
+
 	return null;
     }
 
@@ -583,23 +582,27 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Stores the binary code of an Learning Design thumbnail, created in Flashless Authoring.
+     * 
+     * @throws IOException
      */
     public ActionForward saveLearningDesignImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	Long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-	String extension = request.getParameter("extension");
 	String image = request.getParameter("image");
-	AuthoringAction.saveLearningDesignImage(learningDesignID, extension, image);
-
+	boolean saveSuccesful = AuthoringAction.saveLearningDesignImage(learningDesignID, image);
+	if (!saveSuccesful) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
 	return null;
     }
 
     /**
      * Stores the binary code of an Learning Design thumbnail, created in Flashless Authoring.
      */
-    private static void saveLearningDesignImage(long learningDesignID, String extension, String image) {
-	if (StringUtils.isBlank(image) || (!"SVG".equalsIgnoreCase(extension) && !"PNG".equalsIgnoreCase(extension))) {
-	    return;
+    private static boolean saveLearningDesignImage(long learningDesignID, String image) {
+	if (StringUtils.isBlank(image)) {
+	    AuthoringAction.log.error("No SVG code to save for LD: " + learningDesignID);
+	    return false;
 	}
 
 	// prepare the dir and the file
@@ -609,38 +612,18 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	String absoluteFilePath = FileUtil.getFullPath(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER,
-		learningDesignID + "." + extension.toLowerCase());
+		learningDesignID + ".svg");
 
 	// write out the content
-	FileOutputStream fos = null;
-	try {
-	    fos = new FileOutputStream(absoluteFilePath);
-	    if (extension.equalsIgnoreCase("png")) {
-		// if it comes from Flashless Authoring, it can have a prefix we need to remove
-		if (image.contains("base64")) {
-		    image = image.substring(image.indexOf(",") + 1);
-		}
-		byte[] bytes = DatatypeConverter.parseBase64Binary(image);
-		fos.write(bytes);
-	    } else {
-		// encoding is important, especially for Raphael-generated SVGs
-		Writer writer = new OutputStreamWriter(fos, "UTF8");
-		writer.write(image);
-		writer.close();
-	    }
+	try (FileOutputStream fos = new FileOutputStream(absoluteFilePath);
+		Writer writer = new OutputStreamWriter(fos, "UTF8")) {
+	    // encoding is important, especially for Raphael-generated SVGs
+	    writer.write(image);
 	} catch (IOException e) {
-	    AuthoringAction.log.error(
-		    "Error while writing " + extension.toUpperCase() + " thumbnail of LD " + learningDesignID + ".", e);
-	} finally {
-	    if (fos != null) {
-		try {
-		    fos.close();
-		} catch (IOException e) {
-		    AuthoringAction.log.error("Error while closing stream to " + extension.toUpperCase()
-			    + " thumbnail of LD " + learningDesignID);
-		}
-	    }
+	    AuthoringAction.log.error("Error while writing SVG thumbnail of LD " + learningDesignID + ".", e);
+	    return false;
 	}
+	return true;
     }
 
     /**
