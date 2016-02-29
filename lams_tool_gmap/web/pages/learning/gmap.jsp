@@ -18,50 +18,48 @@
 -->
 </script>
 
-<div id="content">
-	<h1>
-		<c:out value="${gmapDTO.title}" escapeXml="true"/>
-	</h1>
+<lams:Page type="learner" title="${gmapDTO.title}">
 
-	
-	<p>
-		<c:out value="${gmapDTO.instructions}" escapeXml="false"/>
-	</p>
+	<div class="panel">
+		<c:out value="${gmapDTO.instructions}" escapeXml="false" />
+	</div>
 
-	<br />
+	<!-- map UI -->
+	<div class="panel">
+     
+		<%@ include file="../../common/mapLegend.jsp"%>
+
+		<div class="container-fluid">
+		<div class="row no-gutter">
+			<div class="col-sm-10">
+				<div id="map_canvas" style="height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
+			</div>
+			<div class="col-sm-2">
+				<div id="usersidebar"></div>		
+			</div>	
+		</div>
+		</div>
+				
+		<div class="btn-group-sm">
+			<c:if test="${contentEditable}">
+				<a href="javascript:addMarkerToCenter()" class="btn btn-default voffset5" role="button"/><fmt:message key="button.addMarker"/></a>
+			</c:if>
+			<a href="javascript:fitMapMarkers()" class="btn btn-default voffset5" role="button"/><fmt:message key="button.fitMarkers"/></a>
+			<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="btn btn-default voffset5" role="button"/><fmt:message key="button.refresh"/></a>
+		</div>
 	
-	<table>
-		<tr>
-			<td>
-				<div id="map_legend" style="width:100%;" >
-					<iframe marginwidth="0" align="left" height="60px" width="100%" frameborder="0" src="${tool}/common/mapLegend.jsp"></iframe>
-				</div>
-				<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
-				<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
-			</td>
-		</tr>
-		<tr>
-			<td>	
-				<c:choose>
-					<c:when test="${contentEditable}">
-				<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
-					</c:when>
-				</c:choose>
-				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-				<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="button"/><fmt:message key="button.refresh"/></a>
-			</td>
-		</tr>
-	</table>
-	<p />
-	
-	<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="55" name="address" id="address" value="${gmapDTO.defaultGeocoderAddress}" />
-    			<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
-	
+		<div class="voffset5">
+			<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="55" name="address" id="address" value="${gmapDTO.defaultGeocoderAddress}" />
+			<a href="javascript:showAddress()" class="btn btn-default btn-xs" role="button"><span class="fa fa-search" aria-hidden="true"></span></a>
+		</div>
+
+	</div>
+	<!-- end map UI -->
 	
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<%@ include file="parts/finishButton.jsp"%>
 	</c:if>
 	
-</div>
+</lams:Page>
 
 

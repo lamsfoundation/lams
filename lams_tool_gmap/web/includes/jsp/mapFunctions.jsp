@@ -231,8 +231,8 @@ function refreshSideBar(groupName)
 	var sideBarText = "";
 	var j;
 	var i;
-
-	sideBarText += "<nobr><h2>" + groupName + "</h2></nobr>";
+	
+ 	sideBarText += "<p>" + groupName + "</p>";
 	for (j=0;j<users.length; j++)
 	{
 		// leave open image if the user div was already open
@@ -259,7 +259,7 @@ function refreshSideBar(groupName)
 		}
 		sideBarText += "</div>";
 	}
-	document.getElementById("usersidebar").innerHTML = sideBarText;
+ 	document.getElementById("usersidebar").innerHTML = sideBarText;
 }
 
 // Cancels the edit and returns to the view window for the marker

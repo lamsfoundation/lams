@@ -15,29 +15,33 @@
 	<html:hidden property="mode" value="${mode}" />	
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 	<html:hidden property="markersXML" value="" />
-		<div class="space-top">
-			<h3><fmt:message key="heading.reflection" /></h3>
-			<p>
-				<strong><lams:out value="${gmapDTO.reflectInstructions}" escapeHtml="true"/></strong>
-			</p>
-
-			<p>
-				<c:choose>
-					<c:when test="${not empty gmapUserDTO.notebookEntry}">
-						<lams:out escapeHtml="true" value="${gmapUserDTO.notebookEntry}" />
-					</c:when>
-
-					<c:otherwise>
-						<em><fmt:message key="message.no.reflection.available" /> </em>
-					</c:otherwise>
-				</c:choose>
-			</p>
-
-			<html:submit styleClass="button" onclick="javascript:return confirmLeavePage();">
-				<fmt:message key="button.edit" />
-			</html:submit>
+	<div class="row no-gutter">
+		<div class="col-xs-12">
+			<div class="panel panel-default">
+				<div class="panel-heading panel-title">
+					<fmt:message key="heading.reflection" />
+				</div>
+				<div class="panel-body">
+					<div class="reflectionInstructions">
+						<lams:out value="${gmapDTO.reflectInstructions}" escapeHtml="true"/>
+					</div>
+					<div class="panel">
+						<c:choose>
+							<c:when test="${not empty gmapUserDTO.notebookEntry}">
+								<lams:out escapeHtml="true" value="${gmapUserDTO.notebookEntry}" />
+							</c:when>
+							<c:otherwise>
+								<em><fmt:message key="message.no.reflection.available" /> </em>
+							</c:otherwise>
+						</c:choose>
+					</div>
+					<html:submit styleClass="btn btn-default pull-left" onclick="javascript:return confirmLeavePage();">
+						<fmt:message key="button.edit" />
+					</html:submit>
+				</div>
+			</div>
 		</div>
-	
+	</div>	
 </html:form>
 </c:if>
 
@@ -47,28 +51,27 @@
 	<html:hidden property="markersXML" value="" styleId="markersXML" />
 	<html:hidden property="mode" value="${mode}" />	
 	<div class="space-bottom-top align-right">
-		<html:submit styleClass="button" styleId="saveButton" onclick="javascript:document.getElementById('dispatch').value = 'saveMarkers'; return serialiseMarkers();">
+	
+		<html:submit styleClass="btn btn-primary voffset10 pull-left" onclick="javascript:document.getElementById('dispatch').value = 'saveMarkers'; return serialiseMarkers();">
 			<fmt:message>button.save</fmt:message>
 		</html:submit>
 		<c:choose>
 			<c:when test="${!gmapUserDTO.finishedActivity and gmapDTO.reflectOnActivity}">
-				<html:submit styleClass="button" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook'; return serialiseMarkers();">
+				<html:submit styleClass="btn btn-primary voffset10 pull-right" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook'; return serialiseMarkers();">
 					<fmt:message key="button.continue" />
 				</html:submit>
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="javascript:saveAndFinish();">
-					<span class="nextActivity">
-						<c:choose>
-		 					<c:when test="${activityPosition.last}">
-		 						<fmt:message key="button.submit" />
-		 					</c:when>
-		 					<c:otherwise>
-		 		 				<fmt:message key="button.finish" />
-		 					</c:otherwise>
-			 			</c:choose>
-					</span>
+				<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton" onclick="javascript:saveAndFinish();">
+					<c:choose>
+	 					<c:when test="${activityPosition.last}">
+	 						<fmt:message key="button.submit" />
+	 					</c:when>
+	 					<c:otherwise>
+	 		 				<fmt:message key="button.finish" />
+	 					</c:otherwise>
+		 			</c:choose>
 				</html:link>
 			</c:otherwise>
 		</c:choose>
