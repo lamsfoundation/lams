@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -51,9 +51,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.security.SecurityService;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -89,11 +87,11 @@ public class LessonManagerServlet extends HttpServlet {
     private static IExportToolContentService exportService = null;
 
     private static ILamsCoreToolService toolService = null;
-    
+
     private static IGradebookService gradebookService = null;
 
     private static IUserManagementService userManagementService = null;
-    
+
     private static ISecurityService securityService = null;
 
     /**
@@ -154,8 +152,6 @@ public class LessonManagerServlet extends HttpServlet {
 	Long lsId = null;
 	ServletOutputStream outputStream = null;
 	try {
-	    // TODO check input parameters are valid.
-
 	    // Create xml document
 	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder builder = factory.newDocumentBuilder();
@@ -189,18 +185,18 @@ public class LessonManagerServlet extends HttpServlet {
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
-		
+
 	    } else if (method.equals(CentralConstants.METHOD_CLONE)) {
 		lsId = new Long(lsIdStr);
 		Long lessonId = cloneLesson(serverId, datetime, hashValue, username, lsId, courseId, country, lang);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
-		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());		
+		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
 	    } else if (method.equals(CentralConstants.METHOD_DELETE)
 		    || method.equals(CentralConstants.METHOD_REMOVE_LESSON)) {
 		verifyPostRequestMethod(request);
-		
+
 		lsId = new Long(lsIdStr);
 		Boolean deleted = removeLesson(serverId, datetime, hashValue, username, lsId);
 
@@ -210,20 +206,20 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    } else if (method.equals(CentralConstants.METHOD_REMOVE_ALL_LESSONS)) {
 		verifyPostRequestMethod(request);
-		
+
 		element = removeAllLessons(document, serverId, datetime, hashValue, username, courseId);
-		
+
 	    } else if (method.equals(CentralConstants.METHOD_REMOVE_USER)) {
 		verifyPostRequestMethod(request);
-		
+
 		lsId = new Long(lsIdStr);
 		element = removeUser(document, serverId, datetime, hashValue, username, lsId, userIds);
 
 	    } else if (method.equals(CentralConstants.METHOD_REMOVE_ALL_USERS)) {
 		verifyPostRequestMethod(request);
-		
+
 		lsId = new Long(lsIdStr);
-		element = removeAllUsers(document, serverId, datetime, hashValue, username, lsId);		
+		element = removeAllUsers(document, serverId, datetime, hashValue, username, lsId);
 
 	    } else if (method.equals(CentralConstants.METHOD_STUDENT_PROGRESS)) {
 		lsId = new Long(lsIdStr);
@@ -233,7 +229,7 @@ public class LessonManagerServlet extends HttpServlet {
 		String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
 		String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
 		String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
-		
+
 		lsId = new Long(lsIdStr);
 		element = getSingleStudentProgress(document, serverId, datetime, hashValue, username, firstName,
 			lastName, lang, country, email, lsId, courseId);
@@ -253,21 +249,22 @@ public class LessonManagerServlet extends HttpServlet {
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsIdStr);
-		
+
 	    } else if (method.equals("gradebookMarksUser")) {
 		lsId = new Long(lsIdStr);
 		element = getGradebookMarks(document, serverId, datetime, hashValue, username, lsId, null, outputsUser);
-		
+
 	    } else if (method.equals("gradebookMarksLesson")) {
 		lsId = new Long(lsIdStr);
 		element = getGradebookMarks(document, serverId, datetime, hashValue, username, lsId, null, null);
-		
+
 	    } else if (method.equals("gradebookMarksCourse")) {
 		element = getGradebookMarks(document, serverId, datetime, hashValue, username, null, courseId, null);
 
 	    } else if (method.equals("toolOutputsAllUsers")) {
 		lsId = new Long(lsIdStr);
-		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, false, null);
+		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, false,
+			null);
 
 	    } else if (method.equals("authoredToolOutputsAllUsers")) {
 		lsId = new Long(lsIdStr);
@@ -292,6 +289,9 @@ public class LessonManagerServlet extends HttpServlet {
 		out.close();
 		return;
 
+	    } else if (method.equals(CentralConstants.METHOD_LIST_MONITOR)) {
+		element = getLessonMonitorList(document, serverId, datetime, hashValue, username, courseId, country,
+			lang);
 	    } else {
 		String msg = "Method :" + method + " is not recognised";
 		LessonManagerServlet.log.error(msg);
@@ -327,7 +327,7 @@ public class LessonManagerServlet extends HttpServlet {
 	} catch (Exception e) {
 	    LessonManagerServlet.log.error("Problem loading learning manager servlet request", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	    
+
 	} finally {
 	    if (outputStream != null) {
 		outputStream.flush();
@@ -389,7 +389,7 @@ public class LessonManagerServlet extends HttpServlet {
     private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode,
 	    String customCSV, boolean exportPortfolioEnable, boolean presenceEnable, boolean imEnable)
-	    throws RemoteException {
+		    throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -397,27 +397,27 @@ public class LessonManagerServlet extends HttpServlet {
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
-	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId, orgMap
-		    .getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false,
-		    exportPortfolioEnable, presenceEnable, imEnable, true, false, false, null, null);
+	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId,
+		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
+		    false, exportPortfolioEnable, presenceEnable, imEnable, true, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
 	    Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
-	    LessonManagerServlet.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser()
-		    .getUserId());
+	    LessonManagerServlet.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date,
+		    userMap.getUser().getUserId());
 	    return lesson.getLessonId();
 	} catch (Exception e) {
 	    throw new RemoteException(e.getMessage(), e);
 	}
     }
-    
+
     private Long cloneLesson(String serverId, String datetime, String hashValue, String username, long lsId,
 	    String courseId, String countryIsoCode, String langIsoCode) throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    
+
 	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    Integer creatorId = userMap.getUser().getUserId();
 
@@ -430,7 +430,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    Organisation organisation = orgMap.getOrganisation();
 
 	    // clone lesson
-	    Long newLessonId = monitoringService.cloneLesson(lsId, creatorId, true, true, null, null, organisation);
+	    Long newLessonId = LessonManagerServlet.monitoringService.cloneLesson(lsId, creatorId, true, true, null,
+		    null, organisation);
 	    // store information which extServer has started the lesson
 	    LessonManagerServlet.integrationService.createExtServerLessonMap(newLessonId, serverMap);
 
@@ -462,8 +463,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 		    // get the username with the integration prefix removed
 		    String userNoPrefixName = learnerProgress.getUserName().substring(prefix.length() + 1);
-		    ExtUserUseridMap learnerMap = LessonManagerServlet.integrationService.getExtUserUseridMap(
-			    serverMap, userNoPrefixName);
+		    ExtUserUseridMap learnerMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,
+			    userNoPrefixName);
 
 		    Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
 
@@ -474,10 +475,10 @@ public class LessonManagerServlet extends HttpServlet {
 			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE,
 				"" + learnerProgress.getLessonComplete());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT, "" + activitiesTotal);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED, ""
-				+ completedActivities);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED, ""
-				+ attemptedActivities);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED,
+				"" + completedActivities);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED,
+				"" + attemptedActivities);
 			// learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
 			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + learnerMap.getSid());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
@@ -520,8 +521,8 @@ public class LessonManagerServlet extends HttpServlet {
 			serverMap, username, firstName, lastName, language, country, email, usePrefix,
 			isUpdateUserDetails);
 
-		LearnerProgress learnProg = LessonManagerServlet.lessonService.getUserProgressForLesson(userMap
-			.getUser().getUserId(), lsId);
+		LearnerProgress learnProg = LessonManagerServlet.lessonService
+			.getUserProgressForLesson(userMap.getUser().getUserId(), lsId);
 
 		Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
 
@@ -536,10 +537,10 @@ public class LessonManagerServlet extends HttpServlet {
 			learnerProgElem.setAttribute(CentralConstants.ATTR_LESSON_COMPLETE,
 				"" + learnerProgress.getLessonComplete());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITY_COUNT, "" + activitiesTotal);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED, ""
-				+ completedActivities);
-			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED, ""
-				+ attemptedActivities);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_COMPLETED,
+				"" + completedActivities);
+			learnerProgElem.setAttribute(CentralConstants.ATTR_ACTIVITIES_ATTEMPTED,
+				"" + attemptedActivities);
 			// learnerProgElem.setAttribute(CentralConstants.ATTR_CURRENT_ACTIVITY , currActivity);
 			learnerProgElem.setAttribute(CentralConstants.ATTR_STUDENT_ID, "" + userMap.getSid());
 			learnerProgElem.setAttribute(CentralConstants.ATTR_COURSE_ID, courseID);
@@ -585,7 +586,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    throw new RemoteException(e.getMessage(), e);
 	}
     }
-    
+
     /**
      * Deletes all users from the specified course.
      */
@@ -607,7 +608,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    throw new Exception("Course with courseId: " + courseId + " could not be found");
 	}
 	Integer organisationId = orgMap.getOrganisation().getOrganisationId();
-	List<Lesson> lessons = lessonService.getLessonsByGroup(organisationId);
+	List<Lesson> lessons = LessonManagerServlet.lessonService.getLessonsByGroup(organisationId);
 
 	if (lessons != null) {
 	    for (Lesson lesson : lessons) {
@@ -627,30 +628,32 @@ public class LessonManagerServlet extends HttpServlet {
 
 	return lessonsElement;
     }
-    
+
     /**
      * Deletes all lessons from the specified course.
      */
-    private Element removeUser(Document document, String serverId, String datetime, String hashValue,
-	    String username, long lsId, String userIds) throws Exception {
+    private Element removeUser(Document document, String serverId, String datetime, String hashValue, String username,
+	    long lsId, String userIds) throws Exception {
 	// Create the root node of the xml document
 	Element usersElement = document.createElement("Users");
 
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	Authenticator.authenticate(serverMap, datetime, username, hashValue);
 
-	//check is user monitor
+	// check is user monitor
 	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove user", true);
-	
-	//remove requested user
+	LessonManagerServlet.securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove user",
+		true);
+
+	// remove requested user
 	String[] extUsernames = (userIds != null) ? userIds.split(",") : new String[0];
 	for (String extUsername : extUsernames) {
 
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, extUsername);
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,
+		    extUsername);
 	    Integer userId = userMap.getUser().getUserId();
 	    // remove user
-	    lessonService.removeLearner(lsId, userId);
+	    LessonManagerServlet.lessonService.removeLearner(lsId, userId);
 
 	    // add userId to output xml document
 	    Element lessonElement = document.createElement("User");
@@ -661,7 +664,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	return usersElement;
     }
-    
+
     /**
      * Deletes all lessons from the specified course.
      */
@@ -673,11 +676,12 @@ public class LessonManagerServlet extends HttpServlet {
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	Authenticator.authenticate(serverMap, datetime, username, hashValue);
 
-	//check is user monitor
+	// check is user monitor
 	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove all users", true);
-	
-	//remove all users from the specified lesson
+	LessonManagerServlet.securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove all users",
+		true);
+
+	// remove all users from the specified lesson
 	Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
 	Set<User> users = lesson.getAllLearners();
 	if (users != null) {
@@ -685,7 +689,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 		Integer userId = user.getUserId();
 		// remove user
-		lessonService.removeLearner(lsId, userId);
+		LessonManagerServlet.lessonService.removeLearner(lsId, userId);
 
 		// add userId to output xml document
 		Element lessonElement = document.createElement("User");
@@ -711,8 +715,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    Integer userId = userMap.getUser().getUserId();
 
 	    // 1. init lesson
-	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLessonForPreview(title, desc, ldId,
-		    userId, customCSV, presenceEnable, imEnable, false);
+	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLessonForPreview(title, desc, ldId, userId,
+		    customCSV, presenceEnable, imEnable, false);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.monitoringService.createPreviewClassForLesson(userId, lesson.getLessonId());
 
@@ -777,8 +781,8 @@ public class LessonManagerServlet extends HttpServlet {
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(creator);
 	List<User> learnerList = new LinkedList<User>();
-	Vector<User> learnerVector = LessonManagerServlet.userManagementService.getUsersFromOrganisationByRole(
-		organisation.getOrganisationId(), Role.LEARNER, false, true);
+	Vector<User> learnerVector = LessonManagerServlet.userManagementService
+		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, false, true);
 	learnerList.addAll(learnerVector);
 	LessonManagerServlet.monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
@@ -809,13 +813,13 @@ public class LessonManagerServlet extends HttpServlet {
 
 	LessonManagerServlet.toolService = (ILamsCoreToolService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("lamsCoreToolService");
-	
+
 	LessonManagerServlet.gradebookService = (IGradebookService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("gradebookService");
 
 	LessonManagerServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
-	
+
 	LessonManagerServlet.securityService = (ISecurityService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("securityService");
     }
@@ -893,9 +897,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 		// in case there is firstNames available - check all arrays have the same length, as otherwise it's
 		// prone to ArrayOutOfBounds exceptions
-		if ((firstNames != null)
-			&& ((firstNameArray.length != lastNameArray.length)
-				|| (firstNameArray.length != emailArray.length) || (firstNameArray.length != (learnerIdArray.length + monitorIdArray.length)))) {
+		if ((firstNames != null) && ((firstNameArray.length != lastNameArray.length)
+			|| (firstNameArray.length != emailArray.length)
+			|| (firstNameArray.length != (learnerIdArray.length + monitorIdArray.length)))) {
 		    LessonManagerServlet.log.error("Invalid parameters sent: wrong array length.");
 		    return false;
 		}
@@ -953,8 +957,8 @@ public class LessonManagerServlet extends HttpServlet {
 		String countryIsoCode, String langIsoCode) throws UserInfoFetchException, UserInfoValidationException {
 
 	    if (LessonManagerServlet.log.isDebugEnabled()) {
-		LessonManagerServlet.log.debug("Adding user '" + username + "' as " + method + " to lesson with id '"
-			+ lsIdStr + "'.");
+		LessonManagerServlet.log
+			.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lsIdStr + "'.");
 	    }
 
 	    ExtUserUseridMap userMap = null;
@@ -975,8 +979,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    if (LessonManagerServlet.lessonService == null) {
 		LessonManagerServlet.lessonService = (ILessonService) WebApplicationContextUtils
-			.getRequiredWebApplicationContext(request.getSession().getServletContext()).getBean(
-				"lessonService");
+			.getRequiredWebApplicationContext(request.getSession().getServletContext())
+			.getBean("lessonService");
 	    }
 
 	    User user = userMap.getUser();
@@ -994,7 +998,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	}
     }
-    
+
     /**
      * This method gets the tool outputs for a lesson or a specific user and returns them in XML format.
      * 
@@ -1012,36 +1016,36 @@ public class LessonManagerServlet extends HttpServlet {
      */
     @SuppressWarnings("unchecked")
     private Element getGradebookMarks(Document document, String serverId, String datetime, String hashValue,
-	    String username, Long lessonIdParam, String courseId, String outputsUser)
-	    throws Exception {
+	    String username, Long lessonIdParam, String courseId, String outputsUser) throws Exception {
 
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	
+
 	List<Lesson> lessons = new LinkedList<Lesson>();
 	if (courseId != null) {
-	    
+
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap.getSid(),
 		    courseId);
 	    if (orgMap == null) {
-		LessonManagerServlet.log.debug("No course exists for: " + courseId
-			+ ". Cannot get tool outputs report.");
+		LessonManagerServlet.log
+			.debug("No course exists for: " + courseId + ". Cannot get tool outputs report.");
 		throw new Exception("Course with courseId: " + courseId + " could not be found");
-	    }  
+	    }
 	    Integer organisationId = orgMap.getOrganisation().getOrganisationId();
-	    
-	    lessons.addAll(lessonService.getLessonsByGroup(organisationId));
-	    
+
+	    lessons.addAll(LessonManagerServlet.lessonService.getLessonsByGroup(organisationId));
+
 	} else {
 	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lessonIdParam);
 	    if (lesson == null) {
-		LessonManagerServlet.log.debug("No lesson exists for: " + lessonIdParam
-			+ ". Cannot get tool outputs report.");
-		throw new Exception("Lesson with lessonID: " + lessonIdParam + " could not be found for learner progresses");
+		LessonManagerServlet.log
+			.debug("No lesson exists for: " + lessonIdParam + ". Cannot get tool outputs report.");
+		throw new Exception(
+			"Lesson with lessonID: " + lessonIdParam + " could not be found for learner progresses");
 	    }
 	    lessons.add(lesson);
 	}
-	
+
 	// Create the root node of the xml document
 	Element gradebookMarksElement = document.createElement("GradebookMarks");
 
@@ -1062,37 +1066,39 @@ public class LessonManagerServlet extends HttpServlet {
 	    }
 	    lessonElement.setAttribute("lessonMaxPossibleMark", lessonMaxPossibleMark.toString());
 
-	    //get gradebook marks from DB
+	    // get gradebook marks from DB
 	    List<GradebookUserLesson> gradebookUserLessons = new LinkedList<GradebookUserLesson>();
 	    // if outputsUser is null we build results for the whole lesson, otherwise - for the specified learner
 	    if (outputsUser != null) {
 
-		ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(
-			serverMap, outputsUser);
+		ExtUserUseridMap userMap = LessonManagerServlet.integrationService
+			.getExistingExtUserUseridMap(serverMap, outputsUser);
 		if (userMap == null) {
 		    throw new Exception("No user exists for: " + outputsUser + ". Cannot get tool outputs report.");
 		}
 		User user = userMap.getUser();
 		Integer userId = user.getUserId();
-		
-		GradebookUserLesson gradebookUserLesson = gradebookService.getGradebookUserLesson(lessonId, userId);
+
+		GradebookUserLesson gradebookUserLesson = LessonManagerServlet.gradebookService
+			.getGradebookUserLesson(lessonId, userId);
 		if (gradebookUserLesson == null) {
 		    gradebookUserLesson = new GradebookUserLesson(lesson, user);
 		}
 		gradebookUserLessons.add(gradebookUserLesson);
 
 	    } else {
-		gradebookUserLessons.addAll(gradebookService.getGradebookUserLesson(lessonId));
+		gradebookUserLessons.addAll(LessonManagerServlet.gradebookService.getGradebookUserLesson(lessonId));
 		LessonManagerServlet.log.debug("Getting tool ouputs report for: " + lessonId
 			+ ". With learning design: " + lesson.getLearningDesign().getLearningDesignId());
 	    }
-	    
-	    List<ExtUserUseridMap> allUsers = integrationService.getExtUserUseridMapByServerMap(serverMap);
+
+	    List<ExtUserUseridMap> allUsers = LessonManagerServlet.integrationService
+		    .getExtUserUseridMapByServerMap(serverMap);
 
 	    for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
 		Integer userId = gradebookUserLesson.getLearner().getUserId();
-		
-		//find user
+
+		// find user
 		ExtUserUseridMap extUser = null;
 		for (ExtUserUseridMap extUserIter : allUsers) {
 		    if (extUserIter.getUser().getUserId().equals(userId)) {
@@ -1100,20 +1106,21 @@ public class LessonManagerServlet extends HttpServlet {
 			break;
 		    }
 		}
-		
+
 		if (extUser == null) {
-		    throw new Exception("User with userId: " + userId + " doesn't belong to extServer: "
-			    + serverMap.getSid());
+		    throw new Exception(
+			    "User with userId: " + userId + " doesn't belong to extServer: " + serverMap.getSid());
 		}
 
 		Element learnerElement = document.createElement("Learner");
 		learnerElement.setAttribute("extUsername", extUser.getExtUsername());
-		String userTotalMark = gradebookUserLesson.getMark() == null ? "" : gradebookUserLesson.getMark().toString();
+		String userTotalMark = gradebookUserLesson.getMark() == null ? ""
+			: gradebookUserLesson.getMark().toString();
 		learnerElement.setAttribute("userTotalMark", userTotalMark);
 
 		lessonElement.appendChild(learnerElement);
 	    }
-	    
+
 	    gradebookMarksElement.appendChild(lessonElement);
 	}
 
@@ -1139,7 +1146,7 @@ public class LessonManagerServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     public Element getToolOutputs(Document document, String serverId, String datetime, String hashValue,
 	    String username, Long lessonId, String courseID, boolean isAuthoredToolOutputs, String outputsUser)
-	    throws Exception {
+		    throws Exception {
 
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -1161,8 +1168,8 @@ public class LessonManagerServlet extends HttpServlet {
 		    outputsUser);
 	    if (userMap == null) {
 		// TODO: handle this error instead of throwing an exception
-		LessonManagerServlet.log.debug("No user exists for: " + outputsUser
-			+ ". Cannot get tool outputs report.");
+		LessonManagerServlet.log
+			.debug("No user exists for: " + outputsUser + ". Cannot get tool outputs report.");
 		throw new Exception("No user exists for: " + outputsUser + ". Cannot get tool outputs report.");
 	    }
 	    learners.add(userMap.getUser());
@@ -1179,8 +1186,8 @@ public class LessonManagerServlet extends HttpServlet {
 	toolOutputsElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
 	toolOutputsElement.setAttribute("name", lesson.getLessonName());
 
-	List<LearnerProgress> learnerProgresses = LessonManagerServlet.lessonService.getUserProgressForLesson(lesson
-		.getLessonId());
+	List<LearnerProgress> learnerProgresses = LessonManagerServlet.lessonService
+		.getUserProgressForLesson(lesson.getLessonId());
 	List<ToolSession> toolSessions = LessonManagerServlet.toolService.getToolSessionsByLesson(lesson);
 
 	// map contains pairs toolContentId -> toolOutputDefinitions
@@ -1226,8 +1233,8 @@ public class LessonManagerServlet extends HttpServlet {
 			toolSession = dbToolSession;
 		    }
 		}
-		Map<String, ToolOutputDefinition> toolOutputDefinitions = toolOutputDefinitionsMap.get(activity
-			.getToolContentId());
+		Map<String, ToolOutputDefinition> toolOutputDefinitions = toolOutputDefinitionsMap
+			.get(activity.getToolContentId());
 
 		learnerElement.appendChild(getActivityOutputsElement(document, activity, learner, learnerProgress,
 			toolSession, toolOutputDefinitions, isAuthoredToolOutputs));
@@ -1256,8 +1263,8 @@ public class LessonManagerServlet extends HttpServlet {
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
-	Activity firstActivity = LessonManagerServlet.monitoringService.getActivityById(lesson.getLearningDesign()
-		.getFirstActivity().getActivityId());
+	Activity firstActivity = LessonManagerServlet.monitoringService
+		.getActivityById(lesson.getLearningDesign().getFirstActivity().getActivityId());
 	activities.add(firstActivity);
 	activities.addAll(lesson.getLearningDesign().getActivities());
 
@@ -1338,8 +1345,8 @@ public class LessonManagerServlet extends HttpServlet {
 			if (activityEvaluations != null) {
 			    for (ActivityEvaluation evaluation : activityEvaluations) {
 				if (outputName.equals(evaluation.getToolOutputDefinition())) {
-				    ToolOutput toolOutput = LessonManagerServlet.toolService.getOutputFromTool(
-					    outputName, toolSession, learner.getUserId());
+				    ToolOutput toolOutput = LessonManagerServlet.toolService
+					    .getOutputFromTool(outputName, toolSession, learner.getUserId());
 				    activityElement.appendChild(getOutputElement(document, toolOutput, definition));
 				}
 			    }
@@ -1417,7 +1424,7 @@ public class LessonManagerServlet extends HttpServlet {
 	}
 	return null;
     }
-    
+
     /**
      * Checks whether request method is POST, throws SecurityException if not.
      * 
@@ -1431,7 +1438,39 @@ public class LessonManagerServlet extends HttpServlet {
 	if (!isPost) {
 	    throw new SecurityException("This API call allows only POST request method.");
 	}
-	
+
 	return isPost;
+    }
+
+    /**
+     * Lists lessons for which the given user is a Monitor in the given organisation.
+     */
+    private Element getLessonMonitorList(Document document, String serverId, String datetime, String hashValue,
+	    String username, String courseID, String countryIsoCode, String langIsoCode) throws Exception {
+	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+
+	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(serverMap,
+		username);
+	User user = userMap.getUser();
+	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+		courseID, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+	Organisation organisation = orgMap.getOrganisation();
+
+	Map<Long, IndexLessonBean> map = LessonManagerServlet.lessonService.getLessonsByOrgAndUserWithCompletedFlag(
+		userMap.getUser().getUserId(), organisation.getOrganisationId(), Role.ROLE_MONITOR);
+
+	Element lessonsElem = document.createElement("Lessons");
+	for (IndexLessonBean bean : map.values()) {
+	    Element lessonElem = document.createElement(CentralConstants.ELEM_LESSON);
+	    lessonElem.setAttribute(CentralConstants.ATTR_LESSON_ID, bean.getId().toString());
+	    lessonElem.setAttribute(CentralConstants.ATTR_NAME, bean.getName());
+	    lessonElem.setAttribute("description", bean.getDescription());
+	    lessonElem.setAttribute("state", bean.getState().toString());
+	    
+	    lessonsElem.appendChild(lessonElem);
+	}
+
+	return lessonsElem;
     }
 }
