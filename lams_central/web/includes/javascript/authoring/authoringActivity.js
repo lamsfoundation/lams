@@ -429,10 +429,12 @@ ActivityDraw = {
 							    'stroke' : layout.colors.activityBorder,
 								'fill' : layout.colors.grouping
 							 }),
-			label = paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
+			icon = paper.image('../images/grouping.svg', x + 47, y - 3, 32, 45),
+			label = paper.text(x + 62, y + 42, ActivityLib.shortenActivityTitle(this.title))
 						 .attr(layout.defaultTextAttributes);
 		
-		this.items = paper.g(shape, label);
+		this.items = paper.g(shape, icon, label);
+							// uiid is needed in Monitoring
 		if (this.readOnly) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}

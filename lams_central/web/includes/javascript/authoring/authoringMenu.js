@@ -489,17 +489,17 @@ var MenuLib = {
 
 		// trim the image from white space
 		var ctx = workspace.getContext('2d'),
-		w = workspace.width,
-		h = workspace.height,
-		imageData = ctx.getImageData(0, 0, w, h),
-		result = {
-			x : w,
-			y : h,
-			x2 : 0,
-			y2 : 0,
-			workspace : workspace,
-			canvasClone : canvasClone
-		};
+			w = workspace.width,
+			h = workspace.height,
+			imageData = ctx.getImageData(0, 0, w, h),
+			result = {
+				x : w,
+				y : h,
+				x2 : 0,
+				y2 : 0,
+				workspace : workspace,
+				canvasClone : canvasClone
+			};
 
 		for (y = 0; y < h; y++) {
 		    for (x = 0; x < w; x++) {
