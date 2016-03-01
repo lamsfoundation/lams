@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -256,6 +257,9 @@ public class LessonManagerServlet extends HttpServlet {
 		out.close();
 		return;
 
+	    } else if (method.equals(CentralConstants.METHOD_LIST_MONITOR)) {
+		element = getLessonMonitorList(document, serverId, datetime, hashValue, username, courseId, country,
+			lang);
 	    } else {
 		String msg = "Method :" + method + " is not recognised";
 		LessonManagerServlet.log.error(msg);
@@ -1238,5 +1242,36 @@ public class LessonManagerServlet extends HttpServlet {
 	    return (Long) upperLimit;
 	}
 	return null;
+    }
+
+    /**
+     * Lists lessons for which the given user is a Monitor in the given organisation.
+     */
+    private Element getLessonMonitorList(Document document, String serverId, String datetime, String hashValue,
+	    String username, String courseID, String countryIsoCode, String langIsoCode) throws Exception {
+	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+
+	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(serverMap,
+		username);
+	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+		courseID, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+	Organisation organisation = orgMap.getOrganisation();
+
+	Map<Long, IndexLessonBean> map = LessonManagerServlet.lessonService.getLessonsByOrgAndUserWithCompletedFlag(
+		userMap.getUser().getUserId(), organisation.getOrganisationId(), Role.ROLE_MONITOR);
+
+	Element lessonsElem = document.createElement("Lessons");
+	for (IndexLessonBean bean : map.values()) {
+	    Element lessonElem = document.createElement(CentralConstants.ELEM_LESSON);
+	    lessonElem.setAttribute(CentralConstants.ATTR_LESSON_ID, bean.getId().toString());
+	    lessonElem.setAttribute(CentralConstants.ATTR_NAME, bean.getName());
+	    lessonElem.setAttribute("description", bean.getDescription());
+	    lessonElem.setAttribute("state", bean.getState().toString());
+
+	    lessonsElem.appendChild(lessonElem);
+	}
+
+	return lessonsElem;
     }
 }

@@ -91,6 +91,8 @@ public class CentralConstants {
     
     public static final String METHOD_VERIFY_EXT_SERVER = "verify";
 
+    public static final String METHOD_LIST_MONITOR = "listMonitor";
+
     public static final String ATTR_COURSE_ID = "courseId";
 
     public static final String ELEM_LEARNINGDESIGN = "Lesson";
