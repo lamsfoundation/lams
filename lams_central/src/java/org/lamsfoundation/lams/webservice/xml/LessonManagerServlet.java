@@ -1452,7 +1452,6 @@ public class LessonManagerServlet extends HttpServlet {
 
 	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(serverMap,
 		username);
-	User user = userMap.getUser();
 	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
 		courseID, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	Organisation organisation = orgMap.getOrganisation();
