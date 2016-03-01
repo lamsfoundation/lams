@@ -116,3 +116,7 @@ Also supports calls to the LAMS server to use a dummy course to suit the templat
 Now reverted back to previous behaviour with lesson loading in the same tab.
 * LKC-61: Gradebook syncing change
 * LDEV-3621: Ability to import and use groups from integrated server
+
+1.2.18 Release Fixes
+====================
+* LDEV-3399: Support Course Copy feature in Blackboard
