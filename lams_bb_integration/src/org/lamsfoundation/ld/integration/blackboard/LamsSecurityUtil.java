@@ -562,6 +562,84 @@ public class LamsSecurityUtil {
     }
     
     /**
+     * Clones lessons in lams through a LAMS webservice using the lsID & courseId parameter.
+     * 
+     * @param courseId
+     * 		  courseId as a request parameter
+     * @param ldId
+     *            the learning design id for which you wish to start a lesson
+     *            
+     * @return lesson id of a cloned lesson
+     */
+    public static Long cloneLesson(User teacher, String courseId, String lsId) {
+
+	String serverId = getServerID();
+	String serverAddr = getServerAddress();
+	String serverKey = getServerKey();
+	String username = teacher.getUserName();
+	String locale = teacher.getLocale();
+	String country = getCountry(locale);
+	String lang = getLanguage(locale);
+	
+	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
+	    logger.info("Unable to clone lesson, one or more lams configuration properties or the course id is null");
+	    throw new RuntimeException("Unable to clone lesson, one or more lams configuration properties or the course id is null. courseId="+courseId);
+	}
+
+	try {
+	    String method = "clone";
+	    String timestamp = new Long(System.currentTimeMillis()).toString();
+//	    String username = "not_available";//signifier for skipping security check as we can't get the current user requested cloning
+	    String hash = generateAuthenticationHash(timestamp, username, serverId);
+	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
+		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
+		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
+		    + URLEncoder.encode(courseId, "UTF8") + "&country="
+			    + country + "&lang=" + lang + "&lsId=" + lsId + "&method=" + method;
+
+	    logger.info("LAMS clone lesson request: " + serviceURL);
+
+	    // InputStream is = url.openConnection().getInputStream();
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
+	    // parse xml response
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document document = db.parse(is);
+
+	    // get the lesson id from the response
+
+	    /*
+	     * The getTextContext is not a java 1.4 method, so Blackboard 7.1 comes up with errors using getNodeValue()
+	     * instead
+	     */
+	    // return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
+	    return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes()
+		    .getNamedItem("lessonId").getNodeValue());
+	} catch (MalformedURLException e) {
+	    throw new RuntimeException("Unable to clone LAMS lesson, bad URL: '" + serverAddr
+		    + "', please check lams.properties", e);
+	} catch (IllegalStateException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (RemoteException e) {
+	    throw new RuntimeException("Unable to clone LAMS lesson, RMI Remote Exception", e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new RuntimeException("Unable to clone LAMS lesson, Unsupported Encoding Exception", e);
+	} catch (ConnectException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (IOException e) {
+		    throw new RuntimeException("Unable to clone LAMS lesson. " + e.getMessage()
+			    + " Please contact your system administrator.", e);
+	} catch (Exception e) {
+	    throw new RuntimeException("Unable to clone LAMS lesson. Please contact your system administrator.", e);
+	}
+
+    }
+    
+    /**
      * Pre-adding students and monitors to a lesson
      * 
      * @param ctx
