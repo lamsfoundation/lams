@@ -364,8 +364,8 @@ function showSearchLessonDialog(orgID){
 	var id = "dialogSearchLesson" + orgID;
 	showDialog(id, {
 		'orgID' : orgID,
-		'height' : 400,
-		'width' : 600,
+		'height' : 500,
+		'width' : 1000,
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
 			var orgID = $(this).dialog('option', 'orgID');

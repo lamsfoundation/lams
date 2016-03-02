@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.themes.Theme;
@@ -479,7 +478,7 @@ public interface IUserManagementService {
     Integer getCountUsers();
 
     Integer getCountUsers(Integer authenticationMethodId);
-    
+
     /**
      * Count total number of users excluding disabled ones and applying searchString filter.
      * 
@@ -499,7 +498,7 @@ public interface IUserManagementService {
      * @param term
      * @return list of Users
      */
-    List searchUserSingleTerm(String term);
+    List<User> findUsers(String term);
 
     /**
      * Search users across login, first name, last name and email fields using the search term. Filters out disabled
@@ -509,7 +508,7 @@ public interface IUserManagementService {
      * @param filteredOrgId
      * @return list of Users
      */
-    List searchUserSingleTerm(String term, Integer filteredOrgId);
+    List<User> findUsers(String term, Integer filteredOrgId);
 
     /**
      * Search users across login, first name, last name and email fields using the search term. Filters out disabled
@@ -520,7 +519,7 @@ public interface IUserManagementService {
      * @param includeChildOrgs
      * @return list of Users
      */
-    List searchUserSingleTerm(String term, Integer orgId, boolean includeChildOrgs);
+    List<User> findUsers(String term, Integer orgId, boolean includeChildOrgs);
 
     /**
      * Search user members in orgId across login, first name, last name and email fields using the search term. Filters
@@ -531,15 +530,15 @@ public interface IUserManagementService {
      * @param filteredOrgId
      * @return list of Users
      */
-    List searchUserSingleTerm(String term, Integer orgId, Integer filteredOrgId);
+    List<User> findUsers(String term, Integer orgId, Integer filteredOrgId);
 
     /**
      * Get all users, except for disabled users.
      * 
      * @return list of Users
      */
-    List getAllUsers();
-    
+    List<User> getAllUsers();
+
     /**
      * Get all users (paged), except for disabled users.
      * 
@@ -547,7 +546,8 @@ public interface IUserManagementService {
      * @param size
      * @param sortBy
      * @param sortOrder
-     * @param searchString filters results by course name. It can be null and then doesn't affect results
+     * @param searchString
+     *            filters results by course name. It can be null and then doesn't affect results
      * @return paged list of users
      */
     List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString);
@@ -558,7 +558,7 @@ public interface IUserManagementService {
      * @param optionalOrgId
      * @return list of Users
      */
-    List getAllUsers(Integer filteredOrgId);
+    List<User> getAllUsers(Integer filteredOrgId);
 
     /**
      * Get all users with the given Email. Email must not be empty Use a regex check to make sure the string is in
@@ -567,16 +567,7 @@ public interface IUserManagementService {
      * 
      * @return list of Users
      */
-    List getAllUsersWithEmail(String email);
-
-    /**
-     * Get all users in orgId, except for users that are members of filteredOrg.
-     * 
-     * @param orgId
-     * @param filteredOrgId
-     * @return list of Users
-     */
-    List getUsersFromOrganisation(Integer orgId, Integer filteredOrgId);
+    List<User> getAllUsersWithEmail(String email);
 
     /**
      * Tests whether user can edit the given org's details.
