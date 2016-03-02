@@ -120,3 +120,4 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 1.2.18 Release Fixes
 ====================
 * LDEV-3399: Support Course Copy feature in Blackboard
+* LDEV-3704: Ability to modify BB lessons' URL host name

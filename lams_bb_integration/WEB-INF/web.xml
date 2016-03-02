@@ -37,7 +37,10 @@
     <servlet-name>StartLessonServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.StartLessonServlet</servlet-class>
   </servlet>
-  
+  <servlet>
+    <servlet-name>UpdateServerUrlServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.UpdateServerUrlServlet</servlet-class>
+  </servlet> 
 
   <servlet-mapping>
     <servlet-name>LamsLearningDesignServlet</servlet-name>
@@ -67,9 +70,13 @@
     <servlet-name>RenderDesignImageServlet</servlet-name>
     <url-pattern>/RenderImage</url-pattern>
   </servlet-mapping>   
-    <servlet-mapping>
+  <servlet-mapping>
     <servlet-name>StartLessonServlet</servlet-name>
     <url-pattern>/StartLesson</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UpdateServerUrlServlet</servlet-name>
+    <url-pattern>/UpdateServerUrl</url-pattern>
   </servlet-mapping>   
   
 </web-app>
