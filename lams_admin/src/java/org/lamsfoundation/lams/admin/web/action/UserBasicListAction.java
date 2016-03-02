@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.admin.web.action; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.admin.web.action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
- 
+
 /**
  * @author jliew
  *
@@ -53,60 +53,62 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action-forward name="basiclist" path="/user/basiclist.jsp"
  */
 public class UserBasicListAction extends Action {
-	
-	private static IUserManagementService service;
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		HttpSession session = SessionManager.getSession();
-		if (session != null) {
-			UserDTO userDto = (UserDTO)session.getAttribute(AttributeNames.USER);
-			if (userDto != null) {
-				// get inputs
-				Integer userId = userDto.getUserID();
-				Integer orgId = WebUtil.readIntParam(request, "orgId", true);
-				String potential = WebUtil.readStrParam(request, "potential", true);
-				if (orgId != null) {
-					if (!StringUtils.equals(potential, "1")) {
-						// list users in org
-						List users = service.getUsersFromOrganisation(orgId);
-						request.setAttribute("users", users);
-					} else {
-						// get all potential users of this org instead... filters results according to user's roles
-						// get group
-						Organisation org = (Organisation)service.findById(Organisation.class, orgId);
-						Organisation group;
-						if (org != null) {
-							if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-								group = org.getParentOrganisation();
-							} else {
-								group = org;
-							}
-							// get users
-							List users = new ArrayList();
-							if (request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin()) {
-								users = service.getAllUsers(org.getOrganisationId());
-							} else if (service.isUserInRole(userId, group.getOrganisationId(), Role.GROUP_ADMIN)
-									|| service.isUserInRole(userId, group.getOrganisationId(), Role.GROUP_MANAGER)) {
-								if (group.getCourseAdminCanBrowseAllUsers()){
-									users = service.getAllUsers(org.getOrganisationId());
-								} else if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-									users = service.getUsersFromOrganisation(group.getOrganisationId(), orgId);
-								}
-							}
-							request.setAttribute("users", users);
-						}
-					}
-				}
-			}
-		}
-		
-		return mapping.findForward("basiclist");
-	}
 
+    private static IUserManagementService service;
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	UserBasicListAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
+	HttpSession session = SessionManager.getSession();
+	if (session != null) {
+	    UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	    if (userDto != null) {
+		// get inputs
+		Integer userId = userDto.getUserID();
+		Integer orgId = WebUtil.readIntParam(request, "orgId", true);
+		String potential = WebUtil.readStrParam(request, "potential", true);
+		if (orgId != null) {
+		    if (!StringUtils.equals(potential, "1")) {
+			// list users in org
+			List users = UserBasicListAction.service.getUsersFromOrganisation(orgId);
+			request.setAttribute("users", users);
+		    } else {
+			// get all potential users of this org instead... filters results according to user's roles
+			// get group
+			Organisation org = (Organisation) UserBasicListAction.service.findById(Organisation.class,
+				orgId);
+			Organisation group;
+			if (org != null) {
+			    if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+				group = org.getParentOrganisation();
+			    } else {
+				group = org;
+			    }
+			    // get users
+			    List users = new ArrayList();
+			    if (request.isUserInRole(Role.SYSADMIN)
+				    || UserBasicListAction.service.isUserGlobalGroupAdmin()) {
+				users = UserBasicListAction.service.getAllUsers(org.getOrganisationId());
+			    } else if (UserBasicListAction.service.isUserInRole(userId, group.getOrganisationId(),
+				    Role.GROUP_ADMIN)
+				    || UserBasicListAction.service.isUserInRole(userId, group.getOrganisationId(),
+					    Role.GROUP_MANAGER)) {
+				if (group.getCourseAdminCanBrowseAllUsers()) {
+				    users = UserBasicListAction.service.getAllUsers(org.getOrganisationId());
+				} else if (org.getOrganisationType().getOrganisationTypeId()
+					.equals(OrganisationType.CLASS_TYPE)) {
+				    users = UserBasicListAction.service.findUsers(null, group.getOrganisationId(),
+					    orgId);
+				}
+			    }
+			    request.setAttribute("users", users);
+			}
+		    }
+		}
+	    }
+	}
+	return mapping.findForward("basiclist");
+    }
 }
- 

@@ -18,32 +18,29 @@
 
 	<link rel="stylesheet" href="${lams}/css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
 	<style media="screen,projection" type="text/css">
-li.ui-menu-item {
-	list-style: none;
-}
-</style>
+		li.ui-menu-item {
+			list-style: none;
+		}
+	</style>
 
 	<script type="text/javascript" src="${lams}/includes/javascript/getSysInfo.js"></script>
-	<script language="javascript" type="text/javascript" src="${lams}/loadVars.jsp"></script>
+	<script type="text/javascript" src="${lams}/loadVars.jsp"></script>
 	<script type="text/javascript" src="${lams}/includes/javascript/openUrls.js"></script>
 	<script type="text/javascript" src="${lams}/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}/includes/javascript/jquery-ui.js"></script>
 
 	<script type="text/javascript">
-		window.onload = (function() {
-				document.getElementById("query").focus();
-			
-			try {
-				var data = "Core Selectors Attributes Traversing Manipulation CSS Events Effects Ajax Utilities"
-						.split(" ");
-				var url = "${lams}/findUserLessons.do?courseID=${courseID}&dispatch=autocomplete";
-
-				$("#query").autocomplete({
-					source : url
-				});
-			} catch (e) {
-			}
-		});
+		$(document).ready(function(){
+			$("#query").focus().autocomplete({
+				'source' : "${lams}/findUserLessons.do?courseID=${courseID}&dispatch=autocomplete",
+				'delay'  : 700,
+				'select' : function(event, ui){
+					// display results for an exact user ID
+					window.location.href = "${lams}/findUserLessons.do?courseID=${courseID}&dispatch=getResults&userID="
+											+ ui.item.value; 
+			    }
+			});
+		})
 	</script>
 </lams:head>
 <body class="stripes">
@@ -51,11 +48,7 @@ li.ui-menu-item {
 	<c:set var="title">
 		<fmt:message key="lessonsearch.title" />
 	</c:set>
-
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-
+	
 	<lams:Page type="admin" title="${title}">
 
 		<div class="panel">
@@ -63,12 +56,14 @@ li.ui-menu-item {
 		</div>
 
 		<form action="${lams}/findUserLessons.do">
-			<input type="hidden" name="dispatch" value="getResults"> 
-			<input type="text" id="query" name="query"> 
-			<input type="hidden" name="courseID" value="${courseID}">
-			<button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-sm fa-search"></i></button>
+			<input type="hidden" name="dispatch" value="getResults" />
+			<input type="text" id="query" name="query" />
+			<input type="hidden" name="courseID" value="${courseID}" />
+			<button type="submit" class="btn btn-sm btn-primary">
+				<i class="fa fa-sm fa-search"></i>
+			</button>
 		</form>
-		
+
 		<div class="voffset10"></div>
 
 		<c:choose>
@@ -91,13 +86,18 @@ li.ui-menu-item {
 
 				<c:forEach var="user" items="${userLessonsMap}">
 					<div class="user">
-						<strong><c:out value="${user.key.firstName} ${user.key.lastName}" /></strong>
+						<strong><c:out
+								value="${user.key.firstName} ${user.key.lastName}" /></strong>
 						<c:choose>
 							<c:when test="${user.value ne null and not empty user.value}">
 								<ul>
 									<c:forEach var="lessonDto" items="${user.value}">
-										<li><c:out value="${lessonDto.lessonName}" escapeXml="true" /> <c:if test="${lessonDto.displayMonitor}">
-												<a href="javascript:openMonitorLesson(${lessonDto.lessonID})"> <fmt:message key="index.monitor" /></a>
+										<li><c:out value="${lessonDto.lessonName}"
+												escapeXml="true" /> <c:if
+												test="${lessonDto.displayMonitor}">
+												<a href="javascript:openMonitorLesson(${lessonDto.lessonID})">
+													<fmt:message key="index.monitor" />
+												</a>
 											</c:if></li>
 									</c:forEach>
 								</ul>

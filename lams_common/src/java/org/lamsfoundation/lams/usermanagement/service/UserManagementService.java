@@ -101,7 +101,7 @@ public class UserManagementService implements IUserManagementService {
     private IRoleDAO roleDAO;
 
     private IOrganisationDAO organisationDAO;
-    
+
     private IUserDAO userDAO;
 
     private IUserOrganisationDAO userOrganisationDAO;
@@ -109,7 +109,7 @@ public class UserManagementService implements IUserManagementService {
     protected MessageService messageService;
 
     private static IAuditService auditService;
-    
+
     // ---------------------------------------------------------------------
     // Service Methods
     // ---------------------------------------------------------------------
@@ -1096,13 +1096,13 @@ public class UserManagementService implements IUserManagementService {
 	String message = messageService.getMessage("audit.user.create", args);
 	getAuditService().log(moduleName, message);
     }
-    
+
     @Override
     public Integer getCountUsers() {
 	String query = "SELECT count(u) FROM User u";
 	return getFindIntegerResult(query);
     }
-    
+
     @Override
     public int getCountUsers(String searchString) {
 	return userDAO.getCountUsers(searchString);
@@ -1162,86 +1162,43 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public List searchUserSingleTerm(String term) {
-	term = StringEscapeUtils.escapeSql(term);
-	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
-		+ "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
-		+ " and u.disabledFlag=0 order by u.login";
-	List list = baseDAO.find(query);
-	return list;
+    public List<User> findUsers(String searchPhrase) {
+	return userDAO.findUsers(searchPhrase);
     }
 
     @Override
-    public List searchUserSingleTerm(String term, Integer filteredOrgId) {
-	term = StringEscapeUtils.escapeSql(term);
-	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
-		+ "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
-		+ " and u.disabledFlag=0 and u.userId not in (select uo.user.userId from UserOrganisation uo"
-		+ " where uo.organisation.organisationId=" + filteredOrgId + ") order by u.login";
-	List list = baseDAO.find(query);
-	return list;
+    public List<User> findUsers(String searchPhrase, Integer filteredOrgId) {
+	return userDAO.findUsers(searchPhrase, filteredOrgId);
     }
 
     @Override
-    public List searchUserSingleTerm(String term, Integer orgId, Integer filteredOrgId) {
-	term = StringEscapeUtils.escapeSql(term);
-	String query = "select uo.user from UserOrganisation uo where (uo.user.login like '%" + term + "%'"
-		+ " or uo.user.firstName like '%" + term + "%' or uo.user.lastName like '%" + term + "%'"
-		+ " or uo.user.email like '%" + term + "%') and uo.user.disabledFlag=0"
-		+ " and uo.organisation.organisationId=" + orgId + " and uo.user.userId not in"
-		+ " (select uo.user.userId from UserOrganisation uo where uo.organisation.organisationId="
-		+ filteredOrgId + ") order by uo.user.login";
-	List list = baseDAO.find(query);
-	return list;
+    public List<User> findUsers(String searchPhrase, Integer orgId, Integer filteredOrgId) {
+	return userDAO.findUsers(searchPhrase, orgId, filteredOrgId);
     }
 
     @Override
-    public List searchUserSingleTerm(String term, Integer orgId, boolean includeChildOrgs) {
-	term = StringEscapeUtils.escapeSql(term);
-	String whereClause = "";
-	if (includeChildOrgs) {
-	    whereClause = " or uo.organisation.parentOrganisation.organisationId=" + orgId;
-	}
-
-	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
-		+ "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
-		+ " and u.disabledFlag=0 and u.userId in (select uo.user.userId from UserOrganisation uo"
-		+ " where uo.organisation.organisationId=" + orgId + whereClause + ") order by u.login";
-	List list = baseDAO.find(query);
-	return list;
+    public List<User> findUsers(String searchPhrase, Integer orgId, boolean includeChildOrgs) {
+	return userDAO.findUsers(searchPhrase, orgId, includeChildOrgs);
     }
 
     @Override
-    public List getAllUsers() {
-	String query = "from User u where u.disabledFlag=0 order by u.login";
-	return baseDAO.find(query);
+    public List<User> getAllUsers() {
+	return userDAO.getAllUsers();
     }
-    
+
     @Override
-    public List getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
+    public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
 	return userDAO.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
     }
 
     @Override
-    public List getAllUsers(Integer filteredOrgId) {
-	String query = "from User u where u.disabledFlag=0 and u.userId not in"
-		+ " (select uo.user.userId from UserOrganisation uo where uo.organisation.organisationId="
-		+ filteredOrgId + ")" + " order by u.login";
-	return baseDAO.find(query);
+    public List<User> getAllUsers(Integer filteredOrgId) {
+	return userDAO.findUsers(filteredOrgId);
     }
 
     @Override
-    public List getAllUsersWithEmail(String email) {
-	String query = "from User u where u.email=\'" + email + "\' order by u.login";
-	return baseDAO.find(query);
-    }
-
-    @Override
-    public List getUsersFromOrganisation(Integer orgId, Integer filteredOrgId) {
-	String query = "select uo.user from UserOrganisation uo where uo.organisation.organisationId=" + orgId
-		+ " and uo.user.userId not in (select uo.user.userId from UserOrganisation uo"
-		+ " where uo.organisation.organisationId=" + filteredOrgId + ") order by uo.user.login";
-	return baseDAO.find(query);
+    public List<User> getAllUsersWithEmail(String email) {
+	return userDAO.findUsersWithEmail(email);
     }
 
     @Override
@@ -1273,12 +1230,13 @@ public class UserManagementService implements IUserManagementService {
 	return uos.size();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public User getUserDTOByOpenidURL(String openidURL) {
-	List results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
+	List<User> results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
-    
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
@@ -1305,7 +1263,7 @@ public class UserManagementService implements IUserManagementService {
     public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
 	this.organisationDAO = organisationDAO;
     }
-    
+
     public void setUserDAO(IUserDAO userDAO) {
 	this.userDAO = userDAO;
     }
