@@ -202,7 +202,6 @@ public class EventNotificationService implements IEventNotificationService {
 	    for (Integer id : toUserIds) {
 		String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
 		if (result != null) {
-		    EventNotificationService.log.warn("Error occured while sending message: " + result);
 		    event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
 			    String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
 		    subscribe(event, id, deliveryMethod, null);

@@ -2,6 +2,10 @@ package org.lamsfoundation.lams.events;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -24,8 +28,11 @@ import org.lamsfoundation.lams.util.Emailer;
 public class DeliveryMethodMail extends AbstractDeliveryMethod {
     private static final Logger log = Logger.getLogger(DeliveryMethodMail.class);
 
-    private static DeliveryMethodMail instance;
-    private static final EmailValidator emailValidator = EmailValidator.getInstance();
+    private static final long ERROR_SILENCE_TIMEOUT = 5000;
+
+    private static DeliveryMethodMail instance = null;
+    private final EmailValidator emailValidator = EmailValidator.getInstance();
+    private final Map<Long, String> errors = new HashMap<Long, String>();
 
     private IUserManagementService userManagementService = null;
 
@@ -49,7 +56,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 		return "Target user with ID " + toUserId + " was not found.";
 	    }
 	    String toEmail = toUser.getEmail();
-	    if (!DeliveryMethodMail.emailValidator.isValid(toEmail)) {
+	    if (!emailValidator.isValid(toEmail)) {
 		return "Target user's e-mail address is invalid.";
 	    }
 
@@ -61,7 +68,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 		    return "Source user with ID " + fromUserId + " was not found.";
 		}
 		String fromEmail = fromUser.getEmail();
-		if (!DeliveryMethodMail.emailValidator.isValid(fromEmail)) {
+		if (!emailValidator.isValid(fromEmail)) {
 		    return "Source user's e-mail address is invalid.";
 		}
 
@@ -69,8 +76,9 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    }
 	    return null;
 	} catch (Exception e) {
-	    DeliveryMethodMail.log.error("Error while sending an email: " + e.toString());
-	    return e.toString();
+	    String error = e.toString();
+	    logError(error);
+	    return error;
 	}
     }
 
@@ -102,6 +110,31 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 		    "Could not notify admin as his email is blank. The subject: " + subject + ". The message: " + body);
 	} else {
 	    Emailer.sendFromSupportEmail(subject, adminEmail, body, isHtmlFormat);
+	}
+    }
+
+    /**
+     * Checks if the error was already logged recently. If not, logs it.
+     */
+    private synchronized void logError(String error) {
+	Iterator<Entry<Long, String>> errorIterator = errors.entrySet().iterator();
+	boolean logError = true;
+	long currentTime = System.currentTimeMillis();
+	// same errors younger than this will be silenced
+	long silencePeriod = currentTime - DeliveryMethodMail.ERROR_SILENCE_TIMEOUT;
+	while (errorIterator.hasNext()) {
+	    Entry<Long, String> entry = errorIterator.next();
+	    if (entry.getKey() < silencePeriod) {
+		// clear the map from garbage
+		errorIterator.remove();
+	    } else if (error.equals(entry.getValue())) {
+		logError = false;
+		// do not break, let the clean up go through the whole map
+	    }
+	}
+	if (logError) {
+	    errors.put(currentTime, error);
+	    DeliveryMethodMail.log.error("Error while sending emails: " + error);
 	}
     }
 }
