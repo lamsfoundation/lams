@@ -25,10 +25,8 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -47,7 +45,6 @@ import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
@@ -62,7 +59,7 @@ import org.lamsfoundation.lams.util.FileUtilException;
  */
 public class LamsToolService implements ILamsToolService {
     private static Logger log = Logger.getLogger(LamsToolService.class);
-    
+
     //Leader selection tool Constants
     private static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
@@ -72,18 +69,6 @@ public class LamsToolService implements ILamsToolService {
     public IToolContentDAO toolContentDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private ILessonService lessonService;
-
-    @Override
-    public Set<User> getAllPotentialLearners(long toolSessionId) throws LamsToolServiceException {
-
-	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
-	if (session != null) {
-	    return session.getLearners();
-	} else {
-	    log.error("No tool session found for " + toolSessionId + ". No potential learners being returned.");
-	    return new HashSet<User>();
-	}
-    }
 
     @Override
     public IToolVO getToolByID(Long toolId) {
@@ -139,6 +124,7 @@ public class LamsToolService implements ILamsToolService {
 	return toolSessionDAO.getToolSession(toolSessionId);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Boolean isGroupedActivity(long toolContentID) {
 	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentID);
@@ -146,15 +132,15 @@ public class LamsToolService implements ILamsToolService {
 	    Activity activity = activities.get(0);
 	    return activity.getApplyGrouping();
 	} else {
-	    log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
+	    LamsToolService.log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
 	    return null;
 	}
     }
-    
+
     @Override
     public Long getLeaderUserId(Long toolSessionId, Integer learnerId) {
 	Long leaderUserId = null;
-	
+
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
 	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
@@ -163,17 +149,17 @@ public class LamsToolService implements ILamsToolService {
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
 	    User learner = (User) toolContentDAO.find(User.class, learnerId);
-	    String outputName = LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
+	    String outputName = LamsToolService.LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
 	    ToolSession leaderSelectionSession = toolSessionDAO.getToolSessionByLearner(learner,
 		    leaderSelectionActivity);
 	    if (leaderSelectionSession != null) {
-	    ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
+		ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
 
-	    // check if tool produced output
-	    if (output != null && output.getValue() != null) {
-		leaderUserId = output.getValue().getLong();
+		// check if tool produced output
+		if ((output != null) && (output.getValue() != null)) {
+		    leaderUserId = output.getValue().getLong();
+		}
 	    }
-	}
 	}
 
 	return leaderUserId;
@@ -183,8 +169,8 @@ public class LamsToolService implements ILamsToolService {
      * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous
      * activities set first, and then inside the parent set.
      */
+    @SuppressWarnings("rawtypes")
     private Activity getNearestLeaderSelectionActivity(Activity activity, Integer userId, Long lessonId) {
-
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
 	if (activityClass.equals(ToolActivity.class)) {
@@ -200,25 +186,26 @@ public class LamsToolService implements ILamsToolService {
 		toolActivity = (ToolActivity) activity;
 	    }
 
-	    if (LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
+	    if (LamsToolService.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
 		return activity;
 	    }
-	    
-	//in case of floating activity
+
+	    //in case of floating activity
 	} else if (activityClass.equals(FloatingActivity.class)) {
 	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
 	    Map<Activity, CompletedActivityProgress> completedActivities = learnerProgress.getCompletedActivities();
-	    
+
 	    //find the earliest finished Leader Select Activity
 	    Date leaderSelectActivityFinishDate = null;
 	    Activity leaderSelectionActivity = null;
 	    for (Activity completedActivity : completedActivities.keySet()) {
-		
+
 		if (completedActivity instanceof ToolActivity) {
 		    ToolActivity completedToolActivity = (ToolActivity) completedActivity;
-		    if (LEADER_SELECTION_TOOL_SIGNATURE.equals(completedToolActivity.getTool().getToolSignature())) {
+		    if (LamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
+			    .equals(completedToolActivity.getTool().getToolSignature())) {
 			Date finishDate = completedActivities.get(completedActivity).getFinishDate();
-			
+
 			if ((leaderSelectActivityFinishDate == null)
 				|| (finishDate.compareTo(leaderSelectActivityFinishDate) < 0)) {
 			    leaderSelectionActivity = completedToolActivity;
@@ -227,9 +214,9 @@ public class LamsToolService implements ILamsToolService {
 
 		    }
 		}
-		
+
 	    }
-	    
+
 	    return leaderSelectionActivity;
 	}
 
@@ -250,21 +237,9 @@ public class LamsToolService implements ILamsToolService {
     }
 
     @Override
-    public Set<User> getUsersForActivity(Long toolSessionId) {
-	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
-	return session != null ? session.getLearners() : new HashSet<User>();
-    }
-
-    @Override
     public Integer getCountUsersForActivity(Long toolSessionId) {
-
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
-	if ( session.getToolSessionTypeId() == ToolSession.GROUPED_TYPE ) {
-	    return toolSessionDAO.getCountUsersGrouped(toolSessionId);
-	} else {
-	    // expect it to be 0 or 1 
-	    return session.getLearners().size();
-	}
+	return session.getLearners().size();
     }
 
     /**
@@ -305,7 +280,7 @@ public class LamsToolService implements ILamsToolService {
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
 	this.toolContentDAO = toolContentDAO;
     }
-    
+
     /**
      * 
      * @param toolContentDAO
@@ -313,7 +288,7 @@ public class LamsToolService implements ILamsToolService {
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 	this.lamsCoreToolService = lamsCoreToolService;
     }
-    
+
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }

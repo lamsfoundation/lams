@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.commons.codec.binary.Base64;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -47,34 +47,27 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
 /**
  * @author lfoxton
  * 
- * This action is used for notification emails. It is designed to enable direct
- * linking to either monitor or learner so that links can be sent in the email.
- * This must be done through LAMS central so it correctly redirects the user
- * to the login page (if they have no session) before returning them to the 
- * correct location.
+ *         This action is used for notification emails. It is designed to enable direct linking to either monitor or
+ *         learner so that links can be sent in the email. This must be done through LAMS central so it correctly
+ *         redirects the user to the login page (if they have no session) before returning them to the correct location.
  * 
- * This action takes one parameter "h" which is a Base64 hash of a 
- * comma-separated value (relativeUrlPath, toolSessionID, accessMode)
- * where:
- * 	relativeUrlPath = Relative path to resource eg /tool/lawiki10/learner.do
- * 	toolSessionID  = A valid tool session ID for the lesson 
- * 	accessMode = l or t (learner or teacher)
+ *         This action takes one parameter "h" which is a Base64 hash of a comma-separated value (relativeUrlPath,
+ *         toolSessionID, accessMode) where: relativeUrlPath = Relative path to resource eg /tool/lawiki10/learner.do
+ *         toolSessionID = A valid tool session ID for the lesson accessMode = l or t (learner or teacher)
  * 
- * The parameters are hashed to prevent people from identifying the url, and
- * attempting to access content to which they are unauthorised, see LDEV-1978
+ *         The parameters are hashed to prevent people from identifying the url, and attempting to access content to
+ *         which they are unauthorised, see LDEV-1978
  * 
- * The toolSessionID and accessMode are used to determine the permissions of 
- * this user so it someone forwards the email to an unauthorised user, they
- * still cannot access the link unless they are part of the correct group. These 
- * checks may become unneccessary on the completion of LDEV-1978
+ *         The toolSessionID and accessMode are used to determine the permissions of this user so it someone forwards
+ *         the email to an unauthorised user, they still cannot access the link unless they are part of the correct
+ *         group. These checks may become unneccessary on the completion of LDEV-1978
  * 
- * Note that parameter names have been made as short as possible here to 
- * attempt to shorten the entire link required, and hopefully prevent email 
- * clients cutting them off and making a newline which sometimes breaks links.
+ *         Note that parameter names have been made as short as possible here to attempt to shorten the entire link
+ *         required, and hopefully prevent email clients cutting them off and making a newline which sometimes breaks
+ *         links.
  * 
  * @struts:action path="/r" validate="false"
  * @struts:action-forward name="error" path=".error"
@@ -93,22 +86,23 @@ public class RedirectAction extends LamsAction {
     private static ILamsToolService lamsToolService;
     private static IUserManagementService userService;
 
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
-	    throws Exception {
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+	    HttpServletResponse res) throws Exception {
 
 	try {
-	    String hash = WebUtil.readStrParam(req, PARAM_HASH);
-	    
+	    String hash = WebUtil.readStrParam(req, RedirectAction.PARAM_HASH);
+
 	    // Un-hash the string to gain all the paramters
 	    String fullParams = new String(Base64.decodeBase64(hash.getBytes()));
-	    
+
 	    // Split the CSV parameters
 	    String[] split = fullParams.split(",");
-	    
+
 	    if (split.length != 3) {
 		throw new Exception("Hash did not contain correct format (relative path, toolSessionID, toolaccess )");
 	    }
-	    
+
 	    // Getting the parameters from the hash
 	    String relativePath = split[0];
 	    Long toolSessionID = Long.parseLong(split[1]);
@@ -117,7 +111,7 @@ public class RedirectAction extends LamsAction {
 	    // Get the user
 	    UserDTO user = getUser();
 	    if (user == null) {
-		log.error("admin: User missing from session. ");
+		RedirectAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
 	    }
 
@@ -125,32 +119,31 @@ public class RedirectAction extends LamsAction {
 	    ToolSession toolSession = getToolSession(toolSessionID);
 
 	    if (toolSession == null) {
-		log.error("No ToolSession with ID " + toolSessionID + " found.");
+		RedirectAction.log.error("No ToolSession with ID " + toolSessionID + " found.");
 		return mapping.findForward("error");
 	    }
-	    
 
 	    // Get the lesson
 	    Lesson lesson = toolSession.getLesson();
 
 	    // Check the user's permissions, either learner or monitor
-	    if (accessMode.equals(ACCESS_MODE_LEARNER)) {
-		if (lesson == null || !lesson.isLessonStarted()) {
+	    if (accessMode.equals(RedirectAction.ACCESS_MODE_LEARNER)) {
+		if ((lesson == null) || !lesson.isLessonStarted()) {
 		    return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
 		}
 
 		// Check the learner is part of the group in question
-		if (toolSession.getLearners() == null || !toolSession.getLearners().contains(getRealUser(user))) {
-		    log.error("learner: User " + user.getLogin()
+		if (!toolSession.getLearners().contains(getRealUser(user))) {
+		    RedirectAction.log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested group. Cannot access the lesson.");
 		    return displayMessage(mapping, req, "error.authorisation");
 		}
-		
-	    } else if (accessMode.equals(ACCESS_MODE_TEACHER)) {
+
+	    } else if (accessMode.equals(RedirectAction.ACCESS_MODE_TEACHER)) {
 
 		// Check this is a monitor for the lesson in question
-		if (lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(getRealUser(user))) {
-		    log.error("learner: User " + user.getLogin()
+		if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().isStaffMember(getRealUser(user))) {
+		    RedirectAction.log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested lesson. Cannot access the lesson.");
 		    return displayMessage(mapping, req, "error.authorisation");
 		}
@@ -164,7 +157,7 @@ public class RedirectAction extends LamsAction {
 
 	    return null;
 	} catch (Exception e) {
-	    log.error("Failed redirect to url", e);
+	    RedirectAction.log.error("Failed redirect to url", e);
 	    return mapping.findForward("error");
 	}
     }
@@ -182,35 +175,34 @@ public class RedirectAction extends LamsAction {
     private User getRealUser(UserDTO dto) {
 	return getUserService().getUserByLogin(dto.getLogin());
     }
-    
-    private ToolSession getToolSession(Long toolSessionID)
-    {
+
+    private ToolSession getToolSession(Long toolSessionID) {
 	return getLamsToolService().getToolSession(toolSessionID);
     }
 
     private IUserManagementService getUserService() {
-	if (userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    userService = (IUserManagementService) ctx.getBean("userManagementService");
+	if (RedirectAction.userService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    RedirectAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return userService;
+	return RedirectAction.userService;
     }
 
     public static void setUserService(IUserManagementService userService) {
 	RedirectAction.userService = userService;
     }
-    
+
     private ILamsToolService getLamsToolService() {
-	if (lamsToolService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    lamsToolService = (ILamsToolService) ctx.getBean("lamsToolService");
+	if (RedirectAction.lamsToolService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    RedirectAction.lamsToolService = (ILamsToolService) ctx.getBean("lamsToolService");
 	}
-	return lamsToolService;
+	return RedirectAction.lamsToolService;
     }
 
     public static void setLamsToolService(ILamsToolService lamsToolService) {
-        RedirectAction.lamsToolService = lamsToolService;
+	RedirectAction.lamsToolService = lamsToolService;
     }
 }

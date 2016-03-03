@@ -23,15 +23,11 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
-import java.util.Set;
 
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtilException;
-
 
 /**
  * This interface defines all the service available for self contained tool module from lams. Any service that would be
@@ -42,43 +38,30 @@ import org.lamsfoundation.lams.util.FileUtilException;
  * @author Ozgur Demirtas 24/06/2005
  */
 public interface ILamsToolService {
-    /**
-     * Returns a list of all learners who can use a specific set of tool content. Note that none/some/all of these users
-     * may not reach the associated activity so they may not end up using the content. The purpose of this method is to
-     * provide a way for tools to do logic based on completions against potential completions.
-     * 
-     * @param toolContentID
-     *            a long value that identifies the tool content (in the Tool and in LAMS).
-     * @return a List of all the Learners who are scheduled to use the content.
-     * @exception in
-     *                case of any problems.
-     */
-    Set<User> getAllPotentialLearners(long toolSessionID) throws LamsToolServiceException;
-    
     IToolVO getToolByID(Long toolId);
-    
+
     IToolVO getToolBySignature(final String toolSignature);
-    
+
     long getToolDefaultContentIdBySignature(final String toolSignature);
 
     String generateUniqueContentFolder() throws FileUtilException, IOException;
-    
+
     /**
-     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
-     * It's been used by CKEditor.
+     * Return content folder (unique to each learner and lesson) which is used for storing user generated content. It's
+     * been used by CKEditor.
      * 
      * @param toolSessionId
      * @param userId
      * @return
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
-    
+
     void saveOrUpdateTool(Tool tool);
-    
+
     Tool getPersistToolBySignature(final String toolSignature);
-    
+
     ToolSession getToolSession(Long toolSessionId);
-    
+
     /**
      * Allows the tool to ask whether or not the activity is grouped and therefore it should expect more than one tool
      * session.
@@ -87,7 +70,7 @@ public interface ILamsToolService {
      * @return
      */
     Boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Returns leader's UserId from the nearest Leader Selection Tool (the nearest to the specified activity) , and null
      * if no Leader Selection Tools available.
@@ -99,18 +82,9 @@ public interface ILamsToolService {
      * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
-    
-    /**
-     * Get all the potential users for an Activity - they may or may not have joined the lesson.
-     * Works for both grouped, non-grouped and whole class activities.
-     * @param toolSessionId
-     * @return
-     */
-    Set<User> getUsersForActivity(Long toolSessionId);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);
-     */ 
+     */
     Integer getCountUsersForActivity(Long toolSessionId);
-
 }

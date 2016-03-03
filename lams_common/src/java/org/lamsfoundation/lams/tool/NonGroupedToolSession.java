@@ -32,9 +32,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * Not used at present - creates a separate ToolSession for each learner.
- * When we have a user interface that allows the author to select the whole of the class
- * vs an individual learner for the tool session, then it will be used.
+ * Not used at present - creates a separate ToolSession for each learner. When we have a user interface that allows the
+ * author to select the whole of the class vs an individual learner for the tool session, then it will be used.
  * 
  * @author daveg
  */
@@ -43,42 +42,36 @@ public class NonGroupedToolSession extends ToolSession {
     /** persistent field */
     private User user;
 
-    public NonGroupedToolSession(ToolActivity toolActivity,
-                                 Date createDateTime,
-                                 int toolSessionStateId,
-                                 User user,
-                                 Lesson lesson)
-    {
-        super(null,toolActivity,createDateTime,toolSessionStateId,lesson);
-        super.setUniqueKey(UNIQUE_KEY_PREFIX
-        				   +"_"
-                           +toolActivity.getActivityId().toString()
-        				   +"_"
-                           +user.getUserId().toString());
-        this.user=user;
-        //set toolSession name as same as login name of relatived user.
-        this.setToolSessionName(user.getLogin());
+    public NonGroupedToolSession(ToolActivity toolActivity, Date createDateTime, int toolSessionStateId, User user,
+	    Lesson lesson) {
+	super(null, toolActivity, createDateTime, toolSessionStateId, lesson);
+	super.setUniqueKey(ToolSession.UNIQUE_KEY_PREFIX + "_" + toolActivity.getActivityId().toString() + "_"
+		+ user.getUserId().toString());
+	this.user = user;
+	//set toolSession name as same as login name of relatived user.
+	this.setToolSessionName(user.getLogin());
 
     }
-    /**default constructor*/
-    public NonGroupedToolSession(){}
-    
-	public User getUser() 
-	{
-		return user;
-	}
-	
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
-	   /** Get all the learners who may be part of this tool session. */
+
+    /** default constructor */
+    public NonGroupedToolSession() {
+    }
+
+    public User getUser() {
+	return user;
+    }
+
+    public void setUser(User user) {
+	this.user = user;
+    }
+
+    /** Get all the learners who may be part of this tool session. */
+    @Override
     public Set<User> getLearners() {
-    	HashSet<User> users = new HashSet<User>();
-    	if ( user != null ) {
-    		users.add(user);
-    	}
-   		return users;
+	HashSet<User> users = new HashSet<User>();
+	if (user != null) {
+	    users.add(user);
+	}
+	return users;
     }
-
 }
