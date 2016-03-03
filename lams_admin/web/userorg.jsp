@@ -63,8 +63,8 @@
 	
 	function bindAddLink() {
 		jQuery("a.addLink").click(function() {
-			var rowText = jQuery(this).parent().text();
 			var rowId = jQuery(this).parent().attr("id");
+			var rowText = jQuery(this).parent().text();
 			jQuery("div#existing").append("<li id='"+rowId+"'><a class='removeLink'>"+rowText+"</a></li>");
 			jQuery(this).parent().remove();
 			updateExistingTotal();
@@ -98,19 +98,25 @@
 	function loadSearchResultsCallback(potential) {
 		updatePotentialTotal();
 		jQuery("li", "div#potential").each(function() {
-			var rowHtml = jQuery(this).html();
-			jQuery(this).html("<a class='addLink'>"+rowHtml+"</a>");
+			if ($('div#existing li#' + $(this).attr('id')).length > 0) {
+				$(this).remove();
+			} else {
+				$(this).html("<a class='addLink'>"+$(this).html()+"</a>");
+			}
 		});
 
 		if (potential == '1') {
 			for (var userId in removedUsers) {
-				jQuery("div#potential").append("<li id=\"" + userId + "\"><a class='addLink'>" + removedUsers[userId] + "</a></li>");
+				if ($('div#existing li#' + userId + ', div#potential li#' + userId).length == 0) {
+					$("div#potential").append("<li id=\"" + userId + "\"><a class='addLink'>" + removedUsers[userId] + "</a></li>");
+				}
 			}
 			removedUsers = []; 
 		} else {
 			for (var userId in removedUsers) {
 				var term = jQuery("#term").val();
-				if (removedUsers[userId].toLowerCase().indexOf(term.toLowerCase()) >= 0) {
+				if (removedUsers[userId].toLowerCase().indexOf(term.toLowerCase()) >= 0 
+					&& $('div#existing li#' + userId + ', div#potential li#' + userId).length == 0) {
 					jQuery("div#potential").append("<li id=\"" + userId + "\"><a class='addLink'>" + removedUsers[userId] + "</a></li>");
 					delete removedUsers[userId];
 				}
