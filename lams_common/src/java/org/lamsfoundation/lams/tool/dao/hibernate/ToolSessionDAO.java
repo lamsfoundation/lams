@@ -38,119 +38,104 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of ILessonDAO
+ * 
  * @author chris, Jacky Fang
  */
 @Repository
-public class ToolSessionDAO extends LAMSBaseDAO implements IToolSessionDAO
-{
+public class ToolSessionDAO extends LAMSBaseDAO implements IToolSessionDAO {
 
-    protected static final String LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER = 
-        "from NonGroupedToolSession s where s.user = :learner and s.toolActivity = :activity";
-    protected static final String LOAD_GROUPED_TOOL_SESSION_BY_GROUP = 
-        "from GroupedToolSession s where s.sessionGroup = :inputgroup and s.toolActivity = :activity";
-    protected static final String LOAD_GROUPED_TOOL_SESSION_BY_GROUP2 = 
-        "select s from GroupedToolSession as s inner join s.sessionGroup as sg inner join sg.users as u "
-    	+" where :learner = u and s.toolActivity = :activity";
-    protected static final String LOAD_TOOL_SESSION_BY_ACTIVITY = 
-        "from ToolSession s where s.toolActivity = :activity";
-    protected static final String LOAD_TOOL_SESSION_BY_LESSON =  
-        "from ToolSession s where s.lesson = :lesson";
-    private final static String COUNT_GROUPED_LEARNERS_SQL = "select count(*) from lams_user_group ug, lams_tool_session s "
-	 + " where ug.group_id = s.group_id and s.tool_session_id = :toolSessionId";
-	    
+    private static final String LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER = "from NonGroupedToolSession s where s.user = :learner and s.toolActivity = :activity";
+    private static final String LOAD_GROUPED_TOOL_SESSION_BY_GROUP2 = "select s from GroupedToolSession as s inner join s.sessionGroup as sg inner join sg.users as u "
+	    + " where :learner = u and s.toolActivity = :activity";
+    private static final String LOAD_TOOL_SESSION_BY_ACTIVITY = "from ToolSession s where s.toolActivity = :activity";
+    private static final String LOAD_TOOL_SESSION_BY_LESSON = "from ToolSession s where s.lesson = :lesson";
+
     /**
      * Retrieves the ToolSession
-     * @param toolSessionId identifies the ToolSession to get
+     * 
+     * @param toolSessionId
+     *            identifies the ToolSession to get
      * @return the ToolSession
      */
-	public ToolSession getToolSession(Long toolSessionId)
-    {
-        ToolSession session = (ToolSession) getSession().get(ToolSession.class, toolSessionId);
-        return session;
+    @Override
+    public ToolSession getToolSession(Long toolSessionId) {
+	ToolSession session = (ToolSession) getSession().get(ToolSession.class, toolSessionId);
+	return session;
     }
 
-	/**
-	 * Get the tool session by learner and activity. Will attempted to get an appropriate grouped
-	 * tool session (the most common case as this covers a normal group or a whole of class group) 
-	 * and then attempts to get a non-grouped base tool session. The non-grouped tool session
-	 * is meant to be unique against the user and activity. 
-	 * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByLearner(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity)
-	 * @returns toolSession may be of subclass NonGroupedToolSession or GroupedToolSession
-	 */
-	public ToolSession getToolSessionByLearner(final User learner,final Activity activity)
-	{
-		Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_GROUPED_TOOL_SESSION_BY_GROUP2);
-		query.setParameter("learner",learner);
-		query.setParameter("activity",activity);
-		GroupedToolSession groupedToolSession = (GroupedToolSession) query.uniqueResult();
-		if ( groupedToolSession != null ) 
-			return groupedToolSession;
-
-		query = getSessionFactory().getCurrentSession().createQuery(LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER);
-		query.setParameter("learner",learner);
-		query.setParameter("activity",activity);
-		NonGroupedToolSession nonGroupedSession = (NonGroupedToolSession) query.uniqueResult();
-		return nonGroupedSession;
-		
+    /**
+     * Get the tool session by learner and activity. Will attempted to get an appropriate grouped tool session (the most
+     * common case as this covers a normal group or a whole of class group) and then attempts to get a non-grouped base
+     * tool session. The non-grouped tool session is meant to be unique against the user and activity.
+     * 
+     * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByLearner(org.lamsfoundation.lams.usermanagement.User,
+     *      org.lamsfoundation.lams.learningdesign.Activity)
+     * @returns toolSession may be of subclass NonGroupedToolSession or GroupedToolSession
+     */
+    @Override
+    public ToolSession getToolSessionByLearner(final User learner, final Activity activity) {
+	Query query = getSessionFactory().getCurrentSession()
+		.createQuery(ToolSessionDAO.LOAD_GROUPED_TOOL_SESSION_BY_GROUP2);
+	query.setParameter("learner", learner);
+	query.setParameter("activity", activity);
+	GroupedToolSession groupedToolSession = (GroupedToolSession) query.uniqueResult();
+	if (groupedToolSession != null) {
+	    return groupedToolSession;
 	}
 
-	/**
-	 * Get the tool session by activity. A class-grouped activity should have only one tool session,
-	 * per activity but a proper grouped activity or an individial activity may have more
-	 * than one tool sesssion.
-	 * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByActivity(org.lamsfoundation.lams.learningdesign.Activity)
-	 * @returns List of toolSessions, may be of subclass NonGroupedToolSession or GroupedToolSession
-	 */
-	public List getToolSessionByActivity(final Activity activity)
-	{
-		Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_TOOL_SESSION_BY_ACTIVITY);
-		query.setParameter("activity",activity);
-		return (List) query.list();
-	}
-	
-		
-    public void saveToolSession(ToolSession toolSession)
-    {
-    	getSession().save(toolSession);
+	query = getSessionFactory().getCurrentSession()
+		.createQuery(ToolSessionDAO.LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER);
+	query.setParameter("learner", learner);
+	query.setParameter("activity", activity);
+	NonGroupedToolSession nonGroupedSession = (NonGroupedToolSession) query.uniqueResult();
+	return nonGroupedSession;
+
     }
+
+    /**
+     * Get the tool session by activity. A class-grouped activity should have only one tool session, per activity but a
+     * proper grouped activity or an individial activity may have more than one tool sesssion.
+     * 
+     * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByActivity(org.lamsfoundation.lams.learningdesign.Activity)
+     * @returns List of toolSessions, may be of subclass NonGroupedToolSession or GroupedToolSession
+     */
+    @Override
+    public List getToolSessionByActivity(final Activity activity) {
+	Query query = getSessionFactory().getCurrentSession().createQuery(ToolSessionDAO.LOAD_TOOL_SESSION_BY_ACTIVITY);
+	query.setParameter("activity", activity);
+	return query.list();
+    }
+
+    @Override
+    public void saveToolSession(ToolSession toolSession) {
+	getSession().save(toolSession);
+    }
+
     /**
      * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#removeToolSession(org.lamsfoundation.lams.tool.ToolSession)
      */
-    public void removeToolSession(ToolSession toolSession)
-    {
-    	getSession().delete(toolSession);
+    @Override
+    public void removeToolSession(ToolSession toolSession) {
+	getSession().delete(toolSession);
     }
 
     /**
      * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionsByLesson(org.lamsfoundation.lams.lesson.Lesson)
      */
-	public List getToolSessionsByLesson(final Lesson lesson) {
+    @Override
+    public List getToolSessionsByLesson(final Lesson lesson) {
 
-		Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_TOOL_SESSION_BY_LESSON);
-		query.setParameter("lesson",lesson);
-		return query.list();
+	Query query = getSessionFactory().getCurrentSession().createQuery(ToolSessionDAO.LOAD_TOOL_SESSION_BY_LESSON);
+	query.setParameter("lesson", lesson);
+	return query.list();
 
-	}
+    }
 
     /**
      * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)
      */
-    public void updateToolSession(ToolSession toolSession)
-    {
-    	getSession().update(toolSession);
+    @Override
+    public void updateToolSession(ToolSession toolSession) {
+	getSession().update(toolSession);
     }
-
-    /**
-     * Get a count of all the possible users for an activity connected to a tool session, where 
-     * it is a GroupedToolSession ie discriminator-value="1". Don't call on any other type of 
-     * tool session.
-     */
-    public Integer getCountUsersGrouped(final long toolSessionId) {
-	Query query = getSession().createSQLQuery(ToolSessionDAO.COUNT_GROUPED_LEARNERS_SQL);
-	query.setLong("toolSessionId", toolSessionId);
-	Object value = query.uniqueResult();
-	return new Integer(((Number) value).intValue());
-    }
-
-    
 }
