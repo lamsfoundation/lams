@@ -39,6 +39,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/jquery.jscroll.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>		
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
