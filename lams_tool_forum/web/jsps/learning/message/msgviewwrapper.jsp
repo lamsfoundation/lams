@@ -6,17 +6,17 @@
 
 <script type="text/javascript">
 
-	// The treetable code uses the clicks to expand and collapse the replies but then 
-	// the buttons will not work. So stop the event propogating up the event chain. 
-	$(".button").click(function (e) {
-		e.stopPropagation();
-	});
-	$(".rating-stars-div").click(function (e) {
-		e.stopPropagation();
-	});
-	$("#attachments").click(function (e) {
-    	e.stopPropagation();
-	});
+// The treetable code uses the clicks to expand and collapse the replies but then 
+// the buttons will not work. So stop the event propogating up the event chain. 
+$(".button").click(function (e) {
+	e.stopPropagation();
+});
+$(".msg-footer").click(function (e) {
+	e.stopPropagation();
+});
+$(".attachments").click(function (e) {
+	e.stopPropagation();
+});
 
 
 </script>

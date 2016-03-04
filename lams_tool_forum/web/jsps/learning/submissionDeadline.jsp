@@ -1,17 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<div id="content">
+<c:set var="title"><fmt:message key="activity.title" /></c:set>
+<lams:Page type="learner" title="${title}">
 
-	<h1>
-		<fmt:message key="activity.title" />
-	</h1>
-
-	<div class="warning">
+	<lams:Alert type="danger" id="submission-deadline" close="false">
 		<fmt:message key="authoring.info.teacher.set.restriction" >
 			<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 		</fmt:message>
-	</div>
+	</lams:Alert>
 
 	<div class="space-bottom-top align-right">
 		<c:set var="continue">
@@ -34,14 +31,13 @@
 				test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
 				<html:button property="continue"
 					onclick="javascript:location.href='${continue}';"
-					styleClass="button">
+					styleClass="btn btn-primary voffset5 pull-right">
 					<fmt:message key="label.continue" />
 				</html:button>
 			</c:when>
 			<c:otherwise>
 				<html:link href="#nogo"  property="finish" styleId="finish"
-					onclick="submitFinish();" styleClass="button">
-					<span class="nextActivity">
+					onclick="submitFinish();" styleClass="btn btn-primary voffset5 pull-right na">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
 		 						<fmt:message key="label.submit" />
@@ -50,10 +46,9 @@
 		 		 				<fmt:message key="label.finish" />
 		 					</c:otherwise>
 		 				</c:choose>
-			 		</span>
 				</html:link>
 			</c:otherwise>
 		</c:choose>
 
 	</div>
-</div>
+</lams:Page>

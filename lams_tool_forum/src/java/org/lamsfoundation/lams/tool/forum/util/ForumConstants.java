@@ -207,7 +207,7 @@ public interface ForumConstants {
     // for paging long topics & inlining reply
     public static final String PAGE_LAST_ID = "pageLastId";
     public static final String PAGE_SIZE = "size";
-    public static final int DEFAULT_PAGE_SIZE = 2;
+    public static final int DEFAULT_PAGE_SIZE = 50;
     public static final String ATTR_MESS_ID = "messageUid";
     public static final String ATTR_THREAD_ID = "threadUid";
     public static final String ATTR_NO_MORE_PAGES = "noMorePages";

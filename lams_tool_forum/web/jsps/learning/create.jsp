@@ -7,20 +7,20 @@
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<div id="content">
+	<lams:Page type="learner" title="${sessionMap.title}">
 
-		<h1>
-			<c:out value="${sessionMap.title}" escapeXml="true"/>
-		</h1>
-
-		<h2>
-			<fmt:message key="title.message.edit" />
-		</h2>
-
-		<html:errors property="error" />
-		<%@ include file="/jsps/learning/message/topicform.jsp"%>
-
-	</div>
+		<div class="container-fluid">
+		<div class="panel panel-default">
+			<div class="panel-heading panel-title">
+				<fmt:message key="title.message.edit" />
+			</div>
+			<div class="panel-body">
+				<html:errors property="error" />
+ 				<%@ include file="/jsps/learning/message/topicform.jsp"%>
+			</div>
+		</div>
+		</div>		
+	</lams:Page>
 
 </html:form>
 

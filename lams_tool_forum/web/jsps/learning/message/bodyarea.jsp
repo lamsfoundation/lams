@@ -1,32 +1,29 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div>
-	
 	<%-- for validateForm() method --%>
 	<input type="hidden" name="minCharactersEnabled" id="min-characters-enabled" value="${sessionMap.minCharacters > 0}"/>
-	
+
 	<c:if test="${sessionMap.minCharacters > 0}">
-		<div class="info">
+		<lams:Alert id="minCharacters" type="info" close="true">
 			<fmt:message key="info.minimum.number.characters" >
 				<fmt:param>${sessionMap.minCharacters}</fmt:param>
 			</fmt:message>
-		</div>
+		</lams:Alert>
 	</c:if>
 
 	<c:choose>
 		<c:when test="${sessionMap.allowRichEditor}">
-			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 			<lams:CKEditor id="message.body" value="${formBean.message.body}" 
 					contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 			</lams:CKEditor>
 		</c:when>
 		
 		<c:otherwise>
-			<%-- Does not user general tag becuase this field need keep compatible with CKEditor's content --%>
-			<lams:STRUTS-textarea rows="10" cols="60" tabindex="2" property="message.body"/>
+			<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
+			<lams:STRUTS-textarea rows="10" cols="60" tabindex="2" property="message.body"/> 
 		</c:otherwise>
 	</c:choose>
-	<BR>
+	<BR/>
 		
 	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 	<c:if test="${sessionMap.maxCharacters > 0}">
@@ -150,8 +147,6 @@
 		});
 		</script>			
 	</c:if>
-		
-	<BR>
+
 	<html:errors property="message.body" />
 
-<div>

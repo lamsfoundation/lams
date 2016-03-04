@@ -2,30 +2,53 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
-<table  id="topicTable" cellpadding="0" class="alternative-color" cellspacing="0">
-	<tbody>
+<div class="panel panel-default">
+	<div class="panel-heading panel-title"><fmt:message key="label.topics"/></div>
+	<div class="panel-body">
+		<html:button property="refresh" onclick="javascript:location.href='${refresh}';" styleClass="btn btn-sm btn-default voffset5 pull-left">
+			<fmt:message key="label.refresh" />
+		</html:button>
+
+		<c:set var="disabled" value="" />
+		<c:if test="${sessionMap.finishedLock}">
+			<c:set var="disabled" value="disabled" />
+		</c:if>
+
+		<c:if test='${sessionMap.allowNewTopics}'>
+			<html:button property="newtopic"
+				onclick="javascript:location.href='${newtopic}';"
+				disabled="${sessionMap.finishedLock}" styleClass="btn btn-sm btn-default voffset5 ${buttonClass} pull-right">
+				<fmt:message key="label.newtopic" />
+			</html:button>
+		</c:if>
+	</div>
+	<div class="table-responsive">
+	<table  id="topicTable" class="table">
+		<thead>
 		<tr>
 			<th width="">
 				<fmt:message key="lable.topic.title.subject" />
 			</th>
-			<th width="100px">
+			<th width="15%">
 				<fmt:message key="lable.topic.title.startedby" />
 			</th>
-			<th width="60px">
+			<th width="8%">
 				<fmt:message key="lable.topic.title.replies" />
 			</th>
-			<th width="60px">
+			<th width="8%">
 				<fmt:message key="lable.topic.title.repliesnew" />
 			</th>
-			<th width="25%">
+			<th width="20%">
 				<fmt:message key="lable.topic.title.update" />
 			</th>
 			<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
-				<th>
+				<th  width="8%">
 					&nbsp;
 				</th>
 			</c:if>
 		</tr>
+		</thead>
+		<tbody>
 		<c:forEach items="${topicList}" var="topic">
 			<tr>
 				<td>
@@ -43,7 +66,7 @@
 						</c:choose>
 					</html:link>
 					<c:if test="${topic.hasAttachment}">
-						<img src="<html:rewrite page="/images/paperclip.gif"/>">
+						<i class="fa fa-paperclip"></i>
 					</c:if>
 				</td>
 				<td>
@@ -73,5 +96,7 @@
 				</c:if>
 			</tr>
 		</c:forEach>
-	</tbody>
-</table>
+		</tbody>
+	</table>
+	</div>
+</div>

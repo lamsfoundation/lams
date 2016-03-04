@@ -35,9 +35,10 @@
 			var pathToImageFolder = "${lams}images/css/";
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/jquery.jscroll.js"></script>
-		<script type="text/javascript" src="${tool}includes/javascript/jquery.treetable.js"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
@@ -56,75 +57,41 @@
 		
 	</lams:head>
 	<body class="stripes">
-		<div id="content">
+		<lams:Page type="learner" title="${sessionMap.title}">
 
-			<h1>
-				<c:out value="${sessionMap.title}" escapeXml="true"/>
-			</h1>
-		
-			<div>
-				<div class="right-buttons">
-				
-					<c:set var="refreshTopicURL">
-					</c:set>
-					<html:button property="refresh"
-						onclick="javascript:refreshTopic();"
-						styleClass="button">
-						<fmt:message key="label.refresh" />
-					</html:button>
-					
-					<c:set var="backToForum">
-						<html:rewrite
-							page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
-					</c:set>
-					<html:button property="backToForum"
-						onclick="javascript:location.href='${backToForum}';"
-						styleClass="button">
-						<fmt:message key="label.back.to.forum" />
-					</html:button>
-				</div>
-				<h2>
-					<fmt:message key="title.message.view.topic" />
-				</h2>
-		
-			</div>
-		
+			<!-- Announcements and advanced settings -->
 			<c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
-				<c:choose>
-				  	<c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 and sessionMap.maximumReply ne 0)}">
-						<div class="info">
+			
+				<c:if test="${not sessionMap.allowNewTopics and ( sessionMap.minimumReply ne 0 or sessionMap.maximumReply ne 0)}">
+					<lams:Alert id="postingLimits" type="info" close="true">
+					<c:if test="${(sessionMap.minimumReply ne 0 and sessionMap.maximumReply ne 0)}">
 							<fmt:message key="label.postingLimits.topic.reminder">
 								<fmt:param value="${sessionMap.minimumReply}" />
 								<fmt:param value="${sessionMap.maximumReply}" />
 								<fmt:param value="${numOfPosts}" />
 								<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
 							</fmt:message>
-						</div>
-		           </c:when> 
-		           <c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 or sessionMap.maximumReply eq 0)}">
-		           		<div class="info">
+					</c:if>
+					<c:if test="${(sessionMap.minimumReply ne 0 and sessionMap.maximumReply eq 0)}">
 		                	<fmt:message key="label.postingLimits.topic.reminder.min">
 		                    	<fmt:param value="${sessionMap.minimumReply}" />
 		                    	<fmt:param value="${numOfPosts}" />
 		                    	<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
 		                    </fmt:message>
-		                </div>
-		           </c:when> 
-		           <c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply eq 0 or sessionMap.maximumReply ne 0)}">
-		                <div class="info">
+					</c:if>			
+					<c:if test="${(sessionMap.minimumReply eq 0 and sessionMap.maximumReply ne 0)}">
 		                    <fmt:message key="label.postingLimits.topic.reminder.max">
 		                         <fmt:param value="${sessionMap.maximumReply}" />
 		                         <fmt:param value="${numOfPosts}" />
 		                         <fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
 		                     </fmt:message>
-		                </div>
-		            </c:when>
-		    	</c:choose>
-		    	
+					</c:if>
+					</lams:Alert>
+				</c:if>
+				
 				<!-- Rating announcements -->
 				<c:if test="${sessionMap.allowRateMessages}">
-					<div class="info">
-					
+					<lams:Alert id="rateMessages" type="info" close="true">
 						<c:choose>
 							<c:when test="${sessionMap.minimumRate ne 0 and sessionMap.maximumRate ne 0}">
 								<fmt:message key="label.rateLimits.forum.reminder">
@@ -150,46 +117,48 @@
 						<fmt:message key="label.rateLimits.topic.reminder">
 							<fmt:param value="<span id='numOfRatings'>${sessionMap.numOfRatings}</span>"/>
 						</fmt:message>
-						
-					</div>
-				</c:if>
-				    	
-			</c:if>
-			<br>
-			
-			<div class="space-bottom">
-			<div class="scroll" >
-			<%@ include file="message/topicview.jsp"%>
-			</div>
-			</div>
-			<script>
-				<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
-				<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
-				$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true,callback:setupJRatingSetPath});
-			</script>
-			
-			<c:set var="refreshTopicURL">
-			</c:set>
-			
-			<div>
-				<div class="right-buttons">
-					<c:set var="backToForum">
-						<html:rewrite
-							page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
-					</c:set>
-					<html:button property="backToForum"
-						onclick="javascript:location.href='${backToForum}';"
-						styleClass="button">
-						<fmt:message key="label.back.to.forum" />
-					</html:button>
-				</div>
 		
-				<a href="javascript:refreshTopic();" class="button"> <fmt:message
-						key="label.refresh" /> </a>
+					</lams:Alert>
+				</c:if>			
+		</c:if>	
+		<!-- End announcements and advanced settings -->
+
+	<c:set var="buttonPanel">
+		<c:set var="refreshTopicURL"></c:set>
+		<div class="container-fluid">
+		<div class="row no-gutter">
+			<div class="col-xs-6">
+			<a href="javascript:refreshTopic();" class="btn btn-default voffset5  pull-left" role="button"> <fmt:message	key="label.refresh" /> </a>
+			</div>
+			<div class="col-xs-6">
+			<c:set var="backToForum">
+				<html:rewrite
+					page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
+			</c:set>
+			<html:button property="backToForum"
+				onclick="javascript:location.href='${backToForum}';"
+				styleClass="btn btn-primary voffset5 pull-right">
+				<fmt:message key="label.back.to.forum" />
+			</html:button>
 			</div>
 		</div>
-					
+	</div>
+	</c:set>
+		
+		${buttonPanel}
+
+		<div class="scroll" >
+		<%@ include file="message/topicview.jsp"%>
 		</div>
+		<script>
+			<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
+			<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
+			$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true,callback:setupJRatingSetPath});
+		</script>
+			
+		${buttonPanel}
+
+	</lams:Page>
 
 	</body>
 </lams:html>
