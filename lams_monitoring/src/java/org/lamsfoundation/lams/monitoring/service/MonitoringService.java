@@ -2128,7 +2128,7 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
-	Grouping grouping = getGroupingForActivity(activity, true, "addUsersToGroup");
+	Grouping grouping = getGroupingForActivity(activity, !activity.isChosenBranchingActivity(), "addUsersToGroup");
 	ArrayList<User> learners = createUserList(activityID, learnerIDs, "add");
 	lessonService.performGrouping(grouping, groupId, learners);
     }
@@ -2156,59 +2156,33 @@ public class MonitoringService implements IMonitoringService {
 	return learners;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void addUsersToBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
-
-	SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
-	if (branch == null) {
-	    String error = "addUsersToBranch: Branch missing. ActivityID was " + sequenceActivityID;
-	    MonitoringService.log.error(error);
-	    throw new MonitoringServiceException(error);
-	}
-
-	Group group = branch.getSoleGroupForBranch();
-	Grouping grouping = null;
-	if (group == null) {
-	    // create a new group and a matching mapping entry
-	    Activity parentActivity = branch.getParentActivity();
-	    if ((parentActivity == null) || !parentActivity.isBranchingActivity()) {
-		String error = "addUsersToBranch: Branching activity missing or not a branching activity. Branch was "
-			+ branch + " parent activity was " + parentActivity;
-		MonitoringService.log.error(error);
-		throw new MonitoringServiceException(error);
-	    }
-	    BranchingActivity branchingActivity = (BranchingActivity) getActivityById(parentActivity.getActivityId());
-	    grouping = branchingActivity.getGrouping();
-
-	    // Need the learning design to get the next uiid - which is needed
-	    // if
-	    // Live Edit is done, or Flash can't match the branch to the groups
-	    // properly.
+    public void createChosenBranchingGroups(Long branchingActivityID) {
+	BranchingActivity branchingActivity = (BranchingActivity) getActivityById(branchingActivityID);
+	Grouping grouping = branchingActivity.getGrouping();
+	if (grouping.getGroups().isEmpty()) {
 	    LearningDesign design = branchingActivity.getLearningDesign();
-
-	    group = lessonService.createGroup(grouping, branch.getTitle());
-	    groupingDAO.insert(group);
-	    Integer nextUIID = new Integer(design.getMaxID().intValue() + 1);
-	    group.setGroupUIID(nextUIID);
-	    nextUIID = new Integer(nextUIID.intValue() + 1);
-	    group.allocateBranchToGroup(nextUIID, branch, branchingActivity);
-	    groupingDAO.update(group);
-
-	    design.setMaxID(new Integer(nextUIID.intValue() + 1));
+	    for (Activity childActivity : (Set<Activity>) branchingActivity.getActivities()) {
+		SequenceActivity branch = (SequenceActivity) getActivityById(childActivity.getActivityId());
+		Group group = lessonService.createGroup(grouping, branch.getTitle());
+		groupingDAO.insert(group);
+		Integer nextUIID = design.getMaxID() + 1;
+		group.setGroupUIID(nextUIID);
+		nextUIID++;
+		group.allocateBranchToGroup(nextUIID, branch, branchingActivity);
+		groupingDAO.update(group);
+		design.setMaxID(nextUIID);
+	    }
 	    learningDesignDAO.update(design);
-
-	} else {
-	    grouping = group.getGrouping();
 	}
-
-	ArrayList<User> learners = createUserList(sequenceActivityID, learnerIDs, "add");
-	lessonService.performGrouping(grouping, group.getGroupId(), learners);
     }
 
     @Override
     public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
-	Grouping grouping = getGroupingForActivity(activity, true, "removeUsersFromGroup");
+	Grouping grouping = getGroupingForActivity(activity, !activity.isChosenBranchingActivity(),
+		"removeUsersFromGroup");
 	ArrayList<User> learners = createUserList(activityID, learnerIDs, "remove");
 	lessonService.removeLearnersFromGroup(grouping, groupId, learners);
     }
