@@ -324,7 +324,7 @@ function removeGroup(container) {
 				dataType : 'json',
 				url : LAMS_URL + 'monitoring/grouping.do',
 				data : {
-					'method'     : 'removeGroupJSON',
+					'method'     : 'removeGroup',
 					'activityID' : groupingActivityId,
 					'groupID'    : groupId
 				},
@@ -357,7 +357,7 @@ function renameGroup(container) {
 			cache    : false,
 			url : LAMS_URL + 'monitoring/grouping.do',
 			data : {
-				'method'     : 'changeGroupNameJSON',
+				'method'     : 'changeGroupName',
 				'groupID'    : groupId,
 				'name'       : groupName
 			},
@@ -458,7 +458,7 @@ function assignUsersToGroup(userIds, groupContainer) {
 		dataType : 'json',
 		url : LAMS_URL + 'monitoring/grouping.do',
 		data : {
-			'method'     : 'addMembersJSON',
+			'method'     : 'addMembers',
 			'activityID' : groupingActivityId,
 			'groupID'    : groupId,
 			'name'       : groupName,

@@ -75,11 +75,6 @@
 	</listener>
 	
 	<servlet>
-		<servlet-name>performChosenGrouping</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.monitoring.web.PerformChosenGroupingServlet</servlet-class>
-
-	</servlet>
-	<servlet>
 		<servlet-name>initializeLesson</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
 
@@ -112,10 +107,6 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>performChosenGrouping</servlet-name>
-		<url-pattern>/monitoring/performChosenGrouping</url-pattern>
-	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>initializeLesson</servlet-name>
 		<url-pattern>/initializeLesson</url-pattern>

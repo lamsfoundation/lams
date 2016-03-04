@@ -603,16 +603,9 @@ public interface IMonitoringService {
 	    throws LessonServiceException;
 
     /**
-     * Add learners to a branch. Doesn't necessarily check if the user is already in another branch. Assumes there
-     * should only be one group for this branch. Use for Teacher Chosen Branching. Don't use for Group Based Branching
-     * as there could be more than one group for the branch.
-     * 
-     * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
-     * @param learnerIDs
-     *            the IDS of the learners to be added.
+     * Creates groups for branches, if they do not already exist.
      */
-    void addUsersToBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException;
+    void createChosenBranchingGroups(Long branchingActivityID);
 
     /**
      * Remove learners from a branch. Assumes there should only be one group for this branch. Use for Teacher Chosen
