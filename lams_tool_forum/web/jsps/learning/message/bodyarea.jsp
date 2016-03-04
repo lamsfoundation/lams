@@ -3,14 +3,6 @@
 	<%-- for validateForm() method --%>
 	<input type="hidden" name="minCharactersEnabled" id="min-characters-enabled" value="${sessionMap.minCharacters > 0}"/>
 
-	<c:if test="${sessionMap.minCharacters > 0}">
-		<lams:Alert id="minCharacters" type="info" close="true">
-			<fmt:message key="info.minimum.number.characters" >
-				<fmt:param>${sessionMap.minCharacters}</fmt:param>
-			</fmt:message>
-		</lams:Alert>
-	</c:if>
-
 	<c:choose>
 		<c:when test="${sessionMap.allowRichEditor}">
 			<lams:CKEditor id="message.body" value="${formBean.message.body}" 
