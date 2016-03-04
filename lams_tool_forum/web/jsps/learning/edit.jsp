@@ -1,8 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.jRating.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:WebAppURL />includes/javascript/message.js"></script>
 
 <script type="text/javascript">
@@ -15,8 +12,6 @@
     	e.stopPropagation();
 	});
 	
-	// The treetable code uses the clicks to expand and collapse the replies but then 
-	// the buttons will not work. So stop the event propogating up the event chain. 
 	$('#editForm').submit(function() { // catch the form's submit event
 
 		if ( validateForm() ) {
@@ -38,7 +33,7 @@
         			var messageUid = response.messageUid;
 					if ( messageUid ) {
 	        			var rootUid = response.rootUid;
-	        			var messDiv = document.getElementById('msg'+messageUid);
+	        			var messDiv = document.getElementById('outermsg'+messageUid);
 	        			if ( ! messDiv) {
 	        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
         				} else {
@@ -47,7 +42,7 @@
 							$('#edit').remove();
 	        				var loadString = '<html:rewrite page="/learning/viewMessage.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&messageUid="+messageUid;
 							$(messDiv).load(loadString, function() {
-								$('#msg'+messageUid).focus();
+								$('#pb-msg'+messageUid).focus();
 								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
 								highlightMessage();
 							});
@@ -77,20 +72,16 @@
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
-	<div id="content">
-
-		<h1>
-			<c:out value="${sessionMap.title}" escapeXml="true" />
-		</h1>
-
-		<h2>
+	<div class="container-fluid">
+	<div class="panel panel-default">
+		<div class="panel-heading panel-title">
 			<fmt:message key="title.message.edit" />
-		</h2>
-
-		<html:errors property="error" />
-
-		<%@ include file="/jsps/learning/message/topiceditform.jsp"%>
-
+		</div>
+		<div class="panel-body">
+			<html:errors property="error" />
+			<%@ include file="/jsps/learning/message/topiceditform.jsp"%>
+		</div>
+	</div>
 	</div>
 
 </html:form>

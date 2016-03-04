@@ -1,44 +1,30 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<table cellpadding="0">
-	<tr>
-		<td>
-			<span  class="field-name"><fmt:message key="message.label.subject" /></span><BR>		
-			<html:text size="30" tabindex="1" property="message.subject" maxlength="60" />
-			<br>
-			<html:errors property="message.subject" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<span  class="field-name"><fmt:message key="message.label.body" />*</span><BR>
-			<%@include file="bodyarea.jsp"%>
-		</td>
-	</tr>
-	<c:if test="${sessionMap.allowUpload}">
-		<tr>
-			<td>
-				<span class="field-name"><fmt:message key="message.label.attachment" /></span><br>
-				<html:file tabindex="3" property="attachmentFile" /><BR>
-				<html:errors property="message.attachment" />
-			</td>
-		</tr>
-	</c:if>
+<div class="form-group">
+    <label><fmt:message key="message.label.subject" />&nbsp;</label>
+	<html:text size="50" tabindex="1" property="message.subject" maxlength="60"/> &nbsp;
+	<html:errors property="message.subject" />
+</div>
 
-	<tr class="right-buttons">
-		<td>
-			<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="button" styleId="cancelButton">
-				<fmt:message key="button.cancel" />
-			</html:button>
-			<c:set var="backToForum">
-				<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
-			</c:set>
-			<html:submit styleClass="button" styleId="submitButton">
-				<fmt:message key="button.submit" />
-			</html:submit>
-		</td>
-	</tr>
+<div class="form-group">
+    <label><fmt:message key="message.label.body" />  *</label><BR/>
+	<%@include file="bodyarea.jsp"%>
+</div>
 
-</table>
+<c:if test="${sessionMap.allowUpload}">
+	<div class="form-group">
+		<label><fmt:message key="message.label.attachment" /></label><BR/>
+		<html:file tabindex="3" property="attachmentFile" /><BR/>
+		<html:errors property="message.attachment" />
+	</div>
+</c:if>
 
-<div class="space-bottom"></div>
+<c:set var="backToForum">
+	<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
+</c:set>
+<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="btn btn-default voffset5 pull-left" styleId="cancelButton">
+	<fmt:message key="button.cancel" />
+</html:button>&nbsp;
+<html:submit styleClass="btn btn-primary voffset5 pull-right" styleId="submitButton">
+	<fmt:message key="button.submit" />
+</html:submit>

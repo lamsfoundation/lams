@@ -1,8 +1,8 @@
 <%-- Error Messages --%>
 <logic:messagesPresent>
-	<p class="warning">
+		<lams:Alert id="errorMessages" type="danger" close="false">
         <html:messages id="error">
-            <c:out value="${error}" escapeXml="false"/><br/>
+            <c:out value="${error}" escapeXml="false"/>
         </html:messages>
-	</p>
+    </lams:Alert>
 </logic:messagesPresent>

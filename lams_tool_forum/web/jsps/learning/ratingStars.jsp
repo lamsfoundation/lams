@@ -10,7 +10,7 @@
 </c:choose>
 
 <c:if test="${sessionMap.allowRateMessages}">
-	<div class="rating-stars-div" style="float: left;">
+	<div style="display: inline-block">
 		<div class="${ratingStarsClass} rating-stars-new" data-average="${msgDto.averageRating}" data-id="${messageId}"></div>
 		
 		<div class="rating-stars-caption">

@@ -1,8 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.jRating.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:WebAppURL />includes/javascript/message.js"></script>
 
 <script type="text/javascript">
@@ -14,7 +11,6 @@
 	$("#replyForm").keydown(function (e) {
     	e.stopPropagation();
 	});
-	
 
 	$('#replyForm').submit(function() { // catch the form's submit event
 
@@ -42,13 +38,13 @@
         			if ( rootUid ) {
 	        			if ( ! threadDiv) {
     	    				// must have replied to the top level, so show the posting at the top.
-							var threadDiv = document.getElementById('reply');
-							threadDiv.id = 'thread'+messageUid;
-        				} else {
-        					// make sure the old reply form is gone, so if something goes wrong 
-        					// the user won't try to submit it again
-							$('#reply').remove();
-						}
+	        				threadDiv =  document.createElement("div");
+	        				threadDiv.id = 'reply'+messageUid;
+	        				$('#insertTopLevelRepliesHere').after(threadDiv);
+	        			}
+	        			// make sure the old reply form is gone, so if something goes wrong 
+        				// the user won't try to submit it again
+						$('#reply').remove();
         			
 	        			if ( ! threadDiv) {
 	        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
@@ -59,7 +55,7 @@
 								// don't need to do this if we have started a new thread.
 								if ( threadUid != messageUid ) {
 									$('#tree' + threadUid).treetable("reveal",messageUid);
-									$('#msg'+messageUid).focus();
+									$('#pb-msg'+messageUid).focus();
 								}
 								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
 								highlightMessage();
@@ -97,15 +93,15 @@
 
 	<html:hidden property="sessionMapID"/>
 	
-	<div id="content">
-	
-		<h2>
+	<div class="container-fluid">
+	<div class="panel panel-default">
+		<div class="panel-heading panel-title">
 			<fmt:message key="title.message.reply" />
-		</h2>
-		
-		<html:errors property="error" />
-				
-		<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
-	
+		</div>
+		<div class="panel-body">
+			<html:errors property="error" />
+			<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
+		</div>
+	</div>
 	</div>
 </html:form>

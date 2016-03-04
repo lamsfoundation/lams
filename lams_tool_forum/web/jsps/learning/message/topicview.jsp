@@ -3,7 +3,7 @@
 
 <c:set var="maxThreadUid" value="0"/>
 <c:set var="messageTablename" value=""/>
-<c:set var="indent" value="30"/>
+<c:set var="indent" value="10"/>
 
 <c:set var="show"><fmt:message key="label.show.replies" /></c:set>
 <c:set var="hide"><fmt:message key="label.hide.replies" /></c:set>
@@ -26,10 +26,10 @@
 	$(".button").click(function (e) {
     	e.stopPropagation();
 	});
-	$(".rating-stars-div").click(function (e) {
+	$(".msg-footer").click(function (e) {
     	e.stopPropagation();
 	});
-	$("#attachments").click(function (e) {
+	$(".attachments").click(function (e) {
     	e.stopPropagation();
 	});
 
@@ -40,14 +40,7 @@
 			// set up the new reply area
 			var replyDiv = document.createElement("div");
 			replyDiv.id = 'reply';
-
-			if ( level == 0 ) {
-				$('#msg'+messageUid).after(replyDiv);
-			} else {				
-				var parentDiv = document.getElementById('msg'+messageUid);
-				parentDiv.appendChild(replyDiv);
-			}
-			
+			$('#pb-msg'+messageUid).after(replyDiv);
 			$(replyDiv).load(url);
 		}
 	}
@@ -57,15 +50,13 @@
 			alert('<fmt:message key="message.complete.or.cancel.edit"/>');
 		} else {
 			// set up the new edit area
-			var parentDiv = document.getElementById('msg'+messageUid);
 			var editDiv = document.createElement("div");
 			editDiv.id = 'edit';
-			parentDiv.appendChild(editDiv);
+			$('#pb-msg'+messageUid).after(editDiv);
 			$(editDiv).load(url);
 		}
 	}
-
-
+	
 </script>
 
 <c:forEach var="msgDto" items="${topicThread}">
@@ -88,7 +79,7 @@
 		</c:if>
 		<c:set var="messageTablename" value="tree${msgDto.message.uid}"/>
 		<div id="thread${msgDto.message.uid}">
-		<table id="${messageTablename}">
+		<table id="${messageTablename}" class="col-xs-12">
 		<tr data-tt-id="${msgDto.message.uid}"><td>	
 	</c:when>
 	<c:otherwise>
@@ -97,6 +88,10 @@
 	</c:choose>
 	
 	<%@ include file="msgview.jsp"%>
+
+	<c:if test='${(msgLevel == 0)}'>
+		<div id="insertTopLevelRepliesHere"></div>
+	</c:if>
 	
 	<c:if test='${(msgLevel >= 1)}'>
 		</td></tr>	
@@ -114,8 +109,8 @@
 	
 <c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-	<div class="float-right">
+	<div class="text-center">
 	<c:set var="more"><html:rewrite page="/learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}" /></c:set>
-	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>
+	<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
 	</div>
 </c:if>
