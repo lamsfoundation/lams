@@ -1,13 +1,19 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="maxThreadUid" value="0"/>
-<c:set var="messageTablename" value=""/>
-<c:set var="indent" value="10"/>
+<c:set var="maxThreadUid" value="0" />
+<c:set var="messageTablename" value="" />
+<c:set var="indent" value="10" />
 
-<c:set var="show"><fmt:message key="label.show.replies" /></c:set>
-<c:set var="hide"><fmt:message key="label.hide.replies" /></c:set>
-<c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
+<c:set var="show">
+	<fmt:message key="label.show.replies" />
+</c:set>
+<c:set var="hide">
+	<fmt:message key="label.hide.replies" />
+</c:set>
+<c:set var="prompt">
+	<fmt:message key="label.showhide.prompt" />
+</c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
 	expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
@@ -62,55 +68,51 @@
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="msgLevel" value="${msgDto.level}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
-	
+
 	<c:if test='${(msgLevel <= 1)}'>
-		<c:set var="maxThreadUid" value="${msgDto.message.uid}"/>
+		<c:set var="maxThreadUid" value="${msgDto.message.uid}" />
 	</c:if>
 
 	<c:choose>
-	<c:when test='${(msgLevel == 1)}'>
-		<%-- same test & command appears at bottom of script --%>
-		<c:if test='${messageTablename != ""}'>
-			</table>
-			<script> 
+		<c:when test='${(msgLevel == 1)}'>
+			<%-- same test & command appears at bottom of script --%>
+			<c:if test='${messageTablename != ""}'>
+				</table>
+				<script> 
 				$("#${messageTablename}").treetable({${tableCommand}});
-			</script>	
-			</div>
-		</c:if>
-		<c:set var="messageTablename" value="tree${msgDto.message.uid}"/>
-		<div id="thread${msgDto.message.uid}">
-		<table id="${messageTablename}" class="col-xs-12">
-		<tr data-tt-id="${msgDto.message.uid}"><td>	
-	</c:when>
-	<c:otherwise>
-		<tr data-tt-id="${msgDto.message.uid}" data-tt-parent-id="${msgDto.message.parent.uid}"><td>	
-	</c:otherwise>
-	</c:choose>
-	
-	<%@ include file="msgview.jsp"%>
+			</script>
+				
+			</c:if>
+			<c:set var="messageTablename" value="tree${msgDto.message.uid}" />
+			<div id="thread${msgDto.message.uid}">
+				<table id="${messageTablename}" class="col-xs-12">
+					<tr data-tt-id="${msgDto.message.uid}">
+						<td></c:when> <c:otherwise>
+								<tr data-tt-id="${msgDto.message.uid}" data-tt-parent-id="${msgDto.message.parent.uid}">
+									<td>
+							</c:otherwise> </c:choose> <%@ include file="msgview.jsp"%> <c:if test='${(msgLevel == 0)}'>
+								<div id="insertTopLevelRepliesHere"></div>
+							</c:if> <c:if test='${(msgLevel >= 1)}'></td>
+					</tr>
+					</c:if>
 
-	<c:if test='${(msgLevel == 0)}'>
-		<div id="insertTopLevelRepliesHere"></div>
-	</c:if>
-	
-	<c:if test='${(msgLevel >= 1)}'>
-		</td></tr>	
-	</c:if>
+					</c:forEach>
 
-</c:forEach>
-
-	<c:if test='${messageTablename != ""}'>
-		</table>
-		<script>
+					<c:if test='${messageTablename != ""}'>
+				</table>
+				<script>
 			$("#${messageTablename}").treetable({${tableCommand}});
-		</script>	
-		</div>
-	</c:if>
-	
-<c:set var="pageSize" value="<%= ForumConstants.DEFAULT_PAGE_SIZE %>"/>
-<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-	<div class="text-center">
-	<c:set var="more"><html:rewrite page="/learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}" /></c:set>
-	<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
-	</div>
-</c:if>
+		</script>
+			</div>
+			</c:if>
+
+			<c:set var="pageSize" value="<%=ForumConstants.DEFAULT_PAGE_SIZE%>" />
+			<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
+				<div class="text-center">
+					<c:set var="more">
+						<html:rewrite
+							page="/learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}" />
+					</c:set>
+					<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
+				</div>
+			</c:if>
