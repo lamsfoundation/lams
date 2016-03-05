@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE html>
-        
+
 
 <lams:html>
 <lams:head>
@@ -10,11 +10,11 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-		function submitForm(methodName){
+		function submitForm(methodName) {
 			var f = document.getElementById('messageForm');
 			f.submit();
 		}
-	</script>	
+	</script>
 </lams:head>
 <body class="stripes">
 
@@ -25,32 +25,34 @@
 		<html:hidden property="userID" />
 		<html:hidden property="sessionMapID" />
 
-		<div id="content">
-			<h1>
-				<c:out value="${sessionMap.title}" escapeXml="true"/>
-			</h1>
+		<lams:Page type="learner" title="${sessionMap.title}">
 
-			<p>
+			<div class="panel">
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-			</p>
-			
+			</div>
+
 			<%@ include file="/common/messages.jsp"%>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area" />
+			<html:textarea rows="5" styleId="focused" property="entryText" styleClass="form-control" />
 
-			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="nextActivity"><fmt:message key="label.finish" /></span>
+			<div class="voffset10">
+				<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton"
+					onclick="submitForm('finish')">
+					<fmt:message key="label.finish" />
 				</html:link>
 			</div>
 
-		</div>
+
+			<div id="footer"></div>
+			<!--closes footer-->
+		</lams:Page>
 	</html:form>
 
-	<div id="footer">
-	</div>
-	<!--closes footer-->
+	<script type="text/javascript">
+		window.onload = function() {
+			document.getElementById("focused").focus();
+		}
+	</script>
 
 </body>
 </lams:html>

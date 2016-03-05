@@ -3,32 +3,32 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
+	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	
+
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript">
-		function previousQuestion(sessionMapID){
+		function previousQuestion(sessionMapID) {
 			$("surveyForm").action = '<c:url value="/learning/previousQuestion.do"/>';
 			$("surveyForm").submit();
 		}
-		
-		function nextQuestion(sessionMapID){
+
+		function nextQuestion(sessionMapID) {
 			$("surveyForm").action = '<c:url value="/learning/nextQuestion.do"/>';
 			$("surveyForm").submit();
 		}
-		
-		function singleChoice(choiceName){
+
+		function singleChoice(choiceName) {
 			var rs = document.getElementsByName(choiceName);
-			for(idx=0;idx<rs.length;idx++)
-				rs[idx].checked=false;
-		}  
-    </script>
+			for (idx = 0; idx < rs.length; idx++)
+				rs[idx].checked = false;
+		}
+	</script>
 </lams:head>
 <body class="stripes">
 	<html:form action="/learning/doSurvey" method="post" styleId="surveyForm">
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<c:set var="formBean" value="<%=request
+							.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<html:hidden property="questionSeqID" />
 		<html:hidden property="sessionMapID" />
 		<html:hidden property="position" />
@@ -39,20 +39,20 @@
 		<c:set var="questionSeqID" value="${formBean.questionSeqID}" />
 		<c:set var="currentIdx" value="${formBean.currentIdx}" />
 
-		<div id="content">
-			<h1>
-				<c:out value="${sessionMap.title}" escapeXml="true"/>
-			</h1>
-			<p>
+		<lams:Page type="learner" title="${sessionMap.title}">
+
+			<div class="panel">
 				<c:out value="${sessionMap.instructions}" escapeXml="false" />
-			</p>
+			</div>
 			<c:if test="${not empty sessionMap.submissionDeadline}">
-				<div class="info">
-				 	<fmt:message>
-						<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+				<lams:Alert id="submissionDeadline" type="info" close="true">
+					<fmt:message>
+						<fmt:param>
+							<lams:Date value="${sessionMap.submissionDeadline}" />
+						</fmt:param>
 					</fmt:message>
-				</div>
-			</c:if>	
+				</lams:Alert>
+			</c:if>
 			<c:choose>
 				<%-- Show on one page or when learner does not choose edit one question --%>
 				<c:when test="${sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)}">
@@ -63,63 +63,51 @@
 				</c:when>
 				<c:otherwise>
 					<c:set var="question" value="${sessionMap.questionList[questionSeqID]}" />
-					<fmt:message key="label.question" /> ${currentIdx} <fmt:message
-						key="label.of" /> ${sessionMap.totalQuestions}
+					<fmt:message key="label.question" /> ${currentIdx} <fmt:message key="label.of" /> ${sessionMap.totalQuestions}
 						<%@ include file="/pages/learning/question.jsp"%>
 				</c:otherwise>
 			</c:choose>
 
 			<%-- Display button according to different situation --%>
 			<%--POSITION: 0=middle of survey, 1=first question, 2=last question, 3=Only one question available--%>
-			<table>
-				<tr>
-					<td>
-						<c:choose>
-							<c:when
-								test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
-								<div class="right-buttons">
-									<html:submit property="doSurvey"
-										disabled="${sessionMap.finishedLock}" styleClass="button">
-										<fmt:message key="label.submit.survey" />
-									</html:submit>
-								</div>
-							</c:when>
-							<c:otherwise>
-								<c:set var="preChecked" value="true" />
-								<c:if test="${position == 2 || position == 0}">
-									<c:set var="preChecked" value="false" />
-								</c:if>
-								<c:set var="nextChecked" value="true" />
-								<c:if test="${position == 1 || position == 0}">
-									<c:set var="nextChecked" value="false" />
-								</c:if>
-								<span class="left-buttons"> <html:button
-										property="PreviousButton" onclick="previousQuestion()"
-										styleClass="button" disabled="${preChecked}">
-										<fmt:message key="label.previous" />
-									</html:button> </span>
-								<span class="right-buttons"> <c:if
-										test="${position != 2}">
-										<html:button property="NextButton" onclick="nextQuestion()"
-											styleClass="button" disabled="${nextChecked}">
-											<fmt:message key="label.next" />
-										</html:button>
-									</c:if> <c:if test="${position == 2}">
-										<html:submit property="doSurvey"
-											disabled="${sessionMap.finishedLock}" styleClass="button">
-											<fmt:message key="label.submit.survey" />
-										</html:submit>
-									</c:if> </span>
-							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<!--closes content-->
-
-		<div id="footer"></div>
-		<!--closes footer-->
+			<c:choose>
+				<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
+					<div class="right-buttons voffset10">
+						<html:submit property="doSurvey" disabled="${sessionMap.finishedLock}"
+							styleClass="btn btn-sm btn-primary pull-right">
+							<fmt:message key="label.submit.survey" />
+						</html:submit>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<c:set var="preChecked" value="true" />
+					<c:if test="${position == 2 || position == 0}">
+						<c:set var="preChecked" value="false" />
+					</c:if>
+					<c:set var="nextChecked" value="true" />
+					<c:if test="${position == 1 || position == 0}">
+						<c:set var="nextChecked" value="false" />
+					</c:if>
+					<div class="pull-left voffset10"> <html:button property="PreviousButton" onclick="previousQuestion()"
+							styleClass="btn btn-sm btn-default" disabled="${preChecked}">
+							<fmt:message key="label.previous" />
+						</html:button>
+					</div>
+					<div class="pull-right voffset10"> <c:if test="${position != 2}">
+							<html:button property="NextButton" onclick="nextQuestion()" styleClass="btn btn-sm btn-default" disabled="${nextChecked}">
+								<fmt:message key="label.next" />
+							</html:button>
+						</c:if> <c:if test="${position == 2}">
+							<html:submit property="doSurvey" disabled="${sessionMap.finishedLock}" styleClass="btn btn-sm btn-primary">
+								<fmt:message key="label.submit.survey" />
+							</html:submit>
+						</c:if>
+					</div>
+				</c:otherwise>
+			</c:choose>
+			<div id="footer"></div>
+			<!--closes footer-->
+		</lams:Page>
 	</html:form>
 </body>
 </lams:html>
