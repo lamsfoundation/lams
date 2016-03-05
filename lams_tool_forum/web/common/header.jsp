@@ -14,3 +14,6 @@
 <script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
