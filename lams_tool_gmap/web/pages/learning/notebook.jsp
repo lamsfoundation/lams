@@ -35,7 +35,7 @@
 					<lams:out value="${gmapDTO.reflectInstructions}" escapeHtml="true"/>
 				</p>
 		
-				<html:textarea styleId="focused" rows="8" property="entryText" styleClass="form-control"></html:textarea>
+				<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
 		
 				<div class="space-bottom-top align-right">
 					<html:hidden property="dispatch" value="submitReflection" />
