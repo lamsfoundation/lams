@@ -86,18 +86,33 @@
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${peerreview.title}" escapeXml="true"/>
-		</h1>
+	<lams:Page type="learner" title="${peerreview.title}">
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<div class="info">
+			<lams:Alert type="danger" id="warn-lock" close="false">
 				<fmt:message key="message.activityLocked" />
-			</div>
+			</lams:Alert>
 		</c:if>
 		
 		<c:if test="${not empty itemRatingDtos}">
+
+		<!-- Ratings UI -->
+		<div class="panel panel-default">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.ratings" />
+		</div>
+		<div class="panel-body">
+	
+		<table class="tablesorter">
+			<thead>
+				<tr>
+					<th title="<fmt:message key='label.sort.by.user.name'/>" >
+						<fmt:message key="label.user.name" />
+					</th>
+					<th>
+						<fmt:message key="label.rating" />
+					</th>
+	
 			<table class="tablesorter">
 				<thead>
 					<tr>
@@ -123,62 +138,42 @@
 					</c:forEach>
 				</tbody>
 			</table>
+		</div>
+		</div>
 		</c:if>
 		
 		<c:if test="${peerreview.showRatingsLeftForUser}">
-			<h2>
-				<fmt:message key="label.ratings.by.others" />
-			</h2>
-			
+		<div class="panel panel-default">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.ratings.by.others" />
+		</div>
+		<div class="panel-body">
 			<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true" isItemAuthoredByUser="true"/>
+		</div>
+		</div>
 		</c:if>
 
+		<!-- Reflection -->
 		<c:if test="${sessionMap.isSessionCompleted and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h3><fmt:message key="title.reflection" /></h3>
-				<strong>
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</strong>
-
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-
-				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
-			</div>
+			<%@ include file="notebookdisplay.jsp"%>
 		</c:if>
+		<!-- End Reflection -->
 
 		<c:if test="${!peerreview.lockWhenFinished}">
-			<html:button property="redoRatings" styleClass="button" onclick="redoRatings();">
+			<html:button property="redoRatings" styleClass="btn btn-default voffset5 pull-left" onclick="redoRatings();">
 				<fmt:message key="label.redo" />
 			</html:button>
 		</c:if>	
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
 				<c:choose>			
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.isSessionCompleted)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary voffset5 pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
-							<span class="nextActivity">
+						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
 				 						<fmt:message key="label.submit" />
@@ -187,14 +182,13 @@
 				 		 				<fmt:message key="label.finished" />
 				 					</c:otherwise>
 				 				</c:choose>
-							</span>
 						</html:link>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</c:if>
 
-	</div>
+	</lams:Page>
 	<!--closes content-->
 
 	<div id="footer">

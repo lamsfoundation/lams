@@ -13,15 +13,18 @@
 </lams:head>
 
 <body class="stripes">
-	<div id="content">
-		<h1>
-			<fmt:message key="activity.title" />
-		</h1>
+	<c:set scope="request" var="title">
+		<fmt:message key="activity.title" />
+	</c:set>
+
+	<lams:Page type="learner" title="${title}">
 		<c:choose>
 		<c:when test="${creatingUsers == 'true'}"><lams:DefineLater defineLaterMessageKey="creating.users.message"></lams:DefineLater></c:when>
 		<c:otherwise><lams:DefineLater /></c:otherwise>
 		</c:choose>
-	</div>
+	</lams:Page>
+
 	<div id="footer"></div>
+
 </body>
 </lams:html>
