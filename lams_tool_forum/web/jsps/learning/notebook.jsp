@@ -44,3 +44,9 @@
 
 	</lams:Page>
 </html:form>
+
+<script type="text/javascript">
+	window.onload = function() {
+		document.getElementById("focused").focus();
+	}
+</script>
