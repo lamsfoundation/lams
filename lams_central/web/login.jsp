@@ -1,13 +1,12 @@
 <%@page import="org.springframework.web.context.request.SessionScope"%>
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
-<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>
-<%@ page import="org.lamsfoundation.lams.usermanagement.dto.UserDTO" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration"%>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
+<%@ page import="org.lamsfoundation.lams.web.session.SessionManager"%>
+<%@ page import="org.lamsfoundation.lams.usermanagement.dto.UserDTO"%>
 
 <%-- Attributes in request come from sysadmin LoginAs action
 	 while in session from LoginRequestServlet
@@ -35,6 +34,7 @@ j_security_login_page
 	<c:when test="${empty login}">
 		<lams:head>
 			<title><fmt:message key="title.login.window" /></title>
+			<link href="<lams:LAMSURL />css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
 			<lams:css style="core" />
 			<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 			<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -44,62 +44,72 @@ j_security_login_page
 				function submitForm() {
 					$('#loginForm').submit();
 				}
-		
+
 				function onEnter(event) {
 					intKeyCode = event.keyCode;
 					if (intKeyCode == 13) {
 						submitForm();
 					}
 				}
-				
-				$(document).ready(function(){
+
+				$(document).ready(function() {
 					$('#j_username').focus();
 					$('#news').load('<lams:LAMSURL/>www/news.html');
 				});
 			</script>
 		</lams:head>
-		
+
 		<body class="stripes">
 			<div id="login-page">
 				<!--main box 'page'-->
 				<h1 class="no-tabs-below">&nbsp;</h1>
-		
+
 				<div id="login-header"></div>
 				<!--closes header-->
-		
+
 				<div id="login-content">
 					<div id="login-left-col">
 						<h1>
-							<img src="<lams:LAMSURL/>/www/images/lams_login.gif"
-								 alt="LAMS - Learning Activity Management System" />
+							<img src="<lams:LAMSURL/>/www/images/lams_login.gif" alt="LAMS - Learning Activity Management System" />
 						</h1>
-						
+
 						<!--Test if the browsers meets requirements-->
 						<script type="text/javascript">
-							if(isBrowserNotCompatible()) {
+							if (isBrowserNotCompatible()) {
 								// incompatible browser - show warning message
-								document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/> <a href=\"http://getfirefox.com\" target=\"_blank\"><img src=\"images/firefox_logo.png\"></a>');
+								document
+										.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/> <a href=\"http://getfirefox.com\" target=\"_blank\"><img src=\"images/firefox_logo.png\"></a>');
 								document.write('<br></div>');
 							}
-							
+
 							function isBrowserNotCompatible() {
-								if(ie10 || ie11) return false; // IE10-IE11
-								else if(saf4) return false; //Safari4
-								else if(chrome) return false; //Chrome
-								else if(ie5xwin || ie5 || ie4 || ie5mac || ie5x || ie6) return true;
-								else if(saf) return true; // Safari
-								else if(op) return true;	// Opera
-								else if(moz) 
-									if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) return false;	// Firefox 1.5+
-								else return true;
+								if (ie10 || ie11)
+									return false; // IE10-IE11
+								else if (saf4)
+									return false; //Safari4
+								else if (chrome)
+									return false; //Chrome
+								else if (ie5xwin || ie5 || ie4 || ie5mac
+										|| ie5x || ie6)
+									return true;
+								else if (saf)
+									return true; // Safari
+								else if (op)
+									return true; // Opera
+								else if (moz)
+									if ((moz_brow.indexOf("Firefox") != -1)
+											&& (moz_brow_nu >= 1.5))
+										return false; // Firefox 1.5+
+									else
+										return true;
 							}
 						</script>
-						
+
 						<!-- Placeholder for customised login page part -->
 						<div id="news"></div>
 					</div>
 					<!--closes left col-->
-		
+
 					<div id="login-right-col">
 						<p class="version">
 							<fmt:message key="msg.LAMS.version" />
@@ -113,54 +123,49 @@ j_security_login_page
 									<fmt:message key="error.login" />
 								</div>
 							</c:if>
-							
+
 							<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
-							
+
 							<p class="first">
 								<fmt:message key="label.username" />
-								: <input id="j_username" name="j_username" type="text" size="16"
-									style="width: 125px" tabindex="1"
-									value="${login}"
-									onkeypress="onEnter(event)" />
+								: <input id="j_username" name="j_username" type="text" size="16" style="width: 125px" tabindex="1"
+									value="${login}" onkeypress="onEnter(event)" />
 							</p>
-							
+
 							<p>
 								<fmt:message key="label.password" />
-								: <input id="j_password" name="j_password" type="password" size="16"
-									style="width: 125px" autocomplete="off" tabindex="2"
-									value="${password}"
-									onkeypress="onEnter(event)" />
+								: <input id="j_password" name="j_password" type="password" size="16" style="width: 125px" autocomplete="off"
+									tabindex="2" value="${password}" onkeypress="onEnter(event)" />
 							</p>
-							
+
 							<p class="login-button">
-								<a id="loginButton" href="javascript:submitForm()" class="button"
-									tabindex="3" />
+								<a id="loginButton" href="javascript:submitForm()" class="button" tabindex="3" />
 								<fmt:message key="button.login" />
 								</a>
 							</p>
 						</form>
 						<p class="login-button">
-							<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message
-									key="label.forgot.password" />
+							<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" />
 							</a> <br /> <a
-								href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
+								href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration
+								.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
 								<fmt:message key="label.help" />
 							</a>
 						</p>
 					</div>
 					<!--closes right col-->
-		
+
 					<div class="clear"></div>
 					<!-- forces the CSS to display the columns-->
 				</div>
 				<!--closes content-->
-		
+
 				<div id="footer">
 					<p>
 						<fmt:message key="msg.LAMS.version" />
 						<%=Configuration.get(ConfigurationKeys.VERSION)%>
-						<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
-							&copy; <fmt:message key="msg.LAMS.copyright.short" />
+						<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message
+								key="msg.LAMS.copyright.short" />
 						</a>
 					</p>
 				</div>
@@ -169,35 +174,40 @@ j_security_login_page
 			<!--closes page-->
 		</body>
 	</c:when>
-	
+
 	<%-- This is version for integrations and LoginAs authentication. --%>
-	
+
 	<c:otherwise>
 		<lams:head>
-			<lams:css/>
+			<lams:css />
 			<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 			<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 		</lams:head>
 		<body class="stripes">
 			<!-- A bit of content so the page is not completely blank -->
-			<div id="content" style="vertical-align: middle;">
-				<p style="text-align: center; color: gray; font-size: 4px;">
-					<img src="images/loading.gif" />
-					<fmt:message key="msg.loading"/>
-				</p>
-				
+			<lams:Page type="admin">
+
+				<div class="text-center" style="margin-top: 20px; margin-bottom: 20px;">
+					<i class="fa fa-2x fa-refresh fa-spin text-primary"></i>
+					<h4>
+						<fmt:message key="msg.loading" />
+					</h4>
+				</div>
+
+
 				<form style="display: none" method="POST" action="j_security_check">
-					<input type="hidden" name="j_username" value="${login}" />
-					<input type="hidden" name="j_password" value="${password}" />
-					<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
+					<input type="hidden" name="j_username" value="${login}" /> <input type="hidden" name="j_password"
+						value="${password}" /> <input type="hidden" name="redirectURL"
+						value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
 				</form>
-			</div>
-			<div id="footer">
-			</div>
-		<%
-			// invalidate session so a new user can be logged in
-			SessionManager.removeSession(((UserDTO) SessionManager.getSession().getAttribute("user")).getLogin(), true);
-		%>
+				<div id="footer"></div>
+			</lams:Page>
+			<%
+				// invalidate session so a new user can be logged in
+							SessionManager.removeSession(((UserDTO) SessionManager
+									.getSession().getAttribute("user")).getLogin(),
+									true);
+			%>
 			<script type="text/javascript">
 				// submit the hidden form
 				document.forms[0].submit();

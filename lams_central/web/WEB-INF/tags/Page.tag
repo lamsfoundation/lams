@@ -13,19 +13,19 @@
 	<div class="col-xs-12">
 		<div class="container" id="content">
 			<div class="panel panel-default panel-${type}-page">
-				<div class="panel-heading">
-					<c:if test="${not empty title}">
+				<c:if test="${not empty title}">
+					<div class="panel-heading">
 						<div class="panel-title panel-${type}-title">
 							<c:out value="${title}" escapeXml="true" />
 							<c:if test="${not empty titleHelpURL}">
 								<a style="float: right" href="${titleHelpURL}" target="_new"><span class="help" style="margin: 0px"></span></a>
 							</c:if>
 						</div>
-					</c:if>
-					<c:if test="${not empty headingContent}">
-						<c:out value="${headingContent}" escapeXml="true" />
-					</c:if>
-				</div>
+						<c:if test="${not empty headingContent}">
+							<c:out value="${headingContent}" escapeXml="true" />
+						</c:if>
+					</div>
+				</c:if>
 				<div class="panel-body panel-${type}-body">
 					<jsp:doBody />
 				</div>
