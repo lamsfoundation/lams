@@ -44,6 +44,7 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
+	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	
 	var YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
@@ -87,21 +88,18 @@
 							var isMaximumRatesPerUserReached = (${peerreview.maximumRatesPerUser} != 0) && (userData.ratesPerUser >= ${peerreview.maximumRatesPerUser});
 							
 							rows += '<tr>';
-							rows += '<td>';
-							
-							rows += 	'<div>';
-							rows += 		'<span class="field-name">';
-							rows += 			userData["userName"];
-							rows += 		'</span> ';
-							rows += 	'</div>';
-							
+
+							rows += '<td class="username"><span>';
+							rows += userData["userName"];
+							rows += '</span>'
+
 							if (isMaximumRatesPerUserReached) {
-								rows += "<div class='info'><fmt:message key='label.cant.rate' /></div>";
+								rows += '<br/><div class="alert alert-warning"><i class="fa fa-exclamation-circle text-muted"></i> <fmt:message key="label.cant.rate" /></div>';
 							}
-							
+
 							rows += '</td>';
 							
-							rows += '<td style="width:150px;">';
+							rows += '<td class="rating">';
 							rows += 	'<div class="rating-stars-holder">';
 
 							// if the user has left a comment or done a rating in a batch of ratings, we need to keep all related ratings open.
@@ -149,7 +147,7 @@
 							rows += '</td>';
 							
 							if (${isCommentsEnabled}) {
-								rows += '<td style="width:30%; min-width: 250px;" id="comments-area-' + itemId + '">';
+								rows += '<td class="comment" id="comments-area-' + itemId + '">';
 								
 								var commentsCriteriaId = userData["commentsCriteriaId"];
 								var commentPostedByUser = userData["commentPostedByUser"];
@@ -182,7 +180,7 @@
 						return json;
 			    	}
 				},
-			    container: $(this).next(".pager"),
+			    container: $(this).next(".tablesorter-pager"),
 			    output: '{startRow} to {endRow} ({totalRows})',
 			    cssNext: '.tablesorter-next',
 				cssPrev: '.tablesorter-prev',
@@ -230,17 +228,10 @@
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${peerreview.title}" escapeXml="true"/>
-		</h1>
-
-		<p>
-			<c:out value="${peerreview.instructions}" escapeXml="false"/>
-		</p>
+	<lams:Page type="learner" title="${peerreview.title}">
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<div class="info">
+			<lams:Alert type="danger" id="warn-lock" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked" />
@@ -249,13 +240,13 @@
 						<fmt:message key="message.warnLockOnFinish" />
 					</c:otherwise>
 				</c:choose>
-			</div>
+			</lams:Alert>
 		</c:if>
 		
 		<!-- Rating limits info -->
 		<c:if test="${peerreview.minimumRates ne 0 || peerreview.maximumRates ne 0}">
 		
-			<div class="info">
+			<lams:Alert type="info" id="rate-limits-reminder" close="false">
 				<c:choose>
 					<c:when test="${peerreview.minimumRates ne 0 and peerreview.maximumRates ne 0}">
 						<fmt:message key="label.rate.limits.reminder">
@@ -276,35 +267,46 @@
 						</fmt:message>
 					</c:when>
 				</c:choose>
-				<br>
-						
+
+				<BR/>
 				<fmt:message key="label.rate.limits.topic.reminder">
 					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>"/>
 				</fmt:message>
-			</div>
+			</lams:Alert>
+				
 			
 		</c:if>
 				
 		<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
-			<br>
-			<div class="info rating-info">
+			<lams:Alert type="info" id="rate-limits-reminder" close="false">
 				<fmt:message key="label.comment.minimum.number.words">
 					<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 		</c:if>
 				
+		<p>
+			<c:out value="${peerreview.instructions}" escapeXml="false"/>
+		</p>
+
+		<!-- Ratings UI -->
+		<div class="panel panel-default">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.ratings" />
+		</div>
+		<div class="panel-body">
+	
 		<table class="tablesorter">
 			<thead>
 				<tr>
-					<th title="<fmt:message key='label.sort.by.user.name'/>" >
+					<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" >
 						<fmt:message key="label.user.name" />
 					</th>
-					<th>
+					<th class="rating">
 						<fmt:message key="label.rating" />
 					</th>
 					<c:if test="${isCommentsEnabled}">
-						<th>
+						<th class="comment">
 							<fmt:message key="label.comment" />
 						</th>
 					</c:if>
@@ -316,7 +318,7 @@
 		</table>
 					
 		<!-- pager -->
-		<div class="pager">
+		<div class="tablesorter-pager">
 			<form>
 		   	<img class="tablesorter-first"/>
 		    	<img class="tablesorter-prev"/>
@@ -324,6 +326,7 @@
 		   		<img class="tablesorter-next"/>
 		    	<img class="tablesorter-last"/>
 		    	<select class="pagesize">
+		      		<option value="2">2</option>
 		      		<option selected="selected" value="10">10</option>
 		      		<option value="20">20</option>
 		      		<option value="30">30</option>
@@ -337,77 +340,51 @@
 		<div id="no-users-info">
 			<fmt:message key="label.no.users" />
 		</div>
-
+	
+		</div>
+		</div>
+	
+		<!-- Reflection -->
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h3>
-					<fmt:message key="title.reflection" />
-				</h3>
-				
-				<strong>
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</strong>
-
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> 
-								<fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-
-				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
-			</div>
+			<%@ include file="notebookdisplay.jsp"%>
 		</c:if>
+		<!-- End Reflection -->
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-left">
-				<html:button property="FinishButton" styleId="finishButton" onclick="refresh()" styleClass="button">
+				<html:button property="FinishButton" styleId="finishButton" onclick="refresh()" styleClass="btn btn-default voffset5 pull-left">
 					<fmt:message key="label.refresh" />
 				</html:button>
 			</div>
 			<div class="space-bottom-top align-right" id="learner-submit">
 				<c:choose>
-					<c:when test="${peerreview.showRatingsLeftForUser}">
-						<html:button property="FinishButton" styleId="finishButton" onclick="return showResults()" styleClass="button">
-							<fmt:message key="label.submit" />
-						</html:button>
-					</c:when>				
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary voffset5 pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
+					<c:when test="${peerreview.showRatingsLeftForUser}">
+						<html:button property="FinishButton" styleId="finishButton" onclick="return showResults()" styleClass="btn btn-primary voffset5 pull-right">
+							<fmt:message key="label.submit" />
+						</html:button>
+					</c:when>				
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
-							<span class="nextActivity">
-								<c:choose>
-				 					<c:when test="${sessionMap.activityPosition.last}">
-				 						<fmt:message key="label.submit" />
-				 					</c:when>
-				 					<c:otherwise>
-				 		 				<fmt:message key="label.finished" />
-				 					</c:otherwise>
-				 				</c:choose>
-							</span>
+						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
+							<c:choose>
+			 					<c:when test="${sessionMap.activityPosition.last}">
+			 						<fmt:message key="label.submit" />
+			 					</c:when>
+			 					<c:otherwise>
+			 		 				<fmt:message key="label.finished" />
+			 					</c:otherwise>
+			 				</c:choose>
 						</html:link>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</c:if>
-
-	</div>
+		
+	</lams:Page>
 	<!--closes content-->
 
 	<div id="footer">
