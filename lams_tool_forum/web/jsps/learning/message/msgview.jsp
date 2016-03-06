@@ -164,8 +164,12 @@
 				</c:if>
 			</c:if>
 
-		</div>
-	</div>
+		</div> <!--  end msg-footer -->
+	</div> <!--  end panel-body -->
+</div> <!--  end panel -->
+
+<%-- Close the 2 divs from the choose --%> 
+</div>
 </div>
 
 <script type="text/javascript">

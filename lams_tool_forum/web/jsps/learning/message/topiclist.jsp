@@ -75,9 +75,10 @@
 			</table>
 		</div>
 	</div>
+</div>
 
-	<script type="text/javascript">
-		jQuery(document).ready(function() {
-			jQuery("time.timeago").timeago();
-		});
-	</script>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery("time.timeago").timeago();
+	});
+</script>
