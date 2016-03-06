@@ -36,7 +36,7 @@
 				</p>
 		
 				<html:textarea cols="60" rows="8" property="entryText"
-					styleClass="text-area"></html:textarea>
+					styleClass="form-control"></html:textarea>
 		
 				<div class="space-bottom-top align-right">
 					<html:hidden property="dispatch" value="submitReflection" />
