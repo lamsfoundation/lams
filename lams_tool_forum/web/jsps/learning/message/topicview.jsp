@@ -65,54 +65,63 @@
 	
 </script>
 
-<c:forEach var="msgDto" items="${topicThread}">
-	<c:set var="msgLevel" value="${msgDto.level}" />
-	<c:set var="hidden" value="${msgDto.message.hideFlag}" />
-
-	<c:if test='${(msgLevel <= 1)}'>
-		<c:set var="maxThreadUid" value="${msgDto.message.uid}" />
-	</c:if>
-
-	<c:choose>
-		<c:when test='${(msgLevel == 1)}'>
+	<c:forEach var="msgDto" items="${topicThread}">
+		<c:set var="msgLevel" value="${msgDto.level}" />
+		<c:set var="hidden" value="${msgDto.message.hideFlag}" />
+	
+		<c:if test='${(msgLevel <= 1)}'>
+			<c:set var="maxThreadUid" value="${msgDto.message.uid}" />
+		</c:if>
+	
+		<c:choose>
+			<c:when test='${(msgLevel == 1)}'>
 			<%-- same test & command appears at bottom of script --%>
 			<c:if test='${messageTablename != ""}'>
 				</table>
 				<script> 
 				$("#${messageTablename}").treetable({${tableCommand}});
-			</script>
-				
+				</script>
+				 <!--  end thread ${messageTablename} -->	
 			</c:if>
 			<c:set var="messageTablename" value="tree${msgDto.message.uid}" />
-			<div id="thread${msgDto.message.uid}">
+				<!--  start thread  -->
+				<div id="thread${msgDto.message.uid}">
 				<table id="${messageTablename}" class="col-xs-12">
-					<tr data-tt-id="${msgDto.message.uid}">
-						<td></c:when> <c:otherwise>
-								<tr data-tt-id="${msgDto.message.uid}" data-tt-parent-id="${msgDto.message.parent.uid}">
-									<td>
-							</c:otherwise> </c:choose> <%@ include file="msgview.jsp"%> <c:if test='${(msgLevel == 0)}'>
-								<div id="insertTopLevelRepliesHere"></div>
-							</c:if> <c:if test='${(msgLevel >= 1)}'></td>
-					</tr>
-					</c:if>
-
-					</c:forEach>
-
-					<c:if test='${messageTablename != ""}'>
-				</table>
-				<script>
+					<tr data-tt-id="${msgDto.message.uid}"><td>
+			</c:when>
+			<c:otherwise>
+				<tr data-tt-id="${msgDto.message.uid}" data-tt-parent-id="${msgDto.message.parent.uid}">
+					<td>
+			</c:otherwise>
+		</c:choose> 
+		
+		<%@ include file="msgview.jsp"%> 
+		
+		<c:if test='${(msgLevel == 0)}'>
+			<div id="insertTopLevelRepliesHere"></div>
+		</c:if> 
+		
+		<c:if test='${(msgLevel >= 1)}'>
+					</td></tr>
+		</c:if>
+	
+	</c:forEach>
+	
+	<c:if test='${messageTablename != ""}'>	
+		</table>
+		<script>
 			$("#${messageTablename}").treetable({${tableCommand}});
 		</script>
-			</div>
-			</c:if>
+		</div>
+	</c:if>
 
-			<c:set var="pageSize" value="<%=ForumConstants.DEFAULT_PAGE_SIZE%>" />
-			<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-				<div class="text-center">
-					<c:set var="more">
-						<html:rewrite
-							page="/learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}" />
-					</c:set>
-					<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
-				</div>
-			</c:if>
+	<c:set var="pageSize" value="<%=ForumConstants.DEFAULT_PAGE_SIZE%>" />
+	<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
+		<div class="text-center">
+			<c:set var="more">
+				<html:rewrite
+					page="/learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}" />
+			</c:set>
+			<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
+		</div>
+	</c:if>

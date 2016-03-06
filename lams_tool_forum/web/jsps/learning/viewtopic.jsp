@@ -126,6 +126,7 @@
 
 		<c:set var="buttonPanel">
 			<c:set var="refreshTopicURL"></c:set>
+				<!--  Button Panel -->
 				<div class="row no-gutter">
 					<div class="col-xs-12">
 						<a href="javascript:refreshTopic();" class="btn btn-sm btn-default voffset5  pull-left" role="button"> <fmt:message
@@ -141,6 +142,7 @@
 						</html:button>
 					</div>
 				</div>
+				<!--  Button Panel -->
 		</c:set>
 		
 		${buttonPanel}

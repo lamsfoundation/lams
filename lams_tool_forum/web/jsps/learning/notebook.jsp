@@ -25,8 +25,7 @@
 			<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 		</p>
 
-		<html:textarea cols="52" rows="6" property="entryText"
-			styleClass="text-area" />
+		<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
 
 		<div class="space-bottom-top align-right">
 			<html:link  href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
