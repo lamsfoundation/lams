@@ -34,7 +34,6 @@ j_security_login_page
 	<c:when test="${empty login}">
 		<lams:head>
 			<title><fmt:message key="title.login.window" /></title>
-			<link href="<lams:LAMSURL />css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
 			<lams:css style="core" />
 			<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 			<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
