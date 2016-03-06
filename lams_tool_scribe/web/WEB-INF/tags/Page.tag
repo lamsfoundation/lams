@@ -29,6 +29,6 @@
 				</div>
 			</div>
 		</div>
-		<! -- End content container -->
+		<!-- End content container -->
 	</div>
 </div>
