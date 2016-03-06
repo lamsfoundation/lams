@@ -7,9 +7,11 @@
 <%@ attribute name="titleHelpURL" required="false" rtexprvalue="true"%>
 <%@ attribute name="headingContent" required="false" rtexprvalue="true"%>
 
+
+
 <div class="row no-gutter">
 	<div class="col-xs-12">
-		<div class="container" id="${idName}">
+		<div class="container" id="content">
 			<div class="panel panel-default panel-${type}-page">
 				<div class="panel-heading">
 					<c:if test="${not empty title}">
@@ -29,6 +31,6 @@
 				</div>
 			</div>
 		</div>
-		<! -- End content container -->
+		<!-- End content container -->
 	</div>
 </div>
