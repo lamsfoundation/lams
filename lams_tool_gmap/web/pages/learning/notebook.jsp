@@ -37,23 +37,28 @@
 		
 				<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
 		
-				<div class="space-bottom-top align-right">
-					<html:hidden property="dispatch" value="submitReflection" />
-					<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton" 
-				          onclick="javascript:document.learningForm.submit();return false">
-							<c:choose>
-			 					<c:when test="${activityPosition.last}">
-			 						<fmt:message key="button.submit" />
-			 					</c:when>
-			 					<c:otherwise>
-			 		 				<fmt:message key="button.finish" />
-			 					</c:otherwise>
-				 			</c:choose>
-					</html:link>
-				</div>
+				<html:hidden property="dispatch" value="submitReflection" />
+				<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton" 
+			          onclick="javascript:document.learningForm.submit();return false">
+						<c:choose>
+		 					<c:when test="${activityPosition.last}">
+		 						<fmt:message key="button.submit" />
+		 					</c:when>
+		 					<c:otherwise>
+		 		 				<fmt:message key="button.finish" />
+		 					</c:otherwise>
+			 			</c:choose>
+				</html:link>
 			</html:form>
 				
 			</lams:Page>
 			<div class="footer"></div>
+			
+	<script type="text/javascript">
+	window.onload = function() {
+		document.getElementById("focused").focus();
+	}
+	</script>
+		
 	</body>
 </lams:html>
