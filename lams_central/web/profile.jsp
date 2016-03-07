@@ -75,15 +75,3 @@
 </table>
 
 </div>
-
-
-<h2 class="space-top"><fmt:message key="title.archived.groups" /></h2>
-
-<p class="align-left">
-	<c:forEach items="${orgDTOs}" var="dto">
-		<span><c:out value="${dto.orgName}" /></span><br />
-	</c:forEach>
-	<c:if test="${empty orgDTOs}">
-		<fmt:message key="msg.groups.empty" />
-	</c:if>
-</p>

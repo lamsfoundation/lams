@@ -489,8 +489,6 @@ public interface IUserManagementService {
 
     List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
 
-    List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin);
-
     /**
      * Search users across login, first name, last name and email fields using the search term. Filters out disabled
      * users.
