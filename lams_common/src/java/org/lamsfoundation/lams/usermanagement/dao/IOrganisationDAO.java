@@ -40,19 +40,10 @@ public interface IOrganisationDAO extends IBaseDAO {
      * @param isSysadmin
      * @return list of orgIds
      */
-    List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
+    List<Integer> getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
 
     /**
-     * Get list of orgIds of archived groups.
-     * 
-     * @param userId
-     * @param isSysadmin
-     * @return list of orgIds
-     */
-    List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin);
-
-    /**
-     * Returns courses with specified type, state and parent course.  
+     * Returns courses with specified type, state and parent course.
      * 
      * @param parentOrgId
      * @param typeId
@@ -61,11 +52,12 @@ public interface IOrganisationDAO extends IBaseDAO {
      * @param size
      * @param sortBy
      * @param sortOrder
-     * @param searchString filters results by course name. It can be null and then doesn't affect results
+     * @param searchString
+     *            filters results by course name. It can be null and then doesn't affect results
      * @return
      */
-    List<Organisation> getPagedCourses(final Integer parentOrgId, final Integer typeId, final Integer stateId,
-	    int page, int size, String sortBy, String sortOrder, String searchString);
+    List<Organisation> getPagedCourses(final Integer parentOrgId, final Integer typeId, final Integer stateId, int page,
+	    int size, String sortBy, String sortOrder, String searchString);
 
     /**
      * Counts courses with specified type, state and parent course.
@@ -73,7 +65,8 @@ public interface IOrganisationDAO extends IBaseDAO {
      * @param parentOrgId
      * @param typeId
      * @param stateId
-     * @param searchString filters results by course name. It can be null and then doesn't affect results
+     * @param searchString
+     *            filters results by course name. It can be null and then doesn't affect results
      * @return
      */
     int getCountCoursesByParentCourseAndTypeAndState(final Integer parentOrgId, final Integer typeId,

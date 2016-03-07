@@ -115,15 +115,12 @@ public class IndexAction extends Action {
 		return mapping.findForward("password");
 	    }
 	}
-	
+
 	User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
-	
+
 	String tab = WebUtil.readStrParam(request, "tab", true);
 	if (StringUtils.equals(tab, "profile")) {
-	    List orgDTOs = getUserManagementService().getArchivedCourseIdsByUser(loggedInUser.getUserId(),
-		    request.isUserInRole(Role.SYSADMIN));
-	    request.setAttribute("orgDTOs", orgDTOs);
 	    return mapping.findForward("profile");
 	} else if (StringUtils.equals(tab, "editprofile")) {
 	    return mapping.findForward("editprofile");
@@ -198,8 +195,8 @@ public class IndexAction extends Action {
 
     private IUserManagementService getUserManagementService() {
 	if (IndexAction.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    IndexAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return IndexAction.userManagementService;

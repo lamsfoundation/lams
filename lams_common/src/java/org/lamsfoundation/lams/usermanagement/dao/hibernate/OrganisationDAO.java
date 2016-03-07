@@ -44,74 +44,50 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	    + " and o.organisationState.organisationStateId = " + OrganisationState.ACTIVE + " order by name";
 
     private static final String GET_ACTIVE_COURSE_IDS_BY_USER = "select uo.organisation.organisationId, uoc.collapsed"
-	    + " from Organisation o, UserOrganisation uo left join uo.userOrganisationCollapsed uoc"
-	    + " where uo.organisation.organisationId = o.organisationId"
-	    + " and o.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
-	    + " and o.organisationState.organisationStateId = " + OrganisationState.ACTIVE
-	    + " and uo.user.userId = :userId" + " order by name";
+	    + " from UserOrganisation uo left join uo.userOrganisationCollapsed uoc"
+	    + " where uo.organisation.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
+	    + " and uo.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
+	    + " and uo.user.userId = :userId order by name";
 
-    private static final String GET_ALL_ARCHIVED_COURSE_IDS = "select distinct o1.organisationId"
-	    + " from Organisation o1, Organisation o2 " + " where (o1.organisationType.organisationTypeId = "
-	    + OrganisationType.COURSE_TYPE + " and o1.organisationState.organisationStateId = "
-	    + OrganisationState.ACTIVE + " and o2.organisationType.organisationTypeId = " + OrganisationType.CLASS_TYPE
-	    + " and o2.organisationState.organisationStateId = " + OrganisationState.ARCHIVED
-	    + " and o1.organisationId = o2.parentOrganisation.organisationId)"
-	    + " or (o1.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
-	    + " and o1.organisationState.organisationStateId = " + OrganisationState.ARCHIVED + ")"
-	    + " order by o1.name";
+    private static final String GET_PAGED_COURSES = "SELECT o FROM Organisation o WHERE o.organisationType.organisationTypeId =:typeId "
+	    + "AND o.organisationState.organisationStateId =:stateId AND o.parentOrganisation.organisationId =:parentOrgId "
+	    + "AND (o.name LIKE CONCAT('%', :searchString, '%')) ORDER BY ";
 
-    private static final String GET_ARCHIVED_COURSE_IDS_BY_USER = "select distinct o1.organisationId, uoc.collapsed"
-	    + " from UserOrganisation uo1, Organisation o1, Organisation o2 left join uo1.userOrganisationCollapsed uoc"
-	    + " where (uo1.user.userId = :userId" + " and uo1.organisation.organisationId = o1.organisationId"
-	    + " and o1.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
-	    + " and o1.organisationState.organisationStateId = " + OrganisationState.ACTIVE
-	    + " and o2.organisationType.organisationTypeId = " + OrganisationType.CLASS_TYPE
-	    + " and o2.organisationState.organisationStateId = " + OrganisationState.ARCHIVED
-	    + " and o1.organisationId = o2.parentOrganisation.organisationId)"
-	    + " or (uo1.organisation.organisationId = o1.organisationId"
-	    + " and o1.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
-	    + " and o1.organisationState.organisationStateId = " + OrganisationState.ARCHIVED
-	    + " and uo1.user.userId = :userId)" + " order by o1.name";
+    private static final String GET_COUNT_COURSES_BY_PARENT_TYPE_STATE = "SELECT count(*) FROM Organisation o "
+	    + " WHERE o.parentOrganisation.organisationId =:parentOrgId "
+	    + " AND o.organisationType.organisationTypeId =:typeId "
+	    + " AND o.organisationState.organisationStateId =:stateId "
+	    + " AND (o.name LIKE CONCAT('%', :searchString, '%')) ";
 
-    public List getActiveCourseIdsByUser(final Integer userId, final boolean isSysadmin) {
-
-	return (List) (isSysadmin ? getSession().createQuery(GET_ALL_ACTIVE_COURSE_IDS).list() : getSession()
-		.createQuery(GET_ACTIVE_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
-    }
-
-    public List getArchivedCourseIdsByUser(final Integer userId, final boolean isSysadmin) {
-
-	return (List) (isSysadmin ? getSession().createQuery(GET_ALL_ARCHIVED_COURSE_IDS).list() : getSession()
-		.createQuery(GET_ARCHIVED_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
-    }
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Organisation> getPagedCourses(final Integer parentOrgId, final Integer typeId, final Integer stateId,
-	    int page, int size, String sortBy, String sortOrder, String searchString) {
-	String GET_ORGS = "SELECT o FROM " + Organisation.class.getName() + " o "
-		+ " WHERE o.organisationType.organisationTypeId =:typeId "
-		+ " AND o.organisationState.organisationStateId =:stateId "
-		+ " AND o.parentOrganisation.organisationId =:parentOrgId"
-		+ " AND (o.name LIKE CONCAT('%', :searchString, '%')) "
-		+ " ORDER BY ";
-	
+    public List<Integer> getActiveCourseIdsByUser(Integer userId, boolean isSysadmin) {
+	return isSysadmin ? getSession().createQuery(OrganisationDAO.GET_ALL_ACTIVE_COURSE_IDS).list()
+		: getSession().createQuery(OrganisationDAO.GET_ACTIVE_COURSE_IDS_BY_USER).setInteger("userId", userId)
+			.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Organisation> getPagedCourses(Integer parentOrgId, Integer typeId, Integer stateId, int page, int size,
+	    String sortBy, String sortOrder, String searchString) {
 	String sortByParam = "o.name";
-	if (sortBy == null) {
-	    sortByParam = "o.name";
-	    
-	} else if (sortBy.equals("id")) {
+	switch (sortBy) {
+	case "id":
 	    sortByParam = "o.organisationId";
-	    
-	} else if (sortBy.equals("name")) {
+	    break;
+	case "name":
 	    sortByParam = "o.name";
-	    
-	} else if (sortBy.equals("code")) {
+	    break;
+	case "code":
 	    sortByParam = "o.code";
-	    
-	} else if (sortBy.equals("description")) {
+	    break;
+	case "description":
 	    sortByParam = "o.description";
+	    break;
 	}
-	
-	Query query = getSession().createQuery(GET_ORGS + sortByParam + " " +sortOrder);
+
+	Query query = getSession().createQuery(OrganisationDAO.GET_PAGED_COURSES + sortByParam + " " + sortOrder);
 	query.setInteger("typeId", typeId);
 	query.setInteger("stateId", stateId);
 	query.setInteger("parentOrgId", parentOrgId);
@@ -122,30 +98,18 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	query.setMaxResults(size);
 	return query.list();
     }
-    
-    @Override
-    public int getCountCoursesByParentCourseAndTypeAndState(final Integer parentOrgId, final Integer typeId,
-	    final Integer stateId, String searchString) {
-	final String GET_ORGS = "SELECT count(*) FROM Organisation o "
-		+ " WHERE o.parentOrganisation.organisationId =:parentOrgId "
-		+ " AND o.organisationType.organisationTypeId =:typeId "
-		+ " AND o.organisationState.organisationStateId =:stateId "
-		+ " AND (o.name LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query query = getSession().createQuery(GET_ORGS);
+    @Override
+    public int getCountCoursesByParentCourseAndTypeAndState(Integer parentOrgId, Integer typeId, Integer stateId,
+	    String searchString) {
+	Query query = getSession().createQuery(OrganisationDAO.GET_COUNT_COURSES_BY_PARENT_TYPE_STATE);
 	query.setInteger("parentOrgId", parentOrgId);
 	query.setInteger("typeId", typeId);
 	query.setInteger("stateId", stateId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setString("searchString", searchString);
-	
-	List list = query.list();
-	if (list == null || list.size() == 0) {
-	    return 0;
-	} else {
-	    return ((Number) list.get(0)).intValue();
-	}
-    }
 
+	return ((Number) query.uniqueResult()).intValue();
+    }
 }

@@ -1129,12 +1129,6 @@ public class UserManagementService implements IUserManagementService {
 	return populateCollapsedOrgDTOs(list, isSysadmin);
     }
 
-    @Override
-    public List getArchivedCourseIdsByUser(Integer userId, boolean isSysadmin) {
-	List list = organisationDAO.getArchivedCourseIdsByUser(userId, isSysadmin);
-	return populateCollapsedOrgDTOs(list, isSysadmin);
-    }
-
     private List populateCollapsedOrgDTOs(List list, boolean isSysadmin) {
 	ArrayList<CollapsedOrgDTO> dtoList = new ArrayList<CollapsedOrgDTO>();
 	for (Object obj : list) {
