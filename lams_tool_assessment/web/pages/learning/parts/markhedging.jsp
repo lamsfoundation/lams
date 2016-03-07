@@ -6,83 +6,85 @@
 	</fmt:message>
 </div>
 
-<table class="question-table">
-	<c:forEach var="option" items="${question.options}">
-		<tr>
-			<c:if test="${finishedLock || question.responseSubmitted}">
-				<td class="complete-item-gif">
-				
-					<c:if test="${assessment.allowRightAnswersAfterQuestion && option.correct}">
-						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">
-					</c:if>
-					<c:if test="${assessment.allowWrongAnswersAfterQuestion && !option.correct}">
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">
-					</c:if>
-						
-				</td>
-			</c:if>
-			
-			<td class="question-option">
-				<c:out value="${option.optionString}" escapeXml="false" />
-			</td>
-			
-			<td class="has-radio-button">
-			
-				<select name="question${questionIndex}_${option.sequenceId}" class="mark-hedging-select" data-question-index="${questionIndex}"
-					<c:if test="${isEditingDisabled || question.responseSubmitted}">disabled="disabled"</c:if>				
-				>
+<div class="table-responsive">
+	<table class="table table-hover table-condensed">
+		<c:forEach var="option" items="${question.options}">
+			<tr>
+				<c:if test="${finishedLock || question.responseSubmitted}">
+					<td class="complete-item-gif">
 					
-					<c:forEach var="i" begin="0" end="${question.grade}">
-						<option
-							<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
-						>${i}</option>
-					</c:forEach>
-					
-				</select>
-			</td>
-			
-			<c:if test="${(finishedLock || question.responseSubmitted) && assessment.allowQuestionFeedback}">
-
-				<c:choose>
-                	<c:when test="${option.correct}">
-                    	<c:set var="color" scope="page" value="red" />
-        			</c:when>
-					<c:otherwise>
-                    	<c:set var="color" scope="page" value="blue" />
-        			</c:otherwise>
-        		</c:choose>
-
-				<td width="30%" style="padding:5px 10px 2px; font-style: italic; color:${color};">
-					<c:if test="${option.answerInt > 0}">
-						<c:out value="${option.feedback}" escapeXml="false" />
-					</c:if>
-				</td>
-			</c:if>
-			
-		</tr>
-	</c:forEach>
-	
-	<c:if test="${question.hedgingJustificationEnabled}">
-		<tr>
-			<td>
-				<c:if test="${!isEditingDisabled && !question.responseSubmitted}">
-					<div>
-						<fmt:message key="label.justify.hedging.marks" />
-					</div>
+						<c:if test="${assessment.allowRightAnswersAfterQuestion && option.correct}">
+							<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">
+						</c:if>
+						<c:if test="${assessment.allowWrongAnswersAfterQuestion && !option.correct}">
+							<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">
+						</c:if>
+							
+					</td>
 				</c:if>
 				
-				<lams:STRUTS-textarea property="question${questionIndex}" rows="4" cols="60" value="${question.answerString}" 
-					disabled="${isEditingDisabled || question.responseSubmitted}" styleClass="mark-hedging-select"
-				/>
-			</td>
-		</tr>
-	</c:if>
-</table>
+				<td>
+					<c:out value="${option.optionString}" escapeXml="false" />
+				</td>
+				
+				<td style="width: 100px;">
+				
+					<select name="question${questionIndex}_${option.sequenceId}" class="mark-hedging-select" data-question-index="${questionIndex}"
+						<c:if test="${isEditingDisabled || question.responseSubmitted}">disabled="disabled"</c:if>				
+					>
+						
+						<c:forEach var="i" begin="0" end="${question.grade}">
+							<option
+								<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
+							>${i}</option>
+						</c:forEach>
+						
+					</select>
+				</td>
+				
+				<c:if test="${(finishedLock || question.responseSubmitted) && assessment.allowQuestionFeedback}">
+	
+					<c:choose>
+	                	<c:when test="${option.correct}">
+	                    	<c:set var="color" scope="page" value="red" />
+	        			</c:when>
+						<c:otherwise>
+	                    	<c:set var="color" scope="page" value="blue" />
+	        			</c:otherwise>
+	        		</c:choose>
+	
+					<td width="30%" style="padding:5px 10px 2px; font-style: italic; color:${color};">
+						<c:if test="${option.answerInt > 0}">
+							<c:out value="${option.feedback}" escapeXml="false" />
+						</c:if>
+					</td>
+				</c:if>
+				
+			</tr>
+		</c:forEach>
+		
+		<c:if test="${question.hedgingJustificationEnabled}">
+			<tr>
+				<td>
+					<c:if test="${!isEditingDisabled && !question.responseSubmitted}">
+						<div>
+							<fmt:message key="label.justify.hedging.marks" />
+						</div>
+					</c:if>
+					
+					<lams:STRUTS-textarea property="question${questionIndex}" rows="4" cols="60" value="${question.answerString}" 
+						disabled="${isEditingDisabled || question.responseSubmitted}" styleClass="mark-hedging-select"
+					/>
+				</td>
+			</tr>
+		</c:if>
+	</table>
+</div>
 
 <c:if test="${!finishedLock && !question.responseSubmitted && isLeadershipEnabled && isUserLeader}">
 	<div class="float-right">
 		<html:button property="submit-hedging-question${questionIndex}" onclick="return submitSingleMarkHedgingQuestion(${question.uid}, ${questionIndex});" 
-				styleClass="button">
+				styleClass="btn pull-right">
 			<fmt:message key="label.learning.submit" />
 		</html:button>
 	</div>

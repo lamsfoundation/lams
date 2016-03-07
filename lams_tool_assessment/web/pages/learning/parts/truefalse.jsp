@@ -4,7 +4,8 @@
 	<fmt:message key="label.learning.short.answer.answer" />
 </div>
 
-<table class="question-table">
+<div class="table-responsive">
+	<table class="table table-hover table-condensed">
 		<tr>
 			<c:if test="${finishedLock}">
 				<td class="complete-item-gif">
@@ -32,7 +33,7 @@
 					<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>					 
 				/>
 			</td>
-			<td class="question-option">
+			<td>
 				<fmt:message key="label.learning.true.false.true" />
 			</td>
 		</tr>
@@ -62,12 +63,12 @@
 					<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
 				/>
 			</td>
-			<td class="question-option">
+			<td>
 				<fmt:message key="label.learning.true.false.false" />
 			</td>
-		</tr>		
-
-</table>	
+		</tr>
+	</table>
+</div>
 
 <c:if test="${finishedLock && assessment.allowQuestionFeedback && (question.answerString != null)}">
 	<c:choose>

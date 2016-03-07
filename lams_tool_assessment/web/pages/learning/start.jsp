@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+
 <html>
 	<body class="stripes">
 		<script type="text/javascript">

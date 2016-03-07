@@ -11,7 +11,8 @@
 		<fmt:message key="label.learning.ordering.sort.answers" />
 	</div>
 	
-	<table class="question-table">
+	<div class="table-responsive">
+		<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.options}" varStatus="ordStatus">
 			<tr>
 
@@ -27,13 +28,13 @@
 					</td>		
 				</c:if>													
 			
-				<td class="reg-padding">
+				<td class="ordering-option">
 					<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${option.sequenceId}" />
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
 				
 				<c:if test="${(mode != 'teacher') || !hasEditRight}">
-					<td style="width text-align: center; width: 20px;" class="reg-padding">
+					<td style="text-align: center; width: 20px;">
 						<c:if test="${not ordStatus.first and !finishedLock}">
 							<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 								border="0" title="<fmt:message key="label.authoring.basic.up"/>"
@@ -58,7 +59,8 @@
 				</c:if>			
 			</tr>
 		</c:forEach>
-	</table>	
+		</table>
+	</div>
 	
 	<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 		<div class="question-feedback">

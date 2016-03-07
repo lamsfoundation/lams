@@ -537,25 +537,22 @@
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${assessment.title}" escapeXml="true"/>
-		</h1>
+	<lams:Page type="learner" title="${assessment.title}">
 		
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
-			<div class="info">
+			<lams:Alert id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
 					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 		</c:if>
 		
 		<c:if test="${sessionMap.isUserFailed}">
-			<div class="warning">
+			<lams:Alert id="passing-mark-not-reached" type="warning" close="true">
 				<fmt:message key="label.learning.havent.reached.passing.mark">
 					<fmt:param>${assessment.passingMark}</fmt:param>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled}">
@@ -567,22 +564,22 @@
 		</c:if>
 
 		<c:if test="${not finishedLock}">
-			<p>
+			<div class="panel">
 				<c:out value="${assessment.instructions}" escapeXml="false"/>
-			</p>
+			</div>
 		</c:if>
 		
-		<div class="warning" id="warning-answers-required">
+		<lams:Alert id="warning-answers-required" type="warning" close="true">
 			<fmt:message key="warn.answers.required" />
-		</div>
+		</lams:Alert>
 		
-		<div class="warning" id="warning-words-limit">
+		<lams:Alert id="warning-words-limit" type="warning" close="true">
 			<fmt:message key="warn.answers.word.requirements.limit" />
-		</div>
+		</lams:Alert>
 		
-		<div class="warning" id="warning-mark-hedging-wrong-total">
+		<lams:Alert id="warning-mark-hedging-wrong-total" type="warning" close="true">
 			<fmt:message key="warn.mark.hedging.wrong.total" />
-		</div>
+		</lams:Alert>
 		
 		<div id="timelimit-start-dialog"> 
 	        <h1>
@@ -599,34 +596,53 @@
 		<%@ include file="parts/attemptsummary.jsp"%>
 		
 		<c:if test="${!finishedLock || finishedLock && assessment.displaySummary}">
-			<%@ include file="parts/allquestions.jsp"%>
+			<div class="form-group">
+				<%@ include file="parts/allquestions.jsp"%>
+			</div>
 		</c:if>
 		
 		<%-- Reflection entry --%>
 		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight ) && finishedLock}">
-			<div class="small-space-top">
-			 	<h3><fmt:message key="label.export.reflection" /></h3>
-			 	<p>
-					<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
-				</p>
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> <fmt:message key="message.no.reflection.available" />	</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-
-				<c:if test="${(mode != 'teacher') && hasEditRight}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
+			<div class="voffset10">
+				<div class="row">
+					 <div class="col-xs12">
+					 	 <div class="panel panel-default">
+			
+						 	<div class="panel-heading panel-title">
+						 		<fmt:message key="label.export.reflection" />
+						 	</div>
+						 	
+						 	<div class="panel-body">
+							 	<div class="panel">
+							 		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
+								</div>
+								
+								<div class="form-group">
+									<c:choose>
+										<c:when test="${empty sessionMap.reflectEntry}">
+											<p>
+												<em> <fmt:message key="message.no.reflection.available" />	</em>
+											</p>
+										</c:when>
+										<c:otherwise>
+											<p>
+												<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+											</p>
+										</c:otherwise>
+									</c:choose>
+					
+									<c:if test="${(mode != 'teacher') && hasEditRight}">
+										<html:button property="FinishButton" onclick="return continueReflect()" 
+												styleClass="btn btn-sm btn-default pull-left voffset10">
+											<fmt:message key="label.edit" />
+										</html:button>
+									</c:if>
+								</div>
+				
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</c:if>
 
@@ -634,7 +650,8 @@
 			<div class="space-bottom-top align-right">
 				<c:choose>
 					<c:when	test="${not finishedLock && hasEditRight}">					
-						<html:button property="submitAll" onclick="return submitAll(false);" styleClass="button">
+						<html:button property="submitAll" onclick="return submitAll(false);" 
+								styleClass="btn btn-primary voffset10 pull-right na">
 							<fmt:message key="label.learning.submit.all" />
 						</html:button>	
 					</c:when>
@@ -644,7 +661,8 @@
 					
 					<c:otherwise>
 						<c:if test="${isResubmitAllowed && hasEditRight}">
-							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" styleClass="button">
+							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" 
+									styleClass="btn btn-primary">
 								<fmt:message key="label.learning.resubmit" />
 							</html:link>
 						</c:if>	
@@ -653,12 +671,14 @@
 						
 							<c:choose>
 								<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
-									<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+									<html:button property="FinishButton" onclick="return continueReflect()" 
+											styleClass="btn btn-primary voffset10 pull-right na">
 										<fmt:message key="label.continue" />
 									</html:button>
 								</c:when>
 								<c:otherwise>
-									<html:link href="#nogo" property="FinishButton" onclick="return finishSession()" styleClass="button">
+									<html:link href="#nogo" property="FinishButton" onclick="return finishSession()" 
+											styleClass="btn btn-primary voffset10 pull-right na">
 										<span class="nextActivity">
 											<c:choose>
 							 					<c:when test="${sessionMap.activityPosition.last}">
@@ -678,12 +698,7 @@
 			</div>
 		</c:if>
 
-	</div>
-	<!--closes content-->
-
-	<div id="footer">
-	</div>
-	<!--closes footer-->
+	</lams:Page>
 
 </body>
 </lams:html>

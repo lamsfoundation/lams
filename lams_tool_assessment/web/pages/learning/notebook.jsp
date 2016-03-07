@@ -1,6 +1,8 @@
-<%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE html>
-
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMapID" value="${param.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
@@ -11,54 +13,46 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-	    function submitForm(methodName){
+	    function submitForm(methodName) {
         	var f = document.getElementById('reflectionForm');
 	    	f.submit();
 	    }
+
+	    $(document).ready(function(){
+	    	window.onload = function() {
+	    		document.getElementById("focused").focus();
+	    	}
+	    });
 	</script>
 </lams:head>
 <body class="stripes">
-
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<lams:Page type="learner" title="${sessionMap.title}">
 	
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="reflectionForm">
-		<html:hidden property="userID" />
-		<html:hidden property="sessionMapID" />
-
-		<div id="content">
-			<h1>
-				<c:out value="${sessionMap.title}" escapeXml="true"/>
-			</h1>
+		<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="reflectionForm">
+			<html:hidden property="userID" />
+			<html:hidden property="sessionMapID" />
 
 			<%@ include file="/common/messages.jsp"%>
 
-			<p>
+			<div class="panel">
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-			</p>
-
-			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area" />
-
-			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="nextActivity">
-						<c:choose>
-							<c:when test="${sessionMap.activityPosition.last}">
-								<fmt:message key="label.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="label.finished" />
-							</c:otherwise>
-						</c:choose>
-					</span>
-				</html:link>
 			</div>
-		</div>
-	</html:form>
 
-	<div id="footer">
-	</div>
-	<!--closes footer-->
+			<html:textarea rows="5" property="entryText" styleClass="form-control" styleId="focused" />
 
+			<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
+				<c:choose>
+					<c:when test="${sessionMap.activityPosition.last}">
+						<fmt:message key="label.submit" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.finished" />
+					</c:otherwise>
+				</c:choose>
+			</html:link>
+				
+		</html:form>
+
+	</lams:Page>
 </body>
 </lams:html>
