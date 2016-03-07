@@ -50,9 +50,17 @@ j_security_login_page
 						submitForm();
 					}
 				}
+				
+				function isBrowserCompatible() {
+					return Modernizr.atobbtoa && Modernizr.checked && Modernizr.cookies && Modernizr.nthchild && Modernizr.opacity &&
+						   Modernizr.svg && Modernizr.todataurlpng && Modernizr.websockets && Modernizr.xhrresponsetypetext;
+					// Modernizr.datauri - should be included, it's a async test though
+					// Modernizr.time - should be included, fails in Chrome for an unknown reason (reported)
+					// Modernizr.xhrresponsetypejson - should be included, fails in IE 11 for an unknown reason (reported)
+				}
 
 				$(document).ready(function() {
-					if (!Modernizr.testAllProps()) {
+					if (!isBrowserCompatible()) {
 						$('#browserNotCompatible').show();
 					}
 					$('#j_username').focus();
