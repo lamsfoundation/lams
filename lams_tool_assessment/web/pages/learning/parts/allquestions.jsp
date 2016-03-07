@@ -1,64 +1,68 @@
 <%@ include file="/common/taglibs.jsp"%>
-<form id="answers" name="answers" method="post" action="<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>">
-	<table cellspacing="0" class="alternative-color">
-		<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
-			<tr>
-				<c:if test="${assessment.numbered}">
-					<td class="question-numbers">
-						${status.index + sessionMap.questionNumberingOffset} 
-					</td>
-				</c:if>
+<div class="row no-gutter">
+	<div class="col-xs-12">
+		<form id="answers" name="answers" method="post" action="<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>">
+			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 						
-				<td style="padding-left: 0px;" id="question-area-${status.index}">
-					<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
+				<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
 							
-					<div class="field-name" style="padding: 10px 15px 15px;">
+				<div class="panel panel-default" id="question-area-${status.index}">
+					<div class="field-name panel-heading">
+						<c:if test="${assessment.numbered}">
+							<span class="question-numbers">
+								${status.index + sessionMap.questionNumberingOffset}.
+							</span>
+						</c:if>
+									
 						<c:if test="${question.answerRequired}">
-							<span style="float: left; padding-right: 5px;">
+							<span class="asterisk">
 								<img title="* <fmt:message key="label.authoring.answer.required"/>" alt="<fmt:message key="label.authoring.answer.required"/>" src="${ctxPath}/includes/images/req.gif" />
 							</span>
 						</c:if>
+							
 						${question.question}
-						
 					</div>
-							
-					<c:choose>
-						<c:when test="${question.type == 1}">
-							<%@ include file="multiplechoice.jsp"%>
-						</c:when>
-						<c:when test="${question.type == 2}">
-							<%@ include file="matchingpairs.jsp"%>
-						</c:when>
-						<c:when test="${question.type == 3}">
-							<%@ include file="shortanswer.jsp"%>
-						</c:when>
-						<c:when test="${question.type == 4}">
-							<%@ include file="numerical.jsp"%>
-						</c:when>
-						<c:when test="${question.type == 5}">
-							<%@ include file="truefalse.jsp"%>
-						</c:when>
-						<c:when test="${question.type == 6}">
-							<%@ include file="essay.jsp"%>
-						</c:when>
-						<c:when test="${question.type == 7}">
-							<%@ include file="ordering.jsp"%>
-						</c:when>
-						<c:when test="${question.type == 8}">
-							<c:set var="questionIndex" value="${status.index}"/>
-							
-							<div id="mark-hedging-question-${question.uid}">
-								<%@ include file="markhedging.jsp"%>
-							</div>
-						</c:when>						
-					</c:choose>
-							
-					<%@ include file="questionsummary.jsp"%>
-				</td>
-			</tr>
-		</c:forEach>
-	</table>
-</form>
+					
+					<div class="panel-body">
+						<c:choose>
+							<c:when test="${question.type == 1}">
+								<%@ include file="multiplechoice.jsp"%>
+							</c:when>
+							<c:when test="${question.type == 2}">
+								<%@ include file="matchingpairs.jsp"%>
+							</c:when>
+							<c:when test="${question.type == 3}">
+								<%@ include file="shortanswer.jsp"%>
+							</c:when>
+							<c:when test="${question.type == 4}">
+								<%@ include file="numerical.jsp"%>
+							</c:when>
+							<c:when test="${question.type == 5}">
+								<%@ include file="truefalse.jsp"%>
+							</c:when>
+							<c:when test="${question.type == 6}">
+								<%@ include file="essay.jsp"%>
+							</c:when>
+							<c:when test="${question.type == 7}">
+								<%@ include file="ordering.jsp"%>
+							</c:when>
+							<c:when test="${question.type == 8}">
+								<c:set var="questionIndex" value="${status.index}"/>
+								
+								<div id="mark-hedging-question-${question.uid}">
+									<%@ include file="markhedging.jsp"%>
+								</div>
+							</c:when>						
+						</c:choose>
+								
+						<%@ include file="questionsummary.jsp"%>
+					</div>
+					
+				</div>
+			</c:forEach>
+		</form>
+	</div>
+</div>
 		
 <!--Paging-->
 <c:if test="${fn:length(sessionMap.pagedQuestions) > 1}">

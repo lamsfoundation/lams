@@ -56,62 +56,64 @@
 	<fmt:message key="label.learning.short.answer.answer" />
 </div>
 
-<table class="question-table">
-	<c:if test="${isWordsLimitEnabled}">
+<div class="table-responsive">
+	<table class="table table-hover table-condensed">
+		<c:if test="${isWordsLimitEnabled}">
+			<tr>
+				<td>
+	
+					<c:choose>
+						<c:when test="${question.maxWordsLimit != 0 && question.minWordsLimit != 0}">
+							<div class="reg-info">
+								<fmt:message key="label.info.max.and.min.number.words" >
+									<fmt:param>${question.minWordsLimit}</fmt:param>
+									<fmt:param>${question.maxWordsLimit}</fmt:param>
+								</fmt:message>
+							</div>
+						</c:when>
+						<c:when test="${question.maxWordsLimit != 0}">
+							<div class="reg-info">
+								<fmt:message key="label.info.maximum.number.words" >
+									<fmt:param>${question.maxWordsLimit}</fmt:param>
+								</fmt:message>
+							</div>
+						</c:when>
+						<c:when test="${question.minWordsLimit != 0}">
+							<div class="reg-info">
+								<fmt:message key="label.info.minimum.number.words" >
+									<fmt:param>${question.minWordsLimit}</fmt:param>
+								</fmt:message>
+							</div>
+						</c:when>
+					</c:choose>
+				</td>
+			</tr>
+		</c:if>
+	
 		<tr>
-			<td class="reg-padding">
-
+			<td>
 				<c:choose>
-					<c:when test="${question.maxWordsLimit != 0 && question.minWordsLimit != 0}">
-						<div class="info">
-							<fmt:message key="label.info.max.and.min.number.words" >
-								<fmt:param>${question.minWordsLimit}</fmt:param>
-								<fmt:param>${question.maxWordsLimit}</fmt:param>
-							</fmt:message>
-						</div>
+					<c:when test="${question.allowRichEditor && !isEditingDisabled}">
+						<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"></lams:CKEditor>
 					</c:when>
-					<c:when test="${question.maxWordsLimit != 0}">
-						<div class="info">
-							<fmt:message key="label.info.maximum.number.words" >
-								<fmt:param>${question.maxWordsLimit}</fmt:param>
-							</fmt:message>
-						</div>
-					</c:when>
-					<c:when test="${question.minWordsLimit != 0}">
-						<div class="info">
-							<fmt:message key="label.info.minimum.number.words" >
-								<fmt:param>${question.minWordsLimit}</fmt:param>
-							</fmt:message>
-						</div>
-					</c:when>
+					<c:when test="${question.allowRichEditor && finishedLock}">
+						${question.answerString}
+					</c:when>				
+					<c:otherwise>
+						<lams:STRUTS-textarea property="question${status.index}" styleClass="form-control" value="${question.answerString}" disabled="${isEditingDisabled}" />
+					</c:otherwise>
 				</c:choose>
 			</td>
 		</tr>
-	</c:if>
-
-	<tr>
-		<td class="reg-padding">
-			<c:choose>
-				<c:when test="${question.allowRichEditor && !isEditingDisabled}">
-					<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"></lams:CKEditor>
-				</c:when>
-				<c:when test="${question.allowRichEditor && finishedLock}">
-					${question.answerString}
-				</c:when>				
-				<c:otherwise>
-					<lams:STRUTS-textarea property="question${status.index}" rows="7" cols="60" value="${question.answerString}" disabled="${isEditingDisabled}" />
-				</c:otherwise>
-			</c:choose>
-		</td>
-	</tr>
-	
-	<c:if test="${isWordsLimitEnabled}">
-		<tr>
-			<td class="reg-padding">
-				<fmt:message key="label.words" /> <span id="word-count${status.index}">0</span>
-			</td>
-		</tr>
-	</c:if>
-</table>
+		
+		<c:if test="${isWordsLimitEnabled}">
+			<tr>
+				<td>
+					<fmt:message key="label.words" /> <span id="word-count${status.index}">0</span>
+				</td>
+			</tr>
+		</c:if>
+	</table>
+</div>
 
 <%@ include file="markandpenaltyarea.jsp"%>

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
@@ -20,14 +19,11 @@
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${assessment.title}" escapeXml="true"/>
-		</h1>
+	<lams:Page type="learner" title="${content.title}">
 		
-		<h2>
+		<h4>
 			<fmt:message key="label.waiting.for.leader" />
-		</h2>
+		</h4>
 
 		<div>
 			<fmt:message key="label.users.from.group" />
@@ -35,22 +31,17 @@
 		
 		<div>
 			<c:forEach var="user" items="${groupUsers}" varStatus="status">
-				<div>
+				<div class="user">
 					<c:out value="${user.firstName}" escapeXml="true"/> <c:out value="${user.lastName}" escapeXml="true"/>
 				</div>
 			</c:forEach>
 		</div>
 		
-		<div class="space-bottom-top align-right">
-			<html:button property="refreshButton" onclick="refresh();" styleClass="button">
-				<fmt:message key="label.refresh" />
-			</html:button>
-		</div>
+		<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-sm btn-primary pull-right">
+			<fmt:message key="label.refresh" />
+		</html:button>
 
-	</div>
-
-	<div id="footer">
-	</div>
+	</lams:Page>
 
 </body>
 </lams:html>

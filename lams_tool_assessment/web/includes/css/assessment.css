@@ -100,47 +100,42 @@ div.growlUI h1, div.growlUI h2 {
 	text-align: center;
 }
 
-table.alternative-color td.question-numbers {
-	padding: 15px 15px 15px; 
-	width: 10px; 
+.question-numbers {
+	padding-right: 15px;
+	float: left;
 	font-weight: bold;
 }
-table.question-table {
-	padding-bottom: 10px; 
-	border-spacing: 0; 
-	border-collapse: separate;
+.asterisk{
+	float: left; 
+	padding-right: 5px;
 }
-table.question-table td {
-	vertical-align:middle; 
-	background:none; 
-	border-bottom:0px;
+.ordering-option {
+	vertical-align: middle !important;
+} 
+.question-type {
+	padding-bottom: 7px; 
+	font-style: italic;
 }
-.question-table .has-radio-button {
+.question-table {
+	width: 98%;
+}
+.has-radio-button {
 	padding:5px 0px 2px 15px; 
 	width: 5px;
 }
-.question-table .complete-item-gif {
+.complete-item-gif {
 	padding:5px 0px 2px 15px; 
 	width: 7px;
 }
-.question-table .complete-item-gif img {
+.complete-item-gif img {
 	border:1px;
 }
-.question-type {
-	padding: 10px 15px 7px; 
-	font-style: italic;
-}
-.question-table .question-feedback, div.question-feedback {
+.question-feedback, div.question-feedback {
 	padding: 10px 15px 0px; 
 	font-style: italic; 
 	color:#47bc23;
 }
-.question-table .question-option {
-	padding:5px 10px 2px;
-}
-.question-table .reg-padding {
-	padding:5px 0px 2px 15px;
-}
+
 #quesion-summary-title {
 	padding: 2px 15px 10px; 
 	font-style: italic; 
@@ -169,7 +164,7 @@ table.question-table td {
 	display: none;
 }
 
-.reg-padding .info {
+.reg-info {
 	margin-top: 10px;
 	margin-left: 10px;
 	margin-bottom: 10px;
