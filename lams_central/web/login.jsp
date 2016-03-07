@@ -52,6 +52,9 @@ j_security_login_page
 				}
 
 				$(document).ready(function() {
+					if (!Modernizr.testAllProps()) {
+						$('#browserNotCompatible').show();
+					}
 					$('#j_username').focus();
 					$('#news').load('<lams:LAMSURL/>www/news.html');
 				});
@@ -71,38 +74,10 @@ j_security_login_page
 						<h1>
 							<img src="<lams:LAMSURL/>/www/images/lams_login.gif" alt="LAMS - Learning Activity Management System" />
 						</h1>
-
-						<!--Test if the browsers meets requirements-->
-						<script type="text/javascript">
-							if (isBrowserNotCompatible()) {
-								// incompatible browser - show warning message
-								document
-										.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/> <a href=\"http://getfirefox.com\" target=\"_blank\"><img src=\"images/firefox_logo.png\"></a>');
-								document.write('<br></div>');
-							}
-
-							function isBrowserNotCompatible() {
-								if (ie10 || ie11)
-									return false; // IE10-IE11
-								else if (saf4)
-									return false; //Safari4
-								else if (chrome)
-									return false; //Chrome
-								else if (ie5xwin || ie5 || ie4 || ie5mac
-										|| ie5x || ie6)
-									return true;
-								else if (saf)
-									return true; // Safari
-								else if (op)
-									return true; // Opera
-								else if (moz)
-									if ((moz_brow.indexOf("Firefox") != -1)
-											&& (moz_brow_nu >= 1.5))
-										return false; // Firefox 1.5+
-									else
-										return true;
-							}
-						</script>
+						
+						<div id="browserNotCompatible" class="warning" style="display: none">
+							<fmt:message key="msg.browser.compat"/>
+						</div>
 
 						<!-- Placeholder for customised login page part -->
 						<div id="news"></div>
@@ -144,10 +119,9 @@ j_security_login_page
 							</p>
 						</form>
 						<p class="login-button">
-							<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" />
-							</a> <br /> <a
-								href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration
-								.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
+							<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" /></a>
+							<br />
+							<a href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
 								<fmt:message key="label.help" />
 							</a>
 						</p>
