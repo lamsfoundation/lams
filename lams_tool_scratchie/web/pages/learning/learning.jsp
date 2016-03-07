@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<%-- param has higher level for request attribute --%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="scratchie" value="${sessionMap.scratchie}" />
-	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="scratchie" value="${sessionMap.scratchie}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	<style type="text/css">
-    	#scratches {margin: 40px 0px; border-spacing: 0;}
-    	#scratches tr td { padding: 12px 15px; }
-    	#scratches a, #scratches a:hover {border-bottom: none;}
-    	.scartchie-image {border: 0;}
-    </style>
+#scratches {
+	margin: 40px 0px;
+	border-spacing: 0;
+}
+
+#scratches tr td {
+	padding: 12px 15px;
+}
+
+#scratches a, #scratches a:hover {
+	border-bottom: none;
+}
+
+.scartchie-image {
+	border: 0;
+}
+</style>
 
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript">
@@ -95,27 +107,28 @@
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${scratchie.title}" escapeXml="true"/>
-		</h1>
-		
+	<lams:Page type="learner" title="${scratchie.title}">
+
 		<h4>
-			<fmt:message key="label.group.leader" >
-				<fmt:param><c:out value="${sessionMap.groupLeaderName}" escapeXml="true"/></fmt:param>
+			<fmt:message key="label.group.leader">
+				<fmt:param>
+					<mark><c:out value="${sessionMap.groupLeaderName}" escapeXml="true" /></mark>
+				</fmt:param>
 			</fmt:message>
 		</h4>
 
-		<p style="font-style: italic;">
-			<c:out value="${scratchie.instructions}" escapeXml="false"/>
-		</p>
-		
+		<div class="panel">
+			<c:out value="${scratchie.instructions}" escapeXml="false" />
+		</div>
+
 		<c:if test="${not empty sessionMap.submissionDeadline}">
-			<div class="info">
-				<fmt:message key="authoring.info.teacher.set.restriction" >
-					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+			<lams:Alert id="submissionDeadline" close="true" type="info">
+				<fmt:message key="authoring.info.teacher.set.restriction">
+					<fmt:param>
+						<lams:Date value="${sessionMap.submissionDeadline}" />
+					</fmt:param>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
@@ -124,12 +137,9 @@
 			<%@ include file="questionlist.jsp"%>
 		</div>
 
-	</div>
-	<!--closes content-->
 
-	<div id="footer">
-	</div>
-	<!--closes footer-->
-
+		<div id="footer"></div>
+		<!--closes footer-->
+	</lams:Page>
 </body>
 </lams:html>

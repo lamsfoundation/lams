@@ -11,44 +11,42 @@
 		function refresh() {
 			location.reload();
 		}
-		
+
 		//refresh page every 30 sec
-		setTimeout("refresh();",30000);
-    </script>
+		setTimeout("refresh();", 30000);
+	</script>
 </lams:head>
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${scratchie.title}" escapeXml="true"/>
-		</h1>
-		
-		<h2>
-			<fmt:message key="label.waiting.for.leader" />
-		</h2>
+	<lams:Page type="learner" title="${scratchie.title}">
 
-		<div>
+		<lams:Alert id="waitingForLeader" type="info" close="false">
+			<fmt:message key="label.waiting.for.leader" />
+		</lams:Alert>
+
+		<div class="voffset5">
 			<fmt:message key="label.users.from.group" />
 		</div>
+
+		<div class="voffset5">
 		
-		<div>
-			<c:forEach var="user" items="${groupUsers}" varStatus="status">
-				<div>
-					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+			<div class="roffset10">
+				<c:forEach var="user" items="${groupUsers}" varStatus="status">
+					<div class="user">
+						<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+					</div>
+				</c:forEach>
 				</div>
-			</c:forEach>
 		</div>
-		
-		<div class="space-bottom-top align-right">
-			<html:button property="refreshButton" onclick="refresh();" styleClass="button">
+
+		<div class="voffset10">
+			<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-sm btn-default pull-right">
 				<fmt:message key="label.refresh" />
 			</html:button>
 		</div>
 
-	</div>
 
-	<div id="footer">
-	</div>
-
+		<div id="footer"></div>
+	</lams:Page>
 </body>
 </lams:html>

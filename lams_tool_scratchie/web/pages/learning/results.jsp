@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -16,26 +18,28 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	
+
 	<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
-		#reflections-div {
-			padding: 10px 0 20px;
-		}
-		.burning-question-dto {
-			padding-bottom: 5px; 
-		}
-		.ui-jqgrid tr.jqgrow td {
-		    white-space: normal !important;
-		    height:auto;
-		    vertical-align:text-top;
-		    padding-top:2px;
-		}
-	</style>
+#reflections-div {
+	padding: 10px 0 20px;
+}
 
- 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
- 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+.burning-question-dto {
+	padding-bottom: 5px;
+}
+
+.ui-jqgrid tr.jqgrow td {
+	white-space: normal !important;
+	height: auto;
+	vertical-align: text-top;
+	padding-top: 2px;
+}
+</style>
+
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
@@ -128,50 +132,51 @@
 
 <body class="stripes">
 
-	<div id="content">
-		<h1>
-			<c:out value="${scratchie.title}"/>
-		</h1>
-		
+	<c:set var="title">
+	${scratchie.title} / <fmt:message key='label.score' />
+	</c:set>
+
+	<lams:Page type="learner" title="${title}">
+
 		<c:if test="${not empty sessionMap.submissionDeadline}">
-			<div class="info">
-				<fmt:message key="authoring.info.teacher.set.restriction" >
-					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+			<lams:Alert id="submissionDeadline">
+				<fmt:message key="authoring.info.teacher.set.restriction">
+					<fmt:param>
+						<lams:Date value="${sessionMap.submissionDeadline}" />
+					</fmt:param>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
 
-		<h3>
-			<fmt:message key="label.score" />
-		</h3>
-		
-		<h3>
-			<fmt:message key="label.you.ve.got" >
-				<fmt:param>${score}%</fmt:param>
+		<lams:Alert id="score" type="info" close="false">
+			<fmt:message key="label.you.ve.got">
+				<strong><fmt:param>${score}%</fmt:param></strong>
 			</fmt:message>
-		</h3>
-		
+		</lams:Alert>
+
 		<!-- Display burningQuestionDtos -->
 
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
-			<div class="small-space-top">
-				<h3><fmt:message key="label.burning.questions" /></h3>
-				
+			<div class="voffset5">
+				<div class="lead">
+					<fmt:message key="label.burning.questions" />
+				</div>
+
 				<c:forEach var="burningQuestionDto" items="${burningQuestionDtos}" varStatus="i">
 					<div class="burning-question-dto">
 						<table id="burningQuestions${burningQuestionDto.item.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</div>
 				</c:forEach>
-				
+
 				<!-- General burning question's table -->
 				<div class="burning-question-dto">
 					<table id="burningQuestions0" class="scroll" cellpadding="0" cellspacing="0"></table>
 				</div>
-				
+
 				<c:if test="${(mode != 'teacher') && isUserLeader}">
-					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="button">
+					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="btn btn-sm btn-default">
 						<fmt:message key="label.edit" />
 					</html:button>
 				</c:if>
@@ -179,66 +184,64 @@
 		</c:if>
 
 		<c:if test="${sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h3><fmt:message key="monitor.summary.td.notebookInstructions" /></h3>
-				<p>
-					<strong><lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/></strong>
-				</p>
+			<div class="voffset10">
+				<div class="panel panel-default">
+					<div class="panel-heading-sm  bg-success">
+						<fmt:message key="monitor.summary.td.notebookInstructions" />
+					</div>
+					<div class="panel-body-sm">
+						<div class="panel">
+							<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
+						</div>
+						<c:choose>
+							<c:when test="${empty sessionMap.reflectEntry}">
+								<p>
+									<fmt:message key="message.no.reflection.available" />
+								</p>
+							</c:when>
+							<c:otherwise>
+								<div class="panel-body-sm bg-warning">
+									<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+								</div>
+							</c:otherwise>
+						</c:choose>
+						<c:if test="${(mode != 'teacher') && isUserLeader}">
+							<div class="voffset5">
+								<html:button property="finishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default">
+									<fmt:message key="label.edit" />
+								</html:button>
+							</div>
+						</c:if>
 
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<fmt:message key="label.your.answer" />
-						</p>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
+					</div>
+				</div>
 
-				<c:if test="${(mode != 'teacher') && isUserLeader}">
-					<html:button property="finishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
-				
 				<c:if test="${fn:length(reflections) > 0}">
 					<div id="reflections-div">
 						<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</div>
-		        </c:if>
+				</c:if>
 			</div>
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
-					<span class="nextActivity">
-						<c:choose>
-							<c:when test="${sessionMap.activityPosition.last}">
-								<fmt:message key="label.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="label.finished" />
-							</c:otherwise>
-						</c:choose>
-					</span>
+			<div class="voffset10 pull-right">
+				<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finishSession()"
+					styleClass="btn btn-primary na">
+					<c:choose>
+						<c:when test="${sessionMap.activityPosition.last}">
+							<fmt:message key="label.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="label.finished" />
+						</c:otherwise>
+					</c:choose>
 				</html:link>
 			</div>
 		</c:if>
 
-	</div>
-	<!--closes content-->
-
-	<div id="footer">
-	</div>
-	<!--closes footer-->
-
+		<div id="footer"></div>
+		<!--closes footer-->
+	</lams:Page>
 </body>
 </lams:html>

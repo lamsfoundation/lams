@@ -22,17 +22,14 @@
 </lams:head>
 
 <body class="stripes">
-	<div id="content">
-		<h1>
-			${sessionMap.title}
-		</h1>
+	<lams:Page type="learner" title="${sessionMap.title}">
 
-		<div class="warning">
+		<lams:Alert id="deadline" type="danger" close="false">
 			<fmt:message key="label.sorry.the.deadline.has.passed" />
-		</div>
+		</lams:Alert>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and empty sessionMap.submissionDeadline}">
-			<div class="small-space-top">
+			<div class="voffset10">
 				<h2>
 					${sessionMap.reflectInstructions}
 				</h2>
@@ -58,7 +55,7 @@
 			</div>
 		</c:if>
 
-		<div class="space-bottom-top align-right">
+		<div class="voffset10 pull-right">
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished) && empty sessionMap.submissionDeadline}">
 					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
@@ -66,8 +63,7 @@
 					</html:button>
 				</c:when>
 				<c:otherwise>
-					<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button">
-						<span class="nextActivity">
+					<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="btn btn-primary na">
 							<c:choose>
 								<c:when test="${sessionMap.activityPosition.last}">
 									<fmt:message key="label.submit" />
@@ -76,15 +72,13 @@
 									<fmt:message key="label.finished" />
 								</c:otherwise>
 							</c:choose>
-						</span>
 					</html:link>
 				</c:otherwise>
 			</c:choose>
 		</div>
-	</div>
 	<div id="footer">
 	</div>
 	<!--closes footer-->
-
+</lams:Page>
 </body>
 </lams:html>
