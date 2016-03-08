@@ -25,6 +25,11 @@ LAMS Learner Style
     padding-left: 5px;
   }
 }
+@media (min-width: 501px) {
+  .no-gutter > [class*='col-'] {
+    padding-right: 8px;
+    padding-left: 8px;
+}
 /* Spacer classes */
 .voffset2 {
   margin-top: 2px;
