@@ -15,8 +15,8 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	
 	<%@ include file="/common/header.jsp"%>
-	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
+	<link rel="stylesheet" href="${lams}css/jquery.jRating.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
 	<style media="screen,projection" type="text/css">
@@ -41,6 +41,7 @@
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
@@ -54,9 +55,11 @@
 	$(document).ready(function(){
 		
 		$(".tablesorter").tablesorter({
-			theme: 'blue',
+			theme: 'bootstrap',
 		    widthFixed: true,
-		    widgets: ['zebra'],
+		    sortInitialOrder: 'desc',
+		    headerTemplate : '{content} {icon}',
+		    widgets: ['uitheme', 'zebra'],
 	        headers: { 
 	            1: { 
 	                sorter: false 
@@ -64,12 +67,17 @@
 	            2: {
 	                sorter: false 
 	            } 
-	        } 
+	        }
 		});
 		
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
+			    container: $(this).find(".ts-pager"),
+			    output: '{startRow} to {endRow} ({totalRows})',
+				cssPageDisplay: '.pagedisplay',
+				cssPageSize: '.pagesize',
+				cssDisabled: 'disabled',
 				ajaxUrl : "<c:url value='/learning/getUsers.do'/>?page={page}&size={size}&{sortList:column}&sessionMapID=${sessionMapID}&toolContentId=${peerreview.contentId}&toolSessionId=${toolSessionId}&userId=<lams:user property='userID' />",
 				ajaxProcessing: function (data) {
 			    	if (data && data.hasOwnProperty('rows')) {
@@ -174,22 +182,11 @@
 							rows += '</tr>';
 						}
 			            
-						json.total = data.total_rows; // only allow 100 rows in total
-						//json.filteredRows = 100; // no filtering
+						json.total = data.total_rows;
 						json.rows = $(rows);
 						return json;
 			    	}
-				},
-			    container: $(this).next(".tablesorter-pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    cssNext: '.tablesorter-next',
-				cssPrev: '.tablesorter-prev',
-				cssFirst: '.tablesorter-first',
-				cssLast: '.tablesorter-last',
-				cssGoto: '.gotoPage',
-				cssPageDisplay: '.pagedisplay',
-				cssPageSize: '.pagesize',
-				cssDisabled: 'disabled'
+				}
 			})
 			
 			// bind to pager events
@@ -289,59 +286,27 @@
 			<c:out value="${peerreview.instructions}" escapeXml="false"/>
 		</p>
 
-		<!-- Ratings UI -->
-		<div class="panel panel-default">
-		<div class="panel-heading panel-title">
-			<fmt:message key="label.ratings" />
-		</div>
-		<div class="panel-body">
+		<c:set var="numColumns" value="2"/>
+		<c:if test="${isCommentsEnabled}">
+			<c:set var="numColumns" value="3"/>
+		</c:if>
 	
-		<table class="tablesorter">
-			<thead>
-				<tr>
-					<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" >
-						<fmt:message key="label.user.name" />
-					</th>
-					<th class="rating">
-						<fmt:message key="label.rating" />
-					</th>
-					<c:if test="${isCommentsEnabled}">
-						<th class="comment">
-							<fmt:message key="label.comment" />
-						</th>
-					</c:if>
-				</tr>
-			</thead>
-			<tbody>
-
-			</tbody>
-		</table>
-					
-		<!-- pager -->
-		<div class="tablesorter-pager">
-			<form>
-		   	<img class="tablesorter-first"/>
-		    	<img class="tablesorter-prev"/>
-		    	<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-		   		<img class="tablesorter-next"/>
-		    	<img class="tablesorter-last"/>
-		    	<select class="pagesize">
-		      		<option value="2">2</option>
-		      		<option selected="selected" value="10">10</option>
-		      		<option value="20">20</option>
-		      		<option value="30">30</option>
-		      		<option value="40">40</option>
-		      		<option value="50">50</option>
-		      		<option value="100">100</option>
-		    	</select>
-			</form>
-		</div>
-		
+		<lams:TSTable numColumns="${numColumns}">
+			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" > 
+				<fmt:message key="label.user.name" />
+			</th>
+			<th class="rating">  
+				<fmt:message key="label.rating" />
+			</th>
+			<c:if test="${isCommentsEnabled}">
+				<th class="comment"> 
+					<fmt:message key="label.comment" />
+				</th>
+			</c:if>
+		</lams:TSTable>
+							
 		<div id="no-users-info">
 			<fmt:message key="label.no.users" />
-		</div>
-	
-		</div>
 		</div>
 	
 		<!-- Reflection -->
@@ -351,12 +316,9 @@
 		<!-- End Reflection -->
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-left">
 				<html:button property="FinishButton" styleId="finishButton" onclick="refresh()" styleClass="btn btn-default voffset5 pull-left">
 					<fmt:message key="label.refresh" />
 				</html:button>
-			</div>
-			<div class="space-bottom-top align-right" id="learner-submit">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary voffset5 pull-right">
@@ -381,7 +343,6 @@
 						</html:link>
 					</c:otherwise>
 				</c:choose>
-			</div>
 		</c:if>
 		
 	</lams:Page>

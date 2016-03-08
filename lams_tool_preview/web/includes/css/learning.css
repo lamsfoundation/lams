@@ -3,7 +3,7 @@
 		tr.odd:hover .jStar {background-image: url(/lams/images/css/jquery.jRating-stars-grey.png)!important;}
 		tr.even:hover .jStar {background-image: url(/lams/images/css/jquery.jRating-stars-light-grey.png)!important;}
 		tr.odd .jStar {background-image: url(/lams/images/css/jquery.jRating-stars-light-blue.png)!important;}
-		td.username {min-width: 250px;}
+		td.username {min-width: 150px;}
 		td.rating {width:150px;}
 		td.comment {min-width: 250px;}
 		.alert {padding:8px}

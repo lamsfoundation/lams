@@ -20,12 +20,9 @@
 	<%@ include file="/common/header.jsp"%>
 
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
-	<style media="screen,projection" type="text/css">
-		.tablesorter {width: 80%;}
-	</style>
 
 	<script type="text/javascript">
 		//var for jquery.jRating.js
@@ -45,6 +42,7 @@
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>	
@@ -53,9 +51,11 @@
 		$(document).ready(function(){
 			
 			$(".tablesorter").tablesorter({
-				theme: 'blue',
+				theme: 'bootstrap',
 			    widthFixed: true,
-			    widgets: ['zebra'],
+			    sortInitialOrder: 'desc',
+			    headerTemplate : '{content} {icon}',
+			    widgets: ['uitheme', 'zebra'],
 		        headers: { 
 		            1: { 
 		                sorter: false 
@@ -66,7 +66,6 @@
 		        } 
 			});
 			
-			//initializeJRating();
 		 });
 	
 		function finishSession(){
@@ -97,49 +96,32 @@
 		<c:if test="${not empty itemRatingDtos}">
 
 		<!-- Ratings UI -->
-		<div class="panel panel-default">
-		<div class="panel-heading panel-title">
-			<fmt:message key="label.ratings" />
-		</div>
-		<div class="panel-body">
-	
 		<table class="tablesorter">
 			<thead>
 				<tr>
-					<th title="<fmt:message key='label.sort.by.user.name'/>" >
+					<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" > 
 						<fmt:message key="label.user.name" />
 					</th>
-					<th>
+					<th class="comment">
 						<fmt:message key="label.rating" />
 					</th>
-	
-			<table class="tablesorter">
-				<thead>
+				</tr>
+			</thead>
+			<tbody>
+				<c:forEach var="itemRatingDto" items="${itemRatingDtos}">
 					<tr>
-						<th title="<fmt:message key='label.sort.by.user.name'/>" >
-							<fmt:message key="label.user.name" />
-						</th>
-						<th>
-							<fmt:message key="label.rating" />
-						</th>
+						<td>
+							<c:out value="${userNameMap[itemRatingDto.itemId]}" escapeXml="true"/>
+						</td>
+						
+						<td>
+							<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true" isItemAuthoredByUser="false"/>
+						</td>
 					</tr>
-				</thead>
-				<tbody>
-					<c:forEach var="itemRatingDto" items="${itemRatingDtos}">
-						<tr>
-							<td>
-								<c:out value="${userNameMap[itemRatingDto.itemId]}" escapeXml="true"/>
-							</td>
-							
-							<td style="width:50%; text-align: right;">
-								<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true" isItemAuthoredByUser="false"/>
-							</td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-		</div>
-		</div>
+				</c:forEach>
+			</tbody>
+		</table>
+		
 		</c:if>
 		
 		<c:if test="${peerreview.showRatingsLeftForUser}">
