@@ -455,6 +455,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Long learningLibraryID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNING_LIBRARY_ID);
 	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Integer userID = getUserId();
@@ -471,7 +472,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
 	// create the LD and put it in Run Sequences folder in the given organisation
-	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
+	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID, learningLibraryID,
 		contentFolderID, organisationID);
 	if (learningDesignID != null) {
 	    User user = (User) getUserManagementService().findById(User.class, userID);

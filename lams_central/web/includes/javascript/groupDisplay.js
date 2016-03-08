@@ -227,10 +227,11 @@ function showOrgGroupDialog(orgID) {
 	}, true);
 }
 
-function showAddSingleActivityLessonDialog(orgID, toolID) {
+function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 	showDialog("dialogAddSingleActivityLesson", {
 		'orgID' : orgID,
 		'toolID' : toolID,
+		'learningLibraryID' : learningLibraryID,
 		'height' : 600,
 		'width' : 850,
 		'modal' : true,
@@ -422,7 +423,8 @@ function closeAddSingleActivityLessonDialog(action) {
 				'organisationID'  : dialog.dialog('option', 'orgID'),
 				'toolID' : dialog.dialog('option', 'toolID'),
 				'toolContentID' : dialog.dialog('option', 'toolContentID'),
-				'contentFolderID' : dialog.dialog('option', 'contentFolderID')
+				'contentFolderID' : dialog.dialog('option', 'contentFolderID'),
+				'learningLibraryID' : dialog.dialog('option', 'learningLibraryID')
 			},
 			// create LD SVG
 			success : function(learningDesignID) {

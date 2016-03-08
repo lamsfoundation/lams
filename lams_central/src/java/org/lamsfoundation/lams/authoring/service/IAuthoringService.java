@@ -364,7 +364,7 @@ public interface IAuthoringService {
 
     public String getToolAuthorUrl(Long toolID, Long toolContentID, String contentFolderID);
 
-    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID, Long learningLibraryID,
 	    String contentFolderID, Integer organisationID);
 
     public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId);
