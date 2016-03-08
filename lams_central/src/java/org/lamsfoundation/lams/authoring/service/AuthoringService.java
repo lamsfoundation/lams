@@ -1939,7 +1939,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID, Long learningLibraryID, 
 	    String contentFolderID, Integer organisationID) {
 	Integer userID = AuthoringService.getUserId();
 	User user = (User) baseDAO.find(User.class, userID);
@@ -1975,7 +1975,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	learningDesign.setWorkspaceFolder(folder);
 	learningDesignDAO.insert(learningDesign);
 
-	ToolActivity templateActivity = (ToolActivity) activityDAO.getTemplateActivityByLibraryID(toolID);
+	ToolActivity templateActivity = (ToolActivity) activityDAO.getTemplateActivityByLibraryID(learningLibraryID);
 	ToolActivity activity = (ToolActivity) templateActivity.createCopy(1);
 	activity.setLearningDesign(learningDesign);
 	activity.setToolContentId(toolContentID);
