@@ -519,6 +519,7 @@ public class ImportService implements IImportService {
 	}
 	String salt = HashUtil.salt();
 	password = HashUtil.sha256(password, salt);
+	user.setSalt(salt);
 	user.setPassword(password);
 
 	user.setTitle(parseStringCell(row.getCell(TITLE)));
