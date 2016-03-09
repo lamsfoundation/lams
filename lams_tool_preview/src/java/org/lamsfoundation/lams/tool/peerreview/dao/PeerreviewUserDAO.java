@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.peerreview.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 
 public interface PeerreviewUserDAO extends DAO {
@@ -43,4 +44,8 @@ public interface PeerreviewUserDAO extends DAO {
 
     List<PeerreviewUser> getUsersForTablesorter(final Long toolSessionId, final Long excludeUserId, int page, int size,
 	    int sorting);
+
+    int getCountUsersBySession(Long toolSessionId);
+
+    int createUsersForSession(PeerreviewSession session);
 }
