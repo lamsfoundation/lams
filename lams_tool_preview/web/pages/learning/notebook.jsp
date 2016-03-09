@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE html>
-        
 
 <lams:html>
 <lams:head>
@@ -40,14 +39,7 @@
 
 			<div class="space-bottom-top align-right">
 				<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
-						<c:choose>
-		 					<c:when test="${sessionMap.activityPosition.last}">
-		 						<fmt:message key="label.submit" />
-		 					</c:when>
-		 					<c:otherwise>
-		 		 				<fmt:message key="label.finished" />
-		 					</c:otherwise>
-		 				</c:choose>
+					<fmt:message key="label.finished" />
 				</html:link>
 			</div>
 		</lams:Page>

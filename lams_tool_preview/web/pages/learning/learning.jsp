@@ -10,6 +10,15 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
 
+<c:choose>
+	<c:when test="${peerreview.showRatingsLeftForUser}">
+		<c:set var="finishButtonLabel"><fmt:message key="label.continue" /></c:set>
+	</c:when>				
+	<c:otherwise>
+		<c:set var="finishButtonLabel"><fmt:message key="label.finished" /></c:set>
+	</c:otherwise>
+</c:choose>
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
@@ -231,10 +240,10 @@
 			<lams:Alert type="danger" id="warn-lock" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
-						<fmt:message key="message.activityLocked" />
+						<fmt:message key="message.activityLocked"/>
 					</c:when>
 					<c:otherwise>
-						<fmt:message key="message.warnLockOnFinish" />
+						<fmt:message key="message.warnLockOnFinish" ><fmt:param>${finishButtonLabel}</fmt:param></fmt:message>
 					</c:otherwise>
 				</c:choose>
 			</lams:Alert>
@@ -320,26 +329,19 @@
 					<fmt:message key="label.refresh" />
 				</html:button>
 				<c:choose>
+					<c:when test="${peerreview.showRatingsLeftForUser}">
+						<html:button property="FinishButton" styleId="finishButton" onclick="return showResults()" styleClass="btn btn-primary voffset5 pull-right">
+							<fmt:message key="label.continue" />
+						</html:button>
+					</c:when>				
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary voffset5 pull-right">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
-					<c:when test="${peerreview.showRatingsLeftForUser}">
-						<html:button property="FinishButton" styleId="finishButton" onclick="return showResults()" styleClass="btn btn-primary voffset5 pull-right">
-							<fmt:message key="label.submit" />
-						</html:button>
-					</c:when>				
 					<c:otherwise>
 						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
-							<c:choose>
-			 					<c:when test="${sessionMap.activityPosition.last}">
-			 						<fmt:message key="label.submit" />
-			 					</c:when>
-			 					<c:otherwise>
-			 		 				<fmt:message key="label.finished" />
-			 					</c:otherwise>
-			 				</c:choose>
+							<fmt:message key="label.finished" />
 						</html:link>
 					</c:otherwise>
 				</c:choose>

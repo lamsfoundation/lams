@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 
 <%@ attribute name="numColumns" required="true" rtexprvalue="true"%>
-<%@ attribute name="sessionId" required="false" rtexprvalue="true"%>
+<%@ attribute name="dataId" required="false" rtexprvalue="true"%>
 <%@ attribute name="tableClass" required="false" rtexprvalue="true"%>
 <%@ attribute name="pagerClass" required="false" rtexprvalue="true"%>
 <%@ attribute name="test" required="false" rtexprvalue="true"%>
@@ -16,7 +16,11 @@
 	<c:set var="pagerClass" value="ts-pager" />
 </c:if>
 
-<table class="${tableClass}" data-session-id="${sessionId}">
+<c:if test="${empty dataId}">
+	<c:set var="dataId" value="" />
+</c:if>
+
+<table class="${tableClass}" ${dataId}>
 	<thead>
 		<tr>
 			<jsp:doBody />
