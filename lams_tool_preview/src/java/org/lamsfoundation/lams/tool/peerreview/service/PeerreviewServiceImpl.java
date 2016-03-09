@@ -308,46 +308,28 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	return peerreviewUserDao.getByContentId(toolContentId);
     }
 
-    @Override
     public boolean createUsersFromLesson(Long toolSessionId) throws Throwable {
-	// can we change lesson's class?
-	// boolean isGroupedActivity = isGroupedActivity(toolContentId);
 
 	User currentUser = null;
 	try {
 	    boolean wasNotInSetAlready = creatingUsersForSessionIds.add(toolSessionId);
 	    if (!wasNotInSetAlready) {
-		// log.debug("Peer Review: Already processing session " + toolSessionId);
 		return false;
 	    }
 
-	    // log.debug("Peer Review: Processing session " + toolSessionId);
-	    long start = System.currentTimeMillis();
-	    int usersAdded = 0;
+//	    long start = System.currentTimeMillis();
 
 	    PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
-	    Integer numberPotentialLearners = toolService.getCountUsersForActivity(toolSessionId);
-	    // log.debug("Peer Review UserCreateThread " + toolSessionId + ": getCountUsersForActivity took: "
-	    // + (System.currentTimeMillis() - start) + "ms. numLearners "+numberPotentialLearners);
-	    List<Long> sessionUserIds = peerreviewUserDao.getUserIdsBySessionID(toolSessionId);
-	    // log.debug("Peer Review UserCreateThread " + toolSessionId + ": getUserIdsBySessionID took: "
-	    // + (System.currentTimeMillis() - start) + "ms.");
-	    boolean needsUpdate = sessionUserIds.size() != numberPotentialLearners.intValue();
-
-	    if (needsUpdate) {
-		Set<User> lessonUsers = toolService.getToolSession(toolSessionId).getLearners();
-		// create all new users
-		for (User lessonUser : lessonUsers) {
-		    currentUser = lessonUser;
-		    if (!sessionUserIds.contains(lessonUser.getUserId().longValue())) {
-			createUser(new PeerreviewUser(lessonUser, session));
-			usersAdded++;
-		    }
-		}
+	    int numberPotentialLearners = toolService.getCountUsersForActivity(toolSessionId);
+	    int numberActualLearners = peerreviewUserDao.getCountUsersBySession(toolSessionId);
+	    int numUsersCreated = 0;
+	    if ( numberActualLearners != numberPotentialLearners ) {
+		numUsersCreated = peerreviewUserDao.createUsersForSession(session);
 	    }
+	    
+//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated "+numUsersCreated+" took: "
+//	    	    + (System.currentTimeMillis() - start) + "ms.");
 
-	    // log.debug("Peer Review UserCreateThread " + toolSessionId + ": Update needsUpdate "+needsUpdate+" took: "
-	    // + (System.currentTimeMillis() - start) + "ms. Added " + usersAdded);
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    return true;
 	} catch (Throwable e) {
