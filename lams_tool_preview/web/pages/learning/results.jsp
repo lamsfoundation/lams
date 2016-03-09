@@ -89,10 +89,17 @@
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
 			<lams:Alert type="danger" id="warn-lock" close="false">
-				<fmt:message key="message.activityLocked" />
+				<c:choose>
+					<c:when test="${sessionMap.userFinished}">
+						<fmt:message key="message.activityLocked"/>
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" ><fmt:param><fmt:message key="label.finished" /></fmt:param></fmt:message>
+					</c:otherwise>
+				</c:choose>
 			</lams:Alert>
 		</c:if>
-		
+
 		<c:if test="${not empty itemRatingDtos}">
 
 		<!-- Ratings UI -->
@@ -149,21 +156,14 @@
 
 		<c:if test="${mode != 'teacher'}">
 				<c:choose>			
-					<c:when test="${sessionMap.reflectOn && (not sessionMap.isSessionCompleted)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary voffset5 pull-right">
+					<c:when test="${(not sessionMap.isSessionCompleted) and sessionMap.reflectOn}">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
 						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
-								<c:choose>
-				 					<c:when test="${sessionMap.activityPosition.last}">
-				 						<fmt:message key="label.submit" />
-				 					</c:when>
-				 					<c:otherwise>
-				 		 				<fmt:message key="label.finished" />
-				 					</c:otherwise>
-				 				</c:choose>
+							<fmt:message key="label.finished" />
 						</html:link>
 					</c:otherwise>
 				</c:choose>
