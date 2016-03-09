@@ -53,6 +53,8 @@ public class DateUtil
 
 	public static final String WDDX_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 	public static final String LAMS_FLASH_FORMAT = "dd/M/yyyy h:mm a";
+	public static final String ISO8601_FORMAT = "yyyy-MM-dd'T'HH:mmZ";
+	public static final String PRETTY_FORMAT  = "d MMMM yyyy h:mm:ss a";
 
 	/**
      * Convert your local time to Universal Time Coordinator.
