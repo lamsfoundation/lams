@@ -43,7 +43,7 @@
 				<ul>
 					<span><fmt:message key="index.single.activity.lesson.desc" /></span>
 					<c:forEach var="tool" items="${tools}">
-						<li onClick="javascript:showAddSingleActivityLessonDialog(${org.id}, ${tool.toolId})">
+						<li onClick="javascript:showAddSingleActivityLessonDialog(${org.id}, ${tool.toolId}, ${tool.learningLibraryId})">
 							<c:out value="${tool.toolDisplayName}" />
 						</li>
 					</c:forEach>
