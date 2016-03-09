@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.peerreview.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewUserDAO;
+import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 
 public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements PeerreviewUserDAO {
@@ -43,8 +45,12 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
     private static final String FIND_BY_CONTENT_ID = "FROM " + PeerreviewUser.class.getName()
 	    + " AS u WHERE u.session.peerreview.contentId=?";
 
-    private static final String GET_COUNT_USERS_FOR_SESSION = "SELECT COUNT(*) FROM " + PeerreviewUser.class.getName()
+    private static final String GET_COUNT_USERS_FOR_SESSION_EXCLUDE_USER = "SELECT COUNT(*) FROM " + PeerreviewUser.class.getName()
 	    + " AS r WHERE r.session.sessionId=? AND r.userId!=?";
+
+    private static final String GET_COUNT_USERS_FOR_SESSION = "SELECT COUNT(*) FROM " + PeerreviewUser.class.getName()
+	    + " AS r WHERE r.session.sessionId=?";
+
 
     private static final String LOAD_USERS_FOR_SESSION_LIMIT = "FROM user in class PeerreviewUser "
 	    + "WHERE user.session.sessionId=:toolSessionId AND user.userId!=:excludeUserId order by ";
@@ -80,11 +86,23 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
 	return this.getHibernateTemplate().find(FIND_BY_CONTENT_ID, toolContentId);
     }
 
+
     @Override
     public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 
-	List list = getHibernateTemplate().find(GET_COUNT_USERS_FOR_SESSION,
+	List list = this.getHibernateTemplate().find(GET_COUNT_USERS_FOR_SESSION_EXCLUDE_USER,
 		new Object[] { toolSessionId, excludeUserId });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
+    }
+
+    @Override
+    public int getCountUsersBySession(final Long toolSessionId) {
+
+	List list = this.getHibernateTemplate().find(GET_COUNT_USERS_FOR_SESSION,
+		new Object[] { toolSessionId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -113,4 +131,26 @@ public class PeerreviewUserDAOHibernate extends BaseDAOHibernate implements Peer
 		.list();
     }
 
+    private static final String CREATE_USERS = "INSERT into tl_laprev11_user (user_id, login_name, first_name, last_name, session_finished, session_uid) "
+	    + " SELECT user.user_id, user.login, user.first_name, user.last_name, 0, :session_uid "
+	    + " FROM lams_user user "
+	    + " JOIN lams_user_group ug ON ug.user_id = user.user_id "
+	    + " JOIN lams_group grp ON grp.group_id = ug.group_id "
+	    + " JOIN lams_tool_session session ON session.group_id = grp.group_id "
+	    + " WHERE session.tool_session_id = :tool_session_id  "
+	    + " AND NOT EXISTS "
+	    + " ( "
+	    + " SELECT pu.user_id "
+	    + " FROM tl_laprev11_user pu "
+	    + " WHERE pu.session_uid = :session_uid AND pu.user_id = user.user_id "
+	    + " )";
+
+    @Override
+    public int createUsersForSession(final PeerreviewSession session) {
+
+	SQLQuery query =  getSession().createSQLQuery(CREATE_USERS);
+	query.setLong("session_uid", session.getUid())
+	     .setLong("tool_session_id", session.getSessionId());
+	return query.executeUpdate();
+    }
 }
