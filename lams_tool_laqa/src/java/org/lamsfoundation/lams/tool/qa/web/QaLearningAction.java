@@ -1095,11 +1095,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    responcedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	}
 
-	DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
+	DateFormat dateFormatter = new SimpleDateFormat(DateUtil.PRETTY_FORMAT);
+	// setting date format to ISO8601 for jquery.timeago
+	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT); 
 	for (QaUsrResp response : responses) {
 	    QaQueUsr user = response.getQaQueUser();
-	    //JSONArray cell=new JSONArray();
-	    //cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("responseUid", response.getResponseId().toString());
@@ -1111,6 +1111,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    Date attemptTime = response.getAttemptTime();
 	    attemptTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone, attemptTime);
 	    responseRow.put("attemptTime", dateFormatter.format(attemptTime));
+	    responseRow.put("timeAgo", dateFormatterTimeAgo.format(attemptTime));
 
 	    if (isAllowRateAnswers) {
 
