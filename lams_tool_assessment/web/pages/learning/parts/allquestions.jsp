@@ -1,6 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<div class="row no-gutter">
-	<div class="col-xs-12">
 		<form id="answers" name="answers" method="post" action="<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>">
 			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 						
@@ -61,12 +59,10 @@
 				</div>
 			</c:forEach>
 		</form>
-	</div>
-</div>
 		
 <!--Paging-->
 <c:if test="${fn:length(sessionMap.pagedQuestions) > 1}">
-	<div id="pager">
+	<div id="pager" class="voffset10">
 		<fmt:message key="label.learning.page" />
 		<c:forEach var="questions" items="${sessionMap.pagedQuestions}" varStatus="status">
 			<c:choose>

@@ -300,7 +300,7 @@
 				url: "<c:url value='/learning/submitSingleMarkHedgingQuestion.do'/>?sessionMapID=${sessionMapID}&singleMarkHedgingQuestionUid=" + singleMarkHedgingQuestionUid +"&questionIndex="+ questionIndex +"&date=" + new Date().getTime(),
 				target: '#mark-hedging-question-' + singleMarkHedgingQuestionUid,
                 success: function() {
-                	$('#question-area-' + questionIndex).removeClass('warning-answer-required');
+                	$('#question-area-' + questionIndex).removeClass('bg-warning');
                 }
 			});
 		}		
@@ -473,16 +473,16 @@
 				return true;
 				
 			} else {
-				//remove .warning-answer-required from all questions
-				$('[id^=question-area-]').removeClass('warning-answer-required');
+				//remove .bg-warning from all questions
+				$('[id^=question-area-]').removeClass('bg-warning');
 				$('#warning-answers-required').hide();
 				$('#warning-words-limit').hide();
 				$('#warning-mark-hedging-wrong-total').hide();
 				
 				if (missingRequiredQuestions.length != 0) {
-					//add .warning-answer-required class to those needs to be filled
+					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < missingRequiredQuestions.length; i++) {
-					    $("#question-area-" + missingRequiredQuestions[i]).addClass('warning-answer-required');
+					    $("#question-area-" + missingRequiredQuestions[i]).find(".panel-body").addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-answers-required").show();
@@ -490,27 +490,27 @@
 				}
 				
 				if (maxWordsLimitExceededQuestions.length != 0) {
-					//add .warning-answer-required class to those needs to be filled
+					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < maxWordsLimitExceededQuestions.length; i++) {
-					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).addClass('warning-answer-required');
+					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).find(".panel-body").addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-words-limit").show();		
 				}
 				
 				if (minWordsLimitNotReachedQuestions.length != 0) {
-					//add .warning-answer-required class to those needs to be filled
+					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < minWordsLimitNotReachedQuestions.length; i++) {
-					    $("#question-area-" + minWordsLimitNotReachedQuestions[i]).addClass('warning-answer-required');
+					    $("#question-area-" + minWordsLimitNotReachedQuestions[i]).find(".panel-body").addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-words-limit").show();		
 				}
 				
 				if (markHedgingWrongTotalQuestions.length != 0) {
-					//add .warning-answer-required class to those needs to be filled
+					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < markHedgingWrongTotalQuestions.length; i++) {
-					    $("#question-area-" + markHedgingWrongTotalQuestions[i]).addClass('warning-answer-required');
+					    $("#question-area-" + markHedgingWrongTotalQuestions[i]).find(".panel-body").addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-mark-hedging-wrong-total").show();		
@@ -603,47 +603,41 @@
 		
 		<%-- Reflection entry --%>
 		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight ) && finishedLock}">
-			<div class="voffset10">
-				<div class="row">
-					 <div class="col-xs12">
-					 	 <div class="panel panel-default">
-			
-						 	<div class="panel-heading panel-title">
-						 		<fmt:message key="label.export.reflection" />
-						 	</div>
-						 	
-						 	<div class="panel-body">
-							 	<div class="panel">
-							 		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-								</div>
-								
-								<div class="form-group">
-									<c:choose>
-										<c:when test="${empty sessionMap.reflectEntry}">
-											<p>
-												<em> <fmt:message key="message.no.reflection.available" />	</em>
-											</p>
-										</c:when>
-										<c:otherwise>
-											<p>
-												<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-											</p>
-										</c:otherwise>
-									</c:choose>
-					
-									<c:if test="${(mode != 'teacher') && hasEditRight}">
-										<html:button property="FinishButton" onclick="return continueReflect()" 
-												styleClass="btn btn-sm btn-default pull-left voffset10">
-											<fmt:message key="label.edit" />
-										</html:button>
-									</c:if>
-								</div>
-				
-							</div>
+		 	 <div class="panel panel-default">
+	
+				 	<div class="panel-heading panel-title">
+				 		<fmt:message key="label.export.reflection" />
+				 	</div>
+				 	
+				 	<div class="panel-body">
+					 	<div class="panel">
+					 		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 						</div>
+						
+						<div class="form-group">
+							<c:choose>
+								<c:when test="${empty sessionMap.reflectEntry}">
+									<p>
+										<em> <fmt:message key="message.no.reflection.available" />	</em>
+									</p>
+								</c:when>
+								<c:otherwise>
+									<p>
+										<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+									</p>
+								</c:otherwise>
+							</c:choose>
+			
+							<c:if test="${(mode != 'teacher') && hasEditRight}">
+								<html:button property="FinishButton" onclick="return continueReflect()" 
+										styleClass="btn btn-sm btn-default pull-left voffset10">
+									<fmt:message key="label.edit" />
+								</html:button>
+							</c:if>
+						</div>
+		
 					</div>
 				</div>
-			</div>
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">

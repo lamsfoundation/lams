@@ -10,10 +10,10 @@
 			<c:if test="${finishedLock}">
 				<td class="complete-item-gif">
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && question.answerBoolean}">
-						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
+						<i class="fa fa-check"></i>
 					</c:if>			
 					<c:if test="${assessment.allowWrongAnswersAfterQuestion && !question.answerBoolean}">
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">
+						<i class="fa fa-times"></i>
 					</c:if>	
 				</td>
 			</c:if>	
