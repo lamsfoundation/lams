@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-        
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
@@ -117,7 +115,7 @@
 							rows += '</td>';
 							
 							rows += '<td class="rating">';
-							rows += 	'<div class="rating-stars-holder">';
+							rows += 	'<div class="rating-stars-holder text-center center-block">';
 
 							// if the user has left a comment or done a rating in a batch of ratings, we need to keep all related ratings open.
 							var hasStartedRating = false;
@@ -141,9 +139,9 @@
 								var averageRatingDisplayed = (!isCriteriaNotRatedByUser) ? averageRating : 0;
 								var ratingStarsClass = (isDisabled || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
 							
-								rows += '<h4>';
+								rows += '<strong>';
 								rows += 	 criteriaDto.title;
-								rows += '</h4>';
+								rows += '</strong>';
 										
 								rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
 								rows += '</div>';
@@ -177,11 +175,17 @@
 										
 								//show comments textarea and a submit button
 								} else if (!isDisabled) {
-									rows += '<div id="add-comment-area-' + itemId + '">';											
-									rows +=		'<textarea name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
-									
-									rows += 	'<div class="button add-comment add-comment-new" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'">';
+									rows += '<div id="add-comment-area-' + itemId + '">';	
+									rows += '<div class="no-gutter">';
+									rows += '';
+									rows += '<div class="col-xs-12 col-sm-11 ">';										
+									rows +=		'<textarea name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;" class="form-control"><fmt:message key="label.comment.textarea.tip"/></textarea>';
+									rows += '</div>';
+									rows += 	'<div class="button add-comment add-comment-new col-xs-12 col-sm-1" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'">';
 									rows += 	'</div>';
+									
+									rows += '';
+									rows += '';
 									rows += '</div>';											
 								}
 								
