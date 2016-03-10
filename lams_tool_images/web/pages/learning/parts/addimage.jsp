@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-		
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
@@ -8,31 +7,33 @@
 			<fmt:message key="label.learning.title" />
 		</title>
 		<%@ include file="/common/header.jsp"%>
+		
+		<script type="text/javascript">
+			$(document).ready(function(){ 
+				document.getElementById("image-title").focus();
+			});
+		</script>
 	</lams:head>
 	
 	<body class="stripes">
-		<div id="content" >
+		<c:set var="title"><fmt:message key="label.authoring.basic.add.image" /></c:set>
+		<lams:Page type="learner" title="${title}">
+		
 			<%@ include file="/common/messages.jsp"%>
 			
 			<html:form action="/learning/saveNewImage" method="post" styleId="imageGalleryItemForm" enctype="multipart/form-data">
 				<html:hidden property="sessionMapID" />
 	
-				<h2 class="no-space-left">
-					<fmt:message key="label.authoring.basic.add.image" />
-				</h2>
-	
 				<div class="field-name">
 					<fmt:message key="label.authoring.basic.resource.title.input" />
 				</div>
-				<html:text property="title" size="55" tabindex="1" />
+				<html:text property="title" tabindex="1" styleClass="form-control" styleId="image-title"/>
 		
 				<div class="field-name space-top">
 	            	<fmt:message key="label.authoring.basic.resource.description.input" />
 				</div>
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<c:set var="sessionMap"	value="${sessionScope[formBean.sessionMapID]}" />
 				<div class="small-space-bottom" >
-					<lams:STRUTS-textarea rows="5" cols="20" tabindex="4" styleClass="text-area" property="description" />
+					<lams:STRUTS-textarea rows="5" tabindex="4" styleClass="text-area form-control" property="description" />
 				</div>
 	
 				<div class="field-name space-top">
@@ -43,7 +44,7 @@
 				</div>
 				
 				<div style="margin-bottom: 0px; margin-top: 15px;">
-					<a href="<html:rewrite page='/learning/initMultipleImages.do?sessionMapID='/>${formBean.sessionMapID}&KeepThis=true&TB_iframe=true&height=500&width=480&modal=true" class="thickbox">  
+					<a href="<html:rewrite page='/learning/initMultipleImages.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=500&width=480&modal=true" class="thickbox">  
 						<fmt:message key="label.authoring.basic.upload.multiple.images" />
 					</a>				
 				</div>
@@ -52,19 +53,18 @@
 			<br><br>
 	
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button-add-item">
+				<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button-add-item btn btn-primary ">
 					<fmt:message key="label.authoring.basic.add.image" /> 
 				</a>
-				<a href="#" onclick="self.parent.tb_remove();" class="button space-left" name="goback">
+				<a href="#" onclick="self.parent.tb_remove();" class="btn btn-primary  space-left" >
 					<fmt:message key="label.cancel" /> 
 				</a>
 			</lams:ImgButtonWrapper>
 		
-		</div>
+		</lams:Page>
 		<!--closes content-->
 	
-		<div id="footer">
-		</div>
+		<div id="footer"></div>
 		<!--closes footer-->		
 	</body>
 </lams:html>

@@ -98,20 +98,20 @@
 				
 			<c:if test="${imageGallery.allowShareImages}">
 			
-				<a href="#nogo" onclick="return checkNew()" class="button" id="check-for-new-button"> 
+				<a href="#nogo" onclick="return checkNew()" class="btn btn-default" id="check-for-new-button"> 
 					<fmt:message key="label.check.for.new" /> 
 				</a>
 							
 				<c:if test="${not finishedLock}">
-					<br><br>
-					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="button thickbox" id="add-new-image-button">  
+					<br>
+					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="btn btn-default voffset10 thickbox" id="add-new-image-button">  
 						<fmt:message key="label.learning.add.new.image" />
 					</a>
 				</c:if>
 				
 				<c:if test="${sessionMap.isAuthor}">
-					<br><br>
-					<a href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="button" id="delete-button"> 
+					<br>
+					<a href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="btn btn-default voffset10" id="delete-button"> 
 						<fmt:message key="label.learning.delete.image" /> 
 					</a>
 				</c:if>
