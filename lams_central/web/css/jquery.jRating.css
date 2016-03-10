@@ -76,6 +76,15 @@ p.jRatingInfos span.maxRate {
 textarea[id^=comment-textarea-] {
 	color: #d3d3d3;
 }
+.tablesorter tr.odd:hover .jStar {
+	background-image: url(/lams/images/css/jquery.jRating-stars-hover.png)!important;
+}
+.tablesorter tr.even:hover .jStar {
+	background-image: url(/lams/images/css/jquery.jRating-stars-hover.png)!important;
+}
+.tablesorter tr.odd .jStar {
+	background-image: url(/lams/images/css/jquery.jRating-stars-odd.png)!important;
+}
 
 /** Remove the following once we move all tools to use Rating.tag.  **/
 .rating-stars-div {float:right; padding-right: 10px; margin-top: -8px; min-height: 45px;}
