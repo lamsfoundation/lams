@@ -308,8 +308,11 @@ public class LearningAction extends Action {
      */
     private ActionForward newImageInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	
 	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
-	itemForm.setSessionMapID(WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID));
+	itemForm.setSessionMapID(sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 
@@ -366,8 +369,11 @@ public class LearningAction extends Action {
      */
     private ActionForward initMultipleImages(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	
 	MultipleImagesForm multipleForm = (MultipleImagesForm) form;
-	multipleForm.setSessionMapID(WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID));
+	multipleForm.setSessionMapID(sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 

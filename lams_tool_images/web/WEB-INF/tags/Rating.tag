@@ -64,7 +64,7 @@
 <%--Rating stars area---------------------------------------%>
 
 <div class="extra-controls-inner">
-<div class="rating-stars-holder">
+<div class="rating-stars-holder text-center center-block">
 
 	<c:set var="hasStartedRating" value="false"/>
 	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}">
@@ -85,9 +85,9 @@
 			</c:otherwise>
 		</c:choose>
 			
-		<h4>
+		<strong>
 			${criteriaDto.ratingCriteria.title}
-		</h4>
+		</strong>
 			
 		<c:choose>
 			<c:when test='${isItemAuthoredByUser || not isCriteriaNotRatedByUser}'>
@@ -167,21 +167,25 @@
 			<c:when test='${not ( disabled || (maxRates > 0) && (countRatedItems >= maxRates) && !hasStartedRating )}'>
 				<div id="add-comment-area-${itemRatingDto.itemId}">
 			
-					<!-- Rating limits info -->
+					<!-- Comment min words limit -->
 					<c:if test="${itemRatingDto.commentsMinWordsLimit ne 0}">
 					
-						<div class="info rating-info">
+						<lams:Alert type="info" id="comment-limit-${itemRatingDto.itemId}" close="false">
 							<fmt:message key="${minNumberWordsLabel}">
 								: <fmt:param value="${itemRatingDto.commentsMinWordsLimit}"/>
 							</fmt:message>
-						</div>
+						</lams:Alert>
 					</c:if>		
 				
-					<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" onfocus="if(this.value==this.defaultValue)this.value='';" 
-							onblur="if(this.value=='')this.value=this.defaultValue;" ><fmt:message key="label.comment.textarea.tip"/></textarea>
-				
-					<div class="button add-comment add-comment-new" data-item-id="${itemRatingDto.itemId}" data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}">
-					</div>			
+					<div class="no-gutter">
+						<div class="col-xs-12 col-sm-11 ">
+						<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" onfocus="if(this.value==this.defaultValue)this.value='';" 
+								onblur="if(this.value=='')this.value=this.defaultValue;" 
+								class="form-control"><fmt:message key="label.comment.textarea.tip"/></textarea>
+						</div>
+						<div class="button add-comment add-comment-new col-xs-12 col-sm-1 " data-item-id="${itemRatingDto.itemId}" data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}">
+						</div>
+					</div>		
 				</div>			
 			</c:when>
 		</c:choose>

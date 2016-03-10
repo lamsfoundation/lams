@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+
 <lams:html>
 <lams:head>
 	<title>
@@ -20,7 +20,7 @@
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
 
-	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/thickbox.css">
+	<link rel="stylesheet" type="text/css" href="${lams}css/thickbox.css">
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/fotorama.css'/>"/>
 	<style media="screen,projection" type="text/css">
 		@media (max-width: 750px) {
@@ -29,11 +29,6 @@
 		    	width: auto;
 		    	position: static;
 		  	}
-		}
-		#check-for-new-button {
-			margin-top: 20px;
-		}
-		#check-for-new-button, #add-new-image-button, #delete-button {
 		}
 		.extra-controls-inner {
 			float: right;
@@ -53,17 +48,11 @@
 			padding-top: 20px;
 		}
 		[id^=comments-area] {
-			width: 400px;
-			float: right;
 			clear: both;
-			padding: 10px 0 20px;
-		}
-		[id^=comment-textarea] {
-			width: 370px;
+			padding-top: 10px;
 		}
 		.button.add-comment {
-			margin-right: 2px;
-			margin-top: 10px;
+			margin-right: 12px;
 		}
 		table.forum {
 			border-bottom: none;
@@ -88,19 +77,12 @@
 		   height: 0; 
 		   clear: both;
 		}
-		#kkk{
-			float:right;
-		}
-		.space-bottom-top {
-			padding-top: 40px;
-		}
     </style>
-    <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+    <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jRating.css">
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
     
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
- 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/fotorama.js'/>"></script>
 	<script type="text/javascript">
 	
@@ -186,19 +168,16 @@
    
 </lams:head>
 <body class="stripes">
-	<div id="content">
+	 <lams:Page type="learner" title="${imageGallery.title}">
 
-		<%--ImageGallery information-----------------------------------%>
+		<%--Advanced settings and notices-----------------------------------%>
 
-		<h1>
-			<c:out value="${imageGallery.title}" escapeXml="true"/>
-		</h1>
-		<p>
+		<div class="panel">
 			<c:out value="${imageGallery.instructions}" escapeXml="false"/>
-		</p>
+		</div>
 		
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<div class="info">
+			<lams:Alert type="danger" id="lock-on-finish" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked" />
@@ -207,13 +186,12 @@
 						<fmt:message key="message.warnLockOnFinish" />
 					</c:otherwise>
 				</c:choose>
-			</div>
+			</lams:Alert>
 		</c:if>
 		
-		<!-- Rating limits info -->
 		<c:if test="${imageGallery.allowRank && (imageGallery.minimumRates ne 0 || imageGallery.maximumRates ne 0)}">
 		
-			<div class="info">
+			<lams:Alert type="info" id="rating-limits" close="false">
 				<c:choose>
 					<c:when test="${imageGallery.minimumRates ne 0 and imageGallery.maximumRates ne 0}">
 						<fmt:message key="label.rate.limits.reminder">
@@ -239,7 +217,7 @@
 				<fmt:message key="label.rate.limits.topic.reminder">
 					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>"/>
 				</fmt:message>
-			</div>
+			</lams:Alert>
 			
 		</c:if>
 		
@@ -260,50 +238,57 @@
 		<%--Reflection--------------------------------------------------%>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h2><fmt:message key="title.reflection" /></h2>
-				<strong>
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</strong>
+			<div class="panel panel-default voffset10">
+				<div class="panel-heading panel-title">
+					<fmt:message key="title.reflection" />
+				</div>
+						
+		 		<div class="panel-body">
+		 			<div class="reflectionInstructions">
+						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
+					</div>
+				
+					<div class="panel">
+						<c:choose>
+							<c:when test="${empty sessionMap.reflectEntry}">
+								<p>
+									<em> 
+										<fmt:message key="message.no.reflection.available" />
+									</em>
+								</p>
+							</c:when>
+							<c:otherwise>
+								<p>
+									<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+								</p>
+							</c:otherwise>
+						</c:choose>
+					</div>
 
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> 
-								<fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-
-				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
+					<c:if test="${mode != 'teacher'}">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default pull-left">
+							<fmt:message key="label.edit" />
+						</html:button>
+					</c:if>
+				</div>
 			</div>
 		</c:if>
 		
 		<%--Bottom buttons-------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right" id="learner-submit"
+			<div id="learner-submit" class="voffset10"
 				<c:if test="${imageGallery.minimumRates ne 0 && empty sessionMap.currentImage}">style="display:none;"</c:if>
 			>
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button" >
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary pull-right" >
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button" >
-							<span class="nextActivity">
+						<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="btn btn-primary pull-right" >
+							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
 				 						<fmt:message key="label.submit" />
@@ -319,11 +304,10 @@
 			</div>
 		</c:if>	
 
-	</div>
-	<%--closes content--%>
+	</lams:Page>
+	<%--closes lams:Page--%>
 
-	<div id="footer">
-	</div>
+	<div id="footer"></div>
 	<%--closes footer--%>
 
 </body>

@@ -69,7 +69,7 @@
 	<c:set var="jsWarningLabel" value="js.warning.max.min.limit" scope="request"/>
 </c:if>
 <c:if test="${empty allowCommentsLabel}">
-	<c:set var="noMaximumLabel" value="label.allow.comments" scope="request"/>
+	<c:set var="allowCommentsLabel" value="label.allow.comments" scope="request"/>
 </c:if>
 <c:if test="${empty minNumberWordsLabel}">
 	<c:set var="minNumberWordsLabel" value="label.minimum.number.words" scope="request"/>

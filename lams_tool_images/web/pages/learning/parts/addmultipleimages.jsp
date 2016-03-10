@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-		
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
@@ -12,16 +11,13 @@
 	
 	<body class="stripes">
 	
-		<div id="content" >
+		<c:set var="title"><fmt:message key="label.authoring.basic.add.multiple.images" /></c:set>
+		<lams:Page type="learner" title="${title}">
 		
 			<%@ include file="/common/messages.jsp"%>
 			
 			<html:form action="/learning/saveMultipleImages" method="post" styleId="multipleImagesForm" enctype="multipart/form-data">
 				<html:hidden property="sessionMapID" />
-	
-				<h2 class="no-space-left">
-					<fmt:message key="label.authoring.basic.add.multiple.images" />
-				</h2>
 	
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.resource.files.input" />
@@ -41,10 +37,9 @@
 				<div style="margin-top: 4px; margin-left: 15px;">
 					<input type="file" name="file5" />
 				</div>
-				
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />			
+							
 				<div style="margin-bottom: 0px; margin-top: 15px;">
-					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${formBean.sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="thickbox">  
+					<a href="<html:rewrite page='/learning/newImageInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="thickbox">  
 						<fmt:message key="label.authoring.basic.upload.single.image" />
 					</a>				
 				</div>
@@ -54,19 +49,18 @@
 			<br><br>
 	
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="document.multipleImagesForm.submit();" class="button-add-item">
+				<a href="#" onclick="document.multipleImagesForm.submit();" class="button-add-item btn btn-primary">
 					<fmt:message key="label.authoring.basic.add.images" /> 
 				</a>
-				<a href="#" onclick="self.parent.tb_remove();" class="button space-left">
+				<a href="#" onclick="self.parent.tb_remove();" class="button btn btn-primary">
 					<fmt:message key="label.cancel" /> 
 				</a>
 			</lams:ImgButtonWrapper>
 		
-		</div>
+		</lams:Page>
 		<!--closes content-->
 	
-		<div id="footer">
-		</div>
+		<div id="footer"></div>
 		<!--closes footer-->		
 	</body>
 </lams:html>
