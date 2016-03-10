@@ -19,10 +19,10 @@
 					<td class="complete-item-gif">
 					
 						<c:if test="${assessment.allowRightAnswersAfterQuestion && option.answerBoolean && (option.grade > 0)}">
-							<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">
+							<i class="fa fa-check"></i>
 						</c:if>
 						<c:if test="${assessment.allowWrongAnswersAfterQuestion && option.answerBoolean && (option.grade <= 0)}">
-							<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">
+							<i class="fa fa-times"></i>	
 						</c:if>
 							
 					</td>

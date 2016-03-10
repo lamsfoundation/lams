@@ -19,10 +19,10 @@
 				<c:if test="${finishedLock}">
 					<td class="complete-item-gif">
 						<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.sequenceId == ordStatus.index)}">
-							<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
+							<i class="fa fa-check"></i>	
 						</c:if>
 						<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.sequenceId != ordStatus.index)}">
-							<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">	
+							<i class="fa fa-times"></i>	
 						</c:if>
 							
 					</td>		
@@ -36,24 +36,13 @@
 				<c:if test="${(mode != 'teacher') || !hasEditRight}">
 					<td style="text-align: center; width: 20px;">
 						<c:if test="${not ordStatus.first and !finishedLock}">
-							<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.basic.up"/>"
-								onclick="upOption(${question.uid},${ordStatus.index})">
-							<c:if test="${ordStatus.last}">
-								<img src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.authoring.basic.down"/>">
-							</c:if>
+							<i class="fa fa-angle-up" title="<fmt:message key="label.authoring.basic.up"/>" 
+								onclick="upOption(${question.uid},${ordStatus.index})"></i>	
 						</c:if>
 			
 						<c:if test="${not ordStatus.last and !finishedLock}">
-							<c:if test="${ordStatus.first}">
-								<img src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.authoring.basic.up"/>">
-							</c:if>
-			
-							<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.basic.down"/>"
-								onclick="downOption(${question.uid},${ordStatus.index})">
+							<i class="fa fa-angle-down" title="<fmt:message key="label.authoring.basic.down"/>"
+								onclick="downOption(${question.uid},${ordStatus.index})"></i>	
 						</c:if>
 					</td>
 				</c:if>			

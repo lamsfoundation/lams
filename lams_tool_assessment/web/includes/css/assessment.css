@@ -144,20 +144,13 @@ div.growlUI h1, div.growlUI h2 {
 
 #pager {
 	text-align: center; 
-	padding-top: 60px;
+	font-size: 110%;
 }
 #pager a{
 	margin-left: 10px; 
-	font-size: 130%;
 }
 .color-red {
 	color: red;
-}
-
-.warning-answer-required {
-	background-color: bisque !important;
-	background-image: none !important;
-	border-bottom: 1px solid white !important;
 }
 
 #warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total, .hidden {

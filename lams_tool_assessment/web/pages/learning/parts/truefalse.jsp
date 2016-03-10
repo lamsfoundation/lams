@@ -16,10 +16,10 @@
 					
 						<c:choose>
 							<c:when test="${question.correctAnswer}">
-								<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
+								<i class="fa fa-check"></i>
 							</c:when>
 							<c:otherwise>
-								<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">	
+								<i class="fa fa-times"></i>	
 							</c:otherwise>		
 						</c:choose>					
 					
@@ -47,10 +47,10 @@
 					
 						<c:choose>
 							<c:when test="${!question.correctAnswer}">
-								<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
+								<i class="fa fa-check"></i>	
 							</c:when>
 							<c:otherwise>
-								<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">	
+								<i class="fa fa-times"></i>	
 							</c:otherwise>		
 						</c:choose>					
 					</c:if>				

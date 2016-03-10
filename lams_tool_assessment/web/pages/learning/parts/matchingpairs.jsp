@@ -12,10 +12,10 @@
 					<td class="complete-item-gif">
 					
 						<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.answerInt == option.uid)}">
-							<img src="<html:rewrite page='/includes/images/completeitem.gif'/>">	
+							<i class="fa fa-check"></i>	
 						</c:if>
 						<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.answerInt != -1) && (option.answerInt != option.uid)}">
-							<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>">	
+							<i class="fa fa-times"></i>	
 						</c:if>
 							
 					</td>		
