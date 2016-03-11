@@ -395,8 +395,8 @@
 						</fmt:message>
 					</div>
 				</c:if>
-				<c:set var="numColumns" value="1" />
 
+				<c:set var="numColumns" value="1" />
 				<c:choose>
 					<c:when test="${isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
 						<c:set var="numColumns" value="3" />
@@ -405,11 +405,7 @@
 						<c:set var="numColumns" value="2" />
 					</c:otherwise>
 				</c:choose>
-				
-				
-				
-				Columns: <c:out value="${numColumns}"></c:out>
-
+	
 				<lams:TSTable numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"'>
 					<thead>
 						<tr>
