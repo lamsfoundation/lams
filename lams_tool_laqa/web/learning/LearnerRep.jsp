@@ -46,7 +46,7 @@
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
-	
+
 
 	<script type="text/javascript">
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
@@ -357,7 +357,9 @@
 								<%--Rating area---------------------------------------%>
 								<c:if test="${qaContent.allowRateAnswers}">
 									<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
-									<h4 class="text-center"><fmt:message key="label.learning.rating" /></h4>
+										<h4 class="text-center">
+											<fmt:message key="label.learning.rating" />
+										</h4>
 										<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
 											maxRates="${qaContent.maximumRates}" />
 									</div>
@@ -392,7 +394,7 @@
 					</lams:Alert>
 				</c:if>
 
-				<lams:TSTable numColumns="1" dataId='data-question-uid="${question.uid}"'> 
+				<lams:TSTable numColumns="1" dataId='data-question-uid="${question.uid}"'>
 					<thead>
 						<tr>
 							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
@@ -441,38 +443,37 @@
 			<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
 				<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 
-					<html:button property="refreshAnswers" styleClass="btn btn-default voffset5 roffset5 pull-left"
-						onclick="submitMethod('refreshAllResults');">
-						<fmt:message key="label.refresh" />
-					</html:button>
-
-					<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
-						<html:button property="redoQuestions" styleClass="btn btn-primary voffset5  pull-left"
-							onclick="submitMethod('redoQuestions');">
-							<fmt:message key="label.redo" />
-						</html:button>
-					</c:if>
-
 					<div class="right-buttons voffset5" align="right" id="learner-submit">
+						<html:button property="refreshAnswers" styleClass="btn btn-default voffset5 roffset5 pull-left"
+							onclick="submitMethod('refreshAllResults');">
+							<fmt:message key="label.refresh" />
+						</html:button>
+
+						<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
+							<html:button property="redoQuestions" styleClass="btn btn-default voffset5  pull-left"
+								onclick="submitMethod('redoQuestions');">
+								<fmt:message key="label.redo" />
+							</html:button>
+						</c:if>
+
+
 						<c:if test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<html:link href="#nogo" property="endLearning" styleId="finishButton"
-								onclick="javascript:submitMethod('endLearning'); return false;" styleClass="btn btn-primary pull-right">
-								<div class="na">
-									<c:choose>
-										<c:when test="${sessionMap.activityPosition.last}">
-											<fmt:message key="button.submit" />
-										</c:when>
-										<c:otherwise>
-											<fmt:message key="button.endLearning" />
-										</c:otherwise>
-									</c:choose>
-								</div>
+								onclick="javascript:submitMethod('endLearning'); return false;" styleClass="btn btn-primary pull-right na">
+								<c:choose>
+									<c:when test="${sessionMap.activityPosition.last}">
+										<fmt:message key="button.submit" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="button.endLearning" />
+									</c:otherwise>
+								</c:choose>
 							</html:link>
 						</c:if>
 
 						<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
 							<html:button property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-								styleClass="btn btn-primary">
+								styleClass="btn btn-default">
 								<fmt:message key="label.continue" />
 							</html:button>
 						</c:if>
@@ -486,7 +487,7 @@
 
 		<div id="footer"></div>
 
-		
+
 
 	</lams:Page>
 

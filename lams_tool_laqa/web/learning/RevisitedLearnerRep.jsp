@@ -36,7 +36,7 @@
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message>";
-	</script>	
+	</script>
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
@@ -45,7 +45,7 @@
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
-	
+
 	<script type="text/javascript">
 	
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
@@ -366,7 +366,7 @@
 
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
-				<html:button property="redoQuestions" styleClass="btn btn-default pull-right voffset5"
+				<html:button property="redoQuestions" styleClass="btn btn-default pull-left"
 					onclick="submitMethod('redoQuestions');">
 					<fmt:message key="label.redo" />
 				</html:button>
@@ -395,8 +395,22 @@
 						</fmt:message>
 					</div>
 				</c:if>
+				<c:set var="numColumns" value="1" />
 
-				<lams:TSTable numColumns="1" dataId='data-question-uid="${question.uid}"'> 
+				<c:choose>
+					<c:when test="${isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
+						<c:set var="numColumns" value="3" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="numColumns" value="2" />
+					</c:otherwise>
+				</c:choose>
+				
+				
+				
+				Columns: <c:out value="${numColumns}"></c:out>
+
+				<lams:TSTable numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"'>
 					<thead>
 						<tr>
 							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
@@ -415,10 +429,11 @@
 			</c:forEach>
 		</c:if>
 
+		<!-- reflections -->
 		<c:if test="${generalLearnerFlowDTO.reflection == 'true' }">
 			<div class="row no-gutter">
 				<div class="col-xs-12">
-					<div class="panel panel-default">
+					<div class="panel panel-default voffset10">
 						<div class="panel-heading panel-title">
 							<fmt:message key="label.reflection" />
 						</div>
@@ -444,17 +459,22 @@
 
 
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-			<html:button property="endLearning" styleId="finishButton" onclick="javascript:submitMethod('endLearning');"
-				styleClass="btn btn-primary pull-right na">
-				<c:choose>
-					<c:when test="${sessionMap.activityPosition.last}">
-						<fmt:message key="button.submit" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="button.endLearning" />
-					</c:otherwise>
-				</c:choose>
-			</html:button>
+			<div class="row no-gutter">
+				<div class="col-xs-12">
+					<html:button property="endLearning" styleId="finishButton" onclick="javascript:submitMethod('endLearning');"
+						styleClass="btn btn-primary pull-right na">
+						<c:choose>
+							<c:when test="${sessionMap.activityPosition.last}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.endLearning" />
+							</c:otherwise>
+						</c:choose>
+					</html:button>
+
+				</div>
+			</div>
 		</c:if>
 
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
