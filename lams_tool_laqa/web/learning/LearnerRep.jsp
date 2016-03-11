@@ -394,7 +394,17 @@
 					</lams:Alert>
 				</c:if>
 
-				<lams:TSTable numColumns="1" dataId='data-question-uid="${question.uid}"'>
+				<c:set var="numColumns" value="1" />
+				<c:choose>
+					<c:when test="${isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
+						<c:set var="numColumns" value="3" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="numColumns" value="2" />
+					</c:otherwise>
+				</c:choose>
+
+				<lams:TSTable numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"'>
 					<thead>
 						<tr>
 							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
