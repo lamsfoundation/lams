@@ -19,6 +19,7 @@
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet" />
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
 	<lams:css />
 
@@ -44,6 +45,8 @@
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
+	
 
 	<script type="text/javascript">
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
@@ -55,9 +58,10 @@
 			jQuery("time.timeago").timeago();
 			
 			$(".tablesorter").tablesorter({
-				theme: 'blue',
+				theme: 'bootstrap',
+				headerTemplate : '{content} {icon}',
 			    widthFixed: true,
-			    widgets: ['zebra'],
+			    widgets: ['uitheme','zebra'],
 		        headers: { 
 		            2: {
 		                sorter: false 
@@ -95,8 +99,11 @@
 									rows += 	'<div class="user">';
 									rows += 		userData["userName"];
 									rows += 	'</div> - ';
-									rows += 	userData['attemptTime'];
-									rows += '</div>';
+									rows += '<time class="timeago" title="';
+									rows += userData["attemptTime"];
+									rows += '" datetime="';
+									rows += 	userData["timeAgo"];
+									rows += '"></time></div>';
 								}
 								
 								rows += 	'<div class="user-answer">';
@@ -215,23 +222,17 @@
 				            
 				    	}
 					},
-				    container: $(this).next(".pager"),
-				    output: '{startRow} to {endRow} ({totalRows})',
-				    // css class names of pager arrows
-				    cssNext: '.tablesorter-next', // next page arrow
-					cssPrev: '.tablesorter-prev', // previous page arrow
-					cssFirst: '.tablesorter-first', // go to first page arrow
-					cssLast: '.tablesorter-last', // go to last page arrow
-					cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-					cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-					cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-					// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-					cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+					container: $(this).find(".ts-pager"),
+					output: '{startRow} to {endRow} ({totalRows})',
+				  	cssPageDisplay: '.pagedisplay',
+					cssPageSize: '.pagesize',
+					cssDisabled: 'disabled'
 				})
 				
 				// bind to pager events
 				.bind('pagerInitialized pagerComplete', function(event, options){
 					initializeJRating();
+					jQuery("time.timeago").timeago();
 				});
 			});
 		 });
@@ -391,7 +392,7 @@
 					</lams:Alert>
 				</c:if>
 
-				<table class="tablesorter" data-question-uid="${question.uid}">
+				<lams:TSTable numColumns="1" dataId='data-question-uid="${question.uid}"'> 
 					<thead>
 						<tr>
 							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
@@ -406,23 +407,7 @@
 					<tbody>
 
 					</tbody>
-				</table>
-
-				<!-- pager -->
-				<div class="pager">
-					<form>
-						<img class="tablesorter-first" /> <img class="tablesorter-prev" /> <span class="pagedisplay"></span>
-						<!-- this can be any element, including an input -->
-						<img class="tablesorter-next" /> <img class="tablesorter-last" /> <select class="pagesize">
-							<option selected="selected" value="10">10</option>
-							<option value="20">20</option>
-							<option value="30">30</option>
-							<option value="40">40</option>
-							<option value="50">50</option>
-							<option value="100">100</option>
-						</select>
-					</form>
-				</div>
+				</lams:TSTable>
 
 			</c:forEach>
 		</c:if>
