@@ -2,10 +2,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
-<!--
 	window.resizeTo(550,300)
 	window.opener.refresh();
--->
 </script>
 
 <lams:html>
@@ -16,27 +14,24 @@
 	
 	<body class="stripes">
 	
-		<div id="content" align="center">
-
-			<c:choose>
-				<c:when test="${success}">
-					<p class="info">
-						<fmt:message key="message.imageEdited" />
-					<p>
-				</c:when>
-				<c:otherwise>
-					<p class="warning">
-						<fmt:message key="error.retreiving.image" />
-					</p>
-				</c:otherwise>
-			</c:choose>
-			<div class="space-bottom-top">
-			<html:submit styleClass="button" onclick="javascript:window.close();">
-					<fmt:message key="button.close" />
+		<c:choose>
+			<c:when test="${success}">
+				<c:set var="title"><fmt:message key="message.imageEdited" /></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="title"><fmt:message key="error.retreiving.image" /></c:set>
+			</c:otherwise>
+		</c:choose>
+	
+		<lams:Page type="learner" title="${title}">
+			
+			<html:submit styleClass="btn btn-primary pull-right" onclick="javascript:window.close();">
+				<fmt:message key="button.close" />
 			</html:submit>
-			</div>
-		</div>
-		<div class="footer"></div>
+			
+			<div class="footer"></div>
+			
+		</lams:Page>
 	</body>
 </lams:html>
 
