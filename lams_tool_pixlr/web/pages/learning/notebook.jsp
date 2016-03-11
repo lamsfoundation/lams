@@ -9,65 +9,58 @@
 </c:set>
 
 <lams:html>
-
-	<lams:head>  
-	
+	<lams:head>
 		<title>
-			<fmt:message>pageTitle.monitoring.notebook</fmt:message>
+			<fmt:message key="pageTitle.monitoring.notebook"/>
 		</title>
+		<%@ include file="/common/learnerheader.jsp"%>
 		
-		<lams:css/>
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-		
-	</lams:head>
-	
-	<script type="text/javascript">
+		<script type="text/javascript">
 			function disableFinishButton() {
 				document.getElementById("finishButton").disabled = true;
 			}
-		         function submitForm(methodName){
-		                var f = document.getElementById('messageForm');
-		                f.submit();
-		        }
-	</script>
+			
+			function submitForm(methodName){
+				var f = document.getElementById('messageForm');
+				f.submit();
+			}
+
+			$(document).ready(function() {
+				document.getElementById("focused").focus();
+			});
+		</script>
+	</lams:head>
 	
 	<body class="stripes">
-	
-			<div id="content">
-			
-			<h1>
-				<c:out value="${pixlrDTO.title}" escapeXml="true"/>
-			</h1>
+		<lams:Page type="learner" title="${pixlrDTO.title}">
 		
 			<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 				<html:hidden property="mode" value="${mode}" />
 				
-				<p class="small-space-top">
+				<div class="panel">
 					<lams:out value="${pixlrDTO.reflectInstructions}" escapeHtml="true"/>
-				</p>
-		
-				<html:textarea cols="60" rows="8" property="entryText"
-					styleClass="text-area"></html:textarea>
-		
-				<div class="space-bottom-top align-right">
-					<html:hidden property="dispatch" value="submitReflection" />
-					<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-						<span class="nextActivity">
-							<c:choose>
-								<c:when test="${activityPosition.last}">
-									<fmt:message key="button.submit" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.finish" />
-								</c:otherwise>
-							</c:choose>
-						</span>
-					</html:link>
 				</div>
+		
+				<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"/>
+		
+				<html:hidden property="dispatch" value="submitReflection" />
+				<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right" styleId="finishButton" onclick="submitForm('finish')">
+					<span class="na">
+						<c:choose>
+							<c:when test="${activityPosition.last}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+					</span>
+				</html:link>
 			</html:form>
-				
-			</div>
+		
 			<div class="footer"></div>
+				
+		</lams:Page>
 	</body>
 </lams:html>
