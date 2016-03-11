@@ -85,7 +85,7 @@
 	<div class="right-buttons">
 		<html:button property="btnCombined"
 			onclick="javascript:submitMethod('submitAnswersContent');"
-			styleClass="btn btn-primary pull-right voffset5">
+			styleClass="btn btn-default pull-right voffset5">
 			<fmt:message key="button.submitAllContent" />
 		</html:button>
 	</div>

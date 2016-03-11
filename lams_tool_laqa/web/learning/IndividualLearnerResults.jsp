@@ -127,7 +127,7 @@
 
 			<div class="voffset10">
 				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
-					<html:button property="redoQuestions" styleClass="btn btn-primary pull-left"
+					<html:button property="redoQuestions" styleClass="btn btn-default pull-left"
 						onclick="submitMethod('redoQuestions');">
 						<fmt:message key="label.redo" />
 					</html:button>
@@ -135,7 +135,7 @@
 
 				<c:if test="${generalLearnerFlowDTO.showOtherAnswers == 'true'}">
 					<html:button property="viewAllResults" onclick="submitMethod('storeAllResults');"
-						styleClass="btn btn-primary pull-right">
+						styleClass="btn btn-default pull-right">
 						<fmt:message key="label.allResponses" />
 					</html:button>
 				</c:if>
