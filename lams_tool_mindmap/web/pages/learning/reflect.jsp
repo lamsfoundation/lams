@@ -8,21 +8,26 @@
  		var f = document.getElementById('messageForm');
 		f.submit();
  	}
+
+	$(document).ready(function() {
+		document.getElementById("focused").focus();
+	});
 </script>
 
-<div id="content">
-	<h1>
-		<c:out value="${reflectTitle}" escapeXml="true" />
-	</h1>
+<lams:Page type="learner" title="${reflectTitle}">
 	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
-		<p>
+		<html:hidden property="toolSessionID" />
+		<html:hidden property="mindmapContent" styleId="mindmapContent" />
+		<html:hidden property="mode" />
+		<html:hidden property="dispatch" value="finishActivity"/>
+	
+		<div class="panel">
 			<lams:out value="${reflectInstructions}" escapeHtml="true"/>
-		</p>
+		</div>
 		
 		<c:choose>
 			<c:when test="${contentEditable}">
-				<html:textarea cols="60" rows="8" property="entryText" value="${reflectEntry}" styleClass="text-area">
-				</html:textarea>
+				<html:textarea rows="5" property="entryText" value="${reflectEntry}" styleClass="form-control" styleId="focused"/>
 			</c:when>
 		
 			<c:otherwise>
@@ -32,25 +37,18 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<div align="right" class="space-bottom-top">
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="mindmapContent" styleId="mindmapContent" />
-			<html:hidden property="mode" />
-			<html:hidden property="dispatch" value="finishActivity"/>
-			<html:link  href="#" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-				<span class="nextActivity">
-					<c:choose>
-						<c:when test="${activityPosition.last}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-				</span>
-			</html:link>
-		</div>
+		<html:link  href="#nogo" styleClass="btn btn-primary voffset5 pull-right" styleId="finishButton" onclick="submitForm('finish')">
+			<span class="na">
+				<c:choose>
+					<c:when test="${activityPosition.last}">
+						<fmt:message key="button.submit" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="button.finish" />
+					</c:otherwise>
+				</c:choose>
+			</span>
+		</html:link>
 
 	</html:form>
-</div>
-
+</lams:Page>

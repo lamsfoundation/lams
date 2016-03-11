@@ -1,12 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 <script type="text/javascript" src="includes/javascript/jquery.timer.js"></script>
 <script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
 
 <script type="text/javascript">
-<!--
 	var mode = "${mode}";
 
 	function disableFinishButton() {
@@ -43,60 +41,57 @@
 				  pollServer: "${pollServerParam}", notifyServer: "${notifyServerParam}",
 				  dictionary: "${localizationPath}" }
 	
-	function setMindmapContent()
-	{
+	function setMindmapContent() {
 		var mindmapContent = document.getElementById("mindmapContent");
 		mindmapContent.value = document['flashContent'].getMindmap();
 	}
 	
-	function embedFlashObject(x, y)
-	{
+	function embedFlashObject(x, y)	{
 		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
 
 	$(window).resize(makeNice);
 	
 	embedFlashObject(540, 405);
--->
 </script>
 
-<div id="content">
-	<h1>
-		<c:out value="${mindmapDTO.title}" escapeXml="true"/>
-	</h1>
-
-	<p>
-		<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
-	</p>
-
-	<c:if test="${mindmapDTO.lockOnFinish and mode == 'learner'}">
-		<div class="info">
-			<c:choose>
-				<c:when test="${finishedActivity}">
-					<fmt:message key="message.activityLocked" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="message.warnLockOnFinish" />
-				</c:otherwise>
-			</c:choose>
-		</div>
-	</c:if>
+<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="submitForm">
+	<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<html:hidden property="userId" value="${userIdParam}" />
+	<html:hidden property="toolContentId" value="${toolContentIdParam}" />
+	<html:hidden property="toolSessionID" />
+	<html:hidden property="mindmapContent" styleId="mindmapContent" />
 	
-	 <c:if test="${not empty submissionDeadline && (mode == 'author' || mode == 'learner')}">
-		 <div class="info">
-		  	<fmt:message key="authoring.info.teacher.set.restriction" >
-		  		<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
-		  	</fmt:message>
-		 </div>
-	 </c:if>
-
-	&nbsp;
-
-	<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="submitForm">
-		<html:hidden property="userId" value="${userIdParam}" />
-		<html:hidden property="toolContentId" value="${toolContentIdParam}" />
-		<html:hidden property="toolSessionID" />
-		<html:hidden property="mindmapContent" styleId="mindmapContent" />
+	<lams:Page type="learner" title="${mindmapDTO.title}">
+	
+		<%--Advanced settings and notices-----------------------------------%>
+		
+		<div class="panel">
+			<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
+		</div>
+	
+		<c:if test="${mindmapDTO.lockOnFinish and mode == 'learner'}">
+			<lams:Alert type="danger" id="lock-on-finish" close="false">
+				<c:choose>
+					<c:when test="${finishedActivity}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+			</lams:Alert>
+		</c:if>
+		
+		 <c:if test="${not empty submissionDeadline && (mode == 'author' || mode == 'learner')}">
+			 <lams:Alert id="submission-deadline" close="true" type="info">
+			  	<fmt:message key="authoring.info.teacher.set.restriction" >
+			  		<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
+			  	</fmt:message>
+			 </lams:Alert>
+		 </c:if>
+	
+		&nbsp;
 		
 		<c:choose>
 			<c:when test="${reflectOnActivity}">
@@ -107,37 +102,33 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<%--MindMap Flash-----------------------------------%>
 
 		<center id="center12">
 			<div id="flashContent">
-				<fmt:message>message.enableJavaScript</fmt:message>
+				<fmt:message key="message.enableJavaScript"/>
 			</div>
 		</center>
 		
-		<c:choose>
-			<c:when test="${isMonitor}">
-				<div class="space-bottom-top align-right">
-					<html:button styleClass="button" property="backButton" onclick="history.go(-1)">
-						<fmt:message>button.back</fmt:message>
+		<div class="voffset10 pull-right">
+			<c:choose>
+				<c:when test="${isMonitor}">
+					<html:button styleClass="btn btn-primary" property="backButton" onclick="history.go(-1)">
+						<fmt:message key="button.back"/>
 					</html:button>
-				</div>
-			</c:when>
+				</c:when>
 			
-			<c:otherwise>
-				<c:choose>
-					<c:when test="${reflectOnActivity}">
-						<div class="space-bottom-top align-right">
-							<html:link href="javascript:submitForm();" styleClass="button" styleId="finishButton">
-								   <span class="nextActivity"><fmt:message>button.continue</fmt:message></span>
+				<c:otherwise>
+					<c:choose>
+						<c:when test="${reflectOnActivity}">
+							<html:link href="javascript:submitForm();" styleClass="btn btn-primary" styleId="finishButton">
+								   <span class="nextActivity"><fmt:message key="button.continue"/></span>
 							</html:link>
-						</div>
-					</c:when>
+						</c:when>
 		
-					<c:otherwise>
-						<div class="space-bottom-top align-right">
-							<html:link href="javascript:submitForm();" styleClass="button" styleId="finishButton">
-								<span class="nextActivity">
+						<c:otherwise>
+							<html:link href="javascript:submitForm();" styleClass="btn btn-primary" styleId="finishButton">
+								<span class="na">
 									<c:choose>
 					 					<c:when test="${activityPosition.last}">
 					 						<fmt:message key="button.submit" />
@@ -148,12 +139,11 @@
 					 				</c:choose>
 							 	</span>
 							</html:link>
-						</div>
-					</c:otherwise>
-				</c:choose>
-			</c:otherwise>
-			
-		</c:choose>
+						</c:otherwise>
+					</c:choose>
+				</c:otherwise>
+			</c:choose>
+		</div>
 
-	</html:form>
-</div>
+	</lams:Page>
+</html:form>
