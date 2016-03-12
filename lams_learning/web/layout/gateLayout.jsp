@@ -21,31 +21,34 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+
 <!DOCTYPE html>
 <lams:html xhtml="true">
 
-	<lams:head>
-		<title><c:out value="${GateForm.map.gate.title}"/></title>
-		<lams:css/>
-		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate&activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
-	  </lams:head>
-
-	<body class="stripes">
+<lams:head>
+	<title><c:out value="${GateForm.map.gate.title}" /></title>
+	<lams:css />
+	<META HTTP-EQUIV="Refresh"
+		CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate&activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 		
+		
+</lams:head>
 
-			<div id="content">
-
-				<h1><c:out value="${GateForm.map.gate.title}"/></h1>
-
-				<tiles:insert attribute="body" />
-				<%@ include file="../gate/gateNext.jsp" %>			  
-
-			</div>  <!--closes content-->
+<body class="stripes">
 
 
-			<div id="footer">
-			</div><!--closes footer-->
+	<lams:Page type="learner" title="${GateForm.map.gate.title}">
 
-	</body>
+		<tiles:insert attribute="body" />
+		<%@ include file="../gate/gateNext.jsp"%>
+
+
+	</lams:Page>
+</body>
 
 </lams:html>

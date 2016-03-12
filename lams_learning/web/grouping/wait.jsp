@@ -19,41 +19,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 
-	<c:set var="formAction">/grouping.do?method=performGrouping&activityID=${activity.activityId}</c:set>
-	<c:if test="${GroupingForm.map.previewLesson == true}">
-		<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
-	</c:if>
+<c:set var="formAction">/grouping.do?method=performGrouping&activityID=${activity.activityId}</c:set>
+<c:if test="${GroupingForm.map.previewLesson == true}">
+	<c:set var="formAction">
+		<c:out value="${formAction}" />&force=true</c:set>
+</c:if>
 
+<lams:Page type="learner" title="${GroupingForm.map.title}">
 	<html:form action="${formAction}" target="_self">
 
+		<lams:Alert id="waitingGroups" close="false" type="info">
+			<fmt:message key="label.view.view.groups.wait.message" />
+		</lams:Alert>
 
-		<div id="content">
-		
-			<h1><c:out value="${GroupingForm.map.title}"/></h1>
-			
-			<p>&nbsp;</p>
+		<c:if test="${GroupingForm.map.previewLesson == true}">
+			<c:set var="formAction">
+				<c:out value="${formAction}" />&force=true</c:set>
+			<div class="voffset10">
+				<em><fmt:message key="label.grouping.preview.message" /></em>
+			</div>
+		</c:if>
 
-			<p><fmt:message key="label.view.view.groups.wait.message"/></p>
-
-			<c:if test="${GroupingForm.map.previewLesson == true}">
-				<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
-				<p><em><fmt:message key="label.grouping.preview.message"/></em></p>
-			</c:if>
-
-			<table><tr><td><div class="right-buttons">
-					<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
-			</div></td></tr></table>
-
-		</div>  <!--closes content-->
-
-		<div id="footer">
-		</div><!--closes footer-->
+		<div class="right-buttons">
+			<html:submit styleClass="btn btn-primary pull-right">
+				<fmt:message key="label.next.button" />
+			</html:submit>
+		</div>
 
 	</html:form>
+</lams:Page>

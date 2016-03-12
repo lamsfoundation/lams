@@ -32,6 +32,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <tiles:useAttribute name="includeBodyTag" ignore="true" />
 
 
+	
+
 <lams:head>
 	<title><fmt:message key="${pageTitleKey}" />
 	</title>
@@ -42,6 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:set>
 	<script src="${lams}includes/javascript/AC_RunActiveContent.js"
 		type="text/javascript"></script>
+		
 	<script type="text/javascript"
 		src="${lams}includes/javascript/common.js"></script>
 </lams:head>
