@@ -19,18 +19,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 
-<lams:out value="${GateForm.map.gate.description}" escapeHtml="true"/>
+<div class="panel">
+	<lams:out value="${GateForm.map.gate.description}" escapeHtml="true" />
+</div>
 
-<p><fmt:message key="label.synch.gate.message"/></p> 
-<p><fmt:message key="label.gate.waiting.learners">  
-		<fmt:param value="${GateForm.map.waitingLearners}"/>
-		<fmt:param value="${GateForm.map.totalLearners}"/>
-	</fmt:message></p>
+<lams:Alert type="info" close="false" id="waitingAtTheGate">
+	<fmt:message key="label.gate.waiting.learners">
+		<fmt:param value="${GateForm.map.waitingLearners}" />
+		<fmt:param value="${GateForm.map.totalLearners}" />
+	</fmt:message>
+</lams:Alert>
+
+
+<div class="voffset5">
+	<fmt:message key="label.synch.gate.message" />
+</div>
 

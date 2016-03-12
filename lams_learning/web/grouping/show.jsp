@@ -19,71 +19,97 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<style type="text/css">
+.user-container {
+	padding: 2px;
+}
 
-	<html:form action="/grouping.do?method=completeActivity&userId=${user.userID}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self" styleId="messageForm">
+.you {
+	font-weight: bolder;
+}
+</style>
+<lams:Page type="learner" title="${title}">
 
-	<div id="content">
+	<html:form
+		action="/grouping.do?method=completeActivity&userId=${user.userID}&lessonId=${lesson.lessonId}&activityID=${activityID}"
+		target="_self" styleId="messageForm">
 
-		<h1><c:out value="${title}"/></h1>
+		<c:set var="userId" value="${user.userID}" />
 
-		<table class="alternative-color" cellspacing="0">
-			<tr>
-				<th width="25%" class="first">
-					<fmt:message key="label.view.groups.title"/>
-				</th>
-				<th>
-					<fmt:message key="label.view.groups.learners"/>
-				</th>
-			</tr>
-			<logic:iterate id="group" name="groups"> 
-			<tr>
-				<td width="25%" class="first">
-					<c:out value="${group.groupName}"/>
-				</td>
-				<td>
-					<c:forEach items="${group.users}" var="user">
-						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><BR>
-					</c:forEach>
-					&nbsp;
-				</td>
-			</tr>
-			</logic:iterate>
-		</table>
+		<div class="panel panel-default">
+			<div class="panel-heading panel-title">
+				<i class="fa fa-sm fa-users text-primary"></i>&nbsp;
+				<fmt:message key="label.view.groups.title" />
+			</div>
+			<div class="panel-body">
 
-	<c:if test="${finishedButton}">
-	      <script type="text/javascript">
-	        function submitForm(methodName){
-                	 var f = document.getElementById('messageForm');
-                	 f.submit();
-		}
-	      </script>
+				<div class="table-responsive">
+					<table class="table table-condensed table-hover" cellspacing="0">
+						<logic:iterate id="group" name="groups">
+							<tr>
+								<td width="15%"><strong><c:out value="${group.groupName}" /></strong></td>
+								<td><c:forEach items="${group.users}" var="user">
+										<div name="u-${user.userId}" class="user-container">
+											<i name="ui-${user.userId}" class="fa fa-xs fa-user"></i>&nbsp;<c:out value="${user.firstName}" />&nbsp<c:out value="${user.lastName}" />
+										</div>
+									</c:forEach></td>
+							</tr>
+						</logic:iterate>
+					</table>
+				</div>
 
-			<table><tr><td><div id="right" class="right-buttons">
-					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					  <span class="nextActivity">
-	                    <c:choose>
-		 					<c:when test="${activityPosition.last}">
-		 						<fmt:message key="label.submit.button" />
-		 					</c:when>
-		 					<c:otherwise>
-		 		 				<fmt:message key="label.finish.button" />
-		 					</c:otherwise>
-		 				</c:choose>
-		 			 </span>
-					 </html:link>
-			</div></td></tr></table>
-	</c:if>
+			</div>
+		</div>
 
-	</div>  <!--closes content-->
+		<c:if test="${finishedButton}">
+			<script type="text/javascript">
+				function submitForm(methodName) {
+					var f = document.getElementById('messageForm');
+					f.submit();
+				}
+			</script>
 
-	<div id="footer">
-	</div><!--closes footer-->
+			<div class="row no-gutter">
+				<div class="col-xs-12">
+					<div id="right-buttons" class="pull-right voffset10">
+						<html:link href="javascript:;" styleClass="btn btn btn-primary na" styleId="finishButton"
+							onclick="submitForm('finish')">
+							<span class="nextActivity"> <c:choose>
+									<c:when test="${activityPosition.last}">
+										<fmt:message key="label.submit.button" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="label.finish.button" />
+									</c:otherwise>
+								</c:choose>
+							</span>
+						</html:link>
+					</div>
+
+				</div>
+			</div>
+		</c:if>
+
+
+		<div id="footer"></div>
+		<!--closes footer-->
+		<script type="text/javascript">
+			function codeAddress() {
+				var youUser = document.getElementsByName('u-${userId}');
+				if (youUser) {
+					youUser[0].className += ' alert-success you';
+					document.getElementsByName('ui-${userId}')[0].className = 'fa fa-sm fa-star';
+				}
+			}
+			window.onload = codeAddress;
+		</script>
+
 
 	</html:form>
-
-</div>
+</lams:Page>

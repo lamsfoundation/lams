@@ -1,4 +1,5 @@
-	<%-- 
+
+<%-- 
 	Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 	License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
@@ -19,9 +20,11 @@
 	  http://www.gnu.org/licenses/gpl.txt
 	--%>
 
-	<%@ taglib uri="tags-fmt" prefix="fmt" %>
-	<%@ taglib uri="tags-lams" prefix="lams" %>
-	
-	<lams:out value="${GateForm.map.gate.description}" escapeHtml="true"/>
-	
-	<p><fmt:message key="label.condition.gate.close.message"/></p>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<div class="panel">
+	<lams:out value="${GateForm.map.gate.description}" escapeHtml="true" />
+</div>
+<div class="voffset">
+	<fmt:message key="label.condition.gate.close.message" />
+</div>
