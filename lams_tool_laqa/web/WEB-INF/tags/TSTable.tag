@@ -29,12 +29,12 @@
 	<tfoot>
 		<tr>
 	    	<th colspan="${numColumns}" class="${pagerClass} form-horizontal">
-	        <button type="button" class="btn first"><i class="fa fa-step-backward"></i></button>
-	        <button type="button" class="btn prev"><i class="fa fa-backward"></i></button>
+	        <button type="button" class="btn btn-xs first"><i class="fa fa-step-backward"></i></button>
+	        <button type="button" class="btn btn-xs prev"><i class="fa fa-backward"></i></button>
 	        <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-	        <button type="button" class="btn next"><i class="fa fa-forward"></i></button>
-	        <button type="button" class="btn last"><i class="fa fa-step-forward"></i></button>
-	        <select class="pagesize input-mini" title="Select page size">
+	        <button type="button" class="btn btn-xs next"><i class="fa fa-forward"></i></button>
+	        <button type="button" class="btn btn-xs last"><i class="fa fa-step-forward"></i></button>
+	        <select class="pagesize" title="Select page size">
 	      		<c:if test="${not empty test}"><option value="2">2</option></c:if>
 	      		<option selected="selected" value="10">10</option>
 	      		<option value="20">20</option>
