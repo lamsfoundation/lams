@@ -140,14 +140,23 @@
 
 /* pager plugin */
 .tablesorter-bootstrap .tablesorter-pager select {
-  padding: 4px 6px;
+/*  padding: 4px 6px; Original Entry */
+/* LAMS Modified Entries:  */
+	padding: 1px 6px;
+	font-size: 11px;
 }
 .tablesorter-bootstrap .tablesorter-pager .pagedisplay {
 	border: 0;
+/* LAMS Added Entry :  */
+	font-size: 11px;
 }
 /* tfoot i for pager controls */
 .tablesorter-bootstrap tfoot i {
 	font-size: 11px;
+}
+/* LAMS Added Entry: center the pager controls */
+.tablesorter-bootstrap tfoot th{
+	text-align:center;
 }
 
 /* ajax error row */
