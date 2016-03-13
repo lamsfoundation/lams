@@ -20,78 +20,75 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+
+<c:set var="title">
+	<fmt:message key="mynotes.journals.title" />
+</c:set>
 
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
-	<div id="content">
-		<h1><fmt:message key="mynotes.journals.title"/></h1>
-	
-		<h2><fmt:message key="mynotes.view.all.button"/></h2>
-		<p>&nbsp;</p>
-		<table class="alternative-color" cellspacing="0">
-					
-			<c:forEach var="entry" items="${journals}" varStatus="status">
-				
-				<!-- set user check flag -->
-				<c:if test="${status.first}">
-					<c:set var="userToCheck" value="${entry.user.userId}"/>
-					<h2><c:out value="${entry.user.fullName}" escapeXml="false"/></h2>
-						<tr>
-							<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label"/></th>
-							<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label"/></th>
-							<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.last.modified.label"/></th>
-						</tr>
-				</c:if>
-				
-				<c:if test="${!empty userToCheck && userToCheck != entry.user.userId}">
-					<!-- do segment separator -->
-					</table>
-					
-					<c:set var="userToCheck" value="${entry.user.userId}"/>
-					<h2><c:out value="${entry.user.fullName}" escapeXml="false"/></h2>
-					<table class="alternative-color" cellspacing="0">
-						<tr>
-							<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label"/></th>
-							<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label"/></th>
-							<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.last.modified.label"/></th>
-						</tr>
-				</c:if>
-				
+<lams:Page type="learner" title="${title}">
+
+	<h2>
+		<fmt:message key="mynotes.view.all.button" />
+	</h2>
+
+	<table class="alternative-color" cellspacing="0">
+
+		<c:forEach var="entry" items="${journals}" varStatus="status">
+
+			<!-- set user check flag -->
+			<c:if test="${status.first}">
+				<c:set var="userToCheck" value="${entry.user.userId}" />
+				<h2>
+					<c:out value="${entry.user.fullName}" escapeXml="false" />
+				</h2>
 				<tr>
-					<td class="align-left" width="28%">
-						<c:set var="viewnote">
-							<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=" /><c:out value="${entry.uid}"/>
-						</c:set> 
-						<html:link href="${viewnote}">
-							<c:choose>
-								<c:when test="${empty entry.title}">
-									<fmt:message key="mynotes.entry.no.title.label"/>
-								</c:when>
-								<c:otherwise>
-									<c:out value="${entry.title}" escapeXml="false"/>
-								</c:otherwise>
-							</c:choose>
-						</html:link>
-					</td><td>&nbsp;</td>
-					<td><lams:Date value="${entry.createDate}"/></td>
-					<td><lams:Date value="${entry.lastModified}"/></td>
+					<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label" /></th>
+					<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label" /></th>
+					<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.last.modified.label" /></th>
 				</tr>
-			</c:forEach>
-		
-		</table>
-		<table>
-			<tr>
-				<td>
-				<div class="right-buttons">
-					<a href="#" class="button" id="addNewBtn" onClick="window.close();"><fmt:message key="label.close.button"/></a>
-				</div>
-				</td>
-			</tr>
-		</table>
-	</div>  <!--closes content-->
+			</c:if>
 
+			<c:if test="${!empty userToCheck && userToCheck != entry.user.userId}">
+				<!-- do segment separator -->
+	</table>
 
-	<div id="footer">
-	</div><!--closes footer-->
+	<c:set var="userToCheck" value="${entry.user.userId}" />
+	<h2>
+		<c:out value="${entry.user.fullName}" escapeXml="false" />
+	</h2>
+	<table class="alternative-color" cellspacing="0">
+		<tr>
+			<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label" /></th>
+			<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.create.date.label" /></th>
+			<th scope="col" width="25%" align="center"><fmt:message key="mynotes.entry.last.modified.label" /></th>
+		</tr>
+		</c:if>
 
+		<tr>
+			<td class="align-left" width="28%"><c:set var="viewnote">
+					<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=" />
+					<c:out value="${entry.uid}" />
+				</c:set> <html:link href="${viewnote}">
+					<c:choose>
+						<c:when test="${empty entry.title}">
+							<fmt:message key="mynotes.entry.no.title.label" />
+						</c:when>
+						<c:otherwise>
+							<c:out value="${entry.title}" escapeXml="false" />
+						</c:otherwise>
+					</c:choose>
+				</html:link></td>
+			<td>&nbsp;</td>
+			<td><lams:Date value="${entry.createDate}" /></td>
+			<td><lams:Date value="${entry.lastModified}" /></td>
+		</tr>
+		</c:forEach>
+
+	</table>
+	<div class="voffset10 pull-right">
+		<a href="#" class="btn btn-default" id="addNewBtn" onClick="window.close();"><fmt:message key="label.close.button" /></a>
+	</div>
+</lams:Page>
