@@ -23,6 +23,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>	
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
 <c:set var="addnote">
 	<html:rewrite page="/notebook/add.do?lessonID=" />
@@ -120,8 +126,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</c:choose>
 									</html:link></td>
 								<td>&nbsp;</td>
-								<td><lams:Date value="${entry.createDate}" /></td>
-								<td><lams:Date value="${entry.lastModified}" /></td>
+								<td><c:set var="createDateTimeago">
+										<fmt:formatDate value='${entry.createDate}' pattern="yyyy-MM-dd'T'HH:mm:ss.S" />
+									</c:set>
+									<time class="timeago" datetime="${createDateTimeago}" title="<lams:Date value='${entry.createDate}'/>"></time></td>
+								<td>
+									 <c:set var="lastModifiedTimeago">
+										<fmt:formatDate value='${entry.lastModified}' pattern="yyyy-MM-dd'T'HH:mm:ss.S" />
+									</c:set>
+									<time class="timeago" datetime="${lastModifiedTimeago}" title="<lams:Date value='${entry.lastModified}'/>"></time></td>
 							</tr>
 							</c:forEach>
 
@@ -136,3 +149,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 		</c:forEach>
 </lams:Page>
+
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery("time.timeago").timeago();
+	});
+</script>
