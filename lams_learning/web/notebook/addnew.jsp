@@ -18,62 +18,59 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants" %>
+<%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants"%>
 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 <script type="text/javascript">
 	function doSubmit(signature) {
 		document.getElementById("notebookForm").signature.value = signature;
 		document.getElementById("notebookForm").submit();
 	}
-
 </script>
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
-	
-	<div id="content">
-		<html:form action="/notebook.do?method=processNewEntry" styleId="notebookForm" method="post">
-			
-			<html:hidden property="signature"/>
-			<html:hidden property="lessonID" value="${param.lessonID}"/>
-			<h1><fmt:message key="mynotes.title"/></h1>
-			
-			<h2><fmt:message key="mynotes.add.new.button"/></h2>
-			<table>
-				<tr>
-					<td colspan="2">
-						<div class="field-name" style="text-align: left;">
-							<fmt:message key="mynotes.entry.title.label"></fmt:message>
-						</div>
-						<html:text property="title" style="width: 100%;"></html:text>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<div class="field-name" style="text-align: left;">
-							<fmt:message key="mynotes.entry.entry.label"></fmt:message>
-						</div>
-						<html:textarea property="entry" styleId="entry" style="width: 100%" rows="10" />
-					</td>
-				</tr>
-			</table>
-			<table>
-				<tr>
-					<td>	
-						<div class="right-buttons">
-							<a href="#" class="button" id="saveInNotebookBtn" onClick="doSubmit('<%= CoreNotebookConstants.SCRATCH_PAD_SIG %>')"><fmt:message key="mynotes.notebook.save.button"/></a>
-							<a href="#" class="button" id="saveInJournalBtn" onClick="doSubmit('<%= CoreNotebookConstants.JOURNAL_SIG %>')"><fmt:message key="mynotes.journal.save.button"/></a>
-							<a href="javascript: history.back();" class="button" id="cancelBtn"><fmt:message key="label.cancel.button"/></a>
-						</div>
-					</td>
-				</tr>
-			</table>
-		</html:form>
-	</div>  <!--closes content-->
+
+<c:set var="title">
+	<fmt:message key="mynotes.title" />
+</c:set>
+
+<c:set var="scratchPadSig">
+	<%=CoreNotebookConstants.SCRATCH_PAD_SIG%>
+</c:set>
+<c:set var="scratchJournalSig">
+	<%=CoreNotebookConstants.JOURNAL_SIG%>
+</c:set>
 
 
-	<div id="footer">
-	</div><!--closes footer-->
+<lams:Page type="learner" title="${title}">
+	<html:form action="/notebook.do?method=processNewEntry" styleId="notebookForm" method="post">
 
+		<html:hidden property="signature" />
+		<html:hidden property="lessonID" value="${param.lessonID}" />
+
+		<div class="lead">
+			<fmt:message key="mynotes.add.new.button" />
+		</div>
+
+					<div class="form-group">
+						<label for="title"><fmt:message key="mynotes.entry.title.label"></fmt:message></label>
+						<html:text property="title" styleId="title" styleClass="form-control"></html:text>
+					</div> 
+					<div class="form-group">
+						<label for="entry"><fmt:message key="mynotes.entry.entry.label"></fmt:message></label>
+						<html:textarea property="entry" styleId="entry" styleClass="form-control" rows="8" />
+					</div> 
+					<div class="voffset10 pull-right">
+						<a href="#" class="btn btn-default" id="saveInNotebookBtn"
+							onClick="doSubmit('${scratchPadSig}')"><fmt:message
+								key="mynotes.notebook.save.button" /></a> <a href="#" class="btn btn-default" id="saveInJournalBtn"
+							onClick="doSubmit('${scratchJournalSig}')"><fmt:message key="mynotes.journal.save.button" /></a>
+						<a href="javascript: history.back();" class="btn btn-default" id="cancelBtn"><fmt:message key="label.cancel.button" /></a>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</html:form>
+</lams:Page>

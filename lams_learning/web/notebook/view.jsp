@@ -18,126 +18,138 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants" %>
+<%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants"%>
 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 <c:if test="${param.mode == 'edit'}">
-<script type="text/javascript">
-	function doSubmit(signature) {
-		document.getElementById("notebookForm").signature.value = signature;
-		document.getElementById("notebookForm").submit();
-	}
-
-</script>
+	<script type="text/javascript">
+		function doSubmit(signature) {
+			document.getElementById("notebookForm").signature.value = signature;
+			document.getElementById("notebookForm").submit();
+		}
+	</script>
 </c:if>
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
-	
-	
-			
-	<div id="content">
-		<html:form action="/notebook.do?method=updateEntry" styleId="notebookForm" method="post">
-			<html:hidden property="uid" value="${entry.uid}"/>
-			<html:hidden property="signature"/>
-			<html:hidden property="lessonID" value="${entry.externalID}"/>
-	
-		<h1><c:choose><c:when test="${mode == 'teacher'}"><fmt:message key="mynotes.journals.title"/></c:when><c:otherwise><fmt:message key="mynotes.title"/></c:otherwise></c:choose></h1>
-		
+
+<c:set var="scratchPadSig">
+	<%=CoreNotebookConstants.SCRATCH_PAD_SIG%>
+</c:set>
+<c:set var="scratchJournalSig">
+	<%=CoreNotebookConstants.JOURNAL_SIG%>
+</c:set>
+
+<c:set var="title">
+	<c:choose>
+		<c:when test="${mode == 'teacher'}">
+			<fmt:message key="mynotes.journals.title" />
+		</c:when>
+		<c:otherwise>
+			<fmt:message key="mynotes.title" />
+		</c:otherwise>
+	</c:choose>
+</c:set>
+
+<lams:Page type="learner" title="${title}">
+
+	<html:form action="/notebook.do?method=updateEntry" styleId="notebookForm" method="post">
+		<html:hidden property="uid" value="${entry.uid}" />
+		<html:hidden property="signature" />
+		<html:hidden property="lessonID" value="${entry.externalID}" />
+
+
 		<!-- set title -->
 		<c:set var="title">
 			<c:choose>
 				<c:when test="${empty entry.title}">
-					<fmt:message key="mynotes.entry.no.title.label"/>
+					<fmt:message key="mynotes.entry.no.title.label" />
 				</c:when>
 				<c:otherwise>
-					<c:out value="${entry.title}" escapeXml="false"/>
+					<c:out value="${entry.title}" escapeXml="false" />
 				</c:otherwise>
 			</c:choose>
 		</c:set>
-		
+
 		<!-- title -->
-		<h2><c:choose>
-				<c:when test="${param.mode == 'edit'}">
-					<fmt:message key="mynotes.edit.heading">
-						<fmt:param>
-							<c:out value="${title}" escapeXml="false"/>
-						</fmt:param>
-					</fmt:message>
-				</c:when>
-				<c:otherwise>
-					<c:out value="${title}" escapeXml="false"/>
-				</c:otherwise>
-			</c:choose>
-		</h2>
-		
-		<table>
-		<c:choose>
-				<c:when test="${param.mode == 'edit'}">
-							<tr>
-								<td colspan="2">
-									<div class="field-name" style="text-align: left;">
-										<fmt:message key="mynotes.entry.title.label"></fmt:message>
-									</div>
-									<html:text property="title" style="width: 100%;" value="${entry.title}"></html:text>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="field-name" style="text-align: left;">
-										<fmt:message key="mynotes.entry.entry.label"></fmt:message>
-									</div>
-									<html:textarea property="entry" styleId="entry" style="width: 100%" rows="10" value="${entry.entry}" />
-								</td>
-							</tr>
-				</c:when>
-				<c:otherwise>
-					<tr>
-						<td>
-							<c:set var="entryTxt"><c:out value="${entry.entry}" escapeXml="false"/></c:set>
-							<p><lams:out value="${entryTxt}" /></p>
-						</td>
-					</tr>
-					<c:if test="${mode == 'teacher'}">
-						<tr>
-							<td>
-								<p><i><fmt:message key="mynotes.entry.submitted.by">
-									<fmt:param>
-										<c:out value="${entry.user.fullName}" escapeXml="false"/>
-									</fmt:param>
-								</fmt:message></i></p>
-							</td>
-						</tr>
-					</c:if>	
-				</c:otherwise>
-			</c:choose>
-			<tr>
-				<td>
-				<div class="right-buttons">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
 					<c:choose>
 						<c:when test="${param.mode == 'edit'}">
-							<a href="#" class="button" id="saveInNotebookBtn" onClick="doSubmit('<%= CoreNotebookConstants.SCRATCH_PAD_SIG %>')"><fmt:message key="mynotes.notebook.save.button"/></a>
-							<a href="#" class="button" id="saveInJournalBtn" onClick="doSubmit('<%= CoreNotebookConstants.JOURNAL_SIG %>')"><fmt:message key="mynotes.journal.save.button"/></a>
-							<a href="javascript: history.back();" class="button" id="cancelBtn"><fmt:message key="label.cancel.button"/></a>
+							<fmt:message key="mynotes.edit.heading">
+								<fmt:param>
+									<c:out value="${title}" escapeXml="false" />
+								</fmt:param>
+							</fmt:message>
+						</c:when>
+						<c:otherwise>
+							<c:out value="${title}" escapeXml="false" />
+						</c:otherwise>
+					</c:choose>
+				</h4>
+
+			</div>
+			<div class="panel-body">
+				<c:choose>
+					<c:when test="${param.mode == 'edit'}">
+						<div class="form-group" style="text-align: left;">
+							<label for="${entry.title}"><fmt:message key="mynotes.entry.title.label"></fmt:message></label>
+							<html:text property="title" styleClass="form-control" styleId="${entry.title}" value="${entry.title}"></html:text>
+						</div>
+						<div class="form-group" style="text-align: left;">
+							<label><fmt:message key="mynotes.entry.entry.label"></fmt:message></label>
+							<html:textarea property="entry" styleClass="form-control" styleId="entry" style="width: 100%" rows="10"
+								value="${entry.entry}" />
+						</div>
+						</td>
+						</tr>
+					</c:when>
+					<c:otherwise>
+						<c:set var="entryTxt">
+							<c:out value="${entry.entry}" escapeXml="false" />
+						</c:set>
+						<div class="panel">
+							<lams:out value="${entryTxt}" />
+						</div>
+						<c:if test="${mode == 'teacher'}">
+										<i><fmt:message key="mynotes.entry.submitted.by">
+												<fmt:param>
+													<c:out value="${entry.user.fullName}" escapeXml="false" />
+												</fmt:param>
+											</fmt:message></i>
+						</c:if>
+					</c:otherwise>
+				</c:choose>
+
+				<div class="voffset10">
+					<c:choose>
+						<c:when test="${param.mode == 'edit'}">
+							<a href="#" class="btn btn-default" id="saveInNotebookBtn" onClick="doSubmit('${scratchPadSig}')"><fmt:message
+									key="mynotes.notebook.save.button" /></a>
+							<a href="#" class="btn btn-default" id="saveInJournalBtn" onClick="doSubmit('${scratchJournalSig}')"><fmt:message
+									key="mynotes.journal.save.button" /></a>
+							<a href="javascript: history.back();" class="btn btn-default" id="cancelBtn"><fmt:message key="label.cancel.button" /></a>
 						</c:when>
 						<c:otherwise>
 							<c:set var="editnote">
-								<html:rewrite page="/notebook.do?method=viewEntry&mode=edit&uid=" /><c:out value="${entry.uid}"/>
+								<html:rewrite page="/notebook.do?method=viewEntry&mode=edit&uid=" />
+								<c:out value="${entry.uid}" />
 							</c:set>
-							<c:set var="journalSig"><%= CoreNotebookConstants.JOURNAL_SIG %></c:set>
-							<c:if test="${entry.externalSignature != journalSig}"><a href="${editnote}" class="button" id="saveBtn"><fmt:message key="label.edit.button"/></a></c:if>
-							<a href="javascript: history.back();" class="button" id="viewAllBtn"><fmt:message key="mynotes.view.all.button"/></a>
+							<c:if test="${entry.externalSignature != scratchJournalSig}">
+								<a href="${editnote}" class="btn btn-default" id="saveBtn"><fmt:message key="label.edit.button" /></a>
+							</c:if>
+							<a href="javascript: history.back();" class="btn btn-default" id="viewAllBtn"><fmt:message
+									key="mynotes.view.all.button" /></a>
 						</c:otherwise>
 					</c:choose>
 				</div>
-				</td>
-			</tr>
-		</table>
-		</html:form>
-	</div>  <!--closes content-->
+
+			</div>
+		</div>
 
 
-	<div id="footer">
-	</div><!--closes footer-->
 
+	</html:form>
+</lams:Page>
