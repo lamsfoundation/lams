@@ -29,56 +29,52 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
 
-<div id="content">
-	<c:set var="displayName">
-		<lams:user property="firstName"/> <lams:user property="lastName"/>
+<lams:Page type="admin">
+	<c:set var="lastName">
+		<lams:user property="lastName"/> 
+	</c:set>
+	<c:set var="firstName">
+	 <lams:user property="firstName"/>
 	</c:set>
 	
-	
-	<h2>
+	<div class="lead"><i class="fa fa-lg fa-check-square-o text-success"></i>&nbsp;
 		<fmt:message key="message.lesson.finished">
 			<fmt:param>
-				<c:out value="${displayName}" escapeXml="true"/>
+				<strong><c:out value="${firstName}" escapeXml="true"/>&nbsp;<c:out value="${lastName}" escapeXml="true"/></strong>
 			</fmt:param>
 		</fmt:message>
-	</h2>
+	</div>
 	
-	<p>
+	<div class="voffset10">
 		<fmt:message key="message.lesson.finishedCont">
 			<fmt:param>
-				<b><c:out value="${learnerprogress.lesson.lessonName}" escapeXml="true"/></b>
+				<strong><c:out value="${learnerprogress.lesson.lessonName}" escapeXml="true"/></strong>
 			</fmt:param>
 			<fmt:param>
 				 <lams:Date value="${learnerprogress.finishDate}" style="short"/>
 			</fmt:param>			
 		</fmt:message>
-	</p>
+	</div>
 	
 	<c:if test="${not empty releasedLessons}">
-		<p>
+		<div class="voffset10">
 			<fmt:message key="message.released.lessons">
 				<fmt:param>
 					<c:out value="${releasedLessons}" escapeXml="true"/> 
 				</fmt:param>		
 			</fmt:message>
-		</p>
+		</div>
 	</c:if>
 	
 	<c:if test="${displayPrintButton}">
-		<p class="align-right space-top">
-			<a href="#" class="button" onclick="JavaScript:window.print();">
+		<div class="pull-right voffset10">
+			<a href="#" class="btn btn-default" onclick="JavaScript:window.print();">
 				<fmt:message key="label.print" />
 			</a>	
-		</p>
+		</div>
 	</c:if>
 	
-</div>
-<!--closes content-->
-
-
-<div id="footer">
-</div>
-<!--closes footer-->
+</lams:Page>
 
 <c:if test="${not empty lessonFinishUrl}">
 	<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />

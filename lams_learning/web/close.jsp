@@ -43,15 +43,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     window.onload = doCloseRedirect;
 </script>
 
-<div id="content">
+<lams:Page type="admin">
 
-	<p><fmt:message key="message.window.closing"/></p>
+	<div class="voffset10"><fmt:message key="message.window.closing"/></div>
 
-</div>  <!--closes content-->
-
-
-<div id="footer">
-</div><!--closes footer-->
+</lams:Page>
 
 <c:if test="${not empty lessonFinishUrl}">
 	<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />

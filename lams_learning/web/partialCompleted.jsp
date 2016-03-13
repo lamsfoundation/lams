@@ -19,21 +19,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
 
 
-	<div id="content">
+<lams:Page type="admin">
 
-		<p><fmt:message key="message.activity.parallel.partialComplete" /></p>
+	<p>
+		<fmt:message key="message.activity.parallel.partialComplete" />
+	</p>
 
-	</div>  <!--closes content-->
-
-
-	<div id="footer">
-	</div><!--closes footer-->
+</lams:Page>
 
 

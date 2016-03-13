@@ -19,24 +19,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%> 
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-core" prefix="c"%>
 
-	<div id="content">
+<c:if test="${empty lessonID}">
+	<bean:parameter id="lessonID" name="lessonID" />
+</c:if>
 
-		<p><fmt:message key="message.activity.loading"/></p>
-		
-	</div>  <!--closes content-->
-	
-	<c:if test="${empty lessonID}">
-			<bean:parameter id="lessonID" name="lessonID" />
-	</c:if>
-		
-	<script language="JavaScript" type="text/JavaScript">
-	<!--
-		parent.frames['contentFrame'].location.href = "learner.do?method=joinLesson&lessonID=<c:out value='${lessonID}' escapeXml='false' />";
-	//-->
-	</script>
+<script language="JavaScript" type="text/JavaScript">
+<!--
+	parent.frames['contentFrame'].location.href = "learner.do?method=joinLesson&lessonID=<c:out value='${lessonID}' escapeXml='false' />";
+//-->
+</script>
 
 
