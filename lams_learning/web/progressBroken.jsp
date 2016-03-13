@@ -21,13 +21,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<div id="content">
+	<lams:Page type="admin">
 		<p><fmt:message key="message.progress.broken"/></p>
 		<p><fmt:message key="message.progress.broken.try.resume"/></p>
-	</div>  <!--closes content-->
-
-
-	<div id="footer">
-	</div><!--closes footer-->
-
+	</lams:Page>
 
