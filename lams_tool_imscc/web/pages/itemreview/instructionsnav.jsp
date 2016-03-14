@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-        
+<!DOCTYPE html>      
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="sessionMapID" value="${param.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-		<c:if test="${not empty param.mode}">
-			<c:set var="mode" value="${param.mode}" />
-		</c:if>
+<c:if test="${not empty param.mode}">
+	<c:set var="mode" value="${param.mode}" />
+</c:if>
 <%-- runAuto and reflectOn does not set when  authoring preview mode then set false as default value --%>
 <c:choose>
 	<c:when test="${empty sessionMap.runAuto}">
@@ -31,19 +30,18 @@
 
 		<%@ include file="/common/header.jsp"%>
 		
-		<script language="JavaScript" type="text/JavaScript">
-		<!--
-				jQuery.noConflict();
+		<script type="text/JavaScript">
+			jQuery.noConflict();
 		
-		  		jQuery(document).ready(function() {
+		  	jQuery(document).ready(function() {
 
-					jQuery("input#FinishInstruction").bind('click', function() {
-			   			finishIns();
-			  		});	
+				jQuery("input#FinishInstruction").bind('click', function() {
+					finishIns();
+				});	
 
-		  		});
+		  	});
 		
-				function finishIns(){
+			function finishIns(){
 					//learner and author(preview mode) will mark the finish
 					if(${mode == "learner"} || ${mode == "author"}){
 					   var reqIDVar = new Date();
@@ -85,30 +83,29 @@
 					} else {
 						window.parent.close();
 					}
-				}
+			}
 				
-				function continueReflect(){
-					 window.parent.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-				}
-		//-->
+			function continueReflect(){
+				 window.parent.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+			}
 		</script>
 	</lams:head>
 	<body>
 
-		<div id="instructions">
-		
-			<span class="right-buttons">
-			<c:choose>
-				<c:when test="${reflectOn && runAuto}">
-					<input type="button" id="FinishInstruction" name="FinishInstruction"
-						onClick="javascript:continueReflect()" class="button" value="<fmt:message key='label.continue' />" />
-				</c:when>
-				<c:otherwise>
-					<input type="button" id="FinishInstruction" name="FinishInstruction" class="button" value="<fmt:message key='label.finish' />" />
-				</c:otherwise>
-			</c:choose>
-			</span>
-
+		<div id="instructions" class="panel panel-default">	
+			<div class="panel-heading panel-title ">
+				<div class="row ">
+					<c:choose>
+						<c:when test="${reflectOn && runAuto}">
+							<input type="button" id="FinishInstruction" name="FinishInstruction"
+								onClick="javascript:continueReflect()" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.continue' />" />
+						</c:when>
+						<c:otherwise>
+							<input type="button" id="FinishInstruction" name="FinishInstruction" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.finish' />" />
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</div>
 		</div>
 	</body>
 </lams:html>

@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-        
-
 <%@ include file="/common/taglibs.jsp"%>
+
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
+	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -18,132 +17,132 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
 	<script type="text/javascript">
-	<!--
-	function checkNew(checkFinishedLock){
+		function checkNew(checkFinishedLock) {
 		    var reqIDVar = new Date();
-			
-		document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();				
-			
+			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
 		    return false;
-	}
+		}
 
-		function viewItem(itemUid){
+		function viewItem(itemUid) {
 			var myUrl = "<c:url value="/reviewItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=" + itemUid;
 			launchPopup(myUrl,"LearnerView");
 		}
-		function finishSession(){
+		
+		function finishSession() {
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
-		function continueReflect(){
+		
+		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-	-->        
+		}     
     </script>
 </lams:head>
 <body class="stripes">
 
+	<lams:Page type="learner" title="${commonCartridge.title}">
 
-	<div id="content">
-		<h1>
-			<c:out value="${commonCartridge.title}" escapeXml="true"/>
-		</h1>
-
-		<p>
+		<div class="panel">
 			<c:out value="${commonCartridge.instructions}" escapeXml="false"/>
-		</p>
+		</div>
 
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-				<div class="info">
-					<c:choose>
-						<c:when test="${sessionMap.userFinished}">
-							<fmt:message key="message.activityLocked" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="message.warnLockOnFinish" />
-						</c:otherwise>
-					</c:choose>
-				</div>
+			<lams:Alert type="danger" id="lock-on-finish" close="false">
+				<c:choose>
+					<c:when test="${sessionMap.userFinished}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+			</lams:Alert>
+		</c:if>
+		
+		<c:if test="${commonCartridge.miniViewCommonCartridgeNumber > 0}">
+			<lams:Alert type="warning" id="lock-on-finish" close="false">
+				${commonCartridge.miniViewNumberStr}
+			</lams:Alert>
 		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
 
-		<table cellspacing="0" class="alternative-color">
-			<tr>
-				<th width="70%">
-					<fmt:message key="label.resoruce.to.review" />
-				</th>
-				<th align="center">
-					<fmt:message key="label.completed" />
-				</th>
-			</tr>
-			<c:forEach var="item" items="${sessionMap.commonCartridgeList}">
-				<tr>
-					<td>
-						<a href="#" onclick="viewItem(${item.uid})"> <c:out value="${item.title}"/> </a>
-					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.complete}">
-								<img src="<html:rewrite page='/includes/images/tick.gif'/>" border="0">
-							</c:when>
-							<c:otherwise>
-								-
-							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
-			</c:forEach>
-
-			<c:if test="${commonCartridge.miniViewCommonCartridgeNumber > 0}">
-				<tr>
-					<td colspan="3" align="left">
-						<b>${commonCartridge.miniViewNumberStr}</b>
-					</td>
-				</tr>
-			</c:if>
-		</table>
+		<div class="table-responsive">
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th width="70%">
+							<fmt:message key="label.resoruce.to.review" />
+						</th>
+						<th class="text-center">
+							<fmt:message key="label.completed" />
+						</th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<c:forEach var="item" items="${sessionMap.commonCartridgeList}">
+						<tr>
+							<td>
+								<a href="#" onclick="viewItem(${item.uid})"> <c:out value="${item.title}"/> </a>
+							</td>
+							<td class="text-center">
+								<c:choose>
+									<c:when test="${item.complete}">
+										<i class="fa fa-lg fa-check text-success"></i>
+									</c:when>
+									<c:otherwise>
+										<i class="fa fa-lg fa-minus"></i>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
+		<%--Reflection--------------------------------------------------%>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h2><fmt:message key="monitoring.user.reflection"/></h2>
-				<strong>
+			<div class="panel panel-default voffset10">
+				
+				<div class="panel-heading panel-title">
 					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</strong>
+				</div>
 
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
+				<div class="panel-body">
+					<c:choose>
+						<c:when test="${empty sessionMap.reflectEntry}">
 							<em> <fmt:message key="message.no.reflection.available" /></em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
+						</c:when>
+						<c:otherwise>
 							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-
-				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
+						</c:otherwise>
+					</c:choose>
+	
+					<c:if test="${mode != 'teacher'}">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default loffset10">
+							<fmt:message key="label.edit" />
+						</html:button>
+					</c:if>
+				</div>
 			</div>
 		</c:if>
+		
+		<%--Finish buttons--------------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
+			<div class="voffset10 pull-right">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
-							<span class="nextActivity">
+						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary">
+							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
 				 						<fmt:message key="label.submit" />
@@ -159,12 +158,7 @@
 			</div>
 		</c:if>
 
-	</div>
-	<!--closes content-->
-
-	<div id="footer">
-	</div>
-	<!--closes footer-->
+	</lams:Page>
 
 </body>
 </lams:html>
