@@ -1,21 +1,24 @@
-<%@ include file="/common/taglibs.jsp"%>
 <!DOCTYPE html>
-        
+<%@ include file="/common/taglibs.jsp"%>       
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
+	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	
 	<script type="text/javascript">
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-	        function submitForm(methodName){
-        	        var f = document.getElementById('reflectionForm');
-	                f.submit();
-	        }
+		
+		function submitForm(methodName) {
+			var f = document.getElementById('reflectionForm');
+			f.submit();
+		}
+
+		$(document).ready(function() {
+			document.getElementById("focused").focus();
+		});
 	</script>
 </lams:head>
 <body class="stripes">
@@ -27,23 +30,19 @@
 		<html:hidden property="userID" />
 		<html:hidden property="sessionMapID" />
 
-		<div id="content">
-			<h1>
-				<c:out value="${sessionMap.title}" escapeXml="true"/>
-			</h1>
+		<lams:Page type="learner" title="${sessionMap.title}">
 
 			<%@ include file="/common/messages.jsp"%>
 
-			<p>
+			<div class="panel">
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-			</p>
+			</div>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area" />
+			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control" />
 
-			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="nextActivity">
+			<div class="voffset10 pull-right">
+				<html:link href="#nogo" styleClass="btn btn-primary " styleId="finishButton" onclick="submitForm('finish')">
+					<span class="na">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
 		 						<fmt:message key="label.submit" />
@@ -55,7 +54,7 @@
 		 			</span>
 				</html:link>
 			</div>
-		</div>
+		</lams:Page>
 	</html:form>
 
 	<div id="footer">
