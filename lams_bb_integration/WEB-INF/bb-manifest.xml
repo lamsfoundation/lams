@@ -73,13 +73,12 @@
 		<permission type="java.lang.RuntimePermission" name="getClassLoader" />
 		<permission type="java.lang.RuntimePermission" name="createClassLoader" />
 		<permission type="java.lang.RuntimePermission" name="accessDeclaredMembers" actions=""/>
-		<permission type="java.net.SocketPermission" name="*" actions="connect"/>
+		<permission type="java.net.SocketPermission" name="*" actions="connect,resolve"/>
 		<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
 		
 		<permission type="persist" name="Outcome" actions="create,modify,delete"/>
     	<permission type="persist" name="OutcomeDefinition" actions="create,modify,delete"/>
     	<permission type="persist" name="OutcomeDefinitionCategory" actions="create,modify,delete"/>
-		<permission type="java.net.SocketPermission" name="*" actions="connect,resolve"/>
     </permissions>
 </plugin>
 </manifest>
