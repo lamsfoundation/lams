@@ -398,6 +398,11 @@ public class PeerreviewServiceImpl implements IPeerreviewService, ToolContentMan
 	    throw new DataMissingException("Unable to find default content for the peerreview tool");
 	}
 
+	// don't export following fields
+	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+	    criteria.setToolContentId(null);
+	}
+
 	// set PeerreviewToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Peerreview.newInstance(toolContentObj, toolContentId);
 	try {

@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -788,6 +789,11 @@ public class ImageGalleryServiceImpl
 	if (toolContentObj == null) {
 	    throw new DataMissingException("Unable to find default content for the imageGallery tool");
 	}
+	
+	// don't export following fields
+	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+	    criteria.setToolContentId(null);
+	}
 
 	// set ImageGalleryToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = ImageGallery.newInstance(toolContentObj, toolContentId);
@@ -851,6 +857,9 @@ public class ImageGalleryServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
+	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+		criteria.setToolContentId(toolContentId);
+	    }
 	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
 		    toolContentId);
 	    if (user == null) {
