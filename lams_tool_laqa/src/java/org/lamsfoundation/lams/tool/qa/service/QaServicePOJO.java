@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
@@ -893,6 +894,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    for (QaQueContent question : questions) {
 		question.setQaContent(null);
 	    }
+	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+		criteria.setToolContentId(null);
+	    }
 
 	    exportContentService.exportToolContent(toolContentID, toolContentObj, qaToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
@@ -918,7 +922,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    // reset it to new toolContentID
 	    toolContentObj.setQaContentId(toolContentID);
 	    toolContentObj.setCreatedBy(newUserUid);
-
+	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+		criteria.setToolContentId(toolContentID);
+	    }
+	    
 	    // set back the tool content
 	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
 	    for (QaQueContent question : questions) {
