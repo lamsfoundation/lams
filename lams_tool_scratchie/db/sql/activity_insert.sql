@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lascrt11/images/icon_scratchie.swf'
+, 'tool/lascrt11/images/icon_scratchie.svg'
 , NULL
 , NULL
 , NULL

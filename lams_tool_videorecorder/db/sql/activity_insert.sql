@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lavidr10/images/icon_videoRecorder.swf'
+, 'tool/lavidr10/images/icon_videoRecorder.svg'
 , NULL
 , NULL
 , NULL

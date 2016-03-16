@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/larsrc11/images/icon_rsrc.swf'
+, 'tool/larsrc11/images/icon_rsrc.svg'
 , NULL
 , NULL
 , NULL

@@ -100,7 +100,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
      * Get the first activity in the sequence,or the default branch for a branching activity.
      * <p>
      * A Sequence activity is like a little learning design, and while is it being drawn all the the contained
-     * activities may not have transitions between them. So Flash needs to know what the first activity is!
+     * activities may not have transitions between them. So Authoring needs to know what the first activity is!
      * <p>
      * A tool based branching activity has to have a default branch in case the conditions don't match to any other
      * branch.

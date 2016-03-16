@@ -149,7 +149,6 @@ public class GateAction extends LamsDispatchAction {
 	    // if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
 	    if (!gateDTO.getAllowToPass()) {
 		ActionForward forward = findViewByGateType(mapping, (DynaActionForm) form, gateDTO, lesson);
-		LearningWebUtil.setupProgressInRequest((DynaActionForm) form, request, learnerProgress);
 		return forward;
 	    }
 	}

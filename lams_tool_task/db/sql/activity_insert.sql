@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/latask10/images/icon_taskList.swf'
+, 'tool/latask10/images/icon_taskList.svg'
 , NULL
 , NULL
 , NULL

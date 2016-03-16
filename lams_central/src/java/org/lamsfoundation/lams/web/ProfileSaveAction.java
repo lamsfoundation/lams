@@ -24,9 +24,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -69,6 +66,7 @@ public class ProfileSaveAction extends Action {
     private static Logger log = Logger.getLogger(ProfileSaveAction.class);
     private static IUserManagementService service;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -84,12 +82,13 @@ public class ProfileSaveAction extends Action {
 	    }
 	}
 
-	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	User requestor = getService().getUserByLogin(request.getRemoteUser());
 	DynaActionForm userForm = (DynaActionForm) form;
 
 	// check requestor is same as user being edited
 	if (!requestor.getLogin().equals(userForm.get("login"))) {
-	    log.warn(requestor.getLogin() + " tried to edit profile of user " + userForm.get("login"));
+	    ProfileSaveAction.log
+		    .warn(requestor.getLogin() + " tried to edit profile of user " + userForm.get("login"));
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.authorisation"));
 	    saveErrors(request, errors);
 	    return mapping.findForward("editprofile");
@@ -103,7 +102,7 @@ public class ProfileSaveAction extends Action {
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
 	}
-	
+
 	//last name validation
 	String lastName = (userForm.get("lastName") == null) ? null : (String) userForm.get("lastName");
 	if (StringUtils.isBlank(lastName)) {
@@ -140,13 +139,10 @@ public class ProfileSaveAction extends Action {
 		    (Integer) userForm.get("localeId"));
 	    requestor.setLocale(locale);
 
-	    Theme cssTheme = (Theme) getService().findById(Theme.class, (Long) userForm.get("userCSSTheme"));
-	    requestor.setHtmlTheme(cssTheme);
+	    Theme cssTheme = (Theme) getService().findById(Theme.class, (Long) userForm.get("userTheme"));
+	    requestor.setTheme(cssTheme);
 
-	    Theme flashTheme = (Theme) getService().findById(Theme.class, (Long) userForm.get("userFlashTheme"));
-	    requestor.setFlashTheme(flashTheme);
-
-	    if (userForm.get("disableLamsCommunityUsername") != null
+	    if ((userForm.get("disableLamsCommunityUsername") != null)
 		    && (Boolean) userForm.get("disableLamsCommunityUsername")) {
 		requestor.setLamsCommunityToken(null);
 		requestor.setLamsCommunityUsername(null);
@@ -163,12 +159,12 @@ public class ProfileSaveAction extends Action {
     }
 
     private IUserManagementService getService() {
-	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	if (ProfileSaveAction.service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    ProfileSaveAction.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return service;
+	return ProfileSaveAction.service;
     }
 
 }

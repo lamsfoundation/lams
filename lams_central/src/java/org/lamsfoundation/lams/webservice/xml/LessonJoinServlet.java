@@ -303,8 +303,7 @@ public class LessonJoinServlet extends HttpServlet {
 	    ownerUserId = ld.getUser().getUserId();
 	    learnerGroupName = org.getName() + " learners";
 	    staffGroupName = org.getName() + " staff";
-	    Vector userDTOs = LessonJoinServlet.userService.getUsersFromOrganisationByRole(orgId, Role.MONITOR, false,
-		    false);
+	    Vector userDTOs = LessonJoinServlet.userService.getUsersFromOrganisationByRole(orgId, Role.MONITOR, false);
 	    staffList = getUsersFromDTOs(userDTOs);
 	}
 	Lesson lesson = LessonJoinServlet.monitoringService.initializeLesson(lessonName, lessonDescription, ldId, orgId,

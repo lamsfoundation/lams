@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/laimsc11/images/icon_commonCartridge.swf'
+, 'tool/laimsc11/images/icon_commonCartridge.svg'
 , NULL
 , NULL
 , NULL

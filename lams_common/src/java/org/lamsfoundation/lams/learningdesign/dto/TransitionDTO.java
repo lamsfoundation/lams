@@ -29,7 +29,6 @@ import java.util.Date;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.DataTransition;
 import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -164,102 +163,82 @@ public class TransitionDTO extends BaseDTO {
 
     /**
      * @param createDateTime
-     *                The createDateTime to set.
+     *            The createDateTime to set.
      */
     public void setCreateDateTime(Date createDateTime) {
-	if (!createDateTime.equals(WDDXTAGS.DATE_NULL_VALUE)) {
-	    this.createDateTime = createDateTime;
-	}
+	this.createDateTime = createDateTime;
     }
 
     /**
      * @param description
-     *                The description to set.
+     *            The description to set.
      */
     public void setDescription(String description) {
-	if (!description.equals(WDDXTAGS.STRING_NULL_VALUE)) {
-	    this.description = description;
-	}
+	this.description = description;
     }
 
     /**
      * @param fromActivityID
-     *                The fromActivityID to set.
+     *            The fromActivityID to set.
      */
     public void setFromActivityID(Long fromActivityID) {
-	if (!fromActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.fromActivityID = fromActivityID;
-	}
+	this.fromActivityID = fromActivityID;
     }
 
     /**
      * @param fromUIID
-     *                The fromUIID to set.
+     *            The fromUIID to set.
      */
     public void setFromUIID(Integer fromUIID) {
-	if (!fromUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.fromUIID = fromUIID;
-	}
+	this.fromUIID = fromUIID;
     }
 
     /**
      * @param learningDesignID
-     *                The learningDesignID to set.
+     *            The learningDesignID to set.
      */
     public void setLearningDesignID(Long learningDesignID) {
-	if (!learningDesignID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.learningDesignID = learningDesignID;
-	}
+	this.learningDesignID = learningDesignID;
     }
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
-	if (!title.equals(WDDXTAGS.STRING_NULL_VALUE)) {
-	    this.title = title;
-	}
+	this.title = title;
     }
 
     /**
      * @param toActivityID
-     *                The toActivityID to set.
+     *            The toActivityID to set.
      */
     public void setToActivityID(Long toActivityID) {
-	if (!toActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.toActivityID = toActivityID;
-	}
+	this.toActivityID = toActivityID;
     }
 
     /**
      * @param toUIID
-     *                The toUIID to set.
+     *            The toUIID to set.
      */
     public void setToUIID(Integer toUIID) {
-	if (!toUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.toUIID = toUIID;
-	}
+	this.toUIID = toUIID;
     }
 
     /**
      * @param transitionID
-     *                The transitionID to set.
+     *            The transitionID to set.
      */
     public void setTransitionID(Long transitionId) {
-	if (!transitionId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    transitionID = transitionId;
-	}
+	transitionID = transitionId;
     }
 
     /**
      * @param transitionUIID
-     *                The transitionUIID to set.
+     *            The transitionUIID to set.
      */
     public void setTransitionUIID(Integer transitionUIID) {
-	if (!transitionUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.transitionUIID = transitionUIID;
-	}
+	this.transitionUIID = transitionUIID;
     }
 
     public Integer getTransitionType() {

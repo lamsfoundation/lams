@@ -147,20 +147,10 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="align-right"><fmt:message key="label.html.htmlTheme"/>:</td>
+		<td class="align-right"><fmt:message key="label.theme"/>:</td>
 		<td>
-		<html:select property="userCSSTheme" disabled="${!profileEditEnabled}" >
-			<c:forEach items="${cssThemes}" var="theme">	
-				<html:option value="${theme.themeId}">${theme.name}</html:option>
-			</c:forEach>
-		</html:select>
-		</td>
-	</tr>
-	<tr>
-		<td class="align-right"><fmt:message key="label.html.flashTheme"/>:</td>
-		<td>
-		<html:select property="userFlashTheme" disabled="${!profileEditEnabled}" >
-			<c:forEach items="${flashThemes}" var="theme">	
+		<html:select property="userTheme" disabled="${!profileEditEnabled}" >
+			<c:forEach items="${themes}" var="theme">	
 				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
 		</html:select>
@@ -264,40 +254,15 @@
 		<td><bean:write name="UserForm" property="fax" /></td>
 	</tr>
 	<tr>
-		<td class="align-right"><fmt:message key="label.html.htmlTheme"/>:</td>
+		<td class="align-right"><fmt:message key="label.theme"/>:</td>
 		<td>
-		<html:select property="userCSSTheme" disabled="${!profileEditEnabled}" >
-			<c:forEach items="${cssThemes}" var="theme">	
+		<html:select property="userTheme" disabled="${!profileEditEnabled}" >
+			<c:forEach items="${themes}" var="theme">	
 				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
 		</html:select>
 		</td>
 	</tr>
-	<tr>
-		<td class="align-right"><fmt:message key="label.html.flashTheme"/>:</td>
-		<td>
-		<html:select property="userFlashTheme" disabled="${!profileEditEnabled}" >
-			<c:forEach items="${flashThemes}" var="theme">	
-				<html:option value="${theme.themeId}">${theme.name}</html:option>
-			</c:forEach>
-		</html:select>
-		</td>
-	</tr>
-	<c:choose>
-		<c:when test="${serverFlashEnabled}"> 
-			<tr>
-			<td class="align-right"><fmt:message key="label.enable.flash"/>:<bean:write name="UserForm" property="enableFlash" /></td>
-			<td><html:select property="enableFlash" disabled="${!profileEditEnabled}" >
-				<html:option value="true"><fmt:message key="label.yes"/></html:option>
-				<html:option value="false"><fmt:message key="label.no"/></html:option>
-				</html:select>
-			</td>
-			</tr>
-		</c:when>
-		<c:otherwise>
-			<html:hidden property="enableFlash" />
-		</c:otherwise>
-	</c:choose>
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
 		<td>
@@ -330,7 +295,6 @@
 		</td>
 	</tr>
 </c:if>
-	
 	
 	</table>
 			</div>

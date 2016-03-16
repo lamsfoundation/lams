@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lawiki10/images/icon_wiki.swf'
+, 'tool/lawiki10/images/icon_wiki.svg'
 , NULL
 , NULL
 , NULL

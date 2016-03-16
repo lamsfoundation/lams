@@ -11,6 +11,6 @@ values
 1,null,null,0,
 null,null,now(),0,
 null,null,${tool_id},null,
-null,null,null,'tool/larsrc11/images/icon_rsrc.swf',
+null,null,null,'tool/larsrc11/images/icon_rsrc.svg',
 2,0,4,
 'org.lamsfoundation.lams.tool.rsrc.ApplicationResources');

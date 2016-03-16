@@ -1245,7 +1245,7 @@ ActivityLib = {
 		$.ajax({
 			url : LAMS_URL + 'authoring/author.do',
 			data : {
-				'method' : 'getToolOutputDefinitionsJSON',
+				'method' : 'getToolOutputDefinitions',
 				'toolContentID' : activity.toolContentID 
 								|| layout.toolMetadata[activity.learningLibraryID].defaultToolContentID
 			},

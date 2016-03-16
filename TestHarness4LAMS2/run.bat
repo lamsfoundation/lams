@@ -37,7 +37,7 @@ set JAVA=%JAVA_HOME%\bin\java
 rem Setup TestHarness sepecific properties
 set TESTHARNESS_HOME=%DIRNAME%
 set JAVA_OPTS=%JAVA_OPTS% %JVM_MEM%
-set TESTHARNESS_CLASSPATH=;%TESTHARNESS_HOME%build\;%TESTHARNESS_HOME%lib\BrowserLauncher2-all-10rc4.jar;%TESTHARNESS_HOME%lib\commons-codec-1.1.jar;%TESTHARNESS_HOME%lib\httpunit.jar;%TESTHARNESS_HOME%lib\js.jar;%TESTHARNESS_HOME%lib\junit.jar;%TESTHARNESS_HOME%lib\log4j-1.2.13.jar;%TESTHARNESS_HOME%lib\nekohtml-0.9.5.jar;%TESTHARNESS_HOME%lib\Tidy.jar;%TESTHARNESS_HOME%lib\wddx.jar;%TESTHARNESS_HOME%lib\xercesImpl.jar;%TESTHARNESS_HOME%lib\xml-apis.jar
+set TESTHARNESS_CLASSPATH=;%TESTHARNESS_HOME%build\;%TESTHARNESS_HOME%lib\BrowserLauncher2-all-10rc4.jar;%TESTHARNESS_HOME%lib\commons-codec-1.1.jar;%TESTHARNESS_HOME%lib\httpunit.jar;%TESTHARNESS_HOME%lib\js.jar;%TESTHARNESS_HOME%lib\junit.jar;%TESTHARNESS_HOME%lib\log4j-1.2.13.jar;%TESTHARNESS_HOME%lib\nekohtml-0.9.5.jar;%TESTHARNESS_HOME%lib\Tidy.jar;%TESTHARNESS_HOME%lib\xercesImpl.jar;%TESTHARNESS_HOME%lib\xml-apis.jar
 
 echo ===============================================================================
 echo .

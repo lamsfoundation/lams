@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
+import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
@@ -67,6 +68,7 @@ public class LoadToolActivityAction extends ActivityAction {
     /**
      * Gets an activity from the request (attribute) and forwards onto a loading page.
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -90,24 +92,24 @@ public class LoadToolActivityAction extends ActivityAction {
 	 */
 	Object toolSessionCreationLock = null;
 	Long activityID = activity.getActivityId();
-	synchronized (toolSessionCreationLocks) {
-	    toolSessionCreationLock = toolSessionCreationLocks.get(activityID);
+	synchronized (LoadToolActivityAction.toolSessionCreationLocks) {
+	    toolSessionCreationLock = LoadToolActivityAction.toolSessionCreationLocks.get(activityID);
 	    if (toolSessionCreationLock == null) {
 		toolSessionCreationLock = activityID;
-		toolSessionCreationLocks.put(activityID, toolSessionCreationLock);
+		LoadToolActivityAction.toolSessionCreationLocks.put(activityID, toolSessionCreationLock);
 	    }
 	}
 	synchronized (toolSessionCreationLock) {
 	    try {
 		learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
-		
+
 	    } catch (UnexpectedRollbackException e) {
-		log.warn("Got exception while trying to create a tool session, but carrying on.", e);
-		
+		LamsAction.log.warn("Got exception while trying to create a tool session, but carrying on.", e);
+
 	    } catch (RequiredGroupMissingException e) {
-		
+
 		//got here when activity requires existing grouping but no group for user exists yet
-		log.warn(e.getMessage());
+		LamsAction.log.warn(e.getMessage());
 		request.setAttribute("messageKey", e.getMessage());
 		return mapping.findForward("message");
 	    }
@@ -123,12 +125,9 @@ public class LoadToolActivityAction extends ActivityAction {
 	    form.addActivityURL(new ActivityURL(activity.getActivityId(), url));
 
 	} else {
-	    log.error(className + ": activity not ToolActivity");
+	    LamsAction.log.error(LamsAction.className + ": activity not ToolActivity");
 	    return mapping.findForward(ActivityMapping.ERROR);
 	}
-
-	LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
 	return mapping.findForward(mappingName);
     }
-
 }

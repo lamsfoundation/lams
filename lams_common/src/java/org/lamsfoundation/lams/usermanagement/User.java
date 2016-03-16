@@ -36,9 +36,9 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.themes.Theme;
-import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+import org.lamsfoundation.lams.themes.dto.ThemeDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 public class User implements Serializable, Comparable {
@@ -126,10 +126,7 @@ public class User implements Serializable, Comparable {
     private Set userOrganisations;
 
     /** persistent field */
-    private Theme flashTheme;
-
-    /** persistent field */
-    private Theme htmlTheme;
+    private Theme theme;
 
     /** nullable persistent field */
     private String chatId;
@@ -368,20 +365,12 @@ public class User implements Serializable, Comparable {
 	this.authenticationMethod = authenticationMethod;
     }
 
-    public Theme getFlashTheme() {
-	return flashTheme;
+    public Theme getTheme() {
+	return theme;
     }
 
-    public void setFlashTheme(Theme flashTheme) {
-	this.flashTheme = flashTheme;
-    }
-
-    public Theme getHtmlTheme() {
-	return htmlTheme;
-    }
-
-    public void setHtmlTheme(Theme htmlTheme) {
-	this.htmlTheme = htmlTheme;
+    public void setTheme(Theme theme) {
+	this.theme = theme;
     }
 
     public String getChatId() {
@@ -491,7 +480,7 @@ public class User implements Serializable, Comparable {
 		: pagesWithDisabledTutorials;
 
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
-		new CSSThemeBriefDTO(flashTheme), new CSSThemeBriefDTO(htmlTheme),
+		new ThemeDTO(theme),
 		// TimeZone.getTimeZone("Australia/Sydney"),
 		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, lamsCommunityToken,
 		lamsCommunityUsername, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not
@@ -501,8 +490,8 @@ public class User implements Serializable, Comparable {
 	);
     }
 
-    public UserFlashDTO getUserFlashDTO() {
-	return new UserFlashDTO(userId, firstName, lastName, login);
+    public UserBasicDTO getUserBasicDTO() {
+	return new UserBasicDTO(userId, firstName, lastName, login);
     }
 
     /**

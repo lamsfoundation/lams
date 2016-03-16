@@ -510,21 +510,8 @@ public class Lesson implements Serializable {
 	return lessonClass == null ? null : lessonClass.getLearners();
     }
 
-    // ---------------------------------------------------------------------
-    // Domain service methods
-    // ---------------------------------------------------------------------
     /**
-     * Create lesson data transfer object for flash and java learner interaction. Does not include the counts of the
-     * users.
-     * 
-     * @return the lesson data transfer object.
-     */
-    public LessonDTO getLessonData() {
-	return new LessonDTO(this);
-    }
-
-    /**
-     * Create lesson data transfer object for flash and java monitoring interaction. Includes counts of the learners.
+     * Create lesson data transfer object for UI and java monitoring interaction. Includes counts of the learners.
      * 
      * @return the monitoring lesson data transfer object.
      */

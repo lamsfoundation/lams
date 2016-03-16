@@ -21,12 +21,15 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
-import javax.servlet.http.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -35,72 +38,66 @@ import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-
-import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.web.action.LamsAction;
 
-/** 
+/**
  * Action class to display a ParallelActivity.
  * 
  * XDoclet definition:
+ * 
  * @author daveg
- * @struts:action path="/DisplayParallelActivity" name="activityForm"
- *                validate="false" scope="request"
+ * @struts:action path="/DisplayParallelActivity" name="activityForm" validate="false" scope="request"
  * 
  * @struts:action-forward name="displayParallel" path=".parallelActivity"
  * 
  */
 public class DisplayParallelActivityAction extends ActivityAction {
-	
 
-	/**
-	 * Gets a parallel activity from the request (attribute) and forwards to
-	 * the display JSP.
-	 */
-	public ActionForward execute(ActionMapping mapping,
-	                             ActionForm actionForm,
-	                             HttpServletRequest request,
-	                             HttpServletResponse response) 
-	{
+    /**
+     * Gets a parallel activity from the request (attribute) and forwards to the display JSP.
+     */
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-		ActivityForm form = (ActivityForm)actionForm;
-		ICoreLearnerService learnerService = getLearnerService();
-		
-		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
-		
-		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
-		
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		if (!(activity instanceof ParallelActivity)) {
-		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
+	ActivityForm form = (ActivityForm) actionForm;
+	ICoreLearnerService learnerService = getLearnerService();
 
-		ParallelActivity parallelActivity = (ParallelActivity)activity;
+	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 
-		form.setActivityID(activity.getActivityId());
+	actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 
-		List activityURLs = new ArrayList();
-
-		for(Iterator i = parallelActivity.getActivities().iterator();i.hasNext();)
-		{
-			Activity subActivity = (Activity)i.next();
-			ActivityURL activityURL = new ActivityURL(); 
-			String url = actionMappings.getActivityURL(subActivity);
-			activityURL.setUrl(url);
-			activityURLs.add(activityURL);
-		}
-		if (activityURLs.size() == 0) {
-		    log.error(className+": No sub-activity URLs for activity "+activity.getActivityId());
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
-		form.setActivityURLs(activityURLs);
-		
-		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, LearningWebUtil.getLearnerProgress(request, learnerService));
-
-		return mapping.findForward("displayParallel");
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	if (!(activity instanceof ParallelActivity)) {
+	    LamsAction.log.error(LamsAction.className + ": activity not ParallelActivity " + activity.getActivityId());
+	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 
+	ParallelActivity parallelActivity = (ParallelActivity) activity;
+
+	form.setActivityID(activity.getActivityId());
+
+	List activityURLs = new ArrayList();
+
+	for (Iterator i = parallelActivity.getActivities().iterator(); i.hasNext();) {
+	    Activity subActivity = (Activity) i.next();
+	    ActivityURL activityURL = new ActivityURL();
+	    String url = actionMappings.getActivityURL(subActivity);
+	    activityURL.setUrl(url);
+	    activityURLs.add(activityURL);
+	}
+	if (activityURLs.size() == 0) {
+	    LamsAction.log
+		    .error(LamsAction.className + ": No sub-activity URLs for activity " + activity.getActivityId());
+	    return mapping.findForward(ActivityMapping.ERROR);
+	}
+	form.setActivityURLs(activityURLs);
+
+	return mapping.findForward("displayParallel");
+    }
 }

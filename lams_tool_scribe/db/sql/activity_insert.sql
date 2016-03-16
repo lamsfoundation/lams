@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lascrb11/images/icon_scribe.swf'
+, 'tool/lascrb11/images/icon_scribe.svg'
 , NULL
 , NULL
 , NULL

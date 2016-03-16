@@ -39,7 +39,6 @@ import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -96,14 +95,14 @@ public class LearningDesignDTO extends BaseDTO {
 	this.learningDesignUIID = learningDesign.getLearningDesignUIID();
 	this.description = learningDesign.getDescription();
 	this.title = learningDesign.getTitle();
-	this.firstActivityID = learningDesign.getFirstActivity() != null ? learningDesign.getFirstActivity()
-		.getActivityId() : null;
-	this.firstActivityUIID = learningDesign.getFirstActivity() != null ? learningDesign.getFirstActivity()
-		.getActivityUIID() : null;
-	this.floatingActivityID = learningDesign.getFirstActivity() != null ? learningDesign.getFirstActivity()
-		.getActivityId() : null;
-	this.floatingActivityUIID = learningDesign.getFloatingActivity() != null ? learningDesign.getFloatingActivity()
-		.getActivityUIID() : null;
+	this.firstActivityID = learningDesign.getFirstActivity() != null
+		? learningDesign.getFirstActivity().getActivityId() : null;
+	this.firstActivityUIID = learningDesign.getFirstActivity() != null
+		? learningDesign.getFirstActivity().getActivityUIID() : null;
+	this.floatingActivityID = learningDesign.getFirstActivity() != null
+		? learningDesign.getFirstActivity().getActivityId() : null;
+	this.floatingActivityUIID = learningDesign.getFloatingActivity() != null
+		? learningDesign.getFloatingActivity().getActivityUIID() : null;
 
 	this.maxID = learningDesign.getMaxID();
 	this.validDesign = learningDesign.getValidDesign();
@@ -113,12 +112,13 @@ public class LearningDesignDTO extends BaseDTO {
 	this.dateReadOnly = learningDesign.getDateReadOnly();
 
 	this.userID = learningDesign.getUser() != null ? learningDesign.getUser().getUserId() : null;
-	this.originalUserID = learningDesign.getOriginalUser() != null ? learningDesign.getOriginalUser().getUserId() : null;
-	
-	this.editOverrideUserID = learningDesign.getEditOverrideUser() != null ? learningDesign.getEditOverrideUser()
-		.getUserId() : null;
-	this.editOverrideUserFullName = learningDesign.getEditOverrideUser() != null ? learningDesign
-		.getEditOverrideUser().getFullName() : null;
+	this.originalUserID = learningDesign.getOriginalUser() != null ? learningDesign.getOriginalUser().getUserId()
+		: null;
+
+	this.editOverrideUserID = learningDesign.getEditOverrideUser() != null
+		? learningDesign.getEditOverrideUser().getUserId() : null;
+	this.editOverrideUserFullName = learningDesign.getEditOverrideUser() != null
+		? learningDesign.getEditOverrideUser().getFullName() : null;
 
 	this.helpText = learningDesign.getHelpText();
 	this.copyTypeID = learningDesign.getCopyTypeID();
@@ -126,17 +126,17 @@ public class LearningDesignDTO extends BaseDTO {
 	this.createDateTime = learningDesign.getCreateDateTime();
 	this.version = learningDesign.getVersion();
 
-	this.originalLearningDesignID = learningDesign.getOriginalLearningDesign() != null ? learningDesign
-		.getOriginalLearningDesign().getLearningDesignId() : null;
+	this.originalLearningDesignID = learningDesign.getOriginalLearningDesign() != null
+		? learningDesign.getOriginalLearningDesign().getLearningDesignId() : null;
 
-	this.workspaceFolderID = learningDesign.getWorkspaceFolder() != null ? learningDesign.getWorkspaceFolder()
-		.getWorkspaceFolderId() : null;
+	this.workspaceFolderID = learningDesign.getWorkspaceFolder() != null
+		? learningDesign.getWorkspaceFolder().getWorkspaceFolderId() : null;
 
 	this.duration = learningDesign.getDuration();
 	this.licenseText = learningDesign.getLicenseText();
 
 	this.licenseID = learningDesign.getLicense() != null ? learningDesign.getLicense().getLicenseID() : null;
-	
+
 	this.designType = learningDesign.getDesignType();
 
 	this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
@@ -161,7 +161,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the copyTypeID.
      */
     public Integer getCopyTypeID() {
-	//return copyTypeID!=null?copyTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return copyTypeID;
     }
 
@@ -169,7 +169,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the createDateTime.
      */
     public Date getCreateDateTime() {
-	//return createDateTime!=null?createDateTime:WDDXTAGS.DATE_NULL_VALUE;
+
 	return createDateTime;
     }
 
@@ -177,7 +177,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the dateReadOnly.
      */
     public Date getDateReadOnly() {
-	//return dateReadOnly!=null?dateReadOnly:WDDXTAGS.DATE_NULL_VALUE;
+
 	return dateReadOnly;
     }
 
@@ -185,7 +185,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the description.
      */
     public String getDescription() {
-	//return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+
 	return description;
     }
 
@@ -193,7 +193,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the duration.
      */
     public Long getDuration() {
-	//return duration!=null?duration:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+
 	return duration;
     }
 
@@ -201,7 +201,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the firstActivityID.
      */
     public Long getFirstActivityID() {
-	//return firstActivityID!=null?firstActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+
 	return firstActivityID;
     }
 
@@ -216,7 +216,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the helpText.
      */
     public String getHelpText() {
-	//return helpText!=null?helpText:WDDXTAGS.STRING_NULL_VALUE;
+
 	return helpText;
     }
 
@@ -224,7 +224,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the lastModifiedDateTime.
      */
     public Date getLastModifiedDateTime() {
-	//return lastModifiedDateTime!=null?lastModifiedDateTime:WDDXTAGS.DATE_NULL_VALUE;
+
 	return lastModifiedDateTime;
     }
 
@@ -232,7 +232,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the learningDesignID.
      */
     public Long getLearningDesignID() {
-	//return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+
 	return learningDesignID;
     }
 
@@ -240,7 +240,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the learningDesignUIID.
      */
     public Integer getLearningDesignUIID() {
-	//return learningDesignUIID!=null?learningDesignUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return learningDesignUIID;
     }
 
@@ -248,7 +248,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the licenseID.
      */
     public Long getLicenseID() {
-	//return licenseID!=null?licenseID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+
 	return licenseID;
     }
 
@@ -256,7 +256,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the licenseText.
      */
     public String getLicenseText() {
-	//return licenseText!=null?licenseText:WDDXTAGS.STRING_NULL_VALUE;
+
 	return licenseText;
     }
 
@@ -264,7 +264,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the maxID.
      */
     public Integer getMaxID() {
-	//return maxID!=null?maxID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return maxID;
     }
 
@@ -272,7 +272,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the originalLearningDesignID.
      */
     public Long getOriginalLearningDesignID() {
-	//return parentLearningDesignID!=null?parentLearningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+
 	return originalLearningDesignID;
     }
 
@@ -280,7 +280,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the readOnly.
      */
     public Boolean getReadOnly() {
-	//return readOnly!=null?readOnly:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return readOnly;
     }
 
@@ -295,7 +295,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the title.
      */
     public String getTitle() {
-	//return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+
 	return title;
     }
 
@@ -303,19 +303,19 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the userID.
      */
     public Integer getUserID() {
-	//return userID!=null?userID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return userID;
     }
 
     public Integer getOriginalUserID() {
-        return originalUserID;
+	return originalUserID;
     }
-    
+
     /**
      * @return Returns the editOnFlyUserID.
      */
     public Integer getEditOverrideUserID() {
-	//return userID!=null?userID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return editOverrideUserID;
     }
 
@@ -330,7 +330,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the validDesign.
      */
     public Boolean getValidDesign() {
-	//return validDesign!=null?validDesign:WDDXTAGS.BOOLEAN_NULL_VALUE;
+
 	return validDesign;
     }
 
@@ -338,7 +338,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the version.
      */
     public String getVersion() {
-	//return version!=null?version:WDDXTAGS.STRING_NULL_VALUE;
+
 	return version;
     }
 
@@ -353,7 +353,7 @@ public class LearningDesignDTO extends BaseDTO {
      * @return Returns the workspaceFolderID.
      */
     public Integer getWorkspaceFolderID() {
-	//return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return workspaceFolderID;
     }
 
@@ -365,16 +365,14 @@ public class LearningDesignDTO extends BaseDTO {
     }
 
     /**
-     * Gets all the grouping objects for a learning design. Can't do it via
-     * activities as the grouping related to a teacher chosen grouping does not
-     * have a related grouping activity.
+     * Gets all the grouping objects for a learning design. Can't do it via activities as the grouping related to a
+     * teacher chosen grouping does not have a related grouping activity.
      * 
      * Don't set up the userlist if this is to be sent to authoring.
      * 
      * @param design
      * @param groupingDAO
-     *                DAO to directory get the grouping objects (no direct link
-     *                from learning design possible).
+     *            DAO to directory get the grouping objects (no direct link from learning design possible).
      * @param setupUserList
      * @return ArrayList the array of groupingDTOs
      */
@@ -437,7 +435,7 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param activities
-     *                The activities to set.
+     *            The activities to set.
      */
     public void setActivities(ArrayList activities) {
 	this.activities = activities;
@@ -446,7 +444,7 @@ public class LearningDesignDTO extends BaseDTO {
     /**
      * 
      * @param contentFolderID
-     *                The contentFolderID to set.
+     *            The contentFolderID to set.
      */
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
@@ -454,7 +452,7 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param copyTypeID
-     *                The copyTypeID to set.
+     *            The copyTypeID to set.
      */
     public void setCopyTypeID(Integer copyTypeID) {
 	this.copyTypeID = copyTypeID;
@@ -462,133 +460,132 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param createDateTime
-     *                The createDateTime to set.
+     *            The createDateTime to set.
      */
     public void setCreateDateTime(Date createDateTime) {
-	if (!createDateTime.equals(WDDXTAGS.DATE_NULL_VALUE))
-	    this.createDateTime = createDateTime;
+
+	this.createDateTime = createDateTime;
     }
 
     /**
      * @param dateReadOnly
-     *                The dateReadOnly to set.
+     *            The dateReadOnly to set.
      */
     public void setDateReadOnly(Date dateReadOnly) {
-	if (!WDDXTAGS.DATE_NULL_VALUE.equals(dateReadOnly))
-	    this.dateReadOnly = dateReadOnly;
+
+	this.dateReadOnly = dateReadOnly;
     }
 
     /**
      * @param description
-     *                The description to set.
+     *            The description to set.
      */
     public void setDescription(String description) {
-	if (!description.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.description = description;
+
+	this.description = description;
     }
 
     /**
      * @param duration
-     *                The duration to set.
+     *            The duration to set.
      */
     public void setDuration(Long duration) {
-	if (!duration.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-	    this.duration = duration;
+	this.duration = duration;
     }
 
     /**
      * @param firstActivityID
-     *                The firstActivityID to set.
+     *            The firstActivityID to set.
      */
     public void setFirstActivityID(Long firstActivityID) {
-	if (!firstActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-	    this.firstActivityID = firstActivityID;
+
+	this.firstActivityID = firstActivityID;
     }
 
     /**
      * @param floatingActivityID
-     *                The floatingActivityID to set.
+     *            The floatingActivityID to set.
      */
     public void setFloatingActivityID(Long floatingActivityID) {
-	if (!floatingActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-	    this.floatingActivityID = floatingActivityID;
+
+	this.floatingActivityID = floatingActivityID;
     }
 
     /**
      * @param helpText
-     *                The helpText to set.
+     *            The helpText to set.
      */
     public void setHelpText(String helpText) {
-	if (!helpText.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.helpText = helpText;
+
+	this.helpText = helpText;
     }
 
     /**
      * @param lastModifiedDateTime
-     *                The lastModifiedDateTime to set.
+     *            The lastModifiedDateTime to set.
      */
     public void setLastModifiedDateTime(Date lastModifiedDateTime) {
-	if (!lastModifiedDateTime.equals(WDDXTAGS.DATE_NULL_VALUE))
-	    this.lastModifiedDateTime = lastModifiedDateTime;
+
+	this.lastModifiedDateTime = lastModifiedDateTime;
     }
 
     /**
      * @param learningDesignID
-     *                The learningDesignID to set.
+     *            The learningDesignID to set.
      */
     public void setLearningDesignID(Long learningDesignId) {
-	if (!learningDesignId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-	    this.learningDesignID = learningDesignId;
+
+	this.learningDesignID = learningDesignId;
     }
 
     /**
      * @param learningDesignUIID
-     *                The learningDesignUIID to set.
+     *            The learningDesignUIID to set.
      */
     public void setLearningDesignUIID(Integer learningDesignUIID) {
-	if (!learningDesignUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.learningDesignUIID = learningDesignUIID;
+
+	this.learningDesignUIID = learningDesignUIID;
     }
 
     /**
      * @param licenseID
-     *                The licenseID to set.
+     *            The licenseID to set.
      */
     public void setLicenseID(Long licenseID) {
-	if (!licenseID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-	    this.licenseID = licenseID;
+
+	this.licenseID = licenseID;
     }
 
     /**
      * @param licenseText
-     *                The licenseText to set.
+     *            The licenseText to set.
      */
     public void setLicenseText(String licenseText) {
-	if (!licenseText.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.licenseText = licenseText;
+
+	this.licenseText = licenseText;
     }
 
     /**
      * @param maxID
-     *                The maxID to set.
+     *            The maxID to set.
      */
     public void setMaxID(Integer maxID) {
-	if (!maxID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.maxID = maxID;
+
+	this.maxID = maxID;
     }
 
     /**
      * @param parentLearningDesignID
-     *                The parentLearningDesignID to set.
+     *            The parentLearningDesignID to set.
      */
     public void setOriginalLearningDesignID(Long originalLearningDesignID) {
-	if (!originalLearningDesignID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-	    this.originalLearningDesignID = originalLearningDesignID;
+
+	this.originalLearningDesignID = originalLearningDesignID;
     }
 
     /**
      * @param readOnly
-     *                The readOnly to set.
+     *            The readOnly to set.
      */
     public void setReadOnly(Boolean readOnly) {
 	this.readOnly = readOnly;
@@ -596,16 +593,16 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
-	if (!title.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.title = title;
+
+	this.title = title;
     }
 
     /**
      * @param transitions
-     *                The transitions to set.
+     *            The transitions to set.
      */
     public void setTransitions(ArrayList transitions) {
 	this.transitions = transitions;
@@ -613,40 +610,39 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param userID
-     *                The userID to set.
+     *            The userID to set.
      */
     public void setUserID(Integer userID) {
-	if (!userID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.userID = userID;
+
+	this.userID = userID;
     }
 
     public void setOriginalUserID(Integer originalUserID) {
-	if (!originalUserID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.originalUserID = originalUserID;
-	}
+
+	this.originalUserID = originalUserID;
     }
 
     /**
      * @param userID
-     *                The userID to set.
+     *            The userID to set.
      */
     public void setEditOverrideUserID(Integer editOverrideUserID) {
-	if (!editOverrideUserID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.editOverrideUserID = editOverrideUserID;
+
+	this.editOverrideUserID = editOverrideUserID;
     }
 
     /**
      * @param userID
-     *                The userID to set.
+     *            The userID to set.
      */
     public void setEditOverrideUserFullName(String editOverrideUserFullName) {
-	if (!editOverrideUserFullName.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.editOverrideUserFullName = editOverrideUserFullName;
+
+	this.editOverrideUserFullName = editOverrideUserFullName;
     }
 
     /**
      * @param validDesign
-     *                The validDesign to set.
+     *            The validDesign to set.
      */
     public void setValidDesign(Boolean validDesign) {
 	this.validDesign = validDesign;
@@ -654,36 +650,36 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param version
-     *                The version to set.
+     *            The version to set.
      */
     public void setVersion(String version) {
-	if (!version.equals(WDDXTAGS.STRING_NULL_VALUE))
-	    this.version = version;
+
+	this.version = version;
     }
 
     /**
      * @param designVersion
-     *                The design version to set.
+     *            The design version to set.
      */
     public void setVersion(Integer designVersion) {
-	if (!designVersion.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.designVersion = designVersion;
+
+	this.designVersion = designVersion;
     }
 
     /**
      * @param workspaceFolderID
-     *                The workspaceFolderID to set.
+     *            The workspaceFolderID to set.
      */
     public void setWorkspaceFolderID(Integer workspaceFolderID) {
-	if (!workspaceFolderID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.workspaceFolderID = workspaceFolderID;
+
+	this.workspaceFolderID = workspaceFolderID;
     }
 
     /**
      * @return Returns the firstActivityUIID.
      */
     public Integer getFirstActivityUIID() {
-	//return firstActivityUIID!=null?firstActivityUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
 	return firstActivityUIID;
     }
 
@@ -696,20 +692,20 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param firstActivityUIID
-     *                The firstActivityUIID to set.
+     *            The firstActivityUIID to set.
      */
     public void setFirstActivityUIID(Integer firstActivityUIID) {
-	if (firstActivityUIID != null && !firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.firstActivityUIID = firstActivityUIID;
+
+	this.firstActivityUIID = firstActivityUIID;
     }
 
     /**
      * @param floatingActivityUIID
-     *                The floatingActivityUIID to set.
+     *            The floatingActivityUIID to set.
      */
     public void setFloatingActivityUIID(Integer floatingActivityUIID) {
-	if (!floatingActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-	    this.floatingActivityUIID = floatingActivityUIID;
+
+	this.floatingActivityUIID = floatingActivityUIID;
     }
 
     /**
@@ -721,7 +717,7 @@ public class LearningDesignDTO extends BaseDTO {
 
     /**
      * @param groupings
-     *                The groupings to set.
+     *            The groupings to set.
      */
     public void setGroupings(ArrayList groupings) {
 	this.groupings = groupings;
@@ -750,14 +746,13 @@ public class LearningDesignDTO extends BaseDTO {
     public void setAnnotations(ArrayList<LearningDesignAnnotation> annotations) {
 	this.annotations = annotations;
     }
-    
+
     public String getDesignType() {
-        return designType;
+	return designType;
     }
 
     public void setDesignType(String designType) {
-        this.designType = designType;
+	this.designType = designType;
     }
 
- 
 }

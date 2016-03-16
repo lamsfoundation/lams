@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.form;
 
 import java.util.ArrayList;
@@ -33,82 +33,76 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 
-/** 
+/**
  * @author daveg
  * 
- * XDoclet definition:
+ *         XDoclet definition:
  * @struts:form name="activityForm"
  */
 public class ActivityForm extends ActionForm {
 
-	/** Unique identifier specifying the session for this activity, maps back to
-	 * LearnerProgress (or Learner) and Activity. Note that the activity may already
-	 * be complete.
-	 */
-	private Long activityID;
-		
-	/** List of ActivityURL, will only contain one if a simple activity */
-	private List activityURLs;
-	
-	/** Progress summary suitable for Flash. In the form attempted=13_14&completed=10_11&current=12.*/
-	private String progressSummary;
+    /**
+     * Unique identifier specifying the session for this activity, maps back to LearnerProgress (or Learner) and
+     * Activity. Note that the activity may already be complete.
+     */
+    private Long activityID;
 
-	/** Lesson to which this activity belongs. Id comes from the learner progress */
-	private Long lessonID;
-	
-	/** Version no for the design. Increments after every major modification */
-	private Integer version;
-	
-	/** 
-	 * Method reset
-	 * @param mapping
-	 * @param request
-	 */
-	public void reset(ActionMapping mapping, HttpServletRequest request) {
-		activityURLs = null;
-	}
+    /** List of ActivityURL, will only contain one if a simple activity */
+    private List activityURLs;
 
-	public List getActivityURLs() {
-		return activityURLs;
-	}
-	public void setActivityURLs(List activityURLs) {
-		this.activityURLs = activityURLs;
-	}
-	public Long getActivityID() {
-		return activityID;
-	}
-	public void setActivityID(Long activityID) {
-		this.activityID = activityID;
-	}
-	
-	public void addActivityURL(ActivityURL activityUrl)
-	{
-	    if(this.activityURLs ==null)
-	        this.activityURLs = new ArrayList();
-	    this.activityURLs.add(activityUrl);	    
-	}
+    /** Lesson to which this activity belongs. Id comes from the learner progress */
+    private Long lessonID;
 
-	public String getProgressSummary() {
-		return progressSummary;
-	}
+    /** Version no for the design. Increments after every major modification */
+    private Integer version;
 
-	public void setProgressSummary(String progressSummary) {
-		this.progressSummary = progressSummary;
-	}
+    /**
+     * Method reset
+     * 
+     * @param mapping
+     * @param request
+     */
+    @Override
+    public void reset(ActionMapping mapping, HttpServletRequest request) {
+	activityURLs = null;
+    }
 
-	public Long getLessonID() {
-		return lessonID;
-	}
+    public List getActivityURLs() {
+	return activityURLs;
+    }
 
-	public void setLessonID(Long lessonID) {
-		this.lessonID = lessonID;
+    public void setActivityURLs(List activityURLs) {
+	this.activityURLs = activityURLs;
+    }
+
+    public Long getActivityID() {
+	return activityID;
+    }
+
+    public void setActivityID(Long activityID) {
+	this.activityID = activityID;
+    }
+
+    public void addActivityURL(ActivityURL activityUrl) {
+	if (this.activityURLs == null) {
+	    this.activityURLs = new ArrayList();
 	}
-	
-	public Integer getVersion() {
-		return version;
-	}
-	
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
+	this.activityURLs.add(activityUrl);
+    }
+
+    public Long getLessonID() {
+	return lessonID;
+    }
+
+    public void setLessonID(Long lessonID) {
+	this.lessonID = lessonID;
+    }
+
+    public Integer getVersion() {
+	return version;
+    }
+
+    public void setVersion(Integer version) {
+	this.version = version;
+    }
 }

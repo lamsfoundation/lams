@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lasurv11/images/icon_survey.swf'
+, 'tool/lasurv11/images/icon_survey.svg'
 , NULL
 , NULL
 , NULL

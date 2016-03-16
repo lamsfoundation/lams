@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/labbb10/images/icon_bbb.swf'
+, 'tool/labbb10/images/icon_bbb.svg'
 , NULL
 , NULL
 , NULL

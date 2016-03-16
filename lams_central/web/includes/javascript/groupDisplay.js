@@ -378,8 +378,8 @@ function showSearchLessonDialog(orgID){
 }
 
 
-function showFlashlessAuthoringDialog(learningDesignID){
-	showDialog('dialogFlashlessAuthoring', {
+function showAuthoringDialog(learningDesignID){
+	showDialog('dialogAuthoring', {
 		'height' : $(window).height() - 10,
 		'width' : 1280,
 		'title' : 'Authoring',

@@ -1850,7 +1850,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    Integer orgId = getUserManagementService().getRootOrganisation().getOrganisationId();
 	    Vector<User> potentialUsersVector = getUserManagementService().getUsersFromOrganisationByRole(orgId,
-		    Role.SYSADMIN, false, true);
+		    Role.SYSADMIN, true);
 
 	    // list existing users (inherited role from parent nodes)
 	    Set<User> allInheritedUsers = getPedagogicalPlannerDAO().getInheritedNodeUsers(nodeUid, Role.ROLE_SYSADMIN);

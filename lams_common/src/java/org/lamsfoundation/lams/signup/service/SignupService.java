@@ -32,8 +32,7 @@ public class SignupService implements ISignupService {
     @Override
     public void signupUser(User user, String context) {
 	// save User
-	user.setFlashTheme(userManagementService.getDefaultFlashTheme());
-	user.setHtmlTheme(userManagementService.getDefaultHtmlTheme());
+	user.setTheme(userManagementService.getDefaultTheme());
 	user.setDisabledFlag(false);
 	user.setAuthenticationMethod(getAuthenticationMethod(AuthenticationMethod.DB));
 	user.setLocale(getDefaultLocale());

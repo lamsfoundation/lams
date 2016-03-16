@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,10 +108,6 @@ import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.AuditService;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -460,62 +455,6 @@ public class MonitoringService implements IMonitoringService {
 	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
 		new Object[] { lessonName, copiedLearningDesign.getTitle() });
 	return lesson;
-    }
-
-    @Override
-    public String initializeLesson(Integer creatorUserId, String lessonPacket) throws Exception {
-	FlashMessage flashMessage = null;
-
-	try {
-	    Hashtable table = (Hashtable) WDDXProcessor.deserialize(lessonPacket);
-
-	    // parse WDDX values
-
-	    String title = WDDXProcessor.convertToString("lessonName", table.get("lessonName"));
-	    String desc = WDDXProcessor.convertToString("lessonDescription", table.get("lessonDescription"));
-	    int copyType = WDDXProcessor.convertToInt("copyType", table.get("copyType"));
-	    Integer organisationId = WDDXProcessor.convertToInteger("organisationID", table.get("organisationID"));
-	    long ldId = WDDXProcessor.convertToLong(AttributeNames.PARAM_LEARNINGDESIGN_ID,
-		    table.get(AttributeNames.PARAM_LEARNINGDESIGN_ID));
-	    String customCSV = WDDXProcessor.convertToString(WDDXTAGS.CUSTOM_CSV, table.get(WDDXTAGS.CUSTOM_CSV));
-	    Boolean enableLessonIntro = WDDXProcessor.convertToBoolean("enableLessonIntro",
-		    table.get("enableLessonIntro"));
-	    Boolean displayDesignImage = WDDXProcessor.convertToBoolean("displayDesignImage",
-		    table.get("displayDesignImage"));
-	    boolean learnerPresenceAvailable = WDDXProcessor.convertToBoolean("enablePresence",
-		    table.get("enablePresence"));
-	    boolean learnerImAvailable = WDDXProcessor.convertToBoolean("enableIm", table.get("enableIm"));
-	    boolean liveEditEnabled = WDDXProcessor.convertToBoolean("enableLiveEdit", table.get("enableLiveEdit"));
-	    Boolean enableLessonNotifications = WDDXProcessor.convertToBoolean("enableLessonNotifications",
-		    table.get("enableLessonNotifications"));
-	    Integer scheduledNumberDaysToLessonFinish = WDDXProcessor.convertToInteger(
-		    "scheduledNumberDaysToLessonFinish", table.get("scheduledNumberDaysToLessonFinish"));
-	    Long precedingLessonId = WDDXProcessor.convertToLong("organisationID", table.get("precedingLessonID"));
-
-	    // initialize lesson
-
-	    Lesson newLesson = null;
-
-	    if (copyType == LearningDesign.COPY_TYPE_PREVIEW) {
-		newLesson = initializeLessonForPreview(title, desc, ldId, creatorUserId, customCSV,
-			learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
-	    } else {
-		newLesson = initializeLesson(title, desc, ldId, organisationId, creatorUserId, customCSV,
-			enableLessonIntro, displayDesignImage, learnerPresenceAvailable, learnerImAvailable,
-			liveEditEnabled, enableLessonNotifications, false, scheduledNumberDaysToLessonFinish,
-			precedingLessonId);
-	    }
-
-	    if (newLesson != null) {
-		flashMessage = new FlashMessage("initializeLesson", newLesson.getLessonId());
-	    }
-
-	    return flashMessage.serializeMessage();
-
-	} catch (Exception e) {
-	    MonitoringService.log.error("Exception occured trying to create a lesson class ", e);
-	    throw new Exception(e);
-	}
     }
 
     @Override
@@ -1527,48 +1466,6 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public String getLessonLearners(Long lessonID, Integer userID) throws IOException {
-	securityService.isLessonMonitor(lessonID, userID, "get lesson learners", true);
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-
-	Vector lessonLearners = new Vector();
-	FlashMessage flashMessage;
-	if (lesson != null) {
-	    Iterator iterator = lesson.getLessonClass().getLearners().iterator();
-	    while (iterator.hasNext()) {
-		User user = (User) iterator.next();
-		lessonLearners.add(user.getUserFlashDTO());
-	    }
-	    flashMessage = new FlashMessage("getLessonLearners", lessonLearners);
-	} else {
-	    flashMessage = new FlashMessage("getLessonLearners",
-		    messageService.getMessage("NO.SUCH.LESSON", new Object[] { lessonID }), FlashMessage.ERROR);
-	}
-	return flashMessage.serializeMessage();
-    }
-
-    @Override
-    public String getLessonStaff(Long lessonID, Integer userID) throws IOException {
-	securityService.isLessonMonitor(lessonID, userID, "get lesson staff", true);
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-
-	Vector lessonStaff = new Vector();
-	FlashMessage flashMessage;
-	if (lesson != null) {
-	    Iterator iterator = lesson.getLessonClass().getStaffGroup().getUsers().iterator();
-	    while (iterator.hasNext()) {
-		User user = (User) iterator.next();
-		lessonStaff.add(user.getUserFlashDTO());
-	    }
-	    flashMessage = new FlashMessage("getLessonStaff", lessonStaff);
-	} else {
-	    flashMessage = new FlashMessage("getLessonStaff",
-		    messageService.getMessage("NO.SUCH.LESSON", new Object[] { lessonID }), FlashMessage.ERROR);
-	}
-	return flashMessage.serializeMessage();
-    }
-
-    @Override
     public Collection<User> getUsersByEmailNotificationSearchType(int searchType, Long lessonId, String[] lessonIds,
 	    Long activityId, Integer xDaystoFinish, Integer orgId) {
 
@@ -1711,12 +1608,6 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public String getLearningDesignDetails(Long lessonID) throws IOException {
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-	return authoringService.getLearningDesignDetails(lesson.getLearningDesign().getLearningDesignId(), "");
-    }
-
-    @Override
     public Activity getActivityById(Long activityId) {
 	return activityDAO.getActivityByActivityId(activityId);
     }
@@ -1786,7 +1677,6 @@ public class MonitoringService implements IMonitoringService {
     public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException {
 	securityService.isLessonMonitor(lessonID, userID, "get activity monitor URL", true);
-	Lesson lesson = lessonDAO.getLesson(lessonID);
 
 	Activity activity = activityDAO.getActivityByActivityId(activityID);
 
@@ -1798,105 +1688,6 @@ public class MonitoringService implements IMonitoringService {
 	    return lamsCoreToolService.getToolMonitoringURL(lessonID, activity) + "&contentFolderID=" + contentFolderID;
 	}
 	return null;
-    }
-
-    @Override
-    public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID, Integer userID) throws IOException {
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-	FlashMessage flashMessage;
-	if (lesson != null) {
-	    if (lesson.getUser().getUserId().equals(userID)) {
-		WorkspaceFolder workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class,
-			targetWorkspaceFolderID);
-		if (workspaceFolder != null) {
-		    LearningDesign learningDesign = lesson.getLearningDesign();
-		    learningDesign.setWorkspaceFolder(workspaceFolder);
-		    learningDesignDAO.update(learningDesign);
-		    flashMessage = new FlashMessage("moveLesson", targetWorkspaceFolderID);
-		} else {
-		    flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveLesson", targetWorkspaceFolderID);
-		}
-	    } else {
-		flashMessage = FlashMessage.getUserNotAuthorized("moveLesson", userID);
-	    }
-	} else {
-	    flashMessage = new FlashMessage("moveLesson",
-		    messageService.getMessage("NO.SUCH.LESSON", new Object[] { lessonID }), FlashMessage.ERROR);
-
-	}
-	return flashMessage.serializeMessage();
-
-    }
-
-    @Override
-    public String releaseGate(Long activityID) throws IOException {
-	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(activityID);
-	FlashMessage flashMessage;
-	if (gate == null) {
-	    flashMessage = new FlashMessage("releaseGate",
-		    messageService.getMessage("INVALID.ACTIVITYID", new Object[] { activityID }), FlashMessage.ERROR);
-	} else {
-	    // release gate
-	    gate = openGate(activityID);
-
-	    flashMessage = new FlashMessage("releaseGate", gate.getGateOpen());
-
-	}
-	return flashMessage.serializeMessage();
-
-    }
-
-    @Override
-    public void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException {
-	Grouping grouping = groupingActivity.getCreateGrouping();
-
-	if (!grouping.isChosenGrouping()) {
-	    MonitoringService.log.error(
-		    "GroupingActivity [" + groupingActivity.getActivityId() + "] does not have chosen grouping.");
-	    throw new MonitoringServiceException(
-		    "GroupingActivity [" + groupingActivity.getActivityId() + "] is not chosen grouping.");
-	}
-	try {
-	    // try to sorted group list by orderID.
-	    Iterator iter = groups.iterator();
-	    Map sortedMap = new TreeMap(new Comparator() {
-		@Override
-		public int compare(Object arg0, Object arg1) {
-		    return ((Long) arg0).compareTo((Long) arg1);
-		}
-	    });
-	    while (iter.hasNext()) {
-		Hashtable group = (Hashtable) iter.next();
-		Long orderId = WDDXProcessor.convertToLong(group, MonitoringConstants.KEY_GROUP_ORDER_ID);
-		sortedMap.put(orderId, group);
-	    }
-	    iter = sortedMap.values().iterator();
-	    // grouping all group in list
-	    for (int orderId = 0; iter.hasNext(); orderId++) {
-		Hashtable group = (Hashtable) iter.next();
-		List learnerIdList = (List) group.get(MonitoringConstants.KEY_GROUP_LEARNERS);
-		String groupName = WDDXProcessor.convertToString(group, MonitoringConstants.KEY_GROUP_NAME);
-		List learners = new ArrayList();
-		// ? Seem too low efficient, is there a easy way?
-		for (int idx = 0; idx < learnerIdList.size(); idx++) {
-		    User user = (User) baseDAO.find(User.class, ((Double) learnerIdList.get(idx)).intValue());
-		    learners.add(user);
-
-		}
-		MonitoringService.log.debug("Performing grouping for " + groupName + "...");
-		lessonService.performGrouping(groupingActivity, groupName, learners);
-		MonitoringService.log.debug("Finish grouping for " + groupName);
-	    }
-
-	    MonitoringService.log.debug("Persist grouping for [" + grouping.getGroupingId() + "]...");
-	    groupingDAO.update(grouping);
-	    MonitoringService.log.debug("Persist grouping for [" + grouping.getGroupingId() + "] success.");
-
-	} catch (WDDXProcessorConversionException e) {
-	    throw new MonitoringServiceException(
-		    "Perform chosen grouping occurs error when parsing WDDX package:" + e.getMessage());
-	}
-
     }
 
     // ---------------------------------------------------------------------
@@ -2475,8 +2266,7 @@ public class MonitoringService implements IMonitoringService {
     private List<User> createLearnerGroup(Integer groupId, Boolean addAllLearners, String[] learnerIds) {
 	List<User> learnerUsers = new ArrayList<User>();
 	if (addAllLearners) {
-	    Vector learnerVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, false,
-		    true);
+	    Vector learnerVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, true);
 	    learnerUsers.addAll(learnerVector);
 	} else {
 	    User user = null;
@@ -2498,8 +2288,7 @@ public class MonitoringService implements IMonitoringService {
     private List<User> createStaffGroup(Integer groupId, Boolean addAllStaff, String[] staffIds) {
 	List<User> staffUsers = new ArrayList<User>();
 	if (addAllStaff) {
-	    Vector staffVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR, false,
-		    true);
+	    Vector staffVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR, true);
 	    staffUsers.addAll(staffVector);
 	} else {
 	    User user = null;

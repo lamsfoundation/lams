@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.UnsupportedEncodingException;
@@ -34,72 +34,62 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.web.action.LamsAction;
 
 /**
  * Action class to display a sequence activity.
  * 
- * Normally this will display the first activity inside a sequence activity.
- * If there are no activities within the sequence activity then it will display
- * an "empty" message.
+ * Normally this will display the first activity inside a sequence activity. If there are no activities within the
+ * sequence activity then it will display an "empty" message.
  * 
- * @struts:action path="/SequenceActivity" name="activityForm"
- *                validate="false" scope="request"
+ * @struts:action path="/SequenceActivity" name="activityForm" validate="false" scope="request"
  * 
  */
 public class SequenceActivityAction extends ActivityAction {
-	
 
-	/**
-	 * Gets an sequence activity from the request (attribute) and forwards to
-	 * either the first activity in the sequence activity or the "empty" JSP.
-	 * @throws UnsupportedEncodingException 
-	 * @throws LearnerServiceException 
-	 */
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) throws LearnerServiceException, UnsupportedEncodingException {
+    /**
+     * Gets an sequence activity from the request (attribute) and forwards to either the first activity in the sequence
+     * activity or the "empty" JSP.
+     * 
+     * @throws UnsupportedEncodingException
+     * @throws LearnerServiceException
+     */
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) throws LearnerServiceException, UnsupportedEncodingException {
 
-		ActivityForm form = (ActivityForm)actionForm;
-		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
-		Integer learnerId = LearningWebUtil.getUserId();
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
+	Integer learnerId = LearningWebUtil.getUserId();
 
-		ICoreLearnerService learnerService = getLearnerService();
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		if (!(activity instanceof SequenceActivity)) {
-		    log.error(className+": activity not SequenceActivity "+activity.getActivityId());
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
-
-		ActionForward forward = null;
-		SequenceActivity sequenceActivity = (SequenceActivity)activity;
-        Activity firstActivityInSequence = sequenceActivity.getNextActivityByParent(new NullActivity());
-        
-        if ( firstActivityInSequence != null && ! firstActivityInSequence.isNull() ) {
-			// Set the first activity as the current activity and display it
-			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), firstActivityInSequence, true);
-			forward = actionMappings.getActivityForward(firstActivityInSequence, learnerProgress, true);
-			LearningWebUtil.putActivityInRequest(request, firstActivityInSequence, learnerService);
-			LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
-	        return forward;
-		} else {
-		    // No activities exist in the sequence, so go to the next activity.
-	        return LearningWebUtil.completeActivity(request, response,
-			    		actionMappings, learnerProgress, activity, 
-			    		learnerId, learnerService, true);
-		}
-
-       	
+	ICoreLearnerService learnerService = getLearnerService();
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	if (!(activity instanceof SequenceActivity)) {
+	    LamsAction.log.error(LamsAction.className + ": activity not SequenceActivity " + activity.getActivityId());
+	    return mapping.findForward(ActivityMapping.ERROR);
 	}
-	
+
+	ActionForward forward = null;
+	SequenceActivity sequenceActivity = (SequenceActivity) activity;
+	Activity firstActivityInSequence = sequenceActivity.getNextActivityByParent(new NullActivity());
+
+	if ((firstActivityInSequence != null) && !firstActivityInSequence.isNull()) {
+	    // Set the first activity as the current activity and display it
+	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
+		    firstActivityInSequence, true);
+	    forward = actionMappings.getActivityForward(firstActivityInSequence, learnerProgress, true);
+	    LearningWebUtil.putActivityInRequest(request, firstActivityInSequence, learnerService);
+	    return forward;
+	} else {
+	    // No activities exist in the sequence, so go to the next activity.
+	    return LearningWebUtil.completeActivity(request, response, actionMappings, learnerProgress, activity,
+		    learnerId, learnerService, true);
+	}
+    }
 }

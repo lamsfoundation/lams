@@ -73,12 +73,6 @@
 			org.springframework.web.context.ContextLoaderListener
 		</listener-class>
 	</listener>
-	
-	<servlet>
-		<servlet-name>initializeLesson</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
-
-	</servlet>
 
 	<servlet>
 		<servlet-name>action</servlet-name>
@@ -105,11 +99,6 @@
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>initializeLesson</servlet-name>
-		<url-pattern>/initializeLesson</url-pattern>
 	</servlet-mapping>
 
 	<error-page>
@@ -216,7 +205,6 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Lesson start content</web-resource-name>
-			<url-pattern>/initializeLesson</url-pattern>
 			<url-pattern>/monitoring.do</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>

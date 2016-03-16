@@ -28,8 +28,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.util.HelpUtil;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -64,7 +63,7 @@ public class AuthoringActivityDTO extends BaseDTO {
     private Long activityID;
 
     /**
-     * FLASH generated value. Unique per LearningDesign. Required by flash only.
+     * Authoring generated value. Unique per LearningDesign. Required by Authorig only.
      */
     private Integer activityUIID;
 
@@ -231,7 +230,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     /**
      * List of the UIIDs of the activities that are input activities for this activity. This array will only contain
-     * integers. We can't type the get method as that breaks WDDX.
+     * integers.
      */
     private ArrayList<Integer> inputActivities;
 
@@ -271,7 +270,8 @@ public class AuthoringActivityDTO extends BaseDTO {
     /*******************************************************************************************************************
      * Constructors
      ******************************************************************************************************************/
-    public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings, String languageCode) {
+    public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings,
+	    String languageCode) {
 	activityID = activity.getActivityId();
 	activityUIID = activity.getActivityUIID();
 	description = activity.getDescription();
@@ -289,8 +289,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 	orderID = activity.getOrderId();
 	learningDesignID = activity.getLearningDesign() != null ? activity.getLearningDesign().getLearningDesignId()
 		: null;
-	learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary()
-		.getLearningLibraryId() : null;
+	learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary().getLearningLibraryId()
+		: null;
 	createDateTime = activity.getCreateDateTime();
 	languageFile = activity.getLanguageFile();
 	activityCategoryID = activity.getActivityCategoryID();
@@ -391,9 +391,9 @@ public class AuthoringActivityDTO extends BaseDTO {
 	Integer toolActivityUIID = parentActivity == null ? null : parentActivity.getToolInputActivityUIID();
 
 	if (activity.getBranchEntries() != null) {
-	    Iterator iter = activity.getBranchEntries().iterator();
+	    Iterator<BranchActivityEntry> iter = activity.getBranchEntries().iterator();
 	    while (iter.hasNext()) {
-		BranchActivityEntry ba = (BranchActivityEntry) iter.next();
+		BranchActivityEntry ba = iter.next();
 		branchMappings.add(ba.getBranchActivityEntryDTO(toolActivityUIID));
 	    }
 	}
@@ -431,8 +431,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 	    }
 	}
 
-	plannerMetadataDTO = toolActivity.getPlannerMetadata() == null ? null : new PlannerActivityMetadataDTO(
-		toolActivity.getPlannerMetadata());
+	plannerMetadataDTO = toolActivity.getPlannerMetadata() == null ? null
+		: new PlannerActivityMetadataDTO(toolActivity.getPlannerMetadata());
     }
 
     private void addGateActivityAttributes(Object activity, ArrayList<BranchActivityEntryDTO> branchMappings) {
@@ -454,7 +454,6 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     }
 
-    @SuppressWarnings("unchecked")
     private void addConditionGateActivityAttributes(ConditionGateActivity activity,
 	    ArrayList<BranchActivityEntryDTO> branchMappings) {
 	if (activity.getBranchActivityEntries() != null) {
@@ -845,9 +844,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The activityCategoryID to set.
      */
     public void setActivityCategoryID(Integer activityCategoryID) {
-	if (!activityCategoryID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.activityCategoryID = activityCategoryID;
-	}
+	this.activityCategoryID = activityCategoryID;
     }
 
     /**
@@ -855,9 +852,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The activityID to set.
      */
     public void setActivityID(Long activityId) {
-	if (!activityId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    activityID = activityId;
-	}
+	activityID = activityId;
     }
 
     /**
@@ -865,9 +860,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The activityTypeID to set.
      */
     public void setActivityTypeID(Integer activityTypeId) {
-	if (!activityTypeId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    activityTypeID = activityTypeId;
-	}
+	activityTypeID = activityTypeId;
     }
 
     /**
@@ -875,9 +868,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The activityUIID to set.
      */
     public void setActivityUIID(Integer activityUIID) {
-	if (!activityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.activityUIID = activityUIID;
-	}
+	this.activityUIID = activityUIID;
     }
 
     /**
@@ -885,9 +876,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The createDateTime to set.
      */
     public void setCreateDateTime(Date createDateTime) {
-	if (!createDateTime.equals(WDDXTAGS.DATE_NULL_VALUE)) {
-	    this.createDateTime = createDateTime;
-	}
+	this.createDateTime = createDateTime;
     }
 
     /**
@@ -895,9 +884,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The createGroupingID to set.
      */
     public void setCreateGroupingID(Long createGroupingID) {
-	if (!createGroupingID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.createGroupingID = createGroupingID;
-	}
+	this.createGroupingID = createGroupingID;
     }
 
     /**
@@ -905,9 +892,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The createGroupingUIID to set.
      */
     public void setCreateGroupingUIID(Integer createGroupingUIID) {
-	if (!createGroupingUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.createGroupingUIID = createGroupingUIID;
-	}
+	this.createGroupingUIID = createGroupingUIID;
     }
 
     /**
@@ -915,9 +900,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The description to set.
      */
     public void setDescription(String description) {
-	if (!description.equals(WDDXTAGS.STRING_NULL_VALUE)) {
-	    this.description = description;
-	}
+	this.description = description;
     }
 
     /**
@@ -925,9 +908,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The gateActivityLevelID to set.
      */
     public void setGateActivityLevelID(Integer gateActivityLevelID) {
-	if (!gateActivityLevelID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.gateActivityLevelID = gateActivityLevelID;
-	}
+	this.gateActivityLevelID = gateActivityLevelID;
     }
 
     /**
@@ -935,9 +916,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The gateEndDateTime to set.
      */
     public void setGateEndDateTime(Date gateEndDateTime) {
-	if (!gateEndDateTime.equals(WDDXTAGS.DATE_NULL_VALUE)) {
-	    this.gateEndDateTime = gateEndDateTime;
-	}
+	this.gateEndDateTime = gateEndDateTime;
     }
 
     /**
@@ -945,9 +924,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The gateEndTimeOffset to set.
      */
     public void setGateEndTimeOffset(Long gateEndTimeOffset) {
-	if (!gateEndTimeOffset.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.gateEndTimeOffset = gateEndTimeOffset;
-	}
+	this.gateEndTimeOffset = gateEndTimeOffset;
     }
 
     /**
@@ -963,9 +940,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The gateStartDateTime to set.
      */
     public void setGateStartDateTime(Date gateStartDateTime) {
-	if (!gateStartDateTime.equals(WDDXTAGS.DATE_NULL_VALUE)) {
-	    this.gateStartDateTime = gateStartDateTime;
-	}
+	this.gateStartDateTime = gateStartDateTime;
     }
 
     /**
@@ -973,9 +948,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The gateStartTimeOffset to set.
      */
     public void setGateStartTimeOffset(Long gateStartTimeOffset) {
-	if (!gateStartTimeOffset.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.gateStartTimeOffset = gateStartTimeOffset;
-	}
+	this.gateStartTimeOffset = gateStartTimeOffset;
     }
 
     /**
@@ -983,9 +956,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The groupingID to set.
      */
     public void setGroupingID(Long groupingID) {
-	if (!WDDXTAGS.NUMERIC_NULL_VALUE_LONG.equals(groupingID)) {
-	    this.groupingID = groupingID;
-	}
+	this.groupingID = groupingID;
     }
 
     /**
@@ -993,9 +964,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The groupingUIID to set.
      */
     public void setGroupingUIID(Integer groupingUIID) {
-	if (!WDDXTAGS.NUMERIC_NULL_VALUE_LONG.equals(groupingUIID)) {
-	    this.groupingUIID = groupingUIID;
-	}
+	this.groupingUIID = groupingUIID;
     }
 
     /**
@@ -1003,9 +972,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The helpText to set.
      */
     public void setHelpText(String helpText) {
-	if (!helpText.equals(WDDXTAGS.STRING_NULL_VALUE)) {
-	    this.helpText = helpText;
-	}
+	this.helpText = helpText;
     }
 
     /**
@@ -1013,9 +980,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The learningDesignID to set.
      */
     public void setLearningDesignID(Long learningDesignID) {
-	if (!learningDesignID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.learningDesignID = learningDesignID;
-	}
+	this.learningDesignID = learningDesignID;
     }
 
     /**
@@ -1023,9 +988,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The learningLibraryID to set.
      */
     public void setLearningLibraryID(Long learningLibraryID) {
-	if (!learningLibraryID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.learningLibraryID = learningLibraryID;
-	}
+	this.learningLibraryID = learningLibraryID;
     }
 
     /**
@@ -1033,9 +996,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The libraryActivityID to set.
      */
     public void setLibraryActivityID(Long libraryActivityID) {
-	if (!libraryActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.libraryActivityID = libraryActivityID;
-	}
+	this.libraryActivityID = libraryActivityID;
     }
 
     /**
@@ -1043,9 +1004,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The libraryActivityUiImage to set.
      */
     public void setLibraryActivityUIImage(String libraryActivityUiImage) {
-	if (!libraryActivityUiImage.equals(WDDXTAGS.STRING_NULL_VALUE)) {
-	    libraryActivityUIImage = libraryActivityUiImage;
-	}
+	libraryActivityUIImage = libraryActivityUiImage;
     }
 
     /**
@@ -1053,9 +1012,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The maxActivities to set.
      */
     public void setMaxActivities(Integer maxActivities) {
-	if (!maxActivities.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.maxActivities = maxActivities;
-	}
+	this.maxActivities = maxActivities;
     }
 
     /**
@@ -1063,9 +1020,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The maxOptions to set.
      */
     public void setMaxOptions(Integer maxOptions) {
-	if (!maxOptions.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.maxOptions = maxOptions;
-	}
+	this.maxOptions = maxOptions;
     }
 
     /**
@@ -1073,9 +1028,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The minOptions to set.
      */
     public void setMinOptions(Integer minOptions) {
-	if (!minOptions.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.minOptions = minOptions;
-	}
+	this.minOptions = minOptions;
     }
 
     /**
@@ -1083,9 +1036,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The optionsInstructions to set.
      */
     public void setOptionsInstructions(String optionsInstructions) {
-	if (!optionsInstructions.equals(WDDXTAGS.STRING_NULL_VALUE)) {
-	    this.optionsInstructions = optionsInstructions;
-	}
+	this.optionsInstructions = optionsInstructions;
     }
 
     /**
@@ -1093,9 +1044,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The orderID to set.
      */
     public void setOrderID(Integer orderID) {
-	if (!orderID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.orderID = orderID;
-	}
+	this.orderID = orderID;
     }
 
     /**
@@ -1103,9 +1052,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The parentActivityID to set.
      */
     public void setParentActivityID(Long parentActivityID) {
-	if (!WDDXTAGS.NUMERIC_NULL_VALUE_LONG.equals(parentActivityID)) {
-	    this.parentActivityID = parentActivityID;
-	}
+	this.parentActivityID = parentActivityID;
     }
 
     /**
@@ -1113,9 +1060,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The parentUIID to set.
      */
     public void setParentUIID(Integer parentUIID) {
-	if (!parentUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.parentUIID = parentUIID;
-	}
+	this.parentUIID = parentUIID;
     }
 
     /**
@@ -1123,9 +1068,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The title to set.
      */
     public void setActivityTitle(String title) {
-	if (!title.equals(WDDXTAGS.STRING_NULL_VALUE)) {
-	    activityTitle = title;
-	}
+	activityTitle = title;
     }
 
     /**
@@ -1133,9 +1076,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The toolContentID to set.
      */
     public void setToolContentID(Long toolContentID) {
-	if (!toolContentID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.toolContentID = toolContentID;
-	}
+	this.toolContentID = toolContentID;
     }
 
     /**
@@ -1143,9 +1084,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The toolID to set.
      */
     public void setToolID(Long toolID) {
-	if (!toolID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.toolID = toolID;
-	}
+	this.toolID = toolID;
     }
 
     /**
@@ -1153,9 +1092,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The xcoord to set.
      */
     public void setxCoord(Integer xcoord) {
-	if (!xcoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    xCoord = xcoord;
-	}
+	xCoord = xcoord;
     }
 
     /**
@@ -1163,9 +1100,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The ycoord to set.
      */
     public void setyCoord(Integer ycoord) {
-	if (!xCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    yCoord = ycoord;
-	}
+	yCoord = ycoord;
     }
 
     /**
@@ -1181,9 +1116,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The groupingSupportType to set.
      */
     public void setGroupingSupportType(Integer groupingSupportType) {
-	if (!groupingSupportType.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.groupingSupportType = groupingSupportType;
-	}
+	this.groupingSupportType = groupingSupportType;
     }
 
     /**
@@ -1191,9 +1124,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The groupingType to set.
      */
     public void setGroupingType(Integer groupingType) {
-	if (!groupingType.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.groupingType = groupingType;
-	}
+	this.groupingType = groupingType;
     }
 
     /**
@@ -1202,9 +1133,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *            The readOnly to set.
      */
     public void setReadOnly(Boolean readOnly) {
-	if (!readOnly.equals(WDDXTAGS.BOOLEAN_NULL_VALUE)) {
-	    this.readOnly = readOnly;
-	}
+	this.readOnly = readOnly;
     }
 
     public void setAuthoringURL(String toolAuthoringURL) {
@@ -1252,33 +1181,23 @@ public class AuthoringActivityDTO extends BaseDTO {
     }
 
     public void setDefaultActivityUIID(Integer defaultActivityUIID) {
-	if (!defaultActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.defaultActivityUIID = defaultActivityUIID;
-	}
+	this.defaultActivityUIID = defaultActivityUIID;
     }
 
     public void setEndXCoord(Integer endXCoord) {
-	if (!endXCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.endXCoord = endXCoord;
-	}
+	this.endXCoord = endXCoord;
     }
 
     public void setEndYCoord(Integer endYCoord) {
-	if (!endYCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.endYCoord = endYCoord;
-	}
+	this.endYCoord = endYCoord;
     }
 
     public void setStartXCoord(Integer startXCoord) {
-	if (!startXCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.startXCoord = startXCoord;
-	}
+	this.startXCoord = startXCoord;
     }
 
     public void setStartYCoord(Integer startYCoord) {
-	if (!startYCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.startYCoord = startYCoord;
-	}
+	this.startYCoord = startYCoord;
     }
 
     public String getAdminURL() {

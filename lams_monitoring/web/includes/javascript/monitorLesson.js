@@ -1516,7 +1516,7 @@ function openLiveEdit(){
 				if (response) {
 					alert(response);
 				} else {
-					window.parent.showFlashlessAuthoringDialog(ldId, 'editonfly');
+					window.parent.showAuthoringDialog(ldId, 'editonfly');
 					closeMonitorLessonDialog();
 				}
 			}

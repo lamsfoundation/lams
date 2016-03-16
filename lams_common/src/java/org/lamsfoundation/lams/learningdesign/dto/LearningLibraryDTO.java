@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.learningdesign.LearningLibrary;
  * @author Manpreet Minhas
  * 
  * This class acts as a data transfer object for transfering 
- * information between FLASH and the core module. It passes 
+ * information between Authoring and the core module. It passes 
  * information about all available Learning Libraries.
  * 
  */

@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -26,7 +25,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -44,8 +42,6 @@ import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
@@ -97,26 +93,6 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    children = new LinkedList<ContentTreeNode>();
 	}
 
-	List<ContentTreeNode> getChildren() {
-	    return children;
-	}
-
-	void setChildren(List<ContentTreeNode> children) {
-	    this.children = children;
-	}
-
-	FolderContentDTO getContent() {
-	    return content;
-	}
-
-	void setContent(FolderContentDTO content) {
-	    this.content = content;
-	}
-
-	void addChild(FolderContentDTO content) {
-	    children.add(new ContentTreeNode(content));
-	}
-
 	void addChild(ContentTreeNode node) {
 	    children.add(node);
 	}
@@ -144,29 +120,6 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		ex.printStackTrace();
 		return null;
 	    }
-	}
-
-	String convert() {
-	    StringBuilder sb = new StringBuilder();
-	    if (content.getResourceType().equals(FolderContentDTO.FOLDER)) {
-		sb.append("['");
-		sb.append(content.getName()).append("',").append("null").append(',');
-		if (children.size() == 0) {
-		    sb.append("['',null]");
-		} else {
-		    sb.append(children.get(0).convert());
-		    for (int i = 1; i < children.size(); i++) {
-			sb.append(',').append(children.get(i).convert());
-		    }
-		}
-		sb.append(']');
-	    } else if (content.getResourceType().equals(FolderContentDTO.DESIGN)) {
-		sb.append('[');
-		sb.append('\'').append(content.getName()).append('\'').append(',').append('\'')
-			.append(content.getResourceID()).append('\'');
-		sb.append(']');
-	    }
-	    return sb.toString();
 	}
 
 	public Document getDocument() {
@@ -368,23 +321,9 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			LearningDesignRepositoryServlet.PARAM_LEARING_DESIGN_ID);
 		LearningDesignRepositoryServlet.log
 			.debug("User " + userId + " " + username + " deleting learning design " + learningDesignId);
-		String wddxResponse = LearningDesignRepositoryServlet.service.deleteResource(learningDesignId,
-			FolderContentDTO.DESIGN, userId);
-		Hashtable table = (Hashtable) WDDXProcessor.deserialize(wddxResponse);
-
-		Double messageTypeDouble = (Double) table.get("messageType");
-		int messageType = messageTypeDouble != null ? messageTypeDouble.intValue() : 0;
-		if (messageType == FlashMessage.OBJECT_MESSAGE) {
-		    JSONObject jsonObject = new JSONObject(table);
-		    response.setContentType("application/json;charset=utf-8");
-		    response.getWriter().print(jsonObject.toString());
-
-		} else {
-		    LearningDesignRepositoryServlet.log.error("Unable to delete learning design " + learningDesignId
-			    + " for user " + userId + " error " + table.get("messageValue"));
-		    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-			    table.get("messageValue").toString());
-		}
+		// if OK then just return HTTP 200, otherwise an exception will result in error code
+		LearningDesignRepositoryServlet.service.deleteResource(learningDesignId, FolderContentDTO.DESIGN,
+			userId);
 
 		//TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
 	    } else {

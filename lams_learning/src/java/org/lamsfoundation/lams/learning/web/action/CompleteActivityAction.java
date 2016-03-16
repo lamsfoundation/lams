@@ -36,7 +36,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -66,6 +65,7 @@ public class CompleteActivityAction extends ActivityAction {
      * @throws IOException
      * @throws ServletException
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
@@ -78,8 +78,8 @@ public class CompleteActivityAction extends ActivityAction {
 	// This must get the learner progress from the progress id, not cached from the request,
 	// otherwise we may be using an old version of a lesson while a teacher is starting a
 	// live edit, and then the lock flag can't be checked correctly.
-	LearnerProgress progress = learnerService.getProgressById(WebUtil.readLongParam(request,
-		LearningWebUtil.PARAM_PROGRESS_ID, true));
+	LearnerProgress progress = learnerService
+		.getProgressById(WebUtil.readLongParam(request, LearningWebUtil.PARAM_PROGRESS_ID, true));
 
 	// if user has already completed the lesson - we need to let integrations servers know to come and pick up
 	// updated marks (as it won't happen at lessoncomplete.jsp page)
@@ -94,21 +94,19 @@ public class CompleteActivityAction extends ActivityAction {
 	ActionForward forward = null;
 	// Set activity as complete
 	try {
-	    forward = LearningWebUtil.completeActivity(request, response, actionMappings, progress, activity,
-		    learnerId, learnerService, false);
+	    forward = LearningWebUtil.completeActivity(request, response, actionMappings, progress, activity, learnerId,
+		    learnerService, false);
 	} catch (LearnerServiceException e) {
 	    return mapping.findForward("error");
 	}
-
-	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, progress);
 	return forward;
     }
-    
+
     private IntegrationService getIntegrationService() {
-	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		    getServlet().getServletContext()).getBean("integrationService");
+	if (CompleteActivityAction.integrationService == null) {
+	    CompleteActivityAction.integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
 	}
-	return integrationService;
+	return CompleteActivityAction.integrationService;
     }
 }

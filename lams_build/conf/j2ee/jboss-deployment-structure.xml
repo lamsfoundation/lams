@@ -23,7 +23,6 @@
       <module name="org.apache.batik" export="true" />
       <module name="net.sf.cglib" export="true" />
       <module name="net.fckeditor" export="true" />
-      <module name="com.flagstone" export="true" />
       <module name="org.apache.commons.beanutils" export="true" />
       <module name="org.apache.commons.collections" export="true" />
       <module name="org.apache.commons.io" export="true" />
@@ -49,7 +48,6 @@
       <module name="org.apache.struts" export="true" />
       <module name="org.apache.strutsel" export="true" />
       <module name="org.tuckey.urlrewrite" export="true" />
-      <module name="com.allaire.wddx" export="true" />
       <module name="com.thoughtworks.xstream" export="true" />
       <module name="io.undertow.core" export="true" />
   	  <module name="io.undertow.servlet" export="true" />

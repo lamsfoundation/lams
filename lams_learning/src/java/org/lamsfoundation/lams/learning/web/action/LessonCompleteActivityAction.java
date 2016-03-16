@@ -21,11 +21,10 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,23 +41,21 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
-
-/** 
+/**
  * Action class run when the learner finishes a lesson.
  * 
  * XDoclet definition:
  * 
- * ----------------XDoclet Tags-------------------- 
- * @struts:action path="/LessonComplete" name="activityForm"
- *                validate="false" scope="request"
+ * ----------------XDoclet Tags--------------------
+ * 
+ * @struts:action path="/LessonComplete" name="activityForm" validate="false" scope="request"
  * @struts:action-forward name="lessonComplete" path=".lessonComplete"
  * 
  * 
- * ----------------XDoclet Tags--------------------
+ *                        ----------------XDoclet Tags--------------------
  */
 public class LessonCompleteActivityAction extends ActivityAction {
-    
+
     private static IntegrationService integrationService = null;
     private static ILessonService lessonService = null;
 
@@ -66,11 +63,11 @@ public class LessonCompleteActivityAction extends ActivityAction {
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
      * If no activity is in request then use the current activity in learnerProgress.
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, getLearnerService());
-	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, learnerProgress);
-	
+
 	Set<Lesson> releasedLessons = getLessonService().getReleasedSucceedingLessons(
 		learnerProgress.getLesson().getLessonId(), learnerProgress.getUser().getUserId());
 	if (!releasedLessons.isEmpty()) {
@@ -88,23 +85,23 @@ public class LessonCompleteActivityAction extends ActivityAction {
 	if (lessonFinishCallbackUrl != null) {
 	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
 	}
-	
+
 	return mapping.findForward("lessonComplete");
     }
-    
+
     private IntegrationService getIntegrationService() {
-	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		    getServlet().getServletContext()).getBean("integrationService");
+	if (LessonCompleteActivityAction.integrationService == null) {
+	    LessonCompleteActivityAction.integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
 	}
-	return integrationService;
+	return LessonCompleteActivityAction.integrationService;
     }
-    
+
     private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		    getServlet().getServletContext()).getBean("lessonService");
+	if (LessonCompleteActivityAction.lessonService == null) {
+	    LessonCompleteActivityAction.lessonService = (ILessonService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("lessonService");
 	}
-	return lessonService;
+	return LessonCompleteActivityAction.lessonService;
     }
 }

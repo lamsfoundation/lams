@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,62 +31,52 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.web.action.LamsAction;
 
-/** 
+/**
  * Action class to forward the user to a Tool.
  * 
  * @author daveg
  * 
- * XDoclet definition:
+ *         XDoclet definition:
  * 
- * @struts:action path="/DisplayToolActivity" name="activityForm"
- *                validate="false" scope="request"
+ * @struts:action path="/DisplayToolActivity" name="activityForm" validate="false" scope="request"
  * 
  */
 public class DisplayToolActivityAction extends ActivityAction {
 
-	/**
-	 * Gets a tool activity from the request (attribute) and uses a redirect
-	 * to forward the user to the tool.
-	 */
-	public ActionForward execute(ActionMapping mapping,
-	                             ActionForm actionForm,
-	                             HttpServletRequest request,
-	                             HttpServletResponse response) 
-	{
-		//ActivityForm form = (ActivityForm)actionForm;
-		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
-		
-		ICoreLearnerService learnerService = getLearnerService();
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+    /**
+     * Gets a tool activity from the request (attribute) and uses a redirect to forward the user to the tool.
+     */
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	//ActivityForm form = (ActivityForm)actionForm;
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-		if (!(activity instanceof ToolActivity)) 
-		{
-		    log.error(className+": activity not ToolActivity");
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
-		
-		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, learnerProgress);
+	ICoreLearnerService learnerService = getLearnerService();
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
-		ToolActivity toolActivity = (ToolActivity)activity;
-
-		String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), toolActivity, learnerProgress.getUser());
-		try 
-		{
-		    response.sendRedirect(url);
-		}
-		catch (java.io.IOException e) 
-		{
-		    return mapping.findForward(ActivityMapping.ERROR);
-		}
-		return null;
+	if (!(activity instanceof ToolActivity)) {
+	    LamsAction.log.error(LamsAction.className + ": activity not ToolActivity");
+	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 
+	ToolActivity toolActivity = (ToolActivity) activity;
+
+	String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), toolActivity,
+		learnerProgress.getUser());
+	try {
+	    response.sendRedirect(url);
+	} catch (java.io.IOException e) {
+	    return mapping.findForward(ActivityMapping.ERROR);
+	}
+	return null;
+    }
 }

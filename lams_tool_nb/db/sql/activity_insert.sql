@@ -90,7 +90,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lanb11/images/icon_htmlnb.swf'
+, 'tool/lanb11/images/icon_htmlnb.svg'
 , NULL
 , NULL
 , NULL

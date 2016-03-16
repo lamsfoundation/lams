@@ -30,7 +30,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.usermanagement.User;
 
-/** Grouping object, suitable for sending to Flash */
+/** Grouping object, suitable for sending to Authoring */
 public class GroupDTO {
 	
 	private Long groupID;
@@ -41,7 +41,7 @@ public class GroupDTO {
     private Integer groupUIID;
 	
     /** Get the DTO for this group. Does not include the GroupBranchActivities as they will
-     * be in a separate array for Flash. 
+     * be in a separate array for Authoring. 
      * @param group
      */
 	@SuppressWarnings("unchecked")
@@ -54,7 +54,7 @@ public class GroupDTO {
 		if(setupUserList && group.getUsers() != null){
 			Iterator iter = group.getUsers().iterator();
 			while(iter.hasNext()){
-				userList.add(((User)iter.next()).getUserFlashDTO());
+				userList.add(((User)iter.next()).getUserBasicDTO());
 			}
 		}
 	}

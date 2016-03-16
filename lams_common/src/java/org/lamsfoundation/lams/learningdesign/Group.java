@@ -49,7 +49,7 @@ public class Group implements Serializable, Nullable, Comparable {
     private int orderId;
 
     /**
-     * FLASH generated value. Unique per LearningDesign. Required by flash only.
+     * Authoring generated value. Unique per LearningDesign.
      */
     private Integer groupUIID;
 

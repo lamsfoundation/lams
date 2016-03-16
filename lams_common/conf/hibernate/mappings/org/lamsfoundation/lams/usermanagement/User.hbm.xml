@@ -362,25 +362,10 @@
         </meta>
         <column name="authentication_method_id" />
     </many-to-one>
-    <!-- bi-directional many-to-one association to CSSTheme -->
-    <many-to-one
-        name="flashTheme"
-        class="org.lamsfoundation.lams.themes.Theme"
-        lazy="false"
-        not-null="true"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-	        lazy="false"
-            not-null="true"
-           @hibernate.column name="flash_theme_id"         
-        </meta>
-        <column name="flash_theme_id" />
-    </many-to-one>
     
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
-        name="htmlTheme"
+        name="theme"
         class="org.lamsfoundation.lams.themes.Theme"
         lazy="false"
         not-null="true"
@@ -389,9 +374,9 @@
            @hibernate.many-to-one
 	        lazy="false"
             not-null="true"
-           @hibernate.column name="html_theme_id"         
+           @hibernate.column name="theme_id"         
         </meta>
-        <column name="html_theme_id" />
+        <column name="theme_id" />
     </many-to-one>
     
 	<!-- bi-directional one-to-many association to LearnerProgress -->

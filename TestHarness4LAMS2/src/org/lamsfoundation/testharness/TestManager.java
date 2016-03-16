@@ -63,7 +63,6 @@ public class TestManager {
     // property keys of the master property file
     private static final String REPORT_FILE_NAME = "ReportFileName";
     private static final String REPORT_FILE_TEMPLATE = "ReportFileTemplate";
-    private static final String INDEX_PAGE_URL = "IndexPageURL";
     private static final String NUMBER_OF_TEST_SUITES = "NumberOfTestSuites";
     private static final String TARGET_SERVER = "TargetServer";
     private static final String CONTEXT_ROOT = "ContextRoot";
@@ -99,9 +98,6 @@ public class TestManager {
     private static final String LESSON_ID = "LessonId";
     private static final String LESSON_NAME = "LessonName";
     private static final String BASE_MONITOR_NAME = "BaseMonitorName";
-    private static final String GET_LESSON_DETAILS_URL = "GetLessonDetailsURL";
-    private static final String GET_CA_URL = "GetContributeActivitiesURL";
-    private static final String GET_LD_DETAILS_URL = "GetLearningDesignDetailsURL";
     private static final String GET_ALL_PROGRESS_URL = "GetAllLearnersProgressURL";
 
     // property keys of learner test
@@ -133,8 +129,8 @@ public class TestManager {
 	    } else {
 		Integer number = new Integer(value);
 		if (number <= 0) {
-		    throw new TestHarnessException(key + " is not specified as a positive number in file: "
-			    + propertyFileName);
+		    throw new TestHarnessException(
+			    key + " is not specified as a positive number in file: " + propertyFileName);
 		}
 		return number;
 	    }
@@ -143,7 +139,8 @@ public class TestManager {
 	}
     }
 
-    private static String getStringProperty(String properyFileName, Properties properties, String key, boolean optional) {
+    private static String getStringProperty(String properyFileName, Properties properties, String key,
+	    boolean optional) {
 	String value = properties.getProperty(key);
 	if (value != null) {
 	    value = value.trim();
@@ -257,8 +254,8 @@ public class TestManager {
 		TestManager.MIN_DELAY, true);
 	Integer maxDelay = TestManager.getIntegerProperty(authorTestPropertyFileName, authorTestProperties,
 		TestManager.MAX_DELAY, true);
-	String learningDesignUploadURL = TestManager.getStringProperty(authorTestPropertyFileName,
-		authorTestProperties, TestManager.LEARNING_DESIGN_UPLOAD_URL, ldId != null);
+	String learningDesignUploadURL = TestManager.getStringProperty(authorTestPropertyFileName, authorTestProperties,
+		TestManager.LEARNING_DESIGN_UPLOAD_URL, ldId != null);
 	String learningDesignFile = TestManager.getStringProperty(authorTestPropertyFileName, authorTestProperties,
 		TestManager.LEARNING_DESIGN_FILE, ldId != null);
 	String baseAuthorName = TestManager.getStringProperty(authorTestPropertyFileName, authorTestProperties,
@@ -367,23 +364,23 @@ public class TestManager {
 
 	String adminTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.ADMIN_PROPERTY_FILE, suiteIndex), true);
-	AdminTest adminTest = adminTestPropertyFileName == null ? null : createAdminTest(adminTestPropertyFileName,
-		storedUsersFileName);
+	AdminTest adminTest = adminTestPropertyFileName == null ? null
+		: createAdminTest(adminTestPropertyFileName, storedUsersFileName);
 	String authorTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.AUTHOR_PROPERTY_FILE, suiteIndex), true);
-	AuthorTest authorTest = authorTestPropertyFileName == null ? null : createAuthorTest(
-		authorTestPropertyFileName, storedUsers);
+	AuthorTest authorTest = authorTestPropertyFileName == null ? null
+		: createAuthorTest(authorTestPropertyFileName, storedUsers);
 	String monitorTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.MONITOR_PROPERTY_FILE, suiteIndex), true);
-	MonitorTest monitorTest = monitorTestPropertyFileName == null ? null : createMonitorTest(
-		monitorTestPropertyFileName, storedUsers);
+	MonitorTest monitorTest = monitorTestPropertyFileName == null ? null
+		: createMonitorTest(monitorTestPropertyFileName, storedUsers);
 	String learnerTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.LEARNER_PROPERTY_FILE, suiteIndex), true);
-	LearnerTest learnerTest = learnerTestPropertyFileName == null ? null : createLearnerTest(
-		learnerTestPropertyFileName, storedUsers);
+	LearnerTest learnerTest = learnerTestPropertyFileName == null ? null
+		: createLearnerTest(learnerTestPropertyFileName, storedUsers);
 
-	TestSuite suite = new TestSuite(this, suiteIndex, targetServer, contextRoot, adminTest, authorTest,
-		monitorTest, learnerTest);
+	TestSuite suite = new TestSuite(this, suiteIndex, targetServer, contextRoot, adminTest, authorTest, monitorTest,
+		learnerTest);
 
 	TestManager.log.info("Finished creating test suite " + suite.toString());
 	return suite;

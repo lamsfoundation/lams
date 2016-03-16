@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/laqa11/images/icon_questionanswer.swf'
+, 'tool/laqa11/images/icon_questionanswer.svg'
 , NULL
 , NULL
 , NULL

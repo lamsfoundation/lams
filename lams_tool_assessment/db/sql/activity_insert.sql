@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/laasse10/images/icon_assessment.swf'
+, 'tool/laasse10/images/icon_assessment.svg'
 , NULL
 , NULL
 , NULL

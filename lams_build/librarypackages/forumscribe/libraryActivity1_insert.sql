@@ -11,6 +11,6 @@ values
 6,null,null,0,
 null,${learning_library_id},now(),0,
 null,null,null,null,
-null,null,null,'images/icon_forum_and_scribe.swf',
+null,null,null,'images/icon_forum_and_scribe.svg',
 2,0,5,
 'org.lamsfoundation.lams.library.forumscribe.ApplicationResources');

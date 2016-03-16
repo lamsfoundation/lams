@@ -73,7 +73,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @since 2005-3-29
  * @version 1.1
  * 
- * ----------------XDoclet Tags--------------------
+ *          ----------------XDoclet Tags--------------------
  * 
  * @struts:action name = "GroupingForm" path="/grouping" parameter="method" validate="false"
  * @struts:action-forward name="viewGroup" path="/grouping.do?method=viewGrouping"
@@ -138,16 +138,14 @@ public class GroupingAction extends LamsDispatchAction {
 	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 	Long lessonId = learnerProgress.getLesson().getLessonId();
-	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(), LearningWebUtil
-		.getUserId(), forceGroup);
+	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(),
+		LearningWebUtil.getUserId(), forceGroup);
 
 	LearningWebUtil.putActivityInRequest(request, activity, learnerService);
 
 	DynaActionForm groupForm = (DynaActionForm) form;
 	groupForm.set("previewLesson", learnerProgress.getLesson().isPreviewLesson());
 	groupForm.set("title", activity.getTitle());
-
-	LearningWebUtil.setupProgressInRequest(groupForm, request, learnerProgress);
 
 	if (groupingDone) {
 	    request.setAttribute(GroupingAction.FINISHED_BUTTON, Boolean.TRUE);
@@ -164,8 +162,8 @@ public class GroupingAction extends LamsDispatchAction {
 	    prepareGroupData(request);
 	    request.setAttribute(GroupingAction.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
 	    request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
-	    request.setAttribute(GroupingAction.VIEW_STUDENTS_BEFORE_SELECTION, grouping
-		    .getViewStudentsBeforeSelection());
+	    request.setAttribute(GroupingAction.VIEW_STUDENTS_BEFORE_SELECTION,
+		    grouping.getViewStudentsBeforeSelection());
 	    return mapping.findForward(GroupingAction.CHOOSE_GROUP);
 	}
 	return mapping.findForward(GroupingAction.WAIT_GROUP);
@@ -187,14 +185,13 @@ public class GroupingAction extends LamsDispatchAction {
 	prepareGroupData(request);
 	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	request.setAttribute(GroupingAction.FINISHED_BUTTON, new Boolean(mode == null || !mode.isTeacher()));
-	
+	request.setAttribute(GroupingAction.FINISHED_BUTTON, new Boolean((mode == null) || !mode.isTeacher()));
+
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	LearningWebUtil.putActivityPositionInRequest(activityId, request, getServlet().getServletContext());
-	
+
 	return mapping.findForward(GroupingAction.SHOW_GROUP);
     }
-
 
     /**
      * Complete the current tool activity and forward to the url of next activity in the learning design.
@@ -216,8 +213,9 @@ public class GroupingAction extends LamsDispatchAction {
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// so manually resume the progress. The completeActivity code can cope with a missing activity.
-	return LearningWebUtil.completeActivity(request, response, LearningWebUtil.getActivityMapping(this.getServlet()
-		.getServletContext()), progress, groupingActivity, learnerId, learnerService, true);
+	return LearningWebUtil.completeActivity(request, response,
+		LearningWebUtil.getActivityMapping(this.getServlet().getServletContext()), progress, groupingActivity,
+		learnerId, learnerService, true);
     }
 
     /**

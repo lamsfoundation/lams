@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lamc11/images/icon_mcq.swf'
+, 'tool/lamc11/images/icon_mcq.svg'
 , NULL
 , NULL
 , NULL

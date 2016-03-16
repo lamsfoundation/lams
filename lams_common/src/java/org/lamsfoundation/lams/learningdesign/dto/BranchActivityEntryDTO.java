@@ -30,7 +30,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /** 
  * Models the relationship between a group and a branch for Chosen or Group based branching. 
  * Links the group to the sequence activity that makes up a branch within a branching activity.
- * Used by Flash - so we just record the related UI IDs, rather than the actual objects
+ * Used by Authoring - so we just record the related UI IDs, rather than the actual objects
  * as they will appear elsewhere in the design.
  * 
  * @author Fiona Malikoff

@@ -61,8 +61,8 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -83,7 +83,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action path="/home" validate="false" parameter="method"
  * @struts:action-forward name="sysadmin" path="/sysadmin.jsp"
  * @struts:action-forward name="lessonIntro" path="/lessonIntro.jsp"
- * @struts:action-forward name="author" path="/author.jsp"
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"
@@ -95,7 +94,7 @@ public class HomeAction extends DispatchAction {
 
     private static Logger log = Logger.getLogger(HomeAction.class);
 
-    private static IUserManagementService service;
+    private static IUserManagementService userManagementService;
     private static ILessonService lessonService;
     private static ILearningDesignService learningDesignService;
     private static IGroupUserDAO groupUserDAO;
@@ -115,7 +114,7 @@ public class HomeAction extends DispatchAction {
 	    if (user == null) {
 		HomeAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
-	    } else if (getService().isUserInRole(user.getUserID(), orgId, Role.SYSADMIN)) {
+	    } else if (getUserManagementService().isUserInRole(user.getUserID(), orgId, Role.SYSADMIN)) {
 		HomeAction.log.debug("user is sysadmin");
 		return mapping.findForward("sysadmin");
 	    } else {
@@ -242,62 +241,6 @@ public class HomeAction extends DispatchAction {
     }
 
     /**
-     * request for old, Flash author environment
-     */
-    public ActionForward authorFlash(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException, ServletException {
-	try {
-	    UserDTO user = getUser();
-	    if (user == null) {
-		HomeAction.log.error("admin: User missing from session. ");
-		return mapping.findForward("error");
-	    }
-
-	    Long learningDesignID = null;
-	    String layout = null;
-	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-	    req.setAttribute("serverUrl", serverUrl);
-
-	    String requestSrc = req.getParameter("requestSrc");
-	    String notifyCloseURL = req.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
-	    String isPostMessageToParent = req.getParameter("isPostMessageToParent");
-	    String customCSV = req.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
-	    String extLmsId = req.getParameter(AttributeNames.PARAM_EXT_LMS_ID);
-
-	    if (req.getParameter("learningDesignID") != null) {
-		learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
-	    }
-
-	    if (req.getParameter("layout") != null) {
-		layout = WebUtil.readStrParam(req, "layout");
-	    }
-
-	    if (layout != null) {
-		req.setAttribute("layout", layout);
-	    }
-
-	    if (req.getParameter("learningDesignID") != null) {
-		learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
-	    }
-
-	    if (learningDesignID != null) {
-		req.setAttribute("learningDesignID", learningDesignID);
-	    }
-
-	    req.setAttribute("requestSrc", requestSrc);
-	    req.setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
-	    req.setAttribute("isPostMessageToParent", isPostMessageToParent);
-	    req.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
-	    req.setAttribute(AttributeNames.PARAM_EXT_LMS_ID, extLmsId);
-
-	    return mapping.findForward("author");
-	} catch (Exception e) {
-	    HomeAction.log.error("Failed to load author", e);
-	    return mapping.findForward("error");
-	}
-    }
-
-    /**
      * Request for Monitor environment.
      */
     public ActionForward monitorLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
@@ -341,11 +284,11 @@ public class HomeAction extends DispatchAction {
 	JSONObject users = new JSONObject();
 
 	// get learners available for newly created lesson
-	Vector<UserFlashDTO> learners = getWorkspaceManagementService().getUsersFromOrganisationByRole(organisationID,
-		"LEARNER");
-	for (UserFlashDTO user : learners) {
+	Vector<User> learners = getUserManagementService().getUsersFromOrganisationByRole(organisationID, "LEARNER",
+		true);
+	for (User user : learners) {
 	    JSONObject userJSON = new JSONObject();
-	    userJSON.put("userID", user.getUserID());
+	    userJSON.put("userID", user.getUserId());
 	    userJSON.put("firstName", user.getFirstName());
 	    userJSON.put("lastName", user.getLastName());
 	    userJSON.put("login", user.getLogin());
@@ -353,16 +296,16 @@ public class HomeAction extends DispatchAction {
 	    users.append("selectedLearners", userJSON);
 	}
 
-	Vector<UserFlashDTO> monitors = getWorkspaceManagementService().getUsersFromOrganisationByRole(organisationID,
-		"MONITOR");
-	for (UserFlashDTO user : monitors) {
+	Vector<User> monitors = getUserManagementService().getUsersFromOrganisationByRole(organisationID, "MONITOR",
+		true);
+	for (User user : monitors) {
 	    JSONObject userJSON = new JSONObject();
-	    userJSON.put("userID", user.getUserID());
+	    userJSON.put("userID", user.getUserId());
 	    userJSON.put("firstName", user.getFirstName());
 	    userJSON.put("lastName", user.getLastName());
 	    userJSON.put("login", user.getLogin());
 
-	    if (userDTO.getUserID().equals(user.getUserID())) {
+	    if (userDTO.getUserID().equals(user.getUserId())) {
 		// creator is always selected
 		users.append("selectedMonitors", userJSON);
 	    } else {
@@ -373,7 +316,8 @@ public class HomeAction extends DispatchAction {
 	req.setAttribute("users", users.toString());
 
 	// find lessons which can be set as preceding ones for newly created lesson
-	Organisation organisation = (Organisation) getService().findById(Organisation.class, organisationID);
+	Organisation organisation = (Organisation) getUserManagementService().findById(Organisation.class,
+		organisationID);
 	Set<LessonDTO> availableLessons = new TreeSet<LessonDTO>(new LessonDTOComparator());
 	for (Lesson availableLesson : (Set<Lesson>) organisation.getLessons()) {
 	    Integer availableLessonState = availableLesson.getLessonStateId();
@@ -453,13 +397,13 @@ public class HomeAction extends DispatchAction {
 	return mapping.findForward("message");
     }
 
-    private IUserManagementService getService() {
-	if (HomeAction.service == null) {
+    private IUserManagementService getUserManagementService() {
+	if (HomeAction.userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    HomeAction.service = (IUserManagementService) ctx.getBean("userManagementService");
+	    HomeAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return HomeAction.service;
+	return HomeAction.userManagementService;
     }
 
     private ILessonService getLessonService() {
@@ -516,6 +460,6 @@ public class HomeAction extends DispatchAction {
     }
 
     private User getRealUser(UserDTO dto) {
-	return getService().getUserByLogin(dto.getLogin());
+	return getUserManagementService().getUserByLogin(dto.getLogin());
     }
 }

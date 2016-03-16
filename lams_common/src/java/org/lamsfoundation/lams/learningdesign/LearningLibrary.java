@@ -38,12 +38,6 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
  * @author Manpreet Minhas
 */
 public class LearningLibrary implements Serializable {
-	
-	/** Represents a single LearningLibrary object in the WDDXPacket */
-	public static final String LIBRARY_OBJECT ="LearningLibrary";
-	
-	/** Represents a list of LearningLibrary objects in the WDDXPacket */
-	public static final String LIBRARY_LIST_OBJECT ="LearningLibraryList";
 
     /** identifier field */
     private Long learningLibraryId;

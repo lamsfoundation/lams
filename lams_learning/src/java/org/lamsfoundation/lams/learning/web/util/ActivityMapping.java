@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.Serializable;
@@ -49,22 +49,19 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * This class contains the standard struts action mappings for errors as
- * well as methods that get required Action/URL to display an Activity or
- * LearnerProgress.
+ * This class contains the standard struts action mappings for errors as well as methods that get required Action/URL to
+ * display an Activity or LearnerProgress.
  * 
- * In order to return a URL this class needs to know the baseURL. This can
- * be set using in the application context.
+ * In order to return a URL this class needs to know the baseURL. This can be set using in the application context.
  * 
  * @author daveg
  *
  */
-public class ActivityMapping implements Serializable
-{
+public class ActivityMapping implements Serializable {
 
-	private static final long serialVersionUID = 5887602834473598770L;
-	
-	/* These are global struts forwards. */
+    private static final long serialVersionUID = 5887602834473598770L;
+
+    /* These are global struts forwards. */
     public static final String ERROR = "error";
     public static final String NO_SESSION_ERROR = "noSessionError";
     public static final String NO_ACCESS_ERROR = "noAccessError";
@@ -77,329 +74,304 @@ public class ActivityMapping implements Serializable
 
     /**
      * Creates a Struts ActionForward to display an activity.
-     * @param activity, the Activity to be displayed
-     * @param progress, the LearnerProgress associated with the Activity and learner
+     * 
+     * @param activity,
+     *            the Activity to be displayed
+     * @param progress,
+     *            the LearnerProgress associated with the Activity and learner
      */
-    public ActionForward getActivityForward(Activity activity,
-                                            LearnerProgress progress,
-                                            boolean redirect)
-    {
-        ActionForward actionForward = null;
+    public ActionForward getActivityForward(Activity activity, LearnerProgress progress, boolean redirect) {
+	ActionForward actionForward = null;
 
-        //String strutsAction = getActivityAction(activity, progress);
-        String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
-        strutsAction = WebUtil.appendParameterToURL(strutsAction,
-                LearningWebUtil.PARAM_PROGRESS_ID,
-                progress.getLearnerProgressId().toString());
+	//String strutsAction = getActivityAction(activity, progress);
+	String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
+	strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID,
+		progress.getLearnerProgressId().toString());
 
-        if (activity != null && activity.isToolActivity())
-        {
-            // always use redirect false for a ToolActivity as ToolDisplayActivity
-            // does it's own redirect
-            actionForward = strutsActionToForward(strutsAction, activity, false);
-        }
-        else
-        {
-            actionForward = strutsActionToForward(strutsAction,
-                                                  activity,
-                                                  redirect);
-        }
+	if ((activity != null) && activity.isToolActivity()) {
+	    // always use redirect false for a ToolActivity as ToolDisplayActivity
+	    // does it's own redirect
+	    actionForward = strutsActionToForward(strutsAction, activity, false);
+	} else {
+	    actionForward = strutsActionToForward(strutsAction, activity, redirect);
+	}
 
-        return actionForward;
+	return actionForward;
     }
 
     /**
-     * Creates a Struts ActionForward to display a next activity. If the
-     * previous activity was a ParallelActivity then the frames will be
-     * cleared.
-     * @param progress, the LearnerProgress associated with the Activity and learner
-     * @param redirect, If true a RedirectActionForward is used
-     * @param displayParallelFrames, if true then try to display the parallel activity frames rather than the 
-     * 					internal tool screen. This is only set to true for DisplayActivityAction, which 
-     * 					is called when the user joins/resumes the lesson.
-     * @return
-     * @throws UnsupportedEncodingException 
-     */
-    public ActionForward getProgressForward(LearnerProgress progress,
-                                            boolean redirect,
-                                            boolean displayParallelFrames,
-                                            HttpServletRequest request,
-                                            ICoreLearnerService learnerService) throws UnsupportedEncodingException
-    {
-        ActionForward actionForward = null;
-
-        if (progress.isComplete())
-        {
-            // If lesson complete forward to lesson complete action. This action will
-            // cause a client request to clear ALL frames. Need to append the progress
-        	// id as getting to the end from an activity can't have the progress in the request
-        	// and there isn't an activity from which we can determine the lesson and hence
-        	// the progress.
-            String strutsAction = this.getActivityMappingStrategy()
-                                      .getLessonCompleteAction();
-            strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID, progress.getLearnerProgressId().toString());
-            strutsAction = strutsActionToURL(strutsAction, null, true);
-            actionForward = this.getClearFramesForward(strutsAction, progress.getLearnerProgressId().toString());
-        }
-        else
-        {
-            if (! displayParallelFrames && progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING)
-            {
-            	// processing the screen WITHIN parallel activity frames.
-                // progress is waiting, goto waiting page
-                String strutsAction = this.getActivityMappingStrategy()
-                                          .getWaitingAction();
-                actionForward = this.strutsActionToForward(strutsAction,
-                                                           null,
-                                                           redirect);
-            }
-            else
-            {
-                // display next activity
-                if (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING_COMPLETE)
-                {
-                    // if previous activity was a parallel activity then we need to
-                    // clear frames.
-                   	String activityURL = this.getActivityURL(progress.getNextActivity());
-                	actionForward = this.getClearFramesForward(activityURL, progress.getLearnerProgressId().toString());
-                }
-                else
-                {
-                    actionForward = getActivityForward(progress.getNextActivity(),
-                                                       progress,
-                                                       redirect);
-                    if ( progress.getNextActivity() != null ) {
-	                    //setup activity into request for display
-	                    Activity realActivity = learnerService.getActivity(progress.getNextActivity().getActivityId());
-	                    request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);
-
-	                    LearningWebUtil.putActivityInRequest(request,
-                                         progress.getNextActivity(),
-                                         learnerService);
-                    }
-                }
-            }
-        }
-        return actionForward;
-    }
-    
-    /** Call the requestDisplay.do action to break out of any frames.
-     * Doesn't need to redirect this forward, as the requestDisplay.do does a redirect
+     * Creates a Struts ActionForward to display a next activity. If the previous activity was a ParallelActivity then
+     * the frames will be cleared.
      * 
-     * @param activityURL URL to which we will be redirected. Does not need to be encoded as this method will encode it.
+     * @param progress,
+     *            the LearnerProgress associated with the Activity and learner
+     * @param redirect,
+     *            If true a RedirectActionForward is used
+     * @param displayParallelFrames,
+     *            if true then try to display the parallel activity frames rather than the internal tool screen. This is
+     *            only set to true for DisplayActivityAction, which is called when the user joins/resumes the lesson.
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public ActionForward getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames,
+	    HttpServletRequest request, ICoreLearnerService learnerService) throws UnsupportedEncodingException {
+	ActionForward actionForward = null;
+
+	if (progress.isComplete()) {
+	    // If lesson complete forward to lesson complete action. This action will
+	    // cause a client request to clear ALL frames. Need to append the progress
+	    // id as getting to the end from an activity can't have the progress in the request
+	    // and there isn't an activity from which we can determine the lesson and hence
+	    // the progress.
+	    String strutsAction = this.getActivityMappingStrategy().getLessonCompleteAction();
+	    strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID,
+		    progress.getLearnerProgressId().toString());
+	    strutsAction = ActivityMapping.strutsActionToURL(strutsAction, null, true);
+	    actionForward = this.getClearFramesForward(strutsAction, progress.getLearnerProgressId().toString());
+	} else {
+	    if (!displayParallelFrames && (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING)) {
+		// processing the screen WITHIN parallel activity frames.
+		// progress is waiting, goto waiting page
+		String strutsAction = this.getActivityMappingStrategy().getWaitingAction();
+		actionForward = this.strutsActionToForward(strutsAction, null, redirect);
+	    } else {
+		// display next activity
+		if (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING_COMPLETE) {
+		    // if previous activity was a parallel activity then we need to
+		    // clear frames.
+		    String activityURL = this.getActivityURL(progress.getNextActivity());
+		    actionForward = this.getClearFramesForward(activityURL, progress.getLearnerProgressId().toString());
+		} else {
+		    actionForward = getActivityForward(progress.getNextActivity(), progress, redirect);
+		    if (progress.getNextActivity() != null) {
+			//setup activity into request for display
+			Activity realActivity = learnerService.getActivity(progress.getNextActivity().getActivityId());
+			request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);
+
+			LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
+		    }
+		}
+	    }
+	}
+	return actionForward;
+    }
+
+    /**
+     * Call the requestDisplay.do action to break out of any frames. Doesn't need to redirect this forward, as the
+     * requestDisplay.do does a redirect
+     * 
+     * @param activityURL
+     *            URL to which we will be redirected. Does not need to be encoded as this method will encode it.
      * @param progressId
      * @return actionForward to which to forward
      * @throws UnsupportedEncodingException
      */
-    private ActionForward getClearFramesForward(String activityURL, String progressId) throws UnsupportedEncodingException {
+    private ActionForward getClearFramesForward(String activityURL, String progressId)
+	    throws UnsupportedEncodingException {
 
-        String encodedURL = URLEncoder.encode(activityURL, "UTF-8");
+	String encodedURL = URLEncoder.encode(activityURL, "UTF-8");
 
-        ActionForward actionForward = null;
-    	
-        String strutsAction = "/requestDisplay.do?url=" + encodedURL;
-        strutsAction = WebUtil.appendParameterToURL(strutsAction,
-                LearningWebUtil.PARAM_PROGRESS_ID,
-                progressId);
+	ActionForward actionForward = null;
 
-    	actionForward = strutsActionToForward(strutsAction,
-    											null,
-    											false);
-    	return actionForward;
-    	
+	String strutsAction = "/requestDisplay.do?url=" + encodedURL;
+	strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID, progressId);
+
+	actionForward = strutsActionToForward(strutsAction, null, false);
+	return actionForward;
+
     }
 
     /**
-     * Generates an ActivityURL for an Activity using it's progress. The URL is for
-     * the client and so includes hostname etc.
-     * Note that the URL could also be a wait message or a jsp to clear the frames.
-     * @param activity, the Activity to be displayed
-     * @param progress, the LearnerProgress associated with the Activity and learner
+     * Generates an ActivityURL for an Activity using it's progress. The URL is for the client and so includes hostname
+     * etc. Note that the URL could also be a wait message or a jsp to clear the frames.
+     * 
+     * @param activity,
+     *            the Activity to be displayed
+     * @param progress,
+     *            the LearnerProgress associated with the Activity and learner
      */
-    public String getActivityURL(Activity activity)
-    {
-        String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
-        return strutsActionToURL(strutsAction, activity, true);
+    public String getActivityURL(Activity activity) {
+	String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
+	return ActivityMapping.strutsActionToURL(strutsAction, activity, true);
     }
 
     /**
-     * Generates an ActivityURL for a Tool Activity or SystemToolActivity. 
-     * The URL is for the tool and not for the tool loading page. The URL also 
-     * includes toolSessionId or toolContentId and all other required data.
-     * @param activity, the Activity to be displayed
-     * @param progress, the current LearnerProgress, used to get activity status
+     * Generates an ActivityURL for a Tool Activity or SystemToolActivity. The URL is for the tool and not for the tool
+     * loading page. The URL also includes toolSessionId or toolContentId and all other required data.
+     * 
+     * @param activity,
+     *            the Activity to be displayed
+     * @param progress,
+     *            the current LearnerProgress, used to get activity status
      */
-    public String getLearnerToolURL(Lesson lesson, Activity activity, User learner)
-    {
-        try
-        {
-        	if ( lesson.isPreviewLesson() )
-        		return toolService.getToolLearnerPreviewURL(lesson.getLessonId(),activity,learner);
-        	else 
-        		return toolService.getToolLearnerURL(lesson.getLessonId(),activity,learner);
-        }
-        catch (LamsToolServiceException e)
-        {
-            throw new LearnerServiceException(e.getMessage());
-        }
+    public String getLearnerToolURL(Lesson lesson, Activity activity, User learner) {
+	try {
+	    if (lesson.isPreviewLesson()) {
+		return toolService.getToolLearnerPreviewURL(lesson.getLessonId(), activity, learner);
+	    } else {
+		return toolService.getToolLearnerURL(lesson.getLessonId(), activity, learner);
+	    }
+	} catch (LamsToolServiceException e) {
+	    throw new LearnerServiceException(e.getMessage());
+	}
     }
 
     /**
      * Creates a URL for a struts action and an activity.
-     * @param strutsAction, the struts action path.
-     * @param activity, the activity the action is for.
-     * @param useContext, if true prepends the server and context to the URL.
+     * 
+     * @param strutsAction,
+     *            the struts action path.
+     * @param activity,
+     *            the activity the action is for.
+     * @param useContext,
+     *            if true prepends the server and context to the URL.
      */
-    public static String strutsActionToURL(String strutsAction,
-                                       Activity activity,
-                                       boolean useContext)
-    {
-        String url = strutsAction;
+    public static String strutsActionToURL(String strutsAction, Activity activity, boolean useContext) {
+	String url = strutsAction;
 
-        if (activity != null)
-        {
-            url = WebUtil.appendParameterToURL(url,
-            		AttributeNames.PARAM_ACTIVITY_ID,
-            		activity.getActivityId().toString());
-        }
-        if (useContext)
-        {
-            String lamsUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + LEARNING;
-            url = lamsUrl + url;
-        }
+	if (activity != null) {
+	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID,
+		    activity.getActivityId().toString());
+	}
+	if (useContext) {
+	    String lamsUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + ActivityMapping.LEARNING;
+	    url = lamsUrl + url;
+	}
 
-        return url;
+	return url;
     }
 
     /**
      * Creates a Struts ActionForward for an action and activity.
-     * @param strutsAction, the struts action
-     * @param activity, activity that is being displayed
-     * @param redirect, should the action be a client redirect
+     * 
+     * @param strutsAction,
+     *            the struts action
+     * @param activity,
+     *            activity that is being displayed
+     * @param redirect,
+     *            should the action be a client redirect
      * @return
      */
-    protected ActionForward strutsActionToForward(String strutsAction,
-                                                  Activity activity,
-                                                  boolean redirect)
-    {
-        ActionForward actionForward;
-        if (redirect)
-        {
-            String activityURL = strutsActionToURL(strutsAction,
-                                                   activity,
-                                                   false);
-            actionForward = new RedirectingActionForward(activityURL);
-            actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
-        }
-        else
-        {
-            actionForward = new ForwardingActionForward(strutsAction);
-            actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
+    protected ActionForward strutsActionToForward(String strutsAction, Activity activity, boolean redirect) {
+	ActionForward actionForward;
+	if (redirect) {
+	    String activityURL = ActivityMapping.strutsActionToURL(strutsAction, activity, false);
+	    actionForward = new RedirectingActionForward(activityURL);
+	    actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
+	} else {
+	    actionForward = new ForwardingActionForward(strutsAction);
+	    actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
 
-        }
+	}
 
-        return actionForward;
+	return actionForward;
     }
 
-    /** Takes a Struts forward containing the path such as /DisplayRequest.do and turns it into a full URL including servername */
+    /**
+     * Takes a Struts forward containing the path such as /DisplayRequest.do and turns it into a full URL including
+     * servername
+     */
     protected String strutsForwardToURL(ActionForward forward) {
-    	return Configuration.get(ConfigurationKeys.SERVER_URL) + LEARNING + forward.getPath();
+	return Configuration.get(ConfigurationKeys.SERVER_URL) + ActivityMapping.LEARNING + forward.getPath();
     }
+
     /**
      * Calculate the activity url for progress view at learner side.
-     * @param learner the learner who owns the progress data
-     * @param activity the activity the learner want to view
+     * 
+     * @param learner
+     *            the learner who owns the progress data
+     * @param activity
+     *            the activity the learner want to view
      * @return the url for that tool.
      */
-    public String calculateActivityURLForProgressView(Lesson lesson, User learner,
-                                                      Activity activity)
-    {
+    public String calculateActivityURLForProgressView(Lesson lesson, User learner, Activity activity) {
 
-        if (activity != null && activity.isToolActivity() || activity.isSystemToolActivity())
-        {
-            return WebUtil.convertToFullURL(getLearnerToolURL(lesson, ((Activity) activity), learner));
-        } else {
-        	// fall back to the strategy for complex activities
-        	return getActivityURL(activity);
-        }
+	if (((activity != null) && activity.isToolActivity()) || activity.isSystemToolActivity()) {
+	    return WebUtil.convertToFullURL(getLearnerToolURL(lesson, (activity), learner));
+	} else {
+	    // fall back to the strategy for complex activities
+	    return getActivityURL(activity);
+	}
     }
 
-    public void setToolService(ILamsCoreToolService toolService)
-    {
-        this.toolService = toolService;
+    public void setToolService(ILamsCoreToolService toolService) {
+	this.toolService = toolService;
     }
 
-    public ActivityMappingStrategy getActivityMappingStrategy()
-    {
-        return activityMappingStrategy;
+    public ActivityMappingStrategy getActivityMappingStrategy() {
+	return activityMappingStrategy;
     }
 
-    public void setActivityMappingStrategy(ActivityMappingStrategy activityMappingStrategy)
-    {
-        this.activityMappingStrategy = activityMappingStrategy;
+    public void setActivityMappingStrategy(ActivityMappingStrategy activityMappingStrategy) {
+	this.activityMappingStrategy = activityMappingStrategy;
     }
-    
-	/** If the activity is already completed it could be one of five cases:
-	 *  (1) the user has opened just the one activity in in a popup window from the progress bar, in which case we want to close the window
-	 *	(2) the user has opened up a parallel activity in a popup window from the progress bar, and the completed activity
-	 *      is one of the contained activities. In this case we want to display the "wait" message or close depending on the activity
-	 *      in the other frame.
-	 *	(3) the activity was force completed while the user was doing the activity. This case includes "standalone" activities + activities in a parallel frameset
-	 *	(4) the activity is part of a parallel activity and the other activity isn't completed.
-	 * In cases (3) and (4) we want to do whatever we would normally do, apart from completing the activity, but we 
-	 * know whether it is (1),(2) or (3),(4) until we get back to a jsp and can check the window name.
-	 * so prepare the urls for (2), (3) and (4) then call the close window screen and it will sort it out. 
-	 */
-    public ActionForward getCloseForward(Activity justCompletedActivity, Long lessonId) throws UnsupportedEncodingException {
 
-    	String closeWindowURLAction =  activityMappingStrategy.getCloseWindowAction();    
+    /**
+     * If the activity is already completed it could be one of five cases: (1) the user has opened just the one activity
+     * in in a popup window from the progress bar, in which case we want to close the window (2) the user has opened up
+     * a parallel activity in a popup window from the progress bar, and the completed activity is one of the contained
+     * activities. In this case we want to display the "wait" message or close depending on the activity in the other
+     * frame. (3) the activity was force completed while the user was doing the activity. This case includes
+     * "standalone" activities + activities in a parallel frameset (4) the activity is part of a parallel activity and
+     * the other activity isn't completed. In cases (3) and (4) we want to do whatever we would normally do, apart from
+     * completing the activity, but we know whether it is (1),(2) or (3),(4) until we get back to a jsp and can check
+     * the window name. so prepare the urls for (2), (3) and (4) then call the close window screen and it will sort it
+     * out.
+     */
+    public ActionForward getCloseForward(Activity justCompletedActivity, Long lessonId)
+	    throws UnsupportedEncodingException {
 
-		// Always calculate the url for the "normal" next case as we won't know till we reach the close window if we need it.
-		
-    	String action = getDisplayActivityAction(lessonId);
-		action = strutsActionToURL(action,null,true);
-		action = WebUtil.appendParameterToURL(action, DisplayActivityAction.PARAM_INITIAL_DISPLAY, "false");
-		action = URLEncoder.encode(action, "UTF-8");
-    	
-		if(!justCompletedActivity.isFloating())
-			closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "nextURL", action);
-    	
-  		// If we are in the parallel frameset then we might need the nextURL, or we might need the "waiting" url.
-    	if ( justCompletedActivity.getParentActivity() != null && justCompletedActivity.getParentActivity().isParallelActivity() ) {
-    		action = getActivityMappingStrategy().getWaitingAction();
-    		action = strutsActionToURL(action,null,true);
-    		action = URLEncoder.encode(action, "UTF-8");
-        	closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "waitURL", action);
-    	}
+	String closeWindowURLAction = activityMappingStrategy.getCloseWindowAction();
 
-    	return strutsActionToForward(closeWindowURLAction, null, false);
+	// Always calculate the url for the "normal" next case as we won't know till we reach the close window if we need it.
+
+	String action = getDisplayActivityAction(lessonId);
+	action = ActivityMapping.strutsActionToURL(action, null, true);
+	action = WebUtil.appendParameterToURL(action, DisplayActivityAction.PARAM_INITIAL_DISPLAY, "false");
+	action = URLEncoder.encode(action, "UTF-8");
+
+	if (!justCompletedActivity.isFloating()) {
+	    closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "nextURL", action);
+	}
+
+	// If we are in the parallel frameset then we might need the nextURL, or we might need the "waiting" url.
+	if ((justCompletedActivity.getParentActivity() != null)
+		&& justCompletedActivity.getParentActivity().isParallelActivity()) {
+	    action = getActivityMappingStrategy().getWaitingAction();
+	    action = ActivityMapping.strutsActionToURL(action, null, true);
+	    action = URLEncoder.encode(action, "UTF-8");
+	    closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "waitURL", action);
+	}
+
+	return strutsActionToForward(closeWindowURLAction, null, false);
     }
 
     public String getProgressBrokenURL() {
-    	return strutsActionToURL(activityMappingStrategy.getProgressBrokenAction(),null,true);
+	return ActivityMapping.strutsActionToURL(activityMappingStrategy.getProgressBrokenAction(), null, true);
     }
-    
+
     public String getCompleteActivityURL(Long activityId, Long progressId) {
-    	String url =  strutsActionToURL(activityMappingStrategy.getCompleteActivityAction(), null, true);    
-    	if ( activityId != null ) {
-    		url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID, activityId.toString());
-    	}
-    	if ( progressId != null ) {
-    		url = WebUtil.appendParameterToURL(url, LearningWebUtil.PARAM_PROGRESS_ID, progressId.toString());
-    	}
-    	return url;
-    }
- 
-	/**
-	 * Get the "bootstrap" activity action. This is the action called when the user first joins a lesson, and sets up 
-	 * the necessary request details based on the user's progress details. If lessonID is not null then it is appended onto the string.
-	 * If this is for a JSP call then the lessonID is needed, if it is for Flash then it is not needed as Flash will add the id.
-	 */
-	public String getDisplayActivityAction(Long lessonID) {
-		if ( lessonID != null) {
-			return WebUtil.appendParameterToURL("/DisplayActivity.do",AttributeNames.PARAM_LESSON_ID,lessonID.toString());
-		} else {
-			return "/DisplayActivity.do";
-		}
+	String url = ActivityMapping.strutsActionToURL(activityMappingStrategy.getCompleteActivityAction(), null, true);
+	if (activityId != null) {
+	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID, activityId.toString());
 	}
+	if (progressId != null) {
+	    url = WebUtil.appendParameterToURL(url, LearningWebUtil.PARAM_PROGRESS_ID, progressId.toString());
+	}
+	return url;
+    }
+
+    /**
+     * Get the "bootstrap" activity action. This is the action called when the user first joins a lesson, and sets up
+     * the necessary request details based on the user's progress details. If lessonID is not null then it is appended
+     * onto the string. If this is for a JSP call then the lessonID is needed.
+     */
+    public String getDisplayActivityAction(Long lessonID) {
+	if (lessonID != null) {
+	    return WebUtil.appendParameterToURL("/DisplayActivity.do", AttributeNames.PARAM_LESSON_ID,
+		    lessonID.toString());
+	} else {
+	    return "/DisplayActivity.do";
+	}
+    }
 }

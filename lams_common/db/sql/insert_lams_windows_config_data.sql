@@ -11,9 +11,6 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('TempDir','@temp.directory@', 'config.temp.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('DumpDir','@dump.directory@', 'config.dump.dir', 'config.header.system', 'STRING', 1);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('EARDir','@ear.directory@', 'config.ear.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
@@ -89,9 +86,6 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('XmppPassword','wildfire', 'config.xmpp.password', 'config.header.chat', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('DefaultFlashTheme','default', 'config.default.flash.theme', 'config.header.look.feel', 'STRING', 1);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('DefaultHTMLTheme','defaultHTML', 'config.default.html.theme', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
@@ -108,9 +102,6 @@ values ('ShowAllMyLessonLink','true', 'config.show.all.my.lesson.link', 'config.
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
 values ('DisplayPrintButton','false', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ForceMobileDevToUseFlashless','true', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
 values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.features', 'BOOLEAN', 1);
@@ -240,9 +231,6 @@ values ('CustomTabLink','', 'config.custom.tab.link', 'config.header.look.feel',
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('CustomTabTitle','', 'config.custom.tab.title', 'config.header.look.feel', 'STRING', 0);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('EnableFlash','true', 'config.flash.enable', 'config.header.features', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('AuthoringScreenSize','1024x768', 'config.authoring.screen.size', 'config.header.look.feel', 'STRING', 1);

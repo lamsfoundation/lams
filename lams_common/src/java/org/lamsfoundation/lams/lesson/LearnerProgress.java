@@ -154,7 +154,7 @@ public class LearnerProgress implements Serializable {
 
     /**
      * A list of completed activities ids before move on to next activity
-     * following transition. This is created to help flash calculation what has
+     * following transition. This is created to help UI calculation what has
      * *just* been done.
      */
     private List currentCompletedActivitiesList;

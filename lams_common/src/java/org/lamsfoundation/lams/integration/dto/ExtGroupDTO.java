@@ -27,8 +27,6 @@ import java.util.List;
 
 import org.lamsfoundation.lams.util.AlphanumComparator;
 
-/** Grouping object, suitable for sending to Flash */
-
 public class ExtGroupDTO implements Comparable{
     private String groupId;
     private String groupName;

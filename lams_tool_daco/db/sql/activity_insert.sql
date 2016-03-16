@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/ladaco10/images/icon_daco.swf'
+, 'tool/ladaco10/images/icon_daco.svg'
 , NULL
 , NULL
 , NULL

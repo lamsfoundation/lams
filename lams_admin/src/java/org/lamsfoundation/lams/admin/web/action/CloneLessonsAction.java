@@ -68,6 +68,7 @@ public class CloneLessonsAction extends Action {
     private static ILessonService lessonService;
     private static IMonitoringService monitoringService;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws UserAccessDeniedException {
 
@@ -77,7 +78,7 @@ public class CloneLessonsAction extends Action {
 
 	List<String> errors = new ArrayList<String>();
 	try {
-	    userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
+	    CloneLessonsAction.userManagementService = AdminServiceProxy.getService(getServlet().getServletContext());
 
 	    String method = WebUtil.readStrParam(request, "method", true);
 	    if (StringUtils.equals(method, "getGroups")) {
@@ -101,7 +102,7 @@ public class CloneLessonsAction extends Action {
 
 	// default action
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
-	request.setAttribute("org", userManagementService.findById(Organisation.class, groupId));
+	request.setAttribute("org", CloneLessonsAction.userManagementService.findById(Organisation.class, groupId));
 
 	return mapping.findForward("start");
     }
@@ -113,12 +114,12 @@ public class CloneLessonsAction extends Action {
 	response.addHeader("Cache-Control", "no-cache");
 	response.addHeader("content-type", "text/html; charset=UTF-8");
 
-	List groups = userManagementService.getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,
-		OrganisationState.ACTIVE);
+	List groups = CloneLessonsAction.userManagementService
+		.getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
 	for (Object o : groups) {
 	    Organisation org = (Organisation) o;
-	    response.getWriter().println(
-		    "<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
+	    response.getWriter()
+		    .println("<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
 	}
 
 	return null;
@@ -140,11 +141,11 @@ public class CloneLessonsAction extends Action {
 	    properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
 
 	    response.getWriter().println("<option value=''></option>");
-	    List groups = userManagementService.findByProperties(Organisation.class, properties);
+	    List groups = CloneLessonsAction.userManagementService.findByProperties(Organisation.class, properties);
 	    for (Object o : groups) {
 		Organisation org = (Organisation) o;
-		response.getWriter().println(
-			"<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
+		response.getWriter()
+			.println("<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
 	    }
 	}
 
@@ -158,9 +159,9 @@ public class CloneLessonsAction extends Action {
 	Integer sourceGroupId = WebUtil.readIntParam(request, "sourceGroupId", true);
 
 	if (sourceGroupId != null) {
-	    lessonService = AdminServiceProxy.getLessonService(getServlet().getServletContext());
+	    CloneLessonsAction.lessonService = AdminServiceProxy.getLessonService(getServlet().getServletContext());
 
-	    List<Lesson> lessons = lessonService.getLessonsByGroup(sourceGroupId);
+	    List<Lesson> lessons = CloneLessonsAction.lessonService.getLessonsByGroup(sourceGroupId);
 	    request.setAttribute("lessons", lessons);
 	}
 
@@ -174,7 +175,8 @@ public class CloneLessonsAction extends Action {
 
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
 
-	Vector monitors = userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR, false, true);
+	Vector monitors = CloneLessonsAction.userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR,
+		true);
 	request.setAttribute("monitors", monitors);
 
 	response.addHeader("Cache-Control", "no-cache");
@@ -187,7 +189,8 @@ public class CloneLessonsAction extends Action {
 
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
 
-	Vector learners = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, false, true);
+	Vector learners = CloneLessonsAction.userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER,
+		true);
 	request.setAttribute("learners", learners);
 
 	response.addHeader("Cache-Control", "no-cache");
@@ -215,13 +218,14 @@ public class CloneLessonsAction extends Action {
 	    learnerIds = learners.split(",");
 	}
 
-	monitoringService = AdminServiceProxy.getMonitoringService(getServlet().getServletContext());
+	CloneLessonsAction.monitoringService = AdminServiceProxy.getMonitoringService(getServlet().getServletContext());
 	int result = 0;
 
-	Organisation group = (Organisation) userManagementService.findById(Organisation.class, groupId);
+	Organisation group = (Organisation) CloneLessonsAction.userManagementService.findById(Organisation.class,
+		groupId);
 	if (group != null) {
-	    result = monitoringService
-		    .cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds, learnerIds, group);
+	    result = CloneLessonsAction.monitoringService.cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds,
+		    learnerIds, group);
 	} else {
 	    throw new UserException("Couldn't find Organisation based on id=" + groupId);
 	}

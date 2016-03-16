@@ -23,13 +23,6 @@
 				<include name="**/*.ico"/>
 			</fileset>
 		</copy>
-		
-		<echo>${ant.project.name}: Copying Flash files from conf to assembly</echo>
-		<copy todir="${basedir}/build/war/assembly/flashxml">
-			<fileset dir="${conf.dir}/flashxml/lams">
-				<include name="**/*.xml"/>
-			</fileset>
-		</copy>
 	</target>
 	
 	

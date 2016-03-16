@@ -80,18 +80,5 @@
             length="100"
         </meta>    
     </property>
-    <property
-        name="type"
-        type="java.lang.Integer"
-        column="theme_type"
-        length="11"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
-            column="theme_type"
-            length="11"
-        </meta>    
-    </property>
 </class>
 </hibernate-mapping>

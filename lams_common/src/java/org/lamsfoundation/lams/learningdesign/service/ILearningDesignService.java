@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.tool.dto.ToolDTO;
 public interface ILearningDesignService {
 
     /**
-     * Get the learning design DTO, suitable to send to Flash via WDDX
+     * Get the learning design DTO
      * 
      * @param learningDesignId
      * @param languageCode

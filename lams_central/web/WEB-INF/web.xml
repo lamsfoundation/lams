@@ -4,8 +4,10 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
 	version="3.1">
 	<context-param>
-		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-		<param-value>org.lamsfoundation.lams.central.ApplicationResources</param-value>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext
+		</param-name>
+		<param-value>org.lamsfoundation.lams.central.ApplicationResources
+		</param-value>
 	</context-param>
 
 	<!-- In LAMS 2.3 there was a change in this section in all tools and core 
@@ -32,7 +34,8 @@
 	</context-param>
 	<context-param>
 		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
+		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml
+		</param-value>
 	</context-param>
 	<context-param>
 		<param-name>parentContextKey</param-name>
@@ -41,7 +44,8 @@
 
 	<filter>
 		<filter-name>UrlRewriteFilter</filter-name>
-		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter
+		</filter-class>
 	</filter>
 
 	<filter>
@@ -76,13 +80,6 @@
 			<param-name>saveInCookie</param-name>
 			<param-value>true</param-value>
 		</init-param>
-		<!-- <init-param> <param-name>cookieDomain</param-name> <param-value>www.mydomain.com</param-value> 
-			<description>Optional. Domain to store cookie based on RFC 2109. Defaults 
-			to current context.</description> </init-param> -->
-		<init-param>
-			<param-name>ignorePaths</param-name>
-			<param-value>/servlet/authoring/storeLearningDesignDetails</param-value>
-		</init-param>
 	</filter>
 
 	<filter-mapping>
@@ -108,22 +105,12 @@
 
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
-		<url-pattern>*.swf</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
-		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/servlet/*</url-pattern>
 	</filter-mapping>
 
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/ckeditor/*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
-		<filter-name>SystemSessionFilter</filter-name>
-		<url-pattern>/eof/*</url-pattern>
 	</filter-mapping>
 
 	<filter-mapping>
@@ -139,11 +126,6 @@
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>*.xml</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
-		<filter-name>hibernateFilter</filter-name>
-		<url-pattern>*.swf</url-pattern>
 	</filter-mapping>
 
 	<filter-mapping>
@@ -188,11 +170,6 @@
 
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
-		<url-pattern>*.swf</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
-		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/servlet/*</url-pattern>
 	</filter-mapping>
 
@@ -221,22 +198,20 @@
 
 	<servlet>
 		<servlet-name>updateCollapsedGroup</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet
+		</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>storeLD</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
 
-	</servlet>
 	<servlet>
 		<servlet-name>GetRecordingServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet
+		</servlet-class>
 	</servlet>
+
 	<servlet>
 		<servlet-name>Connector</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.LAMSConnectorServlet</servlet-class>
+		<servlet-class>org.lamsfoundation.lams.web.LAMSConnectorServlet
+		</servlet-class>
 
 		<init-param>
 			<param-name>baseDir</param-name>
@@ -248,103 +223,59 @@
 		</init-param>
 
 		<load-on-startup>1</load-on-startup>
-
 	</servlet>
+
 	<servlet>
 		<servlet-name>RegisterServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.webservice.RegisterAction</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.webservice.RegisterAction
+		</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>storeNotebookEntry</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.notebook.web.StoreNBEntryServlet</servlet-class>
 
+	<servlet>
+		<servlet-name>LaunchLearnerUrlServlet</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.web.LaunchLearnerUrlServlet
+		</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>dumpWDDX</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
 
-	</servlet>
-   <servlet>
-      <servlet-name>LaunchLearnerUrlServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.LaunchLearnerUrlServlet</servlet-class>
-
-   </servlet>
-	<servlet>
-		<servlet-name>editLD</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.authoring.web.EditOnFlyServlet</servlet-class>
-
-	</servlet>
-	<servlet>
-		<servlet-name>insertLearningDesign</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.authoring.web.InsertLDServlet</servlet-class>
-
-	</servlet>	
 	<servlet>
 		<servlet-name>jlatexmath</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.JlatexmathServlet</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.web.JlatexmathServlet
+		</servlet-class>
 	</servlet>
+
 	<servlet>
 		<servlet-name>saveLessonOrder</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.LessonOrderServlet</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.web.LessonOrderServlet
+		</servlet-class>
 	</servlet>
+
 	<servlet>
 		<servlet-name>lamsStartupServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.LamsStartupServlet</servlet-class>
+		<servlet-class>org.lamsfoundation.lams.web.LamsStartupServlet
+		</servlet-class>
 
 		<load-on-startup>1</load-on-startup>
-
 	</servlet>
+
 	<servlet>
 		<servlet-name>LessonJoinServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.webservice.xml.LessonJoinServlet</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.webservice.xml.LessonJoinServlet
+		</servlet-class>
 	</servlet>
+
 	<servlet>
 		<servlet-name>forgotPasswordServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.ForgotPasswordServlet</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.web.ForgotPasswordServlet
+		</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>flashCrashDump</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.FlashCrashDumpServlet</servlet-class>
 
-	</servlet>
-	<servlet>
-		<servlet-name>WhiteboardToSwfServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToSwfServlet</servlet-class>
-
-	</servlet>
-	<servlet>
-		<servlet-name>storeTheme</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.themes.web.StoreThemeServlet</servlet-class>
-
-	</servlet>
-	<servlet>
-		<servlet-name>competenceServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.authoring.web.CompetenceServlet</servlet-class>
-
-	</servlet>
 	<servlet>
 		<servlet-name>SimpleUploader</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.LAMSUploadServlet</servlet-class>
-
+		<servlet-class>org.lamsfoundation.lams.web.LAMSUploadServlet
+		</servlet-class>
 		<load-on-startup>1</load-on-startup>
-
 	</servlet>
-	<servlet>
-		<servlet-name>copyMultipleToolContent</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.authoring.web.CopyMultipleToolContentServlet</servlet-class>
-
-	</servlet>
-	<servlet>
-		<servlet-name>BogoPogoServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToJpgServlet</servlet-class>
-
-	</servlet>
-
+	
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>
@@ -431,19 +362,19 @@
 			org.lamsfoundation.lams.web.OrganisationGroupServlet
 		</servlet-class>
 	</servlet>
-	
+
 	<servlet>
 		<servlet-name>RatingServlet</servlet-name>
 		<servlet-class>
 			org.lamsfoundation.lams.web.RatingServlet
 		</servlet-class>
 	</servlet>
-	
+
 	<servlet>
-    	<servlet-name>GetServerTimeServlet</servlet-name>
-    	<servlet-class>
-    		org.lamsfoundation.lams.webservice.GetServerTimeServlet
-    	</servlet-class>
+		<servlet-name>GetServerTimeServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.GetServerTimeServlet
+		</servlet-class>
 	</servlet>
 
 	<servlet>
@@ -452,30 +383,30 @@
 			org.lamsfoundation.lams.rest.LearningDesignRestServlet
 		</servlet-class>
 	</servlet>
- 	
+
 	<servlet>
 		<servlet-name>ToolContentRestServlet</servlet-name>
 		<servlet-class>
 			org.lamsfoundation.lams.rest.ToolContentRestServlet
 		</servlet-class>
 	</servlet>
-	
+
 	<servlet>
 		<servlet-name>RuntimeStatsServlet</servlet-name>
 		<servlet-class>
 			org.lamsfoundation.lams.web.RuntimeStatsServlet
 		</servlet-class>
 	</servlet>
- 	
- 	<servlet-mapping>
- 		<servlet-name>LearningDesignRestServlet</servlet-name>
- 		<url-pattern>/rest/LearningDesign</url-pattern>
- 	</servlet-mapping>
- 	
- 	<servlet-mapping>
- 		<servlet-name>ToolContentRestServlet</servlet-name>
- 		<url-pattern>/rest/ToolContent</url-pattern>
- 	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>LearningDesignRestServlet</servlet-name>
+		<url-pattern>/rest/LearningDesign</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ToolContentRestServlet</servlet-name>
+		<url-pattern>/rest/ToolContent</url-pattern>
+	</servlet-mapping>
 	<!-- Optional Module Placeholder - do not remove -->
 
 	<servlet-mapping>
@@ -527,12 +458,12 @@
 		<servlet-name>CourseGroupManager</servlet-name>
 		<url-pattern>/services/CourseGroupManager</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet-mapping>
 		<servlet-name>RatingServlet</servlet-name>
 		<url-pattern>/servlet/rateItem</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet-mapping>
 		<servlet-name>GetServerTimeServlet</servlet-name>
 		<url-pattern>/services/getServerTime</url-pattern>
@@ -543,40 +474,21 @@
 		<url-pattern>/servlet/updateCollapsedGroup</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>storeLD</servlet-name>
-		<url-pattern>/servlet/authoring/storeLearningDesignDetails</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>GetRecordingServlet</servlet-name>
 		<url-pattern>/GetRecording</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Connector</servlet-name>
-		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector
+		</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>RegisterServlet</servlet-name>
 		<url-pattern>/services/Register/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>storeNotebookEntry</servlet-name>
-		<url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>dumpWDDX</servlet-name>
-		<url-pattern>/servlet/dumpWDDX</url-pattern>
-	</servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>LaunchLearnerUrlServlet</servlet-name>
-      <url-pattern>/r/*</url-pattern>
-   </servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>editLD</servlet-name>
-		<url-pattern>/eof/authoring/editLearningDesign</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>insertLearningDesign</servlet-name>
-		<url-pattern>/servlet/authoring/insertLearningDesign</url-pattern>
+		<servlet-name>LaunchLearnerUrlServlet</servlet-name>
+		<url-pattern>/r/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>jlatexmath</servlet-name>
@@ -599,32 +511,8 @@
 		<url-pattern>/ForgotPasswordRequest</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>flashCrashDump</servlet-name>
-		<url-pattern>/servlet/flashCrashDump</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>WhiteboardToSwfServlet</servlet-name>
-		<url-pattern>/WhiteboardToSwf</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>storeTheme</servlet-name>
-		<url-pattern>/themes/servlet/storeTheme</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>competenceServlet</servlet-name>
-		<url-pattern>/competenceServlet</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>SimpleUploader</servlet-name>
 		<url-pattern>/ckeditor/filemanager/upload/simpleuploader</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>copyMultipleToolContent</servlet-name>
-		<url-pattern>/servlet/authoring/copyMultipleToolContent</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>BogoPogoServlet</servlet-name>
-		<url-pattern>/BogoPogo</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>RuntimeStatsServlet</servlet-name>
@@ -634,11 +522,6 @@
 	<mime-mapping>
 		<extension>csv</extension>
 		<mime-type>text/plain</mime-type>
-	</mime-mapping>
-
-	<mime-mapping>
-		<extension>wsdl</extension>
-		<mime-type>text/xml</mime-type>
 	</mime-mapping>
 
 	<mime-mapping>
@@ -666,35 +549,43 @@
 		<!-- ======================================================== -->
 		<taglib>
 			<taglib-uri>tags-bean</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-html</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-logic</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-tiles</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-bean-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-html-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-logic-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-tiles-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld
+			</taglib-location>
 		</taglib>
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library -->
@@ -720,7 +611,8 @@
 		<!-- ======================================================== -->
 		<taglib>
 			<taglib-uri>tags-permittedTaglibs</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
+			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld
+			</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>tags-scriptfree</taglib-uri>
@@ -766,7 +658,7 @@
 			<url-pattern>/ForgotPasswordRequest</url-pattern>
 			<url-pattern>/forgotPassword.jsp</url-pattern>
 			<url-pattern>/forgotPasswordChange.jsp</url-pattern>
-			<url-pattern>/forgotPasswordProc.jsp</url-pattern>			
+			<url-pattern>/forgotPasswordProc.jsp</url-pattern>
 			<url-pattern>/signup/*</url-pattern>
 			<url-pattern>/rest/*</url-pattern>
 			<url-pattern>/runtimeStats</url-pattern>
@@ -783,11 +675,6 @@
 		<web-resource-collection>
 			<web-resource-name>Authoring content</web-resource-name>
 			<url-pattern>/authoring/*</url-pattern>
-			<url-pattern>/author.jsp</url-pattern>
-			<url-pattern>/authoringConfirm.jsp</url-pattern>
-			<url-pattern>/lams_authoring_library.swf</url-pattern>
-			<url-pattern>/lams_authoring.swf</url-pattern>
-			<url-pattern>/lams_preloader.swf</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
@@ -796,7 +683,7 @@
 			<role-name>SYSADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
-	
+
 	<!-- Some constraints are based on DisplayGroupAction class -->
 	<security-constraint>
 		<web-resource-collection>
@@ -833,7 +720,7 @@
 			<role-name>SYSADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
-	
+
 	<!-- Login Configuration -->
 	<login-config>
 		<auth-method>FORM</auth-method>
@@ -843,7 +730,7 @@
 			<form-error-page>/login.jsp?failed=y</form-error-page>
 		</form-login-config>
 	</login-config>
-	
+
 	<!-- Security Roles -->
 	<security-role>
 		<description>Student</description>

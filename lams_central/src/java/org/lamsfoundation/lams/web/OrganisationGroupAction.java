@@ -351,8 +351,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	    // if groups haven't been selected yet - show all available groups in organisation
 	} else if ((lessonGroups == null) || lessonGroups.isEmpty()) {
 
-	    learners = getUserManagementService().getUsersFromOrganisationByRole(organisationId, Role.LEARNER, false,
-		    true);
+	    learners = getUserManagementService().getUsersFromOrganisationByRole(organisationId, Role.LEARNER, true);
 	    Set<OrganisationGroup> orgGroups = orgGrouping == null ? null : orgGrouping.getGroups();
 	    orgGroupsJSON = getOrgGroupsDetails(orgGroups, learners);
 

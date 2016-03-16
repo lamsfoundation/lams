@@ -25,22 +25,16 @@
 package org.lamsfoundation.lams.authoring;
 
 import java.text.ParseException;
-import java.util.Hashtable;
 
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 public interface IObjectExtractor {
 
     public static final String OBJECT_EXTRACTOR_SPRING_BEANNAME = "ObjectExtractor";
-
-    public LearningDesign extractSaveLearningDesign(Hashtable table, LearningDesign existingLearningDesign,
-	    WorkspaceFolder workspaceFolder, User user) throws WDDXProcessorConversionException,
-	    ObjectExtractorException;
 
     public LearningDesign extractSaveLearningDesign(JSONObject ldJSON, LearningDesign existingLearningDesign,
 	    WorkspaceFolder workspaceFolder, User user) throws ObjectExtractorException, ParseException, JSONException;
