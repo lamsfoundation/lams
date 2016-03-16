@@ -32,17 +32,17 @@
 					<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${option.sequenceId}" />
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
-				
+								
 				<c:if test="${(mode != 'teacher') || !hasEditRight}">
-					<td style="text-align: center; width: 20px;">
+					<td class="arrows">
 						<c:if test="${not ordStatus.first and !finishedLock}">
-							<i class="fa fa-angle-up" title="<fmt:message key="label.authoring.basic.up"/>" 
-								onclick="upOption(${question.uid},${ordStatus.index})"></i>	
+							<c:set var="up"><fmt:message key='label.authoring.basic.up'/></c:set>
+							<lams:Arrow state="up" title="${up}" onclick="upOption(${question.uid},${ordStatus.index})"/>
 						</c:if>
 			
 						<c:if test="${not ordStatus.last and !finishedLock}">
-							<i class="fa fa-angle-down" title="<fmt:message key="label.authoring.basic.down"/>"
-								onclick="downOption(${question.uid},${ordStatus.index})"></i>	
+							<c:set var="down"><fmt:message key='label.authoring.basic.down'/></c:set>
+							<lams:Arrow state="down" title="${down}" onclick="downOption(${question.uid},${ordStatus.index})"/>
 						</c:if>
 					</td>
 				</c:if>			

@@ -18,6 +18,10 @@
 							</span>
 						</c:if>
 							
+						<c:if test="${empty question.question}">
+							<!--  must have something here otherwise the question-numbers span does not float properly -->
+							&nbsp;
+						</c:if>
 						${question.question}
 					</div>
 					
