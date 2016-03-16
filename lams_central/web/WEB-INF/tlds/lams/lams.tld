@@ -443,6 +443,10 @@
 	    <name>TSTable</name>
 		<path>/WEB-INF/tags/TSTable.tag</path>
    	</tag-file>    
+  	<tag-file>
+	    <name>Arrow</name>
+		<path>/WEB-INF/tags/Arrow.tag</path>
+   	</tag-file>  
    	<tag-file>
 	    <name>ImgButtonWrapper</name>
 		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>

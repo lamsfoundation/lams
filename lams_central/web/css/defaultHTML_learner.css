@@ -167,3 +167,14 @@ body.stripes {
   color: inherit;
   /*float: right;*/
 }
+
+/* Restrict the width of the up and down arrows so they do not grow wider when the screen is enlarged. td needs to be 5px wider than div. */
+div.arrows{
+	display:inline-block;
+	width:30px;
+	text-align: center;
+}
+td.arrows{
+	width:35px;
+	text-align: center;
+}
