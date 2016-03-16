@@ -13,26 +13,30 @@
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 	</lams:head>
-	<body class="tabpart">
+	<body>
+
+		<%@ include file="/common/messages.jsp"%>
 
 		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateItem" method="post"
-			styleId="resourceItemForm">
-			<html:hidden property="sessionMapID" />
-			<input type="hidden" name="instructionList" id="instructionList" />
-			<input type="hidden" name="itemType" id="itemType" value="1" />
-			<html:hidden property="itemIndex" />
-
-			<h2 class="no-space-left">
+		<div class="panel panel-default add-file">
+			<div class="panel-heading panel-title">
 				<fmt:message key="label.authoring.basic.add.url" />
-			</h2>
-
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.resource.title.input" />
 			</div>
+			<div class="panel-body">
+			<div class="form-group">
 
-			<html:text property="title" size="55" />
+			<form>
+			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm">
+				<html:hidden property="sessionMapID" />
+				<input type="hidden" name="instructionList" id="instructionList" />
+				<input type="hidden" name="itemType" id="itemType" value="1" />
+				<html:hidden property="itemIndex" />
+
+				<div class="form-group">
+			    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
+					<html:text property="title" size="55" />
+			  	</div>	
+			  
 
 			<div class="field-name space-top">
 				<fmt:message key="label.authoring.basic.resource.url.input" />
@@ -50,6 +54,7 @@
 
 		<!-- Instructions -->
 		<%@ include file="instructions.jsp"%>
+		</form>
 
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="submitResourceItem()" class="button-add-item"><fmt:message

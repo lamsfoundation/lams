@@ -173,7 +173,7 @@
 		</action>
 		
 		
-		<action path="/learning/addfile"
+ 		<action path="/learning/addfile"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			parameter="addfile"
 			name="resourceItemForm" 

@@ -9,17 +9,16 @@
 		<%@ include file="/common/header.jsp"%>
 	</lams:head>
 	<body class="stripes">
-		<script type="text/javascript">
+ 		<script type="text/javascript">
 			var reqIDVar = new Date();
-			window.parent.location.href  = "${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+			window.location.href  = "${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
 		</script>
+		<lams:Page type="learner">
 		<div style="align:center">
-			<c:if test="${addType == 1}">
-				Add URL success, <a href="<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}" target="newResourceFrame">click here to return</a>.
-			</c:if>
-			<c:if test="${addType == 2}">
-				Add File success, <a href="<c:url value='/learning/addfile.do'/>?sessionMapID=${sessionMapID}&mode=${mode}" target="newResourceFrame">click here to return</a>.
-			</c:if>
+			<!--  this should never be seen! -->
+			<a href="${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime()" type="button" class="btn btn-primary">
+					<i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.check.for.new" /></a>
 		</div>
+		</lams:Page>
 	</body>
 </lams:html>
