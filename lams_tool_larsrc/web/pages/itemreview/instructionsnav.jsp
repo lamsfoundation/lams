@@ -36,21 +36,13 @@
 		<!--
 				jQuery.noConflict();
 		
-		  		jQuery(document).ready(function() {
-
-					jQuery("input#FinishInstruction").bind('click', function() {
-			   			finishIns();
-			  		});	
-
-		  		});
-		
 				function finishIns(){
 				//learner and author(preview mode) will mark the finish
 					if(${mode == "learner"} || ${mode == "author"}){
 					   var reqIDVar = new Date();
-					   if(${runAuto}){
+					   if(${runAuto}) {
 					  		//set complete flag and finish this activity as well.
-					        window.parent.location.href='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
+					        location.href='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
 					   }else{
 						    var url="<c:url value="/learning/completeItem"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
 							jQuery.ajax({
@@ -91,25 +83,27 @@
 							
 					   }
 					} else {
-						window.parent.close();
+						window.close();
 					}
 				}
 				
 				function continueReflect(){
-					 window.parent.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+					 location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 				}
 
 				function nextIns(currIns){
-					document.location.href="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
+					var nextUrl="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
+					$('#headerFrame').load(nextUrl);
 				}
 		//-->
 		</script>
 	</lams:head>
 	<body>
 
-		<div id="instructions" style="padding: 0 10px;">
-			
-			<h2>
+		<div class="container-fluid" id="instructions">
+		  <div class="row">
+			<div class="col-xs-12 ">
+			<h4>
 				<c:if test="${instructions.total > 0}" >
 					<fmt:message key="message.step.of">
 						<fmt:param value="${instructions.current}" />
@@ -119,40 +113,49 @@
 				<c:if test="${instructions.total <= 0}" >
 					&nbsp;
 				</c:if>
-			</h2>
-			
-			<span style="position: fixed; right: 10px;">
-				<c:choose>
-					<c:when test="${instructions.current < instructions.total}">
-						<input type="button" id="NextInstruction" name="NextInstruction"
-							onClick="javascript:nextIns(${instructions.current})"
-							class="button" value="<fmt:message key='label.next.instruction' />" />
-					</c:when>
-					<c:when test="${reflectOn && runAuto}">
-						<input type="button" id="FinishInstruction" name="FinishInstruction"
-							onClick="javascript:continueReflect()" class="button" value="<fmt:message
-								key='label.continue' />" />
-					</c:when>
-					<c:otherwise>
-						<input type="button" id="FinishInstruction" name="FinishInstruction" class="button" value="<fmt:message key='label.finish' />" />
-					</c:otherwise>
-				</c:choose>
-			</span>
-
-			<p>
-			
+			</h4>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-xs-12 ">
 				<c:choose>
 					<c:when test="${instructions.instruction == null}">
 						<fmt:message key="msg.no.instruction" />
-					</c:when>
-					
+					</c:when>		
 					<c:otherwise>
 						<c:out value="${instructions.instruction.description}" escapeXml="false"/>
 					</c:otherwise>
 				</c:choose>
-				
-			</p>
-
+			
+				<c:choose>
+					<c:when test="${instructions.current < instructions.total}">
+						<input type="button" id="NextInstruction" name="NextInstruction"
+							onClick="javascript:nextIns(${instructions.current})"
+							class="btn btn-sm btn-default pull-right" value="<fmt:message key='label.next.instruction' />" />
+					</c:when>
+					<c:when test="${reflectOn && runAuto}">
+						<input type="button" id="Reflect" name="Reflect"
+							onClick="javascript:continueReflect()" class="btn btn-sm btn-default pull-right" value="<fmt:message
+								key='label.continue' />" />
+					</c:when>
+					<c:when test="${! reflectOn && runAuto}">
+						<html:link href="#nogo" property="FinishInstruction" styleId="FinishInstruction"
+							onclick="javascript:finishIns()" styleClass="btn btn-sm btn-primary voffset5 pull-right na">
+							<span class="nextActivity">
+								<fmt:message key='label.finish' />
+							</span>
+						</html:link>
+					</c:when>
+					<c:otherwise>
+						<input type="button" onClick="javascript:finishIns()" id="FinishInstruction" name="FinishInstruction" 
+							class="btn btn-sm btn-default pull-right" 
+							value="<fmt:message key='label.finish' />" />	
+					</c:otherwise>
+				</c:choose>
+			</div>
 		</div>
+	</div>
+	
 	</body>
 </lams:html>

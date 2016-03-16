@@ -10,7 +10,7 @@
 -->
 <urlrewrite>
 
-     <rule>
+<!--      <rule>
         <note>
             The rule means that requests to tool's learning jsp will be redirected to /learning/mobile/ folder
             containing mobile version of jsps.
@@ -33,6 +33,6 @@
         <from>^/(.*)itemreview/([^/]*\.jsp)$</from>
         <to>/$1itemreview/mobile/$2</to>
     </rule>
-    
+ -->    
 </urlrewrite>
 

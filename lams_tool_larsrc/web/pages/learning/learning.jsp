@@ -24,23 +24,103 @@
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
-		function gotoURL(){
- 		    var reqIDVar = new Date();
-			var gurl = "<c:url value="/learning/addurl.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
-	      	showMessage(gurl);
-	      	return false;
+	
+		$(document).ready(function(){
+			cancel();
+		});
+
+		function validateForm(itemType) {
+			var error = "";
+			var title = $("#resourcetitle").val();
+			if ( ! title || title == "" ) {
+				error='<fmt:message key="error.resource.item.title.blank" />';
+			}
+			if ( itemType == '1') {
+				var url = $("#url").val();
+				if ( ! url || url == "" ) {
+					if ( error == "" ) {
+						error='<fmt:message key="error.resource.item.url.blank" />';
+					} else {
+						error+='\n<fmt:message key="error.resource.item.url.blank" />';
+					}
+				}
+			}
+			if ( itemType == '2') {
+				var file = $("#file").val();
+				if ( ! file || file == "" ) {
+					if ( error == "" ) {
+						error='<fmt:message key="error.resource.item.file.blank" />';
+					} else {
+						error+='\n<fmt:message key="error.resource.item.file.blank" />';
+					}
+				}
+			}
+			if ( error != "" ) {
+				alert(error);
+				return false;
+			} else { 
+				return true;
+			}
 		}
+		
+ 		function submitResourceForm() {
+			var itemType = $("#itemType").val();
+			<%-- Firefox is sending an empty string rather than nothing when there isn't a file, which breaks Struts. So validate to avoid. --%>
+			if ( validateForm(itemType)) {
+				var formData = new FormData(this);
+			    $.ajax({ // create an AJAX call...
+			        data: formData, 
+			        processData: false, // tell jQuery not to process the data
+			        contentType: false, // tell jQuery not to set contentType
+			        type: $(this).attr('method'), // GET or POST
+			        url: $(this).attr('action'), // the file to call
+			        success: function (response) {
+						$('#addresource').html(response);
+						if ( itemType == 1)
+							setFormURL();
+						else if ( itemType == 2)
+							setFormFile();
+			    	},
+			    	error: function (jqXHR, textStatus, errorThrown ) {
+			    		alert(textStatus+": "+errorThrown);
+			    	},
+			    });
+			}
+			return false;
+		}
+		
+	    function gotoURL(){
+	    	var reqIDVar = new Date();
+	   		var gurl = "<c:url value="/learning/addurl.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+	        $("#addresource").load(gurl, function() {
+	        	setFormURL();
+	        });
+		}
+	    function setFormURL() {
+			$("#itemType").val("1");
+			$("#mode").val("${mode}");
+			$("#sessionMapID").val("${sessionMapID}");
+	    }
+	    
 		function gotoFile(){
- 		    var reqIDVar = new Date();
- 		    var gurl = "<c:url value="/learning/addfile.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
-	      	showMessage(gurl);
-	      	return false;
+		    var reqIDVar = new Date();
+		    var gurl = "<c:url value="/learning/addfile.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+	        $("#addresource").load(gurl, function() {
+	        	setFormFile();
+	        });
+		}		
+		function setFormFile() {
+			$("#itemType").val("2");
+			$("#mode").val("${mode}");
+			$("#sessionMapID").val("${sessionMapID}");
 		}
+		function cancel(){
+			$("#addresource").html('');
+		}		
+		
 		function checkNew(){
  		    var reqIDVar = new Date();
-				
 			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();				
-				
  		    return false;
 		}
 		function viewItem(itemUid){
@@ -55,50 +135,75 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		
-		function showMessage(url) {
-			var area=document.getElementById("reourceInputArea");
-			if(area != null){
-				area.style.width="100%";
-				area.src=url;
-				area.style.display="block";
-			}
-		}
-    </script>
+		    </script>
 </lams:head>
 <body class="stripes">
 
 
-	<div id="content">
-		<h1>
-			<c:out value="${resource.title}" escapeXml="true"/>
-		</h1>
-
-		<p>
-			<c:out value="${resource.instructions}" escapeXml="false"/>
-		</p>
-
+	<lams:Page type="learner" title="${resource.title}">
+	
+		<!--  Warnings -->
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-				<div class="info">
-					<c:choose>
-						<c:when test="${sessionMap.userFinished}">
-							<fmt:message key="message.activityLocked" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="message.warnLockOnFinish" />
-						</c:otherwise>
-					</c:choose>
-				</div>
+			<lams:Alert type="danger" id="warn-lock" close="false">
+				<c:choose>
+					<c:when test="${sessionMap.userFinished}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+			</lams:Alert>
 		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
 
-		<table cellspacing="0" class="alternative-color">
+		<!--  Instructions -->
+		<div class="panel">
+			<c:out value="${resource.instructions}" escapeXml="false"/>
+		</div>
+
+		<!-- Resources to View -->
+		<div class="panel panel-default">
+			<div class="panel-heading panel-title">
+				<fmt:message key="label.resoruce.to.review" />
+
+				<!--  Panel button bar controlling refresh and adding items -->
+				<div class="btn-group pull-right">
+					<c:if test="${mode != 'teacher'}">
+						<a href="#" onclick="javascript:return checkNew()" type="button" class="btn btn-xs btn-default">
+						<i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.check.for.new" /></a>
+					</c:if>
+					<c:if test="${not finishedLock}">
+						<c:choose>
+							<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
+								<a href="#" onclick="javascript:gotoURL()" type="button" class="btn btn-xs btn-default">
+								<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.url.input" /></a>
+								<a href="#" onclick="javascript:gotoFile()" type="button" class="btn btn-xs btn-default">
+								<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.file.input" /></a>
+							</c:when>
+	
+							<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
+								<a href="#" onclick="javascript:gotoFile()" type="button" class="btn btn-xs btn-default">
+								<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.file.input" /></a>
+							</c:when>
+	
+							<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
+								<a href="#" onclick="javascript:gotoURL()" type="button" class="btn btn-xs btn-default">
+								<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.url.input" /></a>
+							</c:when>
+						</c:choose>
+					</c:if>
+				</div>
+				<!--  End panel button bar -->
+			</div> 
+
+			<table class="table table-hover table-striped table-condensed">
 			<tr>
 				<th width="70%">
-					<fmt:message key="label.resoruce.to.review" />
+					<fmt:message key="export.label.resource" />
 				</th>
-				<th align="center">
+				<th class="text-center">
 					<fmt:message key="label.completed" />
 				</th>
 			</tr>
@@ -112,14 +217,13 @@
 								(<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true"/>)
 						</c:if>
 					</td>
-					<td align="center">
+					<td class="text-center">
 						<c:choose>
 							<c:when test="${item.complete}">
-								<img src="<html:rewrite page='/includes/images/tick.gif'/>"
-									border="0">
+								<i class="fa fa-check"></i>
 							</c:when>
 							<c:otherwise>
-								-
+								<i class="fa fa-minus"></i>
 							</c:otherwise>
 						</c:choose>
 					</td>
@@ -133,89 +237,31 @@
 					</td>
 				</tr>
 			</c:if>
-		</table>
+			</table>
 
+		</div>
+		<!--  End Resources to View -->
 
-		<c:if test="${mode != 'teacher'}">
-			<p>
-				<a href="#" onclick="return checkNew()" class="button"> <fmt:message
-						key="label.check.for.new" /> </a>
-			</p>
-		</c:if>
+		<!-- Add a URL/File Form-->
+		<div id="addresource">
+		</div>
 
-		<c:if test="${mode != 'teacher' && (not finishedLock)}">
-			<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
-
-				<h2>
-					<fmt:message key="label.suggest.new" />
-				</h2>
-
-				<div class="small-space-top">
-					<c:choose>
-						<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-							<input type="radio" name="suggest" value="url" checked="true"
-								onclick="gotoURL()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.url.input" /> |
-										<input type="radio" name="suggest" value="file"
-								onclick="gotoFile()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.file.input" />
-						</c:when>
-
-						<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-							<input type="radio" name="suggest" value="file" checked="true"
-								onclick="gotoFile()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.file.input" />
-						</c:when>
-
-						<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-							<input type="radio" name="suggest" value="url" checked="true"
-								onclick="gotoURL()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.url.input" />
-						</c:when>
-					</c:choose>
-				</div>
-
-				<iframe
-					onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px';"
-					id="reourceInputArea" name="reourceInputArea"
-					style="width: 0px; height: 0px; border: 0px; display: none"
-					frameborder="no" scrolling="no">
-				</iframe>
-
-			</c:if>
-
-			<c:choose>
-				<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-					<script type="text/javascript">
-						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					</script>
-				</c:when>
-				<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-					<script type="text/javascript">
-						showMessage("<c:url value='/learning/addfile.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					</script>
-				</c:when>
-				<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-					<script type="text/javascript">
-						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					</script>
-				</c:when>
-			</c:choose>
-			<%-- end mode != teacher --%>
-		</c:if>
-
-
+		<!-- Reflection -->
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h3><fmt:message key="title.reflection" /></h3>
-				<strong>
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</strong>
+			<div class="panel panel-default">
+				<div class="panel-heading panel-title">
+					<fmt:message key="title.reflection" />
+				</div>
+				<div class="panel-body">
+					<div class="reflectionInstructions">
+						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
+					</div>
 
-				<c:choose>
+					<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
 						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
+							<em> 
+								<fmt:message key="message.no.reflection.available" />
 							</em>
 						</p>
 					</c:when>
@@ -224,30 +270,30 @@
 							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
 						</p>
 					</c:otherwise>
-				</c:choose>
+					</c:choose>
 
-				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
+					<c:if test="${mode != 'teacher'}">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default voffset5">
 						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
+						</html:button>
+					</c:if>
+				</div>
 			</div>
 		</c:if>
+		<!-- End Reflection -->
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
 				<c:choose>
 					<c:when
 						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton"
-							onclick="return continueReflect()" styleClass="button">
+							onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
 						<html:link href="#nogo" property="FinishButton" styleId="finishButton"
-							onclick="return finishSession()" styleClass="button">
+							onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
@@ -264,12 +310,12 @@
 			</div>
 		</c:if>
 
-	</div>
 	<!--closes content-->
 
 	<div id="footer">
 	</div>
 	<!--closes footer-->
 
+	</lams:Page>
 </body>
 </lams:html>
