@@ -50,11 +50,6 @@ public class ConfigurationKeys {
 
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
-    /**
-     * Flash crash dump files (see FlashCrashDump servlet) are written to the Dump directory
-     */
-    public static String LAMS_DUMP_DIR = "DumpDir";
-
     public static String CONTENT_REPOSITORY_PATH = "ContentRepositoryPath";
 
     public static String UPLOAD_FILE_MAX_SIZE = "UploadFileMaxSize";
@@ -117,9 +112,7 @@ public class ConfigurationKeys {
 
     public static String XMPP_PASSWORD = "XmppPassword";
 
-    public static String DEFAULT_FLASH_THEME = "DefaultFlashTheme";
-
-    public static String DEFAULT_HTML_THEME = "DefaultHTMLTheme";
+    public static String DEFAULT_THEME = "DefaultTheme";
 
     public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
 

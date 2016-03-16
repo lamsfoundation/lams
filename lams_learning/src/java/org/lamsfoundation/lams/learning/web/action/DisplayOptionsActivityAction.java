@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.util.ArrayList;
@@ -38,89 +38,84 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
-
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.web.action.LamsAction;
 
 /**
  * Action class to display an OptionsActivity.
  * 
  * @author daveg
  *
- * XDoclet definition:
+ *         XDoclet definition:
  * 
- * @struts:action path="/DisplayOptionsActivity" name="optionsActivityForm"
- *                input="/Activity.do" validate="false" scope="request"
+ * @struts:action path="/DisplayOptionsActivity" name="optionsActivityForm" input="/Activity.do" validate="false"
+ *                scope="request"
  * 
  * @struts:action-forward name="displayOptions" path=".optionsActivity"
  * 
  */
 public class DisplayOptionsActivityAction extends ActivityAction {
-	
 
-	/**
-	 * Gets an options activity from the request (attribute) and forwards to
-	 * the display JSP.
-	 */
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) {
-		OptionsActivityForm form = (OptionsActivityForm)actionForm;
-		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
-		
-		ICoreLearnerService learnerService = getLearnerService();
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		if (!(activity instanceof OptionsActivity)) {
-		    log.error(className+": activity not OptionsActivity "+activity.getActivityId());
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
+    /**
+     * Gets an options activity from the request (attribute) and forwards to the display JSP.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	OptionsActivityForm form = (OptionsActivityForm) actionForm;
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-		OptionsActivity optionsActivity = (OptionsActivity)activity;
-
-		form.setActivityID(activity.getActivityId());
-
-		List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
-		Set subActivities = optionsActivity.getActivities();
-		Iterator i = subActivities.iterator();
-		int completedCount = 0;
-		while (i.hasNext()) {
-			ActivityURL activityURL = LearningWebUtil.getActivityURL( actionMappings, learnerProgress, (Activity)i.next(), false, false);
-			if ( activityURL.isComplete() ) {
-				completedCount++;
-			}
-			activityURLs.add(activityURL);
-		}
-		form.setActivityURLs(activityURLs);
-		
-		if ( optionsActivity.getMinNumberOfOptionsNotNull().intValue() <= completedCount ) {
-			form.setFinished(true);
-		}
-		
-		if (completedCount >= optionsActivity.getMaxNumberOfOptionsNotNull().intValue()  )
-		{
-			form.setMaxActivitiesReached(true);
-		}
-			
-		form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
-		form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
-		form.setDescription(optionsActivity.getDescription());
-		form.setTitle(optionsActivity.getTitle());
-		form.setLessonID(learnerProgress.getLesson().getLessonId());
-		form.setProgressID(learnerProgress.getLearnerProgressId());
-		
-		this.saveToken(request);
-        
-        	LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
-        	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request, getServlet().getServletContext());
-		
-		String forward = "displayOptions";
-		return mapping.findForward(forward);
+	ICoreLearnerService learnerService = getLearnerService();
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	if (!(activity instanceof OptionsActivity)) {
+	    LamsAction.log.error(LamsAction.className + ": activity not OptionsActivity " + activity.getActivityId());
+	    return mapping.findForward(ActivityMapping.ERROR);
 	}
-	
+
+	OptionsActivity optionsActivity = (OptionsActivity) activity;
+
+	form.setActivityID(activity.getActivityId());
+
+	List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
+	Set<Activity> subActivities = optionsActivity.getActivities();
+	Iterator<Activity> i = subActivities.iterator();
+	int completedCount = 0;
+	while (i.hasNext()) {
+	    ActivityURL activityURL = LearningWebUtil.getActivityURL(actionMappings, learnerProgress, i.next(), false,
+		    false);
+	    if (activityURL.isComplete()) {
+		completedCount++;
+	    }
+	    activityURLs.add(activityURL);
+	}
+	form.setActivityURLs(activityURLs);
+
+	if (optionsActivity.getMinNumberOfOptionsNotNull().intValue() <= completedCount) {
+	    form.setFinished(true);
+	}
+
+	if (completedCount >= optionsActivity.getMaxNumberOfOptionsNotNull().intValue()) {
+	    form.setMaxActivitiesReached(true);
+	}
+
+	form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
+	form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
+	form.setDescription(optionsActivity.getDescription());
+	form.setTitle(optionsActivity.getTitle());
+	form.setLessonID(learnerProgress.getLesson().getLessonId());
+	form.setProgressID(learnerProgress.getLearnerProgressId());
+
+	this.saveToken(request);
+
+	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request, getServlet().getServletContext());
+
+	String forward = "displayOptions";
+	return mapping.findForward(forward);
+    }
 }

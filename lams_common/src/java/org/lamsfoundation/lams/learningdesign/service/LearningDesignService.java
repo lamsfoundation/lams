@@ -140,7 +140,7 @@ public class LearningDesignService implements ILearningDesignService {
      *******************************************/
 
     /**
-     * Get the learning design DTO, suitable to send to Flash via WDDX
+     * Get the learning design DTO
      * 
      * @param learningDesignId
      * @param languageCode
@@ -279,9 +279,7 @@ public class LearningDesignService implements ILearningDesignService {
 			isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO.getActivityCategoryID());
 
 		if (libraryActivityDTO.getToolID() == null) {
-		    String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
-		    iconPath = iconPath.replace(".swf", ".svg");
-		    toolDTO.setIconPath(iconPath);
+		    toolDTO.setIconPath(libraryActivityDTO.getLibraryActivityUIImage());
 		} else {
 		    Tool tool = (Tool) learningLibraryDAO.find(Tool.class, libraryActivityDTO.getToolID());
 		    String iconPath = "tool/" + tool.getToolSignature() + "/images/icon_" + tool.getToolIdentifier()

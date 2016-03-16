@@ -334,7 +334,7 @@ public abstract class OutputFactory {
 
     /**
      * Build a condition name based on a definition name. For user customised conditions, the conditions name MUST start
-     * with the definition name for Flash to be able to match conditions to definition in the authoring interface, but
+     * with the definition name for UI to be able to match conditions to definition in the authoring interface, but
      * then each condition name needs to be unique, hence "uniquePart".
      * 
      * @param definitionName:

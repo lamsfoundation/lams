@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lasprd10/images/icon_spreadsheet.swf'
+, 'tool/lasprd10/images/icon_spreadsheet.svg'
 , NULL
 , NULL
 , NULL

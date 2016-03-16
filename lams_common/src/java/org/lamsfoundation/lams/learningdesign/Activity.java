@@ -58,7 +58,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * static final variables indicating the type of activities available for a LearningDesign. As new types of
      * activities are added, these constants must be updated, as well as ActivityDAO.getActivityByActivityId()
      * 
-     * OPTIONS_WITH_SEQUENCES_TYPE is set up just to support Flash. The server treads OptionsActivity and
+     * OPTIONS_WITH_SEQUENCES_TYPE is set up just to support Authoring. The server treads OptionsActivity and
      * OptionalSequenceActivity the same.
      */
     /* **************************************************************** */
@@ -105,19 +105,11 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     public static final String I18N_DESCRIPTION = "activity.description";
     public static final String I18N_HELP_TEXT = "activity.helptext";
 
-    // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
-    /**
-     * WDDX packet specific attribute created to identify the type of object being passed.
-     */
-    public static final String OBJECT_TYPE = "Activity";
-
     /** identifier field */
     private Long activityId;
 
     /**
-     * FLASH generated value. Unique per LearningDesign. Required by flash only.
+     * Authoring generated value. Unique per LearningDesign.
      */
     private Integer activityUIID;
 
@@ -772,7 +764,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 		}
 	    }
 	}
-	
+
 	return new NullGroup();
     }
 
@@ -802,23 +794,23 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     public boolean isOptionsActivity() {
-	return getActivityTypeId().intValue() == Activity.OPTIONS_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE;
+	return (getActivityTypeId().intValue() == Activity.OPTIONS_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE);
     }
-    
+
     public boolean isOptionsWithSequencesActivity() {
 	return getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE;
     }
 
     public boolean isComplexActivity() {
-	return getActivityTypeId().intValue() == Activity.SEQUENCE_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.PARALLEL_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.OPTIONS_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE
-		|| getActivityTypeId().intValue() == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.GROUP_BRANCHING_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.TOOL_BRANCHING_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.FLOATING_ACTIVITY_TYPE;
+	return (getActivityTypeId().intValue() == Activity.SEQUENCE_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.PARALLEL_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.OPTIONS_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.TOOL_BRANCHING_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.FLOATING_ACTIVITY_TYPE);
     }
 
     public boolean isSystemToolActivity() {
@@ -826,11 +818,11 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     public boolean isGateActivity() {
-	return getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.PERMISSION_GATE_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.SYNCH_GATE_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.SYSTEM_GATE_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.CONDITION_GATE_ACTIVITY_TYPE;
+	return (getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.PERMISSION_GATE_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.SYNCH_GATE_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.SYSTEM_GATE_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.CONDITION_GATE_ACTIVITY_TYPE);
     }
 
     /**
@@ -888,9 +880,9 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * @return is this activity a branching activity
      */
     public boolean isBranchingActivity() {
-	return getActivityTypeId().intValue() == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.GROUP_BRANCHING_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.TOOL_BRANCHING_ACTIVITY_TYPE;
+	return (getActivityTypeId().intValue() == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
+		|| (getActivityTypeId().intValue() == Activity.TOOL_BRANCHING_ACTIVITY_TYPE);
     }
 
     /**
@@ -1000,7 +992,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	newActivity.setParentActivity(this.getParentActivity());
 	newActivity.setParentUIID(LearningDesign.addOffset(this.getParentUIID(), uiidOffset));
 
-	if (this.getInputActivities() != null && this.getInputActivities().size() > 0) {
+	if ((this.getInputActivities() != null) && (this.getInputActivities().size() > 0)) {
 	    newActivity.setInputActivities(new HashSet());
 	    newActivity.getInputActivities().addAll(this.getInputActivities());
 	}
@@ -1019,11 +1011,11 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Get the input activity UIIDs in a format suitable for Flash. See also getToolInputActivityID
+     * Get the input activity UIIDs in a format suitable for Authoring. See also getToolInputActivityID
      */
     public ArrayList<Integer> getInputActivityUIIDs() {
 	ArrayList<Integer> list = new ArrayList<Integer>();
-	if (getInputActivities() != null && getInputActivities().size() > 0) {
+	if ((getInputActivities() != null) && (getInputActivities().size() > 0)) {
 	    Iterator iter = getInputActivities().iterator();
 	    while (iter.hasNext()) {
 		Activity inputAct = (Activity) iter.next();
@@ -1052,7 +1044,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * activity. Returns null if not in a branch.
      */
     public Activity getParentBranch() {
-	if (isSequenceActivity() && getParentActivity() != null && getParentActivity().isBranchingActivity()) {
+	if (isSequenceActivity() && (getParentActivity() != null) && getParentActivity().isBranchingActivity()) {
 	    // I'm a branch, so start the process off with my parent!
 	    return getParentBranch(getParentActivity(), new HashSet<Long>());
 	} else {
@@ -1091,12 +1083,13 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	return (parentActivity.isFloatingActivity()) ? true : parentActivity.isFloating();
     }
 
+    @Override
     public int compareTo(Activity anotherActivity) {
 
 	Long activityID1 = getActivityId();
 	Long activityID2 = anotherActivity.getActivityId();
 
-	if (activityID1 == null || activityID2 == null) {
+	if ((activityID1 == null) || (activityID2 == null)) {
 	    return 0;
 	}
 

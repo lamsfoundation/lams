@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/laprev11/images/icon_peerreview.swf'
+, 'tool/laprev11/images/icon_peerreview.svg'
 , NULL
 , NULL
 , NULL

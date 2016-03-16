@@ -50,20 +50,6 @@
 			}
 		}
 		
-		function openAuthor() {
-			if (isMac) {
-					authorWin = window.open('home.do?method=authorFlash','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-			} else {
-				if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('home.do?method=author') > -1) {
-					// authorWin.location = 'home.do?method=author';
-					authorWin.focus();
-				} else {
-					authorWin = window.open('home.do?method=authorFlash','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-					authorWin.focus();
-				}
-			}
-		}
-		
 		function openPedagogicalPlanner() {
 			if(isMac) {
 					authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');

@@ -11,6 +11,6 @@ values
 1,null,null,0,
 null,null,now(),0,
 null,null,${tool_id},null,
-null,null,null,'tool/lascrb11/images/icon_scribe.swf',
+null,null,null,'tool/lascrb11/images/icon_scribe.svg',
 2,0,2,
 'org.lamsfoundation.lams.tool.scribe.ApplicationResources');

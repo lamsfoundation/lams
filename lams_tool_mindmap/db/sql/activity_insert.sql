@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lamind10/images/icon_mindmap.swf'
+, 'tool/lamind10/images/icon_mindmap.svg'
 , NULL
 , NULL
 , NULL

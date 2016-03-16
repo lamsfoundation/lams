@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lachat11/images/icon_chat.swf'
+, 'tool/lachat11/images/icon_chat.svg'
 , NULL
 , NULL
 , NULL

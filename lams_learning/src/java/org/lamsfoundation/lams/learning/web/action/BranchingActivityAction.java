@@ -21,13 +21,12 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,14 +37,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -54,178 +52,170 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * @author daveg
  *
- * XDoclet definition:
+ *         XDoclet definition:
  * 
- * @struts:action path="/branching" 
- * 				  name="BranchingForm"
- * 				  parameter="method" 
- *                validate="false"
+ * @struts:action path="/branching" name="BranchingForm" parameter="method" validate="false"
  * 
  * @struts:action-forward name="displayBranchingWait" path=".branchingActivityWait"
  * @struts:action-forward name="displayBranchingPreview" path=".branchingActivityPreview"
  * 
  */
 public class BranchingActivityAction extends LamsDispatchAction {
-	
 
     /** Input parameter. Boolean value */
-    public static final String PARAM_FORCE_GROUPING  = "force";
+    public static final String PARAM_FORCE_GROUPING = "force";
 
     private ICoreLearnerService learnerService = null;
-	
-	protected ICoreLearnerService getLearnerService() {
-		if (learnerService == null) 
-			learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-		return learnerService;
+
+    protected ICoreLearnerService getLearnerService() {
+	if (learnerService == null) {
+	    learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	}
+	return learnerService;
+    }
 
-	/**
-	 * Gets an options activity from the request (attribute) and forwards to
-	 * the display JSP.
-	 */
-	public ActionForward performBranching(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) {
+    /**
+     * Gets an options activity from the request (attribute) and forwards to the display JSP.
+     */
+    public ActionForward performBranching(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());	
-		getLearnerService(); // initialise the learner service, if necessary
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
+	getLearnerService(); // initialise the learner service, if necessary
 
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		Integer learnerId = LearningWebUtil.getUserId();
-        boolean forceGroup = WebUtil.readBooleanParam(request,PARAM_FORCE_GROUPING,false);
-		
-		ActionForward forward = null;
-		
-		if (activity == null) {
-			learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
-			forward = actionMappings.getActivityForward(activity, learnerProgress, true);
-  		
-		} else if (!(activity instanceof BranchingActivity)) {
-		    log.error(className+": activity not BranchingActivity "+activity.getActivityId());
-			forward = mapping.findForward(ActivityMapping.ERROR);
-		
-		} else {
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	Integer learnerId = LearningWebUtil.getUserId();
+	boolean forceGroup = WebUtil.readBooleanParam(request, BranchingActivityAction.PARAM_FORCE_GROUPING, false);
 
-			BranchingActivity branchingActivity = (BranchingActivity)activity;
-			SequenceActivity branch = learnerService.determineBranch(learnerProgress.getLesson(), 
-				branchingActivity, learnerId);
+	ActionForward forward = null;
 
-	        DynaActionForm branchForm = (DynaActionForm)actionForm;
-        	branchForm.set("activityID", activity.getActivityId());
-        	branchForm.set("progressID", learnerProgress.getLearnerProgressId());
-        	branchForm.set("showFinishButton", Boolean.TRUE);
-	        branchForm.set("title", activity.getTitle());
+	if (activity == null) {
+	    learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
+	    forward = actionMappings.getActivityForward(activity, learnerProgress, true);
 
-        	if ( learnerProgress.getLesson().isPreviewLesson() ) {
+	} else if (!(activity instanceof BranchingActivity)) {
+	    LamsDispatchAction.log.error(
+		    LamsDispatchAction.className + ": activity not BranchingActivity " + activity.getActivityId());
+	    forward = mapping.findForward(ActivityMapping.ERROR);
 
-				// The preview version gives you a choice of branches
-        		// If a "normal" branch can be determined based on the group, tool marks, etc then it is marked as the default branch
+	} else {
 
-        		branchForm.set("previewLesson",Boolean.TRUE);
-				forward = mapping.findForward("displayBranchingPreview");
+	    BranchingActivity branchingActivity = (BranchingActivity) activity;
+	    SequenceActivity branch = learnerService.determineBranch(learnerProgress.getLesson(), branchingActivity,
+		    learnerId);
 
-	    		List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
-	    		Iterator i = branchingActivity.getActivities().iterator();
-	    		int completedCount = 0;
-	    		while (i.hasNext()) {
-	    			Activity nextBranch = (Activity)i.next();
-	    			ActivityURL activityURL = LearningWebUtil.getActivityURL( actionMappings, learnerProgress, 
-	    					nextBranch, branch != null && branch.equals(nextBranch), false);
-	    			if ( activityURL.isComplete() ) {
-	    				completedCount++;
-	    			}
-	    			activityURLs.add(activityURL);
-	    		}
-	    		branchForm.set("activityURLs",activityURLs);
-	        	branchForm.set("showNextButton", branchingActivity.getActivities().size() != completedCount );
+	    DynaActionForm branchForm = (DynaActionForm) actionForm;
+	    branchForm.set("activityID", activity.getActivityId());
+	    branchForm.set("progressID", learnerProgress.getLearnerProgressId());
+	    branchForm.set("showFinishButton", Boolean.TRUE);
+	    branchForm.set("title", activity.getTitle());
 
-				LearningWebUtil.setupProgressInRequest(branchForm, request, learnerProgress);
+	    if (learnerProgress.getLesson().isPreviewLesson()) {
 
-        	} else if ( branch == null ) {
-				
-        		// show the learner waiting page
-	        	branchForm.set("previewLesson",Boolean.FALSE);
-				forward = mapping.findForward("displayBranchingWait");
-	        	branchForm.set("showNextButton", Boolean.TRUE);
-		        
-		        if ( branchingActivity.isChosenBranchingActivity() ) {
-		        	branchForm.set("type", BranchingActivity.CHOSEN_TYPE);
-		        } else if ( branchingActivity.isGroupBranchingActivity() ) {
-		        	branchForm.set("type", BranchingActivity.GROUP_BASED_TYPE);
-		        } else if ( branchingActivity.isToolBranchingActivity() ) {
-		        	branchForm.set("type", BranchingActivity.TOOL_BASED_TYPE);
-		        }
+		// The preview version gives you a choice of branches
+		// If a "normal" branch can be determined based on the group, tool marks, etc then it is marked as the default branch
 
-				LearningWebUtil.setupProgressInRequest(branchForm, request, learnerProgress);
+		branchForm.set("previewLesson", Boolean.TRUE);
+		forward = mapping.findForward("displayBranchingPreview");
 
-			} else {
-				// forward to the sequence activity.
-				if ( log.isDebugEnabled() ) {
-					log.debug("Branching: selecting the branch "+branch+" for user "+learnerId);
-				}
-				
-				// Set the branch as the current part of the sequence and display it
-				learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), branch, true);
-				forward = actionMappings.getActivityForward(branch, learnerProgress, true);
-				LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
-			}
+		List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
+		Iterator i = branchingActivity.getActivities().iterator();
+		int completedCount = 0;
+		while (i.hasNext()) {
+		    Activity nextBranch = (Activity) i.next();
+		    ActivityURL activityURL = LearningWebUtil.getActivityURL(actionMappings, learnerProgress,
+			    nextBranch, (branch != null) && branch.equals(nextBranch), false);
+		    if (activityURL.isComplete()) {
+			completedCount++;
+		    }
+		    activityURLs.add(activityURL);
 		}
-		
-		return forward;
-	}
-	
-	/**
-	 * We are in the preview lesson and the author has selected a particular branch. Force it to take that branch.
-	 */
-	public ActionForward forceBranching(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) {
+		branchForm.set("activityURLs", activityURLs);
+		branchForm.set("showNextButton", branchingActivity.getActivities().size() != completedCount);
 
-		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());	
-		getLearnerService(); // initialise the learner service, if necessary
+	    } else if (branch == null) {
 
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-		Integer learnerId = LearningWebUtil.getUserId();
-		ActionForward forward = null;
-		
-		if (activity == null) {
-			learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
-			forward = actionMappings.getActivityForward(activity, learnerProgress, true);
-  		
-		} else if (!(activity instanceof BranchingActivity)) {
-		    log.error(className+": activity not BranchingActivity "+activity.getActivityId());
-			forward = mapping.findForward(ActivityMapping.ERROR);
-		
-		} else {
+		// show the learner waiting page
+		branchForm.set("previewLesson", Boolean.FALSE);
+		forward = mapping.findForward("displayBranchingWait");
+		branchForm.set("showNextButton", Boolean.TRUE);
 
-			BranchingActivity branchingActivity = (BranchingActivity)activity;
-			Long branchId = WebUtil.readLongParam(request, "branchID", false);
-
-			SequenceActivity branch = learnerService.selectBranch(learnerProgress.getLesson(), 
-				branchingActivity, learnerId, branchId);
-
-			if ( branch == null ) {
-			    log.error(className+": branch id from request is not valid. Activity id "+activity.getActivityId()+" branch id "+branchId);
-				forward = mapping.findForward(ActivityMapping.ERROR);
-			}
-			
-			// forward to the sequence activity.
-			if ( log.isDebugEnabled() ) {
-				log.debug("Branching: selecting the branch "+branch+" for user "+learnerId);
-			}
-				
-			// Set the branch as the current part of the sequence and display it
-			learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(), branch, true);
-			forward = actionMappings.getActivityForward(branch, learnerProgress, true);
-			LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
+		if (branchingActivity.isChosenBranchingActivity()) {
+		    branchForm.set("type", BranchingActivity.CHOSEN_TYPE);
+		} else if (branchingActivity.isGroupBranchingActivity()) {
+		    branchForm.set("type", BranchingActivity.GROUP_BASED_TYPE);
+		} else if (branchingActivity.isToolBranchingActivity()) {
+		    branchForm.set("type", BranchingActivity.TOOL_BASED_TYPE);
 		}
-		
-		return forward;
+	    } else {
+		// forward to the sequence activity.
+		if (LamsDispatchAction.log.isDebugEnabled()) {
+		    LamsDispatchAction.log
+			    .debug("Branching: selecting the branch " + branch + " for user " + learnerId);
+		}
+
+		// Set the branch as the current part of the sequence and display it
+		learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
+			branch, true);
+		forward = actionMappings.getActivityForward(branch, learnerProgress, true);
+		LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
+	    }
 	}
+
+	return forward;
+    }
+
+    /**
+     * We are in the preview lesson and the author has selected a particular branch. Force it to take that branch.
+     */
+    public ActionForward forceBranching(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
+	getLearnerService(); // initialise the learner service, if necessary
+
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	Integer learnerId = LearningWebUtil.getUserId();
+	ActionForward forward = null;
+
+	if (activity == null) {
+	    learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
+	    forward = actionMappings.getActivityForward(activity, learnerProgress, true);
+
+	} else if (!(activity instanceof BranchingActivity)) {
+	    LamsDispatchAction.log.error(
+		    LamsDispatchAction.className + ": activity not BranchingActivity " + activity.getActivityId());
+	    forward = mapping.findForward(ActivityMapping.ERROR);
+
+	} else {
+
+	    BranchingActivity branchingActivity = (BranchingActivity) activity;
+	    Long branchId = WebUtil.readLongParam(request, "branchID", false);
+
+	    SequenceActivity branch = learnerService.selectBranch(learnerProgress.getLesson(), branchingActivity,
+		    learnerId, branchId);
+
+	    if (branch == null) {
+		LamsDispatchAction.log
+			.error(LamsDispatchAction.className + ": branch id from request is not valid. Activity id "
+				+ activity.getActivityId() + " branch id " + branchId);
+		forward = mapping.findForward(ActivityMapping.ERROR);
+	    }
+
+	    // forward to the sequence activity.
+	    if (LamsDispatchAction.log.isDebugEnabled()) {
+		LamsDispatchAction.log.debug("Branching: selecting the branch " + branch + " for user " + learnerId);
+	    }
+
+	    // Set the branch as the current part of the sequence and display it
+	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
+		    branch, true);
+	    forward = actionMappings.getActivityForward(branch, learnerProgress, true);
+	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
+	}
+
+	return forward;
+    }
 }

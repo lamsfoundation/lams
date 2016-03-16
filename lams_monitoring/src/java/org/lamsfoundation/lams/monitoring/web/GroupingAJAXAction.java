@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @struts:action path="/grouping" parameter="method" validate="false"
  * @struts.action-forward name = "chosenGrouping" path = "/grouping/chosenGrouping.jsp"
- * @struts.action-forward name = "viewGroups" path = ".viewGroups"
  * 
  *                        ----------------XDoclet Tags--------------------
  */
@@ -72,7 +71,6 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
 
     private static final String CHOSEN_GROUPING_SCREEN = "chosenGrouping";
-    private static final String VIEW_GROUPS_SCREEN = "viewGroups";
     private static final String PARAM_ACTIVITY_TITLE = "title";
     private static final String PARAM_ACTIVITY_DESCRIPTION = "description";
     public static final String PARAM_MAX_NUM_GROUPS = "maxNumberOfGroups";
@@ -133,14 +131,8 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 
 	    return mapping.findForward(GroupingAJAXAction.CHOSEN_GROUPING_SCREEN);
 
-	} else {
-
-	    // go to a view only screen for random grouping
-	    request.setAttribute(GroupingAJAXAction.PARAM_MAY_DELETE, Boolean.FALSE);
-	    request.setAttribute(GroupingAJAXAction.PARAM_VIEW_MODE, Boolean.TRUE);
-	    return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
 	}
-
+	return null;
     }
 
     /**

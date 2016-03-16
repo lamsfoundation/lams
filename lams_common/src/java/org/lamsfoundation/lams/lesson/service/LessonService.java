@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
-import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
@@ -146,16 +145,6 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public LessonDTO getLessonData(Long lessonId) {
-	Lesson lesson = lessonDAO.getLesson(lessonId);
-	LessonDTO dto = null;
-	if (lesson != null) {
-	    dto = lesson.getLessonData();
-	}
-	return dto;
-    }
-
-    @Override
     public Lesson getLesson(Long lessonId) {
 	return lessonDAO.getLesson(lessonId);
     }
@@ -164,7 +153,7 @@ public class LessonService implements ILessonService {
     public void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner)
 	    throws LessonServiceException {
 	Grouping grouping = groupingActivity.getCreateGrouping();
-	if (grouping != null && grouping.isRandomGrouping()) {
+	if ((grouping != null) && grouping.isRandomGrouping()) {
 	    // get the real objects, not the CGLIB version
 	    grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
 	    Grouper grouper = grouping.getGrouper();
@@ -532,19 +521,19 @@ public class LessonService implements ILessonService {
 			LessonService.log.debug("Removed activity from completed activities");
 		    }
 
-		    if (progress.getCurrentActivity() != null && progress.getCurrentActivity().equals(activity)) {
+		    if ((progress.getCurrentActivity() != null) && progress.getCurrentActivity().equals(activity)) {
 			progress.setCurrentActivity(null);
 			recordUpdated = true;
 			LessonService.log.debug("Removed activity as current activity");
 		    }
 
-		    if (progress.getNextActivity() != null && progress.getNextActivity().equals(activity)) {
+		    if ((progress.getNextActivity() != null) && progress.getNextActivity().equals(activity)) {
 			progress.setNextActivity(null);
 			recordUpdated = true;
 			LessonService.log.debug("Removed activity as next activity");
 		    }
 
-		    if (progress.getPreviousActivity() != null && progress.getPreviousActivity().equals(activity)) {
+		    if ((progress.getPreviousActivity() != null) && progress.getPreviousActivity().equals(activity)) {
 			progress.setPreviousActivity(null);
 			recordUpdated = true;
 			LessonService.log.debug("Removed activity as previous activity");
@@ -572,7 +561,7 @@ public class LessonService implements ILessonService {
     @SuppressWarnings("unchecked")
     @Override
     public void performMarkLessonUncompleted(Long lessonId, Long firstAddedActivityId) throws LessonServiceException {
-	if (log.isDebugEnabled()) {
+	if (LessonService.log.isDebugEnabled()) {
 	    LessonService.log.debug("Setting learner progress to uncompleted for lesson " + lessonId);
 	}
 	int count = 0;
@@ -676,7 +665,7 @@ public class LessonService implements ILessonService {
 	if (lesson != null) {
 	    for (Lesson precedingLesson : lesson.getPrecedingLessons()) {
 		LearnerProgress progress = getUserProgressForLesson(learnerId, precedingLesson.getLessonId());
-		if (progress == null || !progress.isComplete()) {
+		if ((progress == null) || !progress.isComplete()) {
 		    return false;
 		}
 	    }

@@ -112,20 +112,6 @@ public interface IMonitoringService {
 	    Long precedingLessonId);
 
     /**
-     * Initialize a new lesson so as to start the learning process for a normal or preview learning session. It needs to
-     * notify lams which learning design it belongs to. The initialize process doesn't involve the setup of lesson class
-     * and organization.
-     * 
-     * @param creatorUserId
-     *            the user who want to create this lesson.
-     * @param lessonPacket
-     *            The WDDX packet containing the required initialisation paramaters
-     * @return WDDX message packet containing the Lesson ID
-     * @throws Exception
-     */
-    String initializeLesson(Integer creatorUserId, String lessonPacket) throws Exception;
-
-    /**
      * Create new lesson according to the learning design specified by the user, but for a preview session rather than a
      * normal learning session. The design is not assigned to any workspace folder.
      */
@@ -363,32 +349,6 @@ public interface IMonitoringService {
     GateActivity closeGate(Long gateId);
 
     /**
-     * Returns a list of learners participating in the given Lesson
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson
-     * @param userID
-     *            The user id of the user requesting the lesson learners
-     * @return String The requested list in wddx format
-     * 
-     * @throws IOException
-     */
-    String getLessonLearners(Long lessonID, Integer userID) throws IOException;
-
-    /**
-     * Returns a list of staff participating in the given Lesson
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson
-     * @param userID
-     *            The user id of the user requesting the lesson staff members
-     * @return String The requested list in wddx format
-     * 
-     * @throws IOException
-     */
-    String getLessonStaff(Long lessonID, Integer userID) throws IOException;
-
-    /**
      * Returns users by search type criteria. It's sorted by first and last user names.
      * 
      * @param searchType
@@ -402,16 +362,6 @@ public interface IMonitoringService {
      */
     Collection<User> getUsersByEmailNotificationSearchType(int searchType, Long lessonId, String[] lessonIds,
 	    Long activityId, Integer xDaystoFinish, Integer orgId);
-
-    /**
-     * This method returns the LearningDesign details for a given Lesson
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson whose LearningDesign details are required
-     * @return String The requested details in wddx format
-     * @throws IOException
-     */
-    String getLearningDesignDetails(Long lessonID) throws IOException;
 
     List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
 
@@ -430,7 +380,6 @@ public interface IMonitoringService {
      *            The user_id of the Learner for whom the URL is being fetched
      * @param requesterID
      *            The user_id of the user who is requesting the url
-     * @return String The required information in WDDX format
      * @throws IOException
      * @throws LamsToolServiceException
      */
@@ -446,27 +395,10 @@ public interface IMonitoringService {
      *            The activity_id of the Activity whose URL will be returned
      * @param userID
      *            The user id of the user requesting the url.
-     * @return String The required information in WDDX format
      * @throws IOException
      */
     String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException;
-
-    /**
-     * This method moves the learning design corresponding to the given Lesson into the specified workspaceFolder. But
-     * before this action is performed it checks whether the user is authorized to do so. If not, Flash is notified of
-     * the same. As of now it is assumed that only the owner of lesson/learning design can move it
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson which has to be moved
-     * @param targetWorkspaceFolderID
-     *            The workspace_folder_id of the WorkspaceFolder to which the lesson has to be moved
-     * @param userID
-     *            The user_id of the User who has requested this operation
-     * @return String The acknowledgement message/error in WDDX format
-     * @throws IOException
-     */
-    String moveLesson(Long lessonID, Integer targetWorkspaceFolderID, Integer userID) throws IOException;
 
     /**
      * Return an activity object based on the requested id.
@@ -495,33 +427,6 @@ public interface IMonitoringService {
      * @return the requested activity object.
      */
     GroupingActivity getGroupingActivityById(Long activityID);
-
-    /**
-     * Returns an acknowledgement that the gate has been released. Returns true if the gate has been released and false
-     * otherwise. This information is packaged in WDDX format
-     * 
-     * @param activityID
-     *            The activity_id of the Activity whose gate must be checked
-     * @param lessonID
-     *            The lesson_id of the Lesson
-     * @return
-     */
-    String releaseGate(Long activityID) throws IOException;
-
-    /**
-     * Perform chosen grouping. The groups contains a list of Hashtable which contain following information for each
-     * group:<br>
-     * <ol>
-     * <li>List of learners in this group</li>
-     * <li>Order ID</li>
-     * <li>Group name</li>
-     * </ol>
-     * 
-     * @param groupingActivity
-     * @param groups
-     *            list of group information.
-     */
-    void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException;
 
     // ---------------------------------------------------------------------
     // Preview Methods

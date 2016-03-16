@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.lesson.LessonClass;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -132,12 +131,10 @@ public class GroupingDTO extends BaseDTO {
 
     /**
      * @param groupingID
-     *                The groupingID to set.
+     *            The groupingID to set.
      */
     public void setGroupingID(Long groupingID) {
-	if (!groupingID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.groupingID = groupingID;
-	}
+	this.groupingID = groupingID;
     }
 
     /**
@@ -149,12 +146,10 @@ public class GroupingDTO extends BaseDTO {
 
     /**
      * @param groupingType
-     *                The groupingType to set.
+     *            The groupingType to set.
      */
     public void setGroupingTypeID(Integer groupingType) {
-	if (!groupingType.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    groupingTypeID = groupingType;
-	}
+	groupingTypeID = groupingType;
     }
 
     /**
@@ -166,12 +161,10 @@ public class GroupingDTO extends BaseDTO {
 
     /**
      * @param groupingUIID
-     *                The groupingUIID to set.
+     *            The groupingUIID to set.
      */
     public void setGroupingUIID(Integer groupingUIID) {
-	if (!groupingUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.groupingUIID = groupingUIID;
-	}
+	this.groupingUIID = groupingUIID;
     }
 
     /**
@@ -183,12 +176,10 @@ public class GroupingDTO extends BaseDTO {
 
     /**
      * @param learnersPerGroup
-     *                The learnersPerGroup to set.
+     *            The learnersPerGroup to set.
      */
     public void setLearnersPerGroup(Integer learnersPerGroup) {
-	if (!learnersPerGroup.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.learnersPerGroup = learnersPerGroup;
-	}
+	this.learnersPerGroup = learnersPerGroup;
     }
 
     /**
@@ -200,12 +191,10 @@ public class GroupingDTO extends BaseDTO {
 
     /**
      * @param maxNumberOfGroups
-     *                The maxNumberOfGroups to set.
+     *            The maxNumberOfGroups to set.
      */
     public void setMaxNumberOfGroups(Integer maxNumberOfGroups) {
-	if (!maxNumberOfGroups.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.maxNumberOfGroups = maxNumberOfGroups;
-	}
+	this.maxNumberOfGroups = maxNumberOfGroups;
     }
 
     /**
@@ -217,12 +206,10 @@ public class GroupingDTO extends BaseDTO {
 
     /**
      * @param numberOfGroups
-     *                The numberOfGroups to set.
+     *            The numberOfGroups to set.
      */
     public void setNumberOfGroups(Integer numberOfGroups) {
-	if (!numberOfGroups.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
-	    this.numberOfGroups = numberOfGroups;
-	}
+	this.numberOfGroups = numberOfGroups;
     }
 
     /**
@@ -234,12 +221,10 @@ public class GroupingDTO extends BaseDTO {
 
     /**
      * @param staffGroupID
-     *                The staffGroupID to set.
+     *            The staffGroupID to set.
      */
     public void setStaffGroupID(Long staffGroupID) {
-	if (!staffGroupID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
-	    this.staffGroupID = staffGroupID;
-	}
+	this.staffGroupID = staffGroupID;
     }
 
     /**

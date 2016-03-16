@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,8 +78,6 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
-import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -111,13 +108,8 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
@@ -380,14 +372,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	learningDesignDAO.insertOrUpdate(learningDesign);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraries()
-     */
-    @Override
-    public List getAllLearningLibraries() {
-	return learningLibraryDAO.getAllLearningLibraries();
-    }
-
     public BeanFactory getBeanFactory() {
 	return beanFactory;
     }
@@ -431,48 +415,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long, int,
-     *      java.lang.Long)
-     */
-    @Override
-    public String getToolOutputDefinitions(Long outputToolContentID, int definitionType, Long inputToolContentID)
-	    throws IOException {
-
-	SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService
-		.getOutputDefinitionsFromToolFiltered(outputToolContentID, definitionType, inputToolContentID);
-
-	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<ToolOutputDefinitionDTO>(
-		defns != null ? defns.size() : 0);
-	if (defns != null) {
-	    for (ToolOutputDefinition defn : defns.values()) {
-		defnDTOList.add(new ToolOutputDefinitionDTO(defn));
-	    }
-	}
-
-	FlashMessage flashMessage = new FlashMessage("getToolOutputDefinitions", defnDTOList);
-	return flashMessage.serializeMessage();
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long,
-     *      java.lang.Long)
-     */
-    @Override
-    public String getLearningDesignDetails(Long learningDesignID, String languageCode) throws IOException {
-	FlashMessage flashMessage = null;
-
-	LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID,
-		languageCode);
-
-	if (learningDesignDTO == null) {
-	    flashMessage = FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails", learningDesignID);
-	} else {
-	    flashMessage = new FlashMessage("getLearningDesignDetails", learningDesignDTO);
-	}
-	return flashMessage.serializeMessage();
-    }
-
-    /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#setupEditOnFlyLock(LearningDesign,
      *      java.lang.Integer)
      */
@@ -488,8 +430,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	LearningDesign design = learningDesignID == null ? null : getLearningDesign(learningDesignID);
 
 	if (design == null) {
-	    throw new LearningDesignException(FlashMessage
-		    .getNoSuchLearningDesignExists("getLearningDesignDetails", learningDesignID).serializeMessage());
+	    throw new LearningDesignException("Learning Design was not found, ID: " + learningDesignID);
 	}
 
 	boolean learningDesignAvailable = (design.getEditOverrideUser() == null)
@@ -498,7 +439,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	if (learningDesignAvailable) {
 	    if (design.getLessons().isEmpty()) {
-		// TODO: add error msg
 		throw new LearningDesignException("There are no lessons attached to the design.");
 	    }
 
@@ -523,7 +463,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
 
     @Override
-    public String setupEditOnFlyGate(Long learningDesignID, Integer userID) throws UserException, IOException {
+    public void setupEditOnFlyGate(Long learningDesignID, Integer userID) throws UserException, IOException {
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
@@ -545,78 +485,60 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    addSystemGateAfterActivity(lastReadOnlyActivity, design);
 	    learningDesignDAO.update(design);
 	}
-
-	return new FlashMessage("setupEditOnFlyGate", true).serializeMessage();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#finishEditOnFly(java.lang.Long,
-     *      java.lang.Integer)
-     */
     @SuppressWarnings("unchecked")
     @Override
-    public String finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException {
-	FlashMessage flashMessage = null;
-
+    public void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException {
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user == null) {
-	    flashMessage = FlashMessage.getNoSuchUserExists("finishEditOnFly", userID);
+	    throw new IOException("User not found, ID: " + userID);
 	}
 
 	LearningDesign design = learningDesignID == null ? null
 		: learningDesignDAO.getLearningDesignById(learningDesignID);
 
 	if (design == null) {
-	    flashMessage = FlashMessage.getNoSuchLearningDesignExists("finishEditOnFly", learningDesignID);
-	} else {
-	    // only the user who is editing the design may unlock it
-	    if (design.getEditOverrideUser().equals(user)) {
-		design.setEditOverrideLock(false);
-		design.setEditOverrideUser(null);
+	    throw new IOException("Learning Design not found, ID: " + learningDesignID);
+	}
+	// only the user who is editing the design may unlock it
+	if (design.getEditOverrideUser().equals(user)) {
+	    design.setEditOverrideLock(false);
+	    design.setEditOverrideUser(null);
 
-		// parse Learning Design to find last read - only Activity
-		// (hopefully the system gate in this case )
+	    // parse Learning Design to find last read - only Activity
+	    // (hopefully the system gate in this case )
 
-		EditOnFlyProcessor processor = new EditOnFlyProcessor(design, activityDAO);
+	    EditOnFlyProcessor processor = new EditOnFlyProcessor(design, activityDAO);
 
-		processor.parseLearningDesign();
+	    processor.parseLearningDesign();
 
-		Activity lastReadOnlyActivity = processor.lastReadOnlyActivity;
-		Long firstAddedActivityId = processor.firstAddedActivity == null ? null
-			: processor.firstAddedActivity.getActivityId();
+	    Activity lastReadOnlyActivity = processor.lastReadOnlyActivity;
+	    Long firstAddedActivityId = processor.firstAddedActivity == null ? null
+		    : processor.firstAddedActivity.getActivityId();
 
-		// open and release waiting list on system gate
-		if ((lastReadOnlyActivity != null) && lastReadOnlyActivity.isGateActivity()
-			&& ((GateActivity) lastReadOnlyActivity).isSystemGate()) {
-		    // remove previously inserted system gate
-		    design = removeTempSystemGate(lastReadOnlyActivity.getActivityId(), design.getLearningDesignId());
+	    // open and release waiting list on system gate
+	    if ((lastReadOnlyActivity != null) && lastReadOnlyActivity.isGateActivity()
+		    && ((GateActivity) lastReadOnlyActivity).isSystemGate()) {
+		// remove previously inserted system gate
+		design = removeTempSystemGate(lastReadOnlyActivity.getActivityId(), design.getLearningDesignId());
+	    }
+
+	    for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
+		lesson.setLockedForEdit(false);
+
+		// LDEV-1899 only mark learners uncompleted if a change was saved and an activity added
+		if (!cancelled && (firstAddedActivityId != null)) {
+		    // the lesson may now have additional activities on the end,
+		    // so clear any completed flags
+		    lessonService.performMarkLessonUncompleted(lesson.getLessonId(), firstAddedActivityId);
 		}
 
-		for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
-		    lesson.setLockedForEdit(false);
-
-		    // LDEV-1899 only mark learners uncompleted if a change was saved and an activity added
-		    if (!cancelled && (firstAddedActivityId != null)) {
-			// the lesson may now have additional activities on the end,
-			// so clear any completed flags
-			lessonService.performMarkLessonUncompleted(lesson.getLessonId(), firstAddedActivityId);
-		    }
-
-		    initialiseToolActivityForRuntime(design, lesson);
-
-		    if (flashMessage == null) {
-			flashMessage = new FlashMessage("finishEditOnFly", lesson.getLessonId());
-		    }
-		}
+		initialiseToolActivityForRuntime(design, lesson);
 
 		learningDesignDAO.update(design);
-	    } else {
-		flashMessage = FlashMessage.getNoSuchUserExists("finishEditOnFly", userID);
 	    }
 	}
-
-	return flashMessage.serializeMessage();
-
     }
 
     /**
@@ -907,9 +829,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     @Override
     public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign, Integer copyType, User user,
-	    WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName, String customCSV)
-
-    {
+	    WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName, String customCSV) {
 	String newTitle = newDesignName;
 	if (newTitle == null) {
 	    newTitle = getUniqueNameForLearningDesign(originalLearningDesign.getTitle(),
@@ -1286,8 +1206,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		// Transfer the floating activities from the main design to the
 		// one that is to be imported.
 		// Number of activities may overflow the max limit for the
-		// container - to be handled in flash
-		// when design is opened.
+		// container - to be handled when design is opened.
 		FloatingActivity fParentActivity = null;
 		Activity refParentActivity = null;
 
@@ -1560,80 +1479,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	return childActivities;
     }
 
-    /**
-     * This method saves a new Learning Design to the database. It received a WDDX packet from flash, deserializes it
-     * and then finally persists it to the database.
-     * 
-     * A user may update an existing learning design if they have user/owner rights to the folder or they are doing live
-     * edit. A user may create a new learning design only if they have user/owner rights to the folder.
-     * 
-     * Note: it does not validate the design - that must be done separately.
-     * 
-     * @param wddxPacket
-     *            The WDDX packet received from Flash
-     * @return Long learning design id
-     * @throws Exception
-     */
-    @Override
-    public Long storeLearningDesignDetails(String wddxPacket) throws Exception {
-
-	Hashtable table = (Hashtable) WDDXProcessor.deserialize(wddxPacket);
-	Integer workspaceFolderID = WDDXProcessor.convertToInteger(table, WDDXTAGS.WORKSPACE_FOLDER_ID);
-
-	User user = null;
-	Integer userID = AuthoringService.getUserId();
-	if (userID != null) {
-	    user = (User) baseDAO.find(User.class, userID);
-	}
-	if (user == null) {
-	    throw new UserException("UserID missing or user not found.");
-	}
-
-	WorkspaceFolder workspaceFolder = null;
-	boolean authorised = false;
-	if (workspaceFolderID != null) {
-	    workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
-	    authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID);
-	}
-
-	Long learningDesignId = WDDXProcessor.convertToLong(table, "learningDesignID");
-	LearningDesign existingLearningDesign = learningDesignId != null
-		? learningDesignDAO.getLearningDesignById(learningDesignId) : null;
-	if (!authorised && (existingLearningDesign != null)
-		&& Boolean.TRUE.equals(existingLearningDesign.getEditOverrideLock())) {
-	    authorised = userID.equals(existingLearningDesign.getEditOverrideUser().getUserId());
-	}
-	if (!authorised) {
-	    throw new UserException("User with user_id of " + userID
-		    + " is not authorized to store a design in this workspace folder " + workspaceFolderID);
-	}
-
-	IObjectExtractor extractor = (IObjectExtractor) beanFactory
-		.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
-	LearningDesign design = extractor.extractSaveLearningDesign(table, existingLearningDesign, workspaceFolder,
-		user);
-
-	if (extractor.getMode().intValue() == 1) {
-
-	    // adding the customCSV to the call if it is present
-	    String customCSV = null;
-	    if (table.containsKey(WDDXTAGS.CUSTOM_CSV)) {
-		customCSV = WDDXProcessor.convertToString(table, WDDXTAGS.CUSTOM_CSV);
-	    }
-
-	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
-	}
-
-	if (existingLearningDesign != null) {
-	    AuthoringService.deleteLearningDesignImages(existingLearningDesign.getLearningDesignId());
-	}
-
-	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, userID, design.getLearningDesignId(),
-		null, null);
-
-	return design.getLearningDesignId();
-    }
-
     @Override
     public LearningDesign saveLearningDesignDetails(JSONObject ldJSON)
 	    throws UserException, JSONException, WorkspaceFolderException, ObjectExtractorException, ParseException {
@@ -1733,50 +1578,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	return listOfAuthoringActivityDTOs;
     }
 
-    /**
-     * This is a utility method used by the method <code>getAllLearningDesignDetails</code> to pack the required
-     * information in a data transfer object.
-     * 
-     * @param iterator
-     * @return Hashtable The required information in a Hashtable
-     */
-    private ArrayList createDesignDetailsPacket(Iterator iterator) {
-	ArrayList arrayList = new ArrayList();
-	while (iterator.hasNext()) {
-	    LearningDesign learningDesign = (LearningDesign) iterator.next();
-	    DesignDetailDTO designDetailDTO = learningDesign.getDesignDetailDTO();
-	    arrayList.add(designDetailDTO);
-	}
-	return arrayList;
-    }
-
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraryDetails()
-     */
-    @Override
-    public String getAllLearningLibraryDetails(String languageCode) throws IOException {
-	FlashMessage flashMessage = new FlashMessage("getAllLearningLibraryDetails",
-		learningDesignService.getAllLearningLibraryDetails(languageCode));
-	return flashMessage.serializeMessage();
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#insertToolContentID(java.lang.Long)
-     */
-
-    @Override
-    public String getToolContentIDFlash(Long toolID) throws IOException {
-	Long toolContentID = insertToolContentID(toolID);
-	if (toolContentID == null) {
-	    return FlashMessage.getNoSuchTool("getToolContentID", toolID).serializeMessage();
-	}
-
-	FlashMessage flashMessage = new FlashMessage("getToolContentID", toolContentID);
-	return flashMessage.serializeMessage();
-    }
-
     @Override
     public Long insertToolContentID(Long toolID) {
 	Tool tool = toolDAO.getToolByID(toolID);
@@ -1792,26 +1593,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public Long copyToolContent(Long toolContentID, String customCSV) throws IOException {
 	return lamsCoreToolService.notifyToolToCopyContent(toolContentID, customCSV);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyMultipleToolContent(java.lang.Integer,
-     *      java.util.List)
-     */
-    @Override
-    public String copyMultipleToolContent(Integer userId, List<Long> toolContentIds, String customCSV) {
-	StringBuffer idMap = new StringBuffer();
-	for (Long oldToolContentId : toolContentIds) {
-	    if (oldToolContentId != null) {
-		Long newToolContentId = lamsCoreToolService.notifyToolToCopyContent(oldToolContentId, customCSV);
-		idMap.append(oldToolContentId);
-		idMap.append('=');
-		idMap.append(newToolContentId);
-		idMap.append(',');
-	    }
-	}
-	// return the id list, stripping off the trailing ,
-	return idMap.length() > 0 ? idMap.substring(0, idMap.length() - 1) : "";
     }
 
     /**
@@ -1863,37 +1644,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#generateUniqueContentFolder()
-     */
-    @Override
-    public String generateUniqueContentFolder() throws FileUtilException, IOException {
-
-	String newUniqueContentFolderID = FileUtil.generateUniqueContentFolderID();
-
-	FlashMessage flashMessage = new FlashMessage("createUniqueContentFolder", newUniqueContentFolderID);
-
-	return flashMessage.serializeMessage();
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getHelpURL()
-     */
-    @Override
-    public String getHelpURL() throws Exception {
-
-	FlashMessage flashMessage = null;
-
-	String helpURL = Configuration.get(ConfigurationKeys.HELP_URL);
-	if (helpURL != null) {
-	    flashMessage = new FlashMessage("getHelpURL", helpURL);
-	} else {
-	    throw new Exception();
-	}
-
-	return flashMessage.serializeMessage();
-    }
-
-    /**
      * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
      * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
      * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
@@ -1939,8 +1689,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID, Long learningLibraryID, 
-	    String contentFolderID, Integer organisationID) {
+    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+	    Long learningLibraryID, String contentFolderID, Integer organisationID) {
 	Integer userID = AuthoringService.getUserId();
 	User user = (User) baseDAO.find(User.class, userID);
 
@@ -2095,17 +1845,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, newLearningDesignID + fullExtension),
 			false);
 	    }
-	}
-    }
-
-    /**
-     * Deletes LD thumbnails, SVG and PNG.
-     */
-    private static void deleteLearningDesignImages(long learningDesignID) throws IOException {
-	for (String extension : AuthoringService.LD_IMAGE_EXTENSIONS) {
-	    String fullExtension = "." + extension;
-	    File image = new File(IAuthoringService.LEARNING_DESIGN_IMAGES_FOLDER, learningDesignID + fullExtension);
-	    FileUtils.deleteQuietly(image);
 	}
     }
 }

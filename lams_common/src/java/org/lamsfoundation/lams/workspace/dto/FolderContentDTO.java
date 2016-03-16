@@ -22,6 +22,7 @@
  */
 /* $$Id$$ */
 package org.lamsfoundation.lams.workspace.dto;
+
 import java.util.Date;
 import java.util.SortedSet;
 import java.util.TimeZone;
@@ -31,238 +32,252 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 
 /**
  * @author Manpreet Minhas
  */
 public class FolderContentDTO implements Comparable<FolderContentDTO> {
-	
-	public static final String LESSON ="Lesson";
-	public static final String DESIGN ="LearningDesign";
-	public static final String FOLDER ="Folder";
-	public static final String FILE ="File";
-	
-	public String name;
-	public String description;
-	public Date creationDateTime;
-	public Date lastModifiedDateTime;
-	public String formattedLastModifiedDateTime;
-	public String resourceType;
-	public Long resourceTypeID;
-	public Long resourceID;
-	public Integer permissionCode;
-	public Vector versionDetails;
-	public Long licenseID; // applicable for designs only
-	public String licenseText; // applicable for designs only
-	public Boolean readOnly; // applicable for designs only
-	public String designType; // applicable for designs only
-	public String author;
-	public String originalAuthor;
-	public FolderContentDTO(){
-		
-	}
 
-	public FolderContentDTO(String name, String description,
-			Date creationDateTime, Date lastModifiedDateTime,
-			String resourceType, Long resourceID, Integer permissionCode,
-			Long licenseID) {
-		super();
-		this.name = name;
-		this.description = description;
-		this.creationDateTime = creationDateTime;
-		this.lastModifiedDateTime = lastModifiedDateTime;
-		this.resourceType = resourceType;
-		this.resourceID = resourceID;
-		this.permissionCode = permissionCode;
-		this.licenseID = licenseID;
-		this.versionDetails = null;
-		this.designType = null;
-		this.readOnly = false;
-	}
-	public FolderContentDTO(LearningDesign design, Integer permissionCode, User user){
-		this.name = design.getTitle();
-		this.description = design.getDescription();
-		this.creationDateTime = design.getCreateDateTime();
-		this.lastModifiedDateTime = design.getLastModifiedDateTime();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
-		this.resourceType = DESIGN;
-		this.resourceID = design.getLearningDesignId();
-		this.permissionCode = permissionCode;
-		this.licenseID = ( design.getLicense() != null ? design.getLicense().getLicenseID() : null);
-		this.licenseText = design.getLicenseText();
-        	this.designType = design.getDesignType();
-		this.versionDetails = null;
-		this.readOnly = design.getReadOnly();
-		this.author = design.getUser().getFullName();
-        	this.originalAuthor = design.getOriginalUser() == null ? null : design.getOriginalUser().getFullName();
-            }
-	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode, User user){
-		this.name = workspaceFolder.getName();
-		this.description = "Folder";
-		this.creationDateTime = workspaceFolder.getCreationDate();
-		this.lastModifiedDateTime = workspaceFolder.getLastModifiedDate();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
-		this.resourceType = FOLDER;
-		this.resourceTypeID = new Long(workspaceFolder.getWorkspaceFolderType().intValue());
-		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
-		this.permissionCode = permissionCode;
-		this.licenseID = null;
-		this.designType = null;
-		this.versionDetails = null;
-		this.readOnly = Boolean.FALSE;
-	}	
-	public FolderContentDTO(Integer permissionCode, WorkspaceFolderContent workspaceFolderContent, SortedSet details, User user){
-		this.name =workspaceFolderContent.getName();
-		this.description = workspaceFolderContent.getDescription();
-		this.creationDateTime = workspaceFolderContent.getCreateDate();
-		this.lastModifiedDateTime = workspaceFolderContent.getLastModified();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
-		this.resourceID = workspaceFolderContent.getFolderContentID();
-		this.permissionCode = permissionCode;		
-		if(workspaceFolderContent.getContentTypeID().equals(WorkspaceFolderContent.CONTENT_TYPE_FILE))
-			this.resourceType = FILE;
-		else
-			this.resourceType = FOLDER;			
-		this.licenseID = null;
-		this.versionDetails = new Vector();
-		versionDetails.addAll(details);
-		this.readOnly = Boolean.FALSE;
-		this.designType = null;
-	}
-	
-	@Override
-        public int compareTo(FolderContentDTO o) {
-        	if ((o != null) && o instanceof FolderContentDTO) {
-        	    FolderContentDTO anotherQuestion = (FolderContentDTO) o;
-        	    // folders go first, then sort by name
-        	    return resourceType.equals(anotherQuestion.getResourceType()) ? name.compareToIgnoreCase(anotherQuestion.getName())
-        		    : FolderContentDTO.FOLDER.equals(anotherQuestion.getResourceType()) ? -1 : 1;
-        	} else {
-        	    return 1;
-        	}
-        }
+    public static final String LESSON = "Lesson";
+    public static final String DESIGN = "LearningDesign";
+    public static final String FOLDER = "Folder";
+    public static final String FILE = "File";
 
-	/**
-	 * @return Returns the creationDateTime.
-	 */
-	public Date getCreationDateTime() {
-		return creationDateTime!=null?creationDateTime:WDDXTAGS.DATE_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the description.
-	 */
-	public String getDescription() {
-		return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the lastModifiedDateTime.
-	 */
-	public Date getLastModifiedDateTime() {
-		return lastModifiedDateTime!=null?lastModifiedDateTime:WDDXTAGS.DATE_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the lastModifiedDateTime.
-	 */
-	public String getFormattedLastModifiedDateTime() {
-		return formattedLastModifiedDateTime!=null?formattedLastModifiedDateTime:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the name.
-	 */
-	public String getName() {
-		return name!=null?name:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the permissionCode.
-	 */
-	public Integer getPermissionCode() {
-		return permissionCode!=null?permissionCode:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-	}
-	/**
-	 * @return Returns the resourceID.
-	 */
-	public Long getResourceID() {
-		return resourceID!=null?resourceID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	}
-	/**
-	 * @return Returns the resourceType.
-	 */
-	public String getResourceType() {
-		return resourceType!=null?resourceType:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the designType.
-	 */
-	public String getDesignType() {
-		return designType;
-	}
-	/**
-	 * @return Returns the resourceTypeID.
-	 */
-	public Long getResourceTypeID() {
-		return resourceTypeID!=null?resourceTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	}
-	/**
-	 * @return Returns the versionDetails.
-	 */
-	public Vector getVersionDetails() {
-		return versionDetails;
-	}
+    public String name;
+    public String description;
+    public Date creationDateTime;
+    public Date lastModifiedDateTime;
+    public String formattedLastModifiedDateTime;
+    public String resourceType;
+    public Long resourceTypeID;
+    public Long resourceID;
+    public Integer permissionCode;
+    public Vector versionDetails;
+    public Long licenseID; // applicable for designs only
+    public String licenseText; // applicable for designs only
+    public Boolean readOnly; // applicable for designs only
+    public String designType; // applicable for designs only
+    public String author;
+    public String originalAuthor;
 
-	/** Get the ID of the related license. Only applicable for learning designs */
-	public Long getLicenseID() {
-		return licenseID;
-	}
+    public FolderContentDTO() {
 
-	/** Set the ID of the related license. Only applicable for learning designs */
-	public void setLicenseID(Long licenseID) {
-		this.licenseID = licenseID;
-	}
+    }
 
-	public String getLicenseText() {
-		return licenseText;
-	}
+    public FolderContentDTO(String name, String description, Date creationDateTime, Date lastModifiedDateTime,
+	    String resourceType, Long resourceID, Integer permissionCode, Long licenseID) {
+	super();
+	this.name = name;
+	this.description = description;
+	this.creationDateTime = creationDateTime;
+	this.lastModifiedDateTime = lastModifiedDateTime;
+	this.resourceType = resourceType;
+	this.resourceID = resourceID;
+	this.permissionCode = permissionCode;
+	this.licenseID = licenseID;
+	this.versionDetails = null;
+	this.designType = null;
+	this.readOnly = false;
+    }
 
-	public void setLicenseText(String licenseText) {
-		this.licenseText = licenseText;
-	}
+    public FolderContentDTO(LearningDesign design, Integer permissionCode, User user) {
+	this.name = design.getTitle();
+	this.description = design.getDescription();
+	this.creationDateTime = design.getCreateDateTime();
+	this.lastModifiedDateTime = design.getLastModifiedDateTime();
+	this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
+	this.resourceType = FolderContentDTO.DESIGN;
+	this.resourceID = design.getLearningDesignId();
+	this.permissionCode = permissionCode;
+	this.licenseID = (design.getLicense() != null ? design.getLicense().getLicenseID() : null);
+	this.licenseText = design.getLicenseText();
+	this.designType = design.getDesignType();
+	this.versionDetails = null;
+	this.readOnly = design.getReadOnly();
+	this.author = design.getUser().getFullName();
+	this.originalAuthor = design.getOriginalUser() == null ? null : design.getOriginalUser().getFullName();
+    }
 
-	public Boolean getReadOnly() {
-		return readOnly;
-	}
+    public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode, User user) {
+	this.name = workspaceFolder.getName();
+	this.description = "Folder";
+	this.creationDateTime = workspaceFolder.getCreationDate();
+	this.lastModifiedDateTime = workspaceFolder.getLastModifiedDate();
+	this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
+	this.resourceType = FolderContentDTO.FOLDER;
+	this.resourceTypeID = new Long(workspaceFolder.getWorkspaceFolderType().intValue());
+	this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
+	this.permissionCode = permissionCode;
+	this.licenseID = null;
+	this.designType = null;
+	this.versionDetails = null;
+	this.readOnly = Boolean.FALSE;
+    }
 
-	public void setReadOnly(Boolean readOnly) {
-		this.readOnly = readOnly;
+    public FolderContentDTO(Integer permissionCode, WorkspaceFolderContent workspaceFolderContent, SortedSet details,
+	    User user) {
+	this.name = workspaceFolderContent.getName();
+	this.description = workspaceFolderContent.getDescription();
+	this.creationDateTime = workspaceFolderContent.getCreateDate();
+	this.lastModifiedDateTime = workspaceFolderContent.getLastModified();
+	this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
+	this.resourceID = workspaceFolderContent.getFolderContentID();
+	this.permissionCode = permissionCode;
+	if (workspaceFolderContent.getContentTypeID().equals(WorkspaceFolderContent.CONTENT_TYPE_FILE)) {
+	    this.resourceType = FolderContentDTO.FILE;
+	} else {
+	    this.resourceType = FolderContentDTO.FOLDER;
 	}
-	
-	public String getAuthor() {
-		return this.author;
-	}
-	
-	public void setAuthor(String author) {
-		this.author = author;
-	}
+	this.licenseID = null;
+	this.versionDetails = new Vector();
+	versionDetails.addAll(details);
+	this.readOnly = Boolean.FALSE;
+	this.designType = null;
+    }
 
-	public String getOriginalAuthor() {
-	    return originalAuthor;
+    @Override
+    public int compareTo(FolderContentDTO o) {
+	if ((o != null) && (o instanceof FolderContentDTO)) {
+	    FolderContentDTO anotherQuestion = o;
+	    // folders go first, then sort by name
+	    return resourceType.equals(anotherQuestion.getResourceType())
+		    ? name.compareToIgnoreCase(anotherQuestion.getName())
+		    : FolderContentDTO.FOLDER.equals(anotherQuestion.getResourceType()) ? -1 : 1;
+	} else {
+	    return 1;
 	}
+    }
 
-	public void setOriginalAuthor(String originalAuthor) {
-	    this.originalAuthor = originalAuthor;
-	}
-	
-	public void setDesignType(String designType) {
-		this.designType = designType;
-	}
+    /**
+     * @return Returns the creationDateTime.
+     */
+    public Date getCreationDateTime() {
+	return creationDateTime;
+    }
 
-	private String formatLastModifiedDateTime(TimeZone tz) {
-		if(this.lastModifiedDateTime != null) {
-			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-			return sdf.format(DateUtil.convertToTimeZoneFromDefault(tz, this.lastModifiedDateTime));
-		} else {
-			return null;
-		}
+    /**
+     * @return Returns the description.
+     */
+    public String getDescription() {
+	return description;
+    }
+
+    /**
+     * @return Returns the lastModifiedDateTime.
+     */
+    public Date getLastModifiedDateTime() {
+	return lastModifiedDateTime;
+    }
+
+    /**
+     * @return Returns the lastModifiedDateTime.
+     */
+    public String getFormattedLastModifiedDateTime() {
+	return formattedLastModifiedDateTime;
+    }
+
+    /**
+     * @return Returns the name.
+     */
+    public String getName() {
+	return name;
+    }
+
+    /**
+     * @return Returns the permissionCode.
+     */
+    public Integer getPermissionCode() {
+	return permissionCode;
+    }
+
+    /**
+     * @return Returns the resourceID.
+     */
+    public Long getResourceID() {
+	return resourceID;
+    }
+
+    /**
+     * @return Returns the resourceType.
+     */
+    public String getResourceType() {
+	return resourceType;
+    }
+
+    /**
+     * @return Returns the designType.
+     */
+    public String getDesignType() {
+	return designType;
+    }
+
+    /**
+     * @return Returns the resourceTypeID.
+     */
+    public Long getResourceTypeID() {
+	return resourceTypeID;
+    }
+
+    /**
+     * @return Returns the versionDetails.
+     */
+    public Vector getVersionDetails() {
+	return versionDetails;
+    }
+
+    /** Get the ID of the related license. Only applicable for learning designs */
+    public Long getLicenseID() {
+	return licenseID;
+    }
+
+    /** Set the ID of the related license. Only applicable for learning designs */
+    public void setLicenseID(Long licenseID) {
+	this.licenseID = licenseID;
+    }
+
+    public String getLicenseText() {
+	return licenseText;
+    }
+
+    public void setLicenseText(String licenseText) {
+	this.licenseText = licenseText;
+    }
+
+    public Boolean getReadOnly() {
+	return readOnly;
+    }
+
+    public void setReadOnly(Boolean readOnly) {
+	this.readOnly = readOnly;
+    }
+
+    public String getAuthor() {
+	return this.author;
+    }
+
+    public void setAuthor(String author) {
+	this.author = author;
+    }
+
+    public String getOriginalAuthor() {
+	return originalAuthor;
+    }
+
+    public void setOriginalAuthor(String originalAuthor) {
+	this.originalAuthor = originalAuthor;
+    }
+
+    public void setDesignType(String designType) {
+	this.designType = designType;
+    }
+
+    private String formatLastModifiedDateTime(TimeZone tz) {
+	if (this.lastModifiedDateTime != null) {
+	    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+	    return sdf.format(DateUtil.convertToTimeZoneFromDefault(tz, this.lastModifiedDateTime));
+	} else {
+	    return null;
 	}
+    }
 }

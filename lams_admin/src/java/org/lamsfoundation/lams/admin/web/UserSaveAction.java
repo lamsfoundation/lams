@@ -179,12 +179,8 @@ public class UserSaveAction extends Action {
 		user.setAuthenticationMethod(authenticationMethod);
 
 		Theme cssTheme = (Theme) UserSaveAction.service.findById(Theme.class,
-			(Long) userForm.get("userCSSTheme"));
-		user.setHtmlTheme(cssTheme);
-
-		Theme flashTheme = (Theme) UserSaveAction.service.findById(Theme.class,
-			(Long) userForm.get("userFlashTheme"));
-		user.setFlashTheme(flashTheme);
+			(Long) userForm.get("userTheme"));
+		user.setTheme(cssTheme);
 
 		UserSaveAction.service.save(user);
 	    } else { // create user
@@ -196,10 +192,9 @@ public class UserSaveAction extends Action {
 		BeanUtils.copyProperties(user, userForm);
 		UserSaveAction.log.debug("creating user... new login: " + user.getLogin());
 		if (errors.isEmpty()) {
-		    // TODO set flash/html themes according to user input
+		    // TODO set theme according to user input
 		    // instead of server default.
-		    user.setFlashTheme(UserSaveAction.service.getDefaultFlashTheme());
-		    user.setHtmlTheme(UserSaveAction.service.getDefaultHtmlTheme());
+		    user.setTheme(UserSaveAction.service.getDefaultTheme());
 		    user.setDisabledFlag(false);
 		    user.setCreateDate(new Date());
 		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service
@@ -208,13 +203,9 @@ public class UserSaveAction extends Action {
 		    user.setUserId(null);
 		    user.setLocale(locale);
 
-		    Theme cssTheme = (Theme) UserSaveAction.service.findById(Theme.class,
-			    (Long) userForm.get("userCSSTheme"));
-		    user.setHtmlTheme(cssTheme);
-
-		    Theme flashTheme = (Theme) UserSaveAction.service.findById(Theme.class,
-			    (Long) userForm.get("userFlashTheme"));
-		    user.setFlashTheme(flashTheme);
+		    Theme theme = (Theme) UserSaveAction.service.findById(Theme.class,
+			    (Long) userForm.get("userTheme"));
+		    user.setTheme(theme);
 
 		    UserSaveAction.service.save(user);
 

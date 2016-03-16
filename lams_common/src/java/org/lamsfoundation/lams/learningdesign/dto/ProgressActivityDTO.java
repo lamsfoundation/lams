@@ -24,8 +24,8 @@ package org.lamsfoundation.lams.learningdesign.dto;
 
 
 /**
- * The data transfer object to allow flash to view an activity from learner
- * progress bar or monitoring flash component.
+ * The data transfer object to allow Authoring to view an activity from learner
+ * progress bar or monitoring UI component.
  * 
  * @author Jacky Fang
  * @since  2005-3-15

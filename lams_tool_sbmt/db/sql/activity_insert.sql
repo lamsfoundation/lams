@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lasbmt11/images/icon_reportsubmission.swf'
+, 'tool/lasbmt11/images/icon_reportsubmission.svg'
 , NULL
 , NULL
 , NULL

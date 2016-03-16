@@ -27,6 +27,7 @@ public class StatisticsService implements IStatisticsService {
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.statistics.service.IStatisticsService#getOverallStatistics()
      */
+    @Override
     public StatisticsDTO getOverallStatistics() {
 
 	StatisticsDTO statisticsDTO = new StatisticsDTO();
@@ -54,6 +55,7 @@ public class StatisticsService implements IStatisticsService {
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.statistics.service.IStatisticsService#getGroupStatisticsDTO(java.lang.Integer)
      */
+    @Override
     public GroupStatisticsDTO getGroupStatisticsDTO(Integer orgId) throws Exception {
 
 	Organisation group = (Organisation) baseDAO.find(Organisation.class, orgId);
@@ -63,11 +65,14 @@ public class StatisticsService implements IStatisticsService {
 	    groupStats.setName(group.getName());
 	    groupStats.setLessons(group.getLessons().size());
 	    groupStats.setTotalUsers(userService.getAllUsers(group.getOrganisationId()).size());
-	    groupStats.setAuthors(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.AUTHOR, false, false).size());
-	    groupStats.setMonitors(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.MONITOR, false, false).size());
-	    groupStats.setLearners(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.LEARNER, false, false).size());
+	    groupStats.setAuthors(
+		    userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.AUTHOR, false).size());
+	    groupStats.setMonitors(
+		    userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.MONITOR, false).size());
+	    groupStats.setLearners(
+		    userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.LEARNER, false).size());
 
-	    Set<Organisation> subGroups = (Set<Organisation>) group.getChildOrganisations();
+	    Set<Organisation> subGroups = group.getChildOrganisations();
 
 	    ArrayList<GroupStatisticsDTO> subGroupStatsList = new ArrayList<GroupStatisticsDTO>();
 	    if (subGroups != null) {
@@ -76,9 +81,12 @@ public class StatisticsService implements IStatisticsService {
 		    subGroupStats.setName(subGroup.getName());
 		    subGroupStats.setLessons(subGroup.getLessons().size());
 		    subGroupStats.setTotalUsers(userService.getAllUsers(subGroup.getOrganisationId()).size());
-		    subGroupStats.setAuthors(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.AUTHOR, false, false).size());
-		    subGroupStats.setMonitors(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.MONITOR, false, false).size());
-		    subGroupStats.setLearners(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.LEARNER, false, false).size());
+		    subGroupStats.setAuthors(userService
+			    .getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.AUTHOR, false).size());
+		    subGroupStats.setMonitors(userService
+			    .getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.MONITOR, false).size());
+		    subGroupStats.setLearners(userService
+			    .getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.LEARNER, false).size());
 		    subGroupStatsList.add(subGroupStats);
 		}
 	    }
@@ -90,12 +98,13 @@ public class StatisticsService implements IStatisticsService {
 
 	return groupStats;
     }
-    
+
+    @Override
     public Map<String, Integer> getGroupMap() {
-	Map groupMap = new HashMap<String, Integer> ();
-	
-	List<Organisation> groups = (List<Organisation>)userService.findByProperty(Organisation.class, "organisationType.organisationTypeId",
-		OrganisationType.COURSE_TYPE);
+	Map groupMap = new HashMap<String, Integer>();
+
+	List<Organisation> groups = userService.findByProperty(Organisation.class,
+		"organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
 	if (groups != null) {
 	    for (Organisation group : groups) {
 		groupMap.put(group.getName(), group.getOrganisationId());

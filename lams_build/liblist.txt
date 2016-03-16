@@ -20,9 +20,6 @@ cglib             cglib_jboss404GA.jar                  4.0.4.GA               A
 
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
 
-flagstone		  transform.jar												   BSD							 Flagstone Software Ltd.		  reading and writing Flash 
-				  translate.jar
-
 jakarta-commons   commons-digester-2.1.jar              2.1                    Apache Software License 2.0   Apache Software Foundation       XML -> Java object mapping tool
                   commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
                   commons-httpclient-3.0.jar			3.0					   Apache License 2.0 			 Apache Software Foundation		  HTTP tools
@@ -63,8 +60,6 @@ struts            jakarta-oro.jar                       2.0.7                  A
 				  struts-el.jar                         1.2.9                  Apache License 2.0            Apache						      Struts extensions
 
 urlrewritefilter urlrewrite-3.2.0.jar                   3.2.0                  BSD License              	 tuckey.org         			  Java Web Filter which allows rewriting URLs
-
-wddx              wddx.jar                              1.1 (modified by LAMS)                                                                data interchange mechanism
 
 xml-commons       xml-apis.jar 							1.3
                   xml-apis-ext.jar                      1.3                    Apache License 2.0            Apache                           Common code and guidelines for xml projects

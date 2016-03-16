@@ -73,7 +73,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
-import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
@@ -88,7 +87,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
@@ -114,7 +112,6 @@ public class LearnerService implements ICoreLearnerService {
     private IUserManagementService userManagementService;
     private ILessonService lessonService;
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
-    protected MessageService messageService;
     private IGradebookService gradebookService;
     private ILogEventService logEventService;
 
@@ -132,21 +129,6 @@ public class LearnerService implements ICoreLearnerService {
      * engine via method injection. If you are creating the bean manually then use the other constructor.
      */
     public LearnerService() {
-    }
-
-    // ---------------------------------------------------------------------
-    // Inversion of Control Methods - Method injection
-    // ---------------------------------------------------------------------
-    /**
-     * Set i18n MessageService
-     */
-    public void setMessageService(MessageService messageService) {
-	this.messageService = messageService;
-    }
-
-    @Override
-    public MessageService getMessageService() {
-	return messageService;
     }
 
     /**
@@ -257,15 +239,6 @@ public class LearnerService implements ICoreLearnerService {
     @Override
     public Lesson getLesson(Long lessonId) {
 	return lessonDAO.getLesson(lessonId);
-    }
-
-    /**
-     * Get the lesson data for a particular lesson. In a DTO format suitable for sending to the client.
-     */
-    @Override
-    public LessonDTO getLessonData(Long lessonId) {
-	Lesson lesson = getLesson(lessonId);
-	return lesson != null ? lesson.getLessonData() : null;
     }
 
     /**
@@ -412,20 +385,6 @@ public class LearnerService implements ICoreLearnerService {
     @Override
     public LearnerProgress getProgressById(Long progressId) {
 	return learnerProgressDAO.getLearnerProgress(progressId);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getProgressDTOByLessonId(java.lang.Long,
-     *      org.lamsfoundation.lams.usermanagement.User)
-     */
-    @Override
-    public LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId) {
-	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
-	if (progress != null) {
-	    return progress.getLearnerProgressData();
-	} else {
-	    return null;
-	}
     }
 
     /**
@@ -724,28 +683,6 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Exit a lesson.
-     * 
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
-     */
-    @Override
-    public void exitLesson(Integer learnerId, Long lessonId) {
-
-	User learner = (User) userManagementService.findById(User.class, learnerId);
-
-	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(), lessonId);
-
-	if (progress != null) {
-	    progress.setRestarting(true);
-	    learnerProgressDAO.updateLearnerProgress(progress);
-	} else {
-	    String error = "Learner Progress " + lessonId + " does not exist. Cannot exit lesson successfully.";
-	    LearnerService.log.error(error);
-	    throw new LearnerServiceException(error);
-	}
-    }
-
-    /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getActivity(java.lang.Long)
      */
     @Override
@@ -971,18 +908,6 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getLearnerActivityURL(java.lang.Integer,
-     *      java.lang.Long)
-     */
-    @Override
-    public String getLearnerActivityURL(Integer learnerId, Long activityId) {
-	User learner = (User) userManagementService.findById(User.class, learnerId);
-	Activity requestedActivity = getActivity(activityId);
-	Lesson lesson = getLessonByActivity(requestedActivity);
-	return activityMapping.calculateActivityURLForProgressView(lesson, learner, requestedActivity);
-    }
-
-    /**
      * Get the lesson for this activity. If the activity is not part of a lesson (ie is from an authoring design then it
      * will return null.
      */
@@ -1043,7 +968,7 @@ public class LearnerService implements ICoreLearnerService {
 	List<LessonDTO> lessonDTOList = new ArrayList<LessonDTO>();
 	for (Iterator i = lessons.iterator(); i.hasNext();) {
 	    Lesson currentLesson = (Lesson) i.next();
-	    lessonDTOList.add(currentLesson.getLessonData());
+	    lessonDTOList.add(new LessonDTO(currentLesson));
 	}
 	return lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);
     }

@@ -59,12 +59,12 @@ public interface IActivityDAO extends IBaseDAO{
 
 	/**
 	 * Returns an object that may be assigned to Activity, based
-	 * on the UI id set by Flash.
+	 * on the UI id set by Authoring
 	 * <p>
 	 * This must return a true Activity object, rather than 
 	 * the Hibernate CGLIB proxy, or other code gets too difficult.
 	 * <p>
-	 * @param uiID The internal id (flash generated) of the activity 
+	 * @param uiID The internal id (Authoring generated) of the activity 
 	 * 		  being looked for 
 	 * @param design The learning_design_id of the design 
 	 * 		  whose first activity we are fetching

@@ -32,7 +32,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
-import org.lamsfoundation.lams.tool.dto.AuthoringToolDTO;
 
 public class Tool implements Serializable {
 
@@ -433,10 +432,6 @@ public class Tool implements Serializable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getToolId()).toHashCode();
-    }
-
-    public AuthoringToolDTO getAuthoringToolDTO() {
-	return new AuthoringToolDTO(this);
     }
 
     public IToolVO createBasicToolVO() {

@@ -471,16 +471,6 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/com/flagstone/main" overwrite="true" verbose="true">
-			<fileset dir="lib/flagstone">
-				<include name="*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/com/flagstone/main/module.xml"
-			  file="lib/flagstone/flagstone.module.xml" overwrite="true" verbose="true" />
-		
-	
-		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/digester/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-digester-*.jar" />
@@ -653,16 +643,6 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/tuckey/urlrewrite/main/module.xml"
 			  file="lib/urlrewritefilter/urlrewrite.module.xml" overwrite="true" verbose="true" />
-			  	
-		
-			  	
-		<copy todir="${server.home}/modules/system/layers/base/com/allaire/wddx/main" overwrite="true" verbose="true">
-			<fileset dir="lib/wddx">
-				<include name="wddx.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/com/allaire/wddx/main/module.xml"
-			  file="lib/wddx/wddx.module.xml" overwrite="true" verbose="true" />
 		
 		
 		

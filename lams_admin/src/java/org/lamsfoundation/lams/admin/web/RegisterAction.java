@@ -65,8 +65,6 @@ import org.apache.commons.codec.binary.Base64;
  */
 
 /**
- * struts doclets
- * 
  * @struts.action path="/register" parameter="method" name="RegisterForm"
  *                input=".register" scope="request" validate="false"
  * @struts.action-forward name="register" path=".register"

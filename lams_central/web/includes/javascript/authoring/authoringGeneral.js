@@ -368,23 +368,11 @@ GeneralInitLib = {
 					url : LAMS_URL + "workspace.do",
 					dataType : 'text',
 					data : {
-						'method'         : 'createFolderForFlash',
+						'method'         : 'createFolder',
 						'name' 		     : title,
 						'parentFolderID' : parentFolder.data.folderID
 					},
-					success : function(response) {
-						// still process WDDX packet, to be changed when we get rid of Flash Authoring
-						var messageIndex = response.indexOf("folderID'><number>") + 18,
-							folderID = response.substring(messageIndex, response.indexOf('<', messageIndex));
-						
-						if (!GeneralLib.numberValidator.test(folderID)) {
-							// error
-							var messageIndex = response.indexOf("messageValue'><string>") + 22,
-								message = response.substring(messageIndex, response.indexOf('<', messageIndex));
-							alert(message);
-							return;
-						}
-						
+					success : function() {
 						tree.removeChildren(parentFolder);
 						parentFolder.expand();
 					}
@@ -442,16 +430,7 @@ GeneralInitLib = {
 						'resourceID'     : copiedResource.resourceID,
 						'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
 					},
-					success : function(response) {
-						// still process WDDX packed, to be changed when we get rid of Flash Authoring
-						var messageIndex = response.indexOf("messageValue'><number>") + 22,
-							message = response.substring(messageIndex, response.indexOf('<', messageIndex));
-						if (!GeneralLib.numberValidator.test(message)) {
-							// error
-							alert(message);
-							return;
-						}
-						
+					success : function() {
 						tree.removeChildren(folderNode);
 						folderNode.expand();
 					}
@@ -468,9 +447,16 @@ GeneralInitLib = {
 	    		var dialog = $(this),
 					tree = dialog.dialog('option', 'ldTree'),
 					// hightlighted sequence/folder in the tree
-					ldNode = tree.getHighlightedNode(),
-					isFolder = ldNode && !ldNode.data.learningDesignId;
-	    		if (!ldNode || !confirm(LABELS.DELETE_NODE_CONFIRM + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
+					ldNode = tree.getHighlightedNode();
+	    		if (!ldNode) {
+	    			return;
+	    		}
+	    		if (!ldNode.data.canModify) {
+	    			alert("You can not modify this");
+	    			return;
+	    		}
+	    		var isFolder = !ldNode.data.learningDesignId;
+	    		if (!confirm(LABELS.DELETE_NODE_CONFIRM + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
 	    			return;
 	    		}
 				
@@ -484,16 +470,7 @@ GeneralInitLib = {
 						'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
 						'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
 					},
-					success : function(response) {
-						// still process WDDX packed, to be changed when we get rid of Flash Authoring
-						var messageIndex = response.indexOf("messageValue'><string>") + 22,
-							message = response.substring(messageIndex, response.indexOf('<', messageIndex));
-						if (!/^.*:\d+$/.test(message)) {
-							// error
-							alert(message);
-							return;
-						}
-						
+					success : function() {
 						var parentFolder = ldNode.parent;
 						tree.removeChildren(parentFolder);
 						parentFolder.expand();
@@ -512,12 +489,16 @@ GeneralInitLib = {
 	    		var dialog = $(this),
 					tree = dialog.dialog('option', 'ldTree'),
 					// hightlighted sequence/folder in the tree
-					ldNode = tree.getHighlightedNode(),
-					isFolder = ldNode && !ldNode.data.learningDesignId;
+					ldNode = tree.getHighlightedNode();
 	    		if (!ldNode) {
 	    			return;
 	    		}
-				var title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
+	    		if (!ldNode.data.canModify) {
+	    			alert("You can not modify this");
+	    			return;
+	    		}
+	    		var isFolder = !ldNode.data.learningDesignId,
+	    			title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
 							+ ' "' + ldNode.label + '"');
 				
 				// skip if no name or the same name was provided
@@ -546,20 +527,12 @@ GeneralInitLib = {
 					url : LAMS_URL + "workspace.do",
 					dataType : 'text',
 					data : {
-						'method'       : 'renameResourceJSON',
+						'method'       : 'renameResource',
 						'name' 		   : title,
 						'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
 						'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
 					},
 					success : function(response) {
-						// still process WDDX packed, to be changed when we get rid of Flash Authoring
-						var messageIndex = response.indexOf("messageValue'><string>") + 22,
-							message = response.substring(messageIndex, response.indexOf('<', messageIndex));
-						if (message != title) {
-							// error
-							alert(message);
-							return;
-						}
 						if (isFolder) {
 							ldNode.label = title;
 							ldNode.getLabelEl().innerHTML = title;
@@ -879,7 +852,7 @@ GeneralInitLib = {
 							async : false,
 							url : LAMS_URL + "authoring/author.do",
 							data : {
-								'method'        : 'copyToolContentPlain',
+								'method'        : 'copyToolContent',
 								'toolContentID' : activity.toolContentID
 							},
 							dataType : 'text',
@@ -981,10 +954,10 @@ GeneralInitLib = {
 			// load subfolder contents
 			var childNodeData = MenuLib.getFolderContents(node.data.folderID);
 			if (childNodeData) {
-			$.each(childNodeData, function(){
-					// create and add a leaf
-					new YAHOO.widget.TextNode(this, node);
-				});
+				$.each(childNodeData, function(){
+						// create and add a leaf
+						new YAHOO.widget.TextNode(this, node);
+					});
 			}
 			
 			// required by YUI
@@ -1391,7 +1364,7 @@ GeneralLib = {
 				},
 				success : function() {
 					GeneralLib.setModified(false);
-					window.parent.closeDialog('dialogFlashlessAuthoring');
+					window.parent.closeDialog('dialogAuthoring');
 				}
 			});
 		}
@@ -2675,7 +2648,7 @@ GeneralLib = {
 								
 								// close the Live Edit dialog
 								alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
-								window.parent.closeDialog('dialogFlashlessAuthoring');
+								window.parent.closeDialog('dialogAuthoring');
 							}
 						});
 						

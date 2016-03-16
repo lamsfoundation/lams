@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -104,15 +103,6 @@ public interface ILessonService {
      * @return lesson details
      */
     Lesson getLesson(Long lessonId);
-
-    /**
-     * Get the lesson details for the LAMS client. Suitable for the learner client. Contains a reduced number of fields
-     * compared to getLessonDetails.
-     * 
-     * @param lessonId
-     * @return lesson details
-     */
-    LessonDTO getLessonData(Long lessonId);
 
     /**
      * If the supplied learner is not already in a group, then perform grouping for the learners who have started the

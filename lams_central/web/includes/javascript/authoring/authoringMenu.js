@@ -552,7 +552,8 @@ var MenuLib = {
 						result.push({'type'            : 'text',
 								  	 'label'           : this.isRunSequencesFolder ?
 								  			 				LABELS.RUN_SEQUENCES_FOLDER : this.name,
-								  	 'folderID'		   : this.folderID
+								  	 'folderID'		   : this.folderID,
+						  	         'canModify'		: this.canModify
 									 });
 					});
 				}
@@ -561,7 +562,8 @@ var MenuLib = {
 						result.push({'type'             : 'text',
 						  	         'label'            : this.name,
 						  	         'isLeaf'           : true,
-						  	         'learningDesignId' : this.learningDesignId
+						  	         'learningDesignId' : this.learningDesignId,
+						  	         'canModify'		: this.canModify
 							        });
 					});
 				}
@@ -764,7 +766,7 @@ var MenuLib = {
 				async : false,
 				url : LAMS_URL + "authoring/author.do",
 				data : {
-					'method'        : 'copyToolContentPlain',
+					'method'        : 'copyToolContent',
 					'toolContentID' : activity.toolContentID
 				},
 				dataType : 'text',

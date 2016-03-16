@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -60,10 +59,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dto.CollapsedOrgDTO;
-import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
-import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.usermanagement.util.CollapsedOrgDTOComparator;
 import org.lamsfoundation.lams.util.Configuration;
@@ -193,25 +189,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public void saveAll(Collection objects) {
-	for (Object o : objects) {
-	    if (o instanceof User) {
-		baseDAO.insertOrUpdate(o); // creating a workspace needs
-		// a userId
-		o = createWorkspaceForUser((User) o);
-	    }
-	}
-	baseDAO.insertOrUpdateAll(objects);
-    }
-
-    @Override
     public void delete(Object object) {
 	baseDAO.delete(object);
-    }
-
-    @Override
-    public void deleteAll(Class clazz) {
-	baseDAO.deleteAll(clazz);
     }
 
     @Override
@@ -222,21 +201,6 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public void deleteById(Class clazz, Serializable id) {
 	baseDAO.deleteById(clazz, id);
-    }
-
-    @Override
-    public void deleteByProperty(Class clazz, String name, Object value) {
-	baseDAO.deleteByProperty(clazz, name, value);
-    }
-
-    @Override
-    public void deleteByProperties(Class clazz, Map<String, Object> properties) {
-	baseDAO.deleteByProperties(clazz, properties);
-    }
-
-    @Override
-    public void deleteAnythingLike(Object object) {
-	baseDAO.deleteAnythingLike(object);
     }
 
     @Override
@@ -260,134 +224,6 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public List findAnythingLike(Object object) {
-	return baseDAO.findAnythingLike(object);
-    }
-
-    @Override
-    public List searchByStringProperties(Class clazz, Map<String, String> properties) {
-	return baseDAO.searchByStringProperties(clazz, properties);
-    }
-
-    @Override
-    public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames) {
-	List<OrganisationDTO> list = new ArrayList<OrganisationDTO>();
-	Iterator i = user.getUserOrganisations().iterator();
-
-	while (i.hasNext()) {
-	    UserOrganisation userOrganisation = (UserOrganisation) i.next();
-	    OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
-	    boolean aRoleFound = addRolesToDTO(restrictToRoleNames, userOrganisation, dto);
-	    if (aRoleFound) {
-		list.add(dto);
-	    }
-	}
-	return OrganisationDTOFactory.createTree(list);
-    }
-
-    @Override
-    public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId,
-	    List<Integer> restrictToClassIds) {
-	List<OrganisationDTO> dtolist = new ArrayList<OrganisationDTO>();
-	Organisation org = (Organisation) baseDAO.find(Organisation.class, courseId);
-	dtolist.add(org.getOrganisationDTO());
-	getChildOrganisations(user, org, restrictToRoleNames, restrictToClassIds, dtolist);
-	OrganisationDTO dtoTree = OrganisationDTOFactory.createTree(dtolist);
-
-	// Want to return the course as the main node, not the dummy root.
-	Vector nodes = dtoTree.getNodes();
-	return (OrganisationDTO) nodes.get(0);
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private void getChildOrganisations(User user, Organisation org, List<String> restrictToRoleNames,
-	    List<Integer> restrictToClassIds, List<OrganisationDTO> dtolist) {
-	if (org != null) {
-	    boolean notCheckClassId = (restrictToClassIds == null) || (restrictToClassIds.size() == 0);
-	    Map<String, Object> map = new HashMap<String, Object>();
-	    map.put("user.userId", user.getUserId());
-	    map.put("organisation.parentOrganisation.organisationId", org.getOrganisationId());
-	    List<UserOrganisation> childOrgs = baseDAO.findByProperties(UserOrganisation.class, map);
-	    for (UserOrganisation userOrganisation : childOrgs) {
-		OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
-		if (notCheckClassId || restrictToClassIds.contains(dto.getOrganisationID())) {
-		    boolean aRoleFound = addRolesToDTO(restrictToRoleNames, userOrganisation, dto);
-		    if (aRoleFound) {
-			dtolist.add(dto);
-		    }
-
-		    // now, process any children of this org
-		    Organisation childOrganisation = userOrganisation.getOrganisation();
-		    if (org.getChildOrganisations().size() > 0) {
-			getChildOrganisations(user, childOrganisation, restrictToRoleNames, restrictToClassIds,
-				dtolist);
-		    }
-		}
-	    }
-	}
-    }
-
-    /**
-     * Go through the roles for this user organisation and add the roles to the dto.
-     * 
-     * @param restrictToRoleNames
-     * @param userOrganisation
-     * @param dto
-     * @return true if a role is found, false otherwise
-     */
-    private boolean addRolesToDTO(List<String> restrictToRoleNames, UserOrganisation userOrganisation,
-	    OrganisationDTO dto) {
-	Iterator iter = userOrganisation.getUserOrganisationRoles().iterator();
-
-	boolean roleFound = false;
-	while (iter.hasNext()) {
-
-	    UserOrganisationRole userOrganisationRole = (UserOrganisationRole) iter.next();
-	    String roleName = userOrganisationRole.getRole().getName();
-	    if ((restrictToRoleNames == null) || (restrictToRoleNames.size() == 0)
-		    || restrictToRoleNames.contains(roleName)) {
-		dto.addRoleName(roleName);
-		roleFound = true;
-	    }
-	}
-	return roleFound;
-    }
-
-    @Override
-    public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId) {
-	if ((user != null) && (organisationId != null)) {
-	    Map<String, Object> map = new HashMap<String, Object>();
-	    map.put("user.userId", user.getUserId());
-	    map.put("organisation.organisationId", organisationId);
-	    UserOrganisation userOrganisation = (UserOrganisation) baseDAO.findByProperties(UserOrganisation.class, map)
-		    .get(0);
-	    OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
-	    addRolesToDTO(null, userOrganisation, dto);
-	    return dto;
-	}
-	return null;
-    }
-
-    @Override
-    public List<Role> getRolesForUserByOrganisation(User user, Integer orgId) {
-	List<Role> list = new ArrayList<Role>();
-	Map<String, Object> map = new HashMap<String, Object>();
-	map.put("user.userId", user.getUserId());
-	map.put("organisation.organisationId", orgId);
-	UserOrganisation userOrg = (UserOrganisation) baseDAO.findByProperties(UserOrganisation.class, map).get(0);
-	if (userOrg == null) {
-	    return null;
-	}
-	Iterator i = userOrg.getUserOrganisationRoles().iterator();
-	while (i.hasNext()) {
-	    UserOrganisationRole userOrgRole = (UserOrganisationRole) i.next();
-	    list.add(userOrgRole.getRole());
-	}
-	return list;
-    }
-
-    @Override
     public List<User> getUsersFromOrganisation(Integer orgId) {
 	String query = "select uo.user from UserOrganisation uo" + " where uo.organisation.organisationId=" + orgId
 		+ " order by uo.user.login";
@@ -396,12 +232,9 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall,
-	    boolean getUser) {
+    public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean getUser) {
 	Vector users = null;
-	if (isFlashCall) {
-	    users = new Vector<UserFlashDTO>();
-	} else if (getUser) {
+	if (getUser) {
 	    users = new Vector<User>();
 	} else {
 	    users = new Vector<UserDTO>();
@@ -413,9 +246,7 @@ public class UserManagementService implements IUserManagementService {
 	List<User> queryResult = baseDAO.find(query);
 
 	for (User user : queryResult) {
-	    if (isFlashCall && !getUser) {
-		users.add(user.getUserFlashDTO());
-	    } else if (getUser) {
+	    if (getUser) {
 		users.add(user);
 	    } else {
 		users.add(user.getUserDTO());
@@ -591,7 +422,7 @@ public class UserManagementService implements IUserManagementService {
 		// get course managers and give them staff role in this new
 		// class
 		Vector<UserDTO> managers = getUsersFromOrganisationByRole(pOrg.getOrganisationId(), Role.GROUP_MANAGER,
-			false, false);
+			false);
 		for (UserDTO m : managers) {
 		    User user = (User) findById(User.class, m.getUserID());
 		    UserOrganisation uo = new UserOrganisation(user, organisation);
@@ -1067,15 +898,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public Theme getDefaultFlashTheme() {
-	String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-	List list = findByProperty(Theme.class, "name", flashName);
-	return list != null ? (Theme) list.get(0) : null;
-    }
-
-    @Override
-    public Theme getDefaultHtmlTheme() {
-	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+    public Theme getDefaultTheme() {
+	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
 	List list = findByProperty(Theme.class, "name", htmlName);
 	return list != null ? (Theme) list.get(0) : null;
     }

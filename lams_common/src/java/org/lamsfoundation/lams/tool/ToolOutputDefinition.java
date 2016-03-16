@@ -181,7 +181,7 @@ public class ToolOutputDefinition implements Comparable {
     }
 
     /**
-     * Should Flash show the definition of the branch conditions (e.g. Range from blah to blah) or just the name of the
+     * Should UI show the definition of the branch conditions (e.g. Range from blah to blah) or just the name of the
      * condition. Set to true if the definition relates to an internal parameter and will mean nothing to the user
      */
     public Boolean isShowConditionNameOnly() {

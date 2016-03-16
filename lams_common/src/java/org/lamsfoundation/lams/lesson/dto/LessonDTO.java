@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 /**
  * <p>
  * This is a cut down version of Lesson domain object. This data transfer object is design for the data interaction
- * between flash and java. As the flash and java communication is expensive, DTO pattern works fine here to save all
+ * between UI and java. As the UI and java communication is expensive, DTO pattern works fine here to save all
  * unecessary data transfer.
  * </p>
  * 

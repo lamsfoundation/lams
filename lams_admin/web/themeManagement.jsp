@@ -2,7 +2,6 @@
 
 
 <script type="text/javascript">
-<!--
 	function editTheme(name, description, imageDirectory, id, currentDefaultTheme, type) {
 		document.getElementById("name").value = name;
 		document.getElementById("description").value = description;
@@ -69,7 +68,6 @@
 	function submitForm() {
 		document.getElementById("themeForm").submit();
 	}
-//-->
 </script>
 
 <h4 class="align-left">
@@ -114,16 +112,6 @@
 				<c:if test="${theme.currentDefaultTheme}">
 					<img src="<lams:LAMSURL/>/images/tick.png" >
 				</c:if>
-			</td>
-			<td>
-				<c:choose>
-					<c:when test="${theme.type==1}">
-						<fmt:message key="admin.themes.html" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="admin.themes.flash" />
-					</c:otherwise>
-				</c:choose>
 			</td>
 			<td align="center">
 
@@ -188,17 +176,6 @@
 			</td>
 			<td>
 				<html:checkbox property="currentDefaultTheme" styleId="currentDefaultTheme" />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<fmt:message key="admin.themes.type" />:
-			</td>
-			<td>
-				<html:select property="type" styleId="type">
-					<html:option value="1"><fmt:message key="admin.themes.html" /></html:option>
-					<html:option value="2"><fmt:message key="admin.themes.flash" /></html:option>
-				</html:select>
 			</td>
 		</tr>
 	</table>

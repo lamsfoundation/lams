@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lawook10/images/icon_wookie.swf'
+, 'tool/lawook10/images/icon_wookie.svg'
 , NULL
 , NULL
 , NULL

@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lagmap10/images/icon_gmap.swf'
+, 'tool/lagmap10/images/icon_gmap.svg'
 , NULL
 , NULL
 , NULL

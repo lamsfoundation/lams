@@ -8,13 +8,6 @@
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.dto.UserDTO"%>
 
-<%-- Attributes in request come from sysadmin LoginAs action
-	 while in session from LoginRequestServlet
-	 
-	 <c:set var="login" value="${empty requestScope.login ? sessionScope.login : requestScope.login}" scope="page" />
-<c:set var="password" value="${empty requestScope.password ? sessionScope.password : requestScope.password}" scope="page" />
-	 
---%>
 <c:if test="${empty requestScope.login}">
 	<c:set var="login" value="${sessionScope.login}" />
 	<c:set var="password" value="${sessionScope.password}" />
@@ -22,10 +15,6 @@
 
 <!DOCTYPE html>
 <lams:html>
-<!--
-flash is searching for this string, so leave it!:
-j_security_login_page
--->
 
 <%-- If login param is empty, this is a regular, manual login page.
 	 Otherwise it is a just an almost empty redirect page for integrations and LoginAs authentication.

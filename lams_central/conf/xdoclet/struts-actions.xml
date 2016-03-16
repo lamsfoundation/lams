@@ -1,17 +1,4 @@
- <!--  uncomment to use wddxPost   
- 	<action
-      path="/servlet/WDDXPost"
-      type="org.lamsfoundation.lams.web.development.WDDXPostAction"
-      name="WDDXPostActionForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-    </action>
     
-     -->
-     
      <action
       path="/comments/comments"
       type="org.lamsfoundation.lams.comments.web.CommentAction"

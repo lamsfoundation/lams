@@ -370,7 +370,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
-	    Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
+	    Date date = DateUtil.convertFromString(startDate, DateUtil.SCHEDULE_LESSON_FORMAT);
 	    LessonManagerServlet.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date,
 		    userMap.getUser().getUserId());
 	    return lesson.getLessonId();
@@ -605,7 +605,7 @@ public class LessonManagerServlet extends HttpServlet {
 	staffList.add(creator);
 	List<User> learnerList = new LinkedList<User>();
 	Vector<User> learnerVector = LessonManagerServlet.userManagementService
-		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, false, true);
+		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
 	LessonManagerServlet.monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		organisation.getName() + " learners", learnerList, organisation.getName() + " staff", staffList,

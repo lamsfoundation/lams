@@ -63,7 +63,6 @@
                 <filter token="dbname" value="${db.name}" />
 	        	<filter token="contentrepository.directory" value="${contentrepository.base}/repository" />
                 <filter token="temp.directory" value="${contentrepository.base}/temp" />
-                <filter token="dump.directory" value="${contentrepository.base}/dump" />
 	        	<filter token="ear.directory" value="${server.home}/standalone/deployments/lams.ear" />
 	        </filterset>
 		</copy>

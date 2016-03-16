@@ -25,13 +25,8 @@ package org.lamsfoundation.lams.themes;
 
 /**
  * @author lfoxton
- * 
- *         Model for theme whether it be flash, css or other
  */
 public class Theme {
-
-    public static final int TYPE_CSS = 1;
-    public static final int TYPE_FLASH = 2;
 
     /** identifier field */
     private Long themeId;

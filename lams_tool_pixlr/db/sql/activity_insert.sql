@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lapixl10/images/icon_pixlr.swf'
+, 'tool/lapixl10/images/icon_pixlr.svg'
 , NULL
 , NULL
 , NULL

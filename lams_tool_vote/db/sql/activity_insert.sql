@@ -89,7 +89,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lavote11/images/icon_ranking.swf'
+, 'tool/lavote11/images/icon_ranking.svg'
 , NULL
 , NULL
 , NULL

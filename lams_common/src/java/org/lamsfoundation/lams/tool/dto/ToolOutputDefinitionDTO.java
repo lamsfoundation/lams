@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
  * @author Mitchell Seaton
  * 
  *         This class acts as a data transfer object for transferring
- *         information between FLASH and the core module.
+ *         information between UI and the core module.
  * 
  *         This class is required in the authoring environment to pass
  *         information about the ToolOutput for a ToolActivity

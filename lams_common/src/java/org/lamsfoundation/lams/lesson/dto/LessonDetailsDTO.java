@@ -24,10 +24,8 @@
 package org.lamsfoundation.lams.lesson.dto;
 
 import java.util.Date;
-import java.util.Set;
 
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -90,33 +88,28 @@ public class LessonDetailsDTO {
 
 	this.duration = lesson.getLearningDesign().getDuration();
 
-	this.organisationID = lesson.getOrganisation() != null ? lesson.getOrganisation().getOrganisationId()
-		: WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	this.organisationID = lesson.getOrganisation() != null ? lesson.getOrganisation().getOrganisationId() : null;
 
-	this.organisationName = lesson.getOrganisation() != null ? lesson.getOrganisation().getName()
-		: WDDXTAGS.STRING_NULL_VALUE;
+	this.organisationName = lesson.getOrganisation() != null ? lesson.getOrganisation().getName() : null;
 
 	this.organisationDescription = lesson.getOrganisation() != null ? lesson.getOrganisation().getDescription()
-		: WDDXTAGS.STRING_NULL_VALUE;
+		: null;
 
 	this.workspaceFolderID = lesson.getLearningDesign().getWorkspaceFolder() != null
-		? lesson.getLearningDesign().getWorkspaceFolder().getWorkspaceFolderId()
-		: WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		? lesson.getLearningDesign().getWorkspaceFolder().getWorkspaceFolderId() : null;
 
 	this.contentFolderID = lesson.getLearningDesign().getContentFolderID() != null
-		? lesson.getLearningDesign().getContentFolderID() : WDDXTAGS.STRING_NULL_VALUE;
+		? lesson.getLearningDesign().getContentFolderID() : null;
 
 	this.licenseID = lesson.getLearningDesign().getLicense() != null
-		? lesson.getLearningDesign().getLicense().getLicenseID() : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		? lesson.getLearningDesign().getLicense().getLicenseID() : null;
 
-	this.licenseText = lesson.getLearningDesign().getLicenseText() != null
-		? lesson.getLearningDesign().getLicenseText() : WDDXTAGS.STRING_NULL_VALUE;
+	this.licenseText = lesson.getLearningDesign().getLicenseText();
 
 	this.learningDesignID = lesson.getLearningDesign().getLearningDesignId();
 
-	Set allLearners = lesson.getAllLearners();
-	this.numberPossibleLearners = new Integer(allLearners != null ? allLearners.size() : 0);
-	this.numberStartedLearners = new Integer(0);
+	this.numberPossibleLearners = lesson.getAllLearners().size();
+	this.numberStartedLearners = 0;
 
 	this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
 	this.learnerImAvailable = lesson.getLearnerImAvailable();
@@ -149,11 +142,11 @@ public class LessonDetailsDTO {
      * @return Returns the createDateTime.
      */
     public Date getCreateDateTime() {
-	return createDateTime != null ? createDateTime : WDDXTAGS.DATE_NULL_VALUE;
+	return createDateTime;
     }
 
     public String getCreateDateTimeStr() {
-	return createDateTimeStr != null ? createDateTimeStr : WDDXTAGS.STRING_NULL_VALUE;
+	return createDateTimeStr;
     }
 
     public void setCreateDateTimeStr(String createDateTimeStr) {
@@ -164,74 +157,74 @@ public class LessonDetailsDTO {
      * @return Returns the duration.
      */
     public Long getDuration() {
-	return duration != null ? duration : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	return duration;
     }
 
     /**
      * @return Returns the learningDesignID.
      */
     public Long getLearningDesignID() {
-	return learningDesignID != null ? learningDesignID : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	return learningDesignID;
     }
 
     /**
      * @return Returns the lessonID.
      */
     public Long getLessonID() {
-	return lessonID != null ? lessonID : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	return lessonID;
     }
 
     /**
      * @return Returns the lessonStateID.
      */
     public Integer getLessonStateID() {
-	return lessonStateID != null ? lessonStateID : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	return lessonStateID;
     }
 
     /**
      * @return Returns the licenseID.
      */
     public Long getLicenseID() {
-	return licenseID != null ? licenseID : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	return licenseID;
     }
 
     /**
      * @return Returns the licenseText.
      */
     public String getLicenseText() {
-	return licenseText != null ? licenseText : WDDXTAGS.STRING_NULL_VALUE;
+	return licenseText;
     }
 
     /**
      * @return Returns the organisationDescription.
      */
     public String getOrganisationDescription() {
-	return organisationDescription != null ? organisationDescription : WDDXTAGS.STRING_NULL_VALUE;
+	return organisationDescription;
     }
 
     /**
      * @return Returns the organisationID.
      */
     public Integer getOrganisationID() {
-	return organisationID != null ? organisationID : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	return organisationID;
     }
 
     /**
      * @return Returns the organisationName.
      */
     public String getOrganisationName() {
-	return organisationName != null ? organisationName : WDDXTAGS.STRING_NULL_VALUE;
+	return organisationName;
     }
 
     /**
      * @return Returns the startDateTime.
      */
     public Date getStartDateTime() {
-	return startDateTime != null ? startDateTime : WDDXTAGS.DATE_NULL_VALUE;
+	return startDateTime;
     }
 
     public String getStartDateTimeStr() {
-	return startDateTimeStr != null ? startDateTimeStr : WDDXTAGS.STRING_NULL_VALUE;
+	return startDateTimeStr;
     }
 
     public void setStartDateTimeStr(String startDateTimeStr) {
@@ -242,7 +235,7 @@ public class LessonDetailsDTO {
      * @return Returns the workspaceFolderID.
      */
     public Integer getWorkspaceFolderID() {
-	return workspaceFolderID != null ? workspaceFolderID : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	return workspaceFolderID;
     }
 
     /**
@@ -250,7 +243,7 @@ public class LessonDetailsDTO {
      * @return Returns the contentFolderID.
      */
     public String getContentFolderID() {
-	return contentFolderID != null ? contentFolderID : WDDXTAGS.STRING_NULL_VALUE;
+	return contentFolderID;
     }
 
     public Integer getNumberStartedLearners() {

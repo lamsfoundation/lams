@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lantbk11/images/icon_notebook.swf'
+, 'tool/lantbk11/images/icon_notebook.svg'
 , NULL
 , NULL
 , NULL

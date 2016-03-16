@@ -90,8 +90,8 @@ public class LearningWebUtil {
     public static User getUser(ICoreLearnerService learnerService) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	return learner != null ? (User) learnerService.getUserManagementService().findById(User.class,
-		learner.getUserID()) : null;
+	return learner != null
+		? (User) learnerService.getUserManagementService().findById(User.class, learner.getUserID()) : null;
     }
 
     /**
@@ -127,13 +127,9 @@ public class LearningWebUtil {
 
 	if (learnerProgress == null) {
 	    Long learnerProgressId = WebUtil.readLongParam(request, LearningWebUtil.PARAM_PROGRESS_ID, true);
-	    // temp hack until Flash side updates it call.
+	    // temp hack until UI side updates it call.
 	    if (learnerProgressId == null) {
 		learnerProgressId = WebUtil.readLongParam(request, "progressId", true);
-		if (learnerProgressId != null) {
-		    LearningWebUtil.log
-			    .warn("Flash client still using progressId, instead of progressID in a learner call");
-		}
 	    }
 
 	    if (learnerProgressId != null) {
@@ -214,8 +210,8 @@ public class LearningWebUtil {
      */
     public static ActionForward completeActivity(HttpServletRequest request, HttpServletResponse response,
 	    ActivityMapping actionMappings, LearnerProgress currentProgress, Activity currentActivity,
-	    Integer learnerId, ICoreLearnerService learnerService, boolean redirect) throws LearnerServiceException,
-	    UnsupportedEncodingException {
+	    Integer learnerId, ICoreLearnerService learnerService, boolean redirect)
+		    throws LearnerServiceException, UnsupportedEncodingException {
 
 	LearnerProgress progress = currentProgress;
 	Lesson lesson = progress.getLesson();
@@ -226,7 +222,7 @@ public class LearningWebUtil {
 
 	    // recalculate activity mark and pass it to gradebook
 	    learnerService.updateGradebookMark(currentActivity, progress);
-	    
+
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	} else {
 	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);
@@ -249,108 +245,6 @@ public class LearningWebUtil {
 	return (ActivityMapping) wac.getBean("activityMapping");
     }
 
-    /** Setup the progress string, version and lesson id in the activityForm. */
-    public static void setupProgressInRequest(ActivityForm activityForm, HttpServletRequest request,
-	    LearnerProgress learnerProgress) {
-
-	LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
-
-	// Calculate the progress summary. On join this method gets called twice, and we
-	// only want to calculate once
-	String progressSummary = activityForm.getProgressSummary();
-	if (progressSummary == null) {
-	    progressSummary = LearningWebUtil.getProgressSummary(learnerProgress);
-	    activityForm.setProgressSummary(progressSummary);
-	}
-
-	Lesson currentLesson = learnerProgress.getLesson();
-	if (currentLesson != null) {
-	    activityForm.setLessonID(currentLesson.getLessonId());
-
-	    LearningDesign currentDesign = currentLesson.getLearningDesign();
-	    if (currentDesign != null) {
-		activityForm.setVersion(currentDesign.getDesignVersion());
-	    }
-	}
-
-	if (LearningWebUtil.log.isDebugEnabled()) {
-	    LearningWebUtil.log.debug("Entering activity: progress summary is " + activityForm.getProgressSummary());
-	}
-
-    }
-
-    /**
-     * Setup the progress string, version and lesson id in the actionForm. The values will go in the map with the keys
-     * "progressSummary", "lessonID", "version".
-     */
-    public static void setupProgressInRequest(DynaActionForm actionForm, HttpServletRequest request,
-	    LearnerProgress learnerProgress) {
-
-	LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
-
-	// Calculate the progress summary. On join this method gets called twice, and we
-	// only want to calculate once
-	String progressSummary = (String) actionForm.get("progressSummary");
-	if (progressSummary == null) {
-	    progressSummary = LearningWebUtil.getProgressSummary(learnerProgress);
-	    actionForm.set("progressSummary", progressSummary);
-	}
-
-	Lesson currentLesson = learnerProgress.getLesson();
-	if (currentLesson != null) {
-	    actionForm.set("lessonID", currentLesson.getLessonId());
-
-	    LearningDesign currentDesign = currentLesson.getLearningDesign();
-	    if (currentDesign != null) {
-		actionForm.set("version", currentDesign.getDesignVersion());
-	    }
-	}
-
-	if (LearningWebUtil.log.isDebugEnabled()) {
-	    LearningWebUtil.log.debug("Entering activity: progress summary is " + actionForm.get("progressSummary"));
-	}
-
-    }
-
-    private static String getProgressSummary(LearnerProgress learnerProgress) {
-	StringBuffer progressSummary = new StringBuffer(100);
-	if (learnerProgress == null) {
-	    progressSummary.append("attempted=&completed=&current=");
-	    progressSummary.append("&lessonID=");
-	} else {
-	    progressSummary.append("attempted=");
-	    boolean first = true;
-	    for (Object obj : learnerProgress.getAttemptedActivities().keySet()) {
-		Activity activity = (Activity) obj;
-		if (!first) {
-		    progressSummary.append("_");
-		} else {
-		    first = false;
-		}
-		progressSummary.append(activity.getActivityId());
-	    }
-
-	    progressSummary.append("&completed=");
-	    first = true;
-	    for (Object obj : learnerProgress.getCompletedActivities().keySet()) {
-		Activity activity = (Activity) obj;
-		if (!first) {
-		    progressSummary.append("_");
-		} else {
-		    first = false;
-		}
-		progressSummary.append(activity.getActivityId());
-	    }
-
-	    progressSummary.append("&current=");
-	    Activity currentActivity = learnerProgress.getCurrentActivity();
-	    if (currentActivity != null) {
-		progressSummary.append(currentActivity.getActivityId());
-	    }
-
-	}
-	return progressSummary.toString();
-    }
 
     public static ActivityURL getActivityURL(ActivityMapping activityMapping, LearnerProgress learnerProgress,
 	    Activity activity, boolean defaultURL, boolean isFloating) {

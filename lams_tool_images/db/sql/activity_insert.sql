@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/laimag10/images/icon_imageGallery.swf'
+, 'tool/laimag10/images/icon_imageGallery.svg'
 , NULL
 , NULL
 , NULL

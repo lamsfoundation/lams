@@ -29,7 +29,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Data transfer object for sending License details to Flash.
+ * Data transfer object for sending License details to Authoring.
  * @author Fiona Malikoff
  */
 public class LicenseDTO implements Serializable{

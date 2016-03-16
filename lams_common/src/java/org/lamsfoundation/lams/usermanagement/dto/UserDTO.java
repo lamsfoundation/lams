@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+import org.lamsfoundation.lams.themes.dto.ThemeDTO;
 
 /**
  * @author Manpreet Minhas
@@ -46,8 +46,7 @@ public class UserDTO implements Serializable {
     private String fckLanguageMapping;
     private String direction;
     private String email;
-    private CSSThemeBriefDTO flashTheme;
-    private CSSThemeBriefDTO htmlTheme;
+    private ThemeDTO theme;
     private TimeZone timeZone;
     private Integer authenticationMethodId;
     private String lamsCommunityToken;
@@ -58,10 +57,10 @@ public class UserDTO implements Serializable {
     private Boolean firstLogin;
 
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
-	    String localeCountry, String direction, String email, CSSThemeBriefDTO flashTheme,
-	    CSSThemeBriefDTO htmlTheme, TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping,
-	    String lamsCommunityToken, String lamsCommunityUsername, Boolean tutorialsDisabled,
-	    Set<String> pagesWithDisabledTutorials, Boolean firstLogin) {
+	    String localeCountry, String direction, String email, ThemeDTO htmlTheme, TimeZone timezone,
+	    Integer authenticationMethodId, String fckLanguageMapping, String lamsCommunityToken,
+	    String lamsCommunityUsername, Boolean tutorialsDisabled, Set<String> pagesWithDisabledTutorials,
+	    Boolean firstLogin) {
 	this.userID = userID;
 	this.firstName = firstName;
 	this.lastName = lastName;
@@ -70,8 +69,7 @@ public class UserDTO implements Serializable {
 	this.localeLanguage = localeLanguage;
 	this.direction = direction;
 	this.email = email;
-	this.flashTheme = flashTheme;
-	this.htmlTheme = htmlTheme;
+	this.theme = htmlTheme;
 	timeZone = timezone;
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
@@ -132,20 +130,12 @@ public class UserDTO implements Serializable {
 	return userID;
     }
 
-    public CSSThemeBriefDTO getFlashTheme() {
-	return flashTheme;
+    public ThemeDTO getTheme() {
+	return theme;
     }
 
-    public void setFlashTheme(CSSThemeBriefDTO flashTheme) {
-	this.flashTheme = flashTheme;
-    }
-
-    public CSSThemeBriefDTO getHtmlTheme() {
-	return htmlTheme;
-    }
-
-    public void setHtmlTheme(CSSThemeBriefDTO htmlTheme) {
-	this.htmlTheme = htmlTheme;
+    public void setTheme(ThemeDTO theme) {
+	this.theme = theme;
     }
 
     public String getEmail() {
@@ -179,9 +169,8 @@ public class UserDTO implements Serializable {
 	return new ToStringBuilder(this).append("userID", getUserID()).append("firstName", getFirstName())
 		.append("lastName", getLastName()).append("login", getLogin())
 		.append("localeLanguage", getLocaleLanguage()).append("localeCountry", getLocaleCountry())
-		.append("direction", getDirection()).append("email", getEmail()).append("flashTheme", getFlashTheme())
-		.append("htmlTheme", getHtmlTheme()).append("timeZone", getTimeZone())
-		.append("authenticationMethodId", getAuthenticationMethodId())
+		.append("direction", getDirection()).append("email", getEmail()).append("htmlTheme", getTheme())
+		.append("timeZone", getTimeZone()).append("authenticationMethodId", getAuthenticationMethodId())
 		.append("fckLanguageMapping", getFckLanguageMapping())
 		.append("lamsCommunityUser", this.getLamsCommunityUsername())
 		.append("lamsCommunityToken", this.getLamsCommunityToken())

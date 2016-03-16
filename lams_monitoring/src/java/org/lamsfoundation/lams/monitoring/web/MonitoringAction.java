@@ -76,13 +76,11 @@ import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -91,8 +89,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -104,7 +100,7 @@ import com.google.gson.GsonBuilder;
 
 /**
  * <p>
- * The action servlet that provide all the monitoring functionalities. It interact with the teacher via flash and JSP
+ * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP
  * monitoring interface.
  * </p>
  * 
@@ -142,8 +138,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static IAuditService auditService;
 
-    private static ITimezoneService timezoneService;
-
     private static ILessonService lessonService;
 
     private static ISecurityService securityService;
@@ -156,24 +150,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return user != null ? user.getUserID() : null;
-    }
-
-    private FlashMessage handleException(Exception e, String methodKey) {
-	LamsDispatchAction.log.error("Exception thrown " + methodKey, e);
-	MonitoringAction.auditService = getAuditService();
-	MonitoringAction.auditService.log(MonitoringAction.class.getName() + ":" + methodKey, e.toString());
-
-	if (e instanceof UserAccessDeniedException) {
-	    return new FlashMessage(methodKey,
-		    getMonitoringService().getMessageService().getMessage("error.user.noprivilege"),
-		    FlashMessage.ERROR);
-	} else {
-	    String[] msg = new String[1];
-	    msg[0] = e.getMessage();
-	    return new FlashMessage(methodKey,
-		    getMonitoringService().getMessageService().getMessage("error.system.error", msg),
-		    FlashMessage.CRITICAL_ERROR);
-	}
     }
 
     private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url)
@@ -191,7 +167,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Initializes a lesson for specific learning design with the given lesson title and lesson description. If
      * initialization is successful, this method will the ID of new lesson.
      * 
-     * Currently used only in TestHarness and Flashless Authoring Preview.
+     * Currently used only in TestHarness and Authoring Preview.
      */
     public ActionForward initializeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -468,8 +444,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * The Struts dispatch method to "unarchive" a lesson. Returns it back to its previous state. A wddx acknowledgement
-     * message will be serialized and sent back to the flash component.
+     * The Struts dispatch method to "unarchive" a lesson. Returns it back to its previous state.
      * 
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
@@ -500,7 +475,7 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * The purpose of suspending is to hide the lesson from learners temporarily. It doesn't make any sense to suspend a
      * created or a not started (ie scheduled) lesson as they will not be shown on the learner interface anyway! If the
-     * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to Flash.
+     * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to UI.
      * 
      * @param mapping
      * @param form
@@ -522,7 +497,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Unsuspend a lesson which state must be Lesson.SUPSENDED_STATE. Otherwise a error message will return to flash
+     * Unsuspend a lesson which state must be Lesson.SUPSENDED_STATE. Otherwise a error message will return to UI
      * client.
      * 
      * @param mapping
@@ -856,38 +831,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    public ActionForward getLessonStaff(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    wddxPacket = getMonitoringService().getLessonStaff(lessonID, getUserId());
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLessonStaff").serializeMessage();
-	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
-    public ActionForward getLearningDesignDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    if (!getSecurityService().isLessonMonitor(lessonID, getUserId(), "get learning design details", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-		return null;
-	    }
-	    wddxPacket = getMonitoringService().getLearningDesignDetails(lessonID);
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLearningDesignDetails").serializeMessage();
-	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
     public ActionForward getDictionaryXML(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
@@ -939,7 +882,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Calls the server to bring up the learner progress page. Assumes destination is a new window. The userid that
-     * comes from Flash is the user id of the learner for which we are calculating the url. This is different to all the
+     * comes from UI is the user id of the learner for which we are calculating the url. This is different to all the
      * other calls.
      */
     public ActionForward getLearnerActivityURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -973,23 +916,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
     }
 
-    public ActionForward moveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket = null;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    Integer userID = getUserId();
-	    Integer targetWorkspaceFolderID = new Integer(WebUtil.readIntParam(request, "folderID"));
-	    wddxPacket = getMonitoringService().moveLesson(lessonID, targetWorkspaceFolderID, userID);
-	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "moveLesson");
-	    wddxPacket = flashMessage.serializeMessage();
-	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
     /**
      * Displays Monitor Lesson page.
      */
@@ -1000,7 +926,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	if ((lessonDTO.getCreateDateTime() != null) && (lessonDTO.getCreateDateTime() != WDDXTAGS.DATE_NULL_VALUE)) {
+	if (lessonDTO.getCreateDateTime() != null) {
 	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
 	}
@@ -1428,6 +1354,7 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Checks if a complex activity or its descendats contain an activity with the given ID.
      */
+    @SuppressWarnings("unchecked")
     private boolean containsActivity(ComplexActivity complexActivity, long targetActivityId,
 	    IMonitoringService monitoringService) {
 	for (Activity childActivity : (Set<Activity>) complexActivity.getActivities()) {
@@ -1445,50 +1372,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	return false;
     }
 
-    public ActionForward releaseGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket = null;
-	try {
-	    Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
-	    wddxPacket = getMonitoringService().releaseGate(activityID);
-	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "releaseGate");
-	    wddxPacket = flashMessage.serializeMessage();
-	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
     public ActionForward startPreviewLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	FlashMessage flashMessage = null;
+	Integer userID = getUserId();
+	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	try {
-
-	    Integer userID = getUserId();
-	    long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	    /**
-	     * InitializeLessonServlet handles the Lesson initialisation process. Create Lesson Class and start Lesson
-	     * Preview.
-	     */
-
-	    try {
-		getMonitoringService().createPreviewClassForLesson(userID, lessonID);
-		getMonitoringService().startLesson(lessonID, getUserId());
-	    } catch (SecurityException e) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
-		return null;
-	    }
-
-	    flashMessage = new FlashMessage("startPreviewSession", new Long(lessonID));
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "startPreviewSession");
+	    getMonitoringService().createPreviewClassForLesson(userID, lessonID);
+	    getMonitoringService().startLesson(lessonID, getUserId());
+	} catch (SecurityException e) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 	}
-
-	PrintWriter writer = response.getWriter();
-	writer.println(flashMessage.serializeMessage());
 	return null;
     }
 

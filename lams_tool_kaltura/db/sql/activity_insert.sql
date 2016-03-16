@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lakalt11/images/icon_kaltura.swf'
+, 'tool/lakalt11/images/icon_kaltura.svg'
 , NULL
 , NULL
 , NULL

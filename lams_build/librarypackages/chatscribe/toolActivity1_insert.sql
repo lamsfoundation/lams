@@ -11,6 +11,6 @@ values
 1,null,null,0,
 null,null,now(),0,
 null,null,${tool_id},null,
-null,null,null,'tool/lachat11/images/icon_chat.swf',
+null,null,null,'tool/lachat11/images/icon_chat.svg',
 2,0,2,
 'org.lamsfoundation.lams.tool.chat.ApplicationResources');

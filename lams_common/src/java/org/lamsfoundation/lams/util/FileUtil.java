@@ -25,10 +25,8 @@ package org.lamsfoundation.lams.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -313,75 +311,6 @@ public class FileUtil {
 	return dir.exists();
     }
 
-    private static String generateDumpFilename(String id, String extension) throws FileUtilException {
-	// get dump directory name and make sure directory exists
-	String dumpDirectory = Configuration.get(ConfigurationKeys.LAMS_DUMP_DIR);
-	if (dumpDirectory == null) {
-	    dumpDirectory = FileUtil.getTempDir();
-	}
-	FileUtil.createDirectory(dumpDirectory);
-
-	String dumpFilename = dumpDirectory + File.separator + id + System.currentTimeMillis()
-		+ (extension != null ? "." + extension : "");
-
-	File dumpFile = new File(dumpFilename);
-	int i = 0;
-	while (dumpFile.exists() && (i < 100)) {
-	    dumpFilename = dumpDirectory + File.separator + id + System.currentTimeMillis() + "_" + i
-		    + (extension != null ? "." + extension : "");
-	    dumpFile = new File(dumpFilename);
-	}
-	if (dumpFile.exists()) {
-	    throw new FileUtilException("Unable to create dump file. The filename that we would use already exists: "
-		    + dumpFile);
-	}
-
-	return dumpFilename;
-    }
-
-    /**
-     * Dump some data to a file in the Dump Directory. The directory is set in the LAMS configuration file. These dumps
-     * are primarily for support/debugging/problem reporting uses.
-     * 
-     * If the dump directory is not set, it will revert to the system temp directory.
-     * 
-     * Used by the FlashCrashDump servlet initially, may be used by other dump methods in future.
-     * 
-     * @param data
-     *            data to dump
-     * @param id
-     *            some identification name for the string. Does not need to be unique. e.g. FLASH_jsmith
-     * @param extension
-     *            optional extension to be added to filename e.g. xml. Note: do not include the "." - that will be added
-     *            automatically.
-     * 
-     * @author Fiona Malikoff
-     * @throws FileUtilException
-     */
-    public static String createDumpFile(byte[] data, String id, String extension) throws FileUtilException {
-	String dumpFilename = FileUtil.generateDumpFilename(id, extension);
-	OutputStream dumpFile = null;
-	try {
-	    dumpFile = new FileOutputStream(dumpFilename);
-	    dumpFile.write(data);
-	} catch (IOException e) {
-	    FileUtil.log.error("Unable to write dump out byte array to dump file. ID: " + id + " Dump: " + data
-		    + " Exception " + e.getMessage(), e);
-	    throw new FileUtilException(e);
-	} finally {
-	    try {
-		if (dumpFile != null) {
-		    dumpFile.close();
-		}
-	    } catch (IOException e) {
-		FileUtil.log.error(
-			"Unable to close dump file. ID: " + id + " Dump: " + data + " Exception " + e.getMessage(), e);
-		throw new FileUtilException(e);
-	    }
-	}
-	return dumpFilename;
-    }
-
     /**
      * get file name from a string which may include directory information. For example : "c:\\dir\\ndp\\pp.txt"; will
      * return pp.txt.? If file has no path infomation, then just return input fileName.
@@ -590,8 +519,8 @@ public class FileUtil {
 	// calculate comparison date
 	long newestDateToKeep = System.currentTimeMillis() - (numDays * FileUtil.numMilliSecondsInADay);
 	Date date = new Date(newestDateToKeep);
-	FileUtil.log.info("Getting all temp zipfile expanded directories before " + date.toString()
-		+ " (server time) (" + newestDateToKeep + ")");
+	FileUtil.log.info("Getting all temp zipfile expanded directories before " + date.toString() + " (server time) ("
+		+ newestDateToKeep + ")");
 
 	File tempSysDir = new File(FileUtil.getTempDir());
 	File candidates[] = tempSysDir.listFiles(new TempDirectoryFilter(newestDateToKeep, FileUtil.log));

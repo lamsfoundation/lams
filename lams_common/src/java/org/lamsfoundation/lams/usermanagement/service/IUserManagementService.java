@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 
@@ -60,26 +59,12 @@ public interface IUserManagementService {
     void save(Object object);
 
     /**
-     * @param objects
-     * @return void
-     */
-    void saveAll(Collection objects);
-
-    /**
      * Remove an object from the database.
      * 
      * @param object
      *            The object to be deleted
      */
     void delete(Object object);
-
-    /**
-     * Be careful to use this method. It will clean up the whole table for the Class
-     * 
-     * @param clazz
-     * @return void
-     */
-    void deleteAll(Class clazz);
 
     /**
      * @param objects
@@ -96,29 +81,6 @@ public interface IUserManagementService {
      * @return void
      */
     void deleteById(Class clazz, Serializable id);
-
-    /**
-     * @param clazz
-     * @param name
-     * @param value
-     * @return void
-     */
-    void deleteByProperty(Class clazz, String name, Object value);
-
-    /**
-     * @param properties
-     *            a map of property names and values
-     * @return void
-     */
-    void deleteByProperties(Class clazz, Map<String, Object> properties);
-
-    /**
-     * Delete any object which has the same non-null property values as the object
-     * 
-     * @param object
-     * @return void
-     */
-    void deleteAnythingLike(Object object);
 
     /**
      * Find an object. If the object is not found then it will return null
@@ -150,74 +112,6 @@ public interface IUserManagementService {
     List findByProperties(Class clazz, Map<String, Object> properties);
 
     /**
-     * Find any object which has the same non-null property values as the object
-     * 
-     * @param object
-     * @return a list of objects which has the same non-null property values as the object
-     */
-    List findAnythingLike(Object object);
-
-    /**
-     * @param clazz
-     * @param properties
-     * @return a list of objects which have similar property values
-     */
-    List searchByStringProperties(Class clazz, Map<String, String> properties);
-
-    /**
-     * Retrieves a tree of organisations for a user. The top of the tree is a "dummy" root organisation, just so that we
-     * have a real tree. This makes life easier for Flash.
-     * 
-     * If restrictToRoleNames contains any role names (ie not null and size > 0 ) then it will restrict the
-     * organisations to those in which the user has one of the given roles. If restrictToRoleNames is null/empty then
-     * till return all organisations to which the user belongs.
-     * 
-     * @param user
-     *            mandatory
-     * @param restrictToRoleNames
-     *            role names to which to restrict the user
-     * @return List of organisationDTOs
-     */
-    OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames);
-
-    /**
-     * Retrieves a tree of child of organisations in which the user has the specified role. If courseID only is set,
-     * then return course organisationDTO and its children as its nodes If courseID && restrictToClassIds are set, then
-     * course organisationDTO and its the nominated class organisationDTOs - most cases will have only single classID
-     * 
-     * If restrictToRoleNames contains any role names (ie not null and size > 0 ) then it will restrict the
-     * organisations to those in which the user has one of the given roles.
-     * 
-     * @param user
-     *            mandatory
-     * @param roles
-     *            optional
-     * @param courseID
-     *            mandatory
-     * @param restrictToClassIds
-     *            optional
-     * @return organisationDTO hierarchy, in WDDX format.
-     */
-    OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId,
-	    List<Integer> restrictToClassIds);
-
-    /**
-     * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations
-     */
-    OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId);
-
-    /**
-     * Retrieves roles in which the user has the specified role
-     * 
-     * @param user
-     *            the user
-     * @param orgId
-     *            organisation's id
-     * @return List of roles
-     */
-    List<Role> getRolesForUserByOrganisation(User user, Integer orgId);
-
-    /**
      * Retrieves users from the specified organisation
      * 
      * @param orgId
@@ -232,12 +126,10 @@ public interface IUserManagementService {
      * 
      * @param organisationID
      * @param roleName
-     * @param isFlashCall
      * @param getUser
-     * @return UserFlashDTO objects (in a Vector to suit WDDX)
+     * @return UserBasicDTO objectsin a Vector
      */
-    Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall,
-	    boolean getUser);
+    Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean getUser);
 
     Organisation getRootOrganisation();
 
@@ -427,15 +319,11 @@ public interface IUserManagementService {
 
     /**
      * Return true if user is a global group admin.
-     * 
-     * @return
      */
     boolean isUserGlobalGroupAdmin();
 
     /**
      * Return true if user has sysadmin role in root organisation.
-     * 
-     * @return
      */
     boolean isUserSysAdmin();
 
@@ -444,7 +332,6 @@ public interface IUserManagementService {
      * 
      * @param roleId
      *            Role ID
-     * @return
      */
     Integer getCountRoleForSystem(Integer roleId);
 
@@ -458,18 +345,11 @@ public interface IUserManagementService {
     Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase);
 
     /**
-     * Get default flash theme of server.
-     * 
-     * @return default flash theme object
-     */
-    Theme getDefaultFlashTheme();
-
-    /**
      * Get default html theme of server.
      * 
      * @return default html theme object
      */
-    Theme getDefaultHtmlTheme();
+    Theme getDefaultTheme();
 
     void auditPasswordChanged(User user, String moduleName);
 

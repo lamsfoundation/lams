@@ -32,14 +32,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ThemeForm;
-import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -49,8 +47,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  *         Actions for maintaining and altering system themes
  * 
- * @struts.action path="/themeManagement" parameter="method" name="themeForm"
- *                input=".themeManagement" scope="request" validate="false"
+ * @struts.action path="/themeManagement" parameter="method" name="themeForm" input=".themeManagement" scope="request"
+ *                validate="false"
  * @struts.action-forward name="success" path=".themeManagement"
  * @struts.action-forward name="error" path=".error"
  */
@@ -59,115 +57,90 @@ public class ThemeManagementAction extends LamsDispatchAction {
     private static IThemeService themeService;
     private static Configuration configurationService;
 
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "RegisterAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
+		    .getMessage("error.authorisation"));
 	    return mapping.findForward("error");
 	}
 
-	if (themeService == null) {
-	    themeService = AdminServiceProxy.getThemeService(getServlet().getServletContext());
+	if (ThemeManagementAction.themeService == null) {
+	    ThemeManagementAction.themeService = AdminServiceProxy.getThemeService(getServlet().getServletContext());
 	}
 
 	// Get all the themes
-	List<Theme> themes = themeService.getAllThemes();
+	List<Theme> themes = ThemeManagementAction.themeService.getAllThemes();
 
 	// Flag the default and un-editable themes
-	String currentCSSTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-	String currentFlashTheme = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
+	String currentCSSTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
 	for (Theme theme : themes) {
-	    theme.setCurrentDefaultTheme(Boolean.FALSE);
-	    if (theme.getName().equals(currentCSSTheme) || theme.getName().equals(currentFlashTheme)) {
-		theme.setCurrentDefaultTheme(Boolean.TRUE);
-	    }
-
-	    theme.setNotEditable(Boolean.FALSE);
-	    if (theme.getName().equals(CSSThemeUtil.DEFAULT_HTML_THEME) || theme.getName().equals(CSSThemeUtil.DEFAULT_FLASH_THEME)) {
-		theme.setNotEditable(Boolean.TRUE);
-	    }
+	    theme.setCurrentDefaultTheme(theme.getName().equals(currentCSSTheme));
+	    theme.setNotEditable(theme.getName().equals(CSSThemeUtil.DEFAULT_HTML_THEME));
 	}
 
 	request.setAttribute("themes", themes);
 	return mapping.findForward("success");
     }
 
-    public ActionForward addOrEditTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward addOrEditTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	ThemeForm themeForm = (ThemeForm) form;
-
 
 	// Update the theme
 	Theme theme = null;
-	if (themeForm.getId() != null && themeForm.getId() != 0) {
-	    theme = themeService.getTheme(themeForm.getId());
+	if ((themeForm.getId() != null) && (themeForm.getId() != 0)) {
+	    theme = ThemeManagementAction.themeService.getTheme(themeForm.getId());
 	} else {
 	    theme = new Theme();
 	}
 	updateThemeFromForm(theme, themeForm);
-	themeService.saveOrUpdateTheme(theme);
+	ThemeManagementAction.themeService.saveOrUpdateTheme(theme);
 
 	// Set the theme as default, or disable it as default.
 	// Disabling restores the system default
-	if (themeForm.getCurrentDefaultTheme() != null && themeForm.getCurrentDefaultTheme() == true) {
-	    if (Integer.parseInt(themeForm.getType()) == Theme.TYPE_CSS) {
-		Configuration.updateItem(ConfigurationKeys.DEFAULT_HTML_THEME, themeForm.getName());
-		getConfiguration().persistUpdate();
-	    } else {
-		Configuration.updateItem(ConfigurationKeys.DEFAULT_FLASH_THEME, themeForm.getName());
-		getConfiguration().persistUpdate();
-	    }
+	if ((themeForm.getCurrentDefaultTheme() != null) && (themeForm.getCurrentDefaultTheme() == true)) {
+	    Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, themeForm.getName());
+	    getConfiguration().persistUpdate();
 	} else {
-	    if (Integer.parseInt(themeForm.getType()) == Theme.TYPE_CSS) {
-		String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-		if (themeForm.getName().equals(currentTheme)) {
-		    Configuration.updateItem(ConfigurationKeys.DEFAULT_HTML_THEME, CSSThemeUtil.DEFAULT_HTML_THEME);
-		    getConfiguration().persistUpdate();
-		}
-	    } else {
-		String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-		if (themeForm.getName().equals(currentTheme)) {
-		    Configuration.updateItem(ConfigurationKeys.DEFAULT_FLASH_THEME, CSSThemeUtil.DEFAULT_FLASH_THEME);
-		    getConfiguration().persistUpdate();
-		}
+	    String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
+	    if (themeForm.getName().equals(currentTheme)) {
+		Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, CSSThemeUtil.DEFAULT_HTML_THEME);
+		getConfiguration().persistUpdate();
 	    }
 	}
 	themeForm.clear();
 	return unspecified(mapping, themeForm, request, response);
     }
 
-    public ActionForward removeTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-	
+    public ActionForward removeTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
 	// Remove the theme
 	ThemeForm themeForm = (ThemeForm) form;
 	if (themeForm.getId() != null) {
-	    themeService.removeTheme(themeForm.getId());
+	    ThemeManagementAction.themeService.removeTheme(themeForm.getId());
 	}
 
-	// If it was the default, restore the system default
-	if (Integer.parseInt(themeForm.getType()) == Theme.TYPE_CSS) {
-	    String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-	    if (themeForm.getName().equals(currentTheme)) {
-		Configuration.updateItem(ConfigurationKeys.DEFAULT_HTML_THEME, CSSThemeUtil.DEFAULT_HTML_THEME);
-		getConfiguration().persistUpdate();
-	    }
-	} else {
-	    String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-	    if (themeForm.getName().equals(currentTheme)) {
-		Configuration.updateItem(ConfigurationKeys.DEFAULT_FLASH_THEME, CSSThemeUtil.DEFAULT_FLASH_THEME);
-		getConfiguration().persistUpdate();
-	    }
+	String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
+	if (themeForm.getName().equals(currentTheme)) {
+	    Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, CSSThemeUtil.DEFAULT_HTML_THEME);
+	    getConfiguration().persistUpdate();
 	}
 
 	themeForm.clear();
 	return unspecified(mapping, themeForm, request, response);
     }
 
-    public ActionForward setAsDefault(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward setAsDefault(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	ThemeForm themeForm = (ThemeForm) form;
 	if (themeForm.getName() != null) {
-	    Configuration.updateItem(ConfigurationKeys.DEFAULT_HTML_THEME, themeForm.getName());
+	    Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, themeForm.getName());
 	    getConfiguration().persistUpdate();
 	}
 	themeForm.clear();
@@ -183,11 +156,12 @@ public class ThemeManagementAction extends LamsDispatchAction {
     }
 
     private Configuration getConfiguration() {
-	if (configurationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-	    configurationService = (Configuration) ctx.getBean("configurationService");
+	if (ThemeManagementAction.configurationService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    ThemeManagementAction.configurationService = (Configuration) ctx.getBean("configurationService");
 
 	}
-	return configurationService;
+	return ThemeManagementAction.configurationService;
     }
 }

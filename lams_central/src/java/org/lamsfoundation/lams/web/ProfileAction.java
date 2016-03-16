@@ -95,7 +95,7 @@ public class ProfileAction extends LamsDispatchAction {
     private static ICoreLearnerService learnerService;
 
     private static IThemeService themeService;
-    
+
     private static ITimezoneService timezoneService;
 
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -127,15 +127,15 @@ public class ProfileAction extends LamsDispatchAction {
 	    Integer orgId = lesson.getOrganisationID();
 	    Organisation org = (Organisation) getService().findById(Organisation.class, orgId);
 	    Integer orgTypeId = org.getOrganisationType().getOrganisationTypeId();
-	    IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), "javascript:openLearner("
-		    + lesson.getLessonID() + ")");
+	    IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(),
+		    "javascript:openLearner(" + lesson.getLessonID() + ")");
 	    lessonBean.setId(lesson.getLessonID());
 	    log.debug("Lesson: " + lesson.getLessonName());
 
 	    // insert or update bean if it is a course
 	    if (orgTypeId.equals(OrganisationType.COURSE_TYPE)) {
-		IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId)) ? new IndexOrgBean(org.getOrganisationId(),
-			org.getName(), orgTypeId) : orgBeansMap.get(orgId);
+		IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId))
+			? new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId) : orgBeansMap.get(orgId);
 		orgBean.addLesson(lessonBean);
 		orgBeansMap.put(orgId, orgBean);
 	    } else if (orgTypeId.equals(OrganisationType.CLASS_TYPE)) {
@@ -143,9 +143,10 @@ public class ProfileAction extends LamsDispatchAction {
 		// if it is a class, find existing or create new parent bean
 		Organisation parentOrg = org.getParentOrganisation();
 		Integer parentOrgId = parentOrg.getOrganisationId();
-		IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId)) ? new IndexOrgBean(parentOrg
-			.getOrganisationId(), parentOrg.getName(), OrganisationType.COURSE_TYPE) : orgBeansMap
-			.get(parentOrgId);
+		IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId))
+			? new IndexOrgBean(parentOrg.getOrganisationId(), parentOrg.getName(),
+				OrganisationType.COURSE_TYPE)
+			: orgBeansMap.get(parentOrgId);
 		// create new bean for class, or use existing bean
 		IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId);
 		List<IndexOrgBean> childOrgBeans = parentOrgBean.getChildIndexOrgBeans();
@@ -203,7 +204,7 @@ public class ProfileAction extends LamsDispatchAction {
 
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	
+
 	//some errors may have already been set in ProfileSaveAction
 	ActionMessages errors = (ActionMessages) request.getAttribute(Globals.ERROR_KEY);
 	if (errors == null) {
@@ -236,63 +237,43 @@ public class ProfileAction extends LamsDispatchAction {
 	themeService = getThemeService();
 
 	// Get all the css themes
-	List<Theme> cssThemes = themeService.getAllCSSThemes();
-	request.setAttribute("cssThemes", cssThemes);
+	List<Theme> themes = themeService.getAllThemes();
+	request.setAttribute("themes", themes);
 
 	// Check the user css theme is still installed
-	Long userSelectedCSSTheme = null;
-	if (requestor.getHtmlTheme() != null) {
-	    for (Theme theme : cssThemes) {
-		if (theme.getThemeId() == requestor.getHtmlTheme().getThemeId()) {
-		    userSelectedCSSTheme = theme.getThemeId();
+	Long userSelectedTheme = null;
+	if (requestor.getTheme() != null) {
+	    for (Theme theme : themes) {
+		if (theme.getThemeId() == requestor.getTheme().getThemeId()) {
+		    userSelectedTheme = theme.getThemeId();
 		    break;
 		}
 	    }
 	}
 	// if still null, use the default
-	if (userSelectedCSSTheme == null) {
-	    userSelectedCSSTheme = themeService.getDefaultCSSTheme().getThemeId();
+	if (userSelectedTheme == null) {
+	    userSelectedTheme = themeService.getDefaultTheme().getThemeId();
 	}
-	userForm.set("userCSSTheme", userSelectedCSSTheme);
+	userForm.set("userTheme", userSelectedTheme);
 
-	// Get all the flash themes
-	List<Theme> flashThemes = themeService.getAllFlashThemes();
-	request.setAttribute("flashThemes", flashThemes);
-
-	// Check the user flash theme is still installed
-	Long userSelectedFlashTheme = null;
-	if (requestor.getHtmlTheme() != null) {
-	    for (Theme theme : flashThemes) {
-		if (theme.getThemeId() == requestor.getFlashTheme().getThemeId()) {
-		    userSelectedFlashTheme = theme.getThemeId();
-		    break;
-		}
-	    }
+	List<Timezone> availableTimeZones = getTimezoneService().getDefaultTimezones();
+	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
+	for (Timezone availableTimeZone : availableTimeZones) {
+	    String timezoneId = availableTimeZone.getTimezoneId();
+	    TimezoneDTO timezoneDto = new TimezoneDTO();
+	    timezoneDto.setTimeZoneId(timezoneId);
+	    timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
+	    timezoneDtos.add(timezoneDto);
 	}
-	// if still null, use the default
-	if (userSelectedFlashTheme == null) {
-	    userSelectedFlashTheme = themeService.getDefaultFlashTheme().getThemeId();
-	}
-	userForm.set("userFlashTheme", userSelectedFlashTheme);
-
-        List<Timezone> availableTimeZones = getTimezoneService().getDefaultTimezones();
-        TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
-        for (Timezone availableTimeZone : availableTimeZones) {
-            String timezoneId = availableTimeZone.getTimezoneId();
-            TimezoneDTO timezoneDto = new TimezoneDTO();
-            timezoneDto.setTimeZoneId(timezoneId);
-            timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
-            timezoneDtos.add(timezoneDto);
-        }
-        request.setAttribute("timezoneDtos", timezoneDtos);
+	request.setAttribute("timezoneDtos", timezoneDtos);
 
 	return mapping.findForward("edit");
     }
 
     private IUserManagementService getService() {
 	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    service = (IUserManagementService) ctx.getBean("userManagementService");
 	    locales = getService().findAll(SupportedLocale.class);
 	    Collections.sort(locales);
@@ -302,8 +283,8 @@ public class ProfileAction extends LamsDispatchAction {
 
     private ICoreLearnerService getLearnerService() {
 	if (learnerService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
 	}
 	return learnerService;
@@ -311,19 +292,19 @@ public class ProfileAction extends LamsDispatchAction {
 
     private IThemeService getThemeService() {
 	if (themeService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    themeService = (IThemeService) ctx.getBean("themeService");
 	}
 	return themeService;
     }
-    
+
     private ITimezoneService getTimezoneService() {
 	if (timezoneService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
 	}
 	return timezoneService;
-    }    
+    }
 }

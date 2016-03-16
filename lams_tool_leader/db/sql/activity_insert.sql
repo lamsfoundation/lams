@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lalead11/images/icon_leaderselection.swf'
+, 'tool/lalead11/images/icon_leaderselection.svg'
 , NULL
 , NULL
 , NULL

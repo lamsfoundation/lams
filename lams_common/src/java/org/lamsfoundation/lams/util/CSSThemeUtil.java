@@ -28,16 +28,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+import org.lamsfoundation.lams.themes.dto.ThemeDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class CSSThemeUtil {
 
-    // private static Logger log = Logger.getLogger(CSSThemeUtil.class);
     public static String DEFAULT_HTML_THEME = "defaultHTML";
-    public static String DEFAULT_FLASH_THEME = "default";
 
     /**
      * Will return a list of stylesheets for the current user. If the user does not have a specific stylesheet, then the
@@ -63,7 +61,7 @@ public class CSSThemeUtil {
 		// session was invalidated, normal situation so do not show any error
 	    }
 	    if (user != null) {
-		CSSThemeBriefDTO theme = user.getHtmlTheme();
+		ThemeDTO theme = user.getTheme();
 
 		if (theme != null) {
 		    userThemeFound = true;
@@ -78,7 +76,7 @@ public class CSSThemeUtil {
 	// if we haven't got a user theme, we are probably on the login page
 	// so we'd better include the default server theme (if it isn't the LAMS default theme
 	if (!userThemeFound) {
-	    String serverDefaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
+	    String serverDefaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
 	    if ((serverDefaultTheme != null) && !serverDefaultTheme.equals(CSSThemeUtil.DEFAULT_HTML_THEME)) {
 		themeList.add(serverDefaultTheme);
 	    }
@@ -87,14 +85,14 @@ public class CSSThemeUtil {
 	return themeList;
     }
 
-    public static CSSThemeBriefDTO getUserTheme() {
-	CSSThemeBriefDTO theme = null;
+    public static ThemeDTO getUserTheme() {
+	ThemeDTO theme = null;
 
 	HttpSession ss = SessionManager.getSession();
 	if (ss != null) {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if (user != null) {
-		theme = user.getHtmlTheme();
+		theme = user.getTheme();
 	    }
 	}
 

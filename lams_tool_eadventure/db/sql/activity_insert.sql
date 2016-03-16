@@ -70,7 +70,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/eueadv10/images/icon_eAdventure2.swf'
+, 'tool/eueadv10/images/icon_eAdventure2.svg'
 , NULL
 , NULL
 , NULL
