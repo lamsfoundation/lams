@@ -28,7 +28,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="${label.view.groups.title}"/></title>
 		<lams:css/>
 		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping&activityID=${activity.activityId}">
-		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	  </lams:head>
 
 	<body class="stripes">

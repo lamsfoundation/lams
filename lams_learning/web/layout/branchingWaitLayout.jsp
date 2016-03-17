@@ -33,7 +33,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:set var="formAction"><c:out value="${formAction}"/>&amp;force=true</c:set>
 		</c:if>
 		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>${formAction}">
-		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	  </lams:head>
 
 	<body class="stripes">
