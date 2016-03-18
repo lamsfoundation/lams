@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 

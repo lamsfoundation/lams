@@ -23,18 +23,16 @@
 <link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 
 <style media="screen,projection" type="text/css">
-	#content {min-width: 600px;}
 	
 	#container{width: 100%; position: relative; display: inline-block; margin-top: 25px;}
 	#player-block {  clear: both; position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
-	#dummy {padding-top: 52%; /* aspect ratio */}
+	#dummy {padding-top: 82%; /* aspect ratio */}
 	#player-wrap {width: 60%; height: 100%; clear: both; margin-bottom: 20px; background: black;}
-	#player-bottombar {height:50px; width: 60%; margin-top: 15px; margin-bottom: 10px;}
+	#player-bottombar {height:50px; margin-top: 15px; margin-bottom: 10px;}
 	
-	#comments-area { padding: 5px 0 20px; min-width: 431px; width: 60%;}
-	#comments-table {border-spacing: 3px; margin-top: 0; padding-right: 3px;}
-	#comment-textarea textarea {width: 99%;}
-	#comment-textarea input {margin-top: 2px;}
+	#comment-textarea textarea {
+		margin-bottom: 4px;
+	}
 	.rating-stars-div {min-height: 50px; padding-right: 0;}
 	.rating-stars-caption { text-align: left; padding-left: 30px; }
 	.rating-stars-disabled-small {padding: 2px 5px;}
@@ -43,7 +41,7 @@
 	.comment-by-text {color: #8E8E8E;}
 	.item-hidden {background: #FFB3B3!important;}
 
-	#player-sidebar {position: absolute; top: 0; right: 0; width: 40%; height: 100%;}
+	#player-sidebar { height: 100%; margin-top: 25px;}
 	#player-sidebar ul {overflow: auto; clear: both; position: relative; list-style: none outside none; margin-left: 15px; margin-right: 0; min-width: 242px; height: 100%;}
 	#player-sidebar ul li:hover {background-color:#D0D0D0;cursor:pointer}
 	#player-sidebar ul li:hover .jRatingColor, #player-sidebar ul li:hover .jStar, .item-hidden .jRatingColor, .item-hidden .jStar {opacity: 0.3;}
@@ -56,7 +54,6 @@
 	.thumb-text {color: #666;}
 </style>	
 
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/instantedit.js"></script>
 <script type="text/javascript">
@@ -129,7 +126,7 @@
 			function(data) {
 				
 				//replace item-hide span
-				var itemHideText = '<span class="float-right align-right item-hide-management">';
+				var itemHideText = '<span class="pull-right text-right item-hide-management">';
 				if (toHide) {
 					$("#previewItem" + itemUid).addClass("item-hidden");
 					itemHideText += '<div class="thumb-text"><fmt:message key="label.video.is.hidden" /></div>' +
@@ -211,25 +208,22 @@
 
 </script>
 
-<div id="content">
-	<h1>
-		<c:out value="${kaltura.title}" escapeXml="true"/>
-	</h1>
+<lams:Page type="learner" title="${kaltura.title}">
 
-	<p>
+	<div class="panel">
 		<c:out value="${kaltura.instructions}" escapeXml="false"/>
-	</p>
+	</div>
 
 	<c:if test="${not empty sessionMap.submissionDeadline}">
-		 <div class="info">
+		<lams:Alert id="submission-deadline" type="info" close="true">
 		 	<fmt:message key="authoring.info.teacher.set.restriction" >
 		 		<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 		 	</fmt:message>
-		 </div>
+		</lams:Alert>
 	</c:if>
 
 	<c:if test="${kaltura.lockOnFinished and mode == 'learner'}">
-		<div class="info">
+		<lams:Alert type="danger" id="lock-on-finish" close="false">
 			<c:choose>
 				<c:when test="${sessionMap.userFinished}">
 					<fmt:message key="message.activityLocked" />
@@ -238,15 +232,15 @@
 					<fmt:message key="message.warnLockOnFinish" />
 				</c:otherwise>
 			</c:choose>
-		</div>
+		</lams:Alert>
 	</c:if>
 	
-	<div id="container">
-		<div id="dummy"></div>
-	
-		<div id="player-block">
+	<div class="col-xs-12 col-sm-7">
 			
-			<div id="player-wrap">
+		<div id="container">	
+			<div id="dummy"></div>
+	
+			<div id="player-block" >
 			    
 				<div id="kplayer">
 					<object height="100%" width="100%">
@@ -255,172 +249,172 @@
 				</div>
 					
 			</div>
-			    
-			<div id="player-sidebar">
-			    <ul>
-			    	<c:forEach var="previewItem" items="${sessionMap.items}" varStatus="status">
-			    		<li id="previewItem${previewItem.uid}" <c:if test="${previewItem.hidden}"> class="item-hidden" </c:if>>
-			    			<a href="<c:url value='/learning.do'/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${previewItem.uid}" class="review-item-link">
-			    				<span class="thumb-wrap">
-							        <img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${previewItem.entryId}/width/100!/height/68!" height="68" width="100" alt="Video">
-							        <em></em>
-							        <span class="duration">
-							        	<fmt:formatDate value="${previewItem.durationDate}" pattern="m:ss" />
-									</span>
-							    </span>
-							    <span class="thumb-title"><c:out value="${previewItem.title}" escapeXml="true"/></span>
-							    
-							    <span class="thumb-stat">
-							    	<c:choose>
-										<c:when test="${empty previewItem.createdBy}">
-											<c:set var="videoAuthor" >
-												<fmt:message key="label.uploaded.by.instructor" />
-											</c:set>
-										</c:when>
-										<c:otherwise>
-											<c:set var="videoAuthor" >
-												<c:out value="${previewItem.createdBy.firstName} ${previewItem.createdBy.lastName}" escapeXml="true"/>
-											</c:set>
-										</c:otherwise>
-									</c:choose>
-									
-							        <fmt:message key="label.uploaded.by" >
-							        	<fmt:param><c:out value="${videoAuthor}" escapeXml="true"/></fmt:param>
-							        </fmt:message>
-							    </span>
-							    
-							    <c:if test="${kaltura.allowRatings}">
-								    <span class="thumb-stat">
-								    	<span class="float-left"><fmt:message key="label.rating" /></span>
-								        <div class="rating-stars-disabled-small" data-average="${previewItem.averageRatingDto.rating}" data-id="${previewItem.uid}"></div>
-									</span>
-								</c:if>
-							    
-							    <c:if test="${kaltura.allowComments && (not empty previewItem.groupComments)}">
-								    <span class="thumb-stat">
-								        <fmt:message key="label.number.of.comments" >
-								        	<fmt:param>${fn:length(previewItem.groupComments)}</fmt:param>
-								    	</fmt:message>
-									</span>
-								</c:if>
-							</a>
-							
-							<c:if test="${sessionMap.isGroupMonitoring}">
-							    <span class="float-right align-right item-hide-management">
-								   	<c:choose>
-										<c:when test="${previewItem.hidden}">
-											<div class="thumb-text">
-												<fmt:message key="label.video.is.hidden" />
-											</div>
-											
-											<a href="#nogo" onclick="return hideItem(${previewItem.uid}, false);">
-								       			<fmt:message key="label.unhide" />
-							    			</a>
-										</c:when>
-										<c:otherwise>
-											<a href="#nogo" onclick="return hideItem(${previewItem.uid}, true);">
-								       			<fmt:message key="label.hide" />
-								   			</a>
-										</c:otherwise>
-									</c:choose>
-								</span>							
-							</c:if>
-							
-			    		</li>
-			    	</c:forEach>
-				</ul>
-			</div>
 		</div>
-		
-	</div>
-	
-	<div id="player-bottombar">
-		
-		<%--"Check for new" and "Add new image" buttons---------------%>
-	
-		<div id="add-new-item">
-			<c:if test="${sessionMap.isAllowUpload && (not finishedLock)}">
-				<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=570&width=740&modal=true" class="button-add-item thickbox">  
-					<fmt:message key="label.learning.add.new.image" />
-				</a>
-			</c:if>
 			
-			<c:if test="${sessionMap.isGroupMonitoring}">
-				<fmt:message key="label.mark" />
-				 
-				<c:choose>
-					<c:when test="${item.mark == null}">
-						<c:set var="itemMark" value="0"/>	
-					</c:when>
-					<c:otherwise>
-						<c:set var="itemMark" value="${item.mark}"/>			
-					</c:otherwise>
-				</c:choose>
-				<span id="itemMark">${itemMark}</span>
+		<div id="player-bottombar">
+			
+			<%--"Check for new" and "Add new image" buttons---------------%>
+		
+			<div id="add-new-item">
+				<c:if test="${sessionMap.isAllowUpload && (not finishedLock)}">
+					<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=570&width=740&modal=true" class="btn btn-sm btn-default thickbox">  
+						<fmt:message key="label.learning.add.new.image" />
+					</a>
+				</c:if>
 				
-				<sup><a href="javascript:;" id="editItemMark"><fmt:message key="label.mark.edit" /></a></sup>
+				<c:if test="${sessionMap.isGroupMonitoring}">
+					<fmt:message key="label.mark" />
+					 
+					<c:choose>
+						<c:when test="${item.mark == null}">
+							<c:set var="itemMark" value="0"/>	
+						</c:when>
+						<c:otherwise>
+							<c:set var="itemMark" value="${item.mark}"/>			
+						</c:otherwise>
+					</c:choose>
+					<span id="itemMark">${itemMark}</span>
+					
+					<sup><a href="javascript:;" id="editItemMark"><fmt:message key="label.mark.edit" /></a></sup>
+				</c:if>
+			</div>
+		
+			<!--  Rating stars -->
+		
+			<c:if test="${kaltura.allowRatings && (item.uid != -1)}">
+				<%@ include file="/pages/learning/ratingStars.jsp"%>
 			</c:if>
 		</div>
-	
-		<!--  Rating stars -->
-	
-		<c:if test="${kaltura.allowRatings && (item.uid != -1)}">
-			<%@ include file="/pages/learning/ratingStars.jsp"%>
-		</c:if>
-	</div>
 	    	
-    <%--Comments area----------------------------------------------%>	
-    	
-    <c:if test="${kaltura.allowComments && (item.uid != -1)}">
-	    <div id="comments-area">
-	    	<%@ include file="/pages/learning/commentlist.jsp"%>
-	    </div>
-    </c:if>
+	    <%--Comments area----------------------------------------------%>	
+	    	
+	    <c:if test="${kaltura.allowComments && (item.uid != -1)}">
+		    <div id="comments-area" class="clearfix">
+		    	<%@ include file="/pages/learning/commentlist.jsp"%>
+		    </div>
+	    </c:if>
+			    
+	</div>
+		
+	<div id="player-sidebar" class="col-xs-12 col-sm-5">
+		<ul>
+			<c:forEach var="previewItem" items="${sessionMap.items}" varStatus="status">
+				<li id="previewItem${previewItem.uid}" <c:if test="${previewItem.hidden}"> class="item-hidden" </c:if>>
+					<a href="<c:url value='/learning.do'/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${previewItem.uid}" class="review-item-link">
+						<span class="thumb-wrap">
+							<img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${previewItem.entryId}/width/100!/height/68!" height="68" width="100" alt="Video">
+							<em></em>
+							<span class="duration">
+								<fmt:formatDate value="${previewItem.durationDate}" pattern="m:ss" />
+							</span>
+						</span>
+						<span class="thumb-title"><c:out value="${previewItem.title}" escapeXml="true"/></span>
+							    
+						<span class="thumb-stat">
+						   	<c:choose>
+								<c:when test="${empty previewItem.createdBy}">
+									<c:set var="videoAuthor" >
+										<fmt:message key="label.uploaded.by.instructor" />
+									</c:set>
+								</c:when>
+								<c:otherwise>
+									<c:set var="videoAuthor" >
+										<c:out value="${previewItem.createdBy.firstName} ${previewItem.createdBy.lastName}" escapeXml="true"/>
+									</c:set>
+								</c:otherwise>
+							</c:choose>
+									
+							<fmt:message key="label.uploaded.by" >
+						    	<fmt:param><c:out value="${videoAuthor}" escapeXml="true"/></fmt:param>
+						    </fmt:message>
+						</span>
+							    
+						<c:if test="${kaltura.allowRatings}">
+						    <span class="thumb-stat">
+						    	<span class="pull-left"><fmt:message key="label.rating" /></span>
+						        <div class="rating-stars-disabled-small" data-average="${previewItem.averageRatingDto.rating}" data-id="${previewItem.uid}"></div>
+							</span>
+						</c:if>
+							    
+						<c:if test="${kaltura.allowComments && (not empty previewItem.groupComments)}">
+							<span class="thumb-stat">
+								<fmt:message key="label.number.of.comments" >
+									<fmt:param>${fn:length(previewItem.groupComments)}</fmt:param>
+								</fmt:message>
+							</span>
+						</c:if>
+					</a>
+							
+					<c:if test="${sessionMap.isGroupMonitoring}">
+					    <span class="pull-right text-right item-hide-management">
+						   	<c:choose>
+								<c:when test="${previewItem.hidden}">
+									<div class="thumb-text">
+										<fmt:message key="label.video.is.hidden" />
+									</div>
+											
+									<a href="#nogo" onclick="return hideItem(${previewItem.uid}, false);">
+						       			<fmt:message key="label.unhide" />
+					    			</a>
+								</c:when>
+								<c:otherwise>
+									<a href="#nogo" onclick="return hideItem(${previewItem.uid}, true);">
+						       			<fmt:message key="label.hide" />
+						   			</a>
+								</c:otherwise>
+							</c:choose>
+						</span>							
+					</c:if>
+							
+			   	</li>
+		 	</c:forEach>
+		</ul>
+	</div>	
 
 	<%--Reflection--------------------------------------------------%>
 
 	<c:if test="${sessionMap.userFinished && sessionMap.reflectOn && !sessionMap.isGroupMonitoring}">
-		<div class="small-space-top">
-			<h2>
-				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-			</h2>
-
-			<c:choose>
-				<c:when test="${empty sessionMap.reflectEntry}">
-					<p>
-						<em> 
-							<fmt:message key="message.no.reflection.available" />
-						</em>
-					</p>
-				</c:when>
-				<c:otherwise>
-					<p>
-						<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-					</p>
-				</c:otherwise>
-			</c:choose>
-
-			<c:if test="${mode != 'teacher'}">
-				<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
-					<fmt:message key="label.edit" />
-				</html:button>
-			</c:if>
+		<div class="col-xs-12 col-sm-12 ">
+			<div class="panel panel-default voffset10">
+				<div class="panel-heading panel-title">
+					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
+				</div>
+	
+				<div class="panel-body">
+					<c:choose>
+						<c:when test="${empty sessionMap.reflectEntry}">
+							<em> 
+								<fmt:message key="message.no.reflection.available" />
+							</em>
+						</c:when>
+						<c:otherwise>
+							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+						</c:otherwise>
+					</c:choose>
+				</div>
+	
+				<c:if test="${mode != 'teacher'}">
+					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default pull-left">
+						<fmt:message key="label.edit" />
+					</html:button>
+				</c:if>
+			</div>
 		</div>
 	</c:if>
 	
 	<%--Bottom buttons-------------------------------------------%>
 
 	<c:if test="${mode != 'teacher'}">
-		<div class="space-bottom-top align-right" >
+		<div class="voffset10 pull-right" style="clear:both;">
 			<c:choose>
 				<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button" >
+					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary" >
 						<fmt:message key="label.continue" />
 					</html:button>
 				</c:when>
 				<c:otherwise>
-					<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishActivity()" styleClass="button" >
-						<span class="nextActivity">
+					<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishActivity()" styleClass="btn btn-primary pull-right" >
+						<span class="na">
 							<c:choose>
 			 					<c:when test="${sessionMap.activityPosition.last}">
 			 						<fmt:message key="button.submit" />
@@ -436,4 +430,4 @@
 		</div>
 	</c:if>
 	
-</div>
+</lams:Page>

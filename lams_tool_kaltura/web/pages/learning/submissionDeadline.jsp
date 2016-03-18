@@ -12,43 +12,38 @@
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
-    function submitForm(methodName){
+    function submitForm(methodName) {
     	var f = document.getElementById('messageForm');
     	f.submit();
     }
 </script>
 
-<div id="content">
-	<h1>
-		<c:out value="${kaltura.title}" escapeXml="true"/>
-	</h1>
+<lams:Page type="learner" title="${kaltura.title}">
 
-	<div class="warning">
+	<lams:Alert id="submission-deadline" type="danger" close="false">
 		<fmt:message key="authoring.info.teacher.set.restriction" >
 			<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 		</fmt:message>	
-	</div>
+	</lams:Alert>
 	
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 			<html:hidden property="dispatch" value="finishActivity" />
 			<html:hidden property="sessionMapID" value="${sessionMapID}"/>
 
-			<div align="right" class="space-bottom-top">
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="nextActivity">
-						<c:choose>
-		 					<c:when test="${sessionMap.activityPosition.last}">
-		 						<fmt:message key="button.submit" />
-		 					</c:when>
-		 					<c:otherwise>
-		 		 				<fmt:message key="button.finish" />
-		 					</c:otherwise>
-		 				</c:choose>
-		 			</span>
-				</html:link>
-			</div>
+			<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right" styleId="finishButton" onclick="submitForm('finish')">
+				<span class="na">
+					<c:choose>
+		 				<c:when test="${sessionMap.activityPosition.last}">
+		 					<fmt:message key="button.submit" />
+		 				</c:when>
+		 				<c:otherwise>
+		 	 				<fmt:message key="button.finish" />
+		 				</c:otherwise>
+		 			</c:choose>
+		 		</span>
+			</html:link>
 		</html:form>
 	</c:if>
-</div>
+</lams:Page>
 

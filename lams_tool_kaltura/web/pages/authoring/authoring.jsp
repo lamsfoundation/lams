@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <%@ page import="org.lamsfoundation.lams.tool.kaltura.util.KalturaConstants"%>
 
 <html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
