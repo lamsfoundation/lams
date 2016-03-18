@@ -19,7 +19,6 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/kaltura.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 		<script type="text/javascript">
-			<!--
 			//Specify Kaltura settings
 			//kaltura server 
 			var KALTURA_SERVER = "${KALTURA_SERVER}";
@@ -158,32 +157,23 @@
 				}
 			}
 		
-			// -->
 		</script>
 	</lams:head>
 
+	<c:set scope="request" var="title">
+		<fmt:message key="label.authoring.basic.video"/>
+	</c:set>
 	<body class="stripes">
-		<div id="content">
-
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.video"/>
-			</div>
+		<lams:Page type="learner" title="${title}">
 						
-			<div id="kcwHolder" style="margin-left: -20px;">		
+			<div id="kcwHolder">	
 				<div id="kcw"></div>
 			</div>
 			
-			<div  style="margin-top: 40px">
-				<lams:ImgButtonWrapper>
-					<a href="#nogo" onclick="return closeThickbox();" onmousedown="self.focus();" class="button space-left float-right" name="goback">
-						<fmt:message key="label.close" /> 
-					</a>
-				</lams:ImgButtonWrapper>
-			</div>
-		</div>
-		
-		<div id="footer">
-		</div>
+			<a href="#nogo" onclick="return closeThickbox();" onmousedown="self.focus();" class="btn btn-sm btn-default voffset10 pull-right">
+				<fmt:message key="label.close" /> 
+			</a>
+		</lams:Page>
 		
 	</body>
 </lams:html>

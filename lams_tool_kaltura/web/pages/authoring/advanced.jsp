@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script lang="javascript">
@@ -21,9 +20,7 @@
 			$("#learnerContributionLimit").prop("disabled", true);
 		</c:if>
 	});
-
 </script>
-
 
 <!-- ========== Advanced Tab ========== -->
 

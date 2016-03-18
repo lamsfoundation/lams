@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<p>
+<lams:Alert id="errorMessages" type="danger" close="false">
 	${requestScope.message};
-</p>
+</lams:Alert>

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
+
 <lams:html>
 <lams:head>
 	<lams:css style="core" />
