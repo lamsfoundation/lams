@@ -19,7 +19,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-<%-- Wheter to display the vertical or horizontal view. --%>
+<%-- Whether to display the vertical or horizontal view. --%>
 <c:set var="horizontal" value="${sessionMap.learningView=='horizontal'}" />
 <c:if test="${empty isIE}">
 	<%-- Some elements are displayed differently depending on the browser. --%>
@@ -46,90 +46,57 @@
 </c:if>
 
 <c:if test='${includeMode=="learning"}'>
-	<table>
-		<tr>
-			<td>
-			<h1><c:out value="${daco.title}" escapeXml="true"/></h1>
-			</td>
-		</tr>
-		<tr>
-			<td><c:out value="${daco.instructions}" escapeXml="false"/></td>
-		</tr>
-	</table>
+<div class="voffset10">
+<div class="panel">
+	<c:out value="${daco.instructions}" escapeXml="false"/>
+</div>
+</div>
 </c:if>
 
 <c:choose>
 	<c:when test="${ empty recordList}">
-		<p class="hint">
-			 <fmt:message key="label.learning.heading.norecords" />
-		</p>
+		<lams:Alert type="info">
+			<fmt:message key="label.learning.heading.norecords" />
+		</lams:Alert>
 	</c:when>
 	<c:otherwise>
 
-		<p class="hint" style="margin-left: 17px; font-weight: bold;">
-			<fmt:message key="label.learning.heading.recordcount" />: ${fn:length(recordList)}
-		</p>
+			<h4><fmt:message key="label.learning.heading.recordcount" />: ${fn:length(recordList)}</h4>
 
-		<c:choose>
+			<c:choose>
 			<c:when test="${horizontal}">
-				<%-- Horizontal view creates a table with question list and one large cell where iframe with records is displayed --%>
-				<table cellspacing="0" class="alternative-color" id="recordListTable">
-					<tr>
-						<th><fmt:message key="label.learning.tableheader.questions" /></th>
-						<th><fmt:message key="label.learning.tableheader.records" /></th>
-					</tr>
-					<tr>
-					<td class="fixedCellHeight" style="width: 160px"><fmt:message key="label.learning.tableheader.recordnumber" /></td>
-					<td rowspan="${fn:length(daco.dacoQuestions) + 2}" style="padding: 0px; height: 100%;">
-						<%-- Link that displayes the horizontal record list --%>
-						<c:url var="showRecordsUrl" value='/learning/diplayHorizontalRecordList.do'>
-							<c:param name="sessionMapID" value="${sessionMapID}" />
-							<c:if test="${includeMode=='monitoring'}">
-								<c:param name="userId" value="${user.userId}" />
-							</c:if>
-							<c:param name="includeMode" value="${includeMode}" />
-						</c:url>
-						<iframe id="${elementIdPrefix}horizontalRecordListFrame"
-								onLoad="javascript:resizeHorizontalRecordListFrame('${elementIdPrefix}',${fn:length(daco.dacoQuestions)});"
-								style="width: 100%;" frameborder="0" scrolling="auto" src="${showRecordsUrl}"></iframe>
-					</td>
-					
-					</tr>
-						<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
-							<tr>
-								<td class="fixedCellHeight" style="width: 160px">
-									<div class="bigNumber">${questionStatus.index+1}</div>
-									<c:out value="${question.description}" escapeXml="false"/>
-								</td>	
-							</tr>
-						</c:forEach>
-				</table>
-			</c:when>
+				<%-- Link that displays the horizontal record list --%>
+				<c:url var="showRecordsUrl" value='/learning/diplayHorizontalRecordList.do'>
+					<c:param name="sessionMapID" value="${sessionMapID}" />
+					<c:if test="${includeMode=='monitoring'}">
+						<c:param name="userId" value="${user.userId}" />
+					</c:if>
+					<c:param name="includeMode" value="${includeMode}" />
+				</c:url>
+				<div id="${elementIdPrefix}horizontalRecordListFrame"></div>
+				<script type="text/javascript">
+				 	$("#${elementIdPrefix}horizontalRecordListFrame").load("${showRecordsUrl}");
+			    </script>
+<%-- 				<iframe id="${elementIdPrefix}horizontalRecordListFrame"
+						onLoad="javascript:resizeHorizontalRecordListFrame('${elementIdPrefix}',${fn:length(daco.dacoQuestions)});"
+						style="width: 100%;" frameborder="0" scrolling="auto" src="${showRecordsUrl}"></iframe>
+ --%>			</c:when>
 			<c:otherwise>
 				<%-- Vertical view displays records as separate tables of answers. --%>
 				<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
-				<table style="width: 97%">
-					<tr>
-						<td class="hint">
-							<fmt:message key="label.learning.heading.recordnumber" /> ${recordStatus.index+1}
-						</td>
+				<!--  record panel  -->
+				<div class="panel panel-default">
+					<div class="panel-heading panel-title">
+						<fmt:message key="label.learning.heading.recordnumber" />&nbsp;${recordStatus.index+1}
 						<c:if test='${includeMode=="learning" and not finishedLock}'>
 						<%-- If the record can be edited, display these links. --%>
-						<td width="5%">
-							<img src="${tool}includes/images/edit.gif"
-								title="<fmt:message key="label.common.edit" />"
-								onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})" />
-						</td>
-						<td width="5%">
-							<img src="${tool}includes/images/cross.gif"
-								title="<fmt:message key="label.common.delete" />"
-								onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})" />
-						</td>
+							<i class="fa fa-pencil pull-right" title="<fmt:message key="label.common.edit" />"
+										onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})"></i>
+							<i class="fa fa-times  pull-right" title="<fmt:message key="label.common.delete" />"
+										onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})"></i>
 						</c:if>
-					</tr>
-				</table>
-				
-					<table cellspacing="0" class="alternative-color recordList">
+					</div>
+					<table class="table table-striped table-condensed">
 						<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
 							<%-- "Generated" means that the table for a long/lat question was already generated
 								 and the current answer only needs to be filled in in the existing textfield.
@@ -181,20 +148,10 @@
 											<c:out value="${question.description}" escapeXml="false"/>
 											<c:choose>
 												<c:when test="${question.type==1}">
-													<input type="text" size="72" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
+													<input type="text" size="60" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
 												</c:when>
 												<c:when test="${question.type==2}">
-													<textarea  cols="55" 
-														<c:choose>
-															<c:when test="${isIE}">															
-																rows="3"
-															</c:when>
-															<c:otherwise>
-																<%-- In Firefox 2 rows are displayed as 3 rows (!) --%>
-																rows="2"
-															</c:otherwise>
-														</c:choose>
-													 readonly="readonly">${answer.answer}</textarea>
+													<textarea  cols="60" rows="3" readonly="readonly">${answer.answer}</textarea>
 												</c:when>
 												<c:when test="${question.type==3}">
 													<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
@@ -220,7 +177,7 @@
 															<fmt:message key="label.learning.file.notuploaded" />
 														</c:when>
 														<c:otherwise>
-															<fmt:message key="label.learning.file.uploaded" />
+															<fmt:message key="label.learning.file.uploaded" />&nbsp;
 															<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
 														</c:otherwise>
 													</c:choose>
@@ -243,7 +200,7 @@
 														<c:otherwise>
 															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 																<c:if test="${status.index+1==answer.answer}">
-																	<fmt:message key="label.learning.dropdown.selected" /> <c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																	<fmt:message key="label.learning.dropdown.selected" />&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
 																</c:if>
 															</c:forEach>
 														</c:otherwise>
@@ -299,9 +256,10 @@
 							</c:forEach>
 						</c:forEach>
 					</table>
+				</div> <!--  1end record panel -->
 				</c:forEach>
 			</c:otherwise>
-		</c:choose>
-	</c:otherwise>
+		</c:choose> <!--  end vertical/horizontal -->
+	</c:otherwise> 
 </c:choose>
 </div>

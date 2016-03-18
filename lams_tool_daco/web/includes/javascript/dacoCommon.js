@@ -30,9 +30,13 @@
 	}
 	
 	function resizeHorizontalRecordListFrame(elementIdPrefix,questionListLength){
-		
+
 		var horizontalRecordListFrame = document.getElementById(elementIdPrefix+'horizontalRecordListFrame');
-		if (horizontalRecordListFrame!=null){
-			horizontalRecordListFrame.style.height=((questionListLength+1)*111)+'px';
-		}
+	    var doc = horizontalRecordListFrame.contentDocument? horizontalRecordListFrame.contentDocument : horizontalRecordListFrame.contentWindow.document;
+        var body = doc.body;
+        var html = doc.documentElement;
+        var height = Math.max( body.scrollHeight, body.offsetHeight, 
+            html.clientHeight, html.scrollHeight, html.offsetHeight );
+        horizontalRecordListFrame.style.height = height + 60 + "px";
 	}
+		

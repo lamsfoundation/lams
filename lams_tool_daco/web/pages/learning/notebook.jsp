@@ -20,27 +20,24 @@
                 f.submit();
         }
 </script>
+
+	<lams:Page type="learner" title="${daco.title}">
+
 	<html:form action="/learning/submitReflection" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;" styleId="messageForm">
 		<html:hidden property="userId" />
 		<html:hidden property="sessionId" />
 		<html:hidden property="sessionMapID" />
 		
-		<div id="content">
-			<h1>
-				<c:out value="${daco.title}" escapeXml="true"/>
-			</h1>
-
 			<%@ include file="/common/messages.jsp"%>
 
 			<p>
 				<lams:out value="${daco.reflectInstructions}" escapeHtml="true" />
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area" />
+			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+				<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
@@ -55,10 +52,19 @@
 			</div>
 		</div>
 	</html:form>
-
+	
 	<div id="footer">
 	</div>
 	<!--closes footer-->
 
+	</lams:Page>
+
 </body>
 </lams:html>
+
+<script type="text/javascript">
+	window.onload = function() {
+		document.getElementById("focused").focus();
+	}
+</script>
+

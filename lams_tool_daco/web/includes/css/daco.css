@@ -41,54 +41,17 @@ div.message img.icon {
 .hint {
 	font-style: italic;
 }
-table.recordList { /* delimeter for records in a vertical record list */
-	border-bottom: thin black solid;
-}
-
-
 form#recordForm input, form#recordForm textarea, form#recordForm select{
 	margin-top: 6px;
-}
-.button-add-div { /* makes a "div" properly padded in tabbed environment */
-	padding-left: 30px;
 }
 div.bigNumber{
 	font-weight: bold;
 	font-size: larger;
 	padding-top: 5px;
 }
-table#horizontalListTable {
-	margin: 0px;
-	padding: 0px;
-	height: 100%;
-}
-
-table#horizontalListTable td { /* delimeter for records in a horizontal record list */
-	border-left: 1px black solid;
-}
-
-table#recordListTable td.fixedCellHeight, table#horizontalListTable td.fixedCellHeight  {
-	/* cells must have the same height, otherwise they will be incorrectly aligned in horizontal record list*/
-	padding-left: 20px;
-	height: 90px;
-	vertical-align: middle;
-}
-
-table#horizontalListTable td#lastHorizontalQuestion{
-	/* cell with the last question in a record list is smaller because of the horizontal scrollbar */
-	padding-left: 20px;
-	height: 75px;
-	vertical-align: middle;
-}
-
-form#recordForm table.alternative-color-inner-table td, table.recordList table.alternative-color-inner-table td,
-table#horizontalListTable table.alternative-color-inner-table td,  table#summaryTable table.alternative-color-inner-table td{
-	/* makes the table-within-table plain, instead of repeating the style */
-	margin: 0px;
-	padding: 0px;
-	border: none;
-	background: transparent;
-	vertical-align: middle;
+table#summaryTable table.alternative-color-inner-table{
+	/* centers the table in the outer table column */
+	margin: auto
 }
 
 table#summaryTable td.singleSummaryCell {
@@ -96,17 +59,11 @@ table#summaryTable td.singleSummaryCell {
 	text-align: center;
 }
 
+table#summaryTable th.singleSummaryCell {
+	vertical-align: middle;
+	text-align: center;
+}
+
 table#recordListTable td.fixedCellWidth{
 	width: 160px;
-}
-
-td.button-cell{
-	height: 30px;
-	padding-top: 30px;
-}
-
-.nextActivity {
-	padding: 0px 20px 0px 0px; 
-	background: url('../images/next.png') no-repeat;
-	background-position: right;
 }
