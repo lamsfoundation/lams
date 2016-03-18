@@ -23,25 +23,27 @@
 
 
 <c:if test='${includeMode=="learning"}'>
-	<table>
-		<tr>
-			<td>
-			<h1><c:out value="${daco.title}" escapeXml="true"/></h1>
-			</td>
-		</tr>
-		<tr>
-			<td><c:out value="${daco.instructions}" escapeXml="false"/></td>
-		</tr>
-	</table>
+<div class="voffset10">
+<div class="panel">
+	<c:out value="${daco.instructions}" escapeXml="false"/>
+</div>
+</div>
 </c:if>
-<table cellspacing="0" class="alternative-color" id="summaryTable">
-	<tr>
-		<th><fmt:message key="label.learning.tableheader.questions" /></th>
-		<th colspan="2"><fmt:message key="label.learning.tableheader.summary" /></th>
-	</tr>
-	<tr>
+
+<!--  summary panel  -->
+<div class="panel panel-default">
+<div class="panel-heading panel-title">
+	<fmt:message key="label.learning.tableheader.questions" />
+</div>
+
+<table class="table table-striped table-condensed" id="summaryTable">
+	<tr class="active">
 		<th></th>
-		<th>
+		<th colspan="2" class="singleSummaryCell"><fmt:message key="label.learning.tableheader.summary" /></th>
+	</tr>
+	<tr class="active">
+		<th></th>
+		<th class="singleSummaryCell">
 		<c:choose>
 			<c:when test="${empty userFullName}">
 				<fmt:message key="label.learning.tableheader.summary.learner" />
@@ -53,7 +55,7 @@
 		</th>
 		<th><fmt:message key="label.learning.tableheader.summary.group" /></th>
 	</tr>
-	<tr>
+	<tr class="active">
 		<td>
 			<fmt:message key="label.learning.heading.recordcount" />
 		</td>
@@ -222,9 +224,11 @@
 		</tr>
 	</c:forEach>
 </table>
+</div> <!--  end summary panel -->
+
 <c:if test='${includeMode=="learning"}'>
 	<p>
-		<a href="#" class="button" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')"><fmt:message key="label.common.summary.refresh" /></a>
+		<a href="#" class="btn btn-default" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')"><fmt:message key="label.common.summary.refresh" /></a>
 	</p>
 </c:if>
 </div>

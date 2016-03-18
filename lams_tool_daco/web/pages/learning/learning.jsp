@@ -6,8 +6,8 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
+	<%@ include file="/common/header.jsp"%>
 	
-	<%@ include file="/common/tabbedheader.jsp"%>
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	</c:if>
@@ -41,50 +41,66 @@
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
 </lams:head>
 
-<body class="stripes" onLoad="init()" id="body">
-<div id="page">
-<h1><fmt:message key="label.learning.title" /></h1>
-<div id="header">
+<body class="stripes" id="body">
+<!-- <body class="stripes" onLoad="init()">
+<c:set var="title"><fmt:message key="label.learning.title" /></c:set>
+-->
+<lams:Page type="learner" title="${daco.title}">
+
+<span class="pull-right voffset5">
+<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="learning" />
+
+<%-- To switch between the vertical/horizontal view --%>
+<c:choose>
+	<c:when test="${sessionMap.learningView=='horizontal'}">
+	<i class="fa fa-ellipsis-h" title="<fmt:message key="label.common.view.change" />"
+	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
+	</c:when>
+	<c:otherwise>
+	<i class="fa fa-ellipsis-v" title="<fmt:message key="label.common.view.change" />"
+	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
+	</c:otherwise>
+</c:choose>
+</span>
+
+<%-- <div id="header">
 <lams:Tabs useKey="true" control="true">
 	<lams:Tab id="1" key="label.learning.heading.add" />
 	<lams:Tab id="2" key="label.learning.heading.list" />
 	<lams:Tab id="3" key="label.learning.heading.summary" />
 </lams:Tabs></div>
-
-<div id="content">
-<%-- To switch between the vertical/horizontal view --%>
-<div style="float: right; margin-left: 10px; padding-top: 4px" class="help">
-	<img src="${tool}includes/images/uparrow.gif" title="<fmt:message key="label.common.view.change" />"
-	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" />
-</div>
-
-<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="learning" />
-
-<c:if test="${daco.lockOnFinished and mode != 'teacher'}">
-	<div class="info"><c:choose>
-		<c:when test="${sessionMap.userFinished}">
-			<fmt:message key="message.learning.activityLocked" />
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="message.learning.warnLockOnFinish" />
-		</c:otherwise>
-	</c:choose></div>
-</c:if>
-
 <lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
 <lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
 <lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
-		
+ --%>
+
+<!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#add" aria-controls="add" role="tab" data-toggle="tab">
+    		<fmt:message key="label.learning.heading.add"/></a></li>
+    <li role="presentation"><a href="#list" aria-controls="list" role="tab" data-toggle="tab">
+			<fmt:message key="label.learning.heading.list"/></a></li>
+    <li role="presentation"><a href="#summary" aria-controls="summary" role="tab" data-toggle="tab">
+    		<fmt:message key="label.learning.heading.summary"/></a></li>
+  </ul>
+
+<!-- Tab panes -->
+  	<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="add"><jsp:include page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}"/></div>
+    <div role="tabpanel" class="tab-pane" id="list"><jsp:include page="listRecords.jsp?includeMode=learning"/></div>
+    <div role="tabpanel" class="tab-pane" id="summary"><jsp:include page="questionSummaries.jsp"/></div>
+  </div> 
+
+
 <c:if test="${mode != 'teacher'}">
-	<div class="space-top align-right space-right" style="padding-right: 20px;">
 		<c:choose>
 			<c:when test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
-				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="button">
+				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="btn btn-default voffset5 pull-right">
 					<fmt:message key="label.learning.continue" />
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="javascript:finishSession()" styleClass="button">
+				<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="javascript:finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
@@ -98,12 +114,12 @@
 				</html:link>
 			</c:otherwise>
 		</c:choose>
-	</div>
 </c:if>
 
-</div>
+</div> 
 
 <div id="footer"></div>
-<!-- end page div --></div>
+</lams:Page>
+
 </body>
 </lams:html>

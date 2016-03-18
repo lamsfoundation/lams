@@ -13,27 +13,43 @@
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
+<div class="voffset10">
+<c:if test="${daco.lockOnFinished and mode != 'teacher'}">
+	<lams:Alert id="activityLocked" type="danger" close="false">
+		<c:choose>
+			<c:when test="${sessionMap.userFinished}">
+				<fmt:message key="message.learning.activityLocked" />
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="message.learning.warnLockOnFinish" />
+			</c:otherwise>
+		</c:choose>
+	</lams:Alert>
+</c:if>
+
 <%@ include file="/common/messages.jsp"%>
 <%-- The status of the last add/edit operation. --%>
 <c:if test="${recordOperationSuccess=='add'}">
-	<div class="info"><fmt:message key="message.learning.addrecordsuccess" /></div>
+	<lams:Alert id="addrecordsuccess" type="info" close="true">
+		<fmt:message key="message.learning.addrecordsuccess" />
+	</lams:Alert>
 </c:if>
 <c:if test="${recordOperationSuccess=='edit'}">
-	<div class="info"><fmt:message key="message.learning.editrecordsuccess" /></div>
+	<lams:Alert id="addrecordsuccess" type="info" close="true">
+		<fmt:message key="message.learning.editrecordsuccess" />
+	</lams:Alert>
 </c:if>
-<table>
-	<tr>
-		<td>
-		<h1><c:out value="${daco.title}" escapeXml="true"/></h1>
-		</td>
-	</tr>
-	<tr>
-		<td><c:out value="${daco.instructions}" escapeXml="false"/></td>
-	</tr>
-</table>
+
+<div class="panel">
+	<c:out value="${daco.instructions}" escapeXml="false"/>
+</div>
+</div>
+
 <c:if test="${not finishedLock }">
 
-	<p class="hint">
+<!--  record panel  -->
+<div class="panel panel-default">
+	<div class="panel-heading panel-title">
 		<fmt:message key="label.learning.heading.recordnumber" />
 		<span id="displayedRecordNumberSpan" class="hint">
 			${displayedRecordNumber}
@@ -50,7 +66,8 @@
 				</fmt:message>
 			</c:if>
 		</span>
-	</p>
+	</div>
+
 	<!-- Form to add/edit a record -->
 	<html:form action="learning/saveOrUpdateRecord" method="post" styleId="recordForm" enctype="multipart/form-data">
 	
@@ -60,7 +77,7 @@
 	<html:hidden property="sessionMapID" value="${sessionMapID}" />
 	<html:hidden styleId="displayedRecordNumber" property="displayedRecordNumber" value="${displayedRecordNumber}" />
 	
-		<table cellspacing="0" class="alternative-color">
+		<table cellspacing="0" class="table table-striped">
 			<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
 				<tr>
 					<td>
@@ -91,7 +108,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:textarea property="answer[${answerIndex}]" cols="50" rows="3" />
+							<html:textarea property="answer[${answerIndex}]" cols="60" rows="3" />
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==3}"><%-- Number --%>
@@ -118,11 +135,11 @@
 								</td><td style="vertical-align: middle;">
 							</c:if>
 							<label><fmt:message key="label.learning.date.day" /></label>
-							<html:text property="answer[${answerIndex}]" size="3" />
+							<html:text property="answer[${answerIndex}]" size="3" />&nbsp;
 							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 							<label><fmt:message key="label.learning.date.month" /></label>
-							<html:text property="answer[${answerIndex}]" size="3" />
+							<html:text property="answer[${answerIndex}]" size="3" />&nbsp;
 							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 							<label><fmt:message key="label.learning.date.year" /></label>
@@ -153,7 +170,7 @@
 							</c:if>
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 							<%-- It displays for example A) instead of 1) --%>
-							${fn:substring(ordinal,status.index,status.index+1)}) <html:radio property="answer[${answerIndex}]" value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></html:radio><br />
+							${fn:substring(ordinal,status.index,status.index+1)}) <html:radio property="answer[${answerIndex}]" value="${status.index+1}">&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></html:radio><br />
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
@@ -218,38 +235,42 @@
 				</tr>
 			</c:forEach>
 		</table>
-		<div class="button-add-div">
-		<lams:ImgButtonWrapper>
-			<a href="#" onclick="javascript:saveOrUpdateRecord()" class="button-add-item"><fmt:message key="label.learning.add" />
-			</a>
-		</lams:ImgButtonWrapper>
-		</div>
+
+		<a href="#" onclick="javascript:saveOrUpdateRecord()" class="btn btn-sm btn-default voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></a>
 	</html:form>
-</c:if>
-<c:if test="${sessionMap.userFinished and daco.reflectOnActivity}">
-	<%-- Buttons that either move onto the next activity or display the reflection screen --%>
-	<p class="small-space-top">
-		<h2><fmt:message key="label.export.reflection.heading" /></h2>
-		<p style="padding-left: 20px;">
-		  <strong><lams:out escapeHtml="true" value="${daco.reflectInstructions}"/></strong>
-		</p>
-		<div class="button-add-div">
-			<c:choose>
-				<c:when test="${empty sessionMap.reflectEntry}">
-					<em><fmt:message key="message.no.reflection.available" /></em>
-				</c:when>
-				<c:otherwise>
-					<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-				</c:otherwise>
-			</c:choose>
-		</div>
-		<c:if test="${mode != 'teacher'}">
-			<div class="small-space-top" style="padding-left: 20px;">
-			<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="button space-left">
-				<fmt:message key="label.common.edit" />
-			</html:button>
-			</div>
-		</c:if>
-	</p>
-</c:if>
 </div>
+<!--  end record panel -->
+</c:if>
+
+<!-- Reflection -->
+<c:if test="${sessionMap.userFinished and daco.reflectOnActivity}">
+	<div class="panel panel-default">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.export.reflection.heading" />
+		</div>
+		<div class="panel-body">
+			<div class="reflectionInstructions">
+				<lams:out value="${daco.reflectInstructions}" escapeHtml="true" />
+			</div>
+			<div class="panel">
+				<c:choose>
+					<c:when test="${empty sessionMap.reflectEntry}">
+						<em><fmt:message key="message.no.reflection.available" /></em>
+					</c:when>
+					<c:otherwise>
+						<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+					</c:otherwise>
+				</c:choose>
+			</div>
+
+			<c:if test="${mode != 'teacher'}">
+				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="btn btn-default pull-left">
+					<fmt:message key="label.common.edit" />
+				</html:button>
+			</c:if>
+		</div>
+	</div>
+</c:if>
+<!-- End Reflection -->
+
+</div> <!-- End addRecordDiv -->

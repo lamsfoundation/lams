@@ -10,12 +10,15 @@
 </lams:head>
 
 <body class="stripes">
-	<div id="content">
-		<h1>
-			<fmt:message key="activity.title" />
-		</h1>
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Page type="learner" title="${title}">
 		<lams:DefineLater />
-	</div>
-	<div id="footer"></div>
+	</lams:Page>
 </body>
 </lams:html>
+
+
+
+
+
+

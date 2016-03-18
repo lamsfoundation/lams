@@ -68,20 +68,14 @@
 	}
 	
 	function editRecord (sessionMapID, recordIndex){
-		var param = "sessionMapID="+sessionMapID+"&recordIndex="+recordIndex+"&reqID="+((new Date()).getTime());
-	    new Ajax.Updater(
-		    	"addRecordDiv",
-		    	editRecordUrl,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete: function(){
-		    			readHiddenFormValues();
-		    			doSelectTab(1);
-		    		},
-		    		evalScripts:true
-		    	}
-	    );
+		var param = {"sessionMapID":sessionMapID,"recordIndex":recordIndex,"reqID":((new Date()).getTime())};
+		$( "#addRecordDiv" ).load( 
+			editRecordUrl, 
+			param, 
+			function() {
+				readHiddenFormValues();
+		//		doSelectTab(1);
+			});
 	}
 	
 	function clearVisibleFormElements (formName,protectedFormElementNames){
@@ -113,63 +107,42 @@
 	
 	function removeRecord(sessionMapID, recordIndex){
  		var displayedRecordNumber = document.getElementById("displayedRecordNumber").value;
-	   	var param = "sessionMapID="+sessionMapID+"&recordIndex="+recordIndex+"&displayedRecordNumber="+displayedRecordNumber+"&reqID="+((new Date()).getTime());    
-	    new Ajax.Updater(
-		    	"recordListDiv",
-		    	removeRecordUrl,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete: function(){
-		    			if (displayedRecordNumber==recordIndex){
-		    				clearVisibleFormElements("recordForm",["sessionMapID","displayedRecordNumber"]);
-	    					displayedRecordNumber = parseInt(recordListLength);
-	    					recordListLength--;
-	    				}
-	    				else if (displayedRecordNumber > recordIndex){
-	    					displayedRecordNumber--;
-	    				}
-						document.getElementById("displayedRecordNumber").value=displayedRecordNumber;
-	    				document.getElementById("displayedRecordNumberSpan").innerHTML=displayedRecordNumber;
-	    				refreshQuestionSummaries(sessionMapID);
-		    		},
-		    		evalScripts:true
-		    	}
-	    );
+		var param = {"sessionMapID":sessionMapID,"recordIndex":recordIndex,"displayedRecordNumber":displayedRecordNumber,"reqID":((new Date()).getTime())};
+		$( "#recordListDiv" ).load( 
+			removeRecordUrl, 
+			param, 
+			function() {
+    			if (displayedRecordNumber==recordIndex){
+    				clearVisibleFormElements("recordForm",["sessionMapID","displayedRecordNumber"]);
+					displayedRecordNumber = parseInt(recordListLength);
+					recordListLength--;
+				}
+				else if (displayedRecordNumber > recordIndex){
+					displayedRecordNumber--;
+				}
+				document.getElementById("displayedRecordNumber").value=displayedRecordNumber;
+				document.getElementById("displayedRecordNumberSpan").innerHTML=displayedRecordNumber;
+				refreshQuestionSummaries(sessionMapID);
+			});
 	}
 	
 	function changeView(sessionMapID,displayedRecordNumber){
-	   	var param = "sessionMapID="+sessionMapID+"&reqID="+((new Date()).getTime())+"&displayedRecordNumber="+displayedRecordNumber
-   					+"&learningCurrentTab="+currentTab;
+		var param = {"sessionMapID":sessionMapID,"learningCurrentTab":currentTab,"displayedRecordNumber":displayedRecordNumber,"reqID":((new Date()).getTime())};
 	   	var previousCurrentTab = currentTab;
-	    new Ajax.Updater(
-	    		"body",
-		    	changeViewUrl,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete: function(){
-		    			var tabNumber = 1;
-		    			while (document.getElementById("tabbody"+tabNumber)!=null){
-		    				doSelectTab(tabNumber++);
-		    			}
-		    			doSelectTab(previousCurrentTab);
-		    		},
-		    		evalScripts: true
-		    	}
-	    );
+		$( "#body" ).load( 
+				changeViewUrl, 
+				param, 
+				function() {
+	    			var tabNumber = 1;
+	 //   			while (document.getElementById("tabbody"+tabNumber)!=null){
+	//    				doSelectTab(tabNumber++);
+	   // 			}
+	    	//		doSelectTab(previousCurrentTab);
+				});			
 	}
 	
 
 	function refreshQuestionSummaries(sessionMapID){
-		var param = "sessionMapID="+sessionMapID+"&reqID="+((new Date()).getTime());
-	    new Ajax.Updater(
-		    	"questionSummariesDiv",
-		    	refreshQuestionSummariesUrl,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		evalScripts:true
-		    	}
-	    );
+		var param = {"sessionMapID":sessionMapID,"reqID":((new Date()).getTime())};
+		$( "#questionSummariesDiv" ).load( refreshQuestionSummariesUrl, param);
 	}

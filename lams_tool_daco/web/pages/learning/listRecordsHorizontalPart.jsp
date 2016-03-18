@@ -4,7 +4,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/prototype.js"></script>
 	<%@ include file="/common/header.jsp"%>
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
@@ -18,7 +17,7 @@
 	<%-- It contains users info divided into sessions. --%>
 	<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
 
-	<lams:css style="main" />
+	<lams:css/>
 	<%-- To enable the table to have maximum height.  --%>
 	<style type="text/css">
 		html,body {
@@ -49,10 +48,15 @@
 		</c:otherwise>
 	</c:choose>
 
-	<table id="horizontalListTable" class="alternative-color" cellspacing="0">
-		<%-- Each column is one record. This is pure data - header was done in the including page.  --%>
+	<div class="table-responsive">
+	<table id="horizontalListTable" class="table table-striped table-condensed table-bordered">
 		<tr>
-			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
+			<th><fmt:message key="label.learning.tableheader.questions" /></th>
+			<th colspan="${fn:length(recordList)}"><fmt:message key="label.learning.tableheader.records" /></th>
+		</tr>
+		<tr>
+			<td class="fixedCellHeight" width="320px"><fmt:message key="label.learning.tableheader.recordnumber" /></td>
+ 			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
 				<td class="fixedCellHeight">
 					<div class="bigNumber" style="float: left; margin-right: 30px;">
 						${recordStatus.index+1}
@@ -60,21 +64,21 @@
 					<c:if test='${includeMode=="learning" and not finishedLock}'>
 						<div >
 						<%-- If the record can be edited, display these links. --%>
-						<img src="${tool}includes/images/edit.gif"
-								title="<fmt:message key="label.common.edit" />"
-								onclick="javascript:parent.editRecord('${sessionMapID}',${recordStatus.index+1})" />
-						<img src="${tool}includes/images/cross.gif"
-								title="<fmt:message key="label.common.delete" />"
-								onclick="javascript:parent.removeRecord('${sessionMapID}',${recordStatus.index+1})" />
+						<i class="fa fa-pencil pull-right" title="<fmt:message key="label.common.edit" />"
+									onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})"></i>
+						<i class="fa fa-times  pull-right" title="<fmt:message key="label.common.delete" />"
+									onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})"></i>
 						</div>
 					</c:if>
-					<div  style="width: 320px;">
-					</div>
 				</td>
 			</c:forEach>
 		</tr>
 		<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">	
 		<tr>
+			<td class="fixedCellHeight" style="width: 160px">
+				<div class="bigNumber">${questionStatus.index+1}</div>
+				<c:out value="${question.description}" escapeXml="false"/>
+			</td>	
 			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
 			<%-- For comments on the structure, see "learning/listRecords.jsp" --%>
 				<c:set var="generated" value="false" />
@@ -156,13 +160,13 @@
 											<c:when test="${question.type==3}">
 												<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
 											</c:when>
-											<c:when test="${question.type==4}">
-												<c:set var="date">
+ 											<c:when test="${question.type==4}">
+<%-- 												<c:set var="date">
 													<c:if test="${not empty answer.answer}">
 														<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
 													</c:if>
 												</c:set>
-												<input type="text" size="20" readonly="readonly" value="${date}" />
+ --%>												<input type="text" size="20" readonly="readonly" value="${date}" />
 											</c:when>
 											<c:when test="${question.type==5 || question.type==6}">
 												<c:choose>
@@ -267,5 +271,6 @@
 			</tr>
 		</c:forEach>
 	</table>
+	</div>
 </body>
 </lams:html>
