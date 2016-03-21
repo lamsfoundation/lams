@@ -174,9 +174,13 @@
 			</lams:Page>
 			<%
 				// invalidate session so a new user can be logged in
-							SessionManager.removeSession(((UserDTO) SessionManager
-									.getSession().getAttribute("user")).getLogin(),
-									true);
+				HttpSession hs = SessionManager.getSession();
+				if (hs != null) {
+					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
+					if (userDTO != null) {
+						SessionManager.removeSession(userDTO.getLogin(), true);
+					}
+				}
 			%>
 			<script type="text/javascript">
 				// submit the hidden form
