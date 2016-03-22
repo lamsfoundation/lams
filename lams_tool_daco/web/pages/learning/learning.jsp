@@ -41,7 +41,7 @@
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
 </lams:head>
 
-<body class="stripes" id="body">
+<body class="stripes" id="body" onLoad="init()">
 <!-- <body class="stripes" onLoad="init()">
 <c:set var="title"><fmt:message key="label.learning.title" /></c:set>
 -->
@@ -63,34 +63,16 @@
 </c:choose>
 </span>
 
-<%-- <div id="header">
 <lams:Tabs useKey="true" control="true">
 	<lams:Tab id="1" key="label.learning.heading.add" />
 	<lams:Tab id="2" key="label.learning.heading.list" />
 	<lams:Tab id="3" key="label.learning.heading.summary" />
-</lams:Tabs></div>
-<lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
-<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
-<lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
- --%>
-
-<!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#add" aria-controls="add" role="tab" data-toggle="tab">
-    		<fmt:message key="label.learning.heading.add"/></a></li>
-    <li role="presentation"><a href="#list" aria-controls="list" role="tab" data-toggle="tab">
-			<fmt:message key="label.learning.heading.list"/></a></li>
-    <li role="presentation"><a href="#summary" aria-controls="summary" role="tab" data-toggle="tab">
-    		<fmt:message key="label.learning.heading.summary"/></a></li>
-  </ul>
-
-<!-- Tab panes -->
-  	<div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="add"><jsp:include page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}"/></div>
-    <div role="tabpanel" class="tab-pane" id="list"><jsp:include page="listRecords.jsp?includeMode=learning"/></div>
-    <div role="tabpanel" class="tab-pane" id="summary"><jsp:include page="questionSummaries.jsp"/></div>
-  </div> 
-
+</lams:Tabs>
+<lams:TabBodys>
+	<lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
+	<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
+	<lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
+</lams:TabBodys>
 
 <c:if test="${mode != 'teacher'}">
 		<c:choose>

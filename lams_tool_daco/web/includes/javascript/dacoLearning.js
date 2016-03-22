@@ -4,6 +4,7 @@
     }
         
     function doSelectTab(tabId) {
+    	alert("Selecting tab "+tabId);
 	  selectTab(tabId);
 	  currentTab = tabId;
     }
@@ -74,7 +75,7 @@
 			param, 
 			function() {
 				readHiddenFormValues();
-		//		doSelectTab(1);
+				doSelectTab(1);
 			});
 	}
 	
@@ -134,10 +135,10 @@
 				param, 
 				function() {
 	    			var tabNumber = 1;
-	 //   			while (document.getElementById("tabbody"+tabNumber)!=null){
-	//    				doSelectTab(tabNumber++);
-	   // 			}
-	    	//		doSelectTab(previousCurrentTab);
+	    			while (document.getElementById("tabbody"+tabNumber)!=null){
+	    				doSelectTab(tabNumber++);
+	    			}
+	    			doSelectTab(previousCurrentTab);
 				});			
 	}
 	
