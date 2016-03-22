@@ -58,8 +58,11 @@
 		<html:hidden property="contentFolderID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 
+		<span class="pull-right voffset5">
 		<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="authoring"/>
-
+		</span>
+		
+		<lams:TabBodys>
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.description" page="basic.jsp" />
 			<!-- end of content (Basic) -->
@@ -67,6 +70,7 @@
 			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.authoring.heading.advanced.description" page="advanced.jsp" />
 			<!-- end of content (Advanced) -->
+		</lams:TabBodys>
 
 			<!-- Button Row -->
 			<%--  Default value 

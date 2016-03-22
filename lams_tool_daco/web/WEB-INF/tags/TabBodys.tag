@@ -22,25 +22,16 @@
  */
 
 /**
- * Tabs.tag
- *	Author: Mitchell Seaton
- *	Description: Create a tab list from a input collection or nested Tab tags.
+ * TabBodys.tag
+ *	Author: Fiona Malikoff
+ *	Description: Create a tabbody list from nested TabBody tags.
  * Wiki: 
  */
 
 		%>
 <%@ tag body-content="scriptless"%>
-<%@ attribute name="collection" type="java.util.Collection" required="false" rtexprvalue="true"%>
-<%@ attribute name="control" required="false" rtexprvalue="true"%>
-<%@ attribute name="useKey" required="false" rtexprvalue="true"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<c:set var="dControl" value="false" scope="request" />
-<c:if test="${control}">
-	<c:set var="dControl" value="${control}" scope="request" />
-</c:if>
 
-<!-- tab holder table -->
-<ul class="nav nav-tabs" role="tablist">
+<!-- tab body holder table -->
+<div class="tab-content">
 	<jsp:doBody />
-</ul>
+</div>
