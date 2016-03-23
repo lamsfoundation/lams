@@ -67,7 +67,6 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_daco/build.xml"          target="_clean-dirs" inheritAll="false"/>
-		<ant antfile="../lams_tool_eadventure/build.xml"    target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_forum/build.xml"         target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_gmap/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_images/build.xml"        target="_clean-dirs" inheritAll="false"/>
@@ -85,11 +84,14 @@
 		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_survey/build.xml"        target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_task/build.xml"          target="_clean-dirs" inheritAll="false"/>
-		<ant antfile="../lams_tool_videorecorder/build.xml" target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="_clean-dirs" inheritAll="false"/>
-       	<ant antfile="../lams_tool_wookie/build.xml"    	target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_kaltura/build.xml"       target="_clean-dirs" inheritAll="false"/>
+		<!-- 
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="_clean-dirs" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="_clean-dirs" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="_clean-dirs" inheritAll="false"/>
+		-->
 	</target>
 	
 	
@@ -107,7 +109,6 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_daco/build.xml"          target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_tool_eadventure/build.xml"    target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_forum/build.xml"         target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_gmap/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_images/build.xml"        target="copy-tags" inheritAll="false"/>
@@ -126,11 +127,14 @@
 		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_survey/build.xml"        target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_task/build.xml"          target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_tool_videorecorder/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="copy-tags" inheritAll="false"/>
-        	<ant antfile="../lams_tool_wookie/build.xml"    target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_kaltura/build.xml"       target="copy-tags" inheritAll="false"/>
+		<!-- 
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="copy-tags" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="copy-tags" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="copy-tags" inheritAll="false"/>
+		-->
 		<echo>MANUALLY COPY TAGS TO UNLISTED PROJECTS:
 			  Kaltura and other public and private tools</echo>
 	</target>
@@ -281,7 +285,6 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_chat/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_daco/build.xml"          target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_eadventure/build.xml"    target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_forum/build.xml"         target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_images/build.xml"        target="deploy-tool" inheritAll="false" />
@@ -300,11 +303,14 @@
 		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="deploy-tool" inheritAll="false" />
   		<ant antfile="../lams_tool_survey/build.xml"        target="deploy-tool" inheritAll="false" />
   		<ant antfile="../lams_tool_task/build.xml"          target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_vote/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_wiki/build.xml"          target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_wookie/build.xml"        target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_kaltura/build.xml"       target="deploy-tool" inheritAll="false" />
+		<!-- 
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="deploy-tool" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="deploy-tool" inheritAll="false"/>
+		-->
 	</target>
 	
 
@@ -740,7 +746,6 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_chat/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_daco/build.xml"          target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_eadventure/build.xml"    target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_forum/build.xml"         target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_gmap/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_images/build.xml"        target="explode-war" inheritAll="false" />
@@ -759,12 +764,15 @@
 		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="explode-war" inheritAll="false" />
   		<ant antfile="../lams_tool_survey/build.xml"        target="explode-war" inheritAll="false" />
   		<ant antfile="../lams_tool_task/build.xml"          target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_videorecorder/build.xml" target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_vote/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_wiki/build.xml"          target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_wookie/build.xml"        target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_kaltura/build.xml"       target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_mindmap/build.xml"       target="explode-war" inheritAll="false" />
+		<!-- 
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="explode-war" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="explode-war" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="explode-war" inheritAll="false"/>
+		-->
 	</target>
 	
 	
