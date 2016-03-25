@@ -2057,8 +2057,8 @@ GeneralLib = {
 		
 		// -20 so Chrome does not create unnecessary scrollbars when dropping a tool template to canvas
 		// +50 so there is space for rubbish bin
-		width = Math.max(0, width, canvas.width()) - 20;
-		height = Math.max(0, height + (isReadOnlyMode ? 20 : 50), canvas.height()) - 20;
+		width = Math.max(0, width, canvas.width() - 20);
+		height = Math.max(0, height + (isReadOnlyMode ? 20 : 50), canvas.height() - 20);
 		
 		paper.attr({
 			'width'  : width, 

@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.web;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -61,7 +62,6 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -268,7 +268,7 @@ public class HomeAction extends DispatchAction {
     @SuppressWarnings("unchecked")
     public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res)
-		    throws IOException, UserAccessDeniedException, JSONException, RepositoryCheckedException {
+	    throws IOException, UserAccessDeniedException, JSONException, RepositoryCheckedException {
 	UserDTO userDTO = getUser();
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 
@@ -336,7 +336,7 @@ public class HomeAction extends DispatchAction {
      */
     public ActionForward getFolderContents(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res)
-		    throws UserAccessDeniedException, JSONException, IOException, RepositoryCheckedException {
+	    throws UserAccessDeniedException, JSONException, IOException, RepositoryCheckedException {
 	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
 	boolean allowInvalidDesigns = WebUtil.readBooleanParam(req, "allowInvalidDesigns", false);
 	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(folderID,
@@ -350,6 +350,13 @@ public class HomeAction extends DispatchAction {
     public ActionForward getLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws JDOMException, IOException {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+	String imagePath = LearningDesignService.getLearningDesignSVGPath(learningDesignId);
+	File imageFile = new File(imagePath);
+	if (!imageFile.canRead()) {
+	    res.sendError(HttpServletResponse.SC_NOT_FOUND);
+	    return null;
+	}
+
 	boolean download = WebUtil.readBooleanParam(req, "download", false);
 	// should the image be downloaded or a part of page?
 	if (download) {
@@ -363,7 +370,6 @@ public class HomeAction extends DispatchAction {
 	    res.setContentType("image/svg+xml");
 	}
 
-	String imagePath = LearningDesignService.getLearningDesignSVGPath(learningDesignId);
 	FileInputStream input = new FileInputStream(imagePath);
 	OutputStream output = res.getOutputStream();
 	IOUtils.copy(input, output);

@@ -17,6 +17,23 @@ function initLessonTab(){
 		var resized = resizeImage('ldScreenshotAuthor', 477);
 		toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
 				: CANVAS_RESIZE_OPTION_NONE);
+	}).error(function(){
+		// the LD SVG is missing, try to re-generate it
+		var image = $(this),
+			learningDesignID = $(this).data('learningDesignID');
+		
+		// iframe just to load Authoring for a single purpose, generate the SVG
+		$('<iframe />').appendTo('body').load(function(){
+			// call svgGenerator.jsp code to store LD SVG on the server
+			var frame = $(this),
+				win = frame[0].contentWindow || frame[0].contentDocument;
+			win.GeneralLib.saveLearningDesignImage();
+			frame.remove();
+			// load the image again, avoid caching
+			image.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_t=' + new Date().getTime());
+		}).attr('src', LAMS_URL 
+					   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+					   + learningDesignID);
 	});
 	
 	// generate LD initial tree; folderContents is declared in newLesson.jsp
@@ -61,8 +78,11 @@ function initLessonTab(){
 		$('.ldChoiceDependentCanvasElement').css('display', 'none');
 		if (event.node.highlightState == 0) {
 			$('#ldScreenshotLoading').css('display', 'inline');
-			$('#ldScreenshotAuthor').attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
-			$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
+			$('#ldScreenshotAuthor').data('learningDesignID', event.node.data.learningDesignId)
+									.attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId 
+																	   + '&_t=' + new Date().getTime())
+									.css('width', 'auto')
+									.css('height', 'auto');
 		} else {
 			toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
 		}

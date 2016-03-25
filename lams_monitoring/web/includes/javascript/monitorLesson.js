@@ -6,7 +6,7 @@ var originalSequenceCanvas = null,
 	flaFormat = false,
 // DIV container for lesson/branching SVG
 // it gets accessed so many times it's worth to cache it here
-	sequenceCanvas = null,
+	sequenceCanvas = $('#sequenceCanvas'),
 // info box show timeout
 	sequenceInfoTimeout = 10000,
 // which learner was selected in the search box
@@ -762,30 +762,8 @@ function updateSequenceTab() {
 		// put bottom layer, LD SVG
 		sequenceCanvas.html(originalSequenceCanvas);
 	} else {
-		// fetch SVG just once, since it is immutable
-		$.ajax({
-			dataType : 'text',
-			url : LAMS_URL + 'home.do',
-			async : false,
-			cache : false,
-			data : {
-				'method'    : 'getLearningDesignThumbnail',
-				'ldId'      : ldId
-			},
-			success : function(response) {
-				sequenceCanvasFirstFetch = true;
-				originalSequenceCanvas = response;
-				// store body dimensions before manipulating HTML
-				// otherwise resizing will yield bad results
-				var width = $('body').width(),
-					height = $('body').height();
-				sequenceCanvas = $('#sequenceCanvas')
-					// remove previously set padding and dimensions, if any
-					.removeAttr('style')
-					.html(originalSequenceCanvas);
-				resizeSequenceCanvas(width, height);
-			}
-		});
+		sequenceCanvasFirstFetch = true;
+		loadLearningDesignSVG();
 	}
 	
 	// clear all completed learner icons except the door
@@ -886,6 +864,49 @@ function updateSequenceTab() {
 			});	
 			
 			sequenceRefreshInProgress = false;
+		}
+	});
+}
+
+function loadLearningDesignSVG() {
+	// fetch SVG just once, since it is immutable
+	$.ajax({
+		dataType : 'text',
+		url : LAMS_URL + 'home.do',
+		async : false,
+		cache : false,
+		data : {
+			'method'    : 'getLearningDesignThumbnail',
+			'ldId'      : ldId
+		},
+		success : function(response) {
+			originalSequenceCanvas = response;
+			// store body dimensions before manipulating HTML
+			// otherwise resizing will yield bad results
+			var width = $('body').width(),
+				height = $('body').height();
+			// Remove previously set padding and dimensions, if any.
+			// For some reason sequenceCanvas needs to be assigned again here.
+			sequenceCanvas = $('#sequenceCanvas').removeAttr('style')
+						  						 .html(originalSequenceCanvas);
+			resizeSequenceCanvas(width, height);
+		},
+		error : function(error) {
+			// the LD SVG is missing, try to re-generate it; if it is an another error, fail
+			if (error.status != 404) {
+				return;
+			}
+			// iframe just to load Authoring for a single purpose, generate the SVG
+			$('<iframe />').appendTo('body').load(function(){
+				// call svgGenerator.jsp code to store LD SVG on the server
+				var frame = $(this),
+					win = frame[0].contentWindow || frame[0].contentDocument;
+				win.GeneralLib.saveLearningDesignImage();
+				frame.remove();
+				// load the image again
+				loadLearningDesignSVG();
+			}).attr('src', LAMS_URL 
+						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID=' + ldId);
 		}
 	});
 }
@@ -1363,8 +1384,8 @@ function sequenceClearSearchPhrase(refresh){
 	$('#sequenceSearchedLearnerHighlighter').hide();
 	sequenceSearchedLearner = null;
 	if (refresh) {
-	updateSequenceTab();
-}
+		updateSequenceTab();
+	}
 }
 
 
@@ -1528,9 +1549,8 @@ function openLiveEdit(){
  * Adjusts sequence canvas (SVG) based on space available in the dialog.
  */
 function resizeSequenceCanvas(width, height){
-	var sequenceCanvas = $('#sequenceCanvas'),
-		// can it be done nicer?
-		canvasHeight = height - $('#tabs>ul').height() - $('#sequenceTopButtonsContainer').height()
+	// can the calculation it be done nicer?
+	var canvasHeight = height - $('#tabs>ul').height() - $('#sequenceTopButtonsContainer').height()
 	  				   - Math.min(20, $('#completedLearnersContainer').height()) - 45,
 		canvasWidth = width - 15,
 		svg = $('svg', sequenceCanvas),
