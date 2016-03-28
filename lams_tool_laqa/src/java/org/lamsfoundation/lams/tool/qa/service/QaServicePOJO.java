@@ -185,8 +185,8 @@ public class QaServicePOJO
 
 	    // if response doesn't exist
 	    if (response == null) {
-		response = new QaUsrResp(leaderResponse.getAnswer(), leaderResponse.getAttemptTime(), "", question,
-			user, true);
+		response = new QaUsrResp(leaderResponse.getAnswer(), leaderResponse.getAnswerAutosaved(),
+			leaderResponse.getAttemptTime(), "", question, user, true);
 		createUserResponse(response);
 
 		// if it's been changed by the leader
@@ -312,7 +312,7 @@ public class QaServicePOJO
     }
 
     @Override
-    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder) {
+    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder, boolean isAutosave) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());
@@ -326,12 +326,20 @@ public class QaServicePOJO
 	QaUsrResp response = getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
 	// if response doesn't exist
 	if (response == null) {
-	    response = new QaUsrResp(newAnswer, new Date(System.currentTimeMillis()), "", question, user, true);
+	    response = isAutosave
+		    ? new QaUsrResp(null, newAnswer, new Date(System.currentTimeMillis()), "", question, user, true)
+		    : new QaUsrResp(newAnswer, null, new Date(System.currentTimeMillis()), "", question, user, true);	    
 	    createUserResponse(response);
 
-	    // if answer has changed
+	// if answer has changed
 	} else if (!newAnswer.equals(response.getAnswer())) {
-	    response.setAnswer(newAnswer);
+	    if (isAutosave) {
+		response.setAnswerAutosaved(newAnswer);
+	    } else {
+		response.setAnswer(newAnswer);
+		response.setAnswerAutosaved(null);
+	    }
+	    
 	    response.setAttemptTime(new Date(System.currentTimeMillis()));
 	    response.setTimezone("");
 	    updateUserResponse(response);

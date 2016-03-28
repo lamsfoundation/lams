@@ -157,15 +157,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		Integer questionIndexInteger = new Integer(questionIndex);
 		mapAnswers.put(questionIndexInteger.toString(), answer);
 		mapAnswersPresentable.put(questionIndexInteger.toString(), answer);
-
+		
 		//validate
 		ActionMessages newErrors = validateQuestionAnswer(answer, questionIndexInteger, generalLearnerFlowDTO);
 		errors.add(newErrors);
 
 		// store
 		if (errors.isEmpty()) {
-		    QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID,
-			    new Long(questionIndex));
+		    QaLearningAction.qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(
+			    questionIndex), false);
 		}
 	    }
 
@@ -269,19 +269,19 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		    .intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
 		String newAnswer = request.getParameter("answer" + questionIndex);
 		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID,
-			new Long(questionIndex));
+			new Long(questionIndex), true);
 	    }
 
 	} else {
 	    String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 	    String newAnswer = qaLearningForm.getAnswer();
-	    QaQueContent currentQuestion = QaLearningAction.qaService
-		    .getQuestionByContentAndDisplayOrder(new Long(currentQuestionIndex), qaContent.getUid());
+	    QaQueContent currentQuestion = QaLearningAction.qaService.getQuestionByContentAndDisplayOrder(new Long(
+		    currentQuestionIndex), qaContent.getUid());
 
 	    boolean isRequiredQuestionMissed = currentQuestion.isRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {
-		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID,
-			new Long(currentQuestionIndex));
+		QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(
+			currentQuestionIndex), true);
 	    }
 	}
 	return null;
@@ -329,15 +329,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setRemainingQuestionCount(new Integer(mapQuestions.size()).toString());
 	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
 
-	// populate answers
-	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
-	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO,
-		QaLearningAction.qaService);
-
 	//in order to track whether redo button is pressed store this info
+	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	qaQueUsr.setResponseFinalized(false);
 	QaLearningAction.qaService.updateUser(qaQueUsr);
-
+	
+	// populate answers
+	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO,
+		QaLearningAction.qaService);
+	
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	qaLearningForm.resetAll();
 	return (mapping.findForward(QaAppConstants.LOAD_LEARNER));
@@ -581,11 +581,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	Map<String, String> mapAnswers = (Map<String, String>) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
 	if (mapAnswers == null) {
-	    mapAnswers = new TreeMap(new QaComparator());
+	    mapAnswers = new TreeMap<String, String>(new QaComparator());
 	}
 
 	String newAnswer = qaLearningForm.getAnswer();
-	Map mapSequentialAnswers = (Map) sessionMap.get(QaAppConstants.MAP_SEQUENTIAL_ANSWERS_KEY);
+	Map<String, String> mapSequentialAnswers = (Map<String, String>) sessionMap.get(QaAppConstants.MAP_SEQUENTIAL_ANSWERS_KEY);
 	if (mapSequentialAnswers.size() >= new Integer(currentQuestionIndex).intValue()) {
 	    mapSequentialAnswers.remove(new Long(currentQuestionIndex).toString());
 	}
@@ -603,17 +603,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	// store
 	if (errors.isEmpty()) {
 	    QaLearningAction.qaService.updateResponseWithNewAnswer(newAnswer, qaLearningForm.getToolSessionID(),
-		    new Long(currentQuestionIndex));
+		    new Long(currentQuestionIndex), false);
 	} else {
 	    saveErrors(request, errors);
 	    nextQuestionOffset = 0;
 	}
-
-	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
-	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
-	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	int intCurrentQuestionIndex = new Integer(currentQuestionIndex).intValue() + nextQuestionOffset;
 	String currentAnswer = "";
@@ -636,11 +630,11 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    userFeedback = "End of the questions.";
 	}
 	generalLearnerFlowDTO.setUserFeedback(userFeedback);
-
 	generalLearnerFlowDTO.setRemainingQuestionCount("" + remainingQuestionCount);
 
 	qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
 
+	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	sessionMap.put(QaAppConstants.MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
