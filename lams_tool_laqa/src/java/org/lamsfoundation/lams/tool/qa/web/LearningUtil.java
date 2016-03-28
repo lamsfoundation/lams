@@ -102,7 +102,7 @@ public class LearningUtil implements QaAppConstants {
 	    IQaService qaService) {
 	
 	//create mapAnswers
-	Map<String, String> mapAnswers = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
+	Map<String, String> mapAnswers = (Map<String, String>) sessionMap.get(MAP_ALL_RESULTS_KEY);
 	if (mapAnswers == null) {
 	    mapAnswers = new TreeMap<String, String>(new QaComparator());
 	    
@@ -111,7 +111,15 @@ public class LearningUtil implements QaAppConstants {
 	    for (QaQueContent question : qaContent.getQaQueContents()) {
 		Long questionUid = question.getUid();
 		QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), questionUid);
-		String answer = (response == null) ? null : response.getAnswer();
+		
+		String answer;
+		if (response == null) {
+		    answer = null;
+		} else if (!user.isResponseFinalized() && response.getAnswerAutosaved() != null) {
+		    answer = response.getAnswerAutosaved();
+		} else {
+		    answer = response.getAnswer();
+		}
 		mapAnswersFromDb.put(String.valueOf(question.getDisplayOrder()), answer);
 	    }	    
 	    
