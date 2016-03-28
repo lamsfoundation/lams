@@ -117,7 +117,8 @@
 			window.setInterval(
 				function(){
 					//fire onchange event for lams:textarea
-					$("[id$=__lamstextarea]").change();
+					$("textarea[name$=__textarea]").change();
+					
 					//ajax form submit
 					$('#learningForm').ajaxSubmit({
 						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
