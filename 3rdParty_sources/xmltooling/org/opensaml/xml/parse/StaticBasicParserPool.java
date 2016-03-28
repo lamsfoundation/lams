@@ -23,15 +23,16 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 
-import org.opensaml.xml.Configuration;
 import org.opensaml.xml.util.LazyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,8 +121,8 @@ public class StaticBasicParserPool implements ParserPool {
         builderPool = new Stack<SoftReference<DocumentBuilder>>();
         builderAttributes = new LazyMap<String, Object>();
         coalescing = true;
-        expandEntityReferences = true;
-        builderFeatures = new LazyMap<String, Boolean>();
+        expandEntityReferences = false;
+        builderFeatures = buildDefaultFeatures();
         ignoreComments = true;
         ignoreElementContentWhitespace = true;
         namespaceAware = true;
@@ -177,10 +178,11 @@ public class StaticBasicParserPool implements ParserPool {
         }
 
         if (builder != null) {
+            prepareBuilder(builder);
             return new DocumentBuilderProxy(builder, this);
         }
 
-        return null;
+        throw new XMLParserException("Unable to obtain a DocumentBuilder");
     }
 
     /** {@inheritDoc} */
@@ -222,6 +224,9 @@ public class StaticBasicParserPool implements ParserPool {
         DocumentBuilder builder = getBuilder();
         Document document = builder.newDocument();
         returnBuilder(builder);
+        if (document == null) {
+            throw new XMLParserException("DocumentBuilder returned a null Document");
+        }
         return document;
     }
 
@@ -230,6 +235,9 @@ public class StaticBasicParserPool implements ParserPool {
         DocumentBuilder builder = getBuilder();
         try {
             Document document = builder.parse(input);
+            if (document == null) {
+                throw new XMLParserException("DocumentBuilder parsed a null Document");
+            }
             return document;
         } catch (SAXException e) {
             throw new XMLParserException("Invalid XML", e);
@@ -245,6 +253,9 @@ public class StaticBasicParserPool implements ParserPool {
         DocumentBuilder builder = getBuilder();
         try {
             Document document = builder.parse(new InputSource(input));
+            if (document == null) {
+                throw new XMLParserException("DocumentBuilder parsed a null Document");
+            }
             return document;
         } catch (SAXException e) {
             throw new XMLParserException("Invalid XML", e);
@@ -554,19 +565,48 @@ public class StaticBasicParserPool implements ParserPool {
         try {
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
 
-            if (entityResolver != null) {
-                builder.setEntityResolver(entityResolver);
-            }
-
-            if (errorHandler != null) {
-                builder.setErrorHandler(errorHandler);
-            }
-
             return builder;
         } catch (ParserConfigurationException e) {
             log.error("Unable to create new document builder", e);
             throw new XMLParserException("Unable to create new document builder", e);
         }
+    }
+    
+    /**
+     * Prepare a document builder instance for use, before returning it from a checkout call.
+     * 
+     * @param builder the document builder to prepare
+     */
+    private void prepareBuilder(DocumentBuilder builder) {
+        if (entityResolver != null) {
+            builder.setEntityResolver(entityResolver);
+        }
+        
+        if (errorHandler != null) {
+            builder.setErrorHandler(errorHandler);
+        }
+    }
+    
+    /**
+     * Build the default set of parser features to use.
+     * 
+     * <p>These will be overriden by a call to {@link #setBuilderFeatures(Map)}.</p>
+     * 
+     * <p>
+     * The default features set are:
+     * <ul>
+     * <li>{@link XMLConstants#FEATURE_SECURE_PROCESSING} = true</li>
+     * <li>http://apache.org/xml/features/disallow-doctype-decl = true</li>
+     * </ul>
+     * </p>
+     * 
+     * @return the default features map
+     */
+    protected Map<String, Boolean> buildDefaultFeatures() {
+        HashMap<String, Boolean> features = new HashMap<String, Boolean>();
+        features.put(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        features.put("http://apache.org/xml/features/disallow-doctype-decl", true);
+        return features;
     }
 
     /**

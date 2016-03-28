@@ -51,7 +51,10 @@ public class ClasspathResolver implements EntityResolver, LSResourceResolver {
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
         InputStream resourceStream = resolver(publicId, systemId);
         if (resourceStream != null) {
-            return new InputSource(resourceStream);
+            InputSource is = new InputSource(resourceStream);
+            is.setSystemId(systemId);
+            is.setPublicId(publicId);
+            return is;
         }
 
         return null;

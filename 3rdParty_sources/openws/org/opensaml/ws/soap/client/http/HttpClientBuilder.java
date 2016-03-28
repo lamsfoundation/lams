@@ -79,6 +79,9 @@ public class HttpClientBuilder {
 
     /** Number of times a failed connection to a host should be retried. */
     private int connectionRetryAttempts;
+    
+    /** Amount of time, in milliseconds, to wait for data to be read from a socket, defaults to 90000. */
+    private int socketTimeout;
 
     /** Socket factory used for the 'https' scheme. */
     private SecureProtocolSocketFactory httpsProtocolSocketFactory;
@@ -100,6 +103,7 @@ public class HttpClientBuilder {
         maxConnectionsPerHost = 5;
         maxTotalConnectons = 20;
         connectionRetryAttempts = 0;
+        socketTimeout = 90*1000;
     }
 
     /**
@@ -126,6 +130,8 @@ public class HttpClientBuilder {
         connMgrParams.setReceiveBufferSize(getReceiveBufferSize());
         connMgrParams.setSendBufferSize(getSendBufferSize());
         connMgrParams.setTcpNoDelay(isTcpNoDelay());
+        // Note: this is deliberately an internal default for now.
+        connMgrParams.setSoTimeout(socketTimeout);
 
         MultiThreadedHttpConnectionManager connMgr = new MultiThreadedHttpConnectionManager();
         connMgr.setParams(connMgrParams);

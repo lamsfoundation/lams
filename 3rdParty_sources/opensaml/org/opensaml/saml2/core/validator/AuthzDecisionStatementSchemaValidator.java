@@ -50,7 +50,7 @@ public class AuthzDecisionStatementSchemaValidator implements Validator<AuthzDec
      * @throws ValidationException
      */
     protected void validateResource(AuthzDecisionStatement authzDS) throws ValidationException {
-        if (DatatypeHelper.isEmpty(authzDS.getResource())) {
+        if (authzDS.getResource() == null) {
             throw new ValidationException("Resource required");
         }
     }

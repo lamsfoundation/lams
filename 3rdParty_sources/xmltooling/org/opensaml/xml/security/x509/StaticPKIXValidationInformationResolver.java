@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.opensaml.xml.security.CriteriaSet;
 import org.opensaml.xml.security.SecurityException;
+import org.opensaml.xml.security.criteria.EntityIDCriteria;
 
 /**
  * An implementation of {@link PKIXValidationInformationResolver} which always returns a static, fixed set of
@@ -61,8 +62,13 @@ public class StaticPKIXValidationInformationResolver implements PKIXValidationIn
     /** {@inheritDoc} */
     public Set<String> resolveTrustedNames(CriteriaSet criteriaSet) throws SecurityException,
             UnsupportedOperationException {
-
-        return trustedNames;
+        
+        HashSet<String> temp = new HashSet<String>(trustedNames);
+        EntityIDCriteria entityIDCriteria = criteriaSet.get(EntityIDCriteria.class);
+        if (entityIDCriteria != null) {
+            temp.add(entityIDCriteria.getEntityID());
+        }
+        return temp;
     }
 
     /** {@inheritDoc} */

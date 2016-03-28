@@ -37,7 +37,7 @@ public interface StatusDetail extends SAMLObject, ElementExtensibleXMLObject {
     public final static QName DEFAULT_ELEMENT_NAME = new QName(SAMLConstants.SAML10P_NS, DEFAULT_ELEMENT_LOCAL_NAME, SAMLConstants.SAML1P_PREFIX);
     
     /** Local name of the XSI type */
-    public final static String TYPE_LOCAL_NAME = "StatusDetailype"; 
+    public final static String TYPE_LOCAL_NAME = "StatusDetailType"; 
         
     /** QName of the XSI type */
     public final static QName TYPE_NAME = new QName(SAMLConstants.SAML10P_NS, TYPE_LOCAL_NAME, SAMLConstants.SAML1P_PREFIX);

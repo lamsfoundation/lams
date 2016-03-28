@@ -67,8 +67,18 @@ public class SAMLMDCredentialContext implements CredentialContext {
      * Return the list of {@link EncryptionMethod}'s associated with credential context.
      * 
      * @return a list of SAML metadata encryption method associated with this context
+     * @deprecated due to typo, use {@link #getEncryptionMethods()}.
      */
     public List<EncryptionMethod> getEncryptionMethod() {
+        return getEncryptionMethods();
+    }
+    
+    /**
+     * Return the list of {@link EncryptionMethod}'s associated with credential context.
+     * 
+     * @return a list of SAML metadata encryption method associated with this context
+     */
+    public List<EncryptionMethod> getEncryptionMethods() {
         return encMethods;
     }
 

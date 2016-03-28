@@ -17,14 +17,18 @@
 
 package org.opensaml;
 
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.xml.security.Init;
 import org.opensaml.saml1.binding.artifact.SAML1ArtifactBuilderFactory;
 import org.opensaml.saml2.binding.artifact.SAML2ArtifactBuilderFactory;
+import org.opensaml.ws.soap.client.http.TLSProtocolSocketFactory;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLConfigurator;
 import org.opensaml.xml.parse.StaticBasicParserPool;
 import org.opensaml.xml.parse.XMLParserException;
 import org.opensaml.xml.security.DefaultSecurityConfigurationBootstrap;
+import org.opensaml.xml.security.x509.tls.StrictHostnameVerifier;
 import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +37,10 @@ import org.slf4j.LoggerFactory;
  * This class can be used to bootstrap the OpenSAML library with the default configurations that ship with the library.
  */
 public class DefaultBootstrap {
+    
+    /** System property used to disable global default HTTPS hostname verification in Apache Commons HttpClient. */
+    public static final String SYSPROP_HTTPCLIENT_HTTPS_DISABLE_HOSTNAME_VERIFICATION = 
+            "org.opensaml.httpclient.https.disableHostnameVerification";
 
     /** List of default XMLTooling configuration files. */
     private static String[] xmlToolingConfigs = { 
@@ -98,6 +106,19 @@ public class DefaultBootstrap {
         initializeParserPool();
         
         initializeESAPI();
+        
+        initializeHttpClient();
+    }
+
+    /**
+     *  Initializes the Apache Commons HttpClient library.
+     */
+    protected static void initializeHttpClient() {
+        if (!Boolean.getBoolean(SYSPROP_HTTPCLIENT_HTTPS_DISABLE_HOSTNAME_VERIFICATION)) {
+            ProtocolSocketFactory socketFactory = 
+                    new TLSProtocolSocketFactory(null, null, new StrictHostnameVerifier());
+            Protocol.registerProtocol("https", new Protocol("https", socketFactory, 443));
+        }
     }
 
     /**

@@ -79,7 +79,7 @@ public abstract class StatusResponseTypeSchemaValidator<StatusResponse extends S
     protected void validateVersion(StatusResponse response) throws ValidationException {
         if (response.getVersion() == null)
             throw new ValidationException("Version attribute must not be null");
-        if (response.getVersion().toString() != SAMLVersion.VERSION_20.toString())
+        if (!DatatypeHelper.safeEquals(response.getVersion().toString(), SAMLVersion.VERSION_20.toString()))
             throw new ValidationException("Wrong SAML Version");
     }
     

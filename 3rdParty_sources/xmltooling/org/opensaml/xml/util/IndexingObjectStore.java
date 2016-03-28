@@ -25,20 +25,29 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * This class is used to store instances of objects that may be created independently but are, in face, the same object.
- * For example, {@link org.opensaml.xml.signature.KeyInfo}s contain keys, certs, and CRLs. Multiple unique instances of
+ * <p>
+ * This class is used to store instances of objects that may be created independently but are, in fact, the same object.
+ * For example, KeyInfo XML structures contain keys, certs, and CRLs. Multiple unique instances of
  * a KeyInfo may contain, and separately construct, the exact same cert. KeyInfo could, therefore, create a class-level
  * instance of this object store and put certs within it. In this manner the cert is only sitting in memory once and
  * each KeyInfo simply stores a reference (index) to stored object.
+ * </p>
  * 
+ * <p>
  * This store uses basic reference counting to keep track of how many of the respective objects are pointing to an
- * entry. Adding an object that already exists, as determined by the objects <code>hashCode()</code> method, simply
+ * entry. Adding an object that already exists, as determined by the object's <code>equals()</code> method, simply
  * increments the reference counter. Removing an object decrements the counter. Only when the counter reaches zero is
  * the object actually freed for garbage collection.
+ * </p>
  * 
- * <strong>Note</strong> the instance of an object returned by {@link #get(String)} need not be the same object as 
- * stored via {@link #put(Object)}.  However, their hash codes will be equal.  Therefore this store should never be 
- * used to store objects that produce identical hash codes but are not functionally identical objects.
+ * <p>
+ * <strong>Note:</strong> the instance of an object returned by {@link #get(String)} need not be the same object as 
+ * stored via {@link #put(Object)}.  However, the instances will be equal according to their <code>equals()</code>.
+ * The indexing and storage is based on use of {@link Map}, so the normal caveats related to use of hash-based
+ * collection types apply: if the stored object's <code>hashCode()</code> and <code>equals()</code> methods are 
+ * implemented based on mutable properties of the object, then those object instance's properties should not 
+ * be mutated while the object is stored, otherwise unpredictable behavior will result.
+ * </p>
  * 
  * @param <T> type of object being stored
  */
@@ -50,11 +59,19 @@ public class IndexingObjectStore<T> {
 
     /** Backing object data store. */
     private Map<String, StoredObjectWrapper> objectStore;
+    
+    /** Map of object instances to the index value used to reference them externally. */
+    private Map<T, Integer> indexStore;
+    
+    /** The last index sequence used. */
+    private int lastIndex;
 
     /** Constructor. */
     public IndexingObjectStore() {
         rwLock = new ReentrantReadWriteLock();
         objectStore = new LazyMap<String, StoredObjectWrapper>();
+        indexStore = new LazyMap<T, Integer>();
+        lastIndex = 0;
     }
 
     /** Clears the object store. */
@@ -63,6 +80,7 @@ public class IndexingObjectStore<T> {
         writeLock.lock();
         try {
             objectStore.clear();
+            indexStore.clear();
         } finally {
             writeLock.unlock();
         }
@@ -92,7 +110,13 @@ public class IndexingObjectStore<T> {
      * @return true if the store is empty, false if not
      */
     public boolean isEmpty() {
-        return objectStore.isEmpty();
+        Lock readLock = rwLock.readLock();
+        readLock.lock();
+        try {
+            return objectStore.isEmpty();
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
@@ -111,7 +135,7 @@ public class IndexingObjectStore<T> {
         Lock writeLock = rwLock.writeLock();
         writeLock.lock();
         try {
-            String index = Integer.toString(object.hashCode());
+            String index = getIndex(object);
 
             StoredObjectWrapper objectWrapper = objectStore.get(index);
             if (objectWrapper == null) {
@@ -172,6 +196,7 @@ public class IndexingObjectStore<T> {
                 objectWrapper.decremementReferenceCount();
                 if (objectWrapper.getReferenceCount() == 0) {
                     objectStore.remove(index);
+                    removeIndex(objectWrapper.getObject());
                 }
             }
         } finally {
@@ -186,7 +211,37 @@ public class IndexingObjectStore<T> {
      * @return number of items in the store
      */
     public int size() {
-        return objectStore.size();
+        Lock readLock = rwLock.readLock();
+        readLock.lock();
+        try {
+            return objectStore.size();
+        } finally {
+            readLock.unlock();
+        }
+    }
+    
+    /**
+     * Get the index for the specified object.
+     * 
+     * @param object the target object
+     * @return the object index value
+     */
+    protected String getIndex(T object) {
+        Integer index = indexStore.get(object);
+        if (index == null) {
+            index = ++lastIndex;
+            indexStore.put(object, index);
+        }
+        return index.toString();
+    }
+    
+    /**
+     * Remove the index for the specified object.
+     * 
+     * @param object the target index
+     */
+    protected void removeIndex(T object) {
+        indexStore.remove(object);
     }
 
     /** Wrapper class that keeps track of the reference count for a stored object. */

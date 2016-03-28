@@ -144,6 +144,7 @@ public class DefaultSecurityConfigurationBootstrap {
         // Generator for X509Credentials
         X509KeyInfoGeneratorFactory x509Factory = new X509KeyInfoGeneratorFactory();
         x509Factory.setEmitEntityCertificate(true);
+        x509Factory.setEmitEntityCertificateChain(true);
         
         defaultManager.registerFactory(basicFactory);
         defaultManager.registerFactory(x509Factory);

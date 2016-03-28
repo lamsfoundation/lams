@@ -74,9 +74,9 @@ public class SignatureValidator implements Validator<Signature> {
             throw new ValidationException("Unable to evaluate key against signature", e);
         }
 
-        log.debug("Signature did not validate against the credential's key");
+        log.debug("Signature cryptographic validation not successful");
 
-        throw new ValidationException("Signature did not validate against the credential's key");
+        throw new ValidationException("Signature cryptographic validation not successful");
     }
 
     /**

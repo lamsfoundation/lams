@@ -154,6 +154,8 @@ public class FileBackedHTTPMetadataProvider extends HTTPMetadataProvider {
             return super.fetchMetadata();
         } catch (MetadataProviderException e) {
             if (metadataBackupFile.exists()) {
+                log.warn("Problem reading metadata from remote source, processing existing backup file: {}", 
+                        metadataBackupFile.getAbsolutePath());
                 try {
                     return DatatypeHelper.fileToByteArray(metadataBackupFile);
                 } catch (IOException ioe) {

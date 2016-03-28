@@ -32,24 +32,22 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.ssl.TrustMaterial;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERString;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.util.Arrays;
-import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-import org.opensaml.xml.schema.SchemaBuilder;
 import org.opensaml.xml.security.SecurityException;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.util.DatatypeHelper;
@@ -69,6 +67,9 @@ public class X509Util {
 
     /** Common Name (CN) OID. */
     public static final String CN_OID = "2.5.4.3";
+    
+    /** Subject Key Identifier (SKI) OID. */
+    public static final String SKI_OID = "2.5.29.14";
 
     /** RFC 2459 Other Subject Alt Name type. */
     public static final Integer OTHER_ALT_NAME = new Integer(0);
@@ -136,12 +137,17 @@ public class X509Util {
     }
 
     /**
-     * Gets the commons names that appear within the given distinguished name. The returned list provides the names in
-     * the order they appeared in the DN.
+     * Gets the commons names that appear within the given distinguished name. 
+     * 
+     * <p>
+     * The returned list provides the names in the order they appeared in the DN, according to 
+     * RFC 1779/2253 encoding. In this encoding the "most specific" name would typically appear
+     * in the left-most position, and would appear first in the returned list.
+     * </p>
      * 
      * @param dn the DN to extract the common names from
      * 
-     * @return the common names that appear in the DN in the order they appear or null if the given DN is null
+     * @return the common names that appear in the DN in the order they appear, or null if the given DN is null
      */
     public static List<String> getCommonNames(X500Principal dn) {
         Logger log = getLogger();
@@ -153,33 +159,35 @@ public class X509Util {
         List<String> commonNames = new LinkedList<String>();
         try {
             ASN1InputStream asn1Stream = new ASN1InputStream(dn.getEncoded());
-            DERObject parent = asn1Stream.readObject();
+            ASN1Sequence dnSequence = (ASN1Sequence) asn1Stream.readObject();
 
-            String cn = null;
-            DERObject dnComponent;
-            DERSequence grandChild;
-            DERObjectIdentifier componentId;
-            for (int i = 0; i < ((DERSequence) parent).size(); i++) {
-                dnComponent = ((DERSequence) parent).getObjectAt(i).getDERObject();
-                if (!(dnComponent instanceof DERSet)) {
-                    log.debug("No DN components.");
+            // Walk the DN sequence in reverse order from last to first, so that the CN(s) from the most-specific RDN
+            // are first in the returned list, consistent with RFC 1779/2253 RDN ordering.
+            for (int i = dnSequence.size()-1; i >= 0; i--) {
+                ASN1Primitive rdn = dnSequence.getObjectAt(i).toASN1Primitive();
+                if (!(rdn instanceof ASN1Set)) {
+                    log.debug("DN RDN was not an instance of ASN1Set.");
                     continue;
                 }
+                
+                // Each RDN is an ASN.1 set (note: unordered)
+                ASN1Set rdnSet = (ASN1Set) rdn;
 
-                // Each DN component is a set
-                for (int j = 0; j < ((DERSet) dnComponent).size(); j++) {
-                    grandChild = (DERSequence) ((DERSet) dnComponent).getObjectAt(j).getDERObject();
+                // Walk the attributes within the RDN from first to last, to preserve the ordering of the encoded form.
+                for (int j = 0; j < rdnSet.size(); j++) {
+                    ASN1Sequence attributeTypeAndValue = (ASN1Sequence) rdnSet.getObjectAt(j).toASN1Primitive();
 
-                    if (grandChild.getObjectAt(0) != null
-                            && grandChild.getObjectAt(0).getDERObject() instanceof DERObjectIdentifier) {
-                        componentId = (DERObjectIdentifier) grandChild.getObjectAt(0).getDERObject();
+                    if (attributeTypeAndValue.getObjectAt(0) != null
+                            && attributeTypeAndValue.getObjectAt(0).toASN1Primitive() instanceof ASN1ObjectIdentifier) {
+                        ASN1ObjectIdentifier attributeTypeId = (ASN1ObjectIdentifier) attributeTypeAndValue
+                                .getObjectAt(0).toASN1Primitive();
 
-                        if (CN_OID.equals(componentId.getId())) {
-                            // OK, this dn component is actually a cn attribute
-                            if (grandChild.getObjectAt(1) != null
-                                    && grandChild.getObjectAt(1).getDERObject() instanceof DERString) {
-                                cn = ((DERString) grandChild.getObjectAt(1).getDERObject()).getString();
-                                commonNames.add(cn);
+                        if (CN_OID.equals(attributeTypeId.getId())) {
+                            // OK, this AVA is actually a cn attribute
+                            if (attributeTypeAndValue.getObjectAt(1) != null
+                                    && attributeTypeAndValue.getObjectAt(1).toASN1Primitive() instanceof ASN1String) {
+                                ASN1String cn = (ASN1String) attributeTypeAndValue.getObjectAt(1).toASN1Primitive();
+                                commonNames.add(cn.getString());
                             }
                         }
                     }
@@ -237,7 +245,7 @@ public class X509Util {
     }
 
     /**
-     * Gets the common name components of the issuer and all the subject alt names of a given type.
+     * Gets the common name components of the subject and all the subject alt names of a given type.
      * 
      * @param certificate certificate to extract names from
      * @param altNameTypes type of alt names to extract
@@ -266,15 +274,15 @@ public class X509Util {
      */
     public static byte[] getSubjectKeyIdentifier(X509Certificate certificate) {
         Logger log = getLogger();
-        byte[] derValue = certificate.getExtensionValue(X509Extensions.SubjectKeyIdentifier.getId());
+        byte[] derValue = certificate.getExtensionValue(SKI_OID);
+
         if (derValue == null || derValue.length == 0) {
             return null;
         }
 
-        SubjectKeyIdentifier ski = null;
         try {
-            ski = new SubjectKeyIdentifierStructure(derValue);
-            return ski.getKeyIdentifier();
+            final ASN1Primitive ski = X509ExtensionUtil.fromExtensionValue(derValue);
+            return ((DEROctetString) ski).getOctets();
         } catch (IOException e) {
             log.error("Unable to extract subject key identifier from certificate: ASN.1 parsing failed: " + e);
             return null;
@@ -466,7 +474,13 @@ public class X509Util {
                 || OTHER_ALT_NAME.equals(nameType)) {
 
             // these have no defined representation, just return a DER-encoded byte[]
-            return ((DERObject) nameValue).getDEREncoded();
+            try {
+                return ((ASN1Primitive) nameValue).getEncoded(ASN1Encoding.DER);
+            } catch (IOException e) {
+                log.error("Encountered problem producing ASN1Primitive from alt name of type: " + nameType, e);
+                return null;
+            }
+            
         }
 
         log.warn("Encountered unknown alt name type '{}', adding as-is", nameType);

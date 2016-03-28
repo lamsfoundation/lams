@@ -222,7 +222,7 @@ public abstract class BaseSAML2MessageDecoder extends BaseSAMLMessageDecoder {
                 QName relyingPartyRole = messageContext.getPeerEntityRole();
                 if (relyingPartyMD != null && relyingPartyRole != null) {
                     List<RoleDescriptor> roles = relyingPartyMD.getRoleDescriptors(relyingPartyRole,
-                            SAMLConstants.SAML11P_NS);
+                            SAMLConstants.SAML20P_NS);
                     if (roles != null && roles.size() > 0) {
                         messageContext.setPeerEntityRoleMetadata(roles.get(0));
                     }

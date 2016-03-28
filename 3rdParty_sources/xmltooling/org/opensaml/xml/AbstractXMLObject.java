@@ -290,7 +290,25 @@ public abstract class AbstractXMLObject implements XMLObject {
      * @return the value that should be assigned
      */
     protected String prepareForAssignment(String oldValue, String newValue) {
-        String newString = DatatypeHelper.safeTrimOrNullString(newValue);
+        return prepareForAssignment(oldValue, newValue, true);
+    }
+    
+    /**
+     * A helper function for derived classes. This 'nornmalizes' newString if <code>normalize=true</code>,
+     * and then if it is different from oldString invalidates the DOM. It returns the new effective value so 
+     * subclasses just have to go. this.foo = * prepareForAssignment(this.foo, foo);
+     * 
+     * @param oldValue - the current value
+     * @param newValue - the new value
+     * @param normalize - whether the newValue should be normalized
+     * 
+     * @return the value that should be assigned
+     */
+    protected String prepareForAssignment(String oldValue, String newValue, boolean normalize) {
+        String newString = newValue;
+        if (normalize) {
+            newString = DatatypeHelper.safeTrimOrNullString(newString);
+        }
 
         if (!DatatypeHelper.safeEquals(oldValue, newString)) {
             releaseThisandParentDOM();

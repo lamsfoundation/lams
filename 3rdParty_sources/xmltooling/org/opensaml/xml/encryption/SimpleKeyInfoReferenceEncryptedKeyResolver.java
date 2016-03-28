@@ -46,7 +46,7 @@ public class SimpleKeyInfoReferenceEncryptedKeyResolver extends AbstractEncrypte
     private int depthLimit;
 
     /** Constructor. */
-    SimpleKeyInfoReferenceEncryptedKeyResolver() {
+    public SimpleKeyInfoReferenceEncryptedKeyResolver() {
         depthLimit = 5;
     }
     

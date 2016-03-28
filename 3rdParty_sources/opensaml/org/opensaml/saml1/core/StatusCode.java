@@ -62,11 +62,17 @@ public interface StatusCode extends SAMLObject {
     public static final QName REQUEST_VERSION_TOO_LOW = new QName(SAMLConstants.SAML10P_NS, "RequestVersionTooLow",
             SAMLConstants.SAML1P_PREFIX);
 
-    /** RequestVersionDepricated status value. */
-    public static final QName REQUEST_VERSION_DEPRICATED = new QName(SAMLConstants.SAML10P_NS,
-            "RequestVersionDepricated", SAMLConstants.SAML1P_PREFIX);
+    /** RequestVersionDeprecated status value. */
+    public static final QName REQUEST_VERSION_DEPRECATED = new QName(SAMLConstants.SAML10P_NS,
+            "RequestVersionDeprecated", SAMLConstants.SAML1P_PREFIX);
 
-    /** TooManyResponses status value. */
+    /** 
+     * RequestVersionDepricated status value <i>(sic)</i>.
+     * 
+     * @deprecated due to typo, use {@link #REQUEST_VERSION_DEPRECATED} instead.
+     * */
+    public static final QName REQUEST_VERSION_DEPRICATED = REQUEST_VERSION_DEPRECATED;
+    
     public static final QName TOO_MANY_RESPONSES = new QName(SAMLConstants.SAML10P_NS, "TooManyResponses",
             SAMLConstants.SAML1P_PREFIX);
 
