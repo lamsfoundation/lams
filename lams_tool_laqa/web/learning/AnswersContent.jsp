@@ -121,8 +121,15 @@
 			var interval = "30000"; // = 30 seconds
 			window.setInterval(
 				function(){
-					//fire onchange event for lams:textarea
-					$("[id$=__lamstextarea]").change();
+					//fire onchange event for textareas/ckeditors
+					if (${generalLearnerFlowDTO.allowRichEditor}) {
+					    for ( instance in CKEDITOR.instances ) {
+					        CKEDITOR.instances[instance].updateElement();
+					    }
+					} else {
+						$("textarea[name$=__textarea]").change();
+					}
+					
 					//ajax form submit
 					$('#learningForm').ajaxSubmit({
 						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
