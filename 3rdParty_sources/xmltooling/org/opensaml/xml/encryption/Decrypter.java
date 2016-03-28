@@ -27,17 +27,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
+
 import org.apache.xml.security.Init;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.XMLRuntimeException;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.io.Unmarshaller;
 import org.opensaml.xml.io.UnmarshallerFactory;
 import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.parse.BasicParserPool;
+import org.opensaml.xml.parse.ParserPool;
+import org.opensaml.xml.parse.StaticBasicParserPool;
 import org.opensaml.xml.parse.XMLParserException;
 import org.opensaml.xml.security.Criteria;
 import org.opensaml.xml.security.CriteriaSet;
@@ -170,13 +174,14 @@ import org.w3c.dom.NodeList;
 public class Decrypter {
 
     /** ParserPool used in parsing decrypted data. */
-    private final BasicParserPool parserPool;
+    private final ParserPool parserPool;
 
     /** Unmarshaller factory, used in decryption of EncryptedData objects. */
     private UnmarshallerFactory unmarshallerFactory;
 
     /** Load-and-Save DOM Implementation singleton. */
     // private DOMImplementationLS domImplLS;
+    
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(Decrypter.class);
 
@@ -219,20 +224,15 @@ public class Decrypter {
         resolverCriteria = null;
         kekResolverCriteria = null;
 
-        // Note: this is hopefully only temporary, until Xerces implements DOM 3 LSParser.parseWithContext().
-        parserPool = new BasicParserPool();
-        parserPool.setNamespaceAware(true);
-
-        // Note: this is necessary due to an unresolved Xerces deferred DOM issue/bug
-        HashMap<String, Boolean> features = new HashMap<String, Boolean>();
-        features.put("http://apache.org/xml/features/dom/defer-node-expansion", Boolean.FALSE);
-        parserPool.setBuilderFeatures(features);
+        // Note: Use of this internal JAXP ParserPool is hopefully only temporary, 
+        // to be replaced when Xerces implements DOM 3 LSParser.parseWithContext(...).
+        parserPool = buildParserPool();
 
         unmarshallerFactory = Configuration.getUnmarshallerFactory();
         
         defaultRootInNewDocument = false;
     }
-    
+
     /**
      * Get the flag which indicates whether by default the DOM Element which backs a decrypted SAML object
      * will be the root of a new DOM document.  Defaults to false.
@@ -339,8 +339,19 @@ public class Decrypter {
      * 
      * @return the static criteria set to use
      */
-    public CriteriaSet setKeyResolverCriteria() {
+    public CriteriaSet getKeyResolverCriteria() {
         return resolverCriteria;
+    }
+    
+    /**
+     * Get the optional static set of criteria used when resolving credentials based on the KeyInfo of an EncryptedData
+     * element.
+     * 
+     * @return the static criteria set to use
+     * @deprecated due to typo, use {@link #getKeyResolverCriteria()}
+     */
+    public CriteriaSet setKeyResolverCriteria() {
+        return getKeyResolverCriteria();
     }
 
     /**
@@ -586,6 +597,11 @@ public class Decrypter {
         } catch (XMLEncryptionException e) {
             log.error("Error decrypting the encrypted data element", e);
             throw new DecryptionException("Error decrypting the encrypted data element", e);
+        } catch (Exception e) {
+            // Catch anything else, esp. unchecked RuntimeException, and convert to our checked type.
+            // BouncyCastle in particular is known to throw unchecked exceptions for what we would 
+            // consider "routine" failures.
+            throw new DecryptionException("Probable runtime exception on decryption:" + e.getMessage(), e);
         }
         if (bytes == null) {
             throw new DecryptionException("EncryptedData could not be decrypted");
@@ -693,6 +709,11 @@ public class Decrypter {
         } catch (XMLEncryptionException e) {
             log.error("Error decrypting encrypted key", e);
             throw new DecryptionException("Error decrypting encrypted key", e);
+        }  catch (Exception e) {
+            // Catch anything else, esp. unchecked RuntimeException, and convert to our checked type.
+            // BouncyCastle in particular is known to throw unchecked exceptions for what we would 
+            // consider "routine" failures.
+            throw new DecryptionException("Probable runtime exception on decryption:" + e.getMessage(), e);
         }
         if (key == null) {
             throw new DecryptionException("Key could not be decrypted");
@@ -953,6 +974,40 @@ public class Decrypter {
                 log.error("Error marshalling target XMLObject", e);
                 throw new DecryptionException("Error marshalling target XMLObject", e);
             }
+        }
+    }
+    
+    /**
+     * Build the internal parser pool instance used to parse decrypted XML.
+     * 
+     * <p>
+     * Note: When using a Xerces parser or derivative, the following feature must be set to false: 
+     * <code>http://apache.org/xml/features/dom/defer-node-expansion</code>
+     * </p>
+     * 
+     * @return a new parser pool instance
+     */
+    protected ParserPool buildParserPool() {
+        StaticBasicParserPool pp = new StaticBasicParserPool();
+        HashMap<String, Boolean> features = new HashMap<String, Boolean>();
+        
+        pp.setNamespaceAware(true);
+        
+        // Note: this feature config is necessary due to an unresolved Xerces deferred DOM issue/bug
+        features.put("http://apache.org/xml/features/dom/defer-node-expansion", Boolean.FALSE);
+        
+        // The following config is to harden the parser pool against known XML security vulnerabilities
+        pp.setExpandEntityReferences(false);
+        features.put(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        features.put("http://apache.org/xml/features/disallow-doctype-decl", true);
+        
+        pp.setBuilderFeatures(features);
+        
+        try {
+            pp.initialize();
+            return pp;
+        } catch (XMLParserException e) {
+            throw new XMLRuntimeException("Problem initializing Decrypter internal ParserPool", e);
         }
     }
 

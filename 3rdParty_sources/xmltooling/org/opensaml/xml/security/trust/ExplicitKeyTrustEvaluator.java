@@ -105,10 +105,17 @@ public class ExplicitKeyTrustEvaluator {
      */
     public boolean validate(Credential untrustedCredential, Iterable<Credential> trustedCredentials) {
 
+        boolean empty = true;
+        
         for (Credential trustedCredential : trustedCredentials) {
+            empty = false;
             if (validate(untrustedCredential, trustedCredential)) {
                 return true;
             }
+        }
+        
+        if (empty) {
+            log.debug("No trusted credentials were provided to evaluate against");
         }
         return false;
     }

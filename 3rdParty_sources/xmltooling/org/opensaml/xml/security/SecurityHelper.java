@@ -60,6 +60,7 @@ import org.apache.commons.ssl.PKCS8Key;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.opensaml.xml.Configuration;
+import org.opensaml.xml.encryption.EncryptionConstants;
 import org.opensaml.xml.encryption.EncryptionParameters;
 import org.opensaml.xml.encryption.KeyEncryptionParameters;
 import org.opensaml.xml.security.credential.BasicCredential;
@@ -198,7 +199,18 @@ public final class SecurityHelper {
                     + "' to key algorithm not available, key generation failed");
             throw new NoSuchAlgorithmException("Algorithm URI'" + algoURI + "' is invalid for key generation");
         }
-        Integer keyLength = getKeyLengthFromURI(algoURI);
+        
+        Integer keyLength = null;
+        if (EncryptionConstants.ALGO_ID_BLOCKCIPHER_TRIPLEDES.equals(algoURI)
+                || EncryptionConstants.ALGO_ID_KEYWRAP_TRIPLEDES.equals(algoURI)) {
+            // We have to special case this b/c a 3DES key is 192 bits, but with KeyGenerator the JCA providers
+            // inconsistently allow either 112/168 (SunJCE) or 112/168/192 (BC). Per JCA docs they're all 
+            // required to support 168. We don't do this in getKeyLength() b/c the 3DES key actually is 192 bits.
+            keyLength = 168;
+        } else {
+            keyLength = getKeyLengthFromURI(algoURI);
+        }
+        
         if (keyLength == null) {
             log.error("Key length could not be determined from algorithm URI, can't generate key");
             throw new KeyException("Key length not determinable from algorithm URI, could not generate new key");
@@ -401,7 +413,7 @@ public final class SecurityHelper {
         if (key instanceof DSAPrivateKey) {
             DSAPrivateKey dsaKey = (DSAPrivateKey) key;
             DSAParams keyParams = dsaKey.getParams();
-            BigInteger y = keyParams.getQ().modPow(dsaKey.getX(), keyParams.getP());
+            BigInteger y = keyParams.getG().modPow(dsaKey.getX(), keyParams.getP());
             DSAPublicKeySpec pubKeySpec = new DSAPublicKeySpec(y, keyParams.getP(), keyParams.getQ(), keyParams.getG());
 
             try {

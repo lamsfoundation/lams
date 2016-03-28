@@ -535,15 +535,14 @@ public abstract class AbstractMetadataProvider extends BaseMetadataProvider {
                 if (!DatatypeHelper.safeEquals(descriptor.getEntityID(), entityID)) {
                     // skip this one, it isn't what we're looking for
                     descriptor = null;
-                }
-                if (!isValid(descriptor)) {
+                } else if (!isValid(descriptor)) {
                     log.trace("Found entity descriptor for entity with ID {} but it is no longer valid, skipping it.",
                             entityID);
                     descriptor = null;
                 }
             } else {
-                log
-                        .trace("Metadata was an EntitiesDescriptor, checking if any of its descendant EntityDescriptor elements is the one we're looking for.");
+                log.trace("Metadata was an EntitiesDescriptor, checking if any of its descendant EntityDescriptor " 
+                        + "elements is the one we're looking for.");
                 if (metadata instanceof EntitiesDescriptor) {
                     descriptor = getEntityDescriptorById(entityID, (EntitiesDescriptor) metadata);
                 }

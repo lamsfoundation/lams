@@ -91,8 +91,7 @@ public abstract class AbstractReloadingMetadataProvider extends AbstractObservab
 
     /** Constructor. */
     protected AbstractReloadingMetadataProvider() {
-        taskTimer = new Timer(true);
-        createdOwnTaskTimer = true;
+        this(null);
     }
 
     /**
@@ -102,9 +101,13 @@ public abstract class AbstractReloadingMetadataProvider extends AbstractObservab
      */
     protected AbstractReloadingMetadataProvider(Timer backgroundTaskTimer) {
         if (backgroundTaskTimer == null) {
-            throw new IllegalArgumentException("Task timer may not be null");
+            log.debug("Creating own background task Timer instance");
+            taskTimer = new Timer(true);
+            createdOwnTaskTimer = true;
+        } else {
+            log.debug("Using ctor arg-supplied background task Timer instance");
+            taskTimer = backgroundTaskTimer;
         }
-        taskTimer = backgroundTaskTimer;
     }
 
     /**
@@ -246,7 +249,7 @@ public abstract class AbstractReloadingMetadataProvider extends AbstractObservab
      * 
      * @throws MetadataProviderException thrown is there is a problem retrieving and processing the metadata
      */
-    public void refresh() throws MetadataProviderException {
+    public synchronized void refresh() throws MetadataProviderException {
         DateTime now = new DateTime(ISOChronology.getInstanceUTC());
         String mdId = getMetadataIdentifier();
 
@@ -260,10 +263,15 @@ public abstract class AbstractReloadingMetadataProvider extends AbstractObservab
                 log.debug("Processing new metadata from '{}'", mdId);
                 processNewMetadata(mdId, now, mdBytes);
             }
-        } catch (Exception e) {
-            log.debug("Error occurred while attempting to refresh metadata from '" + mdId + "'", e);
+        } catch (Throwable t) {
+            log.error("Error occurred while attempting to refresh metadata from '" + mdId + "'", t);
             nextRefresh = new DateTime(ISOChronology.getInstanceUTC()).plus(minRefreshDelay);
-            throw new MetadataProviderException(e);
+            if (t instanceof Exception) {
+                throw new MetadataProviderException((Exception) t);
+            } else {
+                throw new MetadataProviderException(String.format("Saw an error of type '%s' with message '%s'", 
+                        t.getClass().getName(), t.getMessage()));
+            }
         } finally {
             refresMetadataTask = new RefreshMetadataTask();
             long nextRefreshDelay = nextRefresh.getMillis() - System.currentTimeMillis();

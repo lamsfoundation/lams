@@ -26,6 +26,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.joda.time.DateTime;
@@ -36,6 +37,12 @@ import org.opensaml.xml.util.DatatypeHelper;
  * A resource representing a file retrieved from a URL using Apache Commons HTTPClient.
  */
 public class HttpResource extends AbstractFilteredResource {
+    
+    /** HttpClient connection timeout in milliseconds. */
+    private static final int CONNECTION_TIMEOUT = 90*1000;
+    
+    /** HttpClient socket timeout in milliseconds. */
+    private static final int SOCKET_TIMEOUT = 90*1000;
 
     /** HTTP URL of the resource. */
     private String resourceUrl;
@@ -57,6 +64,10 @@ public class HttpResource extends AbstractFilteredResource {
         }
 
         httpClient = new HttpClient();
+        
+        HttpConnectionManagerParams connMgrParams = httpClient.getHttpConnectionManager().getParams();
+        connMgrParams.setConnectionTimeout(CONNECTION_TIMEOUT);
+        connMgrParams.setSoTimeout(SOCKET_TIMEOUT);
     }
 
     /**
@@ -76,6 +87,10 @@ public class HttpResource extends AbstractFilteredResource {
         }
 
         httpClient = new HttpClient();
+        
+        HttpConnectionManagerParams connMgrParams = httpClient.getHttpConnectionManager().getParams();
+        connMgrParams.setConnectionTimeout(CONNECTION_TIMEOUT);
+        connMgrParams.setSoTimeout(SOCKET_TIMEOUT);
     }
 
     /** {@inheritDoc} */

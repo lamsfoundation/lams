@@ -51,7 +51,7 @@ public class CancelTargetImpl extends AbstractWSTrustObject implements CancelTar
 
     /** {@inheritDoc} */
     public void setUnknownXMLObject(XMLObject unknownObject) {
-        prepareForAssignment(unknownChild, unknownObject);
+        unknownChild = prepareForAssignment(unknownChild, unknownObject);
     }
 
     /** {@inheritDoc} */

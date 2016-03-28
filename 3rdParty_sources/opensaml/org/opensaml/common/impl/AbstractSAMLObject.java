@@ -46,6 +46,11 @@ public abstract class AbstractSAMLObject extends AbstractValidatingXMLObject {
         return super.equals(obj);
     }
 
+    /** {@inheritDoc} */
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     /**
      * A helper function for derived classes that checks to see if the old and new value are equal and if so releases
      * the cached dom. Derived classes are expected to use this thus: <code>

@@ -155,21 +155,21 @@ public class TLSProtocolSocketFactory implements SecureProtocolSocketFactory {
     /** {@inheritDoc} */
     public Socket createSocket(String host, int port) throws IOException {
         Socket socket = sslContext.getSocketFactory().createSocket(host, port);
-        verifyHostname(socket);
+        verifyHostname(socket, host);
         return socket;
     }
 
     /** {@inheritDoc} */
     public Socket createSocket(String host, int port, InetAddress localHost, int clientPort) throws IOException {
         Socket socket = sslContext.getSocketFactory().createSocket(host, port, localHost, clientPort);
-        verifyHostname(socket);
+        verifyHostname(socket, host);
         return socket;
     }
 
     /** {@inheritDoc} */
     public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException {
         Socket newSocket = sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
-        verifyHostname(socket);
+        verifyHostname(socket, host);
         return newSocket;
     }
 
@@ -183,7 +183,7 @@ public class TLSProtocolSocketFactory implements SecureProtocolSocketFactory {
         SocketFactory socketfactory = sslContext.getSocketFactory();
         if (timeout == 0) {
             Socket socket = socketfactory.createSocket(host, port, localHost, localPort);
-            verifyHostname(socket);
+            verifyHostname(socket, host);
             return socket;
         } else {
             Socket socket = socketfactory.createSocket();
@@ -191,7 +191,7 @@ public class TLSProtocolSocketFactory implements SecureProtocolSocketFactory {
             SocketAddress remoteaddr = new InetSocketAddress(host, port);
             socket.bind(localaddr);
             socket.connect(remoteaddr, timeout);
-            verifyHostname(socket);
+            verifyHostname(socket, host);
             return socket;
         }
     }
@@ -213,6 +213,8 @@ public class TLSProtocolSocketFactory implements SecureProtocolSocketFactory {
      * 
      * @throws SSLException if the hostname does not verify against the peer's certificate, 
      *          or if there is an error in performing the evaluation
+     *          
+     * @deprecated Use instead {@link #verifyHostname(Socket, String)
      */
     protected void verifyHostname(Socket socket) throws SSLException {
         if (hostnameVerifier == null) {
@@ -227,7 +229,52 @@ public class TLSProtocolSocketFactory implements SecureProtocolSocketFactory {
         
         try {
             SSLSession sslSession = sslSocket.getSession();
-            String hostname = sslSession.getPeerHost();
+            if (!sslSession.isValid()) {
+                throw new SSLException("SSLSession was invalid: Likely implicit handshake failure: " 
+                        + "Set system property javax.net.debug=all for details");
+            }
+            
+            verifyHostname(sslSocket, sslSession.getPeerHost());
+        } catch (SSLException e) {
+            cleanUpFailedSocket(sslSocket);
+            throw e;
+        } catch (Throwable t) {
+            // Make sure we close the socket on any kind of Exception, RuntimeException or Error.
+            cleanUpFailedSocket(sslSocket);
+            throw new SSLException("Error in deprecated verifyHostname(Socket)", t);
+        }
+    }
+    
+    /**
+     * Verifies the peer's hostname using the configured {@link HostnameVerifier}.
+     * 
+     * @param socket the socket connected to the peer whose hostname is to be verified.
+     * @param hostname the caller-supplied hostname to verify
+     * 
+     * @throws SSLException if the hostname does not verify against the peer's certificate, 
+     *          or if there is an error in performing the evaluation
+     */
+    protected void verifyHostname(Socket socket, String hostname) throws SSLException {
+        if (hostnameVerifier == null) {
+            return;
+        }
+        
+        if (hostname == null) {
+            throw new SSLException("Supplied hostname was null, skipping hostname verification and terminating");
+        }
+        
+        if (!(socket instanceof SSLSocket)) {
+            return;
+        }
+        
+        SSLSocket sslSocket = (SSLSocket) socket;
+        
+        try {
+            SSLSession sslSession = sslSocket.getSession();
+            if (!sslSession.isValid()) {
+                throw new SSLException("SSLSession was invalid: Likely implicit handshake failure: " 
+                        + "Set system property javax.net.debug=all for details");
+            }
             
             if (!hostnameVerifier.verify(hostname, sslSession)) {
                 throw new SSLPeerUnverifiedException("SSL peer failed hostname validation for name: " + hostname);

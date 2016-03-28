@@ -83,7 +83,7 @@ public class AttributeMap implements Map<QName, String> {
     /** {@inheritDoc} */
     public String put(QName attributeName, String value) {
         String oldValue = get(attributeName);
-        if (value != oldValue) {
+        if (!DatatypeHelper.safeEquals(value, oldValue)) {
             releaseDOM();
             attributes.put(attributeName, value);
             if (isIDAttribute(attributeName) || Configuration.isIDAttribute(attributeName)) {

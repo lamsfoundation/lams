@@ -17,6 +17,9 @@
 
 package org.opensaml.saml2.metadata.provider;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+
 import org.joda.time.DateTime;
 import org.joda.time.chrono.ISOChronology;
 import org.opensaml.saml2.metadata.EntitiesDescriptor;
@@ -40,10 +43,13 @@ public class RequiredValidUntilFilter implements MetadataFilter {
 
     /** The maximum interval, in milliseconds, between now and the <code>validUntil</code> date. */
     private long maxValidityInterval;
+    
+    /** DatatypeFactory used to convert duration to string representation. */
+    private DatatypeFactory dataTypeFactory;
 
     /** Constructor. */
     public RequiredValidUntilFilter() {
-        maxValidityInterval = 0;
+        this(0);
     }
 
     /**
@@ -53,11 +59,16 @@ public class RequiredValidUntilFilter implements MetadataFilter {
      */
     public RequiredValidUntilFilter(long maxValidity) {
         this.maxValidityInterval = maxValidity * 1000;
+        try {
+            dataTypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException("JVM is required to support XML DatatypeFactory but it does not", e);
+        }
     }
 
     /**
-     * Gets the maximum internal, in milliseconds, between now and the <code>validUntil</code> date. A value of less than 1
-     * indicates that there is no restriction.
+     * Gets the maximum internal, in milliseconds, between now and the <code>validUntil</code> date. 
+     * A value of less than 1 indicates that there is no restriction.
      * 
      * @return maximum internal, in milliseconds, between now and the <code>validUntil</code> date
      */
@@ -77,8 +88,9 @@ public class RequiredValidUntilFilter implements MetadataFilter {
         if (maxValidityInterval > 0 && validUntil.isAfter(now)) {
             long validityInterval = validUntil.getMillis() - now.getMillis();
             if (validityInterval > maxValidityInterval) {
-                throw new FilterException("Metadata's validity interval, " + validityInterval
-                        + "ms, is larger than is allowed, " + maxValidityInterval + "ms.");
+                throw new FilterException(String.format("Metadata's validity interval %s is larger than is allowed %s", 
+                        dataTypeFactory.newDuration(validityInterval).toString(),
+                        dataTypeFactory.newDuration(maxValidityInterval).toString()));
             }
         }
     }

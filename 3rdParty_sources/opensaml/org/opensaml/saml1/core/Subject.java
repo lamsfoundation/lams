@@ -36,7 +36,7 @@ public interface Subject extends SAMLObject {
     public final static QName DEFAULT_ELEMENT_NAME = new QName(SAMLConstants.SAML1_NS, DEFAULT_ELEMENT_LOCAL_NAME, SAMLConstants.SAML1_PREFIX);
     
     /** Local name of the XSI type */
-    public final static String TYPE_LOCAL_NAME = "ActionType"; 
+    public final static String TYPE_LOCAL_NAME = "SubjectType"; 
         
     /** QName of the XSI type */
     public final static QName TYPE_NAME = new QName(SAMLConstants.SAML1_NS, TYPE_LOCAL_NAME, SAMLConstants.SAML1_PREFIX);

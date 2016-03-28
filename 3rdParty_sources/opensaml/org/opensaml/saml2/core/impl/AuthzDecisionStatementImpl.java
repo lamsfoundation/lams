@@ -69,7 +69,7 @@ public class AuthzDecisionStatementImpl extends AbstractSAMLObject implements Au
 
     /** {@inheritDoc} */
     public void setResource(String newResourceURI) {
-        this.resource = prepareForAssignment(this.resource, newResourceURI);
+        this.resource = prepareForAssignment(this.resource, newResourceURI, false);
     }
 
     /** {@inheritDoc} */

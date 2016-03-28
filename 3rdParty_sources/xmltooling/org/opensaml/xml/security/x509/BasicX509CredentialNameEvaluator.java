@@ -217,8 +217,8 @@ public class BasicX509CredentialNameEvaluator implements X509CredentialNameEvalu
             log.debug("No trusted name options are active, skipping name evaluation");
             return true;
         } else if (trustedNames == null || trustedNames.isEmpty()) {
-            log.debug("Supplied trusted names are null or empty, skipping name evaluation");
-            return true;
+            log.debug("Supplied trusted names are null or empty, failing name evaluation");
+            return false;
         }
 
         if (log.isDebugEnabled()) {

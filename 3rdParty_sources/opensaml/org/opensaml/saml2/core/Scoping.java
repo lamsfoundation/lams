@@ -41,7 +41,7 @@ public interface Scoping extends SAMLObject {
             SAMLConstants.SAML20P_PREFIX);
 
     /** Local name of the XSI type. */
-    public static final String TYPE_LOCAL_NAME = "ActionType";
+    public static final String TYPE_LOCAL_NAME = "ScopingType";
 
     /** QName of the XSI type. */
     public static final QName TYPE_NAME = new QName(SAMLConstants.SAML20P_NS, TYPE_LOCAL_NAME,

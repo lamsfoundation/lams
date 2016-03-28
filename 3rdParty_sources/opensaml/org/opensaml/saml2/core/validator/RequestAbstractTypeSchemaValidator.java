@@ -71,7 +71,7 @@ public abstract class RequestAbstractTypeSchemaValidator<RequestType extends Req
         if (request.getVersion() == null) {
             throw new ValidationException("Version attribute must not be null");
         }
-        if (request.getVersion().toString() != SAMLVersion.VERSION_20.toString()) {
+        if (!DatatypeHelper.safeEquals(request.getVersion().toString(), SAMLVersion.VERSION_20.toString())) {
             throw new ValidationException("Wrong SAML Version");
         }
     }

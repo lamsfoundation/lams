@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 
 import org.opensaml.common.SAMLObject;
 import org.opensaml.common.xml.SAMLConstants;
+import org.opensaml.xml.schema.XSString;
 
 /**
  * This interface is for the SAML1 <code> AssertionArtifact </code> extention point.
@@ -34,12 +35,15 @@ public interface AssertionArtifact extends SAMLObject {
     public static final QName DEFAULT_ELEMENT_NAME = new QName(SAMLConstants.SAML10P_NS, DEFAULT_ELEMENT_LOCAL_NAME,
             SAMLConstants.SAML1P_PREFIX);
 
-    /** Local name of the XSI type. */
-    public static final String TYPE_LOCAL_NAME = "AssertionArtifactType";
+    /** Local name of the XSI type. 
+     * @deprecated no replacement
+     */
+    public static final String TYPE_LOCAL_NAME = XSString.TYPE_LOCAL_NAME;
 
-    /** QName of the XSI type. */
-    public static final QName TYPE_NAME = new QName(SAMLConstants.SAML10P_NS, TYPE_LOCAL_NAME,
-            SAMLConstants.SAML1P_PREFIX);
+    /** QName of the XSI type.
+     * @deprecated no replacement
+     */
+    public static final QName TYPE_NAME =  XSString.TYPE_NAME;
 
     /**
      * Get the contents of the artifact.
