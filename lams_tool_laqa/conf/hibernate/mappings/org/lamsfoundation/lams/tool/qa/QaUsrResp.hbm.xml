@@ -26,6 +26,14 @@
     </property>
     
     <property
+        name="answerAutosaved"
+        type="java.lang.String"
+        column="answer_autosaved"
+        length="65535"
+    >
+    </property>
+    
+    <property
         name="attemptTime"
         type="java.util.Date"
         column="attempt_time"

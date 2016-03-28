@@ -32,14 +32,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 
 /**
- * 
- * @author Ozgur Demirtas
+ * Holds user responses to questions
  * 
  * QaUsrResp Value Object The value object that maps to our model database
  * table: tl_laqa11_usr_resp The relevant hibernate mapping resides in:
  * QaQueResp.hbm.xml
  * 
- * Holds user responses to questions
+ * @author Ozgur Demirtas
  */
 
 public class QaUsrResp implements Serializable, Comparable {
@@ -49,6 +48,9 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String answer;
+    
+    /** nullable persistent field */
+    private String answerAutosaved;
 
     /** nullable persistent field */
     private Date attemptTime;
@@ -68,19 +70,21 @@ public class QaUsrResp implements Serializable, Comparable {
     private ItemRatingDTO itemRatingDto;
 
     /** full constructor */
-    public QaUsrResp(Long responseId, String answer, Date attemptTime, String timezone,
+    public QaUsrResp(Long responseId, String answer, String answerAutosaved, Date attemptTime, String timezone,
 	    QaQueContent qaQuestion, QaQueUsr qaQueUser) {
 	this.responseId = responseId;
 	this.answer = answer;
+	this.answerAutosaved = answerAutosaved;
 	this.attemptTime = attemptTime;
 	this.timezone = timezone;
 	this.qaQuestion = qaQuestion;
 	this.qaQueUser = qaQueUser;
     }
 
-    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQueContent qaQuestion,
+    public QaUsrResp(String answer, String answerAutosaved, Date attemptTime, String timezone, QaQueContent qaQuestion,
 	    QaQueUsr qaQueUser, boolean visible) {
 	this.answer = answer;
+	this.answerAutosaved = answerAutosaved;
 	this.attemptTime = attemptTime;
 	this.timezone = timezone;
 	this.qaQuestion = qaQuestion;
@@ -101,8 +105,8 @@ public class QaUsrResp implements Serializable, Comparable {
      * @return the new qa user response cloned from original object
      */
     public static QaUsrResp newInstance(QaUsrResp response) {
-	return new QaUsrResp(response.getResponseId(), response.getAnswer(), response
-		.getAttemptTime(), response.getTimezone(), response.getQaQuestion(), response.qaQueUser);
+	return new QaUsrResp(response.getResponseId(), response.getAnswer(), response.getAnswerAutosaved(),
+		response.getAttemptTime(), response.getTimezone(), response.getQaQuestion(), response.qaQueUser);
     }
 
     public String toString() {
@@ -134,6 +138,21 @@ public class QaUsrResp implements Serializable, Comparable {
      */
     public void setAnswer(String answer) {
 	this.answer = answer;
+    }
+    
+    /**
+     * @return Returns the answerAutosaved.
+     */
+    public String getAnswerAutosaved() {
+	return answerAutosaved;
+    }
+
+    /**
+     * @param answerAutosaved
+     *                The answerAutosaved to set.
+     */
+    public void setAnswerAutosaved(String answerAutosaved) {
+	this.answerAutosaved = answerAutosaved;
     }
 
     /**
