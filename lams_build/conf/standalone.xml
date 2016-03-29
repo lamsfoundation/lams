@@ -291,7 +291,8 @@
 				    <connection-property name="useUnicode">true</connection-property>
 				    <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
 				    <connection-property name="useSSL">false</connection-property>
-				   
+				    <connection-property name="autoReconnect">true</connection-property>
+				    
 				    <!-- Properties below are used only for embedded MySQL server -->
 				    <connection-property name="server.basedir">@db.location@</connection-property>
 				    <connection-property name="createDatabaseIfNotExist">false</connection-property>
@@ -319,7 +320,7 @@
 				      <password>@db.password@</password>
 				    </security>
 				    <validation>
-				      <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker"/>
+				      <check-valid-connection-sql>select 1</check-valid-connection-sql>
 				      <validate-on-match>false</validate-on-match>
 				      <background-validation>false</background-validation>
 				      <use-fast-fail>false</use-fast-fail>
