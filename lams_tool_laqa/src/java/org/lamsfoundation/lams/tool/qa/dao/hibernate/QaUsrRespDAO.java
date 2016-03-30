@@ -105,7 +105,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING1 = 
 	"SELECT resp.*, AVG(rating.rating) avg_rating"
-	    + " FROM tl_laqa11_usr_resp resp"
+	    + " FROM tl_laqa11_usr_resp resp WHERE resp.answer IS NOT NULL"
 	    + " JOIN tl_laqa11_que_usr usr"
 	    + " ON resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
 	    + " AND usr.que_usr_id!=:excludeUserId "
@@ -124,7 +124,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	    
 
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH1 = "from qaUsrResp in class QaUsrResp "
-	    + " where qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId ";
+	    + " WHERE qaUsrResp.answer IS NOT NULL AND qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId ";
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2 = " order by ";
 
 
@@ -213,9 +213,9 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	return ((Number) list.get(0)).intValue();
     }
 
-    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH = "SELECT COUNT(*) from "
+    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH = "SELECT COUNT(*) FROM "
 	    + QaUsrResp.class.getName()
-	    + " as r where r.qaQueUser.qaSession.qaSessionId=? and r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?";
+	    + " AS r WHERE r.answer IS NOT NULL AND r.qaQueUser.qaSession.qaSessionId=? AND r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?";
     
     public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId, String searchString) {
 
