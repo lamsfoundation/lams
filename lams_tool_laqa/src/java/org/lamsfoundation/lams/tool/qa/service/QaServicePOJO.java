@@ -312,7 +312,8 @@ public class QaServicePOJO
     }
 
     @Override
-    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder, boolean isAutosave) {
+    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder,
+	    boolean isAutosave) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());
@@ -328,10 +329,10 @@ public class QaServicePOJO
 	if (response == null) {
 	    response = isAutosave
 		    ? new QaUsrResp(null, newAnswer, new Date(System.currentTimeMillis()), "", question, user, true)
-		    : new QaUsrResp(newAnswer, null, new Date(System.currentTimeMillis()), "", question, user, true);	    
+		    : new QaUsrResp(newAnswer, null, new Date(System.currentTimeMillis()), "", question, user, true);
 	    createUserResponse(response);
 
-	// if answer has changed
+	    // if answer has changed
 	} else if (!newAnswer.equals(response.getAnswer())) {
 	    if (isAutosave) {
 		response.setAnswerAutosaved(newAnswer);
@@ -339,7 +340,7 @@ public class QaServicePOJO
 		response.setAnswer(newAnswer);
 		response.setAnswerAutosaved(null);
 	    }
-	    
+
 	    response.setAttemptTime(new Date(System.currentTimeMillis()));
 	    response.setTimezone("");
 	    updateUserResponse(response);
@@ -692,10 +693,13 @@ public class QaServicePOJO
 	    // reset it to new toolContentID
 	    toolContentObj.setQaContentId(toolContentID);
 	    toolContentObj.setCreatedBy(newUserUid);
-	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
-		criteria.setToolContentId(toolContentID);
+	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	    if (criterias != null) {
+		for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+		    criteria.setToolContentId(toolContentID);
+		}
 	    }
-	    
+
 	    // set back the tool content
 	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
 	    for (QaQueContent question : questions) {

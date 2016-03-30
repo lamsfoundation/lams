@@ -179,7 +179,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null);
+		nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");

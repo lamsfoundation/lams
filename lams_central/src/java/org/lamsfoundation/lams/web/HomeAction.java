@@ -48,7 +48,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.jdom.JDOMException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
@@ -348,7 +347,7 @@ public class HomeAction extends DispatchAction {
     }
 
     public ActionForward getLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws JDOMException, IOException {
+	    HttpServletResponse res) throws IOException {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	String imagePath = LearningDesignService.getLearningDesignSVGPath(learningDesignId);
 	File imageFile = new File(imagePath);

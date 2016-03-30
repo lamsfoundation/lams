@@ -18,8 +18,8 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
+ */
+
 /* $Id$ */
 package org.lamsfoundation.lams.tool.scratchie.service;
 
@@ -42,15 +42,15 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 	this.removeField(ScratchieUser.class, "totalAttempts");
 	this.removeField(ScratchieUser.class, "scratchingFinished");
 	this.removeField(ScratchieUser.class, "mark");
-	
+
 	this.removeField(Scratchie.class, "createdBy");
-	
+
 	this.removeField(ScratchieAnswer.class, "scratchieItem");
-	
-	this.addField(ScratchieSession.class, "mark", new Integer(0));
-	this.addField(ScratchieSession.class, "scratchingFinished", new Integer(0));
+
+	this.addField(ScratchieSession.class, "mark", "0");
+	this.addField(ScratchieSession.class, "scratchingFinished", "0");
     }
-    
+
     /**
      * Import 20131212 version content to 20140102 version tool server.
      */
@@ -60,18 +60,18 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 	this.removeField(Scratchie.class, "offlineInstructions");
 	this.removeField(Scratchie.class, "attachments");
     }
-    
+
     /**
      * Import 20131212 version content to 20140102 version tool server.
      */
     public void up20140102To20140505() {
 	this.removeField(Scratchie.class, "contentInUse");
     }
-    
+
     /**
      * Import 20140613 version content to 20150206 version tool server.
      */
     public void up20140613To20150206() {
-	this.addField(Scratchie.class, "burningQuestionsEnabled", new Integer(1));
+	this.addField(Scratchie.class, "burningQuestionsEnabled", "1");
     }
 }

@@ -190,12 +190,6 @@
 		</listener-class>
 	</listener>
 
-	<listener>
-		<listener-class>
-			org.apache.axis.transport.http.AxisHTTPSessionListener
-		</listener-class>
-	</listener>
-
 	<servlet>
 		<servlet-name>updateCollapsedGroup</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet
@@ -314,21 +308,6 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>AxisServlet</servlet-name>
-		<servlet-class>
-			org.apache.axis.transport.http.AxisServlet
-		</servlet-class>
-	</servlet>
-
-	<servlet>
-		<servlet-name>AdminServlet</servlet-name>
-		<servlet-class>
-			org.apache.axis.transport.http.AdminServlet
-		</servlet-class>
-		<load-on-startup>100</load-on-startup>
-	</servlet>
-
-	<servlet>
 		<servlet-name>LoginRequest</servlet-name>
 		<servlet-class>
 			org.lamsfoundation.lams.web.LoginRequestServlet
@@ -417,21 +396,6 @@
 	<servlet-mapping>
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>/servlet/AxisServlet</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>*.jws</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>/services/*</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

@@ -10,13 +10,7 @@ apache-poi        poi-3.10-FINAL-20140208.jar           3.10                   A
 autopatch		  autopatch-1.4.2-lams.jar			1.4.2-lams				   Apache License				 Tacit Knowledge				  automated Java patching system
 				  discovery-1.0.5-lams.jar				1.0.5-lams				  
 
-axis              axis-ant.jar							1.4                    Apache License 2.0      	     Apache							  XML based Web service framework                                                                                          
-                  axis.jar								1.4																					                                                                                                               
-                  wsdl4j-1.5.1.jar                      1.5.1                  Common Public License 1.0     IBM                              JWSDL
-
 batik             batik-1.7.jar                         1.7                    Apache License 2.0            Apache                           toolkit for manipulating images in SVG format
-
-cglib             cglib_jboss404GA.jar                  4.0.4.GA               Apache License 2.0            Apache                           bytecode manipulation framework
 
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
 

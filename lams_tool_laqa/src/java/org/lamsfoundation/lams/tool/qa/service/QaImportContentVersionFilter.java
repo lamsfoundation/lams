@@ -32,20 +32,19 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 
     /**
-     * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish
-     * field.
+     * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish field.
      */
     public void up20061102To20061113() {
 	// Change name to suit the version you give the tool.
-	this.addField(QaContent.class, "lockWhenFinished", new Boolean(true));
-	this.addField(QaContent.class, "showOtherAnswers", new Boolean(true));
+	this.addField(QaContent.class, "lockWhenFinished", "true");
+	this.addField(QaContent.class, "showOtherAnswers", "true");
     }
-    
+
     public void up20081126To20101022() {
 	this.removeField(QaQueContent.class, "isOptional");
-	this.addField(QaQueContent.class, "required", new Boolean(false));
+	this.addField(QaQueContent.class, "required", "false");
     }
-    
+
     /**
      * Import 20140101 version content to 20140102 version tool server.
      */
@@ -55,7 +54,7 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(QaContent.class, "offlineInstructions");
 	this.removeField(QaContent.class, "qaUploadedFiles");
     }
-    
+
     /**
      * Import 20140102 version content to 20140527 version tool server.
      */
@@ -63,14 +62,14 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(QaContent.class, "contentLocked");
 	this.removeField(QaContent.class, "synchInMonitor");
     }
-    
+
     /**
      * Import 20140822 version content to 20150511 version tool server.
      */
     public void up20140822To20150511() {
-	this.addField(QaContent.class, "minimumRates", 0);
-	this.addField(QaContent.class, "maximumRates", 0);
-	
-	this.addField(QaQueContent.class, "minWordsLimit", 0);
+	this.addField(QaContent.class, "minimumRates", "0");
+	this.addField(QaContent.class, "maximumRates", "0");
+
+	this.addField(QaQueContent.class, "minWordsLimit", "0");
     }
 }
