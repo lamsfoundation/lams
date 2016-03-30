@@ -720,7 +720,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	if (toolContentObj == null) {
 	    throw new DataMissingException("Unable to find default content for the imageGallery tool");
 	}
-	
+
 	// don't export following fields
 	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 	    criteria.setToolContentId(null);
@@ -788,8 +788,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
-		criteria.setToolContentId(toolContentId);
+	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	    if (criterias != null) {
+		for (LearnerItemRatingCriteria criteria : criterias) {
+		    criteria.setToolContentId(toolContentId);
+		}
 	    }
 	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
 		    toolContentId);

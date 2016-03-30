@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.questions;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -74,9 +68,9 @@ public class QuestionExporter {
 
     private static final String EAR_IMAGE_FOLDER = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 	    + FileUtil.LAMS_WWW_DIR;
-    private static final File MANIFEST_TEMPLATE_FILE = new File(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)
-	    + File.separator + "lams-central.war" + File.separator + "questions" + File.separator
-	    + "imsmanifest_template.xml");
+    private static final File MANIFEST_TEMPLATE_FILE = new File(
+	    Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + "lams-central.war" + File.separator
+		    + "questions" + File.separator + "imsmanifest_template.xml");
 
     private String packageTitle = null;
     private Question[] questions = null;
@@ -107,8 +101,8 @@ public class QuestionExporter {
 	    String fileName = FileUtil.getFileName(packagePath);
 	    fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 	    response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
-	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, CentralConstants.HEADER_CONTENT_ATTACHMENT
-		    + fileName);
+	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION,
+		    CentralConstants.HEADER_CONTENT_ATTACHMENT + fileName);
 
 	    // write out the ZIP to respose error
 	    FileUtils.copyFile(packageFile, response.getOutputStream());
@@ -202,14 +196,14 @@ public class QuestionExporter {
 	    }
 
 	    if (itemElem == null) {
-		QuestionExporter.log.warn("Unknow type \"" + question.getType() + "\" of question \""
-			+ question.getTitle() + "\"");
+		QuestionExporter.log
+			.warn("Unknow type \"" + question.getType() + "\" of question \"" + question.getTitle() + "\"");
 	    } else {
 		sectionElem.appendChild(itemElem);
 	    }
 	}
 
-	return writeOutDoc();
+	return FileUtil.writeXMLtoString(doc);
     }
 
     /**
@@ -297,20 +291,20 @@ public class QuestionExporter {
 
 	    // link feedback for correct/incorrect answer
 	    if (isCorrect) {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", correctFeedbackLabel);
 	    } else {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", incorrectFeedbackLabel);
 	    }
 
 	    if (overallFeedbackElem != null) {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
 	    }
@@ -406,8 +400,8 @@ public class QuestionExporter {
 		if (matchAnswerIndex == question.getMatchMap().get(answerIndex)) {
 		    Element respconditionElem = doc.createElement("respcondition");
 		    respconditionElem.setAttribute("title", "Matching " + responseLidIdentifier + " Resp Condition 1");
-		    Element conditionvarElem = (Element) respconditionElem.appendChild(doc
-			    .createElement("conditionvar"));
+		    Element conditionvarElem = (Element) respconditionElem
+			    .appendChild(doc.createElement("conditionvar"));
 		    Element varequalElem = (Element) conditionvarElem.appendChild(doc.createElement("varequal"));
 		    varequalElem.setAttribute("respident", responseLidIdentifier);
 		    varequalElem.setTextContent(matchAnswerIdent);
@@ -555,8 +549,8 @@ public class QuestionExporter {
 	    setvarElem.setTextContent(String.valueOf(answer.getScore()));
 
 	    if (overallFeedbackElem != null) {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
 	    }
@@ -582,36 +576,6 @@ public class QuestionExporter {
 	appendMaterialElements(materialElem, feedback);
 
 	return feedbackElem;
-    }
-
-    /**
-     * Transforms a DOM object to String representation.
-     */
-    private String writeOutDoc() {
-	DOMSource domSource = new DOMSource(doc);
-	StringWriter writer = new StringWriter();
-	StreamResult streamResult = new StreamResult(writer);
-	TransformerFactory tf = TransformerFactory.newInstance();
-	try {
-	    Transformer transformer = tf.newTransformer();
-	    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-	    // a bit of beautification
-	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-	    transformer.transform(domSource, streamResult);
-	} catch (Exception e) {
-	    QuestionExporter.log.error("Error while writing out XML document", e);
-	    return null;
-	}
-
-	String result = writer.toString();
-	try {
-	    writer.close();
-	} catch (IOException e) {
-	    QuestionExporter.log.warn("Writer could not be closed", e);
-	}
-
-	return result;
     }
 
     /**

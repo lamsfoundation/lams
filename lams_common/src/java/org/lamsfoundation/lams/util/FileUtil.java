@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
@@ -35,6 +36,12 @@ import java.util.Properties;
 
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -42,9 +49,9 @@ import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
 import org.hibernate.type.StringType;
-import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import org.w3c.dom.Document;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -55,12 +62,11 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  * General File Utilities
  */
 public class FileUtil {
+    private static Logger log = Logger.getLogger(FileUtil.class);
 
     public static final String ENCODING_UTF_8 = "UTF8";
     public static final String EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = "dd.MM.yyyy h a";
     public static final String EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT = "dd.MM.yyyy";
-
-    private static Logger log = Logger.getLogger(FileUtil.class);
 
     public static final String LAMS_WWW_SECURE_DIR = "secure";
     public static final String LAMS_WWW_DIR = "lams-www.war";
@@ -72,6 +78,21 @@ public class FileUtil {
     public static final String ALLOWED_EXTENSIONS_MEDIA = ".3gp,.avi,.flv,.m4v,.mkv,.mov,.mp3,.mp4,.mpe,.mpeg,.mpg,.mpv,.mts,.m2ts,ogg,.wma,.wmv";
 
     protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
+
+    private static Transformer xmlTransformer = null;
+
+    static {
+	TransformerFactory tf = TransformerFactory.newInstance();
+	try {
+	    FileUtil.xmlTransformer = tf.newTransformer();
+	    FileUtil.xmlTransformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+	    // a bit of beautification
+	    FileUtil.xmlTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	    FileUtil.xmlTransformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+	} catch (Exception e) {
+	    FileUtil.log.error("Error while initialising XML transformer", e);
+	}
+    }
 
     /**
      * Deleting a directory using File.delete() only works if the directory is empty. This method deletes a directory
@@ -667,7 +688,7 @@ public class FileUtil {
      * 	-------------------------------
      * </pre>
      */
-    public static Object getObjectFromXML(XStream xStream, String fullFilePath) throws JDOMException, IOException {
+    public static Object getObjectFromXML(XStream xStream, String fullFilePath) throws IOException {
 
 	Reader file = null;
 	XStream conversionXml = xStream != null ? xStream : new XStream(new SunUnsafeReflectionProvider());
@@ -793,6 +814,27 @@ public class FileUtil {
 	} else {
 	    return ret;
 	}
+    }
 
+    public static void writeXMLtoFile(Document doc, File file) throws IOException {
+	StreamResult streamResult = new StreamResult(file);
+	DOMSource domSource = new DOMSource(doc);
+	try {
+	    FileUtil.xmlTransformer.transform(domSource, streamResult);
+	} catch (TransformerException e) {
+	    throw new IOException("Error while writing out XML document to file", e);
+	}
+    }
+
+    public static String writeXMLtoString(Document doc) {
+	try (StringWriter writer = new StringWriter()) {
+	    StreamResult streamResult = new StreamResult(writer);
+	    DOMSource domSource = new DOMSource(doc);
+	    FileUtil.xmlTransformer.transform(domSource, streamResult);
+	    return writer.toString();
+	} catch (Exception e) {
+	    FileUtil.log.error("Error while writing out XML document to string", e);
+	    return null;
+	}
     }
 }

@@ -18,9 +18,9 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
  * Import filter class for different version of ImageGallery content.
  */
 public class ImageGalleryImportContentVersionFilter extends ToolContentVersionFilter {
-    
+
     /**
      * Import 20090819 version content to 20140102 version tool server.
      */
@@ -40,12 +40,13 @@ public class ImageGalleryImportContentVersionFilter extends ToolContentVersionFi
 	this.removeField(ImageGallery.class, "offlineInstructions");
 	this.removeField(ImageGallery.class, "attachments");
     }
-    
+
     /**
      * Import 20150217 version content to 20150416 version tool server.
      */
     public void up20150217To20150416() {
-	this.addField(ImageGallery.class, "minimumRates", 0);
-	this.addField(ImageGallery.class, "maximumRates", 0);
+	this.removeField(ImageGallery.class, "allowCommentImages");
+	this.addField(ImageGallery.class, "minimumRates", "0");
+	this.addField(ImageGallery.class, "maximumRates", "0");
     }
 }

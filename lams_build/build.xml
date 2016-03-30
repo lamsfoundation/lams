@@ -439,34 +439,6 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/javax/wsdl4j/api/1.5" overwrite="true" verbose="true">
-			<fileset dir="lib/axis">
-				<include name="wsdl4j-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/javax/wsdl4j/api/1.5/module.xml"
-			  file="lib/axis/wsdl4j.module.xml" overwrite="true" verbose="true" />
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/axis/main" overwrite="true" verbose="true">
-			<fileset dir="lib/axis">
-				<include name="axis*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/axis/main/module.xml"
-			  file="lib/axis/axis.module.xml" overwrite="true" verbose="true" />
-
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/net/sf/cglib/main" overwrite="true" verbose="true">
-			<fileset dir="lib/cglib">
-				<include name="cglib_*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/net/sf/cglib/main/module.xml"
-			  file="lib/cglib/cglib.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
 		<copy todir="${server.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
 			<fileset dir="lib/fckeditor">
 				<include name="fckeditor-*.jar" />

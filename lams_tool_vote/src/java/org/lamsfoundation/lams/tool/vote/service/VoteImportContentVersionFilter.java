@@ -42,7 +42,7 @@ public class VoteImportContentVersionFilter extends ToolContentVersionFilter {
      * 2.1, but using 20080108 will cover the prerelease 2.1 + 2.0.4 created import files.
      */
     public void up20080108To20080326() {
-	this.addField(VoteContent.class, "showResults", true);
+	this.addField(VoteContent.class, "showResults", "true");
     }
 
     /** Version 2.3.4 added a minNominationCount column and this should default to "1". */

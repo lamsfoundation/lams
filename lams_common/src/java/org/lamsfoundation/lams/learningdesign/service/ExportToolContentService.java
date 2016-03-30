@@ -50,15 +50,15 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -133,6 +133,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -152,6 +155,8 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  * @version $Revision$
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
+    private Logger log = Logger.getLogger(ExportToolContentService.class);
+
     public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
 
     public static final String MESSAGE_SERVICE_BEAN_NAME = "commonMessageService";
@@ -196,8 +201,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     private static final String DIR_CONTENT = "content";
 
-    // Other fields
-    private Logger log = Logger.getLogger(ExportToolContentService.class);
+    // message keys
+    private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";
 
     // words found both in current complex learning library descriptions and in old exported LD XML files
     private static final String[][] COMPLEX_LEARNING_LIBRARY_KEY_WORDS = { { "Share", "Forum" }, { "Chat", "Scribe" },
@@ -235,8 +240,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private ILearningDesignDAO learningDesignDAO;
 
     private ILearningLibraryDAO learningLibraryDAO;
-
-    private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";
 
     /**
      * Class of tool attachment file handler class and relative fields information container.
@@ -809,15 +812,17 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * @param toolsErrorMsgs
      * @return version of the server that exported this file
      * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
      */
     private String checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs)
-	    throws JDOMException, IOException {
-
-	SAXBuilder sax = new SAXBuilder();
-	Document doc = sax.build(new FileInputStream(fullFilePath), "UTF-8");
-	Element root = doc.getRootElement();
-	String title = root.getChildTextTrim(ExportToolContentService.LAMS_TITLE);
-	String versionString = root.getChildTextTrim(ExportToolContentService.LAMS_VERSION);
+	    throws IOException, ParserConfigurationException, SAXException {
+	DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	Document doc = docBuilder.parse(new FileInputStream(fullFilePath));
+	Element root = doc.getDocumentElement();
+	String title = root.getElementsByTagName(ExportToolContentService.LAMS_TITLE).item(0).getTextContent().trim();
+	String versionString = root.getElementsByTagName(ExportToolContentService.LAMS_VERSION).item(0).getTextContent()
+		.trim();
 
 	String currentVersionString = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
 	try {
@@ -860,7 +865,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    contentFilter.removeField(problemClass, "runOffline");
 	    contentFilter.transformXML(fullFilePath);
 	}
-
     }
 
     private WorkspaceFolder getWorkspaceFolderForDesign(User importer, Integer workspaceFolderUid)
@@ -1113,7 +1117,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     public Long saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder,
 	    Map<Long, ToolContent> toolMapper, Map<Long, AuthoringActivityDTO> removedActMap)
-		    throws ImportToolContentException {
+	    throws ImportToolContentException {
 
 	// grouping object list
 	List<GroupingDTO> groupingDtoList = dto.getGroupings();

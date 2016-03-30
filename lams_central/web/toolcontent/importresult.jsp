@@ -21,7 +21,8 @@
 </c:set>
 
 <body class="stripes">
-
+	<!-- Flashless Authoring is looks for this string: learningDesignID=${learningDesignID} -->
+	
 	<lams:Page type="admin" title="${title}">
 
 		<c:choose>
