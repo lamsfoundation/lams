@@ -177,15 +177,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    mapAnswersPresentable = QaLearningAction.removeNewLinesMap(mapAnswersPresentable);
 	}
 	
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    forwardName = QaAppConstants.LOAD_LEARNER;
-	}
-	
-	//in case noReeditAllowed finalize response so user can't refresh the page and post answers again
-	if (errors.isEmpty() && qaContent.isNoReeditAllowed()) {
+	//finalize response so user won't need to edit his answers again, if coming back to the activity after leaving activity at this point
+	if (errors.isEmpty()) {
 	    qaQueUsr.setResponseFinalized(true);
 	    QaLearningAction.qaService.updateUser(qaQueUsr);
+	    
+	//in case of errors - prompt learner to enter answers again
+	} else {
+	    saveErrors(request, errors);
+	    forwardName = QaAppConstants.LOAD_LEARNER;
 	}
 
 	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
@@ -362,10 +362,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	QaContent qaContent = qaSession.getQaContent();
 	
 	// LearningUtil.storeResponses(mapAnswers, qaService, toolContentID, new Long(toolSessionID));
-	// mark response as finalised
-	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
-	qaQueUsr.setResponseFinalized(true);
-	QaLearningAction.qaService.updateUser(qaQueUsr);
 
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
@@ -398,7 +394,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	    generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
-	    generalLearnerFlowDTO.setUserUid(qaQueUsr.getQueUsrId().toString());
+	    generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
 
 	    int sessionUserCount = 0;
 	    if (qaSession.getQaQueUsers() != null) {
