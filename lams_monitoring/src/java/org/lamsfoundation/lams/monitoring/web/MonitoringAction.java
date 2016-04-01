@@ -1465,10 +1465,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
 
 	try {
-	    getMonitoringService().setPresenceAvailable(lessonID, userID, presenceAvailable);
+	    getMonitoringService().togglePresenceAvailable(lessonID, userID, presenceAvailable);
 
 	    if (!presenceAvailable) {
-		getMonitoringService().setPresenceImAvailable(lessonID, userID, false);
+		getMonitoringService().togglePresenceImAvailable(lessonID, userID, false);
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -1487,7 +1487,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
 
 	try {
-	    getMonitoringService().setPresenceImAvailable(lessonID, userID, presenceImAvailable);
+	    getMonitoringService().togglePresenceImAvailable(lessonID, userID, presenceImAvailable);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
