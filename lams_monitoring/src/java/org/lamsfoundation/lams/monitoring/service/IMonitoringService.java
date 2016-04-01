@@ -235,7 +235,7 @@ public interface IMonitoringService {
      * @return new value for learnerPresenceAvailable. Normally will be same as input parameter, will only be different
      *         if the value cannot be updated for some reason.
      */
-    Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
+    Boolean togglePresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
 
     /**
      * Set whether or not the learner IM button is available in monitor. Checks that the user is a staff member of this
@@ -247,7 +247,7 @@ public interface IMonitoringService {
      * @return new value for learnerPresenceImAvailable. Normally will be same as input parameter, will only be
      *         different if the value cannot be updated for some reason.
      */
-    Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
+    Boolean togglePresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
 
     /**
      * Set whether or not the live edit is available in monitor. Checks that the user is a staff member of this lesson
@@ -259,7 +259,7 @@ public interface IMonitoringService {
      * @return new value for liveEditEnabled. Normally will be same as input parameter, will only be different if the
      *         value cannot be updated for some reason.
      */
-    Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
+    Boolean toggleLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
 
     String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent);
