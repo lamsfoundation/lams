@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -68,23 +69,23 @@ public class HttpState {
      * Map of {@link Credentials credentials} by realm that this 
      * HTTP state contains.
      */
-    private HashMap credMap = new HashMap();
+    protected HashMap credMap = new HashMap();
 
     /**
      * Map of {@link Credentials proxy credentials} by realm that this
      * HTTP state contains
      */
-    private HashMap proxyCred = new HashMap();
+    protected HashMap proxyCred = new HashMap();
 
     /**
      * Array of {@link Cookie cookies} that this HTTP state contains.
      */
-    private ArrayList cookies = new ArrayList();
+    protected ArrayList cookies = new ArrayList();
 
     private boolean preemptive = false;
 
     private int cookiePolicy = -1;
-        // -------------------------------------------------------- Class Variables
+    // -------------------------------------------------------- Class Variables
 
     /**
      * The boolean system property name to turn on preemptive authentication.
@@ -610,7 +611,7 @@ public class HttpState {
     /**
      * Clears all cookies.
      */
-    public void clearCookies() {
+    public synchronized void clearCookies() {
         this.cookies.clear();
     }
     

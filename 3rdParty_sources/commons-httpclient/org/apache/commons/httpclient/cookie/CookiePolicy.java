@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 2002-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -80,8 +81,15 @@ public abstract class CookiePolicy {
      * @since 3.0
      */
     public static final String RFC_2109 = "rfc2109";
-    
-    /** 
+
+    /**
+     * The RFC 2965 compliant policy.
+     *
+     * @since 3.0
+     */
+    public static final String RFC_2965 = "rfc2965";
+
+    /**
      * The policy that ignores cookies. 
      * 
      * @since 3.0
@@ -98,6 +106,7 @@ public abstract class CookiePolicy {
     static {
         CookiePolicy.registerCookieSpec(DEFAULT, RFC2109Spec.class);
         CookiePolicy.registerCookieSpec(RFC_2109, RFC2109Spec.class);
+        CookiePolicy.registerCookieSpec(RFC_2965, RFC2965Spec.class);
         CookiePolicy.registerCookieSpec(BROWSER_COMPATIBILITY, CookieSpecBase.class);
         CookiePolicy.registerCookieSpec(NETSCAPE, NetscapeDraftSpec.class);
         CookiePolicy.registerCookieSpec(IGNORE_COOKIES, IgnoreCookiesSpec.class);
@@ -125,7 +134,14 @@ public abstract class CookiePolicy {
      */
     public static final int RFC2109 = 2;
 
-    /** 
+    /**
+     * The <tt>RFC2965</tt> RFC 2965 compliant policy.
+     *
+     * @deprecated Use {@link #RFC_2965}
+     */
+    public static final int RFC2965 = 3;
+
+    /**
      * The default cookie policy.
      *  
      * @deprecated Use {@link #DEFAULT} 
@@ -241,6 +257,8 @@ public abstract class CookiePolicy {
                 return new NetscapeDraftSpec(); 
             case RFC2109:
                 return new RFC2109Spec();
+            case RFC2965:
+                return new RFC2965Spec();
             default:
                 return getDefaultSpec(); 
         }
@@ -302,4 +320,19 @@ public abstract class CookiePolicy {
     public static CookieSpec getCompatibilitySpec() {
         return getSpecByPolicy(COMPATIBILITY);
     }
+
+    /**
+     * Obtains the currently registered cookie policy names.
+     * 
+     * Note that the DEFAULT policy (if present) is likely to be the same
+     * as one of the other policies, but does not have to be.
+     * 
+     * @return array of registered cookie policy names
+     * 
+     * @since 3.1
+     */
+    public static String[] getRegisteredCookieSpecs(){
+            return (String[]) SPECS.keySet().toArray(new String [SPECS.size()]); 
+    }
+    
 }

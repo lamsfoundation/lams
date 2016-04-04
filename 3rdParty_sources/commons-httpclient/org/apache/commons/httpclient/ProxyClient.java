@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -35,7 +36,6 @@ import java.net.Socket;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpParams;
-
 
 /**
  * A client that provides {@link java.net.Socket sockets} for communicating through HTTP proxies
@@ -179,14 +179,18 @@ public class ProxyClient {
      */
     public ConnectResponse connect() throws IOException, HttpException {
         
-        if (getHostConfiguration().getProxyHost() == null) {
+        HostConfiguration hostconf = getHostConfiguration();
+        if (hostconf.getProxyHost() == null) {
             throw new IllegalStateException("proxy host must be configured");
         }
-        if (getHostConfiguration().getHost() == null) {
+        if (hostconf.getHost() == null) {
             throw new IllegalStateException("destination host must be configured");
         }
+        if (hostconf.getProtocol().isSecure()) {
+            throw new IllegalStateException("secure protocol socket factory may not be used");
+        }
         
-        ConnectMethod method = new ConnectMethod();
+        ConnectMethod method = new ConnectMethod(getHostConfiguration());
         method.getParams().setDefaults(getParams());
         
         DummyConnectionManager connectionManager = new DummyConnectionManager();
@@ -194,7 +198,7 @@ public class ProxyClient {
         
         HttpMethodDirector director = new HttpMethodDirector(
             connectionManager,
-            getHostConfiguration(),
+            hostconf,
             getParams(),
             getState()
         );
