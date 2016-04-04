@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -49,13 +50,18 @@ public class ConnectMethod extends HttpMethodBase {
     /** the name of this method */
     public static final String NAME = "CONNECT";
 
+    private final HostConfiguration targethost;
+
     /**
+     * @deprecated use #ConnectMethod(HttpHost);
+     * 
      * Create a connect method.
      * 
      * @since 3.0
      */
     public ConnectMethod() {
-        LOG.trace("enter ConnectMethod()");
+        super();
+        this.targethost = null;
     }
 
     /**
@@ -67,7 +73,21 @@ public class ConnectMethod extends HttpMethodBase {
      *      to the server
      */
     public ConnectMethod(HttpMethod method) {
-        LOG.trace("enter ConnectMethod(HttpMethod)");
+        super();
+        this.targethost = null;
+    }
+
+    /**
+     * Create a connect method.
+     * 
+     * @since 3.0
+     */
+    public ConnectMethod(final HostConfiguration targethost) {
+        super();
+        if (targethost == null) {
+            throw new IllegalArgumentException("Target host may not be null");
+        }
+        this.targethost = targethost;
     }
 
     /**
@@ -77,6 +97,27 @@ public class ConnectMethod extends HttpMethodBase {
      */
     public String getName() {
         return NAME;
+    }
+    
+    public String getPath() {
+        if (this.targethost != null) {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(this.targethost.getHost()); 
+            int port = this.targethost.getPort();
+            if (port == -1) {
+                port = this.targethost.getProtocol().getDefaultPort();  
+            }
+            buffer.append(':'); 
+            buffer.append(port);
+            return buffer.toString();
+        } else {
+            return "/";
+        }
+    }
+
+    public URI getURI() throws URIException {
+        String charset = getParams().getUriCharset();
+        return new URI(getPath(), true, charset);
     }
 
     /**
@@ -158,15 +199,17 @@ public class ConnectMethod extends HttpMethodBase {
      */
     protected void writeRequestLine(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        int port = conn.getPort();
-        if (port == -1) {
-            port = conn.getProtocol().getDefaultPort();  
-        }
         StringBuffer buffer = new StringBuffer();
         buffer.append(getName()); 
         buffer.append(' '); 
-        buffer.append(conn.getHost()); 
-        if (port > -1) {
+        if (this.targethost != null) {
+            buffer.append(getPath()); 
+        } else {
+            int port = conn.getPort();
+            if (port == -1) {
+                port = conn.getProtocol().getDefaultPort();  
+            }
+            buffer.append(conn.getHost()); 
             buffer.append(':'); 
             buffer.append(port); 
         }

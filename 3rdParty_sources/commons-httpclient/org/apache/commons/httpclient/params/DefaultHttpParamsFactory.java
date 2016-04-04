@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -66,10 +67,10 @@ public class DefaultHttpParamsFactory implements HttpParamsFactory {
     protected HttpParams createParams() {
         HttpClientParams params = new HttpClientParams(null);
         
-        params.setParameter(HttpMethodParams.USER_AGENT, "Jakarta Commons-HttpClient/3.0");
+        params.setParameter(HttpMethodParams.USER_AGENT, "Jakarta Commons-HttpClient/3.1");
         params.setVersion(HttpVersion.HTTP_1_1);
         params.setConnectionManagerClass(SimpleHttpConnectionManager.class);
-        params.setCookiePolicy(CookiePolicy.RFC_2109);
+        params.setCookiePolicy(CookiePolicy.DEFAULT);
         params.setHttpElementCharset("US-ASCII");
         params.setContentCharset("ISO-8859-1");
         params.setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
