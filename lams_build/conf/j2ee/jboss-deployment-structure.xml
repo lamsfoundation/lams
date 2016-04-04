@@ -19,7 +19,6 @@
     <dependencies>
       <module name="org.javassist" export="true" />
       <module name="org.apache.poi" export="true" />
-      <module name="org.apache.batik" export="true" />
       <module name="net.fckeditor" export="true" />
       <module name="org.apache.commons.beanutils" export="true" />
       <module name="org.apache.commons.collections" export="true" />
@@ -49,7 +48,6 @@
       <module name="com.thoughtworks.xstream" export="true" />
       <module name="io.undertow.core" export="true" />
   	  <module name="io.undertow.servlet" export="true" />
-  	  <module name="org.joda.time" slot="2.1" export="true" />
   	  <module name="javax.mail.api" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
