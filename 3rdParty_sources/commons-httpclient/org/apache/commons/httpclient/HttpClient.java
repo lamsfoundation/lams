@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -152,9 +153,7 @@ public class HttpClient {
         }
         this.params = params; 
         this.httpConnectionManager = httpConnectionManager;
-        if (this.httpConnectionManager != null) {
-            this.httpConnectionManager.getParams().setDefaults(this.params);
-        }
+        this.httpConnectionManager.getParams().setDefaults(this.params);
     }
     
     /**
@@ -329,6 +328,7 @@ public class HttpClient {
     * {@link HostConfiguration host configuration}.
     *
     * @param hostConfiguration The {@link HostConfiguration host configuration} to use.
+     * If <code>null</code>, the host configuration returned by {@link #getHostConfiguration} will be used.
     * @param method the {@link HttpMethod HTTP method} to execute.
     * @return the method's response code
     *
@@ -354,9 +354,10 @@ public class HttpClient {
      * {@link HttpState HTTP state}.
      *
      * @param hostconfig The {@link HostConfiguration host configuration} to use.
+     * If <code>null</code>, the host configuration returned by {@link #getHostConfiguration} will be used.
      * @param method the {@link HttpMethod HTTP method} to execute.
      * @param state the {@link HttpState HTTP state} to use when executing the method.
-     * If <code>null</code>, the state returned by {@link #getState} will be used instead.
+     * If <code>null</code>, the state returned by {@link #getState} will be used.
      *
      * @return the method's response code
      *
@@ -382,7 +383,7 @@ public class HttpClient {
         URI uri = method.getURI(); 
         if (hostconfig == defaulthostconfig || uri.isAbsoluteURI()) {
             // make a deep copy of the host defaults
-            hostconfig = new HostConfiguration(hostconfig);
+            hostconfig = (HostConfiguration) hostconfig.clone();
             if (uri.isAbsoluteURI()) {
                 hostconfig.setHost(uri);
             }

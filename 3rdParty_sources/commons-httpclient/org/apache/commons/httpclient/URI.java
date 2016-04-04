@@ -1,15 +1,16 @@
 /*
- * $Header$
+ * $HeadURL: https://svn.apache.org/repos/asf/jakarta/httpcomponents/oac.hc3x/tags/HTTPCLIENT_3_1/src/java/org/apache/commons/httpclient/URI.java $
  * $Revision$
  * $Date$
  *
  * ====================================================================
  *
- *  Copyright 2002-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.BitSet;
 import java.util.Hashtable;
@@ -272,8 +274,7 @@ public class URI implements Cloneable, Comparable, Serializable {
                 getProtocolCharset());
         // Set flag
         _is_opaque_part = true;
-        _fragment = fragment.toCharArray(); 
-
+        _fragment = fragment == null ? null : fragment.toCharArray(); 
         setURI();
     }
 
@@ -513,6 +514,7 @@ public class URI implements Cloneable, Comparable, Serializable {
         if (base._scheme != null) {
             this._scheme = base._scheme;
             this._authority = base._authority;
+            this._is_net_path = base._is_net_path; 
         }
         if (base._is_opaque_part || relative._is_opaque_part) {
             this._scheme = base._scheme;
@@ -523,7 +525,9 @@ public class URI implements Cloneable, Comparable, Serializable {
             this.setURI();
             return;
         }
-        if (relative._scheme != null) {
+        boolean schemesEqual = Arrays.equals(base._scheme,relative._scheme);
+        if (relative._scheme != null 
+                && (!schemesEqual  || relative._authority != null)) {
             this._scheme = relative._scheme;
             this._is_net_path = relative._is_net_path;
             this._authority = relative._authority;
@@ -566,7 +570,8 @@ public class URI implements Cloneable, Comparable, Serializable {
             this._path = relative._path;
         }
         // resolve the path and query if necessary
-        if (relative._scheme == null && relative._authority == null) {
+        if (relative._authority == null 
+            && (relative._scheme == null || schemesEqual)) {
             if ((relative._path == null || relative._path.length == 0)
                 && relative._query == null) {
                 // handle a reference to the current document, see RFC 2396 
@@ -709,7 +714,7 @@ public class URI implements Cloneable, Comparable, Serializable {
     /**
      * The root path.
      */
-    protected static char[] rootPath = { '/' };
+    protected static final char[] rootPath = { '/' };
 
     // ---------------------- Generous characters for each component validation
 
@@ -1553,6 +1558,7 @@ public class URI implements Cloneable, Comparable, Serializable {
         allowed_abs_path.or(abs_path);
         // allowed_abs_path.set('/');  // aleady included
         allowed_abs_path.andNot(percent);
+        allowed_abs_path.clear('+');
     }
 
 
@@ -1564,6 +1570,7 @@ public class URI implements Cloneable, Comparable, Serializable {
     static {
         allowed_rel_path.or(rel_path);
         allowed_rel_path.clear('%');
+        allowed_rel_path.clear('+');
     }
 
 
@@ -1913,7 +1920,8 @@ public class URI implements Cloneable, Comparable, Serializable {
         boolean isStartedFromPath = false;
         int atColon = tmp.indexOf(':');
         int atSlash = tmp.indexOf('/');
-        if (atColon <= 0 || (atSlash >= 0 && atSlash < atColon)) {
+        if ((atColon <= 0 && !tmp.startsWith("//"))
+            || (atSlash >= 0 && atSlash < atColon)) {
             isStartedFromPath = true;
         }
 
@@ -1959,7 +1967,8 @@ public class URI implements Cloneable, Comparable, Serializable {
         if (0 <= at && at < length && tmp.charAt(at) == '/') {
             // Set flag
             _is_hier_part = true;
-            if (at + 2 < length && tmp.charAt(at + 1) == '/') {
+            if (at + 2 < length && tmp.charAt(at + 1) == '/' 
+                && !isStartedFromPath) {
                 // the temporary index to start the search from
                 int next = indexFirstOf(tmp, "/?#", at + 2);
                 if (next == -1) {
@@ -2009,10 +2018,11 @@ public class URI implements Cloneable, Comparable, Serializable {
                     _path = null;
                 }
             }
+            String s = tmp.substring(from, next);
             if (escaped) {
-                setRawPath(tmp.substring(from, next).toCharArray());
+                setRawPath(s.toCharArray());
             } else {
-                setPath(tmp.substring(from, next));
+                setPath(s);
             }
             at = next;
         }
@@ -2033,8 +2043,14 @@ public class URI implements Cloneable, Comparable, Serializable {
             if (next == -1) {
                 next = tmp.length();
             }
-            _query = (escaped) ? tmp.substring(at + 1, next).toCharArray() 
-                : encode(tmp.substring(at + 1, next), allowed_query, charset);
+            if (escaped) {
+                _query = tmp.substring(at + 1, next).toCharArray();
+                if (!validate(_query, uric)) {
+                    throw new URIException("Invalid query");
+                }
+            } else {
+                _query = encode(tmp.substring(at + 1, next), allowed_query, charset);
+            }
             at = next;
         }
 
@@ -2214,8 +2230,14 @@ public class URI implements Cloneable, Comparable, Serializable {
             _is_server = _is_hostname = _is_IPv4address =
             _is_IPv6reference = false;
             // set a registry-based naming authority
-            _authority = (escaped) ? original.toString().toCharArray() 
-                : encode(original.toString(), allowed_reg_name, charset);
+            if (escaped) {
+                _authority = original.toCharArray();
+                if (!validate(_authority, reg_name)) {
+                    throw new URIException("Invalid authority");
+                }
+            } else {
+                _authority = encode(original, allowed_reg_name, charset);
+            }
         } else {
             if (original.length() - 1 > next && hasPort 
                 && original.charAt(next) == ':') { // not empty
@@ -2263,17 +2285,7 @@ public class URI implements Cloneable, Comparable, Serializable {
         if (_is_net_path) {
             buf.append("//");
             if (_authority != null) { // has_authority
-                if (_userinfo != null) { // by default, remove userinfo part
-                    if (_host != null) {
-                        buf.append(_host);
-                        if (_port != -1) {
-                            buf.append(':');
-                            buf.append(_port);
-                        }
-                    }
-                } else {
-                    buf.append(_authority);
-                }
+                buf.append(_authority);
             }
         }
         if (_opaque != null && _is_opaque_part) {
@@ -2930,16 +2942,17 @@ public class URI implements Cloneable, Comparable, Serializable {
 
         // REMINDME: paths are never null
         String base = (basePath == null) ? "" : new String(basePath);
-        int at = base.lastIndexOf('/');
-        if (at != -1) {
-            basePath = base.substring(0, at + 1).toCharArray();
-        }
+
         // _path could be empty
         if (relPath == null || relPath.length == 0) {
             return normalize(basePath);
         } else if (relPath[0] == '/') {
             return normalize(relPath);
         } else {
+            int at = base.lastIndexOf('/');
+            if (at != -1) {
+                basePath = base.substring(0, at + 1).toCharArray();
+            }
             StringBuffer buff = new StringBuffer(base.length() 
                 + relPath.length);
             buff.append((at != -1) ? base.substring(0, at + 1) : "/");
@@ -3594,7 +3607,7 @@ public class URI implements Cloneable, Comparable, Serializable {
      * @param oos the object-output stream
      * @throws IOException If an IO problem occurs.
      */
-    protected void writeObject(ObjectOutputStream oos)
+    private void writeObject(ObjectOutputStream oos)
         throws IOException {
 
         oos.defaultWriteObject();
@@ -3609,7 +3622,7 @@ public class URI implements Cloneable, Comparable, Serializable {
      * input stream cannot be found.
      * @throws IOException If an IO problem occurs.
      */
-    protected void readObject(ObjectInputStream ois)
+    private void readObject(ObjectInputStream ois)
         throws ClassNotFoundException, IOException {
 
         ois.defaultReadObject();
@@ -3671,9 +3684,9 @@ public class URI implements Cloneable, Comparable, Serializable {
      *
      * @return a clone of this instance
      */
-    public synchronized Object clone() {
+    public synchronized Object clone() throws CloneNotSupportedException {
 
-        URI instance = new URI();
+        URI instance = (URI) super.clone();
 
         instance._uri = _uri;
         instance._scheme = _scheme;

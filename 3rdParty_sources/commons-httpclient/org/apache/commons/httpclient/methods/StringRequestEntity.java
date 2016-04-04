@@ -1,15 +1,16 @@
 /*
- * $Header$
+ * $HeadURL: https://svn.apache.org/repos/asf/jakarta/httpcomponents/oac.hc3x/tags/HTTPCLIENT_3_1/src/java/org/apache/commons/httpclient/methods/StringRequestEntity.java $
  * $Revision$
  * $Date$
  *
  * ====================================================================
  *
- *  Copyright 2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -58,16 +59,11 @@ public class StringRequestEntity implements RequestEntity {
      * will use the default platform charset to convert the content string 
      * and will provide no content type.</p>
      *  
-     * <p>This constructor may be deprecated or changed to use the 
-     * default HTTP content charset (ISO-8859-1) in the release 3.1</p>
-     * 
-     * <p>It is strongly recommended to use 
-     * {@link #StringRequestEntity(String, String, String)} constructor 
-     * instead.</p>
-     * 
      * @see #StringRequestEntity(String, String, String)
      * 
      * @param content The content to set.
+     * 
+     * @deprecated use {@link #StringRequestEntity(String, String, String)} instead
      */
     public StringRequestEntity(String content) {
         super();

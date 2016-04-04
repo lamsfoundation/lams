@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 2002-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -548,7 +549,8 @@ public class HttpURL extends URI {
                     "escaped user not valid");
         }
         String username = new String(escapedUser);
-        String password = new String(getRawPassword());
+        char[] rawPassword = getRawPassword();
+        String password = rawPassword == null ? null : new String(rawPassword);
         String userinfo = username + ((password == null) ? "" : ":" + password);
         String hostname = new String(getRawHost());
         String hostport = (_port == -1) ? hostname : hostname + ":" + _port;
@@ -643,7 +645,7 @@ public class HttpURL extends URI {
             throw new URIException(URIException.PARSING, "username required");
         }
         String username = new String(getRawUser());
-        String password = new String(escapedPassword);
+        String password = escapedPassword == null ? null : new String(escapedPassword);
         // an emtpy string is allowed as a password
         String userinfo = username + ((password == null) ? "" : ":" + password);
         String hostname = new String(getRawHost());
@@ -828,5 +830,51 @@ public class HttpURL extends URI {
         }
     }
 
+    /**
+     * Once it's parsed successfully, set this URI.
+     *
+     * @see #getRawURI
+     */
+    protected void setURI() {
+        // set _uri
+        StringBuffer buf = new StringBuffer();
+        // ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
+        if (_scheme != null) {
+            buf.append(_scheme);
+            buf.append(':');
+        }
+        if (_is_net_path) {
+            buf.append("//");
+            if (_authority != null) { // has_authority
+                if (_userinfo != null) { // by default, remove userinfo part
+                    if (_host != null) {
+                        buf.append(_host);
+                        if (_port != -1) {
+                            buf.append(':');
+                            buf.append(_port);
+                        }
+                    }
+                } else {
+                    buf.append(_authority);
+                }
+            }
+        }
+        if (_opaque != null && _is_opaque_part) {
+            buf.append(_opaque);
+        } else if (_path != null) {
+            // _is_hier_part or _is_relativeURI
+            if (_path.length != 0) {
+                buf.append(_path);
+            }
+        }
+        if (_query != null) { // has_query
+            buf.append('?');
+            buf.append(_query);
+        }
+        // ignore the fragment identifier
+        _uri = buf.toString().toCharArray();
+        hash = 0;
+    }
+    
 }
 
