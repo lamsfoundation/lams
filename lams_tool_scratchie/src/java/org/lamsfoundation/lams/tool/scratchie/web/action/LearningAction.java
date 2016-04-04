@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
-import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
@@ -115,6 +115,12 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("showResults")) {
 	    return showResults(mapping, form, request, response);
+	}
+	if (param.equals("like")) {
+	    return like(mapping, form, request, response);
+	}
+	if (param.equals("removeLike")) {
+	    return removeLike(mapping, form, request, response);
 	}
 
 	// ================ Reflection =======================
@@ -503,8 +509,8 @@ public class LearningAction extends Action {
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
 	    Scratchie scratchie = toolSession.getScratchie();
-	    List<BurningQuestionDTO> burningQuestionDtos = LearningAction.service.getBurningQuestionDtos(scratchie);
-	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTIONS_DTOS, burningQuestionDtos);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = LearningAction.service.getBurningQuestionDtos(scratchie, toolSessionId);
+	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
 	// display other groups' notebooks
@@ -532,6 +538,64 @@ public class LearningAction extends Action {
 	}
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    /**
+     * @throws ServletException 
+     * @throws ScratchieApplicationException 
+     */
+    private synchronized ActionForward like(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	initializeScratchieService();
+	
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	final Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(sessionId);
+
+	Long burningQuestionUid = WebUtil.readLongParam(request, ScratchieConstants.PARAM_BURNING_QUESTION_UID);
+
+	ScratchieUser leader = this.getCurrentUser(sessionId);
+	// only leader is allowed to scratch answers
+	if (!toolSession.isUserGroupLeader(leader.getUid())) {
+	    return null;
+	}
+
+	boolean added = service.addLike(burningQuestionUid, sessionId);
+
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put("added", added);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;
+    }
+    
+    /**
+     * @throws ServletException 
+     * @throws ScratchieApplicationException 
+     */
+    private synchronized ActionForward removeLike(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	initializeScratchieService();
+	
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	final Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(sessionId);
+
+	Long burningQuestionUid = WebUtil.readLongParam(request, ScratchieConstants.PARAM_BURNING_QUESTION_UID);
+
+	ScratchieUser leader = this.getCurrentUser(sessionId);
+	// only leader is allowed to scratch answers
+	if (!toolSession.isUserGroupLeader(leader.getUid())) {
+	    return null;
+	}
+
+	service.removeLike(burningQuestionUid, sessionId);
+
+	return null;
     }
 
     /**

@@ -19,6 +19,7 @@
 	
 	<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<lams:LAMSURL />/includes/font-awesome/css/font-awesome.min.css">
 	<style media="screen,projection" type="text/css">
 		#reflections-div {
 			padding: 10px 0 20px;
@@ -32,44 +33,114 @@
 		    vertical-align:text-top;
 		    padding-top:2px;
 		}
+		.ui-jqgrid tr.jqgrow td {vertical-align:middle !important}
 	</style>
 
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript">
+		function likeEntry(burningQuestionUid) {
+
+			var isLike = $( '#like-'+burningQuestionUid ).hasClass( 'fa-thumbs-o-up' );
+
+			if (isLike) {
+				$.ajax({
+				    url: '<c:url value="/learning/like.do"/>',
+					data: {
+						sessionMapID: "${sessionMapID}",
+						burningQuestionUid: burningQuestionUid
+					}
+				})
+			    .done(function (response) {	       		
+		    		if ( ! burningQuestionUid ) {
+						alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+		  			} else if ( response.added ) {
+		  				var currentCount = eval($('#count-'+burningQuestionUid).html());
+		  				currentCount += 1;
+			       		$('#count-'+burningQuestionUid).html(currentCount);
+					}
+				});
+				
+				$( '#like-'+burningQuestionUid ).removeClass( 'fa-thumbs-o-up' ).addClass( 'fa-thumbs-up' );
+				
+			} else {
+				$.ajax({
+				    url: '<c:url value="/learning/removeLike.do"/>',
+					data: {
+						sessionMapID: "${sessionMapID}",
+						burningQuestionUid: burningQuestionUid
+					}
+				})
+			    .done(function (response) {
+		    		if ( ! burningQuestionUid ) {
+						alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+		  			} else {
+		  				var currentCount = eval($('#count-'+burningQuestionUid).html());
+		  				currentCount -= 1;
+			       		$('#count-'+burningQuestionUid).html(currentCount);
+					}
+				});
+		
+				$( '#like-'+burningQuestionUid ).removeClass( 'fa-thumbs-up' ).addClass( 'fa-thumbs-o-up' );
+			}
+
+		}
+	
 		$(document).ready(function(){
 			
-			<!-- Display burningQuestionDtos -->
-			<c:forEach var="burningQuestionDto" items="${burningQuestionDtos}" varStatus="i">
-				jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid({
+			<!-- Display burningQuestionItemDtos -->
+			<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
+				<c:set var="scratchieItem" value="${burningQuestionItemDto.scratchieItem}"/>
+			
+				jQuery("#burningQuestions${scratchieItem.uid}").jqGrid({
 					datatype: "local",
 					rowNum: 10000,
 					height: 'auto',
 					autowidth: true,
 					shrinkToFit: false,
-				   	colNames:['#',
-							"<fmt:message key='label.monitoring.summary.user.name' />",
-						    "<fmt:message key='label.burning.questions' />"
+				   	colNames:[
+						'#',
+						"<fmt:message key='label.monitoring.summary.user.name' />",
+						"<fmt:message key='label.burning.questions' />",
+						"<fmt:message key='label.like' />",
+						"<fmt:message key='label.count' />"
 					],
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 				   		{name:'groupName', index:'groupName', width:200},
-				   		{name:'feedback', index:'feedback', width:522}
+				   		{name:'feedback', index:'feedback', width:401},
+				   		{name:'like', index:'like', width:60, align: "center"},
+				   		{name:'count', index:'count', width:50, align:"right"}
 				   	],
-				   	caption: "${burningQuestionDto.item.title}"
+				   	caption: "${scratchieItem.title}"
 				});
-			    <c:forEach var="entry" items="${burningQuestionDto.groupNameToBurningQuestion}" varStatus="i">
-			    	<c:set var="groupName" value="${entry.key}"/>
-			    	<c:set var="burningQuestion" value="${entry.value}"/>
-			    
-			    	jQuery("#burningQuestions${burningQuestionDto.item.uid}").addRowData(${i.index + 1}, {
+				
+			    <c:forEach var="burningQuestionDto" items="${burningQuestionItemDto.burningQuestionDtos}" varStatus="i">			    
+			    	jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
 			   			id:"${i.index + 1}",
-			   	     	groupName:"${groupName}",
-				   	    feedback:"<lams:out value='${burningQuestion}' escapeHtml='true' />"
+			   	     	groupName:"${burningQuestionDto.sessionName}",
+				   	    feedback:"<lams:out value='${burningQuestionDto.escapedBurningQuestion}' escapeHtml='true' />",
+				   	 	<c:choose>
+				   			<c:when test="${!isUserLeader && burningQuestionDto.userLikeUid != null}">
+				   				like:'<span class="fa fa-thumbs-up fa-2x"></span>',
+				   			</c:when>
+					   		<c:when test="${!isUserLeader}">
+				   				like:'',
+				   			</c:when>
+							<c:when test="${burningQuestionDto.userLikeUid != null}">
+								like:'<span class="fa fa-thumbs-up fa-2x" title="<fmt:message key="label.unlike"/>"' +
+										'onclick="javascript:likeEntry(${burningQuestionDto.burningQuestion.uid});" id="like-${burningQuestionDto.burningQuestion.uid}" />',
+							</c:when>
+							<c:otherwise>
+								like:'<span class="fa fa-thumbs-o-up fa-2x" title="<fmt:message key="label.like"/>"' +
+										'onclick="javascript:likeEntry(${burningQuestionDto.burningQuestion.uid});" id="like-${burningQuestionDto.burningQuestion.uid}" />',
+							</c:otherwise>
+						</c:choose>
+				   	 	count:'<span id="count-${burningQuestionDto.burningQuestion.uid}">${burningQuestionDto.likeCount}</span>'
 			   	   	});
 		        </c:forEach>
 
-		        jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid('sortGrid','groupName', false, 'asc');
+		        jQuery("#burningQuestions${scratchieItem.uid}").jqGrid('sortGrid','groupName', false, 'asc');
 	        </c:forEach>
 			
 			<!-- Display reflection entries -->
@@ -112,16 +183,20 @@
 		    
 		})
 	
-		function finishSession(){
+		function finishSession() {
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 			return false;
 		}
-		function continueReflect(){
+		function continueReflect() {
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		function editBurningQuestions(){
+		function editBurningQuestions() {
 			document.location.href='<c:url value="/learning/showBurningQuestions.do?sessionMapID=${sessionMapID}"/>';
+		}
+		function refresh() {
+			location.reload();
+			return false;
 		}
     </script>
 </lams:head>
@@ -131,6 +206,12 @@
 	<div id="content">
 		<h1>
 			<c:out value="${scratchie.title}"/>
+			
+			<div class="space-bottom-top align-right">
+				<html:button property="refreshButton" onclick="return refresh();" styleClass="button">
+					<fmt:message key="label.refresh" />
+				</html:button>
+			</div>
 		</h1>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline}">
@@ -153,22 +234,17 @@
 			</fmt:message>
 		</h3>
 		
-		<!-- Display burningQuestionDtos -->
+		<!-- Display burningQuestionItemDtos -->
 
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
 			<div class="small-space-top">
 				<h3><fmt:message key="label.burning.questions" /></h3>
 				
-				<c:forEach var="burningQuestionDto" items="${burningQuestionDtos}" varStatus="i">
+				<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 					<div class="burning-question-dto">
-						<table id="burningQuestions${burningQuestionDto.item.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
+						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</div>
 				</c:forEach>
-				
-				<!-- General burning question's table -->
-				<div class="burning-question-dto">
-					<table id="burningQuestions0" class="scroll" cellpadding="0" cellspacing="0"></table>
-				</div>
 				
 				<c:if test="${(mode != 'teacher') && isUserLeader}">
 					<html:button property="finishButton" onclick="return editBurningQuestions()" styleClass="button">
