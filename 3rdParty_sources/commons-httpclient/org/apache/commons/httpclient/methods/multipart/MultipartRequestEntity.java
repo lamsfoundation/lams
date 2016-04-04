@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 2002-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -57,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>This entity is designed to be used in conjunction with the 
  * {@link org.apache.commons.httpclient.methods.PostMethod post method} to provide
  * multipart posts.  Example usage:</p>
- * <code>
+ * <pre>
  *  File f = new File("/path/fileToUpload.txt");
  *  PostMethod filePost = new PostMethod("http://host/some_path");
  *  Part[] parts = {
@@ -69,7 +70,7 @@ import org.apache.commons.logging.LogFactory;
  *      );
  *  HttpClient client = new HttpClient();
  *  int status = client.executeMethod(filePost);
- * </code>
+ * </pre>
  * 
  * @since 3.0
  */

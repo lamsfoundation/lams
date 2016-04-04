@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -119,7 +120,17 @@ public class HttpParser {
                 }
             }
         }
-        return EncodingUtil.getString(rawdata, 0, len - offset, charset);
+        final String result =
+            EncodingUtil.getString(rawdata, 0, len - offset, charset);
+        if (Wire.HEADER_WIRE.enabled()) {
+            String logoutput = result;
+            if (offset == 2)
+                logoutput = result + "\r\n";
+            else if (offset == 1)
+                logoutput = result + "\n";
+            Wire.HEADER_WIRE.input(logoutput);
+        }
+        return result;
     }
 
     /**

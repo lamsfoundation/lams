@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -30,10 +31,8 @@
 package org.apache.commons.httpclient;
 
 import java.io.Serializable;
-import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Locale;
 
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.cookie.CookieSpec;
@@ -481,7 +480,7 @@ public class Cookie extends NameValuePair implements Serializable, Comparator {
                 return 1;
             }
         } else {
-            return STRING_COLLATOR.compare(c1.getPath(), c2.getPath());
+            return c1.getPath().compareTo(c2.getPath());
         }
     }
 
@@ -529,14 +528,6 @@ public class Cookie extends NameValuePair implements Serializable, Comparator {
    private int     cookieVersion = 0;
 
    // -------------------------------------------------------------- Constants
-
-   /** 
-    * Collator for Cookie comparisons.  Could be replaced with references to
-    * specific Locales.
-    */
-   private static final RuleBasedCollator STRING_COLLATOR =
-        (RuleBasedCollator) RuleBasedCollator.getInstance(
-                                                new Locale("en", "US", ""));
 
    /** Log object for this class */
    private static final Log LOG = LogFactory.getLog(Cookie.class);

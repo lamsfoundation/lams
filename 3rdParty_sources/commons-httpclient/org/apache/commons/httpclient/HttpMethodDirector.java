@@ -5,11 +5,12 @@
  *
  * ====================================================================
  *
- *  Copyright 1999-2004 The Apache Software Foundation
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -452,7 +453,7 @@ class HttpMethodDirector {
             releaseConnection = true;
             throw e;
         } catch (RuntimeException e) {
-            if (this.conn.isOpen) {
+            if (this.conn.isOpen()) {
                 LOG.debug("Closing the connection.");
                 this.conn.close();
             }
@@ -472,7 +473,7 @@ class HttpMethodDirector {
     private boolean executeConnect() 
         throws IOException, HttpException {
 
-        this.connectMethod = new ConnectMethod();
+        this.connectMethod = new ConnectMethod(this.hostConfiguration);
         this.connectMethod.getParams().setDefaults(this.hostConfiguration.getParams());
         
         int code;
@@ -515,6 +516,7 @@ class HttpMethodDirector {
             this.connectMethod = null;
             return true;
         } else {
+            this.conn.close();
             return false;
         }
     }
@@ -594,7 +596,10 @@ class HttpMethodDirector {
                 this.conn.getPort(), 
                 method.getPath()
             );
-            redirectUri = new URI(location, true);
+            
+            String charset = method.getParams().getUriCharset();
+            redirectUri = new URI(location, true, charset);
+            
             if (redirectUri.isRelativeURI()) {
                 if (this.params.isParameterTrue(HttpClientParams.REJECT_RELATIVE_REDIRECT)) {
                     LOG.warn("Relative redirect location '" + location + "' not allowed");
@@ -604,12 +609,15 @@ class HttpMethodDirector {
                     LOG.debug("Redirect URI is not absolute - parsing as relative");
                     redirectUri = new URI(currentUri, redirectUri);
                 }
+            } else {
+                // Reset the default params
+                method.getParams().setDefaults(this.params);
             }
             method.setURI(redirectUri);
             hostConfiguration.setHost(redirectUri);
-        } catch (URIException e) {
-            LOG.warn("Redirected location '" + location + "' is malformed");
-            return false;
+        } catch (URIException ex) {
+            throw new InvalidRedirectLocationException(
+                    "Invalid redirect location: " + location, location, ex);
         }
 
         if (this.params.isParameterFalse(HttpClientParams.ALLOW_CIRCULAR_REDIRECTS)) {
@@ -811,8 +819,6 @@ class HttpMethodDirector {
                 if (method.getFollowRedirects()) {
                     return true;
                 } else {
-                    LOG.info("Redirect requested but followRedirects is "
-                            + "disabled");
                     return false;
                 }
             default:
