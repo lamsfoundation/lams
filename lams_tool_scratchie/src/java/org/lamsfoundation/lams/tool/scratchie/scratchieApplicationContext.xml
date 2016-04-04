@@ -31,6 +31,11 @@
         <property name="sessionFactory">
             <ref bean="coreSessionFactory"/>
         </property>
+    </bean> 
+    <bean id="burningQuestionLikeDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.BurningQuestionLikeDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
     </bean>
 
    <bean id="scratchieUserDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieUserDAOHibernate">
@@ -72,6 +77,9 @@
         </property>
         <property name="scratchieBurningQuestionDao">
             <ref local="scratchieBurningQuestionDao"/>
+        </property>
+        <property name="burningQuestionLikeDao">
+            <ref local="burningQuestionLikeDao"/>
         </property>
         <property name="scratchieUserDao">
             <ref local="scratchieUserDao"/>

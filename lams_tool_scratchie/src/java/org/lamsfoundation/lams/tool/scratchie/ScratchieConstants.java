@@ -61,6 +61,8 @@ public class ScratchieConstants {
     public static final String PARAM_NOT_A_NUMBER = "nan";
     
     public static final String PARAM_MARK = "mark";
+    
+    public static final String PARAM_BURNING_QUESTION_UID = "burningQuestionUid";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
@@ -149,7 +151,7 @@ public class ScratchieConstants {
     
     public static final String ATTR_REFLECTIONS = "reflections";
     
-    public static final String ATTR_BURNING_QUESTIONS_DTOS = "burningQuestionDtos";
+    public static final String ATTR_BURNING_QUESTION_ITEM_DTOS = "burningQuestionItemDtos";
 
     public static final String ATTR_USER_UID = "userUid";
     
