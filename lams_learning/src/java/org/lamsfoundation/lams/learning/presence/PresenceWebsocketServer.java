@@ -295,11 +295,13 @@ public class PresenceWebsocketServer {
 	    return;
 	}
 	JSONObject requestJSON = new JSONObject(input);
-	String requestType = requestJSON.getString("type");
-	if (requestType.equals("message")) {
+	switch (requestJSON.getString("type")) {
+	case "message":
 	    PresenceWebsocketServer.storeMessage(requestJSON, session);
-	} else if (requestType.equals("fetchConversation")) {
+	    break;
+	case "fetchConversation":
 	    PresenceWebsocketServer.sendConversation(requestJSON, session);
+	    break;
 	}
     }
 
@@ -378,6 +380,21 @@ public class PresenceWebsocketServer {
 	messageJSON.put("dateSent", message.getDateSent());
 	messageJSON.put("message", message.getMessage());
 	return messageJSON;
+    }
+
+    public static int getActiveUserCount(long lessonId) {
+	Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	if (lessonWebsockets == null) {
+	    return 0;
+	}
+	// there can be few websockets (browser windows) for a single learner
+	Set<String> activeNicknames = new TreeSet<String>();
+	synchronized (lessonWebsockets) {
+	    for (Websocket websocket : lessonWebsockets) {
+		activeNicknames.add(websocket.nickName);
+	    }
+	}
+	return activeNicknames.size();
     }
 
     private static IPresenceChatService getPresenceChatService() {
