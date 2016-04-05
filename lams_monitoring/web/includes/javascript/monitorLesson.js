@@ -489,21 +489,21 @@ function updatePresenceAvailableCount(){
 		counter = $('#presenceAvailableCount');
 	if (checked) {
 		$.ajax({
-			dataType : 'json',
-			url : LAMS_URL + 'PresenceChat.do',
+			dataType : 'text',
+			url : LAMS_URL + 'learning/learner.do',
 			cache : false,
 			data : {
-				'method'    : 'getChatContent',
+				'method'    : 'getPresenceChatActiveUserCount',
 				'lessonID'      : lessonId
 			},
 			success : function(result) {
-				$('span', counter).text(result.roster.length);
-				counter.css('display', null);
+				$('span', counter).text(result);
+				counter.show();
 			}
 		});
 
 	} else {
-		counter.css('display', 'none');
+		counter.hide();
 	}
 }
 

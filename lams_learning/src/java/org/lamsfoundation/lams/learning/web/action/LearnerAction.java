@@ -38,6 +38,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
@@ -255,6 +256,15 @@ public class LearnerAction extends LamsDispatchAction {
 	request.setAttribute("currentActivityID", ret[1]);
 
 	return mapping.findForward("displayProgress");
+    }
+
+    public ActionForward getPresenceChatActiveUserCount(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	int count = PresenceWebsocketServer.getActiveUserCount(lessonId);
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(count);
+	return null;
     }
 
     /**
