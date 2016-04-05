@@ -98,10 +98,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     protected IUserManagementService userMgmtService;
     protected MessageService messageService;
 
-    // To support integrations that need a type for the learning design, any designs that do not have a type field set, 
+    // To support integrations that need a type for the learning design, any designs that do not have a type field set,
     // return "default" in the type field. Also, the integrations can search for designs that do not have a type field
     // set by setting type = default. This setup is done in the FolderContentDTO. See LDEV-3523
     protected static final String DEFAULT_DESIGN_TYPE = "default";
+
+    protected static final String ALL_DESIGN_TYPES = "all";
 
     /**
      * i18n Message service
@@ -182,8 +184,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    errorMessage = messageService.getMessage("delete.lesson.error");
 	}
 
-	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE, messageService.getMessage(
-		"delete.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
+	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE,
+		messageService.getMessage("delete.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
 	return message.serializeMessage();
 
     }
@@ -306,8 +308,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 				// deleted
 	{
 	    baseDAO.delete(folder);
-	    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE, messageService.getMessage(
-		    "folder.delete", new Object[] { folderID }));
+	    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE,
+		    messageService.getMessage("folder.delete", new Object[] { folderID }));
 	}
 
 	return flashMessage;
@@ -342,7 +344,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @throws RepositoryCheckedException
      */
     private Vector<FolderContentDTO> getFolderContentsInternal(User user, WorkspaceFolder workspaceFolder, Integer mode,
-	    String methodName, WorkspaceFolder skipFolder) throws UserAccessDeniedException, RepositoryCheckedException {
+	    String methodName, WorkspaceFolder skipFolder)
+	    throws UserAccessDeniedException, RepositoryCheckedException {
 	Vector<FolderContentDTO> contentDTO = new Vector<FolderContentDTO>();
 	if (user != null) {
 	    Integer permissions = getPermissions(workspaceFolder, user);
@@ -405,31 +408,33 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     @SuppressWarnings("unchecked")
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns)
 	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
-	
+
 	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, null);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns, String designType)
+    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns,
+	    String designType)
 	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
-	
+
 	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, designType);
     }
 
-    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns, 
+    public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns,
 	    boolean designsOnly, String designType)
 	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
 	JSONObject result = new JSONObject();
 	Vector<FolderContentDTO> folderContents = null;
 
 	// folderID == null: get all user accessible folders
-	// folderID == -1: get the learning designs at the root of the user's home folder - used for simplified deployment
-	if (folderID == null || folderID == -1 ) {
-	   
+	// folderID == -1: get the learning designs at the root of the user's home folder - used for simplified
+	// deployment
+	if ((folderID == null) || (folderID == -1)) {
+
 	    FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
 
-	    if ( folderID == null ) {
+	    if (folderID == null) {
 		folderContents = new Vector<FolderContentDTO>(3);
 
 		if (userFolder != null) {
@@ -437,8 +442,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		}
 
 		FolderContentDTO myGroupsFolder = new FolderContentDTO(messageService.getMessage("organisations"),
-		    messageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
-		    WorkspaceAction.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
+			messageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
+			WorkspaceAction.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
 
 		folderContents.add(myGroupsFolder);
 
@@ -446,13 +451,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		if (publicFolder != null) {
 		    folderContents.add(publicFolder);
 		}
-		
-	    } else if ( userFolder != null ) {
-		return getFolderContentsJSON(userFolder.getResourceID().intValue(), userID, allowInvalidDesigns, true, designType);
-	    
+
+	    } else if (userFolder != null) {
+		return getFolderContentsJSON(userFolder.getResourceID().intValue(), userID, allowInvalidDesigns, true,
+			designType);
+
 	    } // else we want to return an empty JSON, which will be done by falling through to the folderContents loop.
-	    
-	// special behaviour for organisation folders
+
+	    // special behaviour for organisation folders
 	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
 	    folderContents = getAccessibleOrganisationWorkspaceFolders(userID);
 	    Collections.sort(folderContents);
@@ -482,9 +488,16 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
 		result.append("folders", subfolderJSON);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
-		if ( folderContent.getDesignType() == null )
-		    folderContent.setDesignType(DEFAULT_DESIGN_TYPE);
-		if ( designType == null || designType.equals(folderContent.getDesignType())) {
+		if (folderContent.getDesignType() == null) {
+		    folderContent.setDesignType(WorkspaceManagementService.DEFAULT_DESIGN_TYPE);
+		}
+		// no designType: get only authored LDs
+		// designType=all: get all template LDs
+		// designType=someting: get only "something" templateLDs
+		if (designType == null
+			? folderContent.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE)
+			: designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES)
+				|| designType.equals(folderContent.getDesignType())) {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", folderContent.getName());
 		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
@@ -508,10 +521,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    int page, int size, String sortName, String sortDate) throws JSONException, IOException {
 
 	JSONArray result = new JSONArray();
-	Pattern searchPattern = searchString != null ? Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE) : null;
+	Pattern searchPattern = searchString != null
+		? Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE) : null;
 	FolderContentDTO userFolder = getUserWorkspaceFolder(userID);
 	long numDesigns = 0;
-	
+
 	if (userFolder != null) {
 	    Integer mode = allowInvalidDesigns ? WorkspaceManagementService.AUTHORING
 		    : WorkspaceManagementService.MONITORING;
@@ -519,41 +533,45 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    int folderId = userFolder.getResourceID().intValue();
 	    List designs = null;
 	    if (WorkspaceManagementService.AUTHORING.equals(mode)) {
-		if ( searchPattern != null ) 
+		if (searchPattern != null) {
 		    designs = learningDesignDAO.getAllPagedLearningDesigns(folderId, null, null, sortName, sortDate);
-		else 
+		} else {
 		    designs = learningDesignDAO.getAllPagedLearningDesigns(folderId, page, size, sortName, sortDate);
+		}
 	    } else {
-		if ( searchPattern != null )
+		if (searchPattern != null) {
 		    designs = learningDesignDAO.getValidPagedLearningDesigns(folderId, null, null, sortName, sortDate);
-	    	else 
-	    	    designs = learningDesignDAO.getValidPagedLearningDesigns(folderId, page, size, sortName, sortDate);
+		} else {
+		    designs = learningDesignDAO.getValidPagedLearningDesigns(folderId, page, size, sortName, sortDate);
+		}
 	    }
-	
-	    
+
 	    Iterator iterator = designs.iterator();
 	    while (iterator.hasNext()) {
 		LearningDesign design = (LearningDesign) iterator.next();
-		if (searchPattern == null || (searchPattern.matcher(design.getTitle()).find()) ) {
+		if ((searchPattern == null) || (searchPattern.matcher(design.getTitle()).find())) {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", StringEscapeUtils.escapeHtml(design.getTitle()));
 		    learningDesignJSON.put("learningDesignId", design.getLearningDesignId());
-		    learningDesignJSON.putOpt("type", design.getDesignType() != null ? design.getDesignType() : DEFAULT_DESIGN_TYPE);
+		    learningDesignJSON.putOpt("type", design.getDesignType() != null ? design.getDesignType()
+			    : WorkspaceManagementService.DEFAULT_DESIGN_TYPE);
 		    learningDesignJSON.put("date", design.getLastModifiedDateTime());
 		    result.put(learningDesignJSON);
 		}
 	    }
-	    
+
 	    // what is the total number (so the pager knows whether to allow paging)
-	    // if we did a search, then no paging just return the whole lot. 
+	    // if we did a search, then no paging just return the whole lot.
 	    // otherwise need the whole count from the db.
-	    numDesigns = searchPattern != null ? result.length() : learningDesignDAO.countAllLearningDesigns(folderId, !allowInvalidDesigns);
+	    numDesigns = searchPattern != null ? result.length()
+		    : learningDesignDAO.countAllLearningDesigns(folderId, !allowInvalidDesigns);
 	}
 
 	JSONObject completeResult = new JSONObject();
 	completeResult.put("total_rows", numDesigns);
-	if ( result.length() > 0)
+	if (result.length() > 0) {
 	    completeResult.put("rows", result);
+	}
 	return completeResult.toString();
     }
 
@@ -656,8 +674,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    errorMessage = messageService.getMessage("copy.no.support");
 	}
 
-	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_COPY, messageService.getMessage(
-		"copy.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
+	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_COPY,
+		messageService.getMessage("copy.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
 	return message.serializeMessage();
 
     }
@@ -732,16 +750,17 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    throws IOException {
 	FlashMessage message = null;
 	try {
-	    LearningDesign ld = authoringService.copyLearningDesign(designID, copyType != null ? copyType
-		    : new Integer(LearningDesign.COPY_TYPE_NONE), userID, targetFolderID, false);
+	    LearningDesign ld = authoringService.copyLearningDesign(designID,
+		    copyType != null ? copyType : new Integer(LearningDesign.COPY_TYPE_NONE), userID, targetFolderID,
+		    false);
 	    message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_COPY, ld.getLearningDesignId());
 
 	} catch (Exception e) {
 	    log.error("copyLearningDesign() unable to copy learning design due to an error. " + "designID=" + designID
 		    + "copyType=" + copyType + "targetFolderID=" + targetFolderID + "userID=" + userID, e);
 
-	    message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_COPY, messageService.getMessage(
-		    "unable.copy", new Object[] { e.getMessage() }), FlashMessage.ERROR);
+	    message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_COPY,
+		    messageService.getMessage("unable.copy", new Object[] { e.getMessage() }), FlashMessage.ERROR);
 
 	}
 
@@ -755,22 +774,23 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * @param folderID
      *            The <code>workspace_folder_id</code> of the <code>WorkspaceFolder<code>
      * 				   under which the User wants to create/copy folder
-     * @param userID
+     * &#64;param userID
      *            The <code>User</code> being checked
      * @return boolean A boolean value indicating whether or not the <code>User</code> is authorized
      * @throws UserException
      * @throws WorkspaceFolderException
      */
     @Override
-    public boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID) throws UserException,
-	    WorkspaceFolderException {
+    public boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID)
+	    throws UserException, WorkspaceFolderException {
 	boolean authorized = false;
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user != null) {
 	    WorkspaceFolder targetParent = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, folderID);
 	    if (targetParent != null) {
 		Integer permissions = getPermissions(targetParent, user);
-		if (!permissions.equals(WorkspaceFolder.NO_ACCESS) && !permissions.equals(WorkspaceFolder.READ_ACCESS)) {
+		if (!permissions.equals(WorkspaceFolder.NO_ACCESS)
+			&& !permissions.equals(WorkspaceFolder.READ_ACCESS)) {
 		    authorized = true;
 		}
 	    } else {
@@ -802,8 +822,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     }
 
     @Override
-    public WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID) throws UserException,
-	    WorkspaceFolderException {
+    public WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID)
+	    throws UserException, WorkspaceFolderException {
 	WorkspaceFolder parentFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, parentFolderID);
 
 	if (parentFolder != null) {
@@ -834,8 +854,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    }
 
 	} else {
-	    throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace",
-		    new Object[] { parentFolderID }));
+	    throw new WorkspaceFolderException(
+		    messageService.getMessage("no.such.workspace", new Object[] { parentFolderID }));
 	}
     }
 
@@ -927,8 +947,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    if (learningDesign != null) {
 		if (learningDesign.getUser().getUserId().equals(user.getUserId()) || isSysAuthorAdmin(user)) {
 		    if (learningDesign.getReadOnly().booleanValue()) {
-			flashMessage = new FlashMessage(
-				IWorkspaceManagementService.MSG_KEY_DELETE,
+			flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE,
 				messageService.getMessage("learningdesign.readonly", new Object[] { learningDesignID }),
 				FlashMessage.ERROR);
 		    } else {
@@ -990,8 +1009,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    errorMessage = messageService.getMessage("unsupport.move");
 	}
 
-	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_MOVE, messageService.getMessage(
-		"move.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
+	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_MOVE,
+		messageService.getMessage("move.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
 	return message.serializeMessage();
 
     }
@@ -1046,10 +1065,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    + IWorkspaceManagementService.REPOSITORY_WORKSPACE
 		    + ". Exception thrown by repository being ignored. ", ie);
 	} catch (RepositoryCheckedException e) {
-	    log.error(
-		    "Error occured while trying to configure repository." + "Workspace name "
-			    + IWorkspaceManagementService.REPOSITORY_WORKSPACE + " Unable to recover from error: "
-			    + e.getMessage(), e);
+	    log.error("Error occured while trying to configure repository." + "Workspace name "
+		    + IWorkspaceManagementService.REPOSITORY_WORKSPACE + " Unable to recover from error: "
+		    + e.getMessage(), e);
 	    throw e;
 	}
     }
@@ -1112,18 +1130,21 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, contentDTO);
 
 		} catch (AccessDeniedException ae) {
-		    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT,
-			    messageService.getMessage("creating.workspace.folder.error",
-				    new Object[] { ae.getMessage() }), FlashMessage.CRITICAL_ERROR);
+		    flashMessage = new FlashMessage(
+			    IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, messageService
+				    .getMessage("creating.workspace.folder.error", new Object[] { ae.getMessage() }),
+			    FlashMessage.CRITICAL_ERROR);
 		} catch (FileException fe) {
-		    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT,
-			    messageService.getMessage("creating.workspace.folder.error",
-				    new Object[] { fe.getMessage() }), FlashMessage.CRITICAL_ERROR);
+		    flashMessage = new FlashMessage(
+			    IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, messageService
+				    .getMessage("creating.workspace.folder.error", new Object[] { fe.getMessage() }),
+			    FlashMessage.CRITICAL_ERROR);
 
 		} catch (InvalidParameterException ip) {
-		    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT,
-			    messageService.getMessage("creating.workspace.folder.error",
-				    new Object[] { ip.getMessage() }), FlashMessage.CRITICAL_ERROR);
+		    flashMessage = new FlashMessage(
+			    IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, messageService
+				    .getMessage("creating.workspace.folder.error", new Object[] { ip.getMessage() }),
+			    FlashMessage.CRITICAL_ERROR);
 		}
 	    } else {
 		flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT,
@@ -1166,11 +1187,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     public String updateWorkspaceFolderContent(Long folderContentID, String path) throws Exception {
 	FlashMessage flashMessage = null;
 	InputStream stream = new FileInputStream(path);
-	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO.find(
-		WorkspaceFolderContent.class, folderContentID);
+	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO
+		.find(WorkspaceFolderContent.class, folderContentID);
 	if (workspaceFolderContent != null) {
 	    NodeKey nodeKey = updateFileInRepository(workspaceFolderContent, stream);
-	    UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(), folderContentID);
+	    UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),
+		    folderContentID);
 	    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_UPDATE_WKF_CONTENT, contentDTO);
 	} else {
 	    flashMessage = FlashMessage.getNoSuchWorkspaceFolderContentExsists(
@@ -1228,8 +1250,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     @Override
     public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted, Long folderContentID) throws Exception {
 	FlashMessage flashMessage = null;
-	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO.find(
-		WorkspaceFolderContent.class, folderContentID);
+	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO
+		.find(WorkspaceFolderContent.class, folderContentID);
 	if (workspaceFolderContent != null) {
 	    Long databaseVersion = workspaceFolderContent.getVersionID();
 
@@ -1245,9 +1267,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    log.warn(error);
 		}
 	    } catch (ItemNotFoundException ie) {
-		flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE_VERSION,
-			messageService.getMessage("no.such.content",
-				new Object[] { versionToBeDeleted, folderContentID }), FlashMessage.ERROR);
+		flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE_VERSION, messageService
+			.getMessage("no.such.content", new Object[] { versionToBeDeleted, folderContentID }),
+			FlashMessage.ERROR);
 		return flashMessage.serializeMessage();
 	    }
 
@@ -1296,8 +1318,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      */
     private String deleteWorkspaceFolderContent(Long folderContentID) throws IOException {
 	FlashMessage flashMessage = null;
-	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO.find(
-		WorkspaceFolderContent.class, folderContentID);
+	WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent) baseDAO
+		.find(WorkspaceFolderContent.class, folderContentID);
 	if (workspaceFolderContent != null) {
 	    baseDAO.delete(workspaceFolderContent);
 	    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_DELETE, "Content deleted");
@@ -1385,8 +1407,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
 		    if (org != null) {
 			Integer orgStateId = org.getOrganisationState().getOrganisationStateId();
-			if (!(OrganisationState.HIDDEN.equals(orgStateId) || OrganisationState.REMOVED
-				.equals(orgStateId))) {
+			if (!(OrganisationState.HIDDEN.equals(orgStateId)
+				|| OrganisationState.REMOVED.equals(orgStateId))) {
 
 			    // Only courses have folders - classes don't!
 			    Workspace workspace = org.getWorkspace();
@@ -1454,7 +1476,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 			    + " does not have a root folder. Returning no folders.");
 		}
 	    } else {
-		log.warn("getUserWorkspaceFolder: User " + userID + " does not have a workspace. Returning no folders.");
+		log.warn(
+			"getUserWorkspaceFolder: User " + userID + " does not have a workspace. Returning no folders.");
 	    }
 	} else {
 	    log.warn("getUserWorkspaceFolder: User " + userID + " does not exist. Returning no folders.");
@@ -1584,8 +1607,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    errorMessage = messageService.getMessage("rename.resource.unspport");
 	}
 
-	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_RENAME, messageService.getMessage(
-		"rename.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
+	FlashMessage message = new FlashMessage(IWorkspaceManagementService.MSG_KEY_RENAME,
+		messageService.getMessage("rename.resource.error", new Object[] { errorMessage }), FlashMessage.ERROR);
 	return message.serializeMessage();
 
     }
@@ -1620,8 +1643,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 				FlashMessage.ERROR);
 		    }
 		} else {
-		    flashMessage = FlashMessage
-			    .getUserNotAuthorized(IWorkspaceManagementService.MSG_KEY_RENAME, userID);
+		    flashMessage = FlashMessage.getUserNotAuthorized(IWorkspaceManagementService.MSG_KEY_RENAME,
+			    userID);
 		}
 	    } else {
 		flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(IWorkspaceManagementService.MSG_KEY_RENAME,
@@ -1661,8 +1684,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    learningDesignDAO.update(design);
 		    flashMessage = new FlashMessage(IWorkspaceManagementService.MSG_KEY_RENAME, title);
 		} else {
-		    flashMessage = FlashMessage
-			    .getUserNotAuthorized(IWorkspaceManagementService.MSG_KEY_RENAME, userID);
+		    flashMessage = FlashMessage.getUserNotAuthorized(IWorkspaceManagementService.MSG_KEY_RENAME,
+			    userID);
 		}
 	    } else {
 		flashMessage = FlashMessage.getNoSuchLearningDesignExists(IWorkspaceManagementService.MSG_KEY_RENAME,
