@@ -23,29 +23,53 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
-import java.util.Map;
-
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 
 public class BurningQuestionDTO {
-    private ScratchieItem item;
+    private ScratchieBurningQuestion burningQuestion;
+    private String escapedBurningQuestion;
+    private String sessionName;
     
-    private Map<String, String> groupNameToBurningQuestion;
+    private Integer likeCount;
+    private boolean userLiked;
     
-    public ScratchieItem getItem() {
-	return item;
+    public ScratchieBurningQuestion getBurningQuestion() {
+	return burningQuestion;
     }
 
-    public void setItem(ScratchieItem item) {
-	this.item = item;
+    public void setBurningQuestion(ScratchieBurningQuestion burningQuestion) {
+	this.burningQuestion = burningQuestion;
+    }
+    
+    public String getEscapedBurningQuestion() {
+	return escapedBurningQuestion;
     }
 
-    public Map<String, String> getGroupNameToBurningQuestion() {
-	return groupNameToBurningQuestion;
+    public void setEscapedBurningQuestion(String escapedBurningQuestion) {
+	this.escapedBurningQuestion = escapedBurningQuestion;
+    }
+    
+    public String getSessionName() {
+	return sessionName;
     }
 
-    public void setGroupNameToBurningQuestion(Map<String, String> leaderNameToBurningQuestion) {
-	this.groupNameToBurningQuestion = leaderNameToBurningQuestion;
+    public void setSessionName(String sessionName) {
+	this.sessionName = sessionName;
+    }
+
+    public Integer getLikeCount() {
+	return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+	this.likeCount = likeCount;
+    }
+
+    public boolean isUserLiked() {
+	return userLiked;
+    }
+
+    public void setUserLiked(boolean userLiked) {
+	this.userLiked = userLiked;
     }
 }

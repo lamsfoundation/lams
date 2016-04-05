@@ -93,9 +93,11 @@
 			
 		</c:forEach>
 		
-		<!-- Display burningQuestionDtos -->
-		<c:forEach var="burningQuestionDto" items="${sessionMap.burningQuestionDtos}" varStatus="i">
-			jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid({
+		<!-- Display burningQuestionItemDtos -->
+		<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
+			<c:set var="scratchieItem" value="${burningQuestionItemDto.scratchieItem}"/>
+			
+			jQuery("#burningQuestions${scratchieItem.uid}").jqGrid({
 				datatype: "local",
 				rowNum: 10000,
 				height: 'auto',
@@ -103,27 +105,28 @@
 				shrinkToFit: false,
 			   	colNames:['#',
 						"<fmt:message key='label.monitoring.summary.user.name' />",
-					    "<fmt:message key='label.burning.questions' />"
+					    "<fmt:message key='label.burning.questions' />",
+						"<fmt:message key='label.count' />"
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'groupName', index:'groupName', width:200},
-			   		{name:'feedback', index:'feedback', width:570}
+			   		{name:'feedback', index:'feedback', width:530},
+			   		{name:'count', index:'count', width:40}
 			   	],
-			   	caption: "${burningQuestionDto.item.title}"
+			   	caption: "${scratchieItem.title}"
 			});
-		    <c:forEach var="entry" items="${burningQuestionDto.groupNameToBurningQuestion}" varStatus="i">
-		    	<c:set var="groupName" value="${entry.key}"/>
-		    	<c:set var="burningQuestion" value="${entry.value}"/>
-		    
-		    	jQuery("#burningQuestions${burningQuestionDto.item.uid}").addRowData(${i.index + 1}, {
+			
+			<c:forEach var="burningQuestionDto" items="${burningQuestionItemDto.burningQuestionDtos}" varStatus="i">
+		    	jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
 		   			id:"${i.index + 1}",
-		   	     	groupName:"${groupName}",
-			   	    feedback:"<lams:out value='${burningQuestion}' escapeHtml='true' />"
+		   	     	groupName:"${burningQuestionDto.sessionName}",
+		   	    	feedback:"<lams:out value='${burningQuestionDto.escapedBurningQuestion}' escapeHtml='true' />",
+		   	  		count:"${burningQuestionDto.likeCount}"
 		   	   	});
 	        </c:forEach>
 	        
-	     	jQuery("#burningQuestions${burningQuestionDto.item.uid}").jqGrid('sortGrid','groupName', false, 'asc');
+	     	jQuery("#burningQuestions${scratchieItem.uid}").jqGrid('sortGrid','groupName', false, 'asc');
         </c:forEach>
 		
 		<!-- Display reflection entries -->
@@ -305,7 +308,7 @@
 			</select>
 		</div>
 		
-		<!-- Display burningQuestionDtos -->
+		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${scratchie.burningQuestionsEnabled}">
 		
 			<div class="section-header">
@@ -314,16 +317,11 @@
 				</H1>
 			</div>
 			
-			<c:forEach var="burningQuestionDto" items="${sessionMap.burningQuestionDtos}" varStatus="i">
+			<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
 				<div class="burning-question-dto">
-					<table id="burningQuestions${burningQuestionDto.item.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
+					<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 				</div>
 			</c:forEach>
-			
-			<!-- General burning question's table -->
-			<div class="burning-question-dto">
-				<table id="burningQuestions0" class="scroll" cellpadding="0" cellspacing="0"></table>
-			</div>
 		</c:if>
 		
 		<!-- Display reflection entries -->

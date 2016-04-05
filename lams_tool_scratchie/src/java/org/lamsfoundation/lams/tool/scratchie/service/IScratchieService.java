@@ -31,6 +31,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
@@ -224,12 +225,17 @@ public interface IScratchieService {
     List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
     
     /**
-     * Get BurningQuestionDtos used for summary tab
+     * In order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs.
      * 
      * @param scratchie
+     * @param sessionId optional parameter, if it's specified, BurningQuestionDTOs will also contain information what leader of this group has liked
      * @return
      */
-    List<BurningQuestionDTO> getBurningQuestionDtos(Scratchie scratchie);
+    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId);
+    
+    boolean addLike(Long burningQuestionUid, Long sessionId);
+    
+    void removeLike(Long burningQuestionUid, Long sessionId);
     
     /**
      * Export excel spreadheet

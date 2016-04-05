@@ -25,11 +25,12 @@ package org.lamsfoundation.lams.tool.scratchie.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 
 public interface ScratchieBurningQuestionDAO extends DAO {
 
-    List<ScratchieBurningQuestion> getBurningQuestionsByItemUid(Long itemUid);
+    List<BurningQuestionDTO> getBurningQuestionsByContentId(Long scratchieUid, Long sessionId);
     
     ScratchieBurningQuestion getBurningQuestionBySessionAndItem(Long sessionId, Long itemUid);
     

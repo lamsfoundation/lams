@@ -66,6 +66,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dao.BurningQuestionLikeDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieBurningQuestionDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieConfigItemDAO;
@@ -74,6 +75,7 @@ import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieUserDAO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
@@ -116,6 +118,8 @@ public class ScratchieServiceImpl
     private ScratchieAnswerVisitDAO scratchieAnswerVisitDao;
 
     private ScratchieBurningQuestionDAO scratchieBurningQuestionDao;
+
+    private BurningQuestionLikeDAO burningQuestionLikeDao;
 
     private ScratchieConfigItemDAO scratchieConfigItemDao;
 
@@ -775,67 +779,76 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public List<BurningQuestionDTO> getBurningQuestionDtos(Scratchie scratchie) {
+    public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId) {
 
 	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 
-	// get all available leaders associated with this content as only leaders have reflections
-	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
-
-	List<BurningQuestionDTO> burningQuestionDtos = new LinkedList<BurningQuestionDTO>();
+	List<BurningQuestionDTO> burningQuestionDtos = scratchieBurningQuestionDao
+		.getBurningQuestionsByContentId(scratchie.getUid(), sessionId);
+	
+	//in order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs
+	List<BurningQuestionItemDTO> burningQuestionItemDtos = new ArrayList<BurningQuestionItemDTO>();
 	for (ScratchieItem item : items) {
-	    BurningQuestionDTO burningQuestionDTO = new BurningQuestionDTO();
-	    burningQuestionDTO.setItem(item);
 
-	    List<ScratchieBurningQuestion> burningQuestions = scratchieBurningQuestionDao
-		    .getBurningQuestionsByItemUid(item.getUid());
+	    List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<BurningQuestionDTO>();
 
-	    Map<String, String> groupNameToBurningQuestion = new LinkedHashMap<String, String>();
-	    for (ScratchieBurningQuestion burningQuestion : burningQuestions) {
-
-		// find corresponding session
-		ScratchieSession session = null;
-		for (ScratchieSession sessionIter : sessionList) {
-		    if (burningQuestion.getSessionId().equals(sessionIter.getSessionId())) {
-			session = sessionIter;
-			break;
-		    }
+	    for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
+		ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
+		
+		//general burning question is handled further down 
+		if (!burningQuestion.isGeneralQuestion() && item.getUid().equals(burningQuestion.getScratchieItem().getUid())) {
+		    burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 		}
-
-		String groupName = StringEscapeUtils.escapeJavaScript(session.getSessionName());
-		String burningQuestionText = StringEscapeUtils.escapeJavaScript(burningQuestion.getQuestion());
-		groupNameToBurningQuestion.put(groupName, burningQuestionText);
 	    }
-	    burningQuestionDTO.setGroupNameToBurningQuestion(groupNameToBurningQuestion);
-
-	    burningQuestionDtos.add(burningQuestionDTO);
+	    
+	    BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
+	    burningQuestionItemDto.setScratchieItem(item);
+	    burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
+	    burningQuestionItemDtos.add(burningQuestionItemDto);
 	}
 
-	// general burning question
-	BurningQuestionDTO generalBurningQuestionDTO = new BurningQuestionDTO();
+	// handle general burning question
+	BurningQuestionItemDTO generalBurningQuestionItemDto = new BurningQuestionItemDTO();
 	ScratchieItem generalDummyItem = new ScratchieItem();
 	generalDummyItem.setUid(0L);
 	final String generalQuestionMessage = messageService.getMessage("label.general.burning.question");
 	generalDummyItem.setTitle(generalQuestionMessage);
-	generalBurningQuestionDTO.setItem(generalDummyItem);
-	Map<String, String> groupNameToBurningQuestion = new LinkedHashMap<String, String>();
-	generalBurningQuestionDTO.setGroupNameToBurningQuestion(groupNameToBurningQuestion);
-	for (ScratchieSession session : sessionList) {
-
-	    ScratchieBurningQuestion burningQuestion = scratchieBurningQuestionDao
-		    .getGeneralBurningQuestionBySession(session.getSessionId());
-	    if (burningQuestion == null) {
-		continue;
+	generalBurningQuestionItemDto.setScratchieItem(generalDummyItem);
+	List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<BurningQuestionDTO>();
+	for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
+	    ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
+	    
+	    if (burningQuestion.isGeneralQuestion()) {
+		burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 	    }
-
-	    String groupName = StringEscapeUtils.escapeJavaScript(session.getSessionName());
-	    String burningQuestionText = StringEscapeUtils.escapeJavaScript(burningQuestion.getQuestion());
-	    groupNameToBurningQuestion.put(groupName, burningQuestionText);
 	}
-	burningQuestionDtos.add(generalBurningQuestionDTO);
+	generalBurningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
+	burningQuestionItemDtos.add(generalBurningQuestionItemDto);
+	
+	//escape for Javascript
+	for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
+	    for (BurningQuestionDTO burningQuestionDto : burningQuestionItemDto.getBurningQuestionDtos()) {
+		String escapedSessionName = StringEscapeUtils.escapeJavaScript(burningQuestionDto.getSessionName());
+		burningQuestionDto.setSessionName(escapedSessionName);
 
-	return burningQuestionDtos;
+		String escapedBurningQuestion = StringEscapeUtils
+			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion());
+		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
+	    }
+	}
+
+	return burningQuestionItemDtos;
+    }
+    
+    @Override
+    public boolean addLike(Long burningQuestionUid, Long sessionId) {
+	return burningQuestionLikeDao.addLike(burningQuestionUid, sessionId);
+    }
+    
+    @Override
+    public void removeLike(Long burningQuestionUid, Long sessionId) {
+	burningQuestionLikeDao.removeLike(burningQuestionUid, sessionId);
     }
 
     @Override
@@ -1046,7 +1059,8 @@ public class ScratchieServiceImpl
 	for (int i = 0; i < percentages.length; i++) {
 	    sum += percentages[i];
 	}
-	int avgMean = sum / percentages.length;
+	int percentagesLength = percentages.length == 0 ? 1 : percentages.length;
+	int avgMean = sum / percentagesLength;
 	row = new ExcelCell[numberOfItems + 3];
 	row[0] = new ExcelCell(getMessage("label.avg.mean"), false);
 	row[numberOfItems + 2] = new ExcelCell(avgMean + "%", false);
@@ -1453,10 +1467,10 @@ public class ScratchieServiceImpl
 
 	ExcelCell[][] fourthPageData = rowList.toArray(new ExcelCell[][] {});
 	dataToExport.put(getMessage("label.spss.analysis"), fourthPageData);
-
+	
 	// ======================================================= Burning questions page
 	// =======================================
-
+	
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    rowList = new LinkedList<ExcelCell[]>();
 
@@ -1464,20 +1478,27 @@ public class ScratchieServiceImpl
 	    row[0] = new ExcelCell(getMessage("label.burning.questions"), true);
 	    rowList.add(row);
 	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	    
+	    row = new ExcelCell[3];
+	    row[0] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), IndexedColors.BLUE);
+	    row[1] = new ExcelCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
+	    row[2] = new ExcelCell(getMessage("label.count"), IndexedColors.BLUE);
+	    rowList.add(row);
 
-	    List<BurningQuestionDTO> burningQuestionDtos = getBurningQuestionDtos(scratchie);
-	    for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
-		ScratchieItem item = burningQuestionDto.getItem();
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null);
+	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
+		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
 		row = new ExcelCell[1];
 		row[0] = new ExcelCell(item.getTitle(), false);
 		rowList.add(row);
-
-		Map<String, String> groupNameToBurningQuestion = burningQuestionDto.getGroupNameToBurningQuestion();
-		for (String groupName : groupNameToBurningQuestion.keySet()) {
-		    String burningQuestion = groupNameToBurningQuestion.get(groupName);
-		    row = new ExcelCell[2];
-		    row[0] = new ExcelCell(groupName, false);
+		
+		List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
+		for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
+		    String burningQuestion = burningQuestionDto.getBurningQuestion().getQuestion();
+		    row = new ExcelCell[3];
+		    row[0] = new ExcelCell(burningQuestionDto.getSessionName(), false);
 		    row[1] = new ExcelCell(burningQuestion, false);
+		    row[2] = new ExcelCell(burningQuestionDto.getLikeCount(), false);
 		    rowList.add(row);
 		}
 		rowList.add(ScratchieServiceImpl.EMPTY_ROW);
@@ -1641,6 +1662,10 @@ public class ScratchieServiceImpl
 
     public void setScratchieBurningQuestionDao(ScratchieBurningQuestionDAO scratchieBurningQuestionDao) {
 	this.scratchieBurningQuestionDao = scratchieBurningQuestionDao;
+    }
+
+    public void setBurningQuestionLikeDao(BurningQuestionLikeDAO burningQuestionLikeDao) {
+	this.burningQuestionLikeDao = burningQuestionLikeDao;
     }
 
     public void setScratchieConfigItemDao(ScratchieConfigItemDAO scratchieConfigItemDao) {
