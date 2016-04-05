@@ -790,6 +790,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	List<BurningQuestionDTO> burningQuestionDtos = scratchieBurningQuestionDao
 		.getBurningQuestionsByContentId(scratchie.getUid(), sessionId);
 	
+	//in order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs
 	List<BurningQuestionItemDTO> burningQuestionItemDtos = new ArrayList<BurningQuestionItemDTO>();
 	for (ScratchieItem item : items) {
 
@@ -798,6 +799,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 		ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
 		
+		//general burning question is handled further down 
 		if (!burningQuestion.isGeneralQuestion() && item.getUid().equals(burningQuestion.getScratchieItem().getUid())) {
 		    burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 		}
@@ -1479,6 +1481,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    row[0] = new ExcelCell(getMessage("label.burning.questions"), true);
 	    rowList.add(row);
 	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	    
+	    row = new ExcelCell[3];
+	    row[0] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), IndexedColors.BLUE);
+	    row[1] = new ExcelCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
+	    row[2] = new ExcelCell(getMessage("label.count"), IndexedColors.BLUE);
+	    rowList.add(row);
 
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null);
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
@@ -1490,9 +1498,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
 		for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 		    String burningQuestion = burningQuestionDto.getBurningQuestion().getQuestion();
-		    row = new ExcelCell[2];
+		    row = new ExcelCell[3];
 		    row[0] = new ExcelCell(burningQuestionDto.getSessionName(), false);
 		    row[1] = new ExcelCell(burningQuestion, false);
+		    row[2] = new ExcelCell(burningQuestionDto.getLikeCount(), false);
 		    rowList.add(row);
 		}
 		rowList.add(ScratchieServiceImpl.EMPTY_ROW);
