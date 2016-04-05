@@ -212,6 +212,14 @@
 			<forward name="notebook" path="/pages/learning/notebook.jsp" />
 			<forward name="success" path="/pages/learning/results.jsp" />
 		</action>
+		<action path="/learning/like"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="like" >
+		</action>
+		<action path="/learning/removeLike"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="removeLike" >
+		</action>
 		
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
