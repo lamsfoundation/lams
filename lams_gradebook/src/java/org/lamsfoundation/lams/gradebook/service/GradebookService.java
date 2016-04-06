@@ -27,6 +27,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -298,6 +299,8 @@ public class GradebookService implements IGradebookService {
 	    //size will be 0 in case of excel export 
 	    if (size == 0) {
 		learners =  new LinkedList<User>(lesson.getAllLearners());
+		Collections.sort(learners, new UserComparator());
+		
 		userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
 		
