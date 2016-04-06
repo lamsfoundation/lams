@@ -85,6 +85,8 @@
 		   		<property name="mcOutputFactory"><ref bean="mcOutputFactory"/></property>	
 		   		<property name="messageService"><ref bean="lamcMessageService"/></property>
 		   		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		   		<property name="lessonService"><ref bean="lessonService"/></property>
+				<property name="activityDAO"><ref bean="activityDAO"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
