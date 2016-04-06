@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.gradebook.service;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,6 +54,7 @@ import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
+import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -296,6 +298,8 @@ public class GradebookService implements IGradebookService {
 	    //size will be 0 in case of excel export 
 	    if (size == 0) {
 		learners =  new LinkedList<User>(lesson.getAllLearners());
+		Collections.sort(learners, new UserComparator());
+		
 		userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
 		
@@ -619,10 +623,11 @@ public class GradebookService implements IGradebookService {
 
 	HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new HashMap<ToolActivity, List<GBUserGridRowDTO>>();
 
-	Set<User> learners = lesson.getAllLearners();
-	if (learners == null) {
-	    learners = new TreeSet<User>();
+	Set<User> learners = new TreeSet<User>(new UserComparator());
+	if (lesson.getAllLearners() != null) {
+	    learners.addAll(lesson.getAllLearners());
 	}
+	
 	Map<Integer, LearnerProgress> userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
 	Set<ToolActivity> activities = getLessonActivities(lesson);
 
@@ -771,9 +776,9 @@ public class GradebookService implements IGradebookService {
 
 	// -------------------- process Learner View page --------------------------------
 
-	Set<User> learners = lesson.getAllLearners();
-	if (learners == null) {
-	    learners = new TreeSet<User>();
+	Set<User> learners = new TreeSet<User>(new UserComparator());
+	if (lesson.getAllLearners() != null) {
+	    learners.addAll(lesson.getAllLearners());
 	}
 
 	rowList = new LinkedList<ExcelCell[]>();
@@ -872,7 +877,7 @@ public class GradebookService implements IGradebookService {
 	    rowList.add(headerRow);
 
 	    // collect users from all lessons
-	    Set<User> allLearners = new LinkedHashSet<User>();
+	    LinkedHashSet<User> allLearners = new LinkedHashSet<User>();
 	    List<Long> lessonIds = new LinkedList<Long>();
 	    for (Lesson lesson : lessons) {
 		Set dbLessonUsers = lesson.getAllLearners();
@@ -883,7 +888,7 @@ public class GradebookService implements IGradebookService {
 	    // Fetching the user data
 	    List<LearnerProgress> learnerProgresses;
 	    List<GradebookUserLesson> gradebookUserLessons;
-	    if (allLearners == null || allLearners.isEmpty()) {
+	    if (allLearners.isEmpty()) {
 		learnerProgresses = new LinkedList<LearnerProgress>();
 		gradebookUserLessons = new LinkedList<GradebookUserLesson>();
 		
@@ -891,8 +896,12 @@ public class GradebookService implements IGradebookService {
 		learnerProgresses = learnerProgressDAO.getLearnerProgressForLessons(lessonIds);
 		gradebookUserLessons = gradebookDAO.getGradebookUserLessons(lessonIds);
 	    }
+	    
+	    //sort users by last name
+	    TreeSet<User> sortedLearners = new TreeSet<User>(new UserComparator());
+	    sortedLearners.addAll(allLearners);
 
-	    for (User learner : allLearners) {
+	    for (User learner : sortedLearners) {
 		i = 0;
 		ExcelCell[] userDataRow = new ExcelCell[numberOfCellsInARow];
 		userDataRow[i++] = new ExcelCell(learner.getLastName(), false);
