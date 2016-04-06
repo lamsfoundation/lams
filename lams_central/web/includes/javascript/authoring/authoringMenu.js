@@ -387,52 +387,6 @@ var MenuLib = {
 			if (crop.x >= crop.x2) {
 				return;
 			}
-			
-			// replace image links with PNG code
-			crop.canvasClone.find('image').each(function(){
-				var image = $(this),
-					attributeName = 'xlink:href',
-					iconPath = image.attr(attributeName);
-				if (!iconPath) {
-					attributeName = 'href',
-					iconPath = image.attr(attributeName);
-				}
-				
-				var iconCode = null, 
-					extensionIndex = iconPath.indexOf('.svg');
-			
-				if (extensionIndex > -1) {
-					var pngPath = iconPath.substring(0, extensionIndex) + '.png';
-					// PNG images got precached when dropping tools on canvas
-					iconCode = layout.iconLib[pngPath];
-					
-					if (!iconCode) {
-						// no precached PNG image, generate one from SVG
-						// the PNG image can not be fetched using Ajax(!):
-						// it can be done only asynchronously or the binary stream has to be converted to text 
-						$.ajax({
-							url : iconPath,
-							async: false,
-							dataType : 'text',
-							success : function(response) {
-								var workspace = $('<canvas />')[0];
-								workspace.width = image.width();
-								workspace.height = image.height();
-								canvg(workspace, response);
-								iconCode = layout.iconLib[pngPath] = workspace.toDataURL('image/png');
-							}
-						});
-					}
-				} else {
-					iconCode = layout.iconLib[iconPath];
-				}
-				 
-				if (iconCode) {
-					image.attr(attributeName, iconCode);
-				}
-			});
-			
-			
 			// set viewBox so content is nicely aligned
 			var width = crop.x2 - crop.x + 2,
 				height = crop.y2 - crop.y + 2;
@@ -475,7 +429,29 @@ var MenuLib = {
 	 * Finds coordinates of canvas content, minus surrounding whitespace.
 	 */
 	getCanvasCrop : function(){
-		var canvasClone = canvas.clone();
+		var result = {
+			x  : Number.MAX_VALUE,
+			y  : Number.MAX_VALUE,
+			x2 : 0,
+			y2 : 0
+		};
+		$.each(layout.activities.concat(layout.regions).concat(layout.labels), function() {
+			var box = this.items.getBBox();
+			if (box.x < result.x) {
+				result.x = box.x;
+			}
+			if (box.y < result.y) {
+				result.y = box.y;
+			}
+			if (box.x2 > result.x2) {
+				result.x2 = box.x2;
+			}
+			if (box.y2 > result.y2) {
+				result.y2 = box.y2;
+			}
+		});
+		
+		var canvasClone = result.canvasClone = canvas.clone()
 		// remove the rubbish bin icon
 		canvasClone.find('#rubbishBin').remove();
 		// IE needs this. There are 2 xmlns declarations and no xmlns:xlink
@@ -483,45 +459,6 @@ var MenuLib = {
 		var canvasHTML = canvasClone.html().replace(/xmlns="http:\/\/www.w3.org\/2000\/svg"/g, '').replace('systemLanguage=""','')
 										   .replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ');
 		canvasClone.html(canvasHTML);
-		// create HTML5 canvas element and fill it with SVG code using canvg library
-		var workspace = $('<canvas />')[0];
-		canvg(workspace, canvasHTML);
-
-		// trim the image from white space
-		var ctx = workspace.getContext('2d'),
-			w = workspace.width,
-			h = workspace.height,
-			imageData = ctx.getImageData(0, 0, w, h),
-			result = {
-				x : w,
-				y : h,
-				x2 : 0,
-				y2 : 0,
-				workspace : workspace,
-				canvasClone : canvasClone
-			};
-
-		for (y = 0; y < h; y++) {
-		    for (x = 0; x < w; x++) {
-		        var index = (y * w + x) * 4,
-		        	a = imageData.data[index + 3];
-
-		        if (a > 0) {
-		            if (x < result.x) {
-		            	result.x = x;
-		            }
-		            if (y < result.y) {
-		            	result.y = y;
-		            }
-		            if (x > result.x2) {
-		            	result.x2 = x;
-		            }
-		            if (y > result.y2) {
-		            	result.y2 = y;
-		            }
-		        }
-		    }
-		}
 		
 		return result;
 	},

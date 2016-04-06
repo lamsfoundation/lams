@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.dto;
 public class ToolDTO {
     private Long toolId;
     private Long learningLibraryId;
+    private String learningLibraryTitle;
     private Long defaultToolContentId;
     private String toolDisplayName;
     private String iconPath;
@@ -82,6 +83,14 @@ public class ToolDTO {
 
     public void setLearningLibraryId(Long learningLibraryId) {
 	this.learningLibraryId = learningLibraryId;
+    }
+
+    public String getLearningLibraryTitle() {
+        return learningLibraryTitle;
+    }
+
+    public void setLearningLibraryTitle(String learningLibraryTitle) {
+        this.learningLibraryTitle = learningLibraryTitle;
     }
 
     public Long getDefaultToolContentId() {
