@@ -34,9 +34,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringProperty.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/canvg/rgbcolor.js"></script> 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/canvg/StackBlur.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/canvg/canvg.js"></script> 
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=getLearningDesignThumbnail&ldId=',
@@ -407,21 +404,19 @@
 				<div class="templateContainer">
 					<c:forEach var="tool" items="${tools}">
 						<div
-							 Id="tool${tool.toolDisplayName}"
 							 toolId="${tool.toolId}"
 							 learningLibraryId="${tool.learningLibraryId}"
+							 learningLibraryTitle="${tool.learningLibraryTitle}"
 							 defaultToolContentId="${tool.defaultToolContentId}"
 							 supportsOutputs="${tool.supportsOutputs}"
 							 activityCategoryId="${tool.activityCategoryID}"
+							 iconPath="${tool.iconPath}"
 							 childToolIds="
 							 <c:forEach var='childId' items='${tool.childToolIds}'>
 							 	${childId},
 							 </c:forEach>
 							 "
 							 class="template">
-							<c:if test="${not empty tool.iconPath}">
-								<img src="<lams:LAMSURL/>${tool.iconPath}" />
-							</c:if>
 							<div><c:out value="${tool.toolDisplayName}" /></div>
 						</div>
 					</c:forEach>

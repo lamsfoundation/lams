@@ -273,6 +273,7 @@ public class LearningDesignService implements ILearningDesignService {
 		    toolDTO.setToolId(libraryActivityDTO.getToolID());
 		}
 		toolDTO.setLearningLibraryId(learningLibrary.getLearningLibraryID());
+		toolDTO.setLearningLibraryTitle(learningLibrary.getTitle());
 		toolDTO.setToolDisplayName(
 			isParallel ? learningLibrary.getTitle() : libraryActivityDTO.getActivityTitle());
 		toolDTO.setActivityCategoryID(

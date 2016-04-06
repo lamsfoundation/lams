@@ -49,14 +49,9 @@ var paper = null,
 		'modified'   : false,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
-		// stores precached tool images so they can be used in exported SVG
-		'iconLib' : {
-			'bin' 					 : 'images/authoring_bin.svg',
-			'../images/grouping.png' : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAtCAYAAADP5GkqAAAABmJLR0QA/wD/AP+gvaeTAAAJMklEQVRYhe2XeXCV1RnGf+ec727Z94QACSEJBJA1ZVE2F2CKjgtUrKUdnaJDh2m1jtM6OrUdrLbWzmjr1FGcqc4IxVoVBS0gIotBDIYdQoEYyyaBJNzcm7t+d/m+0z/uDblgGJ12/Ks8M+/3nX/OeZ73fd7zne/AVVzF/zvEt7HoHxdTr2w5X9u4tbRbwm/QtBzsb13A8kXklOYXrJwy87Y7CirqhTQchHs6aN296WTb58dvXf4urZfPMf4rousx8suM6y1hj9BCnAuHrU3L38cszS1+d+73H5lTWdWIzC1HuvNBW1Q3zBnmWfPkziVdu0e9upOO/0nA04uM744ZN3l17ZhpRc6sQpKxEB1fHDCXq49WXDv3rjmV1ZMxCgajsktQjiyEcuDIKuaG2+N5Bw/f8yREfgIkv4kAsXwRhZEYiT++RwjQv7qNWVNnzl8/afYS6cwtQ2QXI5SD6ok+d25x5UO9gSQoB2iB1hq0BmyEcuAsqWH8uPF3sqb5EcB7RQFLG3EMH248MGZc42MVQ+tKbCvBxBGH2w8da3usrqb2qUmzfyydRVWonDIMdwHS6ULnD+GaOQ/T9PrD+H1+irMK0YkollBIbaO1BbZNUUlpDlAE9AD6KwIawTFmbN76m25fOrdqxI0YWfkIw8M1s0N1dZ+++tbx1n0aIwuEAUICGm3bCGmgcooZUjuO1r3bmVFUDEgAtGFgJ+LYZi/e7i4TcGVyZgoQc26WS2+49b65w8bMR+UPwcgpQRkekJJrcsuJRx8X/24/wsiJJeikiWU4UQDSBttmcPVUWvatJBbuxSMFlpVAKIWOhUgEu9nUdKAViGYKkBlj99jRI39ZPeJ6pCsP4XClshQCIQ0ceRWMm3kfh5rXEg34sM0AthnASoZJxgNYYS8dZ/biD4aJR/xYET92uBsrcJ647wwfrns2uXaP+Ubafz1QBXKra0YMFdIAbLCSaCuBFkZ/qR0ulB0g4PeS5XGjASsRQ2sLO9TNuZOHdVNzS8+1E6qKy4Y0IKQi4jtHc9MHkefeOrayM8AWIDSQBQLwWHZSazuBHTdBBUEIQCNsAysWRifjhMNBokE/ifwsVMIEKdHJBCeOfsiK1Zv3xWYPKdvq7io+9ebaAPEYhZNH5JyrcXqPnmMV0EbGFry8Ask9e/edGnddbLhUUbRU2Ai0lUQoAzviJxn2sWP/GW9R+ZtFDmYJd14ZiYifrlOH9Mur1vxrj9M+smT61MbBldWUVI3Mk9ogkuhlvKdm6LFlRxtbXkrs5jKozCZMmKHCCfWemcWltQg0WAmEnUDHQySCnez84AX7T5tiH4pR94/auHF9sKVpU+z9nSfjn0VniW2nz+x58NGFd5UOKmL7l69ywr+fL3x7OOk7jBKK+dMWzw/X7C/8Yqu5FbAGEpA8eYHuSOeRhtpKOayouBqdjGHFIyRDPezaskL//q8fr43V3b/wtw/dyfjpt7gm3vhD10233O2aN2uC2nIoNrJs7AHaQlsyTphUr3WGT9DRe5zbJy2b0l3waex0s9VM+nC6/DDKMmDaE+XGSuekrPyaxpEu0zR1e0t75OOD8V2hGctGPvrze2tO9STJcirKCz2UF3oYVJzFBV+Yp1etwT3+RVw5USzbwk7aWFY6kjYV2fUMy51g/eWZ16ae3sY+QKvLBFgPwIwfPf/yPdU5o5wFdo0qlvVq+tLl7uqPdtSVLVlWuP1oiHjSRkmBTIdAUF6UzXVjG1j/vsBVsRfDkbGqTj0C5gUaSq+VYUdH9fGtgbVAPFOAfAIW3XLvPaudtk3HU7+jd8cO/J98wvl166j/9eP4Vr7CfqMCPLlIJVEiJUBJgRRQVuhhdHUtb288QFHVeYQSFxX0jbrCJ5jZsKDm0y0tb5lBuvoEyN/AgpsffOAfjrY20bPqb5eWxTTp2rCB+kULGNraxC5nJcqTg1ISKQRK9VejqiKfcM9QzkT/iTu3vw/6XjErypiy2fLzYHPg3H67SQHie1Bz18IFW3JPnXZEtm/nSvA172L43Xdibt/I8UHjMBzOtBWkqyAwpKCiOIe3N35GybDujCr0FUNTnj2cSDyYfWSz9+8ScMwoKnpmUE2NO75tG4rUx0FdIU49/zzz5k2DA014eyP0BGP0BGJ4AzF6gjG8wRhlRbnUFdxGIiqQUiKlRCmJkgKlJKeDBxldO7YOyJNTYNj0xT9YmFz9OkqIAUkzBYlYnETHWW6MtNF1wYc3YOJNi+i5+I5z0+SphLpdqV5REqkEUkmkknRFTlJZOiwbyJXzDOP+vIICid+PUuqKmWdG95p3mDGzEfNMO95esz/7QKoCF3qjFOdn4e8oQWiRIpfyogBbxHEolyiopsQY/Z3GO5zt7dhKodMEJJNoMo6s9LgvrHgcw+Wi5sQu2svrcTgUTkNiKIlDCRxKUJrnIOIrAjqRSqZ+jvoWUhopJI48PEbt5Cm1bNiANIwUudZorVGWhR6AvA/xL79ktCPC8YRJT8CNQ6UEGErgMCSluU4ScQ+Q2qbpxdFaIKULS1v42vEZ2YUFkkAApVQ/efp/Ttv2gAI0YB49xsiqCqy4SSKZxBuIYShxUUCsLBssAykkUoFGo7VEK8gShQQjvmQyStgwlEIZRnqH9JOjdYrQtge0w+o8T2lDA1avibZtzFiCnmCK3KEk0VgCYZjpBuwnN6SDSYW3suvAx12A35CGgVLq0sz7KpFhyeV2EArh8rixvAls2wIEwUgibYMkGksyOLuKyZ7JuDzOi3NjiSg7Wjae2rz64C+ALsOOx5FKXUKe+X3WWqPSTZkpwMjLIx5JZa9tG42NFgJfMEZZgYdQ2GTbun1Pv/fC7jVAImNJC/ADF4C4YUt5qf/9zJdaYlmXCHAWFuEN9LJodi1llVUIIUCk7gNd3mDyD39+5Z3gmd0vAh2XOZjpJIbZ24usrESfPXtF8j4L+naGBrImTuDsrs86n/3okYekK7sbRIpEoM1AZzfx0DnAxxUupX0wXntpxetLfvbTxXmVlVjd3alypkmxbaTWOLTGyOgN2+2m83hb8r3W1ufisJEQwQGyGyjrr0AAQ6bCvAlwQxBi32RSDEJbYbMP9gDdX5fl1wkQgDMdkq+/sus0YYxUc32jTK/iKq7iSvgPMqxnT9+RviEAAAAASUVORK5CYII='
-		},
 		// icons for special activities
 		'toolMetadata': {
-			'gate'     : {		
+			'gate'     : {
 				'iconPath' : '../images/stop.gif'
 			},
 			'grouping' : {
@@ -143,6 +138,7 @@ GeneralInitLib = {
 		// store some template data in JS structures
 		$('.template').each(function(){
 			var learningLibraryID = +$(this).attr('learningLibraryId'),
+				learningLibraryTitle = $(this).attr('learningLibraryTitle'),
 				activityCategoryID = +$(this).attr('activityCategoryId'),
 				parallelChildActivityDefs = null;
 			
@@ -161,10 +157,13 @@ GeneralInitLib = {
 				});
 			}
 			
-			var iconPath = $('img', this).attr('src');
+			// assign icons' data uris to their learning library IDs instead of labels
+			ActivityIcons[learningLibraryID] = ActivityIcons[learningLibraryTitle];
+			delete ActivityIcons[learningLibraryTitle];
+			$('<img />').attr('src', ActivityIcons[learningLibraryID]).appendTo(this);
 			// register tool properties so they are later easily accessible
 			layout.toolMetadata[learningLibraryID] = {
-				'iconPath' 			 	  : iconPath,
+				'iconPath'				  : $(this).attr('iconPath'),
 				'defaultToolContentID'    : $(this).attr('defaultToolContentId'),
 				'supportsOutputs' 	 	  : $(this).attr('supportsOutputs'),
 				'activityCategoryID' 	  : activityCategoryID,
@@ -263,10 +262,7 @@ GeneralInitLib = {
 					    	activity = null,
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
-							eventY = translatedEvent[1],
-							iconPath = layout.toolMetadata[learningLibraryID].iconPath,
-							pngPath = iconPath && /\.svg$/i.test(iconPath)
-								? iconPath.substring(0, iconPath.indexOf('.svg')) + '.png' : iconPath;
+							eventY = translatedEvent[1];
 										    
 					    if (activityCategoryID == 5) {
 					    	// construct child activities out of previously referenced HTML templates
@@ -290,20 +286,6 @@ GeneralInitLib = {
 						layout.activities.push(activity);
 						HandlerLib.dropObject(activity);
 						ActivityLib.dropActivity(activity, eventX, eventY);
-						
-						// precache PNG icons for SVG export
-						if (pngPath && !layout.iconLib[pngPath]) {
-							var ajax = new XMLHttpRequest();
-							ajax.open("GET", pngPath, true);
-							ajax.responseType = "arraybuffer";
-							ajax.onload = function() {
-								if (ajax.response) {
-					                layout.iconLib[pngPath] =
-					                	'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, new Uint8Array(ajax.response)));
-								}
-				            };
-				            ajax.send(null);
-						}
 				   }
 			});
 		}
@@ -2071,7 +2053,7 @@ GeneralLib = {
 			}
 			
 			// draw rubbish bin on canvas
-			layout.bin = paper.image(LAMS_URL + layout.iconLib.bin, width - 55, height - 55, 48, 48);
+			layout.bin = paper.image(ActivityIcons.bin, width - 55, height - 55, 48, 48);
 			// so it can be found when SVG code gets cloned
 			$(layout.bin.node).attr('id', 'rubbishBin');
 			
@@ -2225,11 +2207,7 @@ GeneralLib = {
 			
 			if (activity.toolID) {
 				activityTypeID = 1;
-				// find out what is the icon for tool acitivty
-				var templateIcon = $('.template[learningLibraryId=' + activity.learningLibraryID +'] img');
-				if (templateIcon.width() > 0) {
-					 iconPath = layout.toolMetadata[activity.learningLibraryID].iconPath;
-				}
+				iconPath = layout.toolMetadata[activity.learningLibraryID].iconPath;
 			}
 			// translate activity type to back-end understandable
 			else if (activity instanceof ActivityDefs.GroupingActivity){

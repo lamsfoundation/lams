@@ -61,17 +61,16 @@
 			<div
 				 toolId="${tool.toolId}"
 				 learningLibraryId="${tool.learningLibraryId}"
+				 learningLibraryTitle="${tool.learningLibraryTitle}"
 				 supportsOutputs="${tool.supportsOutputs}"
 				 activityCategoryId="${tool.activityCategoryID}"
+				 iconPath="${tool.iconPath}"
 				 childToolIds="
 				 <c:forEach var='childId' items='${tool.childToolIds}'>
 				 	${childId},
 				 </c:forEach>
 				 "
 				 class="template">
-				<c:if test="${not empty tool.iconPath}">
-					<img src="<lams:LAMSURL/>${tool.iconPath}" />
-				</c:if>
 				<div><c:out value="${tool.toolDisplayName}" /></div>
 			</div>
 		</c:forEach>
