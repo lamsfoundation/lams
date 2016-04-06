@@ -84,6 +84,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     // set by setting type = default. This setup is done in the FolderContentDTO. See LDEV-3523
     protected static final String DEFAULT_DESIGN_TYPE = "default";
 
+    protected static final String ALL_DESIGN_TYPES = "all";
+
     /**
      * i18n Message service
      * 
@@ -278,7 +280,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      */
     private Vector<FolderContentDTO> getFolderContentsInternal(User user, WorkspaceFolder workspaceFolder, Integer mode,
 	    String methodName, WorkspaceFolder skipFolder)
-		    throws UserAccessDeniedException, RepositoryCheckedException {
+	    throws UserAccessDeniedException, RepositoryCheckedException {
 	Vector<FolderContentDTO> contentDTO = new Vector<FolderContentDTO>();
 	if (user != null) {
 	    Integer permissions = getPermissions(workspaceFolder, user);
@@ -341,14 +343,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     @Override
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns,
 	    String designType)
-		    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
+	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
 
 	return getFolderContentsJSON(folderID, userID, allowInvalidDesigns, false, designType);
     }
 
     public String getFolderContentsJSON(Integer folderID, Integer userID, boolean allowInvalidDesigns,
 	    boolean designsOnly, String designType)
-		    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
+	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
 	JSONObject result = new JSONObject();
 	Vector<FolderContentDTO> folderContents = null;
 
@@ -414,13 +416,20 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 				: folderContent.getResourceTypeID().intValue()));
 		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
 		subfolderJSON.put("canModify", WorkspaceFolder.OWNER_ACCESS.equals(folderContent.getPermissionCode())
-			|| (user != null && isSysAuthorAdmin(user)));
+			|| ((user != null) && isSysAuthorAdmin(user)));
 		result.append("folders", subfolderJSON);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
 		if (folderContent.getDesignType() == null) {
 		    folderContent.setDesignType(WorkspaceManagementService.DEFAULT_DESIGN_TYPE);
 		}
-		if ((designType == null) || designType.equals(folderContent.getDesignType())) {
+		// no designType: get only authored LDs
+		// designType=all: get all template LDs
+		// designType=someting: get only "something" templateLDs
+		if (designType == null
+			? folderContent.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE)
+			: (designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES) && !folderContent
+				.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE))
+				|| designType.equals(folderContent.getDesignType())) {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", folderContent.getName());
 		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
@@ -428,7 +437,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		    learningDesignJSON.put("date", folderContent.getLastModifiedDateTime());
 		    learningDesignJSON.put("canModify",
 			    WorkspaceFolder.OWNER_ACCESS.equals(folderContent.getPermissionCode())
-				    || (user != null && isSysAuthorAdmin(user)));
+				    || ((user != null) && isSysAuthorAdmin(user)));
 		    result.append("learningDesigns", learningDesignJSON);
 		}
 	    } else {
