@@ -119,7 +119,7 @@
 			    	jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
 			   			id:"${i.index + 1}",
 			   	     	groupName:"${burningQuestionDto.sessionName}",
-				   	    feedback:"<lams:out value='${burningQuestionDto.escapedBurningQuestion}' escapeHtml='true' />",
+				   	    feedback:"${burningQuestionDto.escapedBurningQuestion}",
 				   	 	<c:choose>
 				   			<c:when test="${!isUserLeader && burningQuestionDto.userLikeUid != null}">
 				   				like:'<span class="fa fa-thumbs-up fa-2x"></span>',
@@ -165,7 +165,7 @@
 		    	jQuery("#reflections").addRowData(${i.index + 1}, {
 		   			id:"${i.index + 1}",
 		   	     	groupName:"${reflectDTO.groupName}",
-			   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
+			   	    feedback:"<c:out value='${reflectDTO.reflection}' escapeXml='true' />"
 		   	   	});
 		    </c:forEach>
 		    
