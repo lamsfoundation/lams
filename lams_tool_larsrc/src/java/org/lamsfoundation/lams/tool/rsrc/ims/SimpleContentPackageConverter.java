@@ -24,469 +24,250 @@
 package org.lamsfoundation.lams.tool.rsrc.ims;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-
-import uk.ac.reload.jdom.XMLDocument;
-import uk.ac.reload.jdom.XMLPath;
-import uk.ac.reload.jdom.XMLUtils;
-import uk.ac.reload.moonunit.contentpackaging.CP_Core;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
- * SimpleContentPackageConverter contains the code required for
- * parsing the IMS Content Package and converting the info into our
- * own structures. 
+ * SimpleContentPackageConverter contains the code required for parsing the IMS Content Package and converting the info
+ * into our own structures.
  *
- * Note: this class has instance data, so do not use it as a singleton.
- * 
- * @author Fiona Malikoff
+ * @author Fiona Malikoff, Marcin Cieslak
  */
-public class SimpleContentPackageConverter implements IContentPackageConverter {
+public class SimpleContentPackageConverter {
+    private static Logger log = Logger.getLogger(SimpleContentPackageConverter.class);
 
-	private Logger log = Logger.getLogger(SimpleContentPackageConverter.class);
-	
-	// manifestDoc and cpCore are set up in the constructor. They are then used
-	// to generate the rest of the values
-	private XMLDocument manifestDoc = null;
-	private CP_Core cpCore = null;
+    private static DocumentBuilder docBuilder = null;
+    private static final XPathFactory xPathFactory = XPathFactory.newInstance();
+    private final XPath xPath = SimpleContentPackageConverter.xPathFactory.newXPath();
 
-	private String schema=null;
-	private String title=null;
-	private String description=null;
-	private String defaultItem=null;
-	private String organzationXML=null;
-	
-	// cachedResourceList is used to avoid building up the list
-	// every time an item is parsed - otherwise there is a lot
-	// of processing done by the reload code time and time again.
-	private Element[] cachedResourceList = null;
+    private Document manifestDoc = null;
 
-	/** Set up a package converter, using the supplied directory as the package. 
-	 * The package should be parsed automatically and the values readied for calls
-	 * to getSchema(), getTitle(), etc. 
-	 * 
-	 * @param directoryName: directory containing an expanded IMS content package.
-	 * @throws IMSManifestException if there is an error in parsing the manifest file
-	 * due to an error in the file or an unexpected value. 
- 	 * @throws ImscpApplicationException if there is any other error
- 	 */
-	public SimpleContentPackageConverter(String directoryName) 
-			throws IMSManifestException, ImscpApplicationException {
+    private String schema = null;
+    private String title = null;
+    private String description = null;
+    private String defaultItem = null;
+    private String organzationXML = null;
 
-		this.manifestDoc = getDocument(directoryName);
-		this.cpCore = new CP_Core(manifestDoc);
-
-		// initialise the property file required for the reload code. Needed to make 
-		// the metadata call work. If we remove the metadata call, then this constructor
-		// may be removed.
-		System.setProperty("editor.properties.file", "uk.ac.reload.editor.properties.rb");
-
-		parsePackage();
+    static {
+	try {
+	    // a single doc builder is enough
+	    SimpleContentPackageConverter.docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	} catch (ParserConfigurationException e) {
+	    SimpleContentPackageConverter.log.error("Error while initialising XML document builder", e);
 	}
-	
-	/** Parse IMS content package expanded out 
-	 * into the supplied directory. Note: the manifest file is expected to be in the
-	 * root of the supplied directory.
-	 * 
-	 * @throws ImscpApplicationException
-	 * @throws IMSManifestException
-	 */
-	private void parsePackage( )	throws IMSManifestException, ImscpApplicationException {
-		
-		String schemaText = getText(manifestDoc, "//metadata/schema");
-		String schemaVersion = getText(manifestDoc, "//metadata/schemaversion");
-   		this.schema = ( schemaText != null ? schemaText : "unknown" ) 
-				+ " " + ( schemaVersion != null ? schemaVersion : "unknown") ;
-		
-		Document orgs = buildOrganisationList();
-		if ( orgs == null ) {
-			String error = "Unable to convert organizations from manifest file to our own structure. Reason unknown - buildOrganisationList returned null";
-			log.error(error);
-			throw new ImscpApplicationException(error);
-		}
-		
-		try {
-			this.organzationXML = XMLUtils.write2XMLString(orgs);
-		} catch ( IOException ioe ) {
-			String error = "Exception thrown converting organization structure (as document) to an XML string."+ioe.getMessage();
-			log.error(error,ioe);
-			throw new ImscpApplicationException(error,ioe);
-		}
+    }
 
-		XMLPath xmlPath = new XMLPath("//metadata/*:lom/*:general/*:title/*:langstring");
-		this.title = getMetaValue(xmlPath);
-		if ( this.title == null ) {
-			// try the old root name - untested
-			xmlPath = new XMLPath("//metadata/*:record/*:general/*:title/*:langstring");
-			this.title = getMetaValue(xmlPath);
-		}
-		
-		xmlPath = new XMLPath("//metadata/*:lom/*:general/*:description/*:langstring");
-		this.description = getMetaValue(xmlPath);
-		if ( this.description == null ) {
-			// try the old root name - untested
-			xmlPath = new XMLPath("//metadata/*:record/*:general/*:description/*:langstring");
-			this.description = getMetaValue(xmlPath);
-		}
-		
+    public SimpleContentPackageConverter(String directoryName) throws IOException {
+	// first parse the manifest XML file
+	this.manifestDoc = getDocument(directoryName);
+
+	// get the necessary data from the XML document using XPath
+	String schemaText = getText("/manifest/metadata/schema/text()", manifestDoc);
+	String schemaVersion = getText("/manifest/metadata/schemaversion/text()", manifestDoc);
+	this.schema = (schemaText == null ? "unknown" : schemaText) + " "
+		+ (schemaVersion == null ? "unknown" : schemaVersion);
+
+	Document orgs = null;
+	try {
+	    orgs = buildOrganisationList();
+	} catch (XPathExpressionException e) {
+	    throw new IOException("Error while building organisations list", e);
+	}
+	if (orgs == null) {
+	    throw new IOException("Unable to convert organisations from manifest file to our own structure");
+	}
+	this.organzationXML = FileUtil.writeXMLtoString(orgs);
+
+	this.title = getText("/manifest/metadata/lom/general/title/langstring/text()", manifestDoc);
+	this.description = getText("/manifest/metadata/lom/general/description/langstring/text()", manifestDoc);
+    }
+
+    /* Get the text for first element matching XPath */
+    private String getText(String xPathString, Object context) throws IOException {
+	try {
+	    return xPath.evaluate(xPathString, context);
+	} catch (XPathExpressionException e) {
+	    throw new IOException("Error when parsing XPath expression: " + xPathString, e);
+	}
+    }
+
+    private Document getDocument(String directoryName) throws IOException {
+	File docFile = new File(directoryName, "imsmanifest.xml");
+	Document doc;
+	try {
+	    doc = SimpleContentPackageConverter.docBuilder.parse(new FileInputStream(docFile));
+	} catch (SAXException | IOException e) {
+	    throw new IOException("Error while parsing IMS manifest", e);
+	}
+	return doc;
+    }
+
+    /**
+     * Build an XML document which is a list of organisations/resources.
+     */
+    private Document buildOrganisationList() throws XPathExpressionException, IOException {
+	Element orgsElem = (Element) xPath.evaluate("/manifest/organizations", manifestDoc, XPathConstants.NODE);
+
+	// default org is for finding default item, but all orgs get processed
+	String defaultOrgIdentifier = orgsElem.getAttribute("default");
+	if (StringUtils.isBlank(defaultOrgIdentifier)) {
+	    defaultOrgIdentifier = getText("organization/@identifier", orgsElem);
+	}
+	if (SimpleContentPackageConverter.log.isDebugEnabled()) {
+	    SimpleContentPackageConverter.log.debug("Default organisation identifier is: " + defaultOrgIdentifier);
 	}
 
+	Document newDoc = SimpleContentPackageConverter.docBuilder.newDocument();
+	Element newRootElement = newDoc.createElement("organizations");
+	setAttribute(newRootElement, "version", "imscp1");
+	newDoc.appendChild(newRootElement);
 
-	/**
-	 * Finds a value at the given xmlPath. If only one element, uses that value.
-	 * If more than one element, tries to find an English value.
-	 * @param xmlPath
-	 * @return Value of the element found at xmlPath. 
-	 */
-	private String getMetaValue(XMLPath xmlPath) {
-		Element[] elList = manifestDoc.getElements(xmlPath);
-		String value = null;
-		if ( elList != null ) {
-			if ( elList.length == 0 ) {
-				value="Unknown";
-			} else if ( elList.length == 1 ) {
-				value=elList[0].getTextTrim();
-			} else {
-				value = null;
-				// TODO check if it is really testing for english
-				for ( int i=0; value == null && i < elList.length; i++ ) {
-					// grab the first English one
-					Element el = elList[i];
-					String attrValue = el.getAttributeValue("lang", Namespace.XML_NAMESPACE );
-					if ( attrValue != null && attrValue.startsWith("en") ) {
-						value = el.getTextTrim();
-					}
-				}
-				if ( value == null ) {
-					// can't seem to find an English one, just pick the first
-					value=elList[0].getTextTrim();
-				}
-			}
-		}
-		return value;
+	NodeList orgs = (NodeList) xPath.evaluate("organization", orgsElem, XPathConstants.NODESET);
+	for (int childIndex = 0; childIndex < orgs.getLength(); childIndex++) {
+	    Element organizationElement = processItem(newDoc, (Element) orgs.item(childIndex), defaultOrgIdentifier,
+		    null);
+	    if (organizationElement != null) {
+		newRootElement.appendChild(organizationElement);
+	    }
 	}
 
-	/* Get the text for this element - expect only 1 */
-	private String getText(XMLDocument document, String xmlPathString ) {
-		XMLPath xmlPath = new XMLPath(xmlPathString);
-		Element el = document.getElement(xmlPath);
-		return el != null ? el.getTextTrim() : null;
-	}
-	
- 	private String debug(XMLDocument document, String param, String xmlPathString ) {
-		XMLPath xmlPath = new XMLPath(xmlPathString);
-		Element[]elList = document.getElements(xmlPath);
-		if ( elList != null ) {
-			log.error(param+" xp: length "+elList.length+" el "+elList);
-			if ( elList.length >= 1 ) {
-				log.error("text is "+elList[0].getTextTrim());
-				return elList[0].getTextTrim();
-			}
-		} else {
-			log.error(param+" xp: el is null");
-		}
-		return null;
-	} 
-
-	/**
-	 * @param directoryName
-	 * @return
-	 * @throws JDOMException
-	 * @throws IOException
-	 */
-	private XMLDocument getDocument(String directoryName) throws IMSManifestException {
-		try { 
-			XMLDocument doc = new XMLDocument();
-			doc.loadDocument(new File(directoryName, "imsmanifest.xml"));
-			return doc;
-		} catch (JDOMException je) {
-			String error = "Parsing error occured while loading imsmanifest.xml file. Contents of file may be invalid. "+je.getMessage();
-			log.error(error, je);
-			throw new IMSManifestException(error, je);
-		} catch (FileNotFoundException e) {
-			String error = "Unable to find imsmanifest file in the package."+e.getMessage();
-			log.error(error, e);
-			throw new IMSManifestException(error, e);
-		} catch (IOException ioe) {
-			String error = "IOException occured while loading imsmanifest file. "+ioe.getMessage();
-			log.error(error, ioe);
-			throw new IMSManifestException(error, ioe);
-		}
+	if (SimpleContentPackageConverter.log.isDebugEnabled()) {
+	    SimpleContentPackageConverter.log.debug("Organizations are: " + FileUtil.writeXMLtoString(newDoc));
 	}
 
-	/** Built an XML document which is a list of organisations/resources. 
-	 */ 
-	private Document buildOrganisationList( ) throws IMSManifestException {
-		
-		Namespace nm = cpCore.getRootManifestElement().getNamespace(); 
-		
-		Element rootElement = cpCore.getRootManifestElement();
-		Element orgsElement = rootElement.getChild(CP_Core.ORGANIZATIONS, nm);
-			
-		// set up a list of all the resources
-		
-		// now get all the organizations and set up the new XML document, combining
-		// the organization and the resources.
-		Element defaultOrg = cpCore.getDefaultOrganization(orgsElement);
-		String defaultOrgIdentifier = null;
-		if ( defaultOrg != null )
-			defaultOrgIdentifier = defaultOrg.getAttributeValue("identifier");
+	return newDoc;
+    }
 
-		log.debug("cpCore default org id: "+defaultOrgIdentifier);
-
-		Element newRootElement = new Element("organizations");
-		setAttribute(newRootElement, "version", "imscp1");
-		Document doc = new Document(newRootElement);
-		
-		Element[] orgs = cpCore.getOrganizationsAllowed(orgsElement);
-		Element initOrganizationElement =null; 
-		for ( int i=0; i<orgs.length; i++) {
-			
-			Element organizationElement = processItem(orgs[i], nm, defaultOrgIdentifier, null);
-			if ( initOrganizationElement == null )
-				initOrganizationElement = organizationElement;
-			
-			newRootElement.addContent(organizationElement);
-		}
-
-		if ( log.isDebugEnabled() ) {
-			try { 
-				log.debug("Organizations are: "+XMLUtils.write2XMLString(doc));
-			} catch ( IOException e ) {
-				log.debug("Unable to convert organizations to XML for log. Organizations are: "+doc);
-			}
-		}
-		
-		return doc;
+    /**
+     * Process the given element. Returns a newly formatted Element if the element is a visible item, null otherwise.
+     * Will also set the value "defaultItemURL" while processing, if it finds the default item.
+     * 
+     * First time through, the element will be an organization and parentOrgIdentifier will be null. After that,
+     * elements are expected to be items and parentOrgIdentifier should not be null.
+     * 
+     * parentOrgIdentifier is the parent organization of an item. An item is the default item if either: (a) the
+     * defaultOrgIdentifier is null and it is the first item encountered which has a resource or (b)
+     * parentOrgIdentifier==defaultOrgIdentifier and it is the first item encountered which has a resource.
+     *
+     * @param element
+     * @return New version of element combining organization/item/resource details
+     * @throws XPathExpressionException
+     * @throws IOException
+     */
+    private Element processItem(Document doc, Element element, String defaultOrgIdentifier, String parentOrgIdentifier)
+	    throws XPathExpressionException, IOException {
+	// only process visible items as we are building the list for display to the user
+	if (!isVisible(element.getAttribute("isVisible"))) {
+	    return null;
 	}
-	
-	/** Process the given element. Returns a newly formatted Element if the element
-	 * is a visible item, null otherwise. Will also set the value "defaultItemURL"
-	 * while processing, if it finds the default item.
-	 * 
-	 * First time through, the element will be an organization and parentOrgIdentifier
-	 * will be null. After that, elements are expected to be items and parentOrgIdentifier
-	 * should not be null.
-	 * 
-	 * parentOrgIdentifier is the parent organization of an item. An item is 
-	 * the default item if either:
-	 * (a) the defaultOrgIdentifier is null and it is the first item encountered 
-	 * which has a resource or 
-	 * (b) parentOrgIdentifier==defaultOrgIdentifier and it is the first item encountered 
-	 * which has a resource. 
-	 *
-	 * @param element
-	 * @return New version of element combining organization/item/resource details
-	 */
-	private Element processItem(Element element, Namespace nm, String defaultOrgIdentifier, String parentOrgIdentifier) 
-	 			throws IMSManifestException {
-		
-		String isVisibleString = element.getAttributeValue(CP_Core.ISVISIBLE);
-		if ( isVisible(isVisibleString) )  {
+	String id = element.getAttribute("identifier");
+	Element itref = doc.createElement("item");
 
-			String id = element.getAttributeValue(CP_Core.IDENTIFIER); 
-			// only process visible items as we are building the list for display to the user
-			Element itref = new Element(OrganizationXMLDef.ITEM);
+	setAttribute(itref, "identifier", id); // mandatory
+	setAttribute(itref, "parameters", element.getAttribute("parameters")); // optional
+	setAttribute(itref, "title", getText("title/text()", element)); // optional
+	String idRef = element.getAttribute("identifierref");
+	// find matching resource
+	String resourceURL = getText("/manifest/resources/resource[@identifier='" + idRef + "']/@href", manifestDoc);
+	setAttribute(itref, "resource", resourceURL); // optional 
 
-			setAttribute(itref, OrganizationXMLDef.IDENTIFIER, id); // mandatory
-			setAttribute(itref, OrganizationXMLDef.PARAMETERS, element.getAttributeValue(CP_Core.PARAMETERS)); // optional
-			setAttribute(itref, OrganizationXMLDef.TITLE, element.getChildText(CP_Core.TITLE, nm)); // optional
-			String resourceURL = getResourceURL(element);
-			if ( resourceURL != null )
-				setAttribute(itref, OrganizationXMLDef.RESOURCE, resourceURL); // optional 
-
-			if ( resourceURL != null && this.defaultItem == null && 
-				 (defaultOrgIdentifier== null ||  defaultOrgIdentifier.equals(parentOrgIdentifier)) ) {
-				setAttribute(itref, OrganizationXMLDef.DEFAULT, Boolean.TRUE.toString());
-				this.defaultItem = resourceURL;
-			} else {
-				setAttribute(itref, OrganizationXMLDef.DEFAULT, Boolean.FALSE.toString());
-			}
-
-			List items = element.getChildren(CP_Core.ITEM, nm);
-			Iterator iter = items.iterator();
-			while (iter.hasNext()) {
-				Element itrefChild  = processItem((Element) iter.next(), 
-						nm, 
-						defaultOrgIdentifier,
-						parentOrgIdentifier != null ? parentOrgIdentifier : id);
-				if ( itrefChild != null )
-					itref.addContent(itrefChild);
-			}
-
-			return itref;
-		}
-		return null;
-		
+	if (StringUtils.isNotBlank(resourceURL) && (this.defaultItem == null)
+		&& ((defaultOrgIdentifier == null) || defaultOrgIdentifier.equals(parentOrgIdentifier))) {
+	    setAttribute(itref, "default", Boolean.TRUE.toString());
+	    this.defaultItem = resourceURL;
+	} else {
+	    setAttribute(itref, "default", Boolean.FALSE.toString());
 	}
 
-	/**
-	 * Not sure exactly what format "isVisible" will be in. In the spec, it says 
-	 * Boolean (True|False) yet the imslipv1p0cp.zip package has a value of "1". 
-	 * So this code will accept anything as visible except for false (any case) 
-	 * or 0.
-	 */
-	private boolean isVisible(String value ) {
-		
-		if ( value != null ) {
-			String trimmed = value.trim();
-			if ( trimmed.equalsIgnoreCase("false") || trimmed.equals("0") ) {
-				return false;
-			}
-		}
-		return true;
-	}
-											  
-	private void setAttribute(Element element, String attributeName, String value) {
-		if ( element != null && attributeName != null && value != null )
-			element.setAttribute(attributeName, value);
+	NodeList items = (NodeList) xPath.evaluate("item", element, XPathConstants.NODESET);
+	for (int childIndex = 0; childIndex < items.getLength(); childIndex++) {
+	    Element itrefChild = processItem(doc, (Element) items.item(childIndex), defaultOrgIdentifier,
+		    parentOrgIdentifier != null ? parentOrgIdentifier : id);
+	    if (itrefChild != null) {
+		itref.appendChild(itrefChild);
+	    }
 	}
 
-	/* Get the resource relating to this item. First time called it will
-	 * get a list of allowed resources it will cache the value in 
-	 * cachedResourceList. After that, it will go to the cache. If 
-	 * it doesn't find the resource, then it will regenerate the list
-	 * of resources.
-	 * 
-	 * This is done for performance - it is assumed that most items will 
-	 * have access to the same resources. This may not be true if sub-manifests
-	 * are used, hence the regneration of the array if the resource
-	 * isn't found in the cache.
-	 * 
-	 * Note: assumes all reference ids are unique across the whole of the 
-	 * manifest file.
-	 * 
-	 * @param item Element of type ITEM
-	 * @return relative path of the resource, null if no IDENTIFIERREF found
-	 * @throws IMSManifestException if IDENTIFIERREF is not null but the resource
-	 * could not found.
-	 */
-	private String getResourceURL(Element itemElement) throws IMSManifestException {
+	return itref;
+    }
 
-		if ( cachedResourceList == null ) {
-			cachedResourceList = cpCore.getReferencedElementsAllowed(itemElement);
-			if ( log.isDebugEnabled() )
-				log.debug("Resources are "+cachedResourceList);
-		}
-		
-		String identifierRef = itemElement.getAttributeValue(CP_Core.IDENTIFIERREF);
-		
-		if ( identifierRef == null ) {
-			
-			return null;
-			
-		} else {
-			
-			Element resource = getResource2(identifierRef);
-			
-			if ( resource == null ) {
-				
-				// We failed to find a matching resource so try generating the list again. 
-				// Note: this may case the list to be generated twice first time if the 
-				//resource is missing. Too bad!
-				cachedResourceList = cpCore.getReferencedElementsAllowed(itemElement);
-				if ( log.isDebugEnabled() )
-					log.debug("Resources are "+cachedResourceList);
-	
-				resource = getResource2(identifierRef);
-			}
-	
-			if ( resource != null ) {
-				return cpCore.getRelativeURL(resource);
-			} else {
-				throw new IMSManifestException("Unable to find resource for item element "
-					+itemElement.getAttributeValue(CP_Core.TITLE)+
-					" looking for identifier "
-					+identifierRef);
-			}
-			
-		} 
-	
+    /**
+     * Not sure exactly what format "isVisible" will be in. In the spec, it says Boolean (True|False) yet the
+     * imslipv1p0cp.zip package has a value of "1". So this code will accept anything as visible except for false (any
+     * case) or 0.
+     */
+    private boolean isVisible(String value) {
+	if (value != null) {
+	    String trimmed = value.trim();
+	    if (trimmed.equalsIgnoreCase("false") || trimmed.equals("0")) {
+		return false;
+	    }
 	}
+	return true;
+    }
 
-	/**
-	 * @param identifierRef
-	 * @return
-	 */
-	private Element getResource2(String identifierRef) {
-		for ( int i=0; i< cachedResourceList.length; i++ ) {
-			Element resource = cachedResourceList[i];
-			if ( identifierRef != null && 
-					identifierRef.equals(resource.getAttributeValue(CP_Core.IDENTIFIER)) ) {
-				return resource;
-			}
-		}
-		return null;
+    private void setAttribute(Element element, String attributeName, String value) {
+	if ((element != null) && StringUtils.isNotBlank(attributeName) && StringUtils.isNotBlank(value)) {
+	    element.setAttribute(attributeName, value);
 	}
+    }
 
+    /**
+     * @return Returns the defaultItem.
+     */
+    public String getDefaultItem() {
+	return defaultItem;
+    }
 
+    /**
+     * @return Returns the description.
+     */
+    public String getDescription() {
+	return description;
+    }
 
-	/**
-	 * @return Returns the defaultItem.
-	 */
-	public String getDefaultItem() {
-		return defaultItem;
-	}
-	/**
-	 * @param defaultItem The defaultItem to set.
-	 */
-	public void setDefaultItem(String defaultItem) {
-		this.defaultItem = defaultItem;
-	}
-	/**
-	 * @return Returns the description.
-	 */
-	public String getDescription() {
-		return description;
-	}
-	/**
-	 * @param description The description to set.
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	/**
-	 * @return Returns the organzationXML.
-	 */
-	public String getOrganzationXML() {
-		return organzationXML;
-	}
-	/**
-	 * @param organzationXML The organzationXML to set.
-	 */
-	public void setOrganzationXML(String organzationXML) {
-		this.organzationXML = organzationXML;
-	}
-	/**
-	 * @return Returns the schema.
-	 */
-	public String getSchema() {
-		return schema;
-	}
-	/**
-	 * @param schema The schema to set.
-	 */
-	public void setSchema(String schema) {
-		this.schema = schema;
-	}
-	/**
-	 * @return Returns the title.
-	 */
-	public String getTitle() {
-		return title;
-	}
-	/**
-	 * @param title The title to set.
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    /**
+     * @return Returns the organzationXML.
+     */
+    public String getOrganzationXML() {
+	return organzationXML;
+    }
+
+    /**
+     * @return Returns the schema.
+     */
+    public String getSchema() {
+	return schema;
+    }
+
+    /**
+     * @return Returns the title.
+     */
+    public String getTitle() {
+	return title;
+    }
+
+    /**
+     * @param title
+     *            The title to set.
+     */
+    public void setTitle(String title) {
+	this.title = title;
+    }
 }
