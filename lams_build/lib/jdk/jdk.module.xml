@@ -56,6 +56,12 @@
                 <path name="com/sun/org/apache/xerces/internal/dom"/>
 				<path name="com/sun/org/apache/xerces/internal/xni"/>
 				<path name="com/sun/org/apache/xerces/internal/jaxp"/>
+				<path name="com/sun/org/apache/xml/internal/serializer"/>
+				<path name="com/sun/org/apache/xml/internal/dtm"/>
+				<path name="com/sun/org/apache/xalan/internal/xsltc"/>
+				<path name="com/sun/org/apache/xalan/internal/xsltc"/>
+				<path name="com/sun/org/apache/xalan/internal/xsltc/dom"/>
+				<path name="com/sun/org/apache/xalan/internal/xsltc/runtime"/>
                 <path name="com/sun/security/auth"/>
                 <path name="com/sun/security/auth/login"/>
                 <path name="com/sun/security/auth/module"/>
