@@ -41,7 +41,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -836,7 +835,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		burningQuestionDto.setSessionName(escapedSessionName);
 
 		String escapedBurningQuestion = StringEscapeUtils
-			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion());
+			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion().replaceAll("\\n", "<br>"));
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}
