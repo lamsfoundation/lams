@@ -85,9 +85,6 @@ import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
-import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
-import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
-import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -661,7 +658,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    // need unzip upload, and parse learning object information from XML file.
 	    if (item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT) {
 		String packageDirectory = ZipFileUtil.expandZip(is, fileName);
-		IContentPackageConverter cpConverter = new SimpleContentPackageConverter(packageDirectory);
+		SimpleContentPackageConverter cpConverter = new SimpleContentPackageConverter(packageDirectory);
 		String initFile = cpConverter.getDefaultItem();
 		item.setInitialItem(initFile);
 		item.setImsSchema(cpConverter.getSchema());
@@ -684,12 +681,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	} catch (IOException e) {
 	    ResourceServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadResourceFileException(messageService.getMessage("error.msg.io.exception"));
-	} catch (IMSManifestException e) {
-	    ResourceServiceImpl.log.error(messageService.getMessage("error.msg.ims.package") + ":" + e.toString());
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.ims.package"));
-	} catch (ImscpApplicationException e) {
-	    ResourceServiceImpl.log.error(messageService.getMessage("error.msg.ims.application") + ":" + e.toString());
-	    throw new UploadResourceFileException(messageService.getMessage("error.msg.ims.application"));
 	}
     }
 
