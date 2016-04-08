@@ -121,7 +121,7 @@
 		    	jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
 		   			id:"${i.index + 1}",
 		   	     	groupName:"${burningQuestionDto.sessionName}",
-		   	    	feedback:"<lams:out value='${burningQuestionDto.escapedBurningQuestion}' escapeHtml='true' />",
+		   	    	feedback:"${burningQuestionDto.escapedBurningQuestion}",
 		   	  		count:"${burningQuestionDto.likeCount}"
 		   	   	});
 	        </c:forEach>
