@@ -1026,6 +1026,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	TimeZone userTimeZone = userDto.getTimeZone();
 
 	boolean isAllowRateAnswers = WebUtil.readBooleanParam(request, "isAllowRateAnswers");
+	boolean isAllowRichEditor = WebUtil.readBooleanParam(request, "isAllowRichEditor");
 	Long qaContentId = WebUtil.readLongParam(request, "qaContentId");
 
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
@@ -1090,10 +1091,16 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT); 
 	for (QaUsrResp response : responses) {
 	    QaQueUsr user = response.getQaQueUser();
+	    
+	    //remove leading and trailing quotes
+	    String answer = StringEscapeUtils.escapeCsv(response.getAnswer());
+	    if (isAllowRichEditor && answer.startsWith("\"") && answer.length() >= 3) {
+		answer = answer.substring(1, answer.length()-1);
+	    }
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("responseUid", response.getResponseId().toString());
-	    responseRow.put("answer", StringEscapeUtils.escapeCsv(response.getAnswer()));
+	    responseRow.put("answer", answer);
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
 
