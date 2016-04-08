@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Interface that defines the contract that all MCQ service provider must follow.
@@ -182,7 +183,7 @@ public interface IMcService {
     List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
     
     /**
-     * Returns userMarksDtos grouped by sessions.
+     * Returns userMarksDtos grouped by sessions. Used *only* for export portfolio.
      * 
      * @param mcContent
      * @param isFullAttemptDetailsRequired
@@ -205,6 +206,15 @@ public interface IMcService {
     
     void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions, List<McQuestionDTO> questionDTOs,
 	    List<McQuestionDTO> deletedQuestions);
+    
+    /**
+     * Recalculate mark for leader and sets it to all members of a group. Authentication check: user must be either
+     * lesson stuff or group manager.
+     * 
+     * @param requestUserDTO
+     * @param lessonId
+     */
+    void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId);
     
     /**
      * 
