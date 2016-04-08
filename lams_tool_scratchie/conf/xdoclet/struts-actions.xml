@@ -209,8 +209,8 @@
 			validate="false" 
 			parameter="saveBurningQuestions" 
 			scope="request">
-			<forward name="notebook" path="/pages/learning/notebook.jsp" />
-			<forward name="success" path="/pages/learning/results.jsp" />
+			<forward name="newReflection" path="/learning/newReflection.do"/>
+			<forward name="showResults" path="/learning/showResults.do" />
 		</action>
 		<action path="/learning/like"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
@@ -239,7 +239,7 @@
 			input="/pages/learning/notebook.jsp"
 			parameter="submitReflection" 
 			scope="request">
-			<forward name="success" path="/pages/learning/results.jsp" />
+			<forward name="showResults" path="/learning/showResults.do" />
 		</action>
 		<!-- ========== Monitoring Definitions ============================== -->
 		

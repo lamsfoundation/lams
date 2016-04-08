@@ -710,12 +710,16 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION, generalQuestion);
 
 	boolean isNotebookSubmitted = sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ENTRY) != null;
+	ActionRedirect redirect;
 	if (scratchie.isReflectOnActivity() && !isNotebookSubmitted) {
-	    return newReflection(mapping, form, request, response);
+	    redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
+	// show results page
 	} else {
-	    return showResults(mapping, form, request, response);
+	    redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	}
-
+	
+	redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	return redirect;
     }
 
     /**
@@ -800,8 +804,10 @@ public class LearningAction extends Action {
 	    LearningAction.service.updateEntry(entry);
 	}
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
-
-	return showResults(mapping, refForm, request, response);
+	
+	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
+	redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	return redirect;
     }
 
     // *************************************************************************************
