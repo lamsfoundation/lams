@@ -833,7 +833,7 @@ public class ScratchieServiceImpl
 		burningQuestionDto.setSessionName(escapedSessionName);
 
 		String escapedBurningQuestion = StringEscapeUtils
-			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion());
+			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion().replaceAll("\\n", "<br>"));
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}

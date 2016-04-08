@@ -110,7 +110,7 @@
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 				   		{name:'groupName', index:'groupName', width:200},
-				   		{name:'feedback', index:'feedback', width:374},
+				   		{name:'feedback', index:'feedback', width:401},
 				   		{name:'like', index:'like', width:60, align: "center"},
 				   		{name:'count', index:'count', width:50, align:"right"}
 				   	],
@@ -121,15 +121,15 @@
 			    	jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
 			   			id:"${i.index + 1}",
 			   	     	groupName:"${burningQuestionDto.sessionName}",
-				   	    feedback:"<lams:out value='${burningQuestionDto.escapedBurningQuestion}' escapeHtml='true' />",
+				   	    feedback:"${burningQuestionDto.escapedBurningQuestion}",
 				   	 	<c:choose>
-				   			<c:when test="${!isUserLeader && burningQuestionDto.userLiked}">
+				   			<c:when test="${!isUserLeader && burningQuestionDto.userLikeUid != null}">
 				   				like:'<span class="fa fa-thumbs-up fa-2x"></span>',
 				   			</c:when>
 					   		<c:when test="${!isUserLeader}">
 				   				like:'',
 				   			</c:when>
-							<c:when test="${burningQuestionDto.userLiked}">
+							<c:when test="${burningQuestionDto.userLikeUid != null}">
 								like:'<span class="fa fa-thumbs-up fa-2x" title="<fmt:message key="label.unlike"/>"' +
 										'onclick="javascript:likeEntry(${burningQuestionDto.burningQuestion.uid});" id="like-${burningQuestionDto.burningQuestion.uid}" />',
 							</c:when>
