@@ -909,14 +909,6 @@ GeneralInitLib = {
 		});
 		
 		layout.dialogs.push(layout.ldStoreDialog);
-		
-		
-		$('#ldScreenshotAuthor', layout.ldStoreDialog).load(function(){
-			// hide "loading" animation
-			$('.ldChoiceDependentCanvasElement', layout.ldStoreDialog).hide();
-			// show the thumbnail
-			$(this).show();
-		});
 
 		$('#ldStoreDialogImportPartFrame').load(function() {
 			if (!$(this).attr('src')){
@@ -1012,6 +1004,7 @@ GeneralInitLib = {
 			}
 		});
 	}
+	
 },
 
 
@@ -2746,13 +2739,37 @@ GeneralLib = {
 				  		   + learningDesignID + '&_=' + new Date().getTime());
 			} else {
 				$('#ldScreenshotLoading', layout.ldStoreDialog).show();
-				// get the image of the chosen LD and prevent caching
-				$('#ldScreenshotAuthor', layout.ldStoreDialog)
-					.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_=' + new Date().getTime())
-					.css({
-						'width'  : 'auto',
-						'height' : 'auto'
-					});
+				
+				// load the thumbnail
+				$.ajax({
+					dataType : 'text',
+					url : LD_THUMBNAIL_URL_BASE + learningDesignID,
+					cache : false,
+					success : function(response) {
+						// hide "loading" animation
+						$('.ldChoiceDependentCanvasElement', layout.ldStoreDialog).hide();
+						// show the thumbnail
+						$('#ldScreenshotAuthor', layout.ldStoreDialog).html(response).show();
+					},
+					error : function(error) {
+						// the LD SVG is missing, try to re-generate it; if it is an another error, fail
+						if (error.status != 404) {
+							return;
+						}
+						// iframe just to load another instance of Authoring for a single purpose, generate the SVG
+						$('<iframe />').appendTo('body').load(function(){
+							// call svgGenerator.jsp code to store LD SVG on the server
+							var frame = $(this),
+								win = frame[0].contentWindow || frame[0].contentDocument;
+							win.GeneralLib.saveLearningDesignImage();
+							frame.remove();
+							// load the image again
+							GeneralLib.showLearningDesignThumbnail(learningDesignID);
+						}).attr('src', LAMS_URL 
+									   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+									   + learningDesignID);
+					}
+				});
 			}
 			
 			if (title) {
