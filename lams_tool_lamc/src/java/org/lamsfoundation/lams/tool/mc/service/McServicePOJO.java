@@ -56,9 +56,14 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -68,6 +73,7 @@ import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -95,6 +101,9 @@ import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -127,6 +136,8 @@ public class McServicePOJO
 
     private IAuditService auditService;
     private IUserManagementService userManagementService;
+    private ILessonService lessonService;
+    private IActivityDAO activityDAO;
     private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IToolContentHandler mcToolContentHandler = null;
@@ -160,7 +171,7 @@ public class McServicePOJO
 		// create new user in a DB
 		if (leader == null) {
 		    McServicePOJO.logger.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
 		    leader = new McQueUsr(leaderUserId, userName, fullName, mcSession, new TreeSet());
@@ -196,7 +207,7 @@ public class McServicePOJO
 			leaderAttempt.isAttemptCorrect());
 		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
-		// if it's been changed by the leader 
+		// if it's been changed by the leader
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
 		userAttempt.setMcOptionsContent(leaderAttempt.getMcOptionsContent());
 		userAttempt.setAttemptTime(leaderAttempt.getAttemptTime());
@@ -516,7 +527,7 @@ public class McServicePOJO
 	    learnerAnswersDTOList.add(learnerAnswersDTO);
 	}
 
-	//populate answers
+	// populate answers
 	if (user != null) {
 
 	    for (McLearnerAnswersDTO learnerAnswersDTO : learnerAnswersDTOList) {
@@ -526,7 +537,7 @@ public class McServicePOJO
 		if (dbAttempt != null) {
 		    Long selectedOptionUid = dbAttempt.getMcOptionsContent().getUid();
 
-		    //mark selected option as selected
+		    // mark selected option as selected
 		    for (McOptsContent option : learnerAnswersDTO.getOptions()) {
 			if (selectedOptionUid.equals(option.getUid())) {
 			    option.setSelected(true);
@@ -795,9 +806,9 @@ public class McServicePOJO
     public void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions,
 	    List<McQuestionDTO> questionDTOs, List<McQuestionDTO> deletedQuestions) {
 
-	//create list of modified questions
+	// create list of modified questions
 	List<McQuestionDTO> modifiedQuestions = new ArrayList<McQuestionDTO>();
-	//create list of modified question marks
+	// create list of modified question marks
 	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<McQuestionDTO>();
 	for (McQueContent oldQuestion : oldQuestions) {
 	    for (McQuestionDTO questionDTO : questionDTOs) {
@@ -806,17 +817,17 @@ public class McServicePOJO
 		    boolean isQuestionModified = false;
 		    boolean isQuestionMarkModified = false;
 
-		    //question is different
+		    // question is different
 		    if (!oldQuestion.getQuestion().equals(questionDTO.getQuestion())) {
 			isQuestionModified = true;
 		    }
 
-		    //mark is different
+		    // mark is different
 		    if (oldQuestion.getMark().intValue() != (new Integer(questionDTO.getMark())).intValue()) {
 			isQuestionMarkModified = true;
 		    }
 
-		    //options are different
+		    // options are different
 		    Set<McOptsContent> oldOptions = oldQuestion.getMcOptionsContents();
 		    List<McOptionDTO> optionDTOs = questionDTO.getListCandidateAnswersDTO();
 		    for (McOptsContent oldOption : oldOptions) {
@@ -851,7 +862,7 @@ public class McServicePOJO
 		final int oldTotalMark = mcUsrAttemptDAO.getUserTotalMark(user.getUid());
 		int newTotalMark = oldTotalMark;
 
-		//get all finished user results
+		// get all finished user results
 		List<McUsrAttempt> userAttempts = getFinalizedUserAttempts(user);
 		Iterator<McUsrAttempt> iter = userAttempts.iterator();
 		while (iter.hasNext()) {
@@ -916,6 +927,94 @@ public class McServicePOJO
 			    toolSessionId, false);
 		}
 
+	    }
+	}
+
+    }
+
+    @Override
+    public void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId) {
+
+	User requestUser = userManagementService.getUserByLogin(requestUserDTO.getLogin());
+	Lesson lesson = lessonService.getLesson(lessonId);
+	Organisation organisation = lesson.getOrganisation();
+
+	// skip doing anything if the user doesn't have permission
+	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId()
+		.equals(OrganisationType.COURSE_TYPE)) ? organisation.getOrganisationId()
+			: organisation.getParentOrganisation().getOrganisationId();
+	boolean isGroupManager = userManagementService.isUserInRole(requestUser.getUserId(), organisationToCheckPermission,
+		Role.GROUP_MANAGER);
+	if (!(lesson.getLessonClass().isStaffMember(requestUser) || isGroupManager)) {
+	    return;
+	}
+
+	// get all lesson activities
+	Set<Activity> lessonActivities = new TreeSet<Activity>();
+	/*
+	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
+	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
+	 * 
+	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
+	 * one
+	 */
+	Activity firstActivity = activityDAO
+		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
+	lessonActivities.add(firstActivity);
+	lessonActivities.addAll(lesson.getLearningDesign().getActivities());
+
+	// iterate through all assessment activities in the lesson
+	for (Activity activity : lessonActivities) {
+
+	    // check if it's assessment activity
+	    if ((activity instanceof ToolActivity) && ((ToolActivity) activity).getTool().getToolSignature()
+		    .equals(McAppConstants.MY_SIGNATURE)) {
+		ToolActivity mcqActivity = (ToolActivity) activity;
+
+		for (ToolSession toolSession : (Set<ToolSession>) mcqActivity.getToolSessions()) {
+		    Long toolSessionId = toolSession.getToolSessionId();
+		    McSession mcSession = getMcSessionById(toolSessionId);
+		    McContent mcContent = mcSession.getMcContent();
+
+		    if (mcContent.isUseSelectLeaderToolOuput()) {
+
+			McQueUsr leader = mcSession.getGroupLeader();
+			//if there is no leader yet or leader hasn't submitted any attempts - no point in updating gradebook marks
+			if (leader == null || (leader.getNumberOfAttempts() == 0)) {
+			    continue;
+			}
+
+			final Double leaderMark = new Double(leader.getLastAttemptTotalMark());
+
+			// update marks for all learners in a group
+			Set<McQueUsr> users = mcSession.getMcQueUsers();
+			for (McQueUsr user : users) {
+			    copyAnswersFromLeader(user, leader);
+
+			    // propagade total mark to Gradebook
+			    gradebookService.updateActivityMark(leaderMark, null, user.getQueUsrId().intValue(), toolSessionId,
+				    false);
+			}
+		    } else {
+
+			// update marks for all learners in a group
+			Set<McQueUsr> users = mcSession.getMcQueUsers();
+			for (McQueUsr user : users) {
+			    
+			    // if leader hasn't submitted any attempts - no point in updating gradebook marks
+			    if (user.getNumberOfAttempts() == 0) {
+				continue;
+			    }
+				
+			    final Double userMark = new Double(user.getLastAttemptTotalMark());
+
+			    // propagade total mark to Gradebook
+			    gradebookService.updateActivityMark(userMark, null, user.getQueUsrId().intValue(), toolSessionId,
+				    false);
+			}
+		    }
+
+		}
 	    }
 	}
 
@@ -1091,7 +1190,7 @@ public class McServicePOJO
 	    rowCount++;
 	}
 
-	//ave
+	// ave
 	row = sheet.createRow(rowCount++);
 	count = 1;
 	cell = row.createCell(count++);
@@ -1101,7 +1200,7 @@ public class McServicePOJO
 	    cell.setCellValue(((numberOfCorrectAnswers * 100) / totalPercentList.size()) + "%");
 	}
 
-	//class mean
+	// class mean
 	Integer[] totalPercents = totalPercentList.toArray(new Integer[0]);
 	Arrays.sort(totalPercents);
 	int sum = 0;
@@ -1369,7 +1468,7 @@ public class McServicePOJO
 	    long defaultToolContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
 	    content = getMcContent(defaultToolContentId);
 	}
-	return getMcOutputFactory().getToolOutputDefinitions(content, definitionType);
+	return mcOutputFactory.getToolOutputDefinitions(content, definitionType);
     }
 
     @Override
@@ -1417,7 +1516,7 @@ public class McServicePOJO
 
 	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
 
-	//create a new a new tool session if it does not already exist in the tool session table
+	// create a new a new tool session if it does not already exist in the tool session table
 	if (!existsSession(toolSessionId)) {
 	    try {
 		McSession mcSession = new McSession(toolSessionId, new Date(System.currentTimeMillis()),
@@ -1575,39 +1674,11 @@ public class McServicePOJO
     }
 
     /**
-     * @return Returns the toolService.
-     */
-    public ILamsToolService getToolService() {
-	return toolService;
-    }
-
-    /**
-     * @return Returns the userManagementService.
-     */
-    public IUserManagementService getUserManagementService() {
-	return userManagementService;
-    }
-
-    /**
-     * @return Returns the mcContentDAO.
-     */
-    public IMcContentDAO getMcContentDAO() {
-	return mcContentDAO;
-    }
-
-    /**
      * @param mcContentDAO
      *            The mcContentDAO to set.
      */
     public void setMcContentDAO(IMcContentDAO mcContentDAO) {
 	this.mcContentDAO = mcContentDAO;
-    }
-
-    /**
-     * @return Returns the mcOptionsContentDAO.
-     */
-    public IMcOptionsContentDAO getMcOptionsContentDAO() {
-	return mcOptionsContentDAO;
     }
 
     /**
@@ -1619,25 +1690,11 @@ public class McServicePOJO
     }
 
     /**
-     * @return Returns the mcQueContentDAO.
-     */
-    public IMcQueContentDAO getMcQueContentDAO() {
-	return mcQueContentDAO;
-    }
-
-    /**
      * @param mcQueContentDAO
      *            The mcQueContentDAO to set.
      */
     public void setMcQueContentDAO(IMcQueContentDAO mcQueContentDAO) {
 	this.mcQueContentDAO = mcQueContentDAO;
-    }
-
-    /**
-     * @return Returns the mcSessionDAO.
-     */
-    public IMcSessionDAO getMcSessionDAO() {
-	return mcSessionDAO;
     }
 
     /**
@@ -1649,25 +1706,11 @@ public class McServicePOJO
     }
 
     /**
-     * @return Returns the mcUserDAO.
-     */
-    public IMcUserDAO getMcUserDAO() {
-	return mcUserDAO;
-    }
-
-    /**
      * @param mcUserDAO
      *            The mcUserDAO to set.
      */
     public void setMcUserDAO(IMcUserDAO mcUserDAO) {
 	this.mcUserDAO = mcUserDAO;
-    }
-
-    /**
-     * @return Returns the mcUsrAttemptDAO.
-     */
-    public IMcUsrAttemptDAO getMcUsrAttemptDAO() {
-	return mcUsrAttemptDAO;
     }
 
     /**
@@ -1681,16 +1724,17 @@ public class McServicePOJO
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
+    
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+
+    public void setActivityDAO(IActivityDAO activityDAO) {
+	this.activityDAO = activityDAO;
+    }
 
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
-    }
-
-    /**
-     * @return Returns the mcToolContentHandler.
-     */
-    public IToolContentHandler getMcToolContentHandler() {
-	return mcToolContentHandler;
     }
 
     /**
@@ -1702,22 +1746,11 @@ public class McServicePOJO
     }
 
     /**
-     * @return Returns the learnerService.
-     */
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    /**
      * @param learnerService
      *            The learnerService to set.
      */
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
-    }
-
-    public IExportToolContentService getExportContentService() {
-	return exportContentService;
     }
 
     public void setExportContentService(IExportToolContentService exportContentService) {
@@ -1726,10 +1759,6 @@ public class McServicePOJO
 
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
-    }
-
-    public MCOutputFactory getMcOutputFactory() {
-	return mcOutputFactory;
     }
 
     public void setMcOutputFactory(MCOutputFactory mcOutputFactory) {
@@ -1858,7 +1887,7 @@ public class McServicePOJO
 
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-	return getMcOutputFactory().getSupportedDefinitionClasses(definitionType);
+	return mcOutputFactory.getSupportedDefinitionClasses(definitionType);
     }
 
     // ****************** REST methods *************************
