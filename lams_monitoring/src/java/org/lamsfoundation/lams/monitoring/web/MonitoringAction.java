@@ -1218,12 +1218,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	// Fetch number of learners at each activity
-	Long[] activityIds = new Long[activities.size()];
-	int index = 0;
+	ArrayList<Long> activityIds = new ArrayList<Long>();
 	for (Activity activity : activities) {
-	    activityIds[index++] = activity.getActivityId();
+	    activityIds.add(activity.getActivityId());
 	}
-	Map<Long, Integer> learnerCounts = getMonitoringService().getCountLearnersCurrentActivities(activityIds);
+	for (Set<Activity> children : parentToChildren.values()) {
+	    for (Activity child : children) {
+		activityIds.add(child.getActivityId());
+	    }
+	}
+	Map<Long, Integer> learnerCounts = getMonitoringService()
+		.getCountLearnersCurrentActivities(activityIds.toArray(new Long[activityIds.size()]));
 
 	JSONArray activitiesJSON = new JSONArray();
 	for (Activity activity : activities) {
