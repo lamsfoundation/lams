@@ -4,7 +4,6 @@
     }
         
     function doSelectTab(tabId) {
-    	alert("Selecting tab "+tabId);
 	  selectTab(tabId);
 	  currentTab = tabId;
     }
@@ -128,17 +127,16 @@
 	}
 	
 	function changeView(sessionMapID,displayedRecordNumber){
-		var param = {"sessionMapID":sessionMapID,"learningCurrentTab":currentTab,"displayedRecordNumber":displayedRecordNumber,"reqID":((new Date()).getTime())};
-	   	var previousCurrentTab = currentTab;
+		var tabID = getCurrentTabID();
+		if ( ! tabID ) {
+			tabID = currentTab;
+		}
+		var param = {"sessionMapID":sessionMapID,"learningCurrentTab":tabID,"displayedRecordNumber":displayedRecordNumber,"reqID":((new Date()).getTime())};
 		$( "#body" ).load( 
 				changeViewUrl, 
 				param, 
 				function() {
-	    			var tabNumber = 1;
-	    			while (document.getElementById("tabbody"+tabNumber)!=null){
-	    				doSelectTab(tabNumber++);
-	    			}
-	    			doSelectTab(previousCurrentTab);
+	    			doSelectTab(tabID);
 				});			
 	}
 	

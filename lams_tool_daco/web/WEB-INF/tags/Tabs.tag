@@ -41,6 +41,6 @@
 </c:if>
 
 <!-- tab holder table -->
-<ul class="nav nav-tabs" role="tablist">
+<ul id="page-tabs" class="nav nav-tabs" role="tablist">
 	<jsp:doBody />
 </ul>

@@ -86,4 +86,4 @@
 	<c:set var="class">class="disabled"</c:set>
 </c:if>
 
-<li role="presentation" ${class}><a href="#${id}" aria-controls="${id}" role="tab" data-toggle="tab">${tabTitle}</a></li>
+<li role="presentation" ${class}><a href="#t${id}" aria-controls="t${id}" role="tab" data-toggle="tab">${tabTitle}</a></li>
