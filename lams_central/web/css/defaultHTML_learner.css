@@ -141,6 +141,14 @@ body.stripes {
   color: inherit;
   float: left;
 }
+.help-tabs{
+  display: inline-block;
+  margin-right: 10px;
+}
+.help-no-tabs{
+  display: inline-block;
+  margin-right: 10px;
+}
 .help {
   display: inline-block;
 }
