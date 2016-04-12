@@ -80,7 +80,7 @@ public class HelpTag extends TagSupport {
 		imgHeight = 18;
 		div = false;
 	    } else {
-		writer.println("<div class='help'>");
+		writer.println("<div class='help-tabs'>");
 	    }
 	    try {
 
@@ -101,23 +101,19 @@ public class HelpTag extends TagSupport {
 			return Tag.SKIP_BODY;
 		    }
 
-		    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "images/help.jpg\" border=\"0\" width=\"" + imgHeight + "\" height=\"" + imgHeight
-			    + "\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+		    writer.println("<i class=\"fa fa-question-circle\" "
+			+" onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\"></i>");
 
 		} else if (page != null) {
 
 		    String fullURL = HelpUtil.constructPageURL(page, languageCode);
 
-		    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "images/help.jpg\" border=\"0\" width=\"" + imgHeight + "\" height=\"" + imgHeight
-			    + "\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+		    writer.println("<i class=\"fa fa-question-circle\" "
+			+" onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\"></i>");
 
 		} else {
 		    HelpTag.log.error("HelpTag unable to write out due to unspecified values.");
-		    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "images/css/warning.gif\" border=\"0\" width=\"" + imgHeight + "\" height=\"" + imgHeight
-			    + "\"/>");
+		    writer.println("<i class=\"fa fa-times-circle\"></i>");
 		}
 	    } catch (NullPointerException npe) {
 		HelpTag.log
