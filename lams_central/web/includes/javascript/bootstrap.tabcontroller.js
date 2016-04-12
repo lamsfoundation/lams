@@ -1,9 +1,6 @@
-var selectedTabID = "0";
-
 function selectTab(tabID) {
-    //save tabID as selectedTabID
-    selectedTabID = tabID;
-    $('#'+tabID).tab('show'); // this line does not work! no errors just no show!
+	var tabFilter = '#page-tabs a[href="#t'+tabID+'"]';
+    $(tabFilter).tab('show');
     
     try {
         //trigger the custom event listener onSelectTab()
@@ -14,3 +11,9 @@ function selectTab(tabID) {
     }
 }
 
+function getCurrentTabID() {
+	var activeTab = $("ul#page-tabs li.active a");
+	var href = activeTab.attr("href") // activated tab, should be "#t<num>"
+	var activeTabID = href.substring(2);
+	return activeTabID;
+}

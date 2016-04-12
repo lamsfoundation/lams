@@ -42,4 +42,4 @@
 	<c:set var="class">active</c:set>
 </c:if>
 
-<div role="tabpanel" class="tab-pane ${class}" id="${id}"><jsp:include page="${page}"/></div>
+<div role="tabpanel" class="tab-pane ${class}" id="t${id}"><jsp:include page="${page}"/></div>
