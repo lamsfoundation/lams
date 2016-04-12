@@ -33,14 +33,23 @@
 <%@ attribute name="collection" type="java.util.Collection" required="false" rtexprvalue="true"%>
 <%@ attribute name="control" required="false" rtexprvalue="true"%>
 <%@ attribute name="useKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="format" required="false" rtexprvalue="true"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <c:set var="dControl" value="false" scope="request" />
 <c:if test="${control}">
 	<c:set var="dControl" value="${control}" scope="request" />
 </c:if>
+<c:choose>
+<c:when test="${empty format}">
+	<c:set var="dFormat" value="nav-tabs" scope="request" />
+</c:when>
+<c:otherwise>
+	<c:set var="dFormat" value="${format}" scope="request" />
+</c:otherwise>
+</c:choose>
 
 <!-- tab holder table -->
-<ul id="page-tabs" class="nav nav-tabs" role="tablist">
+<ul id="page-tabs" class="nav ${dFormat}" role="tablist">
 	<jsp:doBody />
 </ul>
