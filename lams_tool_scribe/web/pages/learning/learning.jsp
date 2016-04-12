@@ -8,12 +8,58 @@
 	<c:out value="${scribeSessionDTO.appointedScribe}" escapeXml="true" />
 </c:set>
 
-
+<script type="text/javascript" src='<lams:LAMSURL/>includes/javascript/jquery.js'></script>
 <script type="text/javascript">
-	var t = setTimeout("refreshPage()", 10000)
+	//init the connection with server using server URL but with different protocol
+	var websocket = new WebSocket('${tool}'.replace('http', 'ws')
+					+ 'learningWebsocket?toolSessionID=' + ${scribeSessionDTO.sessionID}),
+		agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
+		reportSubmitted = ${scribeSessionDTO.reportSubmitted};
 
-	function refreshPage() {
-		window.location.href = '${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}'
+	// run when the server pushes new reports and vote statistics
+	websocket.onmessage = function(e) {
+		// create JSON object
+		var input = JSON.parse(e.data),
+			agreeButton = $('#agreeButton').parent();
+		
+		// if the scribe or monitor force completes the activity, reload to display report page
+		if (input.close) {
+			window.location.href = '${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}';
+			return;
+		}
+		
+		// only changed reports will be sent
+		if (input.reports) {
+			reportSubmitted = true;
+			$.each(input.reports, function() {
+				$('#reportText-' + this.uid).text(this.text);
+			});
+		}
+		
+		// can the user vote
+		if (!reportSubmitted || input.approved) {
+			agreeButton.hide();
+		} else {
+			agreeButton.show();
+		}
+		
+		// update vote statistics
+		var label = agreementPercentageLabel.replace('{0}', input.numberOfVotes)
+											.replace('{1}', input.numberOfLearners);
+		$('#agreementPercentageLabel').text(label);
+		$('#agreementPercentage').text('(' + input.votePercentage + '%)');
+		$('#agreementPercentageBar').attr('aria-valuenow', input.votePercentage)
+									.css('width',input.votePercentage + '%');
+	};
+	
+	function submitApproval() {
+		var agreeButton = $('#agreeButton').parent(),
+			data = {
+				type : 'vote'	
+			};
+		websocket.send(JSON.stringify(data));
+		
+		agreeButton.hide();
 	}
 </script>
 
@@ -32,10 +78,6 @@
 		<fmt:message key="heading.report" />
 	</h4>
 	<p class="help-block" style="font-size: 12px"><fmt:message key="activity.title"/>: ${appointedScribe}</p>
-	<html:form action="learning">
-		<html:hidden property="dispatch" value="submitApproval"></html:hidden>
-		<html:hidden property="toolSessionID"></html:hidden>
-		<html:hidden property="mode"></html:hidden>
 
 		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 
@@ -46,16 +88,13 @@
 							<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
 						</div>
 						<div class="panel-body">
-							<c:if test="${not empty reportDTO.entryText}">
-								<abbr class="pull-right hidden-xs" title="<fmt:message key="label.scribe.posted" />"><i
-									class="fa fa-xs fa-question-circle text-info"></i></abbr>
+							<abbr class="pull-right hidden-xs" title="<fmt:message key="label.scribe.posted" />"><i
+								class="fa fa-xs fa-question-circle text-info"></i></abbr>
 
-								<c:set var="entry">
-									<lams:out value="${reportDTO.entryText}" escapeHtml="true" />
-								</c:set>
-								<c:out value="${entry}" escapeXml="false" />
-
-							</c:if>
+							<c:set var="entry">
+								<lams:out value="${reportDTO.entryText}" escapeHtml="true" />
+							</c:set>
+							<span id="reportText-${reportDTO.uid}"><c:out value="${entry}" escapeXml="false" /></span>
 						</div>
 					</div>
 				</div>
@@ -63,17 +102,13 @@
 
 		</c:forEach>
 
-		<c:if test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
-			<div class="row">
-				<div class="col-xs-12" id="agreeButton">
-					<html:submit styleClass="btn btn-success pull-left">
-						<fmt:message key="button.agree" />
-					</html:submit>
-				</div>
+		<div class="row">
+			<div class="col-xs-12" id="agreeButton">
+				<button class="btn btn-success pull-left" onClick="javascript:submitApproval()">
+					<fmt:message key="button.agree" />
+				</button>
 			</div>
-		</c:if>
-
-	</html:form>
+		</div>
 
 
 	<div id="footer"></div>

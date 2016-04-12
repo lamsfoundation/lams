@@ -24,12 +24,12 @@
 
 package org.lamsfoundation.lams.tool.scribe.service;
 
-import org.apache.struts.upload.FormFile;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
-import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -135,6 +135,8 @@ public interface IScribeService {
     public void createReportEntry(Long toolSessionId);
 
     boolean isGroupedActivity(long toolContentID);
+
+    void submitReport(Long toolSessionId, String userName, JSONObject requestJSON) throws JSONException;
 
     public void deleteHeading(Long headingUid);
 }

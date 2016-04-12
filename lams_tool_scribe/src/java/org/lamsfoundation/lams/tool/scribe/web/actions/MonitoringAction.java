@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.scribe.web.actions;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeDTO;
@@ -136,7 +138,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     public ActionForward forceCompleteActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws JSONException, IOException {
 
 	MonitoringForm monForm = (MonitoringForm) form;
 
@@ -144,6 +146,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	session.setForceComplete(true);
 	scribeService.saveOrUpdateScribeSession(session);
 
+	LearningWebsocketServer.sendCloseRequest(session.getSessionId());
+	
 	ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
 	request.setAttribute("monitoringDTO", scribeDTO);
 	request.setAttribute("contentFolderID", monForm.getContentFolderID());
