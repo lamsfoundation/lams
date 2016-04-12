@@ -483,6 +483,37 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	return toolService.isGroupedActivity(toolContentID);
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public void submitReport(Long toolSessionId, String userName, JSONObject requestJSON) throws JSONException {
+	ScribeSession scribeSession = getSessionBySessionId(toolSessionId);
+	ScribeUser scribe = scribeSession.getAppointedScribe();
+	if ((scribe == null) || !scribe.getLoginName().equals(userName)) {
+	    return;
+	}
+
+	for (ScribeUser learner : (Set<ScribeUser>) scribeSession.getScribeUsers()) {
+	    learner.setReportApproved(false);
+	    saveOrUpdateScribeUser(learner);
+	}
+
+	JSONArray reportsJSON = requestJSON.getJSONArray("reports");
+	for (int reportIndex = 0; reportIndex < reportsJSON.length(); reportIndex++) {
+	    JSONObject reportJSON = reportsJSON.getJSONObject(reportIndex);
+	    Long uid = reportJSON.getLong("uid");
+	    String text = reportJSON.getString("text");
+	    for (ScribeReportEntry report : (Set<ScribeReportEntry>) scribeSession.getScribeReportEntries()) {
+		if (report.getUid().equals(uid)) {
+		    report.setEntryText(text);
+		    break;
+		}
+	    }
+	}
+
+	scribeSession.setReportSubmitted(true);
+	saveOrUpdateScribeSession(scribeSession);
+    }
+
     /* ********** Used by Spring to "inject" the linked objects ************* */
 
     public IScribeDAO getScribeDAO() {

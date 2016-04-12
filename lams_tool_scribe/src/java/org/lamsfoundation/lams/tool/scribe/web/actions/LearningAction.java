@@ -25,10 +25,7 @@
 package org.lamsfoundation.lams.tool.scribe.web.actions;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -46,11 +44,9 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeDTO;
-import org.lamsfoundation.lams.tool.scribe.dto.ScribeReportEntryDTO;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeSessionDTO;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeUserDTO;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
-import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
@@ -70,437 +66,303 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
  * @author
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request"
- *                name="learningForm"
+ * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="learning" path="tiles:/learning/main"
  * @struts.action-forward name="scribe" path="tiles:/learning/scribe"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="waitForScribe" path="tiles:/learning/waitForScribe"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
- * @struts.action-forward name="voteDisplay" path="/pages/parts/voteDisplay.jsp"
  * @struts.action-forward name="report" path="tiles:/learning/report"
- * @struts.action-forward name="instructions"
- *                        path="tiles:/learning/instructions"
+ * @struts.action-forward name="instructions" path="tiles:/learning/instructions"
  */
 public class LearningAction extends LamsDispatchAction {
 
-	private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningAction.class);
 
-	private static final boolean MODE_OPTIONAL = false;
+    private static final boolean MODE_OPTIONAL = false;
 
-	private IScribeService scribeService;
+    private IScribeService scribeService;
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		// 'toolSessionID' and 'mode' paramters are expected to be present.
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
-				AttributeNames.PARAM_MODE, MODE_OPTIONAL);
+    @Override
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	// 'toolSessionID' and 'mode' paramters are expected to be present.
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
+		LearningAction.MODE_OPTIONAL);
 
-		Long toolSessionID = WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-		// set up scribeService
-		if (scribeService == null) {
-			scribeService = ScribeServiceProxy.getScribeService(this
-					.getServlet().getServletContext());
-		}
-		//try to clone scribe heading from content. This method will execute 
-		//for every new learner enter, but the heading only copied once.
-		try{
-			scribeService.createReportEntry(toolSessionID);
-		} catch (ObjectOptimisticLockingFailureException e) {
-			log.debug("Multiple learner get into scribe simultaneously. Cloning report entry skipped");
-		}
-
-		// Retrieve the session and content.
-		ScribeSession scribeSession = scribeService
-				.getSessionBySessionId(toolSessionID);
-		if (scribeSession == null) {
-			throw new ScribeException(
-					"Cannot retrieve session with toolSessionID"
-							+ toolSessionID);
-		}
-		Scribe scribe = scribeSession.getScribe();
-
-		// check defineLater
-		if (scribe.isDefineLater()) {
-			return mapping.findForward("defineLater");
-		}
-
-		// Ensure that the content in use flag is set.
-		if (!scribe.isContentInUse()) {
-			scribe.setContentInUse(new Boolean(true));
-			scribeService.saveOrUpdateScribe(scribe);
-		}
-
-		LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-			.getServletContext());
-		
-		// Retrieve the current user
-		ScribeUser scribeUser = getCurrentUser(toolSessionID);
-
-		// check whether scribe has been appointed
-		while (scribeSession.getAppointedScribe() == null) {
-			// check autoSelectScribe
-			if (scribe.isAutoSelectScribe() == false) {
-				// learner needs to wait until a scribe has been appointed by
-				// teacher.
-				return mapping.findForward("waitForScribe");
-
-			} else {
-				// appoint the currentUser as the scribe
-				scribeSession.setAppointedScribe(scribeUser);
-
-				// attempt to update the scribeSession.
-				try {
-					scribeService.saveOrUpdateScribeSession(scribeSession);
-				} catch (ObjectOptimisticLockingFailureException le) {
-					// scribeSession has been modified. Reload scribeSession and
-					// check again.
-					scribeSession = scribeService
-							.getSessionBySessionId(toolSessionID);
-				}
-			}
-		}
-
-		// setup dto's forms and attributes.
-		((LearningForm) form).setToolSessionID(scribeSession.getSessionId());
-		request.setAttribute("MODE", mode.toString());
-		setupDTOs(request, scribeSession, scribeUser);
-
-		// check force complete
-		if (scribeSession.isForceComplete()) {
-			// go to report page
-			if ( scribeSession.getScribe().isShowAggregatedReports() )
-				setupOtherGroupReportDTO(request, scribeSession, scribeUser);
-			return mapping.findForward("report");
-		}
-
-		// check if user has started activity
-		if (!scribeUser.isStartedActivity()) {
-			if (scribeSession.getAppointedScribe().getUid() == scribeUser
-					.getUid()) {
-				request.setAttribute("role", "scribe");
-			} else {
-				request.setAttribute("role", "learner");
-			}
-			return mapping.findForward("instructions");
-		}
-
-		// check if current user is the scribe.
-		if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
-			return mapping.findForward("scribe");
-		} else {
-			return mapping.findForward("learning");
-		}
-
+	// set up scribeService
+	if (scribeService == null) {
+	    scribeService = ScribeServiceProxy.getScribeService(this.getServlet().getServletContext());
+	}
+	//try to clone scribe heading from content. This method will execute 
+	//for every new learner enter, but the heading only copied once.
+	try {
+	    scribeService.createReportEntry(toolSessionID);
+	} catch (ObjectOptimisticLockingFailureException e) {
+	    LearningAction.log.debug("Multiple learner get into scribe simultaneously. Cloning report entry skipped");
 	}
 
-	private ScribeUser getCurrentUser(Long toolSessionID) {
-		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
-				AttributeNames.USER);
+	// Retrieve the session and content.
+	ScribeSession scribeSession = scribeService.getSessionBySessionId(toolSessionID);
+	if (scribeSession == null) {
+	    throw new ScribeException("Cannot retrieve session with toolSessionID" + toolSessionID);
+	}
+	Scribe scribe = scribeSession.getScribe();
 
-		// attempt to retrieve user using userId and toolSessionID
-		ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(
-				new Long(user.getUserID().intValue()), toolSessionID);
-
-		if (scribeUser == null) {
-			ScribeSession scribeSession = scribeService
-					.getSessionBySessionId(toolSessionID);
-			scribeUser = scribeService.createScribeUser(user, scribeSession);
-		}
-
-		return scribeUser;
+	// check defineLater
+	if (scribe.isDefineLater()) {
+	    return mapping.findForward("defineLater");
 	}
 
-	public ActionForward startActivity(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-
-		LearningForm lrnForm = (LearningForm) form;
-		Long toolSessionID = lrnForm.getToolSessionID();
-
-		ScribeSession scribeSession = scribeService
-				.getSessionBySessionId(toolSessionID);
-		ScribeUser scribeUser = getCurrentUser(toolSessionID);
-
-		// setup dto's, forms and attributes.
-		lrnForm.setToolSessionID(scribeSession.getSessionId());
-		request.setAttribute("MODE", lrnForm.getMode());
-		setupDTOs(request, scribeSession, scribeUser);
-
-		// update scribe user and go to instructions page
-		scribeUser.setStartedActivity(true);
-		scribeService.saveOrUpdateScribeUser(scribeUser);
-
-		// check if current user is the scribe.
-		if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
-			return mapping.findForward("scribe");
-		}
-
-		return mapping.findForward("learning");
+	// Ensure that the content in use flag is set.
+	if (!scribe.isContentInUse()) {
+	    scribe.setContentInUse(new Boolean(true));
+	    scribeService.saveOrUpdateScribe(scribe);
 	}
 
-	public ActionForward finishActivity(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
 
-		LearningForm lrnForm = (LearningForm) form;
+	// Retrieve the current user
+	ScribeUser scribeUser = getCurrentUser(toolSessionID);
 
-		// set the finished flag
-		ScribeUser scribeUser = scribeService.getUserByUID(lrnForm
-				.getScribeUserUID());
-		if (scribeUser != null) {
-			scribeUser.setFinishedActivity(true);
-			scribeService.saveOrUpdateScribeUser(scribeUser);
-		} else {
-			log.error("finishActivity(): couldn't find ScribeUser with uid: "
-					+ lrnForm.getScribeUserUID());
-		}
+	// check whether scribe has been appointed
+	while (scribeSession.getAppointedScribe() == null) {
+	    // check autoSelectScribe
+	    if (scribe.isAutoSelectScribe() == false) {
+		// learner needs to wait until a scribe has been appointed by
+		// teacher.
+		return mapping.findForward("waitForScribe");
 
-		ToolSessionManager sessionMgrService = ScribeServiceProxy
-				.getScribeSessionManager(getServlet().getServletContext());
+	    } else {
+		// appoint the currentUser as the scribe
+		scribeSession.setAppointedScribe(scribeUser);
 
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		Long userID = new Long(user.getUserID().longValue());
-		Long toolSessionID = scribeUser.getScribeSession().getSessionId();
-
-		String nextActivityUrl;
+		// attempt to update the scribeSession.
 		try {
-			nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID,
-					userID);
-			response.sendRedirect(nextActivityUrl);
-		} catch (DataMissingException e) {
-			throw new ScribeException(e);
-		} catch (ToolException e) {
-			throw new ScribeException(e);
-		} catch (IOException e) {
-			throw new ScribeException(e);
+		    scribeService.saveOrUpdateScribeSession(scribeSession);
+		} catch (ObjectOptimisticLockingFailureException le) {
+		    // scribeSession has been modified. Reload scribeSession and
+		    // check again.
+		    scribeSession = scribeService.getSessionBySessionId(toolSessionID);
 		}
-
-		return null; // TODO need to return proper page.
+	    }
 	}
 
-	public ActionForward openNotebook(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+	// setup dto's forms and attributes.
+	((LearningForm) form).setToolSessionID(scribeSession.getSessionId());
+	request.setAttribute("MODE", mode.toString());
+	setupDTOs(request, scribeSession, scribeUser);
 
-		LearningForm lrnForm = (LearningForm) form;
-
-		// set the finished flag
-		ScribeUser scribeUser = scribeService.getUserByUID(lrnForm
-				.getScribeUserUID());
-		ScribeDTO scribeDTO = new ScribeDTO(scribeUser.getScribeSession()
-				.getScribe());
-
-		request.setAttribute("scribeDTO", scribeDTO);
-		
-		LearningWebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(),
-			request, getServlet().getServletContext());
-
-		return mapping.findForward("notebook");
+	// check force complete
+	if (scribeSession.isForceComplete()) {
+	    // go to report page
+	    if (scribeSession.getScribe().isShowAggregatedReports()) {
+		setupOtherGroupReportDTO(request, scribeSession, scribeUser);
+	    }
+	    return mapping.findForward("report");
 	}
 
-	public ActionForward submitReflection(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-
-		// save the reflection entry and call the notebook.
-
-		LearningForm lrnForm = (LearningForm) form;
-
-		ScribeUser scribeUser = scribeService.getUserByUID(lrnForm
-				.getScribeUserUID());
-
-		scribeService.createNotebookEntry(scribeUser.getScribeSession()
-				.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-				ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId()
-						.intValue(), lrnForm.getEntryText());
-
-		return finishActivity(mapping, form, request, response);
+	// check if user has started activity
+	if (!scribeUser.isStartedActivity()) {
+	    if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
+		request.setAttribute("role", "scribe");
+	    } else {
+		request.setAttribute("role", "learner");
+	    }
+	    return mapping.findForward("instructions");
 	}
 
-	public ActionForward submitReport(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-
-		LearningForm lrnForm = (LearningForm) form;
-		Long toolSessionID = lrnForm.getToolSessionID();
-
-		ScribeSession session = scribeService
-				.getSessionBySessionId(toolSessionID);
-
-		ScribeUser scribeUser = getCurrentUser(toolSessionID);
-
-		boolean reportValid = false;
-
-		for (Iterator iter = session.getScribeReportEntries().iterator(); iter
-				.hasNext();) {
-			ScribeReportEntry report = (ScribeReportEntry) iter.next();
-
-			String entryText = (String) lrnForm.getReport(report.getUid()
-					.toString());
-
-			if (entryText.length() != 0) {
-				reportValid = true;
-			}
-		}
-
-		if (reportValid) {
-			// update scribeReports
-			for (Iterator iter = session.getScribeReportEntries().iterator(); iter
-					.hasNext();) {
-				ScribeReportEntry report = (ScribeReportEntry) iter.next();
-
-				String entryText = (String) lrnForm.getReport(report.getUid()
-						.toString());
-				report.setEntryText(entryText);
-			}
-
-			// persist changes
-			for (Iterator iter = session.getScribeUsers().iterator(); iter
-					.hasNext();) {
-				ScribeUser user = (ScribeUser) iter.next();
-				user.setReportApproved(false);
-				scribeService.saveOrUpdateScribeUser(scribeUser);
-			}
-
-			session.setReportSubmitted(true);
-			scribeService.saveOrUpdateScribeSession(session);
-		}
-
-		request.setAttribute("MODE", lrnForm.getMode());
-		setupDTOs(request, session, scribeUser);
-
-		return mapping.findForward("scribe");
+	// check if current user is the scribe.
+	if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
+	    return mapping.findForward("scribe");
+	} else {
+	    return mapping.findForward("learning");
 	}
 
-	public ActionForward submitApproval(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+    }
 
-		LearningForm lrnForm = (LearningForm) form;
+    private ScribeUser getCurrentUser(Long toolSessionID) {
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
-		// get session and user
-		ScribeSession session = scribeService.getSessionBySessionId(lrnForm
-				.getToolSessionID());
-		ScribeUser scribeUser = getCurrentUser(session.getSessionId());
+	// attempt to retrieve user using userId and toolSessionID
+	ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionID);
 
-		scribeUser.setReportApproved(true);
-
-		request.setAttribute("MODE", lrnForm.getMode());
-		setupDTOs(request, session, scribeUser);
-
-		scribeService.saveOrUpdateScribeUser(scribeUser);
-
-		if (session.getAppointedScribe().equals(scribeUser)) {
-			// send updated voteDisplay
-			return getVoteDisplay(mapping, form, request, response);
-		} else {
-			// load learning page.
-			return mapping.findForward("learning");
-		}
+	if (scribeUser == null) {
+	    ScribeSession scribeSession = scribeService.getSessionBySessionId(toolSessionID);
+	    scribeUser = scribeService.createScribeUser(user, scribeSession);
 	}
 
-	public ActionForward getVoteDisplay(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+	return scribeUser;
+    }
 
-		Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
+    public ActionForward startActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-		ScribeSession session = scribeService
-				.getSessionBySessionId(toolSessionID);
+	LearningForm lrnForm = (LearningForm) form;
+	Long toolSessionID = lrnForm.getToolSessionID();
 
-		int numberOfVotes = 0;
+	ScribeSession scribeSession = scribeService.getSessionBySessionId(toolSessionID);
+	ScribeUser scribeUser = getCurrentUser(toolSessionID);
 
-		for (Iterator iter = session.getScribeUsers().iterator(); iter
-				.hasNext();) {
-			ScribeUser user = (ScribeUser) iter.next();
+	// setup dto's, forms and attributes.
+	lrnForm.setToolSessionID(scribeSession.getSessionId());
+	request.setAttribute("MODE", lrnForm.getMode());
+	setupDTOs(request, scribeSession, scribeUser);
 
-			if (user.isReportApproved()) {
-				numberOfVotes++;
-			}
-		}
+	// update scribe user and go to instructions page
+	scribeUser.setStartedActivity(true);
+	scribeService.saveOrUpdateScribeUser(scribeUser);
 
-		int numberOfLearners = session.getScribeUsers().size();
-		int votePercentage = ScribeUtils.calculateVotePercentage(numberOfVotes,
-				numberOfLearners);
-
-		ScribeSessionDTO sessionDTO = new ScribeSessionDTO();
-		sessionDTO.setNumberOfVotes(numberOfVotes);
-		sessionDTO.setNumberOfLearners(numberOfLearners);
-		sessionDTO.setVotePercentage(votePercentage);
-
-		request.setAttribute("scribeSessionDTO", sessionDTO);
-
-		return mapping.findForward("voteDisplay");
+	// check if current user is the scribe.
+	if (scribeSession.getAppointedScribe().getUid() == scribeUser.getUid()) {
+	    return mapping.findForward("scribe");
 	}
 
-	public ActionForward forceCompleteActivity(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+	return mapping.findForward("learning");
+    }
 
-		LearningForm lrnForm = (LearningForm) form;
+    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-		ScribeUser scribeUser = scribeService.getUserByUID(lrnForm
-				.getScribeUserUID());
+	LearningForm lrnForm = (LearningForm) form;
 
-		ScribeSession session = scribeUser.getScribeSession();
-
-		if (session.getAppointedScribe().getUid() == scribeUser.getUid()) {
-			session.setForceComplete(true);
-		} else {
-			// TODO need to implement this.
-			log.error("ScribeUserUID: " + scribeUser.getUid()
-					+ " is not allowed to forceComplete this session");
-		}
-
-		request.setAttribute("MODE", lrnForm.getMode());
-		setupDTOs(request, session, scribeUser);
-
-		scribeService.saveOrUpdateScribeUser(scribeUser);
-
-		if ( session.getScribe().isShowAggregatedReports() )
-			setupOtherGroupReportDTO(request, session, scribeUser);
-        
-        	LearningWebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request, getServlet()
-        		.getServletContext());
-
-		return mapping.findForward("report");
+	// set the finished flag
+	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+	if (scribeUser != null) {
+	    scribeUser.setFinishedActivity(true);
+	    scribeService.saveOrUpdateScribeUser(scribeUser);
+	} else {
+	    LearningAction.log
+		    .error("finishActivity(): couldn't find ScribeUser with uid: " + lrnForm.getScribeUserUID());
 	}
 
-	// Private methods.
+	ToolSessionManager sessionMgrService = ScribeServiceProxy
+		.getScribeSessionManager(getServlet().getServletContext());
 
-	/** Set up all the DTO relating to this session. Doesn't set up the DTO containing the reports of the other groups. */
-	private void setupDTOs(HttpServletRequest request,
-			ScribeSession scribeSession, ScribeUser scribeUser) {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
+	Long toolSessionID = scribeUser.getScribeSession().getSessionId();
 
-		ScribeDTO scribeDTO = new ScribeDTO(scribeSession.getScribe());
-		request.setAttribute("scribeDTO", scribeDTO);
-
-		ScribeSessionDTO sessionDTO = ScribeUtils.createSessionDTO(scribeSession);
-		request.setAttribute("scribeSessionDTO", sessionDTO);
-
-		ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-		if (scribeUser.isFinishedActivity()) {
-			// get the notebook entry.
-			NotebookEntry notebookEntry = scribeService.getEntry(scribeSession
-					.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-					ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId()
-							.intValue());
-			if (notebookEntry != null) {
-				scribeUserDTO.notebookEntry = notebookEntry.getEntry();
-			}
-		}
-		request.setAttribute("scribeUserDTO", scribeUserDTO);
-	}
-	
-	/** Create a map of the reports (in ScribeSessionDTO format) for all the other groups/sessions, where the key
-	 * is the group/session name. The code ensures that the session name is unique, adding the session id if necessary.
-	 * It will only include the finalized reports. */
-	private void setupOtherGroupReportDTO(HttpServletRequest request,
-			ScribeSession scribeSession, ScribeUser scribeUser) {
-		TreeMap<String, ScribeSessionDTO> otherScribeSessions = ScribeUtils.getReportDTOs(scribeSession);
-		if ( otherScribeSessions.size() > 0 ) {
-			request.setAttribute("otherScribeSessions", otherScribeSessions.values());
-		}
+	String nextActivityUrl;
+	try {
+	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, userID);
+	    response.sendRedirect(nextActivityUrl);
+	} catch (DataMissingException e) {
+	    throw new ScribeException(e);
+	} catch (ToolException e) {
+	    throw new ScribeException(e);
+	} catch (IOException e) {
+	    throw new ScribeException(e);
 	}
 
+	return null; // TODO need to return proper page.
+    }
+
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	// set the finished flag
+	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+	ScribeDTO scribeDTO = new ScribeDTO(scribeUser.getScribeSession().getScribe());
+
+	request.setAttribute("scribeDTO", scribeDTO);
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(),
+		request, getServlet().getServletContext());
+
+	return mapping.findForward("notebook");
+    }
+
+    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// save the reflection entry and call the notebook.
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+
+	scribeService.createNotebookEntry(scribeUser.getScribeSession().getSessionId(),
+		CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue(),
+		lrnForm.getEntryText());
+
+	return finishActivity(mapping, form, request, response);
+    }
+
+    public ActionForward forceCompleteActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	LearningForm lrnForm = (LearningForm) form;
+	ScribeUser scribeUser = scribeService.getUserByUID(lrnForm.getScribeUserUID());
+	ScribeSession session = scribeUser.getScribeSession();
+
+	if (session.getAppointedScribe().getUid() == scribeUser.getUid()) {
+	    session.setForceComplete(true);
+	} else {
+	    // TODO need to implement this.
+	    LearningAction.log
+		    .error("ScribeUserUID: " + scribeUser.getUid() + " is not allowed to forceComplete this session");
+	}
+
+	request.setAttribute("MODE", lrnForm.getMode());
+	setupDTOs(request, session, scribeUser);
+	scribeService.saveOrUpdateScribeUser(scribeUser);
+
+	LearningWebsocketServer.sendCloseRequest(session.getSessionId());
+
+	if (session.getScribe().isShowAggregatedReports()) {
+	    setupOtherGroupReportDTO(request, session, scribeUser);
+	}
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request,
+		getServlet().getServletContext());
+
+	return mapping.findForward("report");
+    }
+
+    // Private methods.
+
+    /**
+     * Set up all the DTO relating to this session. Doesn't set up the DTO containing the reports of the other groups.
+     */
+    private void setupDTOs(HttpServletRequest request, ScribeSession scribeSession, ScribeUser scribeUser) {
+
+	ScribeDTO scribeDTO = new ScribeDTO(scribeSession.getScribe());
+	request.setAttribute("scribeDTO", scribeDTO);
+
+	ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
+	request.setAttribute("scribeSessionDTO", sessionDTO);
+
+	ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
+	if (scribeUser.isFinishedActivity()) {
+	    // get the notebook entry.
+	    NotebookEntry notebookEntry = scribeService.getEntry(scribeSession.getSessionId(),
+		    CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE,
+		    scribeUser.getUserId().intValue());
+	    if (notebookEntry != null) {
+		scribeUserDTO.notebookEntry = notebookEntry.getEntry();
+	    }
+	}
+	request.setAttribute("scribeUserDTO", scribeUserDTO);
+    }
+
+    /**
+     * Create a map of the reports (in ScribeSessionDTO format) for all the other groups/sessions, where the key is the
+     * group/session name. The code ensures that the session name is unique, adding the session id if necessary. It will
+     * only include the finalized reports.
+     */
+    private void setupOtherGroupReportDTO(HttpServletRequest request, ScribeSession scribeSession,
+	    ScribeUser scribeUser) {
+	TreeMap<String, ScribeSessionDTO> otherScribeSessions = ScribeUtils.getReportDTOs(scribeSession);
+	if (otherScribeSessions.size() > 0) {
+	    request.setAttribute("otherScribeSessions", otherScribeSessions.values());
+	}
+    }
 
 }

@@ -7,44 +7,83 @@
 	<lams:WebAppURL />
 </c:set>
 
-<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-
+<script type="text/javascript" src='${lams}includes/javascript/jquery.js'></script>
 <script type="text/javascript">
-	setTimeout("refreshPage()", 5000)
+	$(document).ready(function(){
+		// focus on the first report input
+		$('textarea[id^="report-"]').first().focus();
+	});
 
-	function refreshPage() {
-
-		var url = '${tool}learning.do';
-		var params = 'dispatch=getVoteDisplay&toolSessionID=${scribeSessionDTO.sessionID}';
-
-		var myAjax = new Ajax.Updater('voteDisplay', url, {
-			method : 'get',
-			parameters : params
-		});
-
-		setTimeout("refreshPage()", 5000)
+	//init the connection with server using server URL but with different protocol
+	var websocket = new WebSocket('${tool}'.replace('http', 'ws')
+					+ 'learningWebsocket?toolSessionID=' + ${scribeSessionDTO.sessionID}),
+		agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
+		reportSubmitted = ${scribeSessionDTO.reportSubmitted};
+		
+	// run when the server pushes new reports and vote statistics
+	websocket.onmessage = function(e) {
+		// create JSON object
+		var input = JSON.parse(e.data),
+			agreeButton = $('#agreeButton');
+		
+		// if the scribe or monitor force completes the activity, reload to display report page
+		if (input.close) {
+			window.location.href = '${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}';
+			return;
+		}
+		
+		// only changed reports will be sent
+		if (input.reports) {
+			$.each(input.reports, function() {
+				$('#reportText-' + this.uid).text(this.text);
+			});
+		}
+		
+		// can the user vote
+		if (!reportSubmitted || input.approved) {
+			agreeButton.hide();
+		} else {
+			agreeButton.show();
+		}
+		
+		// update vote statistics 
+		var label = agreementPercentageLabel.replace('{0}', input.numberOfVotes)
+											.replace('{1}', input.numberOfLearners);
+		$('#agreementPercentageLabel').text(label);
+		$('#agreementPercentage').text('(' + input.votePercentage + '%)');
+		$('#agreementPercentageBar').attr('aria-valuenow', input.votePercentage)
+									.css('width',input.votePercentage + '%');
 	}
-
+	
 	function submitApproval() {
-		var url = '${tool}learning.do';
-		var params = 'dispatch=submitApproval&toolSessionID=${scribeSessionDTO.sessionID}';
-
-		var myAjax = new Ajax.Updater('voteDisplay', url, {
-			method : 'get',
-			parameters : params
+		var data = {
+				type : 'vote'	
+			};
+		websocket.send(JSON.stringify(data));
+		
+		$('#agreeButton').hide();
+	}
+	
+	function submitReport() {
+		var reports = [],
+			data = {
+				type : 'submitReport'	
+			};
+		// get each report part (heading) text
+		$('textarea[id^="report-"]').each(function(){
+			reports.push({
+				'uid'  : $(this).attr('id').split('-')[1],
+				'text' : $(this).val() 
+			});
 		});
-
-		// remove the Agree button.
-		document.getElementById("agreeButton").innerHTML = "";
+		data.reports = reports;
+		websocket.send(JSON.stringify(data));
+		
+		reportSubmitted = true;
 	}
 
 	function confirmForceComplete() {
-		var message = "<fmt:message key='message.confirmForceComplete'/>";
-		if (confirm(message)) {
-			return true;
-		} else {
-			return false;
-		}
+		return confirm("<fmt:message key='message.confirmForceComplete'/>");
 	}
 </script>
 
@@ -54,67 +93,54 @@
 		<c:out value="${scribeDTO.instructions}" escapeXml="false" />		
 	</div>
 
-	<html:form action="learning">
-		<html:hidden property="dispatch" value="submitReport"></html:hidden>
-		<html:hidden property="toolSessionID"></html:hidden>
-		<html:hidden property="mode"></html:hidden>
+	<div id="voteDisplay">
+		<%@include file="/pages/parts/voteDisplay.jsp"%>
+	</div>
 
-		<div id="voteDisplay">
-			<%@include file="/pages/parts/voteDisplay.jsp"%>
-		</div>
+	<h4>
+		<abbr class="pull-right hidden-xs" title="<fmt:message key="message.scribeInstructions2" />&nbsp;<fmt:message key="message.scribeInstructions3" />"><i
+									class="fa fa-question-circle text-info"></i></abbr>
+		<fmt:message key="heading.report" />
+	</h4>
+	<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-heading panel-title">
+						<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
+					</div>
+					<div class="panel-body">
 
-		<h4>
-			<abbr class="pull-right hidden-xs" title="<fmt:message key="message.scribeInstructions2" />&nbsp;<fmt:message key="message.scribeInstructions3" />"><i
-										class="fa fa-question-circle text-info"></i></abbr>
-			<fmt:message key="heading.report" />
-		</h4>
-		<c:set var="counter" value="0"/>
-		<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
-		<c:set var="counter" value="${counter + 1}"/>
-			<div class="row">
-				<div class="col-xs-12">
-					<div class="panel panel-default">
-						<div class="panel-heading panel-title">
-							<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
+						<div class="panel-warning panel-body bg-warning">
+							<abbr class="pull-right hidden-xs" title="<fmt:message key="label.what.others.see" />"><i
+								class="fa fa-xs fa-question-circle text-info"></i></abbr>
+
+							<c:set var="entry">
+								<lams:out value="${reportDTO.entryText}" escapeHtml="true" />
+							</c:set>
+							<span id="reportText-${reportDTO.uid}"><c:out value="${entry}" escapeXml="false" /></span>
 						</div>
-						<div class="panel-body">
 
-							<c:if test="${not empty reportDTO.entryText}">
-								<div class="panel-warning panel-body bg-warning">
-									<abbr class="pull-right hidden-xs" title="<fmt:message key="label.what.others.see" />"><i
-										class="fa fa-xs fa-question-circle text-info"></i></abbr>
-
-									<c:set var="entry">
-										<lams:out value="${reportDTO.entryText}" escapeHtml="true" />
-									</c:set>
-									<c:out value="${entry}" escapeXml="false" />
-								</div>
-							</c:if>
-
-							<c:if test="${not scribeUserDTO.finishedActivity}">
-								<html:textarea styleId="report-${counter}" property="report(${reportDTO.uid})" rows="6" value="${reportDTO.entryText}"
-									styleClass="form-control voffset5"></html:textarea>
-							</c:if>
-
-
-						</div>
+						<c:if test="${not scribeUserDTO.finishedActivity}">
+							<textarea id="report-${reportDTO.uid}" rows="6"
+								class="form-control voffset5">${reportDTO.entryText}</textarea>
+						</c:if>
 					</div>
 				</div>
 			</div>
-		</c:forEach>
+		</div>
+	</c:forEach>
 
-		<c:if test="${not scribeUserDTO.finishedActivity}">
-			<div class="row">
-				<div class="col-xs-12" id="submitReportBtn">
-					<html:submit styleClass="btn btn-sm btn-default pull-right">
-						<fmt:message key="button.submitReport" />
-					</html:submit>
-				</div>
+	<c:if test="${not scribeUserDTO.finishedActivity}">
+		<div class="row">
+			<div class="col-xs-12" id="submitReportBtn">
+				<button class="btn btn-sm btn-default pull-right" onClick="javascript:submitReport()">
+					<fmt:message key="button.submitReport" />
+				</button>
 			</div>
-		</c:if>
+		</div>
+	</c:if>
 
-
-	</html:form>
 
 	<hr>
 
@@ -131,22 +157,12 @@
 		</div>
 	</html:form>
 
-	<c:if test="${scribeSessionDTO.reportSubmitted and (not scribeUserDTO.reportApproved)}">
-		<div id="agreeButton">
-			<a id="agreeButton" class="btn btn-success pull-left" onclick="submitApproval();"> <fmt:message
-					key="button.agree" />
-			</a>
-		</div>
-	</c:if>
+	<div id="agreeButton">
+		<a id="agreeButton" class="btn btn-success pull-left" onclick="javascript:submitApproval();"> <fmt:message
+				key="button.agree" />
+		</a>
+	</div>
 
 	<div id="footer"></div>
 
 </lams:Page>
-
-
-<script type="text/javascript">
-	window.onload = function() {
-		document.getElementById("report-1").focus();
-	}
-</script>
-
