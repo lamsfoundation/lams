@@ -116,7 +116,7 @@ public class LearningWebsocketServer {
 	}
 
 	/**
-	 * Cheks for stale connections and feeds the opened ones with messages and roster.
+	 * Feeds opened websockets with messages and roster.
 	 */
 	private void send(Long toolSessionId) {
 	    // update the timestamp
@@ -131,22 +131,7 @@ public class LearningWebsocketServer {
 	    String rosterString = null;
 	    // synchronize websockets as a new Learner entering chat could modify this collection
 	    synchronized (sessionWebsockets) {
-		Iterator<Websocket> websocketIterator = sessionWebsockets.iterator();
-		while (websocketIterator.hasNext()) {
-		    Websocket websocket = websocketIterator.next();
-
-		    // check whether the connection is not stale
-		    if (!websocket.session.isOpen()) {
-			// remove the closed connection
-			websocketIterator.remove();
-
-			if (LearningWebsocketServer.log.isDebugEnabled()) {
-			    LearningWebsocketServer.log.debug(
-				    "User " + websocket.userName + " left Chat with toolSessionId: " + toolSessionId);
-			}
-			continue;
-		    }
-
+		for (Websocket websocket : sessionWebsockets) {
 		    // the connection is valid, carry on
 		    JSONObject responseJSON = new JSONObject();
 		    // fetch roster only once, but messages are personalised
@@ -280,14 +265,32 @@ public class LearningWebsocketServer {
     }
 
     /**
-     * If there was something wrong with the connection, put it into logs.
+     * When user leaves the activity.
      */
     @OnClose
-    public void unregisterUser(CloseReason reason) {
-	if (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-		|| reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))) {
-	    LearningWebsocketServer.log.warn("Abnormal Chat websocket close. Code: " + reason.getCloseCode()
-		    + ". Reason: " + reason.getReasonPhrase());
+    public void unregisterUser(Session session, CloseReason reason) {
+	Long toolSessionId = Long
+		.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
+	synchronized (sessionWebsockets) {
+	    Iterator<Websocket> websocketIterator = sessionWebsockets.iterator();
+	    while (websocketIterator.hasNext()) {
+		Websocket websocket = websocketIterator.next();
+		if (websocket.session.equals(session)) {
+		    websocketIterator.remove();
+		    break;
+		}
+	    }
+	}
+	
+	if (LearningWebsocketServer.log.isDebugEnabled()) {
+	    LearningWebsocketServer.log.debug(
+		    "User " + session.getUserPrincipal().getName() + " left Chat with toolSessionId: " + toolSessionId
+			    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
+				    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
+					    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
+						    + reason.getReasonPhrase()
+					    : ""));
 	}
     }
 
