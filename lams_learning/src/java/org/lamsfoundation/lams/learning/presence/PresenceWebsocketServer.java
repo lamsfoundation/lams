@@ -110,7 +110,7 @@ public class PresenceWebsocketServer {
 	}
 
 	/**
-	 * Cheks for stale connections and feeds the opened ones with messages and roster.
+	 * Feeds opened websockets with messages and roster.
 	 */
 	private void send(Long lessonId, String nickName) {
 	    Long lastSendTime = lastSendTimes.get(lessonId);
@@ -134,18 +134,6 @@ public class PresenceWebsocketServer {
 		    Websocket websocket = websocketIterator.next();
 		    // if this run is meant only for one learner, skip the others
 		    if ((nickName != null) && !nickName.equals(websocket.nickName)) {
-			continue;
-		    }
-
-		    // check whether the connection is not stale
-		    if (!websocket.session.isOpen()) {
-			// remove the closed connection
-			websocketIterator.remove();
-
-			if (PresenceWebsocketServer.log.isDebugEnabled()) {
-			    PresenceWebsocketServer.log.debug(
-				    "User " + websocket.nickName + " left Presence Chat with lessonId: " + lessonId);
-			}
 			continue;
 		    }
 
@@ -268,7 +256,7 @@ public class PresenceWebsocketServer {
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
 	    PresenceWebsocketServer.log
-		    .debug("User " + websocket.nickName + " entered Chat with toolSessionId: " + lessonId);
+		    .debug("User " + websocket.nickName + " entered Presence Chat with lesson ID: " + lessonId);
 	}
     }
 
@@ -276,11 +264,28 @@ public class PresenceWebsocketServer {
      * If there was something wrong with the connection, put it into logs.
      */
     @OnClose
-    public void unregisterUser(CloseReason reason) {
-	if (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-		|| reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))) {
-	    PresenceWebsocketServer.log.warn("Abnormal Presence Chat websocket close. Code: " + reason.getCloseCode()
-		    + ". Reason: " + reason.getReasonPhrase());
+    public void unregisterUser(Session session, CloseReason reason) {
+	Long lessonId = Long.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
+	Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	synchronized (lessonWebsockets) {
+	    Iterator<Websocket> websocketIterator = lessonWebsockets.iterator();
+	    while (websocketIterator.hasNext()) {
+		Websocket websocket = websocketIterator.next();
+		if (websocket.session.equals(session)) {
+		    websocketIterator.remove();
+		    break;
+		}
+	    }
+	}
+
+	if (PresenceWebsocketServer.log.isDebugEnabled()) {
+	    PresenceWebsocketServer.log.debug(
+		    "User " + session.getUserPrincipal().getName() + " left Presence Chat with lessonId: " + lessonId
+			    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
+				    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
+					    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
+						    + reason.getReasonPhrase()
+					    : ""));
 	}
     }
 
