@@ -63,7 +63,7 @@
 </c:choose>
 </span>
 
-<lams:Tabs useKey="true" control="true">
+<lams:Tabs useKey="true" control="true" format="nav-pills">
 	<lams:Tab id="1" key="label.learning.heading.add" />
 	<lams:Tab id="2" key="label.learning.heading.list" />
 	<lams:Tab id="3" key="label.learning.heading.summary" />
