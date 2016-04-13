@@ -120,7 +120,6 @@ public class ToolContentVersionFilter {
      * Call by lams import tool service core. Do not use it in tool version filter class.
      * 
      * @param toolFilePath
-     * @throws JDOMException
      * @throws IOException
      */
     public void transformXML(String toolFilePath) throws IOException {
