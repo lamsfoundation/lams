@@ -128,9 +128,6 @@ public class User implements Serializable, Comparable {
     /** persistent field */
     private Theme theme;
 
-    /** nullable persistent field */
-    private String chatId;
-
     /** persistent field */
     private Set learnerProgresses;
 
@@ -373,14 +370,6 @@ public class User implements Serializable, Comparable {
 	this.theme = theme;
     }
 
-    public String getChatId() {
-	return chatId;
-    }
-
-    public void setChatId(String chatId) {
-	this.chatId = chatId;
-    }
-
     public Set getUserOrganisations() {
 	return userOrganisations;
     }
@@ -486,7 +475,7 @@ public class User implements Serializable, Comparable {
 		lamsCommunityUsername, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not
 		// set
 		tutorialPages, (firstLogin == null ? true : false) // assume no firstLogin value means they haven't
-								   // logged in
+							   // logged in
 	);
     }
 
