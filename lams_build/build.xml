@@ -515,17 +515,7 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/scilab/forge/jlatexmath/main/module.xml"
 			  file="lib/jlatexmath/jlatexmath.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/verisign/joid/main" overwrite="true" verbose="true">
-			<fileset dir="lib/joid">
-				<include name="joid.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/verisign/joid/main/module.xml"
-			  file="lib/joid/joid.module.xml" overwrite="true" verbose="true" />
-		
+
 		
 		
 		<copy todir="${server.home}/modules/system/layers/base/com/google/gson/main" overwrite="true" verbose="true">
@@ -565,17 +555,7 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/quartz/main/module.xml"
 			  file="lib/quartz/quartz.module.xml" overwrite="true" verbose="true" />
-		
-		
-		
-		<copy todir="${server.home}/modules/system/layers/base/uk/ac/reload/main" overwrite="true" verbose="true">
-			<fileset dir="lib/reload">
-				<include name="reload-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/uk/ac/reload/main/module.xml"
-			  file="lib/reload/reload.module.xml" overwrite="true" verbose="true" />
-		
+
 		
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/springframework/main" overwrite="true" verbose="true">
