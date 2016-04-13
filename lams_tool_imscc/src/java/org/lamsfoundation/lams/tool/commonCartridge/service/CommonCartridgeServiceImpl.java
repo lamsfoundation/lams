@@ -72,8 +72,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeSessionDA
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeUserDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.Summary;
-import org.lamsfoundation.lams.tool.commonCartridge.ims.IMSManifestException;
-import org.lamsfoundation.lams.tool.commonCartridge.ims.ImscpApplicationException;
 import org.lamsfoundation.lams.tool.commonCartridge.ims.SimpleCommonCartridgeConverter;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
@@ -621,14 +619,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    CommonCartridgeServiceImpl.log
 		    .error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.io.exception"));
-	} catch (IMSManifestException e) {
-	    CommonCartridgeServiceImpl.log
-		    .error(messageService.getMessage("error.msg.ims.package") + ":" + e.toString());
-	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.ims.package"));
-	} catch (ImscpApplicationException e) {
-	    CommonCartridgeServiceImpl.log
-		    .error(messageService.getMessage("error.msg.ims.application") + ":" + e.toString());
-	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.ims.application"));
 	}
     }
 

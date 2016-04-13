@@ -24,10 +24,8 @@
 package org.lamsfoundation.lams.tool.commonCartridge.ims;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,21 +33,15 @@ import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.imsglobal.basiclti.BasicLTIUtil;
 import org.imsglobal.basiclti.XMLMap;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
-
-import uk.ac.reload.jdom.XMLDocument;
-import uk.ac.reload.jdom.XMLPath;
-import uk.ac.reload.jdom.XMLUtils;
-import uk.ac.reload.moonunit.contentpackaging.CP_Core;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * SimpleContentPackageConverter contains the code required for parsing the IMS Content Package and converting the info
@@ -57,16 +49,21 @@ import uk.ac.reload.moonunit.contentpackaging.CP_Core;
  * 
  * Note: this class has instance data, so do not use it as a singleton.
  * 
- * @author Fiona Malikoff
+ * @author Fiona Malikoff, Marcin Cieslak
  */
-public class SimpleCommonCartridgeConverter implements IContentPackageConverter {
+public class SimpleCommonCartridgeConverter {
 
-    private Logger log = Logger.getLogger(SimpleCommonCartridgeConverter.class);
+    private static final Logger log = Logger.getLogger(SimpleCommonCartridgeConverter.class);
 
-    // manifestDoc and cpCore are set up in the constructor. They are then used
-    // to generate the rest of the values
-    private XMLDocument manifestDoc = null;
-    private CP_Core cpCore = null;
+    public static final String DEFAULT = "default";
+    public static final String ITEM = "item";
+    public static final String PARAMETERS = "parameters";
+    public static final String HREF = "href";
+    public static final String IDENTIFIER = "identifier";
+    public static final String RESOURCE = "commonCartridge";
+    public static final String TITLE = "title";
+
+    private static DocumentBuilder docBuilder = null;
 
     private String schema = null;
     private String title = null;
@@ -74,18 +71,20 @@ public class SimpleCommonCartridgeConverter implements IContentPackageConverter 
     private String defaultItem = null;
     private String organzationXML = null;
 
-    // cachedCommonCartridgeList is used to avoid building up the list
-    // every time an item is parsed - otherwise there is a lot
-    // of processing done by the reload code time and time again.
-    private Element[] cachedCommonCartridgeList = null;
-
-    // ---
-
     private Properties types = new Properties();
     private Properties hrefs = new Properties();
     private Map<String, Object> manifestFullMap = null;
     private String directoryName = null;
     private List<CommonCartridgeItem> basicLTIItems = null;
+
+    static {
+	try {
+	    // a single doc builder is enough
+	    SimpleCommonCartridgeConverter.docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	} catch (ParserConfigurationException e) {
+	    SimpleCommonCartridgeConverter.log.error("Error while initialising XML document builder", e);
+	}
+    }
 
     /**
      * Set up a package converter, using the supplied directory as the package. The package should be parsed
@@ -93,23 +92,12 @@ public class SimpleCommonCartridgeConverter implements IContentPackageConverter 
      * 
      * @param directoryName
      *            : directory containing an expanded IMS content package.
-     * @throws IMSManifestException
-     *             if there is an error in parsing the manifest file due to an error in the file or an unexpected value.
-     * @throws ImscpApplicationException
-     *             if there is any other error
+     * @throws IOException
      */
-    public SimpleCommonCartridgeConverter(String directoryName) throws IMSManifestException, ImscpApplicationException {
+    public SimpleCommonCartridgeConverter(String directoryName) throws IOException {
 	this.directoryName = directoryName;
-	this.manifestFullMap = getManifestFullMap();
 
-	// this.manifestDoc = getDocument(directoryName);
-	// this.cpCore = new CP_Core(manifestDoc);
-	//
-	// // initialise the property file required for the reload code. Needed to make
-	// // the metadata call work. If we remove the metadata call, then this constructor
-	// // may be removed.
-	// System.setProperty("editor.properties.file", "uk.ac.reload.editor.properties.rb");
-
+	parseManifestFullMap();
 	parsePackage();
     }
 
@@ -120,19 +108,22 @@ public class SimpleCommonCartridgeConverter implements IContentPackageConverter 
      * @throws ImscpApplicationException
      * @throws IMSManifestException
      */
-    private void parsePackage() throws IMSManifestException, ImscpApplicationException {
+    private void parsePackage() {
 
 	List<Map<String, Object>> resources = XMLMap.getList(manifestFullMap, "/manifest/resources/resource");
 	for (Map<String, Object> resource : resources) {
 	    String identifier = XMLMap.getString(resource, "/!identifier");
-	    if (identifier == null)
+	    if (identifier == null) {
 		continue;
+	    }
 	    String type = XMLMap.getString(resource, "/!type");
-	    if (type != null)
+	    if (type != null) {
 		types.setProperty(identifier, type);
+	    }
 	    String href = XMLMap.getString(resource, "/file!href");
-	    if (href != null)
+	    if (href != null) {
 		hrefs.setProperty(identifier, href);
+	    }
 	}
 
 	basicLTIItems = new LinkedList<CommonCartridgeItem>();
@@ -141,49 +132,11 @@ public class SimpleCommonCartridgeConverter implements IContentPackageConverter 
 		    "/manifest/organizations/organization/item");
 	    parseItem(topItem.get(0));
 	} catch (IOException e) {
-	    log.error("<p><b>Error displaying navigation from manifest:" + e.getMessage());
-	    log.error("</div>");
+	    SimpleCommonCartridgeConverter.log
+		    .error("<p><b>Error displaying navigation from manifest:" + e.getMessage());
+	    SimpleCommonCartridgeConverter.log.error("</div>");
 	    return;
 	}
-
-	// String schemaText = getText(manifestDoc, "//metadata/schema");
-	// String schemaVersion = getText(manifestDoc, "//metadata/schemaversion");
-	// this.schema = (schemaText != null ? schemaText : "unknown") + " "
-	// + (schemaVersion != null ? schemaVersion : "unknown");
-	//
-	// Document orgs = buildOrganisationList();
-	// if (orgs == null) {
-	// String error =
-	// "Unable to convert organizations from manifest file to our own structure. Reason unknown - buildOrganisationList returned null";
-	// log.error(error);
-	// throw new ImscpApplicationException(error);
-	// }
-	//
-	// try {
-	// this.organzationXML = XMLUtils.write2XMLString(orgs);
-	// } catch (IOException ioe) {
-	// String error = "Exception thrown converting organization structure (as document) to an XML string."
-	// + ioe.getMessage();
-	// log.error(error, ioe);
-	// throw new ImscpApplicationException(error, ioe);
-	// }
-	//
-	// XMLPath xmlPath = new XMLPath("//metadata/*:lom/*:general/*:title/*:langstring");
-	// this.title = getMetaValue(xmlPath);
-	// if (this.title == null) {
-	// // try the old root name - untested
-	// xmlPath = new XMLPath("//metadata/*:record/*:general/*:title/*:langstring");
-	// this.title = getMetaValue(xmlPath);
-	// }
-	//
-	// xmlPath = new XMLPath("//metadata/*:lom/*:general/*:description/*:langstring");
-	// this.description = getMetaValue(xmlPath);
-	// if (this.description == null) {
-	// // try the old root name - untested
-	// xmlPath = new XMLPath("//metadata/*:record/*:general/*:description/*:langstring");
-	// this.description = getMetaValue(xmlPath);
-	// }
-
     }
 
     private void parseItem(Map<String, Object> item) throws IOException {
@@ -195,7 +148,7 @@ public class SimpleCommonCartridgeConverter implements IContentPackageConverter 
 	if (ref != null) {
 	    String type = types.getProperty(ref);
 	    String href = hrefs.getProperty(ref);
-	    if (type != null && href != null) {
+	    if ((type != null) && (href != null)) {
 		File basciLTIXml = new File(directoryName, href);
 
 		if (type.equals("webcontent")) {
@@ -246,332 +199,24 @@ public class SimpleCommonCartridgeConverter implements IContentPackageConverter 
     }
 
     /**
-     * Finds a value at the given xmlPath. If only one element, uses that value. If more than one element, tries to find
-     * an English value.
-     * 
-     * @param xmlPath
-     * @return Value of the element found at xmlPath.
-     */
-    private String getMetaValue(XMLPath xmlPath) {
-	Element[] elList = manifestDoc.getElements(xmlPath);
-	String value = null;
-	if (elList != null) {
-	    if (elList.length == 0) {
-		value = "Unknown";
-	    } else if (elList.length == 1) {
-		value = elList[0].getTextTrim();
-	    } else {
-		value = null;
-		// TODO check if it is really testing for english
-		for (int i = 0; value == null && i < elList.length; i++) {
-		    // grab the first English one
-		    Element el = elList[i];
-		    String attrValue = el.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-		    if (attrValue != null && attrValue.startsWith("en")) {
-			value = el.getTextTrim();
-		    }
-		}
-		if (value == null) {
-		    // can't seem to find an English one, just pick the first
-		    value = elList[0].getTextTrim();
-		}
-	    }
-	}
-	return value;
-    }
-
-    /* Get the text for this element - expect only 1 */
-    private String getText(XMLDocument document, String xmlPathString) {
-	XMLPath xmlPath = new XMLPath(xmlPathString);
-	Element el = document.getElement(xmlPath);
-	return el != null ? el.getTextTrim() : null;
-    }
-
-    private String debug(XMLDocument document, String param, String xmlPathString) {
-	XMLPath xmlPath = new XMLPath(xmlPathString);
-	Element[] elList = document.getElements(xmlPath);
-	if (elList != null) {
-	    log.error(param + " xp: length " + elList.length + " el " + elList);
-	    if (elList.length >= 1) {
-		log.error("text is " + elList[0].getTextTrim());
-		return elList[0].getTextTrim();
-	    }
-	} else {
-	    log.error(param + " xp: el is null");
-	}
-	return null;
-    }
-
-    /**
      * @param directoryName
-     * @return
-     * @throws JDOMException
-     * @throws IOException
      */
-    private XMLDocument getDocument(String directoryName) throws IMSManifestException {
+    private void parseManifestFullMap() throws IOException {
+	// Parsing manifest
+	Document document = null;
 	try {
-	    XMLDocument doc = new XMLDocument();
-	    doc.loadDocument(new File(directoryName, "imsmanifest.xml"));
-	    return doc;
-	} catch (JDOMException je) {
-	    String error = "Parsing error occured while loading imsmanifest.xml file. Contents of file may be invalid. "
-		    + je.getMessage();
-	    log.error(error, je);
-	    throw new IMSManifestException(error, je);
-	} catch (FileNotFoundException e) {
-	    String error = "Unable to find imsmanifest file in the package." + e.getMessage();
-	    log.error(error, e);
-	    throw new IMSManifestException(error, e);
-	} catch (IOException ioe) {
-	    String error = "IOException occured while loading imsmanifest file. " + ioe.getMessage();
-	    log.error(error, ioe);
-	    throw new IMSManifestException(error, ioe);
+	    document = SimpleCommonCartridgeConverter.docBuilder.parse(new File(directoryName, "imsmanifest.xml"));
+	} catch (SAXException e) {
+	    SimpleCommonCartridgeConverter.log.error("Error parsing manifest XML", e);
 	}
-    }
-
-    /**
-     * @param directoryName
-     * @return
-     * @throws JDOMException
-     * @throws IOException
-     */
-    private Map<String, Object> getManifestFullMap() throws IMSManifestException {
-
-	try {
-	    // Parsing manifest
-	    DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	    org.w3c.dom.Document document = parser.parse(new File(directoryName, "imsmanifest.xml"));
-
-	    if (document == null)
-		return null;
-
-	    Map<String, Object> manifestFullMap = XMLMap.getFullMap(document);
-
-	    if (manifestFullMap == null) {
-		log.error("Error parsing manifest XML");
-	    }
-
-	    return manifestFullMap;
-
-	} catch (Exception e) {
-	    log.error("Error parsing manifest XML" + e.getMessage());
-	    return null;
+	if (document == null) {
+	    throw new IOException("Error parsing manifest XML");
 	}
 
-	// out.println("Reading resources from manifest...");
-
-	// try {
-	// XMLDocument doc = new XMLDocument();
-	// doc.loadDocument(new File(directoryName, "imsmanifest.xml"));
-	// return doc;
-	// } catch (JDOMException je) {
-	// String error = "Parsing error occured while loading imsmanifest.xml file. Contents of file may be invalid. "
-	// + je.getMessage();
-	// log.error(error, je);
-	// throw new IMSManifestException(error, je);
-	// } catch (FileNotFoundException e) {
-	// String error = "Unable to find imsmanifest file in the package." + e.getMessage();
-	// log.error(error, e);
-	// throw new IMSManifestException(error, e);
-	// } catch (IOException ioe) {
-	// String error = "IOException occured while loading imsmanifest file. " + ioe.getMessage();
-	// log.error(error, ioe);
-	// throw new IMSManifestException(error, ioe);
-	// }
-    }
-
-    /**
-     * Built an XML document which is a list of organisations/commonCartridge.
-     */
-    private Document buildOrganisationList() throws IMSManifestException {
-
-	Namespace nm = cpCore.getRootManifestElement().getNamespace();
-
-	Element rootElement = cpCore.getRootManifestElement();
-	Element orgsElement = rootElement.getChild(CP_Core.ORGANIZATIONS, nm);
-
-	// set up a list of all the commonCartridge
-
-	// now get all the organizations and set up the new XML document, combining
-	// the organization and the commonCartridge.
-	Element defaultOrg = cpCore.getDefaultOrganization(orgsElement);
-	String defaultOrgIdentifier = null;
-	if (defaultOrg != null)
-	    defaultOrgIdentifier = defaultOrg.getAttributeValue("identifier");
-
-	log.debug("cpCore default org id: " + defaultOrgIdentifier);
-
-	Element newRootElement = new Element("organizations");
-	setAttribute(newRootElement, "version", "imscp1");
-	Document doc = new Document(newRootElement);
-
-	Element[] orgs = cpCore.getOrganizationsAllowed(orgsElement);
-	Element initOrganizationElement = null;
-	for (int i = 0; i < orgs.length; i++) {
-
-	    Element organizationElement = processItem(orgs[i], nm, defaultOrgIdentifier, null);
-	    if (initOrganizationElement == null)
-		initOrganizationElement = organizationElement;
-
-	    newRootElement.addContent(organizationElement);
+	this.manifestFullMap = XMLMap.getFullMap(document);
+	if (manifestFullMap == null) {
+	    throw new IOException("Error parsing manifest XML");
 	}
-
-	if (log.isDebugEnabled()) {
-	    try {
-		log.debug("Organizations are: " + XMLUtils.write2XMLString(doc));
-	    } catch (IOException e) {
-		log.debug("Unable to convert organizations to XML for log. Organizations are: " + doc);
-	    }
-	}
-
-	return doc;
-    }
-
-    /**
-     * Process the given element. Returns a newly formatted Element if the element is a visible item, null otherwise.
-     * Will also set the value "defaultItemURL" while processing, if it finds the default item.
-     * 
-     * First time through, the element will be an organization and parentOrgIdentifier will be null. After that,
-     * elements are expected to be items and parentOrgIdentifier should not be null.
-     * 
-     * parentOrgIdentifier is the parent organization of an item. An item is the default item if either: (a) the
-     * defaultOrgIdentifier is null and it is the first item encountered which has a commonCartridge or (b)
-     * parentOrgIdentifier==defaultOrgIdentifier and it is the first item encountered which has a commonCartridge.
-     * 
-     * @param element
-     * @return New version of element combining organization/item/commonCartridge details
-     */
-    private Element processItem(Element element, Namespace nm, String defaultOrgIdentifier, String parentOrgIdentifier)
-	    throws IMSManifestException {
-
-	String isVisibleString = element.getAttributeValue(CP_Core.ISVISIBLE);
-	if (isVisible(isVisibleString)) {
-
-	    String id = element.getAttributeValue(CP_Core.IDENTIFIER);
-	    // only process visible items as we are building the list for display to the user
-	    Element itref = new Element(OrganizationXMLDef.ITEM);
-
-	    setAttribute(itref, OrganizationXMLDef.IDENTIFIER, id); // mandatory
-	    setAttribute(itref, OrganizationXMLDef.PARAMETERS, element.getAttributeValue(CP_Core.PARAMETERS)); // optional
-	    setAttribute(itref, OrganizationXMLDef.TITLE, element.getChildText(CP_Core.TITLE, nm)); // optional
-	    String commonCartridgeURL = getCommonCartridgeURL(element);
-	    if (commonCartridgeURL != null)
-		setAttribute(itref, OrganizationXMLDef.RESOURCE, commonCartridgeURL); // optional
-
-	    if (commonCartridgeURL != null && this.defaultItem == null
-		    && (defaultOrgIdentifier == null || defaultOrgIdentifier.equals(parentOrgIdentifier))) {
-		setAttribute(itref, OrganizationXMLDef.DEFAULT, Boolean.TRUE.toString());
-		this.defaultItem = commonCartridgeURL;
-	    } else {
-		setAttribute(itref, OrganizationXMLDef.DEFAULT, Boolean.FALSE.toString());
-	    }
-
-	    List items = element.getChildren(CP_Core.ITEM, nm);
-	    Iterator iter = items.iterator();
-	    while (iter.hasNext()) {
-		Element itrefChild = processItem((Element) iter.next(), nm, defaultOrgIdentifier,
-			parentOrgIdentifier != null ? parentOrgIdentifier : id);
-		if (itrefChild != null)
-		    itref.addContent(itrefChild);
-	    }
-
-	    return itref;
-	}
-	return null;
-
-    }
-
-    /**
-     * Not sure exactly what format "isVisible" will be in. In the spec, it says Boolean (True|False) yet the
-     * imslipv1p0cp.zip package has a value of "1". So this code will accept anything as visible except for false (any
-     * case) or 0.
-     */
-    private boolean isVisible(String value) {
-
-	if (value != null) {
-	    String trimmed = value.trim();
-	    if (trimmed.equalsIgnoreCase("false") || trimmed.equals("0")) {
-		return false;
-	    }
-	}
-	return true;
-    }
-
-    private void setAttribute(Element element, String attributeName, String value) {
-	if (element != null && attributeName != null && value != null)
-	    element.setAttribute(attributeName, value);
-    }
-
-    /*
-     * Get the commonCartridge relating to this item. First time called it will get a list of allowed commonCartridge it
-     * will cache the value in cachedCommonCartridgeList. After that, it will go to the cache. If it doesn't find the
-     * commonCartridge, then it will regenerate the list of commonCartridge.
-     * 
-     * This is done for performance - it is assumed that most items will have access to the same commonCartridge. This
-     * may not be true if sub-manifests are used, hence the regneration of the array if the commonCartridge isn't found
-     * in the cache.
-     * 
-     * Note: assumes all reference ids are unique across the whole of the manifest file.
-     * 
-     * @param item Element of type ITEM
-     * 
-     * @return relative path of the commonCartridge, null if no IDENTIFIERREF found
-     * 
-     * @throws IMSManifestException if IDENTIFIERREF is not null but the commonCartridge could not found.
-     */
-    private String getCommonCartridgeURL(Element itemElement) throws IMSManifestException {
-
-	if (cachedCommonCartridgeList == null) {
-	    cachedCommonCartridgeList = cpCore.getReferencedElementsAllowed(itemElement);
-	    if (log.isDebugEnabled())
-		log.debug("CommonCartridge are " + cachedCommonCartridgeList);
-	}
-
-	String identifierRef = itemElement.getAttributeValue(CP_Core.IDENTIFIERREF);
-
-	if (identifierRef == null) {
-
-	    return null;
-
-	} else {
-
-	    Element commonCartridge = getCommonCartridge2(identifierRef);
-
-	    if (commonCartridge == null) {
-
-		// We failed to find a matching commonCartridge so try generating the list again.
-		// Note: this may case the list to be generated twice first time if the
-		// commonCartridge is missing. Too bad!
-		cachedCommonCartridgeList = cpCore.getReferencedElementsAllowed(itemElement);
-		if (log.isDebugEnabled())
-		    log.debug("CommonCartridge are " + cachedCommonCartridgeList);
-
-		commonCartridge = getCommonCartridge2(identifierRef);
-	    }
-
-	    if (commonCartridge != null) {
-		return cpCore.getRelativeURL(commonCartridge);
-	    } else {
-		throw new IMSManifestException("Unable to find commonCartridge for item element "
-			+ itemElement.getAttributeValue(CP_Core.TITLE) + " looking for identifier " + identifierRef);
-	    }
-
-	}
-
-    }
-
-    /**
-     * @param identifierRef
-     * @return
-     */
-    private Element getCommonCartridge2(String identifierRef) {
-	for (int i = 0; i < cachedCommonCartridgeList.length; i++) {
-	    Element commonCartridge = cachedCommonCartridgeList[i];
-	    if (identifierRef != null && identifierRef.equals(commonCartridge.getAttributeValue(CP_Core.IDENTIFIER))) {
-		return commonCartridge;
-	    }
-	}
-	return null;
     }
 
     /**
