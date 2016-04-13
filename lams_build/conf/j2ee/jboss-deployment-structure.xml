@@ -36,11 +36,9 @@
       <module name="org.jboss.jbossweb" export="true" />
       <module name="org.jdom" export="true" />
       <module name="org.scilab.forge.jlatexmath" export="true" />
-      <module name="org.verisign.joid" export="true" />
       <module name="com.google.gson" export="true" />
       <module name="org.apache.lucene" slot="4.10" export="true" />
       <module name="org.quartz" export="true" />
-      <module name="uk.ac.reload" export="true" />
       <module name="org.springframework" export="true" meta-inf="export" />
       <module name="org.apache.struts" export="true" />
       <module name="org.apache.strutsel" export="true" />

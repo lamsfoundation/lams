@@ -23,8 +23,6 @@ jboss			  jbossweb.jar							2.1.3				   LGPL 2.1						 Apache Software Foundati
 				  
 jlatexmath		  jlatexmath-1.0.3.jar                  1.0.3
 
-joid			  joid.jar								2.0					   Apache License 2.0			 								  Java Open ID library
-
 lucene			  lucene-core-2.4.0.jar					2.4.0				   Apache License 2.0			 Apache							  text search engine library
 				  lucene-snowball-2.4.0.jar				2.4.0
 
@@ -33,10 +31,6 @@ mysql             mysql-connector-java-5.1.38-bin.jar	5.1.31				   GPL							 Or
 odmg              odmg-3.0.jar                          3.0                                                                                   
 
 quartz			  quartz-2.2.1.jar						2.2.1			   	   Apache License 2.0			 Terracotta						  For running scheduled jobs
-
-reload			  reload-diva.jar						2.0.1				   MIT License					 Reload							  Suite of tools for viewing, editing and creating IMS and SCORM Content Packages
-				  reload-jdom.jar
-				  reload-moonunit.jar 
 
 spring            spring-core-4.0.6.RELEASE.jar			4.0.6				   Apache License 2.0			GoPivotal						  programming and configuration model for modern Java-based enterprise applications
 				  spring-beans-4.0.6.RELEASE.jar
