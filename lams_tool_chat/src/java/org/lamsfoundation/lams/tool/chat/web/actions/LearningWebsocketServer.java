@@ -125,45 +125,44 @@ public class LearningWebsocketServer {
 	    ChatSession chatSession = LearningWebsocketServer.getChatService().getSessionBySessionId(toolSessionId);
 	    List<ChatMessage> messages = LearningWebsocketServer.getChatService().getLastestMessages(chatSession, null,
 		    true);
-	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
+	    // make a copy of the websocket collection so it does not get blocked while sending messages
+	    Set<Websocket> sessionWebsockets = new HashSet<Websocket>(
+		    LearningWebsocketServer.websockets.get(toolSessionId));
 	    Roster roster = null;
 	    JSONArray rosterJSON = null;
 	    String rosterString = null;
-	    // synchronize websockets as a new Learner entering chat could modify this collection
-	    synchronized (sessionWebsockets) {
-		for (Websocket websocket : sessionWebsockets) {
-		    // the connection is valid, carry on
-		    JSONObject responseJSON = new JSONObject();
-		    // fetch roster only once, but messages are personalised
-		    if (rosterJSON == null) {
-			roster = LearningWebsocketServer.rosters.get(toolSessionId);
-			if (roster == null) {
-			    // build a new roster object
-			    roster = new Roster(toolSessionId);
-			    LearningWebsocketServer.rosters.put(toolSessionId, roster);
-			}
-
-			rosterJSON = roster.getRosterJSON();
-			rosterString = rosterJSON.toString();
+	    for (Websocket websocket : sessionWebsockets) {
+		// the connection is valid, carry on
+		JSONObject responseJSON = new JSONObject();
+		// fetch roster only once, but messages are personalised
+		if (rosterJSON == null) {
+		    roster = LearningWebsocketServer.rosters.get(toolSessionId);
+		    if (roster == null) {
+			// build a new roster object
+			roster = new Roster(toolSessionId);
+			LearningWebsocketServer.rosters.put(toolSessionId, roster);
 		    }
 
-		    try {
-			String userName = websocket.userName;
-			JSONArray messagesJSON = LearningWebsocketServer.getMessages(chatSession, messages, userName);
-			// if hash of roster and messages is the same as before, do not send the message, save the bandwidth
-			String hash = HashUtil.sha1(rosterString + messagesJSON.toString());
-			if ((websocket.hash == null) || !websocket.hash.equals(hash)) {
-			    websocket.hash = hash;
+		    rosterJSON = roster.getRosterJSON();
+		    rosterString = rosterJSON.toString();
+		}
 
-			    responseJSON.put("messages", messagesJSON);
-			    responseJSON.put("roster", rosterJSON);
+		try {
+		    String userName = websocket.userName;
+		    JSONArray messagesJSON = LearningWebsocketServer.getMessages(chatSession, messages, userName);
+		    // if hash of roster and messages is the same as before, do not send the message, save the bandwidth
+		    String hash = HashUtil.sha1(rosterString + messagesJSON.toString());
+		    if ((websocket.hash == null) || !websocket.hash.equals(hash)) {
+			websocket.hash = hash;
 
-			    // send the payload to the Learner's browser
-			    websocket.session.getBasicRemote().sendText(responseJSON.toString());
-			}
-		    } catch (Exception e) {
-			LearningWebsocketServer.log.error("Error while building message JSON", e);
+			responseJSON.put("messages", messagesJSON);
+			responseJSON.put("roster", rosterJSON);
+
+			// send the payload to the Learner's browser
+			websocket.session.getBasicRemote().sendText(responseJSON.toString());
 		    }
+		} catch (Exception e) {
+		    LearningWebsocketServer.log.error("Error while building message JSON", e);
 		}
 	    }
 	}
@@ -282,7 +281,7 @@ public class LearningWebsocketServer {
 		}
 	    }
 	}
-	
+
 	if (LearningWebsocketServer.log.isDebugEnabled()) {
 	    LearningWebsocketServer.log.debug(
 		    "User " + session.getUserPrincipal().getName() + " left Chat with toolSessionId: " + toolSessionId
