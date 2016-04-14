@@ -48,16 +48,16 @@
 <lams:Page type="learner" title="${daco.title}">
 
 <span class="pull-right voffset5">
-<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="learning" />
+<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="learning" style="small"/>
 
 <%-- To switch between the vertical/horizontal view --%>
 <c:choose>
 	<c:when test="${sessionMap.learningView=='horizontal'}">
-	<i class="fa fa-ellipsis-h" title="<fmt:message key="label.common.view.change" />"
+	<i class="fa fa-ellipsis-h loffset10" title="<fmt:message key="label.common.view.change" />"
 	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
 	</c:when>
 	<c:otherwise>
-	<i class="fa fa-ellipsis-v" title="<fmt:message key="label.common.view.change" />"
+	<i class="fa fa-ellipsis-v loffset10" title="<fmt:message key="label.common.view.change" />"
 	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
 	</c:otherwise>
 </c:choose>

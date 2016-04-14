@@ -1,13 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
+<div class="voffset10">
 <c:choose>
 	<c:when test="${empty sessionSummaries}">
-		<fmt:message key="message.monitoring.summary.no.session" />
+		<lams:Alert type="info" id="no-session-stats" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
 	</c:when>
 
 	<c:otherwise>
-	<table cellpadding="0" class="alternative-color">
+	<table class="table table-striped table-condensed">
 		<tr>
 			<c:if test="${sessionMap.isGroupedActivity}">
 			<th scope="col" width="36%">
@@ -37,5 +40,5 @@
 	</table>
 	</c:otherwise>
 </c:choose>
-
+</div>
 
