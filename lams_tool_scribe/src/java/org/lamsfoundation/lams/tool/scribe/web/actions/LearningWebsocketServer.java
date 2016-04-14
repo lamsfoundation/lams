@@ -170,14 +170,14 @@ public class LearningWebsocketServer {
 
 	    // either send only to the new user or to everyone
 	    if (newWebsocket == null) {
-		Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
+		// make a copy of the websocket collection so it does not get blocked while sending messages
+		Set<Session> sessionWebsockets = new HashSet<Session>(
+			LearningWebsocketServer.websockets.get(toolSessionId));
 		// synchronize websockets as a new Learner entering Scribe could modify this collection
-		synchronized (sessionWebsockets) {
-		    for (Session websocket : sessionWebsockets) {
-			String userName = websocket.getUserPrincipal().getName();
-			responseJSON.put("approved", learnersApproved.contains(userName));
-			websocket.getBasicRemote().sendText(responseJSON.toString());
-		    }
+		for (Session websocket : sessionWebsockets) {
+		    String userName = websocket.getUserPrincipal().getName();
+		    responseJSON.put("approved", learnersApproved.contains(userName));
+		    websocket.getBasicRemote().sendText(responseJSON.toString());
 		}
 	    } else {
 		String userName = newWebsocket.getUserPrincipal().getName();
@@ -298,11 +298,10 @@ public class LearningWebsocketServer {
 	responseJSON.put("close", true);
 	String response = responseJSON.toString();
 
-	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
-	synchronized (sessionWebsockets) {
-	    for (Session websocket : sessionWebsockets) {
-		websocket.getBasicRemote().sendText(response);
-	    }
+	// make a copy of the websocket collection so it does not get blocked while sending messages
+	Set<Session> sessionWebsockets = new HashSet<Session>(LearningWebsocketServer.websockets.get(toolSessionId));
+	for (Session websocket : sessionWebsockets) {
+	    websocket.getBasicRemote().sendText(response);
 	}
     }
 
