@@ -167,19 +167,6 @@
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />			
 		</action>
-		<action path="/learning/refreshQuestionList"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			parameter="refreshQuestionList" >
-			<forward name="success" path="/pages/learning/questionlist.jsp" />		
-		</action>
-		<action path="/learning/checkLeaderSubmittedNotebook"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			parameter="checkLeaderSubmittedNotebook" >
-		</action>
-		<action path="/learning/isAnswerCorrect"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			parameter="isAnswerCorrect" >
-		</action>
 		<action path="/learning/recordItemScratched"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			parameter="recordItemScratched" >
