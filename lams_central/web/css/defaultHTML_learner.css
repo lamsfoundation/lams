@@ -93,6 +93,10 @@ LAMS Learner Style
   border-radius: 0px;
   box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
 }
+.panel-monitor-page {
+  border-radius: 0px;
+  box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
+}
 .panel-learner-page-title,
 .panel-admin-page-title {
   -moz-border-bottom-colors: none;
@@ -185,4 +189,62 @@ div.arrows{
 td.arrows{
 	width:35px;
 	text-align: center;
+}
+/* Tabs are a cross between pills (colouring) and tab outlines. */
+.nav-tabs > li.active > a{
+	color:#fff !important;
+	background-color:#337ab7 !important;
+}
+.nav-tabs > li > a{
+  border:1px solid #ddd
+}
+/* Icons to show panel is collapsed */
+.collapsable-icon-right a:after {
+    font-family: FontAwesome;
+    content:"\f078";
+    float: right;
+    color: grey;
+	margin-right: 5px;
+}
+.collapsable-icon-right a.collapsed:after {
+    content:"\f054";
+}
+.collapsable-icon-left a:after {
+    font-family: FontAwesome;
+    content:"\f078";
+    float: left;
+    color: grey;
+	margin-right: 5px;
+}
+.collapsable-icon-left a.collapsed:after {
+    content:"\f054";
+}
+
+div.navbar-heading {
+	padding:0;
+}
+
+nav.navbar-heading {
+	border: 0; 
+	margin: 0;
+	color: inherit;
+}
+
+.navbar-heading .divider {
+	height: 50px;
+	margin-left: 5px;
+	margin-right: 5px;
+	border-left: 1px solid #dddddd;
+}
+
+.navbar-heading .in .divider {
+	height: 1px;
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	border-top: 1px solid #dddddd;
+}
+
+.navbar-heading .in .navbar-text {
+	padding-left: 15px;
 }

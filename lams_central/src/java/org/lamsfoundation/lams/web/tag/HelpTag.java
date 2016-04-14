@@ -37,9 +37,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HelpUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -70,24 +70,27 @@ public class HelpTag extends TagSupport {
     public int doStartTag() throws JspException {
 	try {
 
-	    int imgHeight = 25;
-	    boolean div = true;
+	    boolean div = false;
+	    String helpWord = "";
 
 	    JspWriter writer = pageContext.getOut();
 	    if (StringUtils.equals(style, "no-tabs")) {
 		writer.println("<div class='help-no-tabs'>");
-	    } else if (StringUtils.equals(style, "small")) {
-		imgHeight = 18;
-		div = false;
-	    } else {
-		writer.println("<div class='help-tabs'>");
+		div = true;
 	    }
+	    
+	    if (! StringUtils.equals(style, "small")) {
+		MessageService msgService = (MessageService) getContext().getBean(
+			    CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+		helpWord = msgService.getMessage("label.help");
+	    } 
+	    
 	    try {
 
 		HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
 		Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 		String languageCode = locale != null ? locale.getLanguage() : "";
-
+		
 		if ((toolSignature != null) && (module != null)) {
 
 		    // retrieve help URL for tool
@@ -101,15 +104,17 @@ public class HelpTag extends TagSupport {
 			return Tag.SKIP_BODY;
 		    }
 
-		    writer.println("<i class=\"fa fa-question-circle\" "
-			+" onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\"></i>");
+		    writer.println("<span onclick=\"window.open('" + fullURL +"', 'help')\" id=\"help-tag\">"
+		    	+ "<i class=\"fa fa-question-circle\" ></i> " + helpWord
+		    	+ "</span>");
 
 		} else if (page != null) {
 
 		    String fullURL = HelpUtil.constructPageURL(page, languageCode);
 
-		    writer.println("<i class=\"fa fa-question-circle\" "
-			+" onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\"></i>");
+		    writer.println("<span onclick=\"window.open('" + fullURL +"', 'help')\" id=\"help-tag\">"
+			    	+ "<i class=\"fa fa-question-circle\" ></i> " + helpWord
+			    	+ "</span>");
 
 		} else {
 		    HelpTag.log.error("HelpTag unable to write out due to unspecified values.");
@@ -161,7 +166,7 @@ public class HelpTag extends TagSupport {
 		.getServletContext());
 	return ctx;
     }
-
+    
     /**
      * @return
      * 

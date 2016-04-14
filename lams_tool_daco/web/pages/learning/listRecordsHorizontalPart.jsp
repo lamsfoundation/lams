@@ -64,9 +64,9 @@
 					<c:if test='${includeMode=="learning" and not finishedLock}'>
 						<div >
 						<%-- If the record can be edited, display these links. --%>
-						<i class="fa fa-pencil pull-right" title="<fmt:message key="label.common.edit" />"
+						<i class="fa fa-pencil pull-right roffset10" title="<fmt:message key="label.common.edit" />"
 									onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})"></i>
-						<i class="fa fa-times  pull-right" title="<fmt:message key="label.common.delete" />"
+						<i class="fa fa-times  pull-right roffset10" title="<fmt:message key="label.common.delete" />"
 									onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})"></i>
 						</div>
 					</c:if>

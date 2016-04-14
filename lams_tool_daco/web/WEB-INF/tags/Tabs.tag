@@ -53,3 +53,22 @@
 <ul id="page-tabs" class="nav ${dFormat}" role="tablist">
 	<jsp:doBody />
 </ul>
+
+<%--
+	Usually methodCall is selectTab, but the calling code can override methodCall if desired.
+	this is handy if the page needs different logic on initialisation and user switching tabs
+	
+	-- 			onclick="${methodCall}(${id});return false;">
+	
+--%>
+
+<c:if test="${methodCall == null}">
+	<c:choose>
+		<c:when test="${dControl}">
+			<c:set var="methodCall" value="doSelectTab" />
+		</c:when>
+		<c:otherwise>
+			<c:set var="methodCall" value="selectTab" />
+		</c:otherwise>
+	</c:choose>
+</c:if>

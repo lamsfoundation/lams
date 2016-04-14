@@ -2,13 +2,15 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="daco" value="${sessionMap.daco}"/>
 
+<div class="voffset10">
+
 <c:if test="${!sessionMap.isPageEditable}">
-	<p class="warning">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.learning.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellpadding="0">
+<table class="table table-condensed">
 	<tr>
 		<td width="10%" nowrap>
 			<fmt:message key="label.authoring.basic.title" />
@@ -42,3 +44,5 @@
 		</tr>
 	</c:if>
 </table>
+
+</div>
