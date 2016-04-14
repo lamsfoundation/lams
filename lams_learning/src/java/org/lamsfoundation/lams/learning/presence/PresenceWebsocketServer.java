@@ -124,36 +124,31 @@ public class PresenceWebsocketServer {
 		lastSendTimes.put(lessonId, System.currentTimeMillis());
 	    }
 
-	    Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	    Set<Websocket> lessonWebsockets = new HashSet<Websocket>(PresenceWebsocketServer.websockets.get(lessonId));
 	    Roster roster = PresenceWebsocketServer.rosters.get(lessonId);
 	    JSONArray rosterJSON = roster.getRosterJSON();
-	    // synchronize websockets as a new Learner entering chat could modify this collection
-	    synchronized (lessonWebsockets) {
-		Iterator<Websocket> websocketIterator = lessonWebsockets.iterator();
-		while (websocketIterator.hasNext()) {
-		    Websocket websocket = websocketIterator.next();
-		    // if this run is meant only for one learner, skip the others
-		    if ((nickName != null) && !nickName.equals(websocket.nickName)) {
-			continue;
+	    // make a copy of the websocket collection so it does not get blocked while sending messages
+	    for (Websocket websocket : lessonWebsockets) {
+		// if this run is meant only for one learner, skip the others
+		if ((nickName != null) && !nickName.equals(websocket.nickName)) {
+		    continue;
+		}
+
+		// the connection is valid, carry on
+		JSONObject responseJSON = new JSONObject();
+
+		try {
+		    // if it is just roster, skip messages
+		    if (roster.imEnabled) {
+			JSONArray messagesJSON = PresenceWebsocketServer.filterMessages(messages, websocket.nickName);
+			responseJSON.put("messages", messagesJSON);
 		    }
+		    responseJSON.put("roster", rosterJSON);
 
-		    // the connection is valid, carry on
-		    JSONObject responseJSON = new JSONObject();
-
-		    try {
-			// if it is just roster, skip messages
-			if (roster.imEnabled) {
-			    JSONArray messagesJSON = PresenceWebsocketServer.filterMessages(messages,
-				    websocket.nickName);
-			    responseJSON.put("messages", messagesJSON);
-			}
-			responseJSON.put("roster", rosterJSON);
-
-			// send the payload to the Learner's browser
-			websocket.session.getBasicRemote().sendText(responseJSON.toString());
-		    } catch (Exception e) {
-			PresenceWebsocketServer.log.error("Error while building message JSON", e);
-		    }
+		    // send the payload to the Learner's browser
+		    websocket.session.getBasicRemote().sendText(responseJSON.toString());
+		} catch (Exception e) {
+		    PresenceWebsocketServer.log.error("Error while building message JSON", e);
 		}
 	    }
 	}
