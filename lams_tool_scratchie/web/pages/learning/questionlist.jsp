@@ -15,45 +15,40 @@
 
 <!-- isUserLeader=${sessionMap.isUserLeader} -->
 
-<script type="text/javascript">
-
-	//stop refreshing non-leaders in case scratching is finished
-	if (${isScratchingFinished} && (refreshIntervalId != null)) {
-		clearInterval(refreshIntervalId);
-	}
-	
-	//hide finish button if isWaitingForLeaderToSubmitNotebook
+<c:if test="${not sessionMap.isUserLeader}">
+	<script type="text/javascript">
 	$(document).ready(function(){
-		if (${!isUserLeader && isWaitingForLeaderToSubmitNotebook}) {
+		// hide Finish button for non-leaders until leader finishes
+		if (${!isUserLeader && !isScratchingFinished}) {
 			$("#finishButton").hide();
 		}
 	});
 	
-	//query for leader status (only in case there is notebook at the end of activity and leader hasn't answered it yet)
-	var checkLeaderIntervalId = null;
-	if (${!isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook && mode != "teacher"}) {
-		checkLeaderIntervalId = setInterval("checkLeaderSubmittedNotebook();",2000);// ask for leader status every 20 seconds
-	}
 	
-	//check Leader Submitted Notebook and if true show finishButton
-	function checkLeaderSubmittedNotebook() {
-        $.ajax({
-            url: '<c:url value="/learning/checkLeaderSubmittedNotebook.do"/>',
-            data: 'sessionMapID=${sessionMapID}',
-            dataType: 'json',
-            type: 'post',
-            success: function (json) {
-            	if (!json.isWaitingForLeaderToSubmitNotebook) {
-            		if (checkLeaderIntervalId != null) {
-            			clearInterval(checkLeaderIntervalId);
-            		}
-					
-					$("#finishButton").show();
-            	}
-            }
-       	});
-	}
-</script>
+	//init the connection with server using server URL but with different protocol
+	var websocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+					+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
+	
+	// run when the server pushes new reports and vote statistics
+	websocket.onmessage = function(e) {
+		// create JSON object
+		var input = JSON.parse(e.data);
+		
+		if (input.close) {
+			// leader finished the activity
+			$('#finishButton').show();
+			return;
+		}
+		
+		$.each(input, function(itemUid, answers) {
+			$.each(answers, function(answerUid, isCorrect){
+				// only updates come via websockets
+				scratchImage(itemUid, answerUid, isCorrect);
+			});
+		});
+	};
+	</script>
+</c:if>
 
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 	<div class="lead">
@@ -68,14 +63,16 @@
 			<tr id="tr${answer.uid}">
 				<td style="width: 40px;"><c:choose>
 						<c:when test="${answer.scratched && answer.correct}">
-							<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image">
+							<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image"
+								 id="image-${item.uid}-${answer.uid}">
 						</c:when>
 						<c:when test="${answer.scratched && !answer.correct}">
-							<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" id="image-${item.uid}-${answer.uid}"
-								class="scartchie-image">
+							<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" class="scartchie-image"
+								 id="image-${item.uid}-${answer.uid}">
 						</c:when>
 						<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher')}">
-							<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image">
+							<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image"
+								 id="image-${item.uid}-${answer.uid}">
 						</c:when>
 						<c:otherwise>
 							<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.uid}); return false;"
@@ -140,13 +137,12 @@
 					<fmt:message key="label.continue" />
 				</html:button>
 			</c:when>
-			<c:when
-				test="${isUserLeader && (!sessionMap.isBurningQuestionsEnabled || !sessionMap.reflectOn) || !isUserLeader && isScratchingFinished}">
+			<c:otherwise>
 				<html:button property="finishButton" styleId="finishButton" onclick="return finish('showResults')"
 					styleClass="btn btn-default">
 					<fmt:message key="label.submit" />
 				</html:button>
-			</c:when>
+			</c:otherwise>
 		</c:choose>
 	</div>
 </c:if>

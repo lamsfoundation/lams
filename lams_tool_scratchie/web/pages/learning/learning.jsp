@@ -35,12 +35,21 @@
 }
 </style>
 
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript">
+		function scratchImage(itemUid, answerUid, isCorrect) {
+			// first show animation, then put static image
+			var imageSuffix = isCorrect ? 'correct' : 'wrong';
+    		$('#image-' + itemUid + '-' + answerUid).load(function(){
+    			var image = $(this).off("load");
+    			// show static image after animation
+    			setTimeout(function(){
+    				image.attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + ".png'/>");
+    			}, 1300);
+    		}).attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + "-animation.gif'/>");
+		}
 
 		function scratchItem(itemUid, answerUid){
-			var id = '-' + itemUid + '-' + answerUid;
-			
 	        $.ajax({
 	            url: '<c:url value="/learning/recordItemScratched.do"/>',
 	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid,
@@ -51,19 +60,15 @@
 	            		return false;
 	            	}
 	            	
+	            	scratchImage(itemUid, answerUid, json.answerCorrect);
+	            	
 	            	if (json.answerCorrect) {
-	            		//show animation
-	            		$('#image' + id).attr("src", "<html:rewrite page='/includes/images/scratchie-correct-animation.gif'/>?reqID=" + (new Date()).getTime());
-	            		
 	            		//disable scratching
 	            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
 	            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
 	            		$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
-
 	            	} else {
-	            		
-	            		//show animation, disable onclick
-	            		$('#image' + id).attr("src", "<html:rewrite page='/includes/images/scratchie-wrong-animation.gif'/>?reqID=" + (new Date()).getTime());
+	            		var id = '-' + itemUid + '-' + answerUid;
 	            		$('#imageLink' + id).removeAttr('onclick');
 	            		$('#imageLink' + id).css('cursor','default');
 	            	}
@@ -72,8 +77,8 @@
 		}
 
 		function finish(method){
-			var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
-			var	finishConfirmed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;
+			var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length,
+				finishConfirmed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;
 			
 			if (finishConfirmed) {
 				document.getElementById("finishButton").disabled = true;
@@ -83,25 +88,6 @@
 			}
 		}
 		
-		var refreshIntervalId = null;
-		if (${!isUserLeader && mode != "teacher"}) {
-			refreshIntervalId = setInterval("refreshQuestionList();",3000);// Auto-Refresh every 3 seconds
-		}
-		
-		function refreshQuestionList() {
-			var url = "<c:url value="/learning/refreshQuestionList.do"/>",
-				scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-			$("#questionListArea").load(
-				url,
-				{
-					sessionMapID: "${sessionMapID}",
-					reqId: (new Date()).getTime()
-				},
-				function(){
-					$("html,body").scrollTop(scrollTop);
-				}
-			);
-		}
 		
     </script>
 </lams:head>

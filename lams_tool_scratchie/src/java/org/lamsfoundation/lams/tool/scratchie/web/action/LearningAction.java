@@ -88,18 +88,12 @@ public class LearningAction extends Action {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-		    throws IOException, ServletException, JSONException, ScratchieApplicationException {
+	    throws IOException, ServletException, JSONException, ScratchieApplicationException {
 
 	String param = mapping.getParameter();
 	// -----------------------Scratchie Learner function ---------------------------
 	if (param.equals("start")) {
 	    return start(mapping, form, request, response);
-	}
-	if (param.equals("refreshQuestionList")) {
-	    return refreshQuestionList(mapping, form, request, response);
-	}
-	if (param.equals("checkLeaderSubmittedNotebook")) {
-	    return checkLeaderSubmittedNotebook(mapping, form, request, response);
 	}
 	if (param.equals("recordItemScratched")) {
 	    return recordItemScratched(mapping, form, request, response);
@@ -343,36 +337,6 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Refresh
-     * 
-     * @throws ScratchieApplicationException
-     */
-    private ActionForward refreshQuestionList(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ScratchieApplicationException {
-	initializeScratchieService();
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
-
-	// set scratched flag for display purpose
-	Collection<ScratchieItem> items = LearningAction.service.getItemsWithIndicatedScratches(toolSessionId);
-	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
-
-	// refresh leadership status
-	ScratchieUser user = this.getCurrentUser(toolSessionId);
-	boolean isUserLeader = toolSession.isUserGroupLeader(user.getUid());
-	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
-
-	// refresh ScratchingFinished status
-	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, toolSession.isScratchingFinished());
-
-	return mapping.findForward(ScratchieConstants.SUCCESS);
-    }
-
-    /**
      * Return whether leader still needs submit notebook.
      */
     private ActionForward checkLeaderSubmittedNotebook(ActionMapping mapping, ActionForm form,
@@ -477,9 +441,11 @@ public class LearningAction extends Action {
      * @param response
      * @return
      * @throws ScratchieApplicationException
+     * @throws IOException
+     * @throws JSONException
      */
     private ActionForward showResults(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ScratchieApplicationException {
+	    HttpServletResponse response) throws ScratchieApplicationException, JSONException, IOException {
 	initializeScratchieService();
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -498,6 +464,8 @@ public class LearningAction extends Action {
 	// see Next Activity button
 	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
 	    LearningAction.service.setScratchingFinished(toolSessionId);
+
+	    LearningWebsocketServer.sendCloseRequest(toolSessionId);
 	}
 
 	// get updated score from ScratchieSession
@@ -509,7 +477,8 @@ public class LearningAction extends Action {
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
 	    Scratchie scratchie = toolSession.getScratchie();
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = LearningAction.service.getBurningQuestionDtos(scratchie, toolSessionId);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = LearningAction.service
+		    .getBurningQuestionDtos(scratchie, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
@@ -539,15 +508,16 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
-    
+
     /**
-     * @throws ServletException 
-     * @throws ScratchieApplicationException 
+     * @throws ServletException
+     * @throws ScratchieApplicationException
      */
     private synchronized ActionForward like(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	    HttpServletResponse response)
+	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();
-	
+
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -570,15 +540,16 @@ public class LearningAction extends Action {
 	response.getWriter().print(JSONObject);
 	return null;
     }
-    
+
     /**
-     * @throws ServletException 
-     * @throws ScratchieApplicationException 
+     * @throws ServletException
+     * @throws ScratchieApplicationException
      */
     private synchronized ActionForward removeLike(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	    HttpServletResponse response)
+	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();
-	
+
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -713,11 +684,11 @@ public class LearningAction extends Action {
 	ActionRedirect redirect;
 	if (scratchie.isReflectOnActivity() && !isNotebookSubmitted) {
 	    redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
-	// show results page
+	    // show results page
 	} else {
 	    redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	}
-	
+
 	redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return redirect;
     }
@@ -804,7 +775,7 @@ public class LearningAction extends Action {
 	    LearningAction.service.updateEntry(entry);
 	}
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
-	
+
 	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return redirect;
