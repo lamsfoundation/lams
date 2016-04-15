@@ -27,8 +27,7 @@
  *	Description: Create a hybrid panel header that contains a nav bar that acts like tabs.
  */
 
-		%>
-<%@ tag body-content="scriptless"%>
+%>
 <%@ attribute name="control" required="false" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="refreshOnClickAction" required="false" rtexprvalue="true"%>

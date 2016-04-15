@@ -42,9 +42,6 @@
 </lams:head>
 
 <body class="stripes" id="body" onLoad="init()">
-<!-- <body class="stripes" onLoad="init()">
-<c:set var="title"><fmt:message key="label.learning.title" /></c:set>
--->
 <lams:Page type="learner" title="${daco.title}">
 
 <span class="pull-right voffset5">

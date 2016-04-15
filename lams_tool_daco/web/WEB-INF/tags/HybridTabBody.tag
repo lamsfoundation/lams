@@ -29,7 +29,6 @@
  */
 
 %>
-<%@ tag body-content="scriptless"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-bean" prefix="bean"%>
 

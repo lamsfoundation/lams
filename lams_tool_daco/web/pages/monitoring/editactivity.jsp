@@ -37,7 +37,7 @@
 					<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 					<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
 				</c:url>
-				<a href="#" onclick="javascript:launchPopup('${authoringUrl}','definelater')" class="button">
+				<a href="#" onclick="javascript:launchPopup('${authoringUrl}','definelater')" class="btn btn-default">
 					<fmt:message key="label.monitoring.edit.activity.edit" />
 				</a>
 			</td>

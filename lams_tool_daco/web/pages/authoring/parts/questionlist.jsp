@@ -7,10 +7,14 @@
 
 <div id="questionList">
 <%-- This image is shown when a question is being downloaded from a server. --%>
-<h2 class="spacer-left"><fmt:message key="label.authoring.basic.list.title" /> <img
-	src="${ctxPath}/includes/images/indicator.gif" style="display: none" id="questionListArea_Busy" /></h2>
 
-<table class="alternative-color" id="questionTable" cellspacing="0">
+<div class="panel panel-default voffset5">
+	<div class="panel-heading panel-title">
+		<fmt:message key="label.authoring.basic.list.title" /> 
+		<img src="${ctxPath}/includes/images/indicator.gif" style="display: none" id="questionListArea_Busy" />
+	</div>
+
+	<table class="table table-striped table-condensed" id="questionTable">
 	<tr>
 		<th width="24%"><fmt:message key="label.authoring.basic.list.header.type" /></th>
 		<th colspan="3"><fmt:message key="label.authoring.basic.list.header.question" /></th>
@@ -20,7 +24,7 @@
 
 	<c:forEach var="question" items="${sessionMap.questionList}" varStatus="status">
 		<tr>
-			<td><span class="field-name">
+			<td><label>
 				<c:choose>
 					<c:when test="${question.type == 1}">
 						<span class="field-name"> <fmt:message key="label.authoring.basic.textfield" />
@@ -53,17 +57,16 @@
 						 <fmt:message key="label.authoring.basic.longlat" />
 					</c:when>
 				</c:choose>
-				</span></td>
+				</label></td>
 				<td>${question.description}</td>
-				<td><img src="${tool}includes/images/edit.gif"
-					title="<fmt:message key="label.common.edit" />"
-					onclick="javascript:editQuestion(${status.index},'${sessionMapID}')" /></td>
-				<td><img src="${tool}includes/images/cross.gif"
-					title="<fmt:message key="label.common.delete" />"
-					onclick='javascript:if (confirm("<fmt:message key="message.authoring.delete.question" />")) deleteQuestion(${status.index},"${sessionMapID}");' /></td>
+				<td><i class="fa fa-pencil"	title="<fmt:message key="label.common.edit" />"
+					onclick="javascript:editQuestion(${status.index},'${sessionMapID}')"></i></td>
+				<td><i class="fa fa-times"	title="<fmt:message key="label.common.delete" />"
+					onclick='javascript:if (confirm("<fmt:message key="message.authoring.delete.question" />")) deleteQuestion(${status.index},"${sessionMapID}");'></i></td>
 		</tr>
 	</c:forEach>
-</table>
+	</table>
+</div>
 </div>
 
 <%-- This script will work when a new question is submited in order to refresh "Question List" panel. --%>
