@@ -81,23 +81,19 @@
 </script>
 
 <!-- Basic Tab Content -->
-
-<table>
-	<tr>
-		<td colspan="2">
-		<div class="field-name"><fmt:message key="label.authoring.basic.title" /></div>
-		<html:text property="daco.title" style="width: 99%;"></html:text></td>
-	</tr>
-	<tr>
-		<td colspan="2">
-		<div class="field-name"><fmt:message key="label.authoring.basic.instruction"></fmt:message></div>
-		<lams:CKEditor id="daco.instructions" value="${formBean.daco.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor></td>
-	</tr>
-</table>
+ <div class="form-group">
+    <label for="daco.title"><fmt:message key="label.authoring.basic.title" /></label>
+    <html:text property="daco.title" style="width: 100%;"></html:text>
+ </div>
+ <div class="form-group">
+    <label for="daco.title"><fmt:message key="label.authoring.basic.instruction" /></label>
+    <lams:CKEditor id="daco.instructions" value="${formBean.daco.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+ </div>
+  
 <!-- Dropdown menu for choosing a question type -->
 <div id="questionListArea"><c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <%@ include	file="/pages/authoring/parts/questionlist.jsp"%></div>
-<p><select id="questionType" style="float: left">
+<div><select id="questionType">
 	<option selected="selected"><fmt:message key="label.authoring.basic.textfield" /></option>
 	<option><fmt:message key="label.authoring.basic.textarea" /></option>
 	<option><fmt:message key="label.authoring.basic.number" /></option>
@@ -108,9 +104,9 @@
 	<option><fmt:message key="label.authoring.basic.dropdown" /></option>
 	<option><fmt:message key="label.authoring.basic.checkbox" /></option>
 	<option><fmt:message key="label.authoring.basic.longlat" /></option>
-</select><html:link href="#" styleClass="button space-left" onclick="javascript:showQuestionInputAreaByType('${showMessageURL }')">
-	<fmt:message key="label.authoring.basic.question.add" />
-</html:link></p>
+</select><html:link href="#" styleClass="btn btn-default btn-xs loffset5" onclick="javascript:showQuestionInputAreaByType('${showMessageURL }')">
+	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.question.add" />
+</html:link></p></div>
 <a name="questionInputAreaAnchor"></a>
 <p><iframe onload="javascript:this.style.height=resizeOnMessageFrameLoad();window.location.hash = '#questionInputArea';" id="questionInputArea"
 	name="questionInputArea" style="width: 0px; height: 0px; border: 0px; display: none" frameborder="no" scrolling="no"> </iframe></p>

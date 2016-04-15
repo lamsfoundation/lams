@@ -61,7 +61,7 @@
 								rows +=	'&nbsp;&nbsp;<a href="#" onclick="javascript:launchPopup(\''+url+'\',\''+popUpTitle+'\');" class="btn btn-default btn-xs">';
 								rows += 'View Records'
 								url = '<c:url value="/monitoring/getQuestionSummaries.do"/>?sessionMapID=${sessionMapID}&toolSessionID='+$(table).attr('data-session-id')+'&userId='+userData["userId"];
-								popUpTitle = '<fmt:message key="tab.monitoring.statistics" />';
+								popUpTitle = '<fmt:message key="label.common.summary" />';
 								rows += '</a>&nbsp;&nbsp;<a href="#" onclick="javascript:launchPopup(\''+url+'\',\''+popUpTitle+'\');" class="btn btn-default btn-xs">';
 								rows += 'View Summary'
 								rows += '</a>';

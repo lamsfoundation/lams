@@ -21,10 +21,11 @@
 </c:set>
 <%-- Whether to display the vertical or horizontal view. --%>
 <c:set var="horizontal" value="${sessionMap.learningView=='horizontal'}" />
-<c:if test="${empty isIE}">
+<c:if test="${empty isIE}"> 
 	<%-- Some elements are displayed differently depending on the browser. --%>
-	<c:set var="userAgent" value='<%=request.getHeader("User-Agent") %>' />
-	<c:set var="isIE" value='${(not empty userAgent) && fn:indexOf(userAgent,"MSIE") != -1}' scope="session" />
+	<c:if test="${fn:contains(header['User-Agent'],'MSIE')}">
+		<c:set var="isIE" value='true' scope="session" />
+	</c:if>
 </c:if>
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:choose>
@@ -159,15 +160,9 @@
 												<c:when test="${question.type==4}">
 													<c:set var="date">
 														<c:if test="${not empty answer.answer}">
-															<c:set var="dateString" value="${answer.answer}" />
-															<%
-															  String answer = (String) pageContext.getAttribute("dateString");
-															  pageContext.setAttribute("parsedDate", 
-																  new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(answer));
-															%>
-															<%-- To display a date a single textfield with formatted date is used. --%>
+															<fmt:parseDate pattern="EEE MMM dd HH:mm:ss zzz yyyy" value="${answer.answer}" var="parsedDate" />
 															<lams:Date value="${parsedDate}" type="date" style="medium"/>
-														</c:if>
+ 														</c:if>
 													</c:set>
 													<input type="text" size="20" readonly="readonly" value="${date}" />
 												</c:when>

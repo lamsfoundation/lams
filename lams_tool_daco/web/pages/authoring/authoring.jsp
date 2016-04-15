@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-        
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.daco.DacoConstants"%>
@@ -36,57 +36,52 @@
  
 </lams:head>
 <body class="stripes" onLoad="init()">
-<c:set var="title"><fmt:message key="label.author.title" /></c:set>
-<lams:Page type="learner" title="${title}">
 
-		<span class="pull-right voffset5">
-		<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="authoring"/>
-		</span>
-		
-		<!-- start tabs -->
-		<lams:Tabs useKey="true" control="true">
-			<lams:Tab id="1" key="label.authoring.heading.basic" />
-			<lams:Tab id="2" key="label.authoring.heading.advanced" />
-		</lams:Tabs></div>
+<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
+<c:set var="formBean"  value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+
+<c:set var="title"><fmt:message key="label.author.title" /></c:set>
+<lams:Page title="${title}" type="navbar">
+
+	<lams:HybridTabHeader control="true" title="${title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+			<lams:HybridTab id="1" key="label.authoring.heading.basic" />
+			<lams:HybridTab id="2" key="label.authoring.heading.advanced" />
+	</lams:HybridTabHeader>	
+
+	<lams:HybridTabBody>
+		<%@ include file="/common/messages.jsp"%>
+
+
+		<html:hidden property="daco.contentId" />
+		<html:hidden property="sessionMapID" />
+		<html:hidden property="contentFolderID" />
+		<html:hidden property="currentTab" styleId="currentTab" />
+
 		
 		<lams:TabBodys>
 			<!-- tab content 1 (Basic) -->
-			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.description" /> <!--  page="basic.jsp" -->
+			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.description" page="basic.jsp" />
 			<!-- end of content (Basic) -->
 
 			<!-- tab content 2 (Advanced) -->
-			<lams:TabBody id="2" titleKey="label.authoring.heading.advanced.description" page="advanced.jsp"  /> <!--  -->
+			<lams:TabBody id="2" titleKey="label.authoring.heading.advanced.description" page="advanced.jsp" />
 			<!-- end of content (Advanced) -->
 		</lams:TabBodys>
-		<!--  end tabs -->
 
- 		<%@ include file="/common/messages.jsp"%>
+		<!-- Button Row -->
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
+			toolSignature="<%=DacoConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.daco.contentId}" 
+			 customiseSessionID="${formBean.sessionMapID}"
+			 contentFolderID="${formBean.contentFolderID}"
+			 cancelConfirmMsgKey="message.authoring.cancel.save" />
 
- 		<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-<%--  		<c:set var="formBean"  value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
- --%>  		
- 			
-	 		<html:hidden property="daco.contentId" />
-			<html:hidden property="sessionMapID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="currentTab" styleId="currentTab" />  
-
-			<!-- Button Row -->
-			<%--  Default value 
-				cancelButtonLabelKey="label.common.cancel"
-				saveButtonLabelKey="label.authoring.save.button"
-				cancelConfirmMsgKey="message.authoring.cancel.save"
-				accessMode="author"
-			--%>
- 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-				toolSignature="<%=DacoConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.daco.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}"
-				 contentFolderID="${formBean.contentFolderID}"
-				 cancelConfirmMsgKey="message.authoring.cancel.save" />
-	</html:form>  
+	</lams:HybridTabBody>
 
 <div id="footer"></div>
 <!-- end page div -->
 </lams:Page>
+
+</html:form>
+
 </body>
 </lams:html>
