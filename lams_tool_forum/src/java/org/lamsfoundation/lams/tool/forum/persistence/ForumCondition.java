@@ -180,7 +180,8 @@ public class ForumCondition extends TextSearchCondition {
 	Set<Message> topicsCopy = new TreeSet<Message>(new ConditionTopicComparator());
 	for (Message conditionTopic : getTopics()) {
 	    for (Message contentTopic : (Set<Message>) forum.getMessages()) {
-		if (contentTopic.getIsAuthored() && contentTopic.getCreated().equals(conditionTopic.getCreated())) {
+		if (contentTopic.getIsAuthored() && contentTopic.getToolSession() == null
+			&& contentTopic.getCreated().equals(conditionTopic.getCreated())) {
 		    topicsCopy.add(contentTopic);
 		}
 	    }
@@ -202,9 +203,9 @@ public class ForumCondition extends TextSearchCondition {
      * It filters the given text in order to find any of the unwanted words.
      * 
      * @param excludedWords
-     *                words to search for
+     *            words to search for
      * @param textToMatch
-     *                string to be filtered
+     *            string to be filtered
      * @return <code>true</code> if at least one of the words from the list is found in the text
      */
     private boolean matchExcludedWordsOnly(List<String> excludedWords, String textToMatch) {
@@ -213,8 +214,9 @@ public class ForumCondition extends TextSearchCondition {
 	}
 	StringBuilder stringPattern = new StringBuilder();
 	for (String excludedWord : excludedWords) {
-	    stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
-		    Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
+	    stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+		    .append(Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+		    .append(")|");
 	}
 	stringPattern.deleteCharAt(stringPattern.length() - 1);
 	Pattern regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
