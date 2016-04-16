@@ -303,7 +303,32 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		
+		//if ShowOtherAnswersAfterDeadline is enabled - show others answers
+		if (qaContent.isShowOtherAnswersAfterDeadline()) {
+		    generalLearnerFlowDTO.setLockWhenFinished(Boolean.TRUE.toString());
+		    generalLearnerFlowDTO.setNoReeditAllowed(true);
+		    /*
+		     * the report should have all the users' entries OR the report should have only the current
+		     * session's entries
+		     */
+		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
+
+		    QaLearningAction.refreshSummaryData(request, qaContent, qaService, sessionMapId, user,
+			    generalLearnerFlowDTO);
+
+		    if (user.isLearnerFinished()) {
+			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
+			return (mapping.findForward(REVISITED_LEARNER_REP));
+		    } else {
+			generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(false).toString());
+			return (mapping.findForward(LEARNER_REP));
+		    }
+		    
+		// show submissionDeadline page otherwise
+		} else {
+		    return mapping.findForward("submissionDeadline");
+		}
 	    }
 	}
 	

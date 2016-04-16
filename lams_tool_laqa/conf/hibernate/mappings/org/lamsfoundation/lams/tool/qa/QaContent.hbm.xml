@@ -82,6 +82,14 @@
 		column="submission_deadline"
 		length="10"
 	/>
+	
+	<property
+        name="showOtherAnswersAfterDeadline"
+        type="boolean"
+        access="property"        
+        column="show_other_answers_after_deadline"
+        length="1"
+    />
 
    <property
         name="questionsSequenced"
