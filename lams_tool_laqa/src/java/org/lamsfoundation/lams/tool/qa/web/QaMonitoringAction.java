@@ -123,8 +123,35 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	    
+	} else {
+	    //set showOtherAnswersAfterDeadline to false
+	    content.setShowOtherAnswersAfterDeadline(false);
 	}
 	content.setSubmissionDeadline(tzSubmissionDeadline);
+	qaService.saveOrUpdateQaContent(content);
+
+	return null;
+    }
+    
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setShowOtherAnswersAfterDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	IQaService qaService = getQAService();
+	
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	QaContent content = qaService.getQaContent(contentID);
+	
+	boolean showOtherAnswersAfterDeadline = WebUtil.readBooleanParam(request, QaAppConstants.PARAM_SHOW_OTHER_ANSWERS_AFTER_DEADLINE);
+	content.setShowOtherAnswersAfterDeadline(showOtherAnswersAfterDeadline);
 	qaService.saveOrUpdateQaContent(content);
 
 	return null;
