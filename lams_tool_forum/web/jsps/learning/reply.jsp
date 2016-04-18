@@ -18,6 +18,7 @@
 
 	$('#replyForm').submit(function() { // catch the form's submit event
 
+		disableSubmitButton();
 		if ( validateForm() ) {
 
 			if ( typeof CKEDITOR !== 'undefined' ) {
@@ -78,6 +79,9 @@
 		    	}
 		    });
 		} // end validateForm()
+		else {
+			enableSubmitButton();
+		}
 		return false;
 	});
 
