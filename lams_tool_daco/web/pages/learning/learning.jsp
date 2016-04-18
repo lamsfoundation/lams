@@ -41,13 +41,12 @@
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
 </lams:head>
 
-<body class="stripes" id="body" onLoad="init()">
-<lams:Page type="learner" title="${daco.title}">
 
-<span class="pull-right voffset5">
-<lams:help toolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" module="learning" style="small"/>
+<body class="stripes" id="body" onLoad="init()">
+<lams:Page type="navbar" title="${daco.title}">
 
 <%-- To switch between the vertical/horizontal view --%>
+<c:set var="ellipsisControl">
 <c:choose>
 	<c:when test="${sessionMap.learningView=='horizontal'}">
 	<i class="fa fa-ellipsis-h loffset10" title="<fmt:message key="label.common.view.change" />"
@@ -58,18 +57,21 @@
 	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
 	</c:otherwise>
 </c:choose>
-</span>
+</c:set> 
 
-<lams:Tabs useKey="true" control="true" format="nav-pills">
-	<lams:Tab id="1" key="label.learning.heading.add" />
-	<lams:Tab id="2" key="label.learning.heading.list" />
-	<lams:Tab id="3" key="label.learning.heading.summary" />
-</lams:Tabs>
-<lams:TabBodys>
-	<lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
-	<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
-	<lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
-</lams:TabBodys>
+<lams:HybridTabHeader control="true" title="${daco.title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="learning" extraControl="${ellipsisControl}">
+ 	<lams:HybridTab id="1" key="label.learning.heading.add" />
+ 	<lams:HybridTab id="2" key="label.learning.heading.list" />
+	<lams:HybridTab id="3" key="label.learning.heading.summary" />
+</lams:HybridTabHeader>	
+
+
+<lams:HybridTabBody>
+	<lams:TabBodys>
+	 	<lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
+ 		<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
+	 	<lams:TabBody id="3" titleKey="label.learning.heading.summary" page="questionSummaries.jsp" />
+	 </lams:TabBodys>
 
 <c:if test="${mode != 'teacher'}">
 		<c:choose>
@@ -94,8 +96,8 @@
 			</c:otherwise>
 		</c:choose>
 </c:if>
-
-</div> 
+ 
+</lams:HybridTabBody>
 
 <div id="footer"></div>
 </lams:Page>
