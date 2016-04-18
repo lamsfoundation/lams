@@ -81,7 +81,7 @@
 </script>
 
 <!-- Basic Tab Content -->
- <div class="form-group">
+ <div class="form-group voffset10">
     <label for="daco.title"><fmt:message key="label.authoring.basic.title" /></label>
     <html:text property="daco.title" style="width: 100%;"></html:text>
  </div>

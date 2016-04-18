@@ -40,15 +40,15 @@
 <html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
 <c:set var="formBean"  value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
-<c:set var="title"><fmt:message key="label.author.title" /></c:set>
+<c:set var="title"><fmt:message key="label.common.heading" /></c:set>
 <lams:Page title="${title}" type="navbar">
 
-	<lams:HybridTabHeader control="true" title="${title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+ 	<lams:HybridTabHeader control="true" title="${title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 			<lams:HybridTab id="1" key="label.authoring.heading.basic" />
 			<lams:HybridTab id="2" key="label.authoring.heading.advanced" />
 	</lams:HybridTabHeader>	
 
-	<lams:HybridTabBody>
+ 	<lams:HybridTabBody>
 		<%@ include file="/common/messages.jsp"%>
 
 
@@ -58,7 +58,7 @@
 		<html:hidden property="currentTab" styleId="currentTab" />
 
 		
-		<lams:TabBodys>
+ 		<lams:TabBodys>
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.description" page="basic.jsp" />
 			<!-- end of content (Basic) -->
@@ -74,8 +74,8 @@
 			 customiseSessionID="${formBean.sessionMapID}"
 			 contentFolderID="${formBean.contentFolderID}"
 			 cancelConfirmMsgKey="message.authoring.cancel.save" />
-
 	</lams:HybridTabBody>
+ 
 
 <div id="footer"></div>
 <!-- end page div -->

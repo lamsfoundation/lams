@@ -29,7 +29,6 @@
  */
 
 %>
-<%@ tag body-content="scriptless"%>
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
 <%@ attribute name="tabTitle" required="false" rtexprvalue="true"%>
 <%@ attribute name="titleKey" required="false" rtexprvalue="true"%>
