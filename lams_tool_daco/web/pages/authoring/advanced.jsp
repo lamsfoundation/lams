@@ -8,7 +8,7 @@
 </script>
 
 <!-- Advance Tab Content -->
-<div class="form-group">
+<div class="form-group  voffset10">
 <label><fmt:message key="label.authoring.advanced.record" /></label><BR/>
 <!-- Minimum number of records learner must provide -->
 <label for="minRecords"><fmt:message key="label.common.min" /></label> 

@@ -33,12 +33,13 @@
 <%@ attribute name="refreshOnClickAction" required="false" rtexprvalue="true"%>
 <%@ attribute name="helpToolSignature" required="false" rtexprvalue="true"%>
 <%@ attribute name="helpModule" required="false" rtexprvalue="true"%>
+<%@ attribute name="extraControl" required="false" rtexprvalue="true"%>
 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <c:set var="useActions" value="false" scope="request" />
-<c:if test="${not empty helpToolSignature or not empty helpModule or not empty refreshOnClickAction}">
+<c:if test="${not empty helpToolSignature or not empty helpModule or not empty refreshOnClickAction or not empty extraControl}">
 	<c:set var="useActions" value="true" scope="request" />
 </c:if>
 
@@ -76,6 +77,9 @@
              </c:if>
              <c:if test="${not empty helpToolSignature or not empty helpModule}">
              <li class="navbar-text" ><lams:help toolSignature="${helpToolSignature}" module="${helpModule}" style="small"/></li>
+             </c:if>
+             <c:if test="${not empty extraControl}">
+             <li class="navbar-text" >${extraControl}</li>
              </c:if>
          </ul>
          </c:if>
