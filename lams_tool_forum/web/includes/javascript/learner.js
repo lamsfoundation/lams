@@ -34,3 +34,12 @@ function getNumberOfCharacters(value, isRemoveHtmlTags) {
     var wordCount = value ? (value).length : 0;
     return wordCount;
 }
+
+/* Used by both Reply and Edit */
+function disableSubmitButton() {
+	$("#submitButton").attr("disabled", true);
+}
+function enableSubmitButton() {
+	$("#submitButton").removeAttr("disabled");
+}
+
