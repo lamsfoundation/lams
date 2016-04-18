@@ -2,7 +2,7 @@
 
 <script>
 	function doSubmit() {
-		disableSubmitButton; 
+		disableSubmitButton(); 
 		if (validateForm()) {
 			return true;
 		}
