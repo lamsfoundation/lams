@@ -1,5 +1,17 @@
 <%@ include file="/common/taglibs.jsp"%>
-<html:form action="/learning/createTopic.do" onsubmit="return validateForm();" 
+
+<script>
+	function doSubmit() {
+		disableSubmitButton; 
+		if (validateForm()) {
+			return true;
+		}
+		enableSubmitButton();
+		return false;
+	}
+</script>
+
+<html:form action="/learning/createTopic.do" onsubmit="return doSubmit();" 
 		method="post" focus="message.subject" enctype="multipart/form-data">
 		
 	<html:hidden property="sessionMapID" />
