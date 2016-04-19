@@ -416,6 +416,10 @@
        <path>/WEB-INF/tags/TabName.tag</path>
    	</tag-file>
    	<tag-file>
+       <name>TabBodyArea</name>
+       <path>/WEB-INF/tags/TabBodyArea.tag</path>
+   	</tag-file>
+   	<tag-file>
        <name>CKEditor</name>
        <path>/WEB-INF/tags/CKEditor.tag</path>
    	</tag-file>
@@ -450,18 +454,6 @@
   	<tag-file>
 	    <name>Arrow</name>
 		<path>/WEB-INF/tags/Arrow.tag</path>
-   	</tag-file>
-   	<tag-file>
-       <name>HybridTab</name>
-       <path>/WEB-INF/tags/HybridTab.tag</path>
-   	</tag-file>
-   	<tag-file>
-       <name>HybridTabHeader</name>
-       <path>/WEB-INF/tags/HybridTabHeader.tag</path>
-   	</tag-file>    
-   	<tag-file>
-       <name>HybridTabBody</name>
-       <path>/WEB-INF/tags/HybridTabBody.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AdvancedAccordian</name>

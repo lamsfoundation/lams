@@ -23,52 +23,70 @@
 
 /**
  * Tabs.tag
- *	Author: Mitchell Seaton
- *	Description: Create a tab list from a input collection or nested Tab tags.
- * Wiki: 
+ *	Author: Fiona Malikoff
+ *	Description: Create a hybrid panel header that contains a nav bar that acts like tabs.
  */
 
-		%>
-<%@ tag body-content="scriptless"%>
-<%@ attribute name="collection" type="java.util.Collection" required="false" rtexprvalue="true"%>
+%>
 <%@ attribute name="control" required="false" rtexprvalue="true"%>
-<%@ attribute name="useKey" required="false" rtexprvalue="true"%>
-<%@ attribute name="format" required="false" rtexprvalue="true"%>
+<%@ attribute name="title" required="false" rtexprvalue="true"%>
+<%@ attribute name="refreshOnClickAction" required="false" rtexprvalue="true"%>
+<%@ attribute name="helpToolSignature" required="false" rtexprvalue="true"%>
+<%@ attribute name="helpModule" required="false" rtexprvalue="true"%>
+<%@ attribute name="extraControl" required="false" rtexprvalue="true"%>
+
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+
+<c:set var="useActions" value="false" scope="request" />
+<c:if test="${not empty helpToolSignature or not empty helpModule or not empty refreshOnClickAction or not empty extraControl}">
+	<c:set var="useActions" value="true" scope="request" />
+</c:if>
+
 <c:set var="dControl" value="false" scope="request" />
 <c:if test="${control}">
 	<c:set var="dControl" value="${control}" scope="request" />
 </c:if>
-<c:choose>
-<c:when test="${empty format}">
-	<c:set var="dFormat" value="nav-tabs" scope="request" />
-</c:when>
-<c:otherwise>
-	<c:set var="dFormat" value="${format}" scope="request" />
-</c:otherwise>
-</c:choose>
 
-<!-- tab holder table -->
-<ul id="page-tabs" class="nav ${dFormat}" role="tablist">
-	<jsp:doBody />
-</ul>
+<!-- navbar combined with tabs -->
+<div class="panel panel-default panel-monitor-page">
+<div class="panel-heading navbar-heading">
 
-<%--
-	Usually methodCall is selectTab, but the calling code can override methodCall if desired.
-	this is handy if the page needs different logic on initialisation and user switching tabs
-	
-	-- 			onclick="${methodCall}(${id});return false;">
-	
---%>
-
-<c:if test="${methodCall == null}">
-	<c:choose>
-		<c:when test="${dControl}">
-			<c:set var="methodCall" value="doSelectTab" />
-		</c:when>
-		<c:otherwise>
-			<c:set var="methodCall" value="selectTab" />
-		</c:otherwise>
-	</c:choose>
-</c:if>
+ 	<nav class="navbar navbar-default navbar-heading">
+	<div class="container-fluid">
+    	<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <span class="navbar-brand">${title}</span>
+		</div>
+		<div class="collapse navbar-collapse" id="navbar-collapse-1" role="navigation">
+         <ul class="nav navbar-nav" id="page-tabs">
+	         <li role="separator" class="divider"></li>
+	          <jsp:doBody />
+         </ul>
+         <c:if test="${useActions}">
+         <ul class="nav navbar-nav navbar-right" id="page-actions">
+		     <li role="separator" class="divider"></li>
+		     <c:if test="${not empty refreshOnClickAction}">
+             <li class="navbar-text" ><span onclick="${refreshOnClickAction}"><i class="fa fa-refresh"></i></span></li>
+             </c:if>
+             <c:if test="${not empty helpToolSignature or not empty helpModule}">
+             <li class="navbar-text" ><lams:help toolSignature="${helpToolSignature}" module="${helpModule}" style="small"/></li>
+             </c:if>
+             <c:if test="${not empty extraControl}">
+             <li class="navbar-text" >${extraControl}</li>
+             </c:if>
+         </ul>
+         </c:if>
+ 	    
+ 		</div>
+	 </div>
+     </nav>
+     <!-- /top nav -->
+</div>
+<!-- panel div closed by TabBodyArea -->
