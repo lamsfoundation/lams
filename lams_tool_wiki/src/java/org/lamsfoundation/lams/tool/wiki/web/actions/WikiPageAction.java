@@ -512,8 +512,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	} else {
 	    // subscribe the learner to the event
 	    notificationService.subscribe(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-		    toolSessionID, user.getUserID(), IEventNotificationService.DELIVERY_METHOD_MAIL,
-		    IEventNotificationService.PERIODICITY_SINGLE);
+		    toolSessionID, user.getUserID(), IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
 	// return to the wiki page

@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.events;
 
 import java.security.InvalidParameterException;
-import java.util.Date;
 
 /**
  * Subscription for an event notification. This class binds an user to an event and stores some information on the
@@ -30,16 +29,6 @@ public class Subscription {
     private Short deliveryMethodId;
 
     /**
-     * How often should the message be resend
-     */
-    private Long periodicity;
-
-    /**
-     * Time of the notification attempt
-     */
-    private Date lastOperationTime;
-
-    /**
      * Message returned by a delivery methond during the last notification attempt
      */
     private String lastOperationMessage;
@@ -63,19 +52,18 @@ public class Subscription {
      * @param deliveryMethod
      * @param periodicity
      */
-    public Subscription(Integer userId, AbstractDeliveryMethod deliveryMethod, Long periodicity) {
+    public Subscription(Integer userId, AbstractDeliveryMethod deliveryMethod) {
 	if (deliveryMethod == null) {
 	    throw new InvalidParameterException("Delivery method can not be null.");
 	}
 	this.userId = userId;
 	this.deliveryMethod = deliveryMethod;
-	setPeriodicity(periodicity);
 	deliveryMethodId = deliveryMethod.getId();
     }
 
     @Override
     public Object clone() {
-	return new Subscription(userId, deliveryMethod, periodicity);
+	return new Subscription(userId, deliveryMethod);
     }
 
     public AbstractDeliveryMethod getDeliveryMethod() {
@@ -114,26 +102,6 @@ public class Subscription {
 	return lastOperationMessage;
     }
 
-    public boolean getLastOperationSuccessful() {
-	return lastOperationMessage == null;
-    }
-
-    /**
-     * @hibernate.property column="last_operation_time"
-     * @return
-     */
-    public Date getLastOperationTime() {
-	return lastOperationTime;
-    }
-
-    /**
-     * @hibernate.property column="periodicity"
-     * @return
-     */
-    public Long getPeriodicity() {
-	return periodicity;
-    }
-
     /**
      * @hibernate.id column="uid" generator-class="native"
      */
@@ -149,16 +117,6 @@ public class Subscription {
 	return userId;
     }
 
-    /**
-     * States if a message should be send to the user or rather this subscription should be skipped.
-     * 
-     * @return if the message should be send
-     */
-    public boolean isEligibleForNotification() {
-	return !getLastOperationSuccessful() || (lastOperationTime == null)
-		|| ((System.currentTimeMillis() - lastOperationTime.getTime()) > periodicity);
-    }
-
     public void setDeliveryMethodId(Short deliveryMethodId) {
 	this.deliveryMethodId = deliveryMethodId;
     }
@@ -169,14 +127,6 @@ public class Subscription {
 
     public void setLastOperationMessage(String lastOperationMessage) {
 	this.lastOperationMessage = lastOperationMessage;
-    }
-
-    public void setLastOperationTime(Date lastOperationTime) {
-	this.lastOperationTime = lastOperationTime;
-    }
-
-    public void setPeriodicity(Long periodicity) {
-	this.periodicity = periodicity == null ? IEventNotificationService.PERIODICITY_SINGLE : periodicity;
     }
 
     public void setUid(Long uid) {

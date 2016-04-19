@@ -171,8 +171,8 @@ public class LearnerAction extends DispatchAction {
 	content.setDefineLater(false);
 	submitFilesService.saveOrUpdateContent(content);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
+		getServlet().getServletContext());
 
 	// check if there is submission deadline
 	Date submissionDeadline = content.getSubmissionDeadline();
@@ -200,7 +200,7 @@ public class LearnerAction extends DispatchAction {
 
 	    submitFilesService.getEventNotificationService().subscribe(SbmtConstants.TOOL_SIGNATURE,
 		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
-		    IEventNotificationService.DELIVERY_METHOD_MAIL, IEventNotificationService.PERIODICITY_SINGLE);
+		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
 	return mapping.findForward(SbmtConstants.SUCCESS);
@@ -227,8 +227,8 @@ public class LearnerAction extends DispatchAction {
 	// set the mode into http session
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
+		getServlet().getServletContext());
 
 	if (validateUploadForm(learnerForm, request)) {
 	    // get session from shared session.
@@ -269,11 +269,11 @@ public class LearnerAction extends DispatchAction {
 	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
 	if (content.isNotifyTeachersOnFileSubmit()) {
 
-	    String message = submitFilesService
-		    .getLocalisedMessage("event.file.submit.body", new Object[] { learner.getFullName() });
+	    String message = submitFilesService.getLocalisedMessage("event.file.submit.body",
+		    new Object[] { learner.getFullName() });
 	    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID, message, false);
 	}
-	
+
 	return mapping.getInputForward();
     }
 
@@ -298,8 +298,8 @@ public class LearnerAction extends DispatchAction {
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR)) {
-	    ToolSessionManager sessionMgrService = SubmitFilesServiceProxy.getToolSessionManager(getServlet()
-		    .getServletContext());
+	    ToolSessionManager sessionMgrService = SubmitFilesServiceProxy
+		    .getToolSessionManager(getServlet().getServletContext());
 	    ISubmitFilesService submitFilesService = getService();
 
 	    // get back login user DTO
@@ -329,8 +329,8 @@ public class LearnerAction extends DispatchAction {
     // Private mehtods
     // **********************************************************************************************
     private ISubmitFilesService getService() {
-	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet()
-		.getServletContext());
+	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy
+		.getSubmitFilesService(this.getServlet().getServletContext());
 	return submitFilesService;
     }
 
@@ -339,15 +339,15 @@ public class LearnerAction extends DispatchAction {
 	ActionMessages errors = new ActionMessages();
 	Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getFileName())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", this.getResources(request)
-		    .getMessage(preferredLocale, "learner.form.filepath.displayname")));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required",
+		    this.getResources(request).getMessage(preferredLocale, "learner.form.filepath.displayname")));
 	}
 	if (StringUtils.isBlank(learnerForm.getDescription())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", this.getResources(request)
-		    .getMessage(preferredLocale, "label.learner.fileDescription")));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required",
+		    this.getResources(request).getMessage(preferredLocale, "label.learner.fileDescription")));
 	} else if (learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.maxdescsize",
-		    LearnerForm.DESCRIPTION_LENGTH));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage("errors.maxdescsize", LearnerForm.DESCRIPTION_LENGTH));
 	}
 
 	FileValidatorUtil.validateFileSize(learnerForm.getFile(), false, errors);
