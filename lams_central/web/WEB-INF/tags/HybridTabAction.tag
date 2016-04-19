@@ -24,8 +24,8 @@
 
 	/**
 	 * Tab.tag
-	 *	Author: Mitchell Seaton
-	 *	Description: Creates a tab element.
+	 *	Author: Fiona Malikoff
+	 *	Description: Creates a tab element within the Hybrid Tab Header.
 	 * Wiki: 
 	 */
 %>
@@ -34,8 +34,8 @@
 <%@ attribute name="value" required="false" rtexprvalue="true"%>
 <%@ attribute name="key" required="false" rtexprvalue="true"%>
 <%@ attribute name="inactive" required="false" rtexprvalue="true"%>
-<%@ attribute name="methodCall" required="false" rtexprvalue="true"%> 
-
+<%-- <%@ attribute name="methodCall" required="false" rtexprvalue="true"%>
+ --%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -59,7 +59,7 @@
 	
 --%>
 
-<c:if test="${methodCall == null}">
+<%-- <c:if test="${methodCall == null}">
 	<c:choose>
 		<c:when test="${dControl}">
 			<c:set var="methodCall" value="doSelectTab" />
@@ -69,7 +69,7 @@
 		</c:otherwise>
 	</c:choose>
 </c:if>
-
+ --%>
 <c:if test="${key != null && value == null}">
 	<c:set var="tabTitle">
 		<fmt:message key="${key}" />
@@ -86,4 +86,4 @@
 	<c:set var="class">class="disabled"</c:set>
 </c:if>
 
-<li role="presentation" ${class}><a href="#t${id}" aria-controls="t${id}" role="tab" onclick="${methodCall}(${id});return false;">${tabTitle}</a></li>
+<li role="presentation" ${class}><a href="#t${id}" aria-controls="t${id}" role="tab" data-toggle="tab">${tabTitle}</a></li>
