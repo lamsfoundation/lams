@@ -135,7 +135,6 @@ public class EventNotificationService implements IEventNotificationService {
      *            whether the message is of HTML content-type or plain text
      */
     public void notifyUser(Subscription subscription, String subject, String message, boolean isHtmlFormat) {
-	subscription.setLastOperationTime(new Date());
 	subscription.setLastOperationMessage(
 		subscription.getDeliveryMethod().send(null, subscription.getUserId(), subject, message, isHtmlFormat));
     }
@@ -147,23 +146,21 @@ public class EventNotificationService implements IEventNotificationService {
 	    List<Event> events = eventDAO.getEventsToResend();
 	    for (Event event : events) {
 		trigger(event, null, null);
-		if (event.getFailTime() != null) {
-		    if (!event.getSubscriptions().isEmpty() && ((System.currentTimeMillis()
-			    - event.getFailTime().getTime()) >= IEventNotificationService.RESEND_TIME_LIMIT)) {
-			StringBuilder body = new StringBuilder(messageService.getMessage("mail.resend.abandon.body1"))
-				.append(event.getMessage())
-				.append(messageService.getMessage("mail.resend.abandon.body2"));
-			for (Subscription subscription : event.getSubscriptions()) {
-			    User user = (User) userManagementService.findById(User.class, subscription.getUserId());
-			    body.append(user.getLogin()).append('\n');
-			}
-			IEventNotificationService.DELIVERY_METHOD_MAIL.notifyAdmin(
-				messageService.getMessage("mail.resend.abandon.subject"), body.toString(),
-				event.isHtmlFormat());
-			eventDAO.deleteEvent(event);
+		if ((event.getFailTime() != null) && !event.getSubscriptions().isEmpty() && ((System.currentTimeMillis()
+			- event.getFailTime().getTime()) >= IEventNotificationService.RESEND_TIME_LIMIT)) {
+		    StringBuilder body = new StringBuilder(messageService.getMessage("mail.resend.abandon.body1"))
+			    .append(event.getMessage()).append(messageService.getMessage("mail.resend.abandon.body2"));
+		    for (Subscription subscription : event.getSubscriptions()) {
+			User user = (User) userManagementService.findById(User.class, subscription.getUserId());
+			body.append(user.getLogin()).append('\n');
 		    }
+		    IEventNotificationService.DELIVERY_METHOD_MAIL.notifyAdmin(
+			    messageService.getMessage("mail.resend.abandon.subject"), body.toString(),
+			    event.isHtmlFormat());
+		    eventDAO.deleteEvent(event);
 		}
 	    }
+
 	} catch (Exception e) {
 	    EventNotificationService.log.error("Error while resending messages", e);
 	}
@@ -180,7 +177,7 @@ public class EventNotificationService implements IEventNotificationService {
 	EventNotificationService.log.error("Error occured while sending message: " + result);
 	Event event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
 		String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
-	subscribe(event, toUserId, deliveryMethod, null);
+	subscribe(event, toUserId, deliveryMethod);
 	event.setFailTime(new Date());
 	eventDAO.saveEvent(event);
 	return false;
@@ -204,7 +201,7 @@ public class EventNotificationService implements IEventNotificationService {
 		if (result != null) {
 		    event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
 			    String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
-		    subscribe(event, id, deliveryMethod, null);
+		    subscribe(event, id, deliveryMethod);
 		}
 	    }
 	    if (event != null) {
@@ -239,7 +236,7 @@ public class EventNotificationService implements IEventNotificationService {
      * See {@link IEventNotificationService#subscribe(String, String, Long, Long, AbstractDeliveryMethod, Long)
      * 
      */
-    protected void subscribe(Event event, Integer userId, AbstractDeliveryMethod deliveryMethod, Long periodicity)
+    private void subscribe(Event event, Integer userId, AbstractDeliveryMethod deliveryMethod)
 	    throws InvalidParameterException {
 	if (userId == null) {
 	    throw new InvalidParameterException("User ID can not be null.");
@@ -254,21 +251,18 @@ public class EventNotificationService implements IEventNotificationService {
 	    if (subscription.getUserId().equals(userId)
 		    && subscription.getDeliveryMethod().equals(deliveryMethod.getId())) {
 		substriptionFound = true;
-		if (!subscription.getPeriodicity().equals(periodicity)) {
-		    subscription.setPeriodicity(periodicity);
-		}
 		break;
 	    }
 	}
 	if (!substriptionFound) {
-	    event.getSubscriptions().add(new Subscription(userId, deliveryMethod, periodicity));
+	    event.getSubscriptions().add(new Subscription(userId, deliveryMethod));
 	}
 	eventDAO.saveEvent(event);
     }
 
     @Override
     public void subscribe(String scope, String name, Long eventSessionId, Integer userId,
-	    AbstractDeliveryMethod deliveryMethod, Long periodicity) throws InvalidParameterException {
+	    AbstractDeliveryMethod deliveryMethod) throws InvalidParameterException {
 	if (scope == null) {
 	    throw new InvalidParameterException("Scope should not be null.");
 	}
@@ -285,7 +279,7 @@ public class EventNotificationService implements IEventNotificationService {
 	if (event == null) {
 	    throw new InvalidParameterException("An event with the given parameters does not exist.");
 	}
-	subscribe(event, userId, deliveryMethod, periodicity);
+	subscribe(event, userId, deliveryMethod);
     }
 
     /**
@@ -301,19 +295,16 @@ public class EventNotificationService implements IEventNotificationService {
 	    Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
 	    while (subscriptionIterator.hasNext()) {
 		Subscription subscription = subscriptionIterator.next();
-		if ((event.getFailTime() != null) || subscription.isEligibleForNotification()) {
-		    notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
-		    if (subscription.getLastOperationSuccessful()) {
-			if (event.getFailTime() != null) {
-			    subscriptionIterator.remove();
-			}
-		    } else if (event.getFailTime() == null) {
-			if (eventFailCopy == null) {
-			    eventFailCopy = (Event) event.clone();
-			}
-			subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod(),
-				subscription.getPeriodicity());
+		notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
+		if (subscription.getLastOperationMessage() == null) {
+		    if (event.getFailTime() != null) {
+			subscriptionIterator.remove();
 		    }
+		} else if (event.getFailTime() == null) {
+		    if (eventFailCopy == null) {
+			eventFailCopy = (Event) event.clone();
+		    }
+		    subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
 		}
 	    }
 	    if (event.getSubscriptions().isEmpty()) {
@@ -393,19 +384,24 @@ public class EventNotificationService implements IEventNotificationService {
     /**
      * See {@link IEventNotificationService#triggerForSingleUser(String, String, Long, Long)}
      */
-    protected boolean triggerForSingleUser(Event event, Integer userId, String subject, String message)
+    private void triggerForSingleUser(Event event, Integer userId, String subject, String message)
 	    throws InvalidParameterException {
-	if (userId == null) {
-	    throw new InvalidParameterException("User ID can not be null.");
-	}
+	final String subjectToSend = subject == null ? event.getSubject() : subject;
+	final String messageToSend = message == null ? event.getMessage() : message;
 
 	for (Subscription subscription : event.getSubscriptions()) {
-	    if (subscription.getUserId().equals(userId) && subscription.isEligibleForNotification()) {
+	    if (subscription.getUserId().equals(userId)) {
 		notifyUser(subscription, subject, message, event.isHtmlFormat());
-		return subscription.getLastOperationSuccessful();
+		if (subscription.getLastOperationMessage() != null) {
+		    Event eventFailCopy = (Event) event.clone();
+		    eventFailCopy.setFailTime(new Date());
+		    eventFailCopy.setSubject(subjectToSend);
+		    eventFailCopy.setMessage(messageToSend);
+		    subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
+		    eventDAO.saveEvent(eventFailCopy);
+		}
 	    }
 	}
-	return false;
     }
 
     @Override

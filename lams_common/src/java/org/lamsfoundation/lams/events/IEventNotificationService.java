@@ -24,26 +24,6 @@ public interface IEventNotificationService {
     static final String SINGLE_MESSAGE_SCOPE = "SINGLE_MESSAGE";
 
     /**
-     * User should be notified only once. Used when subscribing a user to an event.
-     */
-    static final long PERIODICITY_SINGLE = 0;
-
-    /**
-     * User should be notified daily. Used when subscribing a user to an event.
-     */
-    static final long PERIODICITY_DAILY = 24 * 60 * 60;
-
-    /**
-     * User should be notified weekly. Used when subscribing a user to an event.
-     */
-    static final long PERIODICITY_WEEKLY = IEventNotificationService.PERIODICITY_DAILY * 7;
-
-    /**
-     * User should be notified monthly. Used when subscribing a user to an event.
-     */
-    static final long PERIODICITY_MONTHLY = IEventNotificationService.PERIODICITY_WEEKLY * 4;
-
-    /**
      * Period after which the thread gives up on attempting to resend messages. Currently - 2 days.
      */
     static final long RESEND_TIME_LIMIT = 2 * 24 * 60 * 60 * 1000;
@@ -174,8 +154,7 @@ public interface IEventNotificationService {
 	    String message, boolean isHtmlFormat) throws InvalidParameterException;
 
     /**
-     * Registeres an user for notification of the event. If a subscription with given user ID and delivery method
-     * already exists, only periodicity is updated.
+     * Registeres an user for notification of the event.
      * 
      * @param scope
      *            scope of the event
@@ -186,14 +165,12 @@ public interface IEventNotificationService {
      * @param userId
      *            ID of the user
      * @param deliveryMethod
-     *            method of messaged delivery to use
-     * @param periodicity
-     *            how often the user should be notified (in seconds)
+     *            method of messaged delivery to use how often the user should be notified (in seconds)
      * @throws InvalidParameterException
      *             if scope, userId or delivery method are <code>null</code>, or name is blank
      */
     void subscribe(String scope, String name, Long eventSessionId, Integer userId,
-	    AbstractDeliveryMethod deliveryMethod, Long periodicity) throws InvalidParameterException;
+	    AbstractDeliveryMethod deliveryMethod) throws InvalidParameterException;
 
     /**
      * Triggers the event with the default (or previously set) subject and message. Each subscribed user is notified.

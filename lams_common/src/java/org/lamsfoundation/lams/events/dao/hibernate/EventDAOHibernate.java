@@ -15,9 +15,7 @@ class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
 	    + " AS e WHERE e.scope=? AND e.name=? AND e.eventSessionId=? AND e.failTime IS NULL";
 
     private static final String GET_EVENTS_TO_RESEND_QUERY = "SELECT DISTINCT e FROM " + Event.class.getName()
-	    + " AS e INNER JOIN e.subscriptions AS subscription WHERE (e.failTime IS NOT NULL OR "
-	    + "(subscription.periodicity > 0 AND subscription.lastOperationTime IS NOT NULL "
-	    + "AND (NOW()- subscription.lastOperationTime >= subscription.periodicity)))";
+	    + " AS e WHERE e.failTime IS NOT NULL";
 
     @SuppressWarnings("unchecked")
     public Event getEvent(String scope, String name, Long sessionId) throws InvalidParameterException {
