@@ -12,6 +12,12 @@
 <div class="row no-gutter">
 	<div class="col-xs-12">
 		<div class="container" id="content">
+		
+		<c:choose>
+		<c:when test='${type == "navbar"}'>
+			<jsp:doBody />
+		</c:when> 
+		<c:otherwise>
 			<div class="panel panel-default panel-${type}-page">
 				<c:if test="${not empty title}">
 					<div class="panel-heading">
@@ -30,7 +36,14 @@
 					<jsp:doBody />
 				</div>
 			</div>
+		</c:otherwise>
+		</c:choose>
+			
 		</div>
 		<!-- End content container -->
 	</div>
 </div>
+
+
+		
+			

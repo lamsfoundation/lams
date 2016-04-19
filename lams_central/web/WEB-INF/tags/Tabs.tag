@@ -33,37 +33,42 @@
 <%@ attribute name="collection" type="java.util.Collection" required="false" rtexprvalue="true"%>
 <%@ attribute name="control" required="false" rtexprvalue="true"%>
 <%@ attribute name="useKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="format" required="false" rtexprvalue="true"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <c:set var="dControl" value="false" scope="request" />
 <c:if test="${control}">
 	<c:set var="dControl" value="${control}" scope="request" />
 </c:if>
-
-<c:set var="dUseKey" value="false" scope="request" />
-<c:if test="${useKey}">
-	<c:set var="dUseKey" value="${useKey}" scope="request" />
-</c:if>
+<c:choose>
+<c:when test="${empty format}">
+	<c:set var="dFormat" value="nav-tabs" scope="request" />
+</c:when>
+<c:otherwise>
+	<c:set var="dFormat" value="${format}" scope="request" />
+</c:otherwise>
+</c:choose>
 
 <!-- tab holder table -->
-<div id="nav">
+<ul id="page-tabs" class="nav ${dFormat}" role="tablist">
+	<jsp:doBody />
+</ul>
+
+<%--
+	Usually methodCall is selectTab, but the calling code can override methodCall if desired.
+	this is handy if the page needs different logic on initialisation and user switching tabs
+	
+	-- 			onclick="${methodCall}(${id});return false;">
+	
+--%>
+
+<c:if test="${methodCall == null}">
 	<c:choose>
-		<c:when test="${collection != null}">
-			<c:set var="count" value="0" />
-			<c:forEach var="tab" begin="0" items="${collection}">
-				<c:set var="count" value="${count+1}" />
-				<c:choose>
-					<c:when test="${dUseKey}">
-						<lams:Tab id="${count}" key="${tab}" />
-					</c:when>
-					<c:otherwise>
-						<lams:Tab id="${count}" value="${tab}" />
-					</c:otherwise>
-				</c:choose>
-			</c:forEach>
+		<c:when test="${dControl}">
+			<c:set var="methodCall" value="doSelectTab" />
 		</c:when>
 		<c:otherwise>
-			<jsp:doBody />
+			<c:set var="methodCall" value="selectTab" />
 		</c:otherwise>
 	</c:choose>
-</div>
+</c:if>

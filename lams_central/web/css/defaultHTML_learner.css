@@ -116,6 +116,12 @@ LAMS Learner Style
   box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
   margin-top: 20px;
 }
+.panel-learner-title {
+	color:#337ab7 !important;
+}
+.panel-admin-title {
+	color:#337ab7 !important;
+}
 body.stripes {
   background: url('/lams/images/css/light-fabric.jpg');
 }
@@ -191,10 +197,11 @@ td.arrows{
 	text-align: center;
 }
 /* Tabs are a cross between pills (colouring) and tab outlines. */
-.nav-tabs > li.active > a{
+/* .nav-tabs > li.active > a{
 	color:#fff !important;
 	background-color:#337ab7 !important;
 }
+ */
 .nav-tabs > li > a{
   border:1px solid #ddd
 }
@@ -247,4 +254,20 @@ nav.navbar-heading {
 
 .navbar-heading .in .navbar-text {
 	padding-left: 15px;
+}
+
+.navbar-brand {
+	color:#337ab7 !important;
+}
+
+/** Authoring */
+/*layout of adding a topic button */
+a.button-add-item:before {
+  content: "\f067";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  margin-left: 5px;
+  color: inherit;
 }
