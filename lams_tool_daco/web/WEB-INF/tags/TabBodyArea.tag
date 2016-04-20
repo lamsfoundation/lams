@@ -22,9 +22,9 @@
  */
 
 /**
- * HybridTabBody.tag
+ * TabBodyArea.tag
  *	Author: Fiona Malikoff
- *	Description: Creates the body container for a tab element
+ *	Description: Creates the panel body area for a nav bar screen
  * Wiki: 
  */
 
@@ -36,4 +36,4 @@
 	 <jsp:doBody />
 </div>
 
-</div> <!--  close tab opened in HybridTabHeader -->
+</div> <!--  close tab opened in TabHeader -->

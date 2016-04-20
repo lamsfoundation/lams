@@ -24,8 +24,8 @@
 
 	/**
 	 * Tab.tag
-	 *	Author: Mitchell Seaton
-	 *	Description: Creates a tab element.
+	 *	Author: Fiona Malikoff
+	 *	Description: Creates a tab element within the Hybrid Tab Header.
 	 * Wiki: 
 	 */
 %>
@@ -34,7 +34,7 @@
 <%@ attribute name="value" required="false" rtexprvalue="true"%>
 <%@ attribute name="key" required="false" rtexprvalue="true"%>
 <%@ attribute name="inactive" required="false" rtexprvalue="true"%>
-<%@ attribute name="methodCall" required="false" rtexprvalue="true"%> 
+<%@ attribute name="methodCall" required="false" rtexprvalue="true"%>
 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>

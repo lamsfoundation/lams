@@ -25,19 +25,19 @@
 	<c:set var="title"><fmt:message key="label.common.heading" /></c:set>
  	<lams:Page type="navbar" title="${title}"> 
 
-		<lams:HybridTabHeader control="true" title="${title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="monitoring" refreshOnClickAction="javascript:refreshPage()">
-			<lams:HybridTab id="1" key="label.common.summary"/>
-			<lams:HybridTab id="2" key="tab.monitoring.edit.activity"/>
-			<lams:HybridTab id="3" key="tab.monitoring.statistics"/>
-		</lams:HybridTabHeader>	
+		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="monitoring" refreshOnClickAction="javascript:refreshPage()">
+			<lams:Tab id="1" key="label.common.summary"/>
+			<lams:Tab id="2" key="tab.monitoring.edit.activity"/>
+			<lams:Tab id="3" key="tab.monitoring.statistics"/>
+		</lams:Tabs>	
 
-  		<lams:HybridTabBody>
+  		<lams:TabBodyArea>
 			<lams:TabBodys>			
 					<lams:TabBody id="1" titleKey="label.common.summary" page="summary.jsp"/>
 					<lams:TabBody id="2" titleKey="tab.monitoring.edit.activity" page="editactivity.jsp"/>	
 					<lams:TabBody id="3" titleKey="tab.monitoring.statistics" page="statistics.jsp"/>
 			</lams:TabBodys> 
-		</lams:HybridTabBody> 
+		</lams:TabBodyArea> 
 
 	<div id="footer"></div>
 	</lams:Page>
