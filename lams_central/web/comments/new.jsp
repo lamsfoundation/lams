@@ -69,6 +69,7 @@
 	
 	function clearNewForm() {
 		$('#newFormBody').val('');
+		enableButton(btnName);
 		return false;
 	}
 	

@@ -26,6 +26,14 @@
 	});
 	
 	function replyFormSubmit() {
+	
+		var btnName = "replyCommentSubmitButton";
+		if ( isDisabled(btnName) ) {
+			return false;
+		}
+
+		disableButton(btnName);
+	
 		var theForm = $(replyForm);
 		if ( validateBodyText($('#replyFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>, "<fmt:message key="label.comment.body.validation" />") ) {
 
@@ -47,7 +55,10 @@
 			reloadThread(response,'<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
 			});
 		} // end validateBodyText
-	return false;
+		else {
+			enableButton(btnName);
+		}
+		return false;
 	}
 	
 	function cancelReply() {
@@ -67,7 +78,7 @@
 		<a href="#" onclick="javascript:cancelReply();" class="button">
 			<fmt:message key="label.cancel" />
 		</a>&nbsp;
-		<a href="#" onclick="javascript:replyFormSubmit();" class="button">
+		<a href="#" onclick="javascript:replyFormSubmit();" class="button" id="replyCommentSubmitButton">
 			<fmt:message key="label.post" />
 		</a>
 	</div>
