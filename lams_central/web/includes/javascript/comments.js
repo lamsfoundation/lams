@@ -42,3 +42,17 @@
     		alert(errorCannotRedisplayMessage);
     	} 
 	}
+	
+	/** Disable the submit button when pressed to stop double submission. disabled = true doesn't stop the link working it just
+	 * greys it out. So we need to test with isDisabled() in the submit methods too! Messy. */
+	function disableButton(buttonId) {
+		$("#"+buttonId).attr("disabled", true); 
+		$("#"+buttonId).addClass("disabled"); 
+	}
+	function isDisabled(buttonId) {
+		return $("#"+buttonId).attr("disabled");
+	}
+	function enableButton(buttonId) {
+		$("#"+buttonId).removeAttr("disabled");
+		$("#"+buttonId).removeClass("disabled"); 
+	}	
