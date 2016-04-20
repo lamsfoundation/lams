@@ -26,9 +26,16 @@
 	$('#editForm').submit(function() { // catch the form's submit event
 		editCommentSubmit()
 	} );
-		
+		 	
 	function editCommentSubmit() {
 
+		var btnName = "editCommentSubmitButton";
+		if ( isDisabled(btnName) ) {
+			return false;
+		}
+
+		disableButton(btnName);
+		
 		var theForm = $(editForm);			
 
 		if ( validateBodyText($('#editFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>, "<fmt:message key="label.comment.body.validation" />") ) {
@@ -48,6 +55,9 @@
 				reloadThread(response,'<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
     		});
 		} // end validateBodyText
+		else {
+			enableButton(btnName);
+		}
 		return false;
 	};
 
@@ -64,7 +74,7 @@
 	<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
 	
 	<div class="right-buttons voffset5">
-		<a href="#nogo" onclick="javascript:editCommentSubmit();" class="btn btn-xs btn-primary pull-right">
+		<a href="#nogo" onclick="javascript:editCommentSubmit();" class="btn btn-xs btn-primary pull-right" id="editCommentSubmitButton">
 			<fmt:message key="label.post" />
 		</a>&nbsp;
 		<a href="#nogo" onclick="javascript:cancelEdit();" class="btn btn-xs btn-primary pull-right roffset5">

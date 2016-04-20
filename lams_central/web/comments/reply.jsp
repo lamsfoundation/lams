@@ -26,6 +26,14 @@
 	});
 
 	function replyFormSubmit() {
+		
+		var btnName = "replyCommentSubmitButton";
+		if ( isDisabled(btnName) ) {
+			return false;
+		}
+
+		disableButton(btnName);
+		
 		var theForm = $(replyForm);
 		if (validateBodyText($('#replyFormBody').val(),
 <%=CommentConstants.MAX_BODY_LENGTH%>
@@ -56,6 +64,9 @@
 										'<fmt:message key="error.please.refresh"/>');
 							});
 		} // end validateBodyText
+		else {
+			enableButton(btnName);
+		}
 		return false;
 	}
 
@@ -76,7 +87,7 @@
 
 		<div class="right-buttons voffset5">
 			<a href="#nogo" onclick="javascript:replyFormSubmit();"
-				class="btn btn-xs btn-primary pull-right"> <fmt:message
+				class="btn btn-xs btn-primary pull-right" id="replyCommentSubmitButton"> <fmt:message
 					key="label.post" />
 			</a>&nbsp; <a href="#nogo" onclick="javascript:cancelReply();"
 				class="btn btn-xs btn-primary pull-right roffset5"> <fmt:message
