@@ -15,8 +15,10 @@
 
 <lams:html>
 <lams:head>
-	<lams:css style="main"/>
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
+	<lams:css/>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<title><fmt:message key="activity.title" /></title>
 
@@ -37,8 +39,6 @@
 
 <body class="stripes" onLoad='init()'>
 
-	<div id="page">
-	
 		<html:form action="/monitoring" target="_self">
 
 			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" scope="request"/>
@@ -49,32 +49,28 @@
 				<html:rewrite page="/monitoring.do" />
 			</c:set>
 			
+			<c:set var="title"><fmt:message key="activity.title" /></c:set>
+			<lams:Page title="${title}" type="navbar">
 
-			<h1>
-				<fmt:message key="activity.title" />
-			</h1>
-			
-			<div id="header">
-			
-				<lams:Tabs>
-					<lams:Tab id="<%=NbMonitoringAction.SUMMARY_TABID%>" key="titleHeading.summary" />
-					<lams:Tab id="<%=NbMonitoringAction.EDITACTIVITY_TABID%>" key="titleHeading.editActivity" />
-					<lams:Tab id="<%=NbMonitoringAction.STATISTICS_TABID%>" key="titleHeading.statistics" />
-				</lams:Tabs>
-			</div>
+		 	<lams:Tabs title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
+				<lams:Tab id="1" key="titleHeading.summary" />
+				<lams:Tab id="2" key="titleHeading.editActivity" />
+				<lams:Tab id="3" key="titleHeading.statistics" />
+			</lams:Tabs>
 		
-			<div id="content">
-				<lams:help toolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" module="monitoring"/>
-				
+			<lams:TabBodyArea>
+			<lams:TabBodys>
 				<lams:TabBody id="1" titleKey="titleHeading.summary" page="m_Summary.jsp" /> 
 				<lams:TabBody id="2" titleKey="titleHeading.editActivity" page="m_EditActivity.jsp" />
-				<lams:TabBody id="3" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
-			</div>
+  				<lams:TabBody id="3" titleKey="titleHeading.statistics" page="m_Statistics.jsp" />
+ 			</lams:TabBodys>
+			</lams:TabBodyArea>
 			
 			<div id="footer" />
+			
+			</lams:Page>
 
 		</html:form>
-	</div>
 
 </body>
 

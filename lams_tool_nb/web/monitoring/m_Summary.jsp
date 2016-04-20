@@ -1,15 +1,17 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	
-	<H2><c:out value="${formBean.title}" escapeXml="true" /></H2>
-	<div class="space-top"><c:out value="${formBean.basicContent}" escapeXml="false" /></div>
+	<div class="panel">
+	<h4><c:out value="${formBean.title}" escapeXml="true" /></h4>
+	<div class="voffset5"><c:out value="${formBean.basicContent}" escapeXml="false" /></div>
+	</div>
 
-	<H2><fmt:message key="titleHeading.statistics"/></H2>
+	<H4><fmt:message key="titleHeading.statistics"/></H2>
 	<%@ include file="m_Statistics.jsp"%>
 
 	<c:if test="${reflectOnActivity}" >
-		<H2><fmt:message key="titleHeading.reflections"/></H2>
-		<table class="alternative-color">
+		<H4><fmt:message key="titleHeading.reflections"/></H4>
+		<table class="table table-striped">
 		<c:forEach var="reflection" items="${reflections}">
 			<logic:empty name="reflections">
 				<tr>
@@ -19,7 +21,7 @@
 				</tr>
 			</logic:empty>
 			<tr>
-				<td>
+				<td width="40%">
 					<c:out value="${reflection.username}" />
 				</td>
 				<c:url value="monitoring.do" var="viewReflection">
@@ -37,17 +39,10 @@
 		
 	</c:if>
 	
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
+<c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
+<lams:AdvancedAccordian title="${adTitle}">
+          	
+<table class="table table-striped table-condensed">
 	
 	<tr>
 		<td>
@@ -94,4 +89,4 @@
 		</tr>
 	</c:if>
 </table>
-</div>	
+</lams:AdvancedAccordian>
