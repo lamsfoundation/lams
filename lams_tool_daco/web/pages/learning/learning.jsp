@@ -59,14 +59,14 @@
 </c:choose>
 </c:set> 
 
-<lams:HybridTabHeader control="true" title="${daco.title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="learning" extraControl="${ellipsisControl}">
- 	<lams:HybridTab id="1" key="label.learning.heading.add" />
- 	<lams:HybridTab id="2" key="label.learning.heading.list" />
-	<lams:HybridTab id="3" key="label.learning.heading.summary" />
-</lams:HybridTabHeader>	
+<lams:Tabs control="true" title="${daco.title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="learning" extraControl="${ellipsisControl}">
+ 	<lams:Tab id="1" key="label.learning.heading.add" />
+ 	<lams:Tab id="2" key="label.learning.heading.list" />
+	<lams:Tab id="3" key="label.learning.heading.summary" />
+</lams:Tabs>	
 
 
-<lams:HybridTabBody>
+<lams:TabBodyArea>
 	<lams:TabBodys>
 	 	<lams:TabBody id="1" titleKey="label.learning.heading.add" page="addRecord.jsp?displayedRecordNumber=${displayedRecordNumber}" />
  		<lams:TabBody id="2" titleKey="label.learning.heading.list" page="listRecords.jsp?includeMode=learning" />
@@ -97,7 +97,7 @@
 		</c:choose>
 </c:if>
  
-</lams:HybridTabBody>
+</lams:TabBodyArea>
 
 <div id="footer"></div>
 </lams:Page>

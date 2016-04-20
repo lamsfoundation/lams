@@ -43,12 +43,12 @@
 <c:set var="title"><fmt:message key="label.common.heading" /></c:set>
 <lams:Page title="${title}" type="navbar">
 
- 	<lams:HybridTabHeader control="true" title="${title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="authoring">
-			<lams:HybridTab id="1" key="label.authoring.heading.basic" />
-			<lams:HybridTab id="2" key="label.authoring.heading.advanced" />
-	</lams:HybridTabHeader>	
+ 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+			<lams:Tab id="1" key="label.authoring.heading.basic" />
+			<lams:Tab id="2" key="label.authoring.heading.advanced" />
+	</lams:Tabs>	
 
- 	<lams:HybridTabBody>
+ 	<lams:TabBodyArea>
 		<%@ include file="/common/messages.jsp"%>
 
 
@@ -74,7 +74,7 @@
 			 customiseSessionID="${formBean.sessionMapID}"
 			 contentFolderID="${formBean.contentFolderID}"
 			 cancelConfirmMsgKey="message.authoring.cancel.save" />
-	</lams:HybridTabBody>
+	</lams:TabBodyArea>
  
 
 <div id="footer"></div>
