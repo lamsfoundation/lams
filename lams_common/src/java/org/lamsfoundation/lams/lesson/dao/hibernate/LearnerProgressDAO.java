@@ -359,6 +359,23 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
 
 	return learners;
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getLearnersCompletedActivity(final Activity activity) {
+	List<User> learners = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	learners = (List<User>) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(LearnerProgressDAO.LOAD_LEARNERS_COMPLETED_ACTIVITY)
+			.setLong("activityId", activity.getActivityId().longValue()).list();
+	    }
+	});
+
+	return learners;
+    }
 
     @Override
     public Integer getNumUsersAttemptedActivity(final Activity activity) {

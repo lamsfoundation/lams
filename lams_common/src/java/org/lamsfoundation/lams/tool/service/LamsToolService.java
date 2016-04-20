@@ -29,25 +29,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.proxy.HibernateProxy;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
-import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -75,9 +74,13 @@ public class LamsToolService implements ILamsToolService {
     private static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
-    public IToolDAO toolDAO;
-    public IToolSessionDAO toolSessionDAO;
-    public IToolContentDAO toolContentDAO;
+    private IActivityDAO activityDAO;
+    private ILessonDAO lessonDAO;
+    private ILearnerProgressDAO learnerProgressDAO;
+    private IToolDAO toolDAO;
+    private IToolSessionDAO toolSessionDAO;
+    private IToolContentDAO toolContentDAO;
+    private IGradebookService gradebookService;
     private ILamsCoreToolService lamsCoreToolService;
     private ILessonService lessonService;
 
@@ -157,6 +160,76 @@ public class LamsToolService implements ILamsToolService {
 	    log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
 	    return null;
 	}
+    }
+    
+    @Override
+    public String getActivityEvaluation(Long toolContentId) {
+	
+	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentId);
+	if (activities.size() != 1) {
+	    log.debug("ToolContent contains multiple activities, can't get ActivityEvaluation.");
+	    return null;
+	}
+	
+	ToolActivity toolActivity = (ToolActivity) activities.get(0);
+	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
+	if (activityEvaluations.isEmpty()) {
+	    return null;
+	} else {
+	    ActivityEvaluation activityEvaluation = activityEvaluations.iterator().next();
+	    return activityEvaluation.getToolOutputDefinition();
+	}
+    }
+    
+    @Override
+    public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
+	
+	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentId);
+	if (activities.size() != 1) {
+	    throw new LamsToolServiceException(
+		    "ToolContent contains multiple activities, can't set ActivityEvaluation.");
+	}
+	if (StringUtils.isEmpty(toolOutputDefinition)) {
+	    return;
+	}
+	
+	ToolActivity toolActivity = (ToolActivity) activities.get(0);
+	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
+	
+	// Get the first (only) ActivityEvaluation if it exists
+	ActivityEvaluation activityEvaluation;
+	boolean isToolOutputDefinitionChanged = false;
+	if (activityEvaluations.isEmpty()) {
+	    activityEvaluation = new ActivityEvaluation();
+	    activityEvaluation.setActivity(toolActivity);
+
+	    activityEvaluations = new HashSet<ActivityEvaluation>();
+	    activityEvaluations.add(activityEvaluation);
+	    toolActivity.setActivityEvaluations(activityEvaluations);
+
+	} else {
+	    activityEvaluation = activityEvaluations.iterator().next();
+	    isToolOutputDefinitionChanged = !toolOutputDefinition.equals(activityEvaluation.getToolOutputDefinition());
+	}
+
+	activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
+	activityDAO.insertOrUpdate(activityEvaluation);
+
+	// update the parent toolActivity
+	toolActivity.setActivityEvaluations(activityEvaluations);
+	activityDAO.insertOrUpdate(toolActivity);
+	
+	//update gradebook marks if required
+	if (isToolOutputDefinitionChanged) {
+	    Lesson lesson = lessonDAO.getLessonForActivity(toolActivity.getActivityId());
+	    List<User> users = learnerProgressDAO.getLearnersCompletedActivity(toolActivity);
+	    
+	    //update for all users in activity
+	    for (User user: users) {
+		gradebookService.updateUserActivityGradebookMark(lesson, toolActivity, user);
+	    }
+	}
+	
     }
 
     @Override
@@ -276,22 +349,23 @@ public class LamsToolService implements ILamsToolService {
     }
 
     /**
-     * @return Returns the toolDAO.
-     */
-    public IToolDAO getToolDAO() {
-	return toolDAO;
-    }
-
-    /**
      * @param toolDAO
      *            The toolDAO to set.
      */
     public void setToolDAO(IToolDAO toolDAO) {
 	this.toolDAO = toolDAO;
     }
-
-    public IToolSessionDAO getToolSessionDAO() {
-	return toolSessionDAO;
+    
+    public void setActivityDAO(IActivityDAO activityDAO) {
+	this.activityDAO = activityDAO;
+    }
+    
+    public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO) {
+	this.learnerProgressDAO = learnerProgressDAO;
+    }
+    
+    public void setLessonDAO(ILessonDAO lessonDAO) {
+	this.lessonDAO = lessonDAO;
     }
 
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
@@ -300,18 +374,14 @@ public class LamsToolService implements ILamsToolService {
 
     /**
      * 
-     * @return
-     */
-    public IToolContentDAO getToolContentDAO() {
-	return toolContentDAO;
-    }
-
-    /**
-     * 
      * @param toolContentDAO
      */
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
 	this.toolContentDAO = toolContentDAO;
+    }
+    
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
     }
 
     /**

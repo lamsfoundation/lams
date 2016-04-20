@@ -148,6 +148,12 @@ public interface ILearnerProgressDAO {
      * progress records to determine the users.
      */
     List<User> getLearnersAttemptedActivity(Activity activity);
+    
+    /**
+     * Get all the users records where the user has completed the given activity. Uses the progress records to determine
+     * the users.
+     */
+    List<User> getLearnersCompletedActivity(Activity activity);   
 
     /**
      * Get all the users records where the user has ever attempted the given activity. Uses the progress records to
