@@ -72,6 +72,23 @@ public interface ILamsToolService {
     Boolean isGroupedActivity(long toolContentID);
 
     /**
+     * Assign tool an ActivityEvaluation (it is an equivalent of doing it manually on authoring canvas). It also updates
+     * gradebook marks for all participating learners from the lesson.
+     * 
+     * @param toolContentId
+     * @param toolOutputDefinition
+     */
+    void setActivityEvaluation(Long toolContentId, String toolOutputDefinition);
+    
+    /**
+     * Get tool's ActivityEvaluation that has been set in authoring.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    String getActivityEvaluation(Long toolContentId);
+    
+    /**
      * Returns leader's UserId from the nearest Leader Selection Tool (the nearest to the specified activity) , and null
      * if no Leader Selection Tools available.
      * 

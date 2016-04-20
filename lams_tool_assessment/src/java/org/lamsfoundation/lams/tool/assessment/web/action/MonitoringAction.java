@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -50,6 +51,8 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
@@ -111,6 +114,9 @@ public class MonitoringAction extends Action {
 	if (param.equals("setSubmissionDeadline")) {
 	    return setSubmissionDeadline(mapping, form, request, response);
 	}
+	if (param.equals("setActivityEvaluation")) {
+	    return setActivityEvaluation(mapping, form, request, response);
+	}
 	if (param.equals("getUsers")) {
 	    return getUsers(mapping, form, request, response);
 	}
@@ -171,6 +177,16 @@ public class MonitoringAction extends Action {
 		questionList.add(reference.getQuestion());
 	    }
 	}
+	
+	//prepare toolOutputDefinitions and activityEvaluation
+	List<String> toolOutputDefinitions = new ArrayList<String>();
+	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE);
+	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_BEST_SCORE);
+	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE);
+	toolOutputDefinitions.add(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE);
+	String activityEvaluation = service.getActivityEvaluation(contentId);
+	sessionMap.put(AssessmentConstants.ATTR_TOOL_OUTPUT_DEFINITIONS, toolOutputDefinitions);
+	sessionMap.put(AssessmentConstants.ATTR_ACTIVITY_EVALUATION, activityEvaluation);
 
 	// cache into sessionMap
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
@@ -275,6 +291,32 @@ public class MonitoringAction extends Action {
     }
     
     /**
+     * Set tool's activityEvaluation
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws JSONException 
+     * @throws IOException 
+     */
+    private ActionForward setActivityEvaluation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	initAssessmentService();
+	
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION);
+	service.setActivityEvaluation(contentID, activityEvaluation);
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("success", "true");
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responseJSON.toString()));
+	return null;
+    }
+    
+    /**
      * Refreshes user list.
      */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -306,7 +348,7 @@ public class MonitoringAction extends Action {
 	    
 	    if (groupLeader != null) {
 
-		float assessmentResult = service.getLastFinishedAssessmentResultGrade(assessment.getUid(),
+		float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(),
 			groupLeader.getUserId());
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
@@ -560,7 +602,7 @@ public class MonitoringAction extends Action {
 		    
 		    if (groupLeader != null) {
 
-			float assessmentResult = service.getLastFinishedAssessmentResultGrade(assessment.getUid(),
+			float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(),
 				groupLeader.getUserId());
 
 			AssessmentUserDTO userDto = new AssessmentUserDTO();
