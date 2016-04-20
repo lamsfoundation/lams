@@ -12,9 +12,16 @@
 		});
 	});
 
+	var btnName = "newCommentSubmitButton";
+
 	function newCommentSubmit() {
+
+		if ( isDisabled(btnName) ) {
+			return false;
+		}
 		
 		var theForm = $(newForm);
+		disableButton(btnName);
 		
 		if ( validateBodyText($('#newFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>, "<fmt:message key="label.comment.body.validation" />") ) {
 
@@ -47,12 +54,16 @@
 					clearNewForm();
 				} else if ( response.errMessage ) {
 					alert(response.errMessage);
+					enableButton(btnName);
 				} else {
        				alert('<fmt:message key="error.please.refresh"/>');
 				}
 
 	    	});
 		} // end validateBodyText
+		else {
+			enableButton(btnName);
+		}
 		return false;
 	}
 	
@@ -76,7 +87,7 @@
 		<a href="#" onclick="javascript:clearNewForm();" class="button">
 			<fmt:message key="label.cancel" />
 		</a>&nbsp;
-		<a href="#" onclick="javascript:newCommentSubmit();" class="button">
+		<a href="#" onclick="javascript:newCommentSubmit();" class="button"  id="newCommentSubmitButton">
 			<fmt:message key="label.post" />
 		</a>
 	</div>
