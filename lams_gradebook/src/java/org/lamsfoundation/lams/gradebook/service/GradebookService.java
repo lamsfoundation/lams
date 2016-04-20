@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -65,7 +66,10 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -429,6 +433,46 @@ public class GradebookService implements IGradebookService {
 		    lesson.getLessonId().toString(), oldMark, mark.toString() };
 	    String message = messageService.getMessage("audit.lesson.change.mark", args);
 	    auditService.log(monitorUser, GradebookConstants.MODULE_NAME, message);
+	}
+    }
+    
+    @Override
+    public void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
+	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
+
+	if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
+		|| (activity == null) || !(activity instanceof ToolActivity)
+		|| (((ToolActivity) activity).getActivityEvaluations() == null)
+		|| ((ToolActivity) activity).getActivityEvaluations().isEmpty()) {
+	    return;
+	}
+	ToolActivity toolActivity = (ToolActivity) activity;
+
+	// Getting the first activity evaluation
+	ActivityEvaluation eval = toolActivity.getActivityEvaluations().iterator().next();
+
+	try {
+	    ToolOutput toolOutput = toolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
+		    learner.getUserId());
+
+	    if (toolOutput != null) {
+		ToolOutputValue outputVal = toolOutput.getValue();
+		if (outputVal != null) {
+		    Double outputDouble = outputVal.getDouble();
+
+		    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(toolActivity.getActivityId(),
+			    learner.getUserId());
+
+		    // Only set the mark if it hasnt previously been set by a teacher
+		    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
+			updateUserActivityGradebookMark(lesson, learner, toolActivity, outputDouble, false, false);
+		    }
+		}
+	    }
+
+	} catch (ToolException e) {
+	    GradebookService.logger.debug(
+		    "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
 	}
     }
 
