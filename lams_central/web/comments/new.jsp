@@ -11,9 +11,16 @@
 		});
 	});
 
+	var btnName = "newCommentSubmitButton";
+
 	function newCommentSubmit() {
 
+		if ( isDisabled(btnName) ) {
+			return false;
+		}
+		
 		var theForm = $(newForm);
+		disableButton(btnName);
 
 		if (validateBodyText($('#newFormBody').val(),
 <%=CommentConstants.MAX_BODY_LENGTH%>,"<fmt:message key="label.comment.body.validation" />")) {
@@ -56,17 +63,22 @@
 									clearNewForm();
 								} else if (response.errMessage) {
 									alert(response.errMessage);
+									enableButton(btnName);
 								} else {
 									alert('<fmt:message key="error.please.refresh"/>');
 								}
 
 							});
 		} // end validateBodyText
+		else {
+			enableButton(btnName);
+		}
 		return false;
 	}
 
 	function clearNewForm() {
 		$('#newFormBody').val('');
+		enableButton(btnName);
 		return false;
 	}
 </script>
@@ -93,9 +105,9 @@
 								href="javascript:refreshComments();" style="margin: 5px"
 								class="btn btn-primary btn-xs"> <fmt:message
 									key="label.refresh" />
-							</a> <a href="#nogo" onclick="javascript:newCommentSubmit();"
-								style="margin: 5px" class="btn btn-primary btn-xs pull-right">
-								<fmt:message key="label.post" />
+							</a> <span onclick="javascript:newCommentSubmit();"
+								style="margin: 5px" class="btn btn-primary btn-xs pull-right" id="newCommentSubmitButton">
+								<fmt:message key="label.post" /></span>
 							</a> <a href="#nogo" onclick="javascript:clearNewForm();"
 								style="margin: 5px" class="btn btn-primary btn-xs pull-right">
 								<fmt:message key="label.cancel" />
