@@ -268,6 +268,15 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
 	return users;
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getLearnersCompletedActivity(final Activity activity) {
+	List<User> users = getSession().createQuery(LearnerProgressDAO.LOAD_LEARNERS_COMPLETED_ACTIVITY)
+		.setLong("activityId", activity.getActivityId().longValue()).list();
+
+	return users;
+    }
 
     @Override
     public Integer getNumUsersAttemptedActivity(Activity activity) {

@@ -62,6 +62,16 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
+    private static final String BEST_SCORE_BY_SESSION_AND_USER = "SELECT MAX(r.grade) FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
+    
+    private static final String FIRST_SCORE_BY_SESSION_AND_USER = "SELECT r.grade FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
+    
+    private static final String AVERAGE_SCORE_BY_SESSION_AND_USER = "SELECT AVG(r.grade) FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
+
+
     private static final String FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
@@ -76,7 +86,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
-    public List<AssessmentResult> getFinishedAssessmentResultsBySession(Long sessionId, Long userId) {
+    public List<AssessmentResult> getFinishedAssessmentResultsByUser(Long sessionId, Long userId) {
 	return (List<AssessmentResult>) doFind(AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER_AND_FINISHED,
 		new Object[] { userId, sessionId });
     }
@@ -106,15 +116,44 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
-    public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
+    public Float getLastTotalScoreByUser(Long assessmentUid, Long userId) {
 	
 	Query q = getSession()
 		.createQuery(AssessmentResultDAOHibernate.FIND_LAST_ASSESSMENT_RESULT_GRADE);
 	q.setParameter(0, userId);
 	q.setParameter(1, assessmentUid);
-	return ((Number) q.uniqueResult()).floatValue();
+	return ((Float) q.uniqueResult());
     }
 
+    @Override
+    public Float getBestTotalScoreByUser(Long sessionId, Long userId) {
+	Query q = getSession()
+		.createQuery(AssessmentResultDAOHibernate.BEST_SCORE_BY_SESSION_AND_USER);
+	q.setParameter(0, userId);
+	q.setParameter(1, sessionId);
+	return ((Float) q.uniqueResult());
+    }
+    
+    @Override
+    public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
+	Query q = getSession()
+		.createQuery(AssessmentResultDAOHibernate.FIRST_SCORE_BY_SESSION_AND_USER);
+	q.setParameter(0, userId);
+	q.setParameter(1, sessionId);
+	q.setMaxResults(1);
+	return ((Float) q.uniqueResult());
+    }
+    
+    @Override
+    public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
+	Query q = getSession()
+		.createQuery(AssessmentResultDAOHibernate.AVERAGE_SCORE_BY_SESSION_AND_USER);
+	q.setParameter(0, userId);
+	q.setParameter(1, sessionId);
+	Object result = q.uniqueResult();
+	return result == null ? null : ((Double) result).floatValue();
+    }
+    
     @Override
     public Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId) {
 
@@ -127,7 +166,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
-    public AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId) {
+    public AssessmentResult getLastFinishedAssessmentResultByUser(Long sessionId, Long userId) {
 	Query q = getSession().createQuery(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_SESSION_AND_USER);
 	q.setParameter(0, userId);
 	q.setParameter(1, sessionId);

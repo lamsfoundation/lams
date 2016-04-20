@@ -33,17 +33,23 @@ public interface AssessmentResultDAO extends DAO {
 
     List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId);
 
-    List<AssessmentResult> getFinishedAssessmentResultsBySession(Long sessionId, Long userId);
+    List<AssessmentResult> getFinishedAssessmentResultsByUser(Long sessionId, Long userId);
 
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
 
     AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
 
-    Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId);
+    Float getLastTotalScoreByUser(Long assessmentUid, Long userId);
+
+    Float getBestTotalScoreByUser(Long sessionId, Long userId);
+    
+    Float getFirstTotalScoreByUser(Long sessionId, Long userId);
+    
+    Float getAvergeTotalScoreByUser(Long sessionId, Long userId);
 
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
-    AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId);
+    AssessmentResult getLastFinishedAssessmentResultByUser(Long sessionId, Long userId);
 
     int getAssessmentResultCount(Long assessmentUid, Long userId);
 

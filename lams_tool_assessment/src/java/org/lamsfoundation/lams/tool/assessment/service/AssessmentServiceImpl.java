@@ -111,8 +111,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * @author Andrey Balan
  */
-public class AssessmentServiceImpl
-	implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager {
+public class AssessmentServiceImpl implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -753,8 +752,23 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId) {
-	return assessmentResultDao.getLastFinishedAssessmentResultGrade(assessmentUid, userId);
+    public Float getLastTotalScoreByUser(Long assessmentUid, Long userId) {
+	return assessmentResultDao.getLastTotalScoreByUser(assessmentUid, userId);
+    }
+    
+    @Override
+    public Float getBestTotalScoreByUser(Long sessionId, Long userId) {
+	return assessmentResultDao.getBestTotalScoreByUser(sessionId, userId);
+    }
+    
+    @Override
+    public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
+	return assessmentResultDao.getFirstTotalScoreByUser(sessionId, userId);
+    }
+    
+    @Override
+    public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
+	return assessmentResultDao.getAvergeTotalScoreByUser(sessionId, userId);
     }
 
     @Override
@@ -903,7 +917,7 @@ public class AssessmentServiceImpl
 	    ArrayList<AssessmentResult> assessmentResults = new ArrayList<AssessmentResult>();
 	    for (AssessmentUser user : users) {
 		AssessmentResult assessmentResult = assessmentResultDao
-			.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
+			.getLastFinishedAssessmentResultByUser(sessionId, user.getUserId());
 		if (assessmentResult == null) {
 		    assessmentResult = new AssessmentResult();
 		    assessmentResult.setUser(user);
@@ -926,7 +940,7 @@ public class AssessmentServiceImpl
 
     @Override
     public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
-	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
 		userId);
 	if (lastFinishedResult != null) {
 	    SortedSet<AssessmentQuestionResult> questionResults = new TreeSet<AssessmentQuestionResult>(
@@ -944,10 +958,10 @@ public class AssessmentServiceImpl
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
-	List<AssessmentResult> results = assessmentResultDao.getFinishedAssessmentResultsBySession(sessionId, userId);
+	List<AssessmentResult> results = assessmentResultDao.getFinishedAssessmentResultsByUser(sessionId, userId);
 	userSummary.setNumberOfAttempts(results.size());
 
-	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
 		userId);
 	long timeTaken = lastFinishedResult == null ? 0
 		: lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime();
@@ -1029,7 +1043,7 @@ public class AssessmentServiceImpl
 	    ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<AssessmentQuestionResult>();
 	    for (AssessmentUser user : users) {
 		AssessmentResult assessmentResult = assessmentResultDao
-			.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
+			.getLastFinishedAssessmentResultByUser(sessionId, user.getUserId());
 		AssessmentQuestionResult questionResult = null;
 		if (assessmentResult == null) {
 		    questionResult = new AssessmentQuestionResult();
@@ -1494,6 +1508,16 @@ public class AssessmentServiceImpl
     }
 
     @Override
+    public String getActivityEvaluation(Long toolContentId) {
+	return toolService.getActivityEvaluation(toolContentId);
+    }
+    
+    @Override
+    public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {	
+	toolService.setActivityEvaluation(toolContentId, toolOutputDefinition);
+    }
+
+    @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {
 	return toolService.getLearnerContentFolder(toolSessionId, userId);
     }
@@ -1648,14 +1672,6 @@ public class AssessmentServiceImpl
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-     */
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {

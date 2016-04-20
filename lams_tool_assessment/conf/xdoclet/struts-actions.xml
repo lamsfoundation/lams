@@ -289,6 +289,10 @@
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
 			parameter="setSubmissionDeadline" >
 		</action>
+		<action path="/monitoring/setActivityEvaluation"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="setActivityEvaluation" >
+		</action>
 		<action path="/monitoring/getUsers"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
 			parameter="getUsers" >
