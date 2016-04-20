@@ -1,8 +1,12 @@
 <%@ include file="/includes/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<c:if test="${isGroupedActivity}">
-	<table>
-		<tr><td colspan="2"><h4><fmt:message key="heading.totalLearnersInGroup" /></h4></td></tr>
+<div class="voffset10">
+
+	
+ <c:if test="${isGroupedActivity}">
+	<table class="table table-striped table-condensed">
+		<tr><td colspan="${allowComments ? 3 : 2}"><fmt:message key="heading.totalLearnersInGroup" /></td></tr>
 	
 		<c:forEach var="group" items="${formBean.groupStatsMap}">
 			<tr><td width="40%"><c:out value="${group.key}" /></td> 
@@ -20,9 +24,9 @@
 	</table>
 </c:if>
 
-<table>
+<table class="table table-striped table-condensed">
 	<tr>
-		<td width="40%"><h4><fmt:message key="heading.totalLearners" /></h4></td>
+		<td width="40%"><fmt:message key="heading.totalLearners" /></td>
 		<td><c:out value="${formBean.totalLearners}" /></td>
 		<c:if test="${allowComments && !isGroupedActivity}">
 			<c:forEach var="group" items="${formBean.sessionIdMap}">
@@ -35,5 +39,5 @@
 		</c:if>
 	</tr>
 </table>
-
-</table>
+ 
+</div>

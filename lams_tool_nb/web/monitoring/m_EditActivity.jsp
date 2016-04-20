@@ -1,12 +1,14 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
+<div class="voffset10">
+
 <c:if test="${formBean.totalLearners >= 1}">
-	<p class="warning">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<table class="table table-condensed">
 			<tr>
 				<td class="field-name">
 					<fmt:message key="basic.title" />
@@ -26,8 +28,10 @@
 </table>
 
 <p class="align-right">
-	<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button" target="_blank">
+	<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="btn btn-default" target="_blank">
 		<fmt:message key="button.edit" />
 	</html:link>
 </p>
+
+</div>
 

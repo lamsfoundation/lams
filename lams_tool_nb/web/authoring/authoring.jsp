@@ -10,13 +10,13 @@
 
 <lams:html>
 <lams:head>
+  	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" />
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+
 	<lams:headItems />
 	<title><fmt:message key="activity.title" />
 	</title>
-	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-
 	<script type="text/javascript">
 		function init(){
 			var showBasicContent = "${requestScope.showBasicContent}";
@@ -55,46 +55,37 @@
 
 <body class="stripes" onLoad="init()">
 
-	<div id="page">
-		<html:form action="/authoring" styleId="authoringForm" target="_self"
-			enctype="multipart/form-data">
+<html:form action="/authoring" styleId="authoringForm" target="_self" enctype="multipart/form-data">
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
+<c:set var="title"><fmt:message key="activity.title" /></c:set>
+<lams:Page title="${title}" type="navbar">
+
 			<html:hidden property="toolContentID" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
 			<html:hidden property="defineLater" />
-
-			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			
-			<h1>
-				<fmt:message key="activity.title" />
-			</h1>
-			<div id="header">
-				<!-- start tabs -->
-				<lams:Tabs control="true">
-					<lams:Tab id="1" key="label.authoring.heading.basic" />
-					<lams:Tab id="2" key="label.authoring.heading.advanced" />
-				</lams:Tabs>
-				<!-- end tab buttons -->
-			</div>
-
-			<div id="content">
-				<!-- show any error messages here -->
-				<logic:messagesPresent>
-					<p class="warning">
-					        <html:messages id="error">
-					            <c:out value="${error}" escapeXml="false"/><br/>
-					        </html:messages>
-					</p>
+		
+		 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+				<lams:Tab id="1" key="label.authoring.heading.basic" />
+				<lams:Tab id="2" key="label.authoring.heading.advanced" />
+			</lams:Tabs>	
+		
+		 	<lams:TabBodyArea>
+		 		<logic:messagesPresent>
+				<lams:Alert id="errorMessages" type="danger" close="false">
+			        <html:messages id="error">
+        			    <c:out value="${error}" escapeXml="false"/><BR/>
+   				     </html:messages>
+ 			    </lams:Alert>
 				</logic:messagesPresent>
-								
-				<lams:help toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"
-					module="authoring" />
+		 		
 				<!--  Set up tabs  -->
-				<lams:TabBody id="1" titleKey="label.authoring.heading.basic"
-					page="basic.jsp" />
-				<lams:TabBody id="2" titleKey="label.authoring.heading.advanced"
-						page="advance.jsp" />
-
+		 		<lams:TabBodys>
+   					<lams:TabBody id="1" titleKey="label.authoring.heading.basic" page="basic.jsp" />
+ 					<lams:TabBody id="2" titleKey="label.authoring.heading.advanced" page="advance.jsp" />
+  				</lams:TabBodys>
+		
 				<!-- Button Row -->
 				<html:hidden property="method" value="save" />
 				<c:set var="accessMode">
@@ -107,7 +98,6 @@
 						</c:otherwise>
 					</c:choose>
 				</c:set>
-
 				<lams:AuthoringButton formID="authoringForm"
 					clearSessionActionUrl="/clearsession.do" toolSignature="lanb11"
 					toolContentID="${formBean.toolContentID}"
@@ -116,9 +106,13 @@
 					accessMode="${accessMode}"
 					defineLater="${formBean.defineLater}"
 					contentFolderID="${NbAuthoringForm.contentFolderID}" />
-			</div>
-			<div id="footer" />
-		</html:form>
-	</div>
+			</lams:TabBodyArea>
+
+<div id="footer"></div>
+<!-- end page div -->
+</lams:Page>
+
+</html:form>
+
 </body>
 </lams:html>
