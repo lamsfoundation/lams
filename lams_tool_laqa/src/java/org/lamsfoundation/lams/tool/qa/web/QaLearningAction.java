@@ -458,9 +458,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-
 	qaLearningForm.setHttpSessionID(httpSessionID);
 	generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	/*recreate the users and responses*/
 	qaLearningForm.resetUserActions();
@@ -477,16 +478,24 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	qaLearningForm.resetAll();
 
-	boolean lockWhenFinished = qaContent.isLockWhenFinished();
+	boolean lockWhenFinished;
+	boolean noReeditAllowed;
+	if (sessionMap.get("noRefresh") != null && (Boolean)sessionMap.get("noRefresh")) {
+	    lockWhenFinished = true;
+	    noReeditAllowed = true;
+	} else {
+	    lockWhenFinished = qaContent.isLockWhenFinished();
+	    noReeditAllowed = qaContent.isNoReeditAllowed();
+	}
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
-	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
+	generalLearnerFlowDTO.setNoReeditAllowed(noReeditAllowed);
 
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 
 	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
 	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
-	
+
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
