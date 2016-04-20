@@ -47,10 +47,10 @@
 		</lams:CKEditor>
 	</div>
   
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-sm pull-right"><fmt:message
+	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs pull-right"><fmt:message
 		key="label.authoring.basic.additionaloptions.show" /> </a>
 
-	<div id="additionalOptionsArea" class="voffset5" style="display: none;">
+	<div id="additionalOptionsArea" class="voffset5 form-inline" style="display: none;">
 		<div class="form-group">
 	    	<label for=min><fmt:message key="label.authoring.basic.min.select" />&nbsp;
 		<html:text styleId="min" property="min" size="10" />
