@@ -126,6 +126,14 @@ public interface IGradebookService {
      * @param mark
      */
     void updateUserLessonGradebookMark(Lesson lesson, User learner, Double mark);
+    
+    /**
+     * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.  
+     * 
+     * @param toolActivity
+     * @param progress
+     */
+    void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner);
 
     /**
      * Updates a user's activity mark, this will automatically add up all the user's activity marks for a lesson and set
