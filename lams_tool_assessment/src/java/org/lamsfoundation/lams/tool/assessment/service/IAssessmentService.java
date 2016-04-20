@@ -225,7 +225,34 @@ public interface IAssessmentService {
      * @param userId
      * @return
      */
-    Float getLastFinishedAssessmentResultGrade(Long assessmentUid, Long userId);
+    Float getLastTotalScoreByUser(Long assessmentUid, Long userId);
+    
+    /**
+     * Return the best *finished* result grade.
+     * 
+     * @param sessionId
+     * @param userId
+     * @return
+     */
+    Float getBestTotalScoreByUser(Long sessionId, Long userId);
+    
+    /**
+     * Return the first *finished* result grade.
+     * 
+     * @param sessionId
+     * @param userId
+     * @return
+     */
+    Float getFirstTotalScoreByUser(Long sessionId, Long userId);
+    
+    /**
+     * Return the average score of all *finished* result scores.
+     * 
+     * @param sessionId
+     * @param userId
+     * @return
+     */
+    Float getAvergeTotalScoreByUser(Long sessionId, Long userId);
 
     /**
      * Return the latest *finished* result grade.
@@ -359,6 +386,18 @@ public interface IAssessmentService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
+     * 
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     */
+    String getActivityEvaluation(Long toolContentId);
+    
+    void setActivityEvaluation(Long toolContentId, String toolOutputDefinition);
     
     /**
      * Return content folder (unique to each learner and lesson) which can be used for storing user generated content.

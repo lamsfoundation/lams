@@ -141,13 +141,10 @@
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="store*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAttemptStarted">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setQuestionStartDate">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="changeQuestionResultMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setQuestionComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setQuestionAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="notifyTeachersOnAttemptCompletion">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
@@ -155,7 +152,6 @@
 			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
                 <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
 				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
-				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="copyAnswersFromLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="recalculate*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
