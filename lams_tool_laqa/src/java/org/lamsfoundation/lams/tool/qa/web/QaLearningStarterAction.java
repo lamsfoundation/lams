@@ -308,6 +308,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		if (qaContent.isShowOtherAnswersAfterDeadline()) {
 		    generalLearnerFlowDTO.setLockWhenFinished(Boolean.TRUE.toString());
 		    generalLearnerFlowDTO.setNoReeditAllowed(true);
+		    //only for ActionForward refreshAllResults(..) method
+		    sessionMap.put("noRefresh", true);
 		    /*
 		     * the report should have all the users' entries OR the report should have only the current
 		     * session's entries
