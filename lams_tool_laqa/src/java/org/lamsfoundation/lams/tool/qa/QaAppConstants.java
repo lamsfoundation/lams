@@ -203,6 +203,7 @@ public interface QaAppConstants {
     public static final String NO_TOOL_SESSIONS_AVAILABLE = "noToolSessionAvailable";
     public static final String ATTR_CONTENT = "content";
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String PARAM_SHOW_OTHER_ANSWERS_AFTER_DEADLINE = "showOtherAnswersAfterDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     public static final String ATTR_GROUP_USERS = "groupUsers";
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
