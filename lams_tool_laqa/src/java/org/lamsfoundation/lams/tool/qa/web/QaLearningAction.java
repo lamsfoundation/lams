@@ -490,8 +490,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    lockWhenFinished = qaContent.isLockWhenFinished();
 	    noReeditAllowed = qaContent.isNoReeditAllowed();
 	}
-	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(noReeditAllowed).toString());
-	generalLearnerFlowDTO.setNoReeditAllowed(lockWhenFinished);
+	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	generalLearnerFlowDTO.setNoReeditAllowed(noReeditAllowed);
 
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
