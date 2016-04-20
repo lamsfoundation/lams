@@ -103,7 +103,9 @@ public class QaContent implements Serializable {
     private Date updateDate;
 
     private Date submissionDeadline;
-
+    
+    private boolean showOtherAnswersAfterDeadline;
+    
     private int maximumRates;
 
     private int minimumRates;
@@ -384,6 +386,21 @@ public class QaContent implements Serializable {
      */
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
+    }
+    
+    /**
+     * @return Returns the showOtherAnswersAfterDeadline.
+     */
+    public boolean isShowOtherAnswersAfterDeadline() {
+	return showOtherAnswersAfterDeadline;
+    }
+
+    /**
+     * @param showOtherAnswersAfterDeadline
+     *            The showOtherAnswersAfterDeadline to set.
+     */
+    public void setShowOtherAnswersAfterDeadline(boolean showOtherAnswersAfterDeadline) {
+	this.showOtherAnswersAfterDeadline = showOtherAnswersAfterDeadline;
     }
 
     /**
