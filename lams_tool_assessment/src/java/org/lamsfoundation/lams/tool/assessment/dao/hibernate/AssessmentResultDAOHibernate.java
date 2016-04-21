@@ -158,7 +158,8 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
-	    return ((Float) list.get(0));
+	    Object result = list.get(0);
+	    return result == null ? null : ((Double) result).floatValue();
 	}
     }
 
