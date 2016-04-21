@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.events;
 
 import java.security.InvalidParameterException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,7 +16,17 @@ public interface IEventNotificationService {
     /**
      * Scope for the events that are common for the whole LAMS environment.
      */
-    static final String CORE_EVENTS_SCOPE = "CORE";
+    static final String CORE_SCOPE = "CORE";
+
+    /**
+     * Scope for the events that are meant for given lesson staff.
+     */
+    static final String LESSON_MONITORS_SCOPE = "LESSON_MONITORS";
+
+    /**
+     * Scope for the events that are meant for given lesson learners.
+     */
+    static final String LESSON_LEARNERS_SCOPE = "LESSON_LEARNERS";
 
     /**
      * Scope for events that were created after {@link #sendMessage(Long, AbstractDeliveryMethod, String, String)}
@@ -34,6 +45,8 @@ public interface IEventNotificationService {
      */
     static final DeliveryMethodMail DELIVERY_METHOD_MAIL = DeliveryMethodMail.getInstance();
 
+    static final DeliveryMethodNotification DELIVERY_METHOD_NOTIFICATION = DeliveryMethodNotification.getInstance();
+
     static final Set<AbstractDeliveryMethod> availableDeliveryMethods = new HashSet<AbstractDeliveryMethod>(2);
 
     /**
@@ -51,12 +64,12 @@ public interface IEventNotificationService {
      *            body of the message send to users; it can be altered when triggering the event
      * @param isHtmlFormat
      *            whether the message is of HTML content-type or plain text
-     * @return <code>true</code> if the event did not exist and was correctly created
-     * @throws InvalidParameterException
-     *             if scope was <code>null</code> or name was blank
      */
     void createEvent(String scope, String name, Long eventSessionId, String defaultSubject, String defaultMessage,
-	    boolean isHtmlFormat) throws InvalidParameterException;
+	    boolean isHtmlFormat);
+
+    void createLessonEvent(String scope, String name, Long toolSessionId, String defaultSubject, String defaultMessage,
+	    boolean isHtmlFormat, AbstractDeliveryMethod deliveryMethod);
 
     /**
      * Checks if event with the given parameters exists in the database.
@@ -79,6 +92,10 @@ public interface IEventNotificationService {
      * @return set of available delivery methods in the system
      */
     Set<AbstractDeliveryMethod> getAvailableDeliveryMethods();
+
+    List<Subscription> getNotificationSubscriptions(Long lessonId, Integer userId, Integer limit, Integer offset);
+
+    long getNotificationPendingCount(Long lessonId, Integer userId);
 
     /**
      * Checks if an user is subscribed to the given event.
@@ -206,6 +223,8 @@ public interface IEventNotificationService {
     void trigger(String scope, String name, Long eventSessionId, Object[] parameterValues)
 	    throws InvalidParameterException;
 
+    void triggerLessonEvent(String scope, String name, Long toolContentId, String subject, String message);
+
     /**
      * Triggers the event with given subject and message. Each subscribed user is notified. Default message and subject
      * are overridden.
@@ -225,6 +244,8 @@ public interface IEventNotificationService {
      */
     void trigger(String scope, String name, Long eventSessionId, String subject, String message)
 	    throws InvalidParameterException;
+
+    void triggerForSingleUser(Long subscriptionUid, String subject, String message);
 
     /**
      * Notifies only a single user of the event using the default subject and message. Does not set the event as

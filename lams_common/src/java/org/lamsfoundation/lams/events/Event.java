@@ -154,7 +154,7 @@ public class Event {
 
     /**
      * 
-     * @hibernate.set cascade="all-delete-orphan" order-by="last_operation_time desc" outer-join="true"
+     * @hibernate.set cascade="all-delete-orphan" outer-join="true"
      * @hibernate.collection-key column="event_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.events.Subscription"
      * 

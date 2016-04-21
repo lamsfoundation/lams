@@ -106,6 +106,36 @@
 		</property>
 	</bean>
 	
+	<bean id="lessonServiceTarget" class="org.lamsfoundation.lams.lesson.service.LessonService">
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+	</bean>
+	
+	<bean id="lessonService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="lessonServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="perform*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
 	<bean id="themeServiceTarget" class="org.lamsfoundation.lams.themes.service.ThemeService">
 		<property name="themeDAO"><ref bean="themeDAO"/></property>
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
@@ -327,15 +357,16 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="createEvent">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
 				<prop key="eventExists">PROPAGATION_REQUIRED</prop>
 				<prop key="sendMessage">PROPAGATION_REQUIRED</prop>
 				<prop key="resendMessages">PROPAGATION_REQUIRED</prop>
-				<prop key="notifyLessonMonitors">PROPAGATION_REQUIRED</prop>
+				<prop key="notify*">PROPAGATION_REQUIRED</prop>
 				<prop key="subscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="unsubscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="trigger*">PROPAGATION_REQUIRED</prop>
 				<prop key="isSubscribed">PROPAGATION_REQUIRED</prop>
+				<prop key="getNotification*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -443,7 +474,21 @@
 	</bean>
 	<bean id="licenseDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
+	</bean>
+	
+	<!-- Lesson related beans -->
+	
+	<bean id="lessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="lessonClassDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="learnerProgressDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
 	
 	<!--User management related beans -->
 	

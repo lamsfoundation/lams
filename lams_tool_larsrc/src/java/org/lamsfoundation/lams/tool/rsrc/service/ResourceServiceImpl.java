@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -85,6 +86,7 @@ import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
+import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -100,9 +102,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Dapeng.Ni
@@ -561,6 +565,23 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	String userName = resourceUser.getLastName() + " " + resourceUser.getFirstName();
 	String message = getLocalisedMessage("event.assigment.submit.body", new Object[] { userName });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
+    }
+
+    @Override
+    public void notifyTeachersOnFileUpload(Long toolContentId, Long toolSessionId, String sessionMapId, String userName,
+	    Long itemUid, String fileName) {
+	String eventName = new StringBuilder("resources_file_upload_").append(toolContentId).append("_")
+		.append(System.currentTimeMillis()).toString();
+	String url = new StringBuilder("<a href='").append(WebUtil.getBaseServerURL())
+		.append("/lams/tool/larsrc11/reviewItem.do?").append(ResourceConstants.ATTR_SESSION_MAP_ID).append("=")
+		.append(sessionMapId).append("&").append(AttributeNames.ATTR_MODE).append("=")
+		.append(ToolAccessMode.TEACHER.toString()).append("&").append(ResourceConstants.ATTR_TOOL_SESSION_ID)
+		.append("=").append(toolSessionId).append("&").append(ResourceConstants.ATTR_RESOURCE_ITEM_UID)
+		.append("=").append(itemUid).append("'>")
+		.append(getLocalisedMessage("event.file.upload", new Object[] { userName, fileName })).append("</a>")
+		.toString();
+	eventNotificationService.createLessonEvent(IEventNotificationService.LESSON_MONITORS_SCOPE, eventName,
+		toolContentId, null, url, true, IEventNotificationService.DELIVERY_METHOD_NOTIFICATION);
     }
 
     // *****************************************************************************
@@ -1144,6 +1165,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resource.setMiniViewResourceNumber(JsonUtil.opt(toolContentJSON, "minViewResourceNumber", 0));
 	resource.setNotifyTeachersOnAssigmentSumbit(
 		JsonUtil.opt(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
+	resource.setNotifyTeachersOnAssigmentSumbit(
+		JsonUtil.opt(toolContentJSON, "notifyTeachersOnFileUpload", Boolean.FALSE));
 	resource.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	resource.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
 	resource.setRunAuto(JsonUtil.opt(toolContentJSON, "runAuto", Boolean.FALSE));

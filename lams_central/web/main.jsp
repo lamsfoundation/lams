@@ -68,6 +68,16 @@
 					NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
 					<fmt:message key="index.monitoring.title" var="MONITORING_TITLE_VAR"/>
 					MONITORING_TITLE : '<c:out value="${MONITORING_TITLE_VAR}" />',
+					<fmt:message key="label.private.notifications.title" var="PRIVATE_NOTIFICATIONS_TITLE_VAR"/>
+					PRIVATE_NOTIFICATIONS_TITLE : '<c:out value="${PRIVATE_NOTIFICATIONS_TITLE_VAR}" />',
+					<fmt:message key="label.private.notifications.messages" var="PRIVATE_NOTIFICATIONS_MESSAGES_VAR"/>
+					PRIVATE_NOTIFICATIONS_MESSAGES : '<c:out value="${PRIVATE_NOTIFICATIONS_MESSAGES_VAR}" />',
+					<fmt:message key="label.private.notifications.read" var="PRIVATE_NOTIFICATIONS_READ_VAR"/>
+					PRIVATE_NOTIFICATIONS_READ : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_VAR}" />',
+					<fmt:message key="label.private.notifications.read.hint" var="PRIVATE_NOTIFICATIONS_READ_HINT_VAR"/>
+					PRIVATE_NOTIFICATIONS_READ_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_HINT_VAR}" />',
+					<fmt:message key="label.private.notifications.read.all.hint" var="PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR"/>
+					PRIVATE_NOTIFICATIONS_READ_ALL_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR}" />',
 				},
 				
 				tabName = '${tab}',
@@ -192,12 +202,13 @@
 					</c:if>
 				</td>
 				<td class="linksCell">
-					<c:if test="${not empty orgDTOs}">
-						<div id="refreshButton" class="ui-button" title="<fmt:message key="index.refresh.hint"/>"
-							 onClick="javascript:loadOrgTab(null, true)">
-								<fmt:message key="index.refresh" />
-						</div>
-					</c:if>
+					<div id="refreshButton" class="ui-button" title="<fmt:message key="index.refresh.hint"/>"
+						 onClick="javascript:refreshPrivateNotificationCount();loadOrgTab(null, true)">
+							<fmt:message key="index.refresh" />
+					</div>
+					<div id="notificationsButton" class="ui-button" onClick="javascript:showPrivateNotificationsDialog()">
+						Notifications <span id="notificationsPendingCount"></span>
+					</div>
 					<div id="logoutButton" class="ui-button" onClick="javascript:closeAllChildren();document.location.href='home.do?method=logout'">
 							<fmt:message key="index.logout" />
 					</div>
@@ -248,6 +259,5 @@
 		</p>
 	</div>
 </div>
-
 </body>
 </lams:html>

@@ -1,8 +1,12 @@
 package org.lamsfoundation.lams.events;
 
 import java.security.InvalidParameterException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 /**
  * Provides methods to notify users of an event.
@@ -11,16 +15,6 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 public abstract class AbstractDeliveryMethod {
-    /**
-     * Short name for the delivery method
-     */
-    protected final String signature;
-
-    /**
-     * Short description of the delivery method.
-     */
-    protected final String description;
-
     /**
      * Unique identifier of the delivery method.
      */
@@ -31,24 +25,16 @@ public abstract class AbstractDeliveryMethod {
      */
     protected long sendTimeout = Long.MAX_VALUE;
 
+    protected final Map<Long, String> errors = new HashMap<Long, String>();
+    protected static final long ERROR_SILENCE_TIMEOUT = 5000;
+
     /**
      * Standard constructor.
      * 
      * @param id
      *            ID of the delivery method
-     * @param signature
-     *            signature of the delivery method
-     * @param description
-     *            short description of the delivery method
-     * @throws InvalidParameterException
-     *             if signature is blank
      */
-    protected AbstractDeliveryMethod(short id, String signature, String description) throws InvalidParameterException {
-	if (StringUtils.isEmpty(signature)) {
-	    throw new InvalidParameterException("Signature must not be blank.");
-	}
-	this.signature = signature;
-	this.description = description;
+    protected AbstractDeliveryMethod(short id) throws InvalidParameterException {
 	this.id = id;
     }
 
@@ -69,18 +55,13 @@ public abstract class AbstractDeliveryMethod {
     protected abstract String send(Integer fromUserId, Integer toUserId, String subject, String message,
 	    boolean isHtmlFormat) throws InvalidParameterException;
 
-    public String getSignature() {
-	return signature;
-    }
+    protected abstract Logger getLog();
 
-    public String getDescription() {
-	return description;
-    }
+    protected abstract boolean lastOperationFailed(Subscription subscription);
 
     @Override
     public boolean equals(Object o) {
-	return (o instanceof AbstractDeliveryMethod)
-		&& ((AbstractDeliveryMethod) o).signature.equalsIgnoreCase(signature);
+	return (o instanceof AbstractDeliveryMethod) && (((AbstractDeliveryMethod) o).id == this.id);
     }
 
     public short getId() {
@@ -93,5 +74,30 @@ public abstract class AbstractDeliveryMethod {
 
     public void setSendTimeout(long sendTimeout) {
 	this.sendTimeout = sendTimeout;
+    }
+
+    /**
+     * Checks if the error was already logged recently. If not, logs it.
+     */
+    protected synchronized void logError(String error) {
+	Iterator<Entry<Long, String>> errorIterator = errors.entrySet().iterator();
+	boolean logError = true;
+	long currentTime = System.currentTimeMillis();
+	// same errors younger than this will be silenced
+	long silencePeriod = currentTime - AbstractDeliveryMethod.ERROR_SILENCE_TIMEOUT;
+	while (errorIterator.hasNext()) {
+	    Entry<Long, String> entry = errorIterator.next();
+	    if (entry.getKey() < silencePeriod) {
+		// clear the map from garbage
+		errorIterator.remove();
+	    } else if (error.equals(entry.getValue())) {
+		logError = false;
+		// do not break, let the clean up go through the whole map
+	    }
+	}
+	if (logError) {
+	    errors.put(currentTime, error);
+	    getLog().error("Error while notifying users: " + error);
+	}
     }
 }

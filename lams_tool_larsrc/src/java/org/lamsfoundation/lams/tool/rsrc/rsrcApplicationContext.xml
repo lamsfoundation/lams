@@ -119,7 +119,7 @@
                 <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="notifyTeachersOnAssigmentSumbit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notifyTeachers*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

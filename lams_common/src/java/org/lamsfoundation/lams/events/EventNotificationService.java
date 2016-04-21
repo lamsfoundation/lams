@@ -20,6 +20,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 /**
  * Provides tools for managing events and notifing users.
@@ -33,6 +34,7 @@ public class EventNotificationService implements IEventNotificationService {
 
     static {
 	IEventNotificationService.availableDeliveryMethods.add(IEventNotificationService.DELIVERY_METHOD_MAIL);
+	IEventNotificationService.availableDeliveryMethods.add(IEventNotificationService.DELIVERY_METHOD_NOTIFICATION);
     }
 
     private EventDAO eventDAO = null;
@@ -43,10 +45,33 @@ public class EventNotificationService implements IEventNotificationService {
 
     @Override
     public void createEvent(String scope, String name, Long eventSessionId, String defaultSubject,
-	    String defaultMessage, boolean isHtmlFormat) throws InvalidParameterException {
+	    String defaultMessage, boolean isHtmlFormat) {
 	if (!eventExists(scope, name, eventSessionId)) {
 	    Event event = new Event(scope, name, eventSessionId, defaultSubject, defaultMessage, isHtmlFormat);
-	    eventDAO.saveEvent(event);
+	    eventDAO.insertOrUpdate(event);
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void createLessonEvent(String scope, String name, Long toolContentId, String defaultSubject,
+	    String defaultMessage, boolean isHtmlFormat, AbstractDeliveryMethod deliveryMethod)
+	    throws InvalidParameterException {
+	Lesson lesson = getLessonByToolContentId(toolContentId);
+	if (!eventExists(scope, name, lesson.getLessonId())) {
+	    Event event = new Event(scope, name, lesson.getLessonId(), defaultSubject, defaultMessage, isHtmlFormat);
+	    Set<User> users = null;
+	    if (scope.equals(IEventNotificationService.LESSON_MONITORS_SCOPE)) {
+		users = lesson.getLessonClass().getStaffGroup().getUsers();
+	    } else if (scope.equals(IEventNotificationService.LESSON_LEARNERS_SCOPE)) {
+		users = lesson.getLessonClass().getLearners();
+	    }
+	    if (users != null) {
+		for (User user : users) {
+		    event.getSubscriptions().add(new Subscription(user.getUserId(), deliveryMethod));
+		}
+		eventDAO.insert(event);
+	    }
 	}
     }
 
@@ -157,7 +182,7 @@ public class EventNotificationService implements IEventNotificationService {
 		    IEventNotificationService.DELIVERY_METHOD_MAIL.notifyAdmin(
 			    messageService.getMessage("mail.resend.abandon.subject"), body.toString(),
 			    event.isHtmlFormat());
-		    eventDAO.deleteEvent(event);
+		    eventDAO.delete(event);
 		}
 	    }
 
@@ -179,7 +204,7 @@ public class EventNotificationService implements IEventNotificationService {
 		String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
 	subscribe(event, toUserId, deliveryMethod);
 	event.setFailTime(new Date());
-	eventDAO.saveEvent(event);
+	eventDAO.insertOrUpdate(event);
 	return false;
     }
 
@@ -195,6 +220,8 @@ public class EventNotificationService implements IEventNotificationService {
 	}
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
+	    HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
+
 	    Event event = null;
 	    for (Integer id : toUserIds) {
 		String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
@@ -206,9 +233,20 @@ public class EventNotificationService implements IEventNotificationService {
 	    }
 	    if (event != null) {
 		event.setFailTime(new Date());
-		eventDAO.saveEvent(event);
+		eventDAO.insertOrUpdate(event);
 	    }
 	}).start();
+    }
+
+    @Override
+    public List<Subscription> getNotificationSubscriptions(Long lessonId, Integer userId, Integer limit,
+	    Integer offset) {
+	return eventDAO.getLessonEventSubscriptions(lessonId, userId, limit, offset);
+    }
+
+    @Override
+    public long getNotificationPendingCount(Long lessonId, Integer userId) {
+	return eventDAO.getPendingNotificationCount(lessonId, userId);
     }
 
     public void setEventDAO(EventDAO eventDAO) {
@@ -229,7 +267,7 @@ public class EventNotificationService implements IEventNotificationService {
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-	IEventNotificationService.DELIVERY_METHOD_MAIL.setUserManagementService(userManagementService);
+	DeliveryMethodMail.setUserManagementService(userManagementService);
     }
 
     /**
@@ -248,8 +286,7 @@ public class EventNotificationService implements IEventNotificationService {
 	List<Subscription> subscriptionList = new ArrayList<Subscription>(event.getSubscriptions());
 	for (int index = 0; index < subscriptionList.size(); index++) {
 	    Subscription subscription = subscriptionList.get(index);
-	    if (subscription.getUserId().equals(userId)
-		    && subscription.getDeliveryMethod().equals(deliveryMethod.getId())) {
+	    if (subscription.getUserId().equals(userId) && subscription.getDeliveryMethod().equals(deliveryMethod)) {
 		substriptionFound = true;
 		break;
 	    }
@@ -257,7 +294,7 @@ public class EventNotificationService implements IEventNotificationService {
 	if (!substriptionFound) {
 	    event.getSubscriptions().add(new Subscription(userId, deliveryMethod));
 	}
-	eventDAO.saveEvent(event);
+	eventDAO.update(event);
     }
 
     @Override
@@ -291,12 +328,14 @@ public class EventNotificationService implements IEventNotificationService {
 
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
+	    HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
+
 	    Event eventFailCopy = null;
 	    Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
 	    while (subscriptionIterator.hasNext()) {
 		Subscription subscription = subscriptionIterator.next();
 		notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
-		if (subscription.getLastOperationMessage() == null) {
+		if (subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
 		    if (event.getFailTime() != null) {
 			subscriptionIterator.remove();
 		    }
@@ -308,9 +347,9 @@ public class EventNotificationService implements IEventNotificationService {
 		}
 	    }
 	    if (event.getSubscriptions().isEmpty()) {
-		eventDAO.deleteEvent(event);
+		eventDAO.delete(event);
 	    } else {
-		eventDAO.saveEvent(event);
+		eventDAO.insertOrUpdate(event);
 	    }
 
 	    /*
@@ -321,7 +360,7 @@ public class EventNotificationService implements IEventNotificationService {
 		eventFailCopy.setFailTime(new Date());
 		eventFailCopy.setSubject(subjectToSend);
 		eventFailCopy.setMessage(messageToSend);
-		eventDAO.saveEvent(eventFailCopy);
+		eventDAO.insertOrUpdate(eventFailCopy);
 	    }
 	}).start();
     }
@@ -366,6 +405,12 @@ public class EventNotificationService implements IEventNotificationService {
     }
 
     @Override
+    public void triggerLessonEvent(String scope, String name, Long toolContentId, String subject, String message) {
+	Lesson lesson = getLessonByToolContentId(toolContentId);
+	trigger(scope, name, lesson.getLessonId(), subject, message);
+    }
+
+    @Override
     public void trigger(String scope, String name, Long eventSessionId, String title, String message)
 	    throws InvalidParameterException {
 	if (scope == null) {
@@ -381,26 +426,28 @@ public class EventNotificationService implements IEventNotificationService {
 	trigger(event, title, message);
     }
 
-    /**
-     * See {@link IEventNotificationService#triggerForSingleUser(String, String, Long, Long)}
-     */
-    private void triggerForSingleUser(Event event, Integer userId, String subject, String message)
-	    throws InvalidParameterException {
-	final String subjectToSend = subject == null ? event.getSubject() : subject;
-	final String messageToSend = message == null ? event.getMessage() : message;
-
+    private void triggerForSingleUser(Event event, Integer userId, String subject, String message) {
 	for (Subscription subscription : event.getSubscriptions()) {
 	    if (subscription.getUserId().equals(userId)) {
-		notifyUser(subscription, subject, message, event.isHtmlFormat());
-		if (subscription.getLastOperationMessage() != null) {
-		    Event eventFailCopy = (Event) event.clone();
-		    eventFailCopy.setFailTime(new Date());
-		    eventFailCopy.setSubject(subjectToSend);
-		    eventFailCopy.setMessage(messageToSend);
-		    subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
-		    eventDAO.saveEvent(eventFailCopy);
-		}
+		triggerForSingleUser(subscription.getUid(), subject, message);
 	    }
+	}
+    }
+
+    @Override
+    public void triggerForSingleUser(Long subscriptionUid, String subject, String message) {
+	Subscription subscription = (Subscription) eventDAO.find(Subscription.class, subscriptionUid);
+	Event event = subscription.getEvent();
+	String subjectToSend = subject == null ? event.getSubject() : subject;
+	String messageToSend = message == null ? event.getMessage() : message;
+	notifyUser(subscription, subject, message, event.isHtmlFormat());
+	if (subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
+	    Event eventFailCopy = (Event) event.clone();
+	    eventFailCopy.setFailTime(new Date());
+	    eventFailCopy.setSubject(subjectToSend);
+	    eventFailCopy.setMessage(messageToSend);
+	    subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
+	    eventDAO.insertOrUpdate(eventFailCopy);
 	}
     }
 
@@ -484,9 +531,9 @@ public class EventNotificationService implements IEventNotificationService {
 	    }
 	}
 	if (event.getSubscriptions().isEmpty()) {
-	    eventDAO.deleteEvent(event);
+	    eventDAO.delete(event);
 	} else {
-	    eventDAO.saveEvent(event);
+	    eventDAO.insertOrUpdate(event);
 	}
     }
 
@@ -509,9 +556,9 @@ public class EventNotificationService implements IEventNotificationService {
 	    }
 	}
 	if (event.getSubscriptions().isEmpty()) {
-	    eventDAO.deleteEvent(event);
+	    eventDAO.delete(event);
 	} else {
-	    eventDAO.saveEvent(event);
+	    eventDAO.insertOrUpdate(event);
 	}
     }
 
@@ -554,5 +601,11 @@ public class EventNotificationService implements IEventNotificationService {
 	    throw new InvalidParameterException("An event with the given parameters does not exist.");
 	}
 	unsubscribe(event, userId, deliveryMethod);
+    }
+
+    private Lesson getLessonByToolContentId(Long toolContentId) {
+	ToolActivity activity = (ToolActivity) eventDAO
+		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	return (Lesson) activity.getLearningDesign().getLessons().iterator().next();
     }
 }

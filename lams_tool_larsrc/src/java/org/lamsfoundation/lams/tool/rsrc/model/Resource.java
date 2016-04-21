@@ -23,19 +23,14 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.rsrc.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 
 /**
  * Resource
@@ -76,6 +71,8 @@ public class Resource implements Cloneable {
     private boolean contentInUse;
 
     private boolean notifyTeachersOnAssigmentSumbit;
+
+    private boolean notifyTeachersOnFileUpload;
 
     // general infomation
     private Date created;
@@ -444,7 +441,6 @@ public class Resource implements Cloneable {
 
     /**
      * @hibernate.property column="assigment_submit_notify"
-     * @return
      */
     public boolean isNotifyTeachersOnAssigmentSumbit() {
 	return notifyTeachersOnAssigmentSumbit;
@@ -452,5 +448,16 @@ public class Resource implements Cloneable {
 
     public void setNotifyTeachersOnAssigmentSumbit(boolean notifyTeachersOnAssigmentSumbit) {
 	this.notifyTeachersOnAssigmentSumbit = notifyTeachersOnAssigmentSumbit;
+    }
+
+    /**
+     * @hibernate.property column="file_upload_notify"
+     */
+    public boolean isNotifyTeachersOnFileUpload() {
+	return notifyTeachersOnFileUpload;
+    }
+
+    public void setNotifyTeachersOnFileUpload(boolean notifyTeachersOnFileUpload) {
+	this.notifyTeachersOnFileUpload = notifyTeachersOnFileUpload;
     }
 }
