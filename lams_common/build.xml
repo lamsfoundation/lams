@@ -14,6 +14,7 @@
 		<!-- Event Notification and Pedagogical Planner -->
 		<include name="**/Event.java" />
 		<include name="**/Subscription.java" />
+		<include name="**/DeliveryPending.java" />
 		<include name="**/LogEvent.java" />
 		<include name="**/PedagogicalPlanner*.java" />
 		<include name="**/DataFlowObject.java" />

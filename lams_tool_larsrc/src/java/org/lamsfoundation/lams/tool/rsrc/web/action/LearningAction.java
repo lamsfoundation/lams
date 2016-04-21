@@ -48,8 +48,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -66,7 +64,6 @@ import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
@@ -85,6 +82,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class LearningAction extends Action {
 
     private static Logger log = Logger.getLogger(LearningAction.class);
+
+    private static IResourceService resourceService;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -162,7 +161,7 @@ public class LearningAction extends Action {
 	// get back the resource and item list and display them on page
 	IResourceService service = getResourceService();
 	ResourceUser resourceUser = null;
-	if (mode != null && mode.isTeacher()) {
+	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // resourceUser may be null if the user was force completed.
 	    resourceUser = getSpecifiedUser(service, sessionId,
@@ -177,14 +176,14 @@ public class LearningAction extends Action {
 	resource = service.getResourceBySessionId(sessionId);
 
 	// check whehter finish lock is on/off
-	boolean lock = resource.getLockWhenFinished() && resourceUser != null && resourceUser.isSessionFinished();
+	boolean lock = resource.getLockWhenFinished() && (resourceUser != null) && resourceUser.isSessionFinished();
 
 	// check whether there is only one resource item and run auto flag is true or not.
 	boolean runAuto = false;
 	int itemsNumber = 0;
 	if (resource.getResourceItems() != null) {
 	    itemsNumber = resource.getResourceItems().size();
-	    if (resource.isRunAuto() && itemsNumber == 1) {
+	    if (resource.isRunAuto() && (itemsNumber == 1)) {
 		ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
 		// only visible item can be run auto.
 		if (!item.isHide()) {
@@ -209,7 +208,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, resource.getInstructions());
 	sessionMap.put(ResourceConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(ResourceConstants.ATTR_LOCK_ON_FINISH, resource.getLockWhenFinished());
-	sessionMap.put(ResourceConstants.ATTR_USER_FINISHED, resourceUser != null && resourceUser.isSessionFinished());
+	sessionMap.put(ResourceConstants.ATTR_USER_FINISHED,
+		(resourceUser != null) && resourceUser.isSessionFinished());
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -360,7 +360,7 @@ public class LearningAction extends Action {
 		return mapping.findForward(ResourceConstants.ERROR);
 	    }
 	    item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
-	    
+
 	} else if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(itemForm.getUrl());
 	    item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
@@ -392,7 +392,13 @@ public class LearningAction extends Action {
 	if (resource.isNotifyTeachersOnAssigmentSumbit()) {
 	    service.notifyTeachersOnAssigmentSumbit(sessionId, resourceUser);
 	}
-	
+
+	if (resource.isNotifyTeachersOnFileUpload() && (type == ResourceConstants.RESOURCE_TYPE_FILE)) {
+	    service.notifyTeachersOnFileUpload(resource.getContentId(), sessionId, sessionMapID,
+		    resourceUser.getFirstName() + " " + resourceUser.getLastName(), item.getUid(),
+		    itemForm.getFile().getFileName());
+	}
+
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
@@ -490,8 +496,8 @@ public class LearningAction extends Action {
 	// if current user view less than reqired view count number, then just return error message.
 	if (miniViewFlag > 0) {
 	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("lable.learning.minimum.view.number.less",
-		    miniViewFlag));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage("lable.learning.minimum.view.number.less", miniViewFlag));
 	    this.addErrors(request, errors);
 	    return false;
 	}
@@ -500,9 +506,12 @@ public class LearningAction extends Action {
     }
 
     private IResourceService getResourceService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
-	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
+	if (LearningAction.resourceService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    LearningAction.resourceService = (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
+	}
+	return LearningAction.resourceService;
     }
 
     /**
@@ -616,11 +625,11 @@ public class LearningAction extends Action {
 	// if(StringUtils.isBlank(itemForm.getDescription()))
 	// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
 	// }
-	if (itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
-		|| itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-		|| itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
+	if ((itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE)
+		|| (itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
+		|| (itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE)) {
 
-	    if (itemForm.getFile() != null && FileUtil.isExecutableFile(itemForm.getFile().getFileName())) {
+	    if ((itemForm.getFile() != null) && FileUtil.isExecutableFile(itemForm.getFile().getFileName())) {
 		ActionMessage msg = new ActionMessage("error.attachment.executable");
 		errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
 	    }
@@ -630,7 +639,7 @@ public class LearningAction extends Action {
 
 	    // for edit validate: file already exist
 	    if (!itemForm.isHasFile()
-		    && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
+		    && ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
 	    }
 	}
@@ -666,5 +675,4 @@ public class LearningAction extends Action {
 	    }
 	}
     }
-
 }

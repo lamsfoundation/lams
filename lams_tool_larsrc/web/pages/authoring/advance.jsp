@@ -73,6 +73,15 @@
 </p>
 
 <p>
+	<html:checkbox property="resource.notifyTeachersOnFileUpload"
+		styleClass="noBorder" styleId="notifyTeachersOnFileUpload">
+	</html:checkbox>
+	<label for="notifyTeachersOnFileUpload">
+		<fmt:message key="label.authoring.advanced.notify.onfileupload" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="resource.reflectOnActivity"
 		styleClass="noBorder" styleId="reflectOn">
 	</html:checkbox>

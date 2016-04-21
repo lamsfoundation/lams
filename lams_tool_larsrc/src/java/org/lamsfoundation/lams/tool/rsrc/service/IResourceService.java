@@ -258,6 +258,9 @@ public interface IResourceService {
 
     void notifyTeachersOnAssigmentSumbit(Long sessionId, ResourceUser resourceUser);
 
+    void notifyTeachersOnFileUpload(Long toolContentId, Long toolSessionId, String sessionMapId, String userName,
+	    Long itemUid, String fileName);
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
      * 

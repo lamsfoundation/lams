@@ -144,3 +144,35 @@ body > .addLessonDialog .ui-dialog-titlebar {
 	width: 25px;
 	right : 10px;
 }
+
+#dialogPrivateNotifications table {
+}
+
+#dialogPrivateNotifications table tr:first-child td {
+	font-weight: bold;
+	text-align: center;
+}
+
+#dialogPrivateNotifications td.notificationsReadCell {
+	font-size: 16px;
+	width: 30px;
+	text-align: center;
+}
+
+#dialogPrivateNotifications td.notificationsPendingCell {
+	font-weight: bold;
+}
+
+#dialogPrivateNotifications td.notificationsClickableCell:hover {
+	cursor: pointer;
+	
+	border-color: #9be0f9;
+	background-color: #F0F8FF;
+	/* CSS3 glow effect: */
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	-moz-box-shadow: 0 0 5px #A6E5FD;
+	-webkit-box-shadow: 0 0 5px #A6E5FD;
+	box-shadow: 0 0 5px #A6E5FD;
+}
