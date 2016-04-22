@@ -18,7 +18,7 @@
 
 <body class="stripes">
 
-	<c:set var="title"><fmt:message key="activity.title" />&nbsp;<fmt:message key="titleHeading.reflection" /></c:set>
+	<c:set var="title"><fmt:message key="activity.title" />: <fmt:message key="titleHeading.reflection" /></c:set>
 	<lams:Page title="${title}" type="learner">
 
 		<table class=table table-striped">
