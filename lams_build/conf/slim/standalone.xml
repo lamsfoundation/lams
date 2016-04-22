@@ -292,7 +292,7 @@
 				      <password>@db.password@</password>
 				    </security>
 				    <validation>
-				      <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker"/>
+				      <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
 				      <validate-on-match>true</validate-on-match>
 				      <background-validation>false</background-validation>
 				      <use-fast-fail>false</use-fast-fail>
