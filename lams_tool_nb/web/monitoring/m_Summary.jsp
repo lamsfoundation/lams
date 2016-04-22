@@ -21,7 +21,7 @@
 				</tr>
 			</logic:empty>
 			<tr>
-				<td width="40%">
+				${allowComments ? '<td>' : '<td width="40%">'}
 					<c:out value="${reflection.username}" />
 				</td>
 				<c:url value="monitoring.do" var="viewReflection">
@@ -29,7 +29,8 @@
 					<c:param name="userID" value="${reflection.userId}" />
 					<c:param name="toolSessionID" value="${reflection.externalId}" />
 				</c:url>
-				<td><html:link href="javascript:launchPopup('${viewReflection}')">
+				<td>
+				<html:link href="javascript:launchPopup('${viewReflection}')" styleClass="btn btn-default btn-sm ${allowComments ? 'pull-right' : ''}">
 							<fmt:message key="link.view" />
 					</html:link>
 				</td>
