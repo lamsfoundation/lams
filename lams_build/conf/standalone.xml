@@ -320,8 +320,8 @@
 				      <password>@db.password@</password>
 				    </security>
 				    <validation>
-				      <check-valid-connection-sql>select 1</check-valid-connection-sql>
-				      <validate-on-match>false</validate-on-match>
+				      <valid-connection-checker class-name="org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker"/>
+				      <validate-on-match>true</validate-on-match>
 				      <background-validation>false</background-validation>
 				      <use-fast-fail>false</use-fast-fail>
 				    </validation>
