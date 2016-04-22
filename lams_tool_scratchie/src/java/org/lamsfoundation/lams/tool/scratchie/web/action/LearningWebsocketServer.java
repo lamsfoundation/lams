@@ -217,8 +217,12 @@ public class LearningWebsocketServer {
 	responseJSON.put("close", true);
 	String response = responseJSON.toString();
 
+	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
+	if (sessionWebsockets == null) {
+	    return;
+	}
 	// make a copy of the websocket collection so it does not get blocked while sending messages
-	Set<Session> sessionWebsockets = new HashSet<Session>(LearningWebsocketServer.websockets.get(toolSessionId));
+	sessionWebsockets = new HashSet<Session>(sessionWebsockets);
 	for (Session websocket : sessionWebsockets) {
 	    websocket.getBasicRemote().sendText(response);
 	}
