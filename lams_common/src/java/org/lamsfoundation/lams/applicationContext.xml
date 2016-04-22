@@ -15,17 +15,22 @@
 			<prop key="hibernate.show_sql">false</prop>
 			<prop key="hibernate.current_session_context_class">org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext</prop>
 		    <prop key="hibernate.cache.use_second_level_cache">true</prop>
+		    <prop key="hibernate.cache.use_query_cache">true</prop>
             <prop key="hibernate.cache.infinispan.cachemanager">java:jboss/infinispan/container/hibernate</prop>
             <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>
+            <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
             <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
             <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>   
-            
+            <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>
+             
+            <!-- 
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.cfg">contentrepository-entity</prop>
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.crNodeVersions.cfg">contentrepository-entity</prop>
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.cfg">contentrepository-entity</prop>
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.crNodeVersionProperties.cfg">contentrepository-entity</prop>
             <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty.cfg">contentrepository-entity</prop>
-            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrWorkspace.cfg">contentrepository-entity</prop>			
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrWorkspace.cfg">contentrepository-entity</prop>	
+            -->		
 		</props>
 		</property>
   	</bean>
