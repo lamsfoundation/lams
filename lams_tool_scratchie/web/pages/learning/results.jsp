@@ -123,13 +123,13 @@
 			   	     	groupName:"${burningQuestionDto.sessionName}",
 				   	    feedback:"${burningQuestionDto.escapedBurningQuestion}",
 				   	 	<c:choose>
-				   			<c:when test="${!isUserLeader && burningQuestionDto.userLikeUid != null}">
+				   			<c:when test="${!isUserLeader && burningQuestionDto.userLiked}">
 				   				like:'<span class="fa fa-thumbs-up fa-2x"></span>',
 				   			</c:when>
 					   		<c:when test="${!isUserLeader}">
 				   				like:'',
 				   			</c:when>
-							<c:when test="${burningQuestionDto.userLikeUid != null}">
+							<c:when test="${burningQuestionDto.userLiked}">
 								like:'<span class="fa fa-thumbs-up fa-2x" title="<fmt:message key="label.unlike"/>"' +
 										'onclick="javascript:likeEntry(${burningQuestionDto.burningQuestion.uid});" id="like-${burningQuestionDto.burningQuestion.uid}" />',
 							</c:when>
