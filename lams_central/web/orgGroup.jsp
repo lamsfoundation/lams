@@ -58,13 +58,13 @@
 			<c:if test="${canEdit}">
 				<!-- It has to have inline style as it gets appended to dialog titlebar
 				     where local CSS is not visible -->
-				<a class="customDialogButton" href="#" onClick="javascript:saveOrgGroups()" style="right: 50px;">
+				<a class="customDialogButton" href="#" onClick="javascript:saveOrgGroups()" style="right: 80px;">
 					<fmt:message key="button.save" />
 				</a>
 			</c:if>
 			<a class="customDialogButton" href="#"
-			   onClick="javascript:loadOrgGroupDialogContents(null, 460, 460,'<lams:LAMSURL/>OrganisationGroup.do?method=viewGroupings&organisationID=' + $('#dialogOrgGroup').dialog('option', 'orgID'))"
-			   style="right: 140px;">
+			   onClick="javascript:showOrgGroupDialogContents(null, 460, 460,'<lams:LAMSURL/>OrganisationGroup.do?method=viewGroupings&organisationID=' + $('#dialogOrgGroup').dialog('option', 'orgID'))"
+			   style="right: 170px;">
 				<fmt:message key="label.course.groups.back" />
 			</a>
 	

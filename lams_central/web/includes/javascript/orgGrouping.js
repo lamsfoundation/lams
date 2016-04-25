@@ -33,6 +33,6 @@ function showGroups(groupingId) {
 		}
 	} else {
 		// load to dialog
-		window.parent.loadOrgGroupDialogContents(null, 880, 460, url);
+		window.parent.showOrgGroupDialogContents(null, 880, 500, url);
 	}
 }
