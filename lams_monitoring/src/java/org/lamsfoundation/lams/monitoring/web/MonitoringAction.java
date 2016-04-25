@@ -40,7 +40,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -100,8 +99,8 @@ import com.google.gson.GsonBuilder;
 
 /**
  * <p>
- * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP
- * monitoring interface.
+ * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
+ * interface.
  * </p>
  * 
  * @author Jacky Fang
@@ -758,18 +757,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		return null;
 	    }
 
-	    boolean flaFormat = WebUtil.readBooleanParam(request, "flaFormat", true);
 	    Set<Long> activities = new TreeSet<Long>();
 	    activities.add(activityId);
-
-	    // for the Flash format of LD SVGs, children activities are hidden
-	    // and the parent activity shows all learners
-	    if (!flaFormat && (activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity())) {
-		Set<Activity> descendants = getDescendants((ComplexActivity) activity);
-		for (Activity descendat : descendants) {
-		    activities.add(descendat.getActivityId());
-		}
-	    }
 
 	    List<User> learners = getMonitoringService().getLearnersByActivities(activities.toArray(new Long[] {}),
 		    MonitoringAction.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringAction.USER_PAGE_SIZE,
@@ -1052,74 +1041,25 @@ public class MonitoringAction extends LamsDispatchAction {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
-	Long branchingActivityId = WebUtil.readLongParam(request, "branchingActivityID", true);
 	Integer searchedLearnerId = WebUtil.readIntParam(request, "searchedLearnerId", true);
 
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
 	String contentFolderId = learningDesign.getContentFolderID();
 
-	// find out if the LD SVG is in new Flashless (exploded) format
-	JSONObject responseJSON = new JSONObject();
-	boolean flaFormat = false;
-	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
-	    if ((activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity())
-		    && (((ComplexActivity) activity).getXcoord() == null)) {
-		// if a single activity is in FLA format, all of them are
-		flaFormat = true;
-		break;
-	    }
-	}
-	responseJSON.put("flaFormat", flaFormat);
-
 	Set<Activity> activities = new HashSet<Activity>();
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
-	Map<Long, Set<Activity>> parentToChildren = new TreeMap<Long, Set<Activity>>();
 	// filter activities that are interesting for further processing
 	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
 	    if (activity.isSequenceActivity()) {
 		// skip sequence activities as they are just for grouping
 		continue;
 	    }
-
-	    if (flaFormat) {
-		// in FLA format everything is exploded so there are no hidden child activities
-		activities.add(activity);
-		continue;
-	    }
-
-	    Activity parentActivity = activity.getParentActivity();
-	    Activity parentParentActivity = parentActivity == null ? null : parentActivity.getParentActivity();
-	    if (parentParentActivity == null) {
-		activities.add(activity);
-		continue;
-	    }
-
-	    if (!parentParentActivity.isOptionsWithSequencesActivity() && (!parentParentActivity.isBranchingActivity()
-		    || parentParentActivity.getActivityId().equals(branchingActivityId))) {
-		activities.add(activity);
-	    } else {
-		// branching and options with sequences in Flash format have hidden activities
-		// map the children to their parent for further processing
-		Set<Activity> children = parentToChildren.get(parentParentActivity.getActivityId());
-		if (children == null) {
-		    children = new HashSet<Activity>();
-		    parentToChildren.put(parentParentActivity.getActivityId(), children);
-		}
-		children.add(activity);
-
-		// skip hidden contribute activities
-		if (contributeActivities != null) {
-		    Iterator<ContributeActivityDTO> contributeActivityIterator = contributeActivities.iterator();
-		    while (contributeActivityIterator.hasNext()) {
-			if (activity.getActivityId().equals(contributeActivityIterator.next().getActivityID())) {
-			    contributeActivityIterator.remove();
-			}
-		    }
-		}
-	    }
+	    activities.add(activity);
+	    continue;
 	}
 
+	JSONObject responseJSON = new JSONObject();
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
 	if (contributeActivities != null) {
 	    Gson gson = new GsonBuilder().create();
 	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
@@ -1186,15 +1126,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    // find few latest users and count of all users for each activity
 	    int learnerCount = learnerCounts.get(activityId);
-	    if (activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity()) {
-		// go through hidden children of complex activities and take them into account
-		Set<Activity> children = parentToChildren.get(activityId);
-		if (children != null) {
-		    for (Activity child : children) {
-			learnerCount += learnerCounts.get(child.getActivityId());
-		    }
-		}
-	    } else {
+	    if (!activity.isBranchingActivity() && !activity.isOptionsWithSequencesActivity()) {
 		List<User> latestLearners = getMonitoringService().getLearnersLatestByActivity(activity.getActivityId(),
 			MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT, null);
 
@@ -1587,23 +1519,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static int getActivityCoordinate(Integer coord) {
 	return (coord == null) || (coord < 0) ? ObjectExtractor.DEFAULT_COORD : coord;
-    }
-
-    /**
-     * Gets all children and their childre etc. of the given complex activity.
-     */
-    @SuppressWarnings("unchecked")
-    private Set<Activity> getDescendants(ComplexActivity complexActivity) {
-	Set<Activity> result = new HashSet<Activity>();
-	for (Activity child : (Set<Activity>) complexActivity.getActivities()) {
-	    child = getMonitoringService().getActivityById(child.getActivityId());
-	    if (child.isComplexActivity()) {
-		result.addAll(getDescendants((ComplexActivity) child));
-	    } else {
-		result.add(child);
-	    }
-	}
-	return result;
     }
 
     /**
