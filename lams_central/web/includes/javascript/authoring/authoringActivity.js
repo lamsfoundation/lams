@@ -337,7 +337,7 @@ ActivityDraw = {
 	                     .attr(layout.defaultTextAttributes);
 		
 		this.items = paper.g(shape, label);
-		if (this.readOnly) {
+		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
 		if (this.isStart) {
@@ -427,7 +427,7 @@ ActivityDraw = {
 						 .attr('stroke', layout.colors.gateText);
 		
 		this.items = paper.g(shape, label);
-		if (this.readOnly) {
+		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
 		// uiid is needed in Monitoring
@@ -469,7 +469,7 @@ ActivityDraw = {
 		
 		this.items = paper.g(shape, icon, label);
 							// uiid is needed in Monitoring
-		if (this.readOnly) {
+		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
 		// uiid is needed in Monitoring
@@ -618,7 +618,7 @@ ActivityDraw = {
 			 			 .attr('fill', layout.colors.activityText);
 		
 		this.items = paper.g(shape, icon, label);
-		if (this.readOnly) {
+		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
 		// uiid is needed in Monitoring
