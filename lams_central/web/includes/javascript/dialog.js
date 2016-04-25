@@ -4,12 +4,16 @@ var dialogTemplate = $('<div class="dialogContainer" />').append('<iframe />');
  * Checks if the dialog is already opened.
  * If not, creates a new dialog with the given ID and init parameters.
  */
-function showDialog(id, initParams, extraButtons) {
+function showDialog(id, initParams, extraButtons, recreate) {
 	var dialog = $('#' + id);
+	// is it open  already?
 	if (dialog.length > 0) {
-		// is it open already?
-		dialog.dialog('moveToTop');
-		return;
+		if (recreate){
+			dialog.dialog('close');
+		} else {
+			dialog.dialog('moveToTop');
+			return;
+		}
 	}
 	
 	// create a new dialog by cloning a template
