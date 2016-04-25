@@ -25,7 +25,7 @@ $(document).ready(function(){
 	} else {
 		$('#groupingName').val(grouping.name);
 		// move Save button to the titlebar, i.e. outside of this iframe to the enveloping dialog
-		$('div.ui-dialog-titlebar', window.parent.document).prepend($('.customDialogButton'));
+		$('div.ui-dialog-titlebar', window.parent.document).append($('.customDialogButton'));
 	}
 	
 	if (canEdit) {
