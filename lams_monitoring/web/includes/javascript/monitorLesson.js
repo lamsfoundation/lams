@@ -1,10 +1,7 @@
 ﻿// ********** GLOBAL VARIABLES **********
-// copy of lesson/branching SVG so it does no need to be fetched every time
-// HTML with SVG of the lesson
+// copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
-// is the LD SVG in Flashless format or the old, Flash format
-	flaFormat = false,
-// DIV container for lesson/branching SVG
+// DIV container for lesson SVG
 // it gets accessed so many times it's worth to cache it here
 	sequenceCanvas = $('#sequenceCanvas'),
 // info box show timeout
@@ -33,11 +30,7 @@ var originalSequenceCanvas = null,
 // double tap support
 	tapTimeout = 500,
 	lastTapTime = 0,
-	lastTapTarget = null,
-
-// after first entering of branching in old SVGs layout gets a bit broken
-// setting this property fixes it
-	branchingEntered = false;
+	lastTapTarget = null;
 
 // ********* GENERAL TABS FUNCTIONS *********
 
@@ -787,10 +780,7 @@ function updateSequenceTab() {
 		},		
 		success : function(response) {
 			if (sequenceCanvasFirstFetch) {
-				// once Flashless SVG format is detected, it applies for all activities
-				flaFormat = response.flaFormat;
-				
-				// FLA activities have uiids but no ids, set it here
+				// activities have uiids but no ids, set it here
 				$.each(response.activities, function(activityIndex, activity){
 					$('g[uiid="' + activity.uiid + '"]', sequenceCanvas).attr('id', activity.id);
 				});
@@ -853,7 +843,7 @@ function updateSequenceTab() {
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
 				
-				if (activity.url || (isBranching && !flaFormat)) {
+				if (activity.url) {
 					var activityGroup = $('g[id="' + activity.id + '"]');
 					activityGroup.css('cursor', 'pointer');
 					dblTap(activityGroup, function(){  
@@ -921,8 +911,7 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 	var foundActivities = [],
 		targetActivity = null;
 	// check all activities and "users who finished lesson" bar
-	// rootElement is only in Flash LDs
-	$('g[id]:not([id*="_to_"]):not(#rootElement)', sequenceCanvas).add('#completedLearnersContainer').each(function(){
+	$('g[id]:not([id*="_to_"])', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
 		var act = $(this),
 			coord = {
@@ -1065,15 +1054,15 @@ function addActivityIcons(activity) {
 	// add group of users icon
 	var appendTarget = $('svg', sequenceCanvas)[0],
 		// branching and gates require extra adjustments
-		isNewBranching =  [10,11,12,13].indexOf(activity.type) > -1 && flaFormat,
+		isBranching =  [10,11,12,13].indexOf(activity.type) > -1,
 		isGate = [3,4,5,14].indexOf(activity.type) > -1;
 	
 	if (activity.learnerCount > 0){
 		var	groupTitle = activity.learnerCount + ' ' + LABELS.LEARNER_GROUP_COUNT + ' ' + LABELS.LEARNER_GROUP_SHOW,
 			element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'learnerGroup',
-			'x'          : isNewBranching ? coord.x + 2  : (isGate ? coord.x + 10 : coord.x2 - 18),
-			'y'          : isNewBranching ? coord.y - 12 : coord.y + 1,
+			'x'          : isBranching ? coord.x + 2  : (isGate ? coord.x + 10 : coord.x2 - 18),
+			'y'          : isBranching ? coord.y - 12 : coord.y + 1,
 			'height'     : 16,
 			'width'      : 16,
 			'xlink:href' : LAMS_URL + 'images/icons/group.png',
@@ -1083,43 +1072,21 @@ function addActivityIcons(activity) {
 		// add a small number telling how many learners are in the group
 		element = appendXMLElement('text', {
 			'id'         : 'act' + activity.id + 'learnerGroupText',
-			'x'          : isNewBranching ? coord.x + 9  : (isGate ? coord.x + 17 : coord.x2 - 9),
-			'y'          : isNewBranching ? coord.y + 12 : coord.y + 25,
+			'x'          : isBranching ? coord.x + 9  : (isGate ? coord.x + 17 : coord.x2 - 9),
+			'y'          : isBranching ? coord.y + 12 : coord.y + 25,
 			'text-anchor': 'middle',
 			'font-family': 'Verdana',
 			'font-size'  : 8,
 			'style'		 : 'cursor : pointer'
 		}, activity.learnerCount, appendTarget);
 		appendXMLElement('title', null, groupTitle, element);
-	
-		if (activity.learners) {
-		// draw single icons for the first few learners;
-		// don't do it for gate and optional activities, and new branching/optional sequences format
-			if ([3,4,5,7,13,14].indexOf(activity.type) == -1 && !flaFormat) {
-			$.each(activity.learners, function(learnerIndex, learner){
-				var learnerDisplayName = getLearnerDisplayName(learner);
-					element = appendXMLElement('image', {
-						'id'         : 'act' + activity.id + 'learner' + learner.id,
-						'x'          : coord.x + learnerIndex*15 + 1,
-						// a bit lower for Optional Activity
-						'y'          : coord.y,
-						'height'     : 16,
-						'width'      : 16,
-							'xlink:href' : LAMS_URL + 'images/icons/' 
-										   + (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
-						'style'		 : 'cursor : pointer'
-					}, null, appendTarget);
-					appendXMLElement('title', null, learnerDisplayName, element);
-				});
-			}
-		}
 	} 
 
 	if (activity.requiresAttention) {
 		var element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'attention',
-			'x'          : isNewBranching ? coord.x + 14 : coord.x2 - 19,
-			'y'          : isNewBranching ? coord.y + 6  : coord.y2 - 19,
+			'x'          : isBranching ? coord.x + 14 : coord.x2 - 19,
+			'y'          : isBranching ? coord.y + 6  : coord.y2 - 19,
 			'height'     : 16,
 			'width'      : 16,
 			'xlink:href' : LAMS_URL + 'images/icons/exclamation.png',
@@ -1194,8 +1161,7 @@ function addActivityIconsHandlers(activity) {
 					url : LAMS_URL + 'monitoring/monitoring.do',
 					data : {
 						'method'     : 'getCurrentLearners',
-						'activityID' : activity.id,
-						'flaFormat' : flaFormat
+						'activityID' : activity.id
 					}
 				};
 			showLearnerGroupDialog(ajaxProperties, activity.title, false, true, usersViewable, false);
@@ -1302,8 +1268,8 @@ function getActivityCoordinates(activity){
 		}
 	}
 	
-	// special processing for new format of branching and optional sequences
-	if ([10,11,12,13].indexOf(activity.type) > -1 && flaFormat) {
+	// special processing for branching and optional sequences
+	if ([10,11,12,13].indexOf(activity.type) > -1) {
 		return {
 			'x'  : activity.x,
 			'y'  : activity.y
@@ -1314,27 +1280,15 @@ function getActivityCoordinates(activity){
 	if (group.length == 0) {
 		return;
 	}
-	var elem = $('rect, path', group),
-		// if it's a rectangle, it has these attributes; rectangles are in old SVGs
-		width = elem.attr('width'),
-		height = elem.attr('height');
-	if (width) {
+	var path = $('path', group).attr('d'),
+	// extract width and height from path M<x>,<y>h<width>v<height>... or M <x> <y> h <width> v <height>...
+		match = /h\s?(\d+)\s?v\s?(\d+)/.exec(path);
+	if (match) {
 		return {
 			'x'    : activity.x,
-			'y'    : activity.y,
-			'x2'   : activity.x + +width,
-			'y2'   : activity.y + +height
-		}
-	} else {
-		// extract width and height from path M<x>,<y>h<width>v<height>... or M <x> <y> h <width> v <height>...
-		var match = /h\s?(\d+)\s?v\s?(\d+)/.exec(elem.attr('d'));
-		if (match) {
-			return {
-				'x'    : activity.x,
-				'y'    : activity.y + 1,
-				'x2'   : activity.x + +match[1],
-				'y2'   : activity.y + +match[2]
-			}
+			'y'    : activity.y + 1,
+			'x2'   : activity.x + +match[1],
+			'y2'   : activity.y + +match[2]
 		}
 	}
 }
@@ -1560,8 +1514,6 @@ function resizeSequenceCanvas(width, height){
 		
 		sequenceCanvas.css({
 			'padding-top'    : canvasPaddingTop,
-			// after first entering of Branching in old SVGs we need this adjustment
-			'padding-bottom' : branchingEntered ? 20 : 0,
 			'padding-left'   : canvasPaddingLeft,
 			'width'          : canvasWidth - canvasPaddingLeft,
 			'height'         : canvasHeight - canvasPaddingTop
