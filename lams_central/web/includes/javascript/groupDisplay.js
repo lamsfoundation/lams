@@ -435,26 +435,27 @@ function closeDialog(id, refresh) {
 	$("#" + id).dialog('close');
 }
 
-
-/**
- * Loads contents to already open organisation groups dialog.
- */
-function loadOrgGroupDialogContents(title, width, height, url) {
-	var dialog = $('#dialogOrgGroup');
-	if (title) {
-		dialog.dialog('option', 'title', title);
+function showOrgGroupDialogContents(title, width, height, url) {
+	var id = "dialogOrgGroup",
+		dialog = $('#' + id),
+		exists = dialog.length > 0,
+		orgID = null;
+	if (exists) {
+		if (!title) {
+			title = dialog.dialog('option', 'title');
+		}
+		orgID = dialog.dialog('option', 'orgID');
 	}
-	if (width && height) {
-		dialog.dialog('option', {
-			'width'    : width,
-			'height'   : height,
-		}).dialog('option', 'position', 'center');
-	}
-	if (url) {
-		$('iframe', dialog).contents().find("body").html('');
-		$('iframe', dialog).attr('src', url);
-		$('div.ui-dialog-titlebar .customDialogButton').remove();
-	}
+	showDialog(id, {
+		'orgID'  : orgID,
+		'height' : height,
+		'width'  : width,
+		'title'  : title,
+		'hide'   : false,
+		'open'   : function() {
+			$('iframe', this).attr('src', url);
+		}
+	}, true, exists);
 }
 
 /**
@@ -463,7 +464,7 @@ function loadOrgGroupDialogContents(title, width, height, url) {
 function saveOrgGroups() {
 	var groupsSaved = $('#dialogOrgGroup iframe')[0].contentWindow.saveGroups();
 	if (groupsSaved) {
-		loadOrgGroupDialogContents(null, 460, 460,
+		showOrgGroupDialogContents(null, 460, 460,
 			LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&organisationID='
 			         + $('#dialogOrgGroup').dialog('option', 'orgID'));
 	}
