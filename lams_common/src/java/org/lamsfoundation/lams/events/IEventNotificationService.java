@@ -93,7 +93,8 @@ public interface IEventNotificationService {
      */
     Set<AbstractDeliveryMethod> getAvailableDeliveryMethods();
 
-    List<Subscription> getNotificationSubscriptions(Long lessonId, Integer userId, Integer limit, Integer offset);
+    List<Subscription> getNotificationSubscriptions(Long lessonId, Integer userId, boolean pendingOnly, Integer limit,
+	    Integer offset);
 
     long getNotificationPendingCount(Long lessonId, Integer userId);
 

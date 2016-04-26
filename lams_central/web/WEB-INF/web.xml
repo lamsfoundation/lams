@@ -367,6 +367,13 @@
 			org.lamsfoundation.lams.web.RuntimeStatsServlet
 		</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>NotificationServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.xml.NotificationServlet
+		</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>LearningDesignRestServlet</servlet-name>
@@ -472,6 +479,10 @@
 	<servlet-mapping>
 		<servlet-name>RuntimeStatsServlet</servlet-name>
 		<url-pattern>/runtimeStats</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>NotificationServlet</servlet-name>
+		<url-pattern>/services/xml/NotificationManager</url-pattern>
 	</servlet-mapping>
 
 	<mime-mapping>
@@ -610,6 +621,7 @@
 			<url-pattern>/services/CourseGroupManager</url-pattern>
 			<url-pattern>/services/getServerTime</url-pattern>
 			<url-pattern>/services/Register/*</url-pattern>
+			<url-pattern>/services/xml/NotificationManager</url-pattern>
 			<url-pattern>/ForgotPasswordRequest</url-pattern>
 			<url-pattern>/forgotPassword.jsp</url-pattern>
 			<url-pattern>/forgotPasswordChange.jsp</url-pattern>

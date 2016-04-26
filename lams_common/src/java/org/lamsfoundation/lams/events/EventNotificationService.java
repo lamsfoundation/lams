@@ -239,9 +239,9 @@ public class EventNotificationService implements IEventNotificationService {
     }
 
     @Override
-    public List<Subscription> getNotificationSubscriptions(Long lessonId, Integer userId, Integer limit,
-	    Integer offset) {
-	return eventDAO.getLessonEventSubscriptions(lessonId, userId, limit, offset);
+    public List<Subscription> getNotificationSubscriptions(Long lessonId, Integer userId, boolean pendingOnly,
+	    Integer limit, Integer offset) {
+	return eventDAO.getLessonEventSubscriptions(lessonId, userId, pendingOnly, limit, offset);
     }
 
     @Override

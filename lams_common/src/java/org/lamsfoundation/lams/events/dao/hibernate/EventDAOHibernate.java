@@ -49,13 +49,17 @@ class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Subscription> getLessonEventSubscriptions(Long lessonId, Integer userId, Integer limit,
-	    Integer offset) {
+    public List<Subscription> getLessonEventSubscriptions(Long lessonId, Integer userId, boolean pendingOnly,
+	    Integer limit, Integer offset) {
 	String query = EventDAOHibernate.GET_LESSON_EVENT_SUBSCRIPTIONS;
 	if (lessonId != null) {
 	    query += " AND s.event.eventSessionId = ?";
 	}
-	query += " ORDER BY ISNULL(s.lastOperationMessage) DESC, uid ASC";
+	if (pendingOnly) {
+	    query += " AND (s.lastOperationMessage IS NULL OR s.lastOperationMessage != '"
+		    + DeliveryMethodNotification.LAST_OPERATION_SEEN + "')";
+	}
+	query += " ORDER BY ISNULL(s.lastOperationMessage) DESC, uid DESC";
 	Query queryObject = getSession().createQuery(query);
 	queryObject.setInteger(0, userId);
 	if (lessonId != null) {

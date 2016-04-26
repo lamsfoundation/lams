@@ -24,7 +24,8 @@ public interface EventDAO extends IBaseDAO {
      */
     List<Event> getEventsToResend();
 
-    List<Subscription> getLessonEventSubscriptions(Long lessonId, Integer userId, Integer limit, Integer offset);
+    List<Subscription> getLessonEventSubscriptions(Long lessonId, Integer userId, boolean pendingOnly, Integer limit,
+	    Integer offset);
 
     long getPendingNotificationCount(Long lessonId, Integer userId);
 }
