@@ -61,7 +61,7 @@ public class NotificationAction extends DispatchAction {
 	Integer limit = WebUtil.readIntParam(req, "limit", true);
 	Integer offset = WebUtil.readIntParam(req, "offset", true);
 	List<Subscription> subscriptions = getEventNotificationService().getNotificationSubscriptions(null,
-		getUser().getUserID(), limit, offset);
+		getUser().getUserID(), false, limit, offset);
 	JSONArray responseJSON = new JSONArray();
 	Event event = null;
 	for (Subscription subscription : subscriptions) {
