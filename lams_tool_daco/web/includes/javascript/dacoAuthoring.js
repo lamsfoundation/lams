@@ -4,25 +4,12 @@
 	//Initial behavior
 	$(document).ready(function() {
 		defaultShowAdditionaOptionsArea();
-		resizeQuestionInputArea ();
 	});
 	
 	//Checks if the element exists and has an empty value
 	function checkNonDefaultValue(elementName){
 	    var elem = document.getElementById(elementName);
     	return (elem!=null && elem.value!="");
-	}
-	
-	//Resizes the question input area so it is visible on the screen.
-	function resizeQuestionInputArea (){
-		var obj = window.document.getElementById('questionInputArea');
-		if (!obj && window.parent) { 
-			 obj = window.parent.document.getElementById('questionInputArea');
-		}  
-		if (!obj) {
-			obj = window.top.document.getElementById('questionInputArea');
-		}
-		obj.style.height=obj.contentWindow.document.body.scrollHeight + 10 + 'px';
 	}
 	
 	//Checks if the additional options area has all the default values, so it may stay hidden
@@ -45,7 +32,6 @@
 			else {
 				$('#toggleAdditionalOptionsAreaLink').text(msgShowAdditionalOptions);	
 			}
-			resizeQuestionInputArea();
 		});
 	}
 	
@@ -110,24 +96,36 @@
 	//Packs additional elements and submits the question form
 	function submitDacoQuestion(){
 	
-    var questionType = $("#questionType").val();
+		if ( typeof CKEDITOR !== 'undefined' ) {
+			for ( instance in CKEDITOR.instances )
+				CKEDITOR.instances[instance].updateElement();
+		}
+
+		var questionType = $("#questionType").val();
     
-	if(questionType==7 || questionType==8 || questionType==9){
-	  $("#answerOptionList").val($("#answerOptionsForm").serialize());
-	}
-	
-	else if (questionType == 10){
-	var longlatMapsString = "";
-	$("#longlatMaps option:selected").each(function (){
-		longlatMapsString += this.value + "&";
-	});
-	$("#longlatMapsSelected").val(longlatMapsString);
-   }
-   
-	$("#dacoQuestionForm").submit();
-  }
-	
+		if(questionType==7 || questionType==8 || questionType==9){
+			$("#answerOptionList").val($("#answerOptionsForm").serialize());
+		}
+		
+		else if (questionType == 10){
+			var longlatMapsString = "";
+			$("#longlatMaps option:selected").each(function (){
+				longlatMapsString += this.value + "&";
+			});
+			$("#longlatMapsSelected").val(longlatMapsString);
+		}
+
+	    $.ajax({
+	           type: $("#dacoQuestionForm").attr('method'),
+	           url: $("#dacoQuestionForm").attr('action'),
+	           data: $("#dacoQuestionForm").serialize(), // serializes the form's elements.
+	           success: function(data) {
+	               $('#questionInputArea').html(data);
+	           }
+	         });
+	}   
+
 	//Cancels a question adding procedure
 	function cancelDacoQuestion(){
-		window.hideQuestionInputArea ? window.hideQuestionInputArea() : window.top.hideQuestionInputArea();
+		window.hideQuestionInputArea ? window.hideQuestionInputArea() : window.parent.hideQuestionInputArea();
 	}

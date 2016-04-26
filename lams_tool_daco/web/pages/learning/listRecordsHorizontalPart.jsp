@@ -161,12 +161,13 @@
 												<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
 											</c:when>
  											<c:when test="${question.type==4}">
-<%-- 												<c:set var="date">
+												<c:set var="date">
 													<c:if test="${not empty answer.answer}">
-														<lams:Date value="${fn:trim(answer.answer)}" type="date" style="medium"/>
-													</c:if>
+														<fmt:parseDate pattern="EEE MMM dd HH:mm:ss zzz yyyy" value="${answer.answer}" var="parsedDate" />
+														<lams:Date value="${parsedDate}" type="date" style="medium"/>
+														</c:if>
 												</c:set>
- --%>												<input type="text" size="20" readonly="readonly" value="${date}" />
+												<input type="text" size="20" readonly="readonly" value="${date}" />
 											</c:when>
 											<c:when test="${question.type==5 || question.type==6}">
 												<c:choose>
@@ -175,12 +176,12 @@
 													</c:when>
 													<c:otherwise>
 														<fmt:message key="label.learning.file.uploaded" />
-														<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">${answer.fileName}</a>
+														<a href="<c:url value='/download/?uuid=${answer.fileUuid}&preferDownload=true'/>">&nbsp;${answer.fileName}</a>
 													</c:otherwise>
 												</c:choose>
 											</c:when>
 											<c:when test="${question.type==7}">
-												<table class="alternative-color-inner-table">
+												<table class="table table-condensed table-no-border table-nonfluid">
 													<tr>
 														<td>
 															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
@@ -192,7 +193,7 @@
 																<c:if test="${answer.answer==status.index+1}">
 																checked="checked"
 																</c:if>
-																>
+																>&nbsp;
 																<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 															</c:forEach>
 														</td>
@@ -207,14 +208,14 @@
 													<c:otherwise>
 														<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 															<c:if test="${status.index+1==answer.answer}">
-																<fmt:message key="label.learning.dropdown.selected" /> <c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																<fmt:message key="label.learning.dropdown.selected" />&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
 															</c:if>
 														</c:forEach>
 													</c:otherwise>
 												</c:choose>
 											</c:when>
 											<c:when test="${question.type==9}">
-												<table class="alternative-color-inner-table">
+												<table class="table table-condensed table-no-border table-nonfluid">
 													<tr>
 														<td>
 															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
@@ -222,14 +223,14 @@
 																	</td>
 																	<td>
 																</c:if>
-																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
+																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 															</c:forEach>
 														</td>
 													</tr>
 												</table>
 											</c:when>
 											<c:when test="${question.type==10}">
-												<table class="alternative-color-inner-table">
+												<table class="table table-condensed table-no-border table-nonfluid">
 													<tr>
 														<td width="80px">
 														<label><fmt:message key="label.learning.longlat.longitude" /></label>

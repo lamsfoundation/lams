@@ -35,58 +35,46 @@
 
 	<p><fmt:message key="label.authoring.basic.radio.help" /></p>
 
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+	<%@ include file="description.jsp"%>
 
-	<div class="form-group">
-    	<label for="description"><fmt:message key="label.authoring.basic.description" /></label>
-		<lams:CKEditor id="description" value="${formBean.description}" 
-			contentFolderID="${sessionMap.contentFolderID}"
-	                width="100%"
-	                resizeParentFrameName="questionInputArea">
-		</lams:CKEditor>
+	<!--  Options -->  
+	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-xs-block visible-lg-block btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+	<div id="additionalOptionsArea" style="display: none;">
+ 		<div class="form-inline">
+		<div class="form-group">
+    	<label for="min"><fmt:message key="label.authoring.basic.min.select" /></label>
+		<html:text styleId="min" property="min" size="10" styleClass="form-control"/>
+		</div>
+		<div class="form-group">
+    	<label for="max"><fmt:message key="label.authoring.basic.max.select" /></label>
+		<html:text styleId="max" property="max" size="10" styleClass="form-control"/>
+		</div>
+		<div class="form-group">
+    	<label for="summary"><fmt:message key="label.common.summary" /></label>
+		<html:select property="summary" styleClass="form-control">
+			<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
+			<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
+			<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
+		</html:select>
+		</div>
+		<div class="checkbox">
+		    <label>
+	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+		    </label>
+	  	</div>
+	  	</div>
 	</div>
+	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-sm-block visible-md-block btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+ 	<!--  end options -->
   
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs pull-right"><fmt:message
-		key="label.authoring.basic.additionaloptions.show" /> </a>
-
-	<div id="additionalOptionsArea" class="voffset5 form-inline" style="display: none;">
-		<div class="form-group">
-	    	<label for=min><fmt:message key="label.authoring.basic.min.select" />&nbsp;
-		<html:text styleId="min" property="min" size="10" />
-		</div>
-		
-		<div class="form-group">
-	    	<label for="max"><fmt:message key="label.authoring.basic.max.select" />&nbsp;
-		<html:text styleId="max" property="max" size="10" />
-		</div>
-		
-		<div class="form-group">
-	    	<label for="questionRequired"><html:checkbox property="questionRequired" styleId="questionRequired" styleClass="noBorder">&nbsp;
-			<fmt:message key="label.authoring.basic.required" />
-		</html:checkbox>
-		</div>
-	</div>
-	
-	<div class="form-group voffset5">
-    	<label for="summary"><fmt:message key="label.common.summary" />
-	<html:select property="summary" styleClass="noBorder">
-		<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
-		<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
-		<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
-	</html:select>
-	</div>
 </html:form>
 
 <!-- Answer options -->
 
 <%@ include file="answeroptions.jsp"%>
 
-<div class="voffset5">
-	<a href="#" onclick="javascript:submitDacoQuestion()" class="btn btn-default btn-sm"> <fmt:message
-		key="label.authoring.basic.checkbox.add" /> </a>
-	<a href="#" onclick="javascript:cancelDacoQuestion()" class="btn btn-default btn-sm loffset5"> <fmt:message key="label.common.cancel" /> </a>
-</div>
+<c:set var="addButtonMessageKey" value="label.authoring.basic.checkbox.add" />
+<%@ include file="buttons.jsp"%>
 
 </div>
 </div>

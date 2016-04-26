@@ -183,7 +183,7 @@
 														<c:if test="${answer.answer==status.index+1}">
 														checked="checked"
 														</c:if>
-														>
+														>&nbsp;
 														<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 													</c:forEach>
 												</c:when>
@@ -203,11 +203,11 @@
 												</c:when>
 												<c:when test="${question.type==9}">
 													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-														<input type="checkbox" disabled="disabled" id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
+														<input type="checkbox" disabled="disabled" id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
 													</c:forEach>
 												</c:when>
 												<c:when test="${question.type==10}">
-													<table class="alternative-color-inner-table">
+													<table class="table table-condensed table-no-border table-nonfluid">
 														<tr>
 															<td width="80px">
 																<label><fmt:message key="label.learning.longlat.longitude" /></label>

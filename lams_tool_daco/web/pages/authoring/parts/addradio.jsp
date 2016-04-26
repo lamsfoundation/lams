@@ -5,7 +5,7 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-	<lams:css style="main" />
+	<lams:css />
 	<!-- To use in external script files. -->
 	<script type="text/javascript">
 	   var removeAnswerOptionUrl = "<c:url value='/authoring/removeAnswerOption.do'/>";
@@ -18,6 +18,13 @@
 </lams:head>
 <body class="tabpart">
 
+<div class="panel panel-default">
+<div class="panel-heading">
+	<div class="panel-title"><fmt:message key="label.authoring.basic.radio" /></div>
+</div>
+
+<div class="panel-body">
+
 <!-- Add question form-->
 <%@ include file="/common/messages.jsp"%>
 <html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
@@ -26,43 +33,43 @@
 	<html:hidden property="questionIndex" />
 	<input type="hidden" id="answerOptionList" name="answerOptionList" />
 
-	<h2 class="no-space-left"><fmt:message key="label.authoring.basic.radio" /></h2>
-	<div><fmt:message key="label.authoring.basic.radio.help" /></div>
+	<p><fmt:message key="label.authoring.basic.radio.help" /></p>
 
-	<div class="field-name space-top"><fmt:message key="label.authoring.basic.description" /></div>
+	<%@ include file="description.jsp"%>
 
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
-	<lams:CKEditor id="description" value="${formBean.description}" 
-		contentFolderID="${sessionMap.contentFolderID}"
-                width="100%"
-                resizeParentFrameName="questionInputArea">
-	</lams:CKEditor>
-	<div class="space-bottom-top"><a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()"><fmt:message
-		key="label.authoring.basic.additionaloptions.show" /> </a><br />
+  	<!--  Options -->  
+	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+	<div id="additionalOptionsArea" style="display: none;">
+ 		<div class="form-inline">
+		<div class="form-group">
+    	<label for="summary"><fmt:message key="label.common.summary" /></label>
+    	<label for="summary"><fmt:message key="label.common.summary" />&nbsp;
+		<html:select property="summary"  styleClass="form-control">
+			<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
+			<html:option value="2" ><fmt:message key="label.common.summary.average" /></html:option>
+			<html:option value="3" ><fmt:message key="label.common.summary.count" /></html:option>
+		</html:select>
+		</div>
+		<div class="checkbox">
+		    <label>
+	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+		    </label>
+	  	</div>
+	  	</div>
 	</div>
+ 	<!--  end options -->
 
-	<div id="additionalOptionsArea" style="display: none;"><html:checkbox property="questionRequired"
-		styleId="questionRequired" styleClass="noBorder">
-		<fmt:message key="label.authoring.basic.required" />
-	</html:checkbox>
-
-	<div class="field-name space-top"><fmt:message key="label.common.summary" /></div>
-	<html:select property="summary" styleClass="noBorder">
-	<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
-		<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
-		<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
-	</html:select></div>
-</html:form>
+ </html:form>
 
 <!-- Answer options -->
 
 <%@ include file="answeroptions.jsp"%>
 
-<lams:ImgButtonWrapper>
-	<a href="#" onclick="javascript:submitDacoQuestion()" class="button-add-item"><fmt:message
-		key="label.authoring.basic.radio.add" /> </a>
-	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.common.cancel" /> </a>
-</lams:ImgButtonWrapper>
+<c:set var="addButtonMessageKey" value="label.authoring.basic.radio.add" />
+<%@ include file="buttons.jsp"%>
+
+</div>
+</div>
+
 </body>
 </lams:html>

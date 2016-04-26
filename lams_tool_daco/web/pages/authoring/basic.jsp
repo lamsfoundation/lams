@@ -3,22 +3,23 @@
 <c:url var="showMessageURL" value='/authoring/newQuestion.do'>
 	<c:param name="sessionMapID" value="${formBean.sessionMapID}" />
 </c:url>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoAuthoring.js'/>"></script>
 
 <script type="text/javascript">
 	//Showes the add/edit question area
 	function showQuestionInputArea(url) {
-
-		var area=document.getElementById("questionInputArea");
-		if(area != null){
-			area.style.width="100%";
-			area.style.height="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
+		$("#questionInputArea").load(url, function() {
+			var area=document.getElementById("questionInputArea");
+			if(area != null){
+				area.style.width="100%";
+				area.style.height="100%";
+				area.style.display="block";
+			}
+			var elem = document.getElementById("saveCancelButtons");
+			if (elem != null) {
+				elem.style.display="none";
+			}
+		} );
 	}
 	
 	//Hides the add/edit question area
@@ -37,7 +38,7 @@
 	
 	//Shows the add/edit question area for the corresponding question type
    function showQuestionInputAreaByType(url){
-	 var questionTypeDropdown=document.getElementById("questionType");
+	 var questionTypeDropdown=document.getElementById("questionTypeDropdown");
 	 showQuestionInputArea(url+"&questionType="+(questionTypeDropdown.selectedIndex + 1));
 }
 	
@@ -47,23 +48,19 @@
 		showQuestionInputArea(url);
 	}
 	
-	//Question list panel
-	var questionListTargetDiv = "questionListArea";
-		
 	function deleteQuestion(questionIndex,sessionMapID){
 		var url = "<c:url value='/authoring/removeQuestion.do'/>";
 		var param = "questionIndex=" + questionIndex +"&reqID="+(new Date()).getTime()+"&sessionMapID="+sessionMapID;;
 		deleteQuestionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	questionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete:deleteQuestionComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$.ajax({
+            type: 'post',
+            url: url,
+            data: param,
+            success: function(data) {
+            	$("#questionListArea").html(data);
+            	deleteQuestionComplete();
+            }
+        });
 	}
 	
 
@@ -74,39 +71,35 @@
 	function deleteQuestionComplete(){
 		hideBusy("#questionListArea");
 	}
-	function resizeOnMessageFrameLoad(){
-		var messageAreaFrame = document.getElementById("questionInputArea");
-		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
-	}
 </script>
 
 <!-- Basic Tab Content -->
  <div class="form-group voffset10">
     <label for="daco.title"><fmt:message key="label.authoring.basic.title" /></label>
-    <html:text property="daco.title" style="width: 100%;"></html:text>
+    <html:text property="daco.title" style="width: 100%;" styleClass="form-control"></html:text>
  </div>
  <div class="form-group">
-    <label for="daco.title"><fmt:message key="label.authoring.basic.instruction" /></label>
+    <label for="daco.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
     <lams:CKEditor id="daco.instructions" value="${formBean.daco.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
  </div>
   
 <!-- Dropdown menu for choosing a question type -->
 <div id="questionListArea"><c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <%@ include	file="/pages/authoring/parts/questionlist.jsp"%></div>
-<div><select id="questionType">
-	<option selected="selected"><fmt:message key="label.authoring.basic.textfield" /></option>
-	<option><fmt:message key="label.authoring.basic.textarea" /></option>
-	<option><fmt:message key="label.authoring.basic.number" /></option>
-	<option><fmt:message key="label.authoring.basic.date" /></option>
-	<option><fmt:message key="label.authoring.basic.file" /></option>
-	<option><fmt:message key="label.authoring.basic.image" /></option>
-	<option><fmt:message key="label.authoring.basic.radio" /></option>
-	<option><fmt:message key="label.authoring.basic.dropdown" /></option>
-	<option><fmt:message key="label.authoring.basic.checkbox" /></option>
-	<option><fmt:message key="label.authoring.basic.longlat" /></option>
-</select><html:link href="#" styleClass="btn btn-default btn-xs loffset5" onclick="javascript:showQuestionInputAreaByType('${showMessageURL }')">
+<div class="form-inline"><select id="questionTypeDropdown" class="form-control">
+	<option selected="selected"><fmt:message key="label.authoring.basic.textfield"/></option>
+	<option><fmt:message key="label.authoring.basic.textarea"/></option>
+	<option><fmt:message key="label.authoring.basic.number"/></option>
+	<option><fmt:message key="label.authoring.basic.date"/></option>
+	<option><fmt:message key="label.authoring.basic.file"/></option>
+	<option><fmt:message key="label.authoring.basic.image"/></option>
+	<option><fmt:message key="label.authoring.basic.radio"/></option>
+	<option><fmt:message key="label.authoring.basic.dropdown"/></option>
+	<option><fmt:message key="label.authoring.basic.checkbox"/></option>
+	<option><fmt:message key="label.authoring.basic.longlat"/></option>
+</select><html:link href="#" styleClass="btn btn-default btn-sm" onclick="javascript:showQuestionInputAreaByType('${showMessageURL }')">
 	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.question.add" />
 </html:link></p></div>
 <a name="questionInputAreaAnchor"></a>
-<p><iframe onload="javascript:this.style.height=resizeOnMessageFrameLoad();window.location.hash = '#questionInputArea';" id="questionInputArea"
-	name="questionInputArea" style="width: 0px; height: 0px; border: 0px; display: none" frameborder="no" scrolling="no"> </iframe></p>
+<p><div onload="javascript:window.location.hash = '#questionInputArea';" id="questionInputArea"
+	name="questionInputArea"> </div></p>

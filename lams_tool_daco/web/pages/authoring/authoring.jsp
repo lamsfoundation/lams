@@ -69,11 +69,13 @@
 		</lams:TabBodys>
 
 		<!-- Button Row -->
+		<div id="saveCancelButtons">
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 			toolSignature="<%=DacoConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.daco.contentId}" 
 			 customiseSessionID="${formBean.sessionMapID}"
 			 contentFolderID="${formBean.contentFolderID}"
 			 cancelConfirmMsgKey="message.authoring.cancel.save" />
+		</div>
 	</lams:TabBodyArea>
  
 
