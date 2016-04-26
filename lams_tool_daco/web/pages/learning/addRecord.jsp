@@ -95,10 +95,10 @@
 									depending on the maximum number of characters the teacher provided
 								--%>
 								<c:when test="${question.max!=null}">
-									<html:text property="answer[${answerIndex}]" size="60" maxlength="${question.max}" />
+									<html:text property="answer[${answerIndex}]" size="60" maxlength="${question.max}"  styleClass="form-control"/>
 								</c:when>
 								<c:otherwise>
-									<html:text property="answer[${answerIndex}]" size="60" />
+									<html:text property="answer[${answerIndex}]" size="60"  styleClass="form-control"/>
 								</c:otherwise>
 							</c:choose>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
@@ -108,7 +108,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:textarea property="answer[${answerIndex}]" cols="60" rows="3" />
+							<html:textarea property="answer[${answerIndex}]" cols="60" rows="3"  styleClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==3}"><%-- Number --%>
@@ -126,7 +126,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:text property="answer[${answerIndex}]" size="10" />
+							<html:text property="answer[${answerIndex}]" size="10"  styleClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==4}"><%-- Date can be entered in three textfields --%>
@@ -134,17 +134,24 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<label><fmt:message key="label.learning.date.day" /></label>
-							<html:text property="answer[${answerIndex}]" size="3" />&nbsp;
-							
-							<c:set var="answerIndex" value="${answerIndex+1}" />
-							<label><fmt:message key="label.learning.date.month" /></label>
-							<html:text property="answer[${answerIndex}]" size="3" />&nbsp;
-							
-							<c:set var="answerIndex" value="${answerIndex+1}" />
-							<label><fmt:message key="label.learning.date.year" /></label>
-							<html:text property="answer[${answerIndex}]" size="5" />
-							
+							<span class="form-inline">
+								<div class="form-group">
+								<label><fmt:message key="label.learning.date.day" /></label>
+								<html:text property="answer[${answerIndex}]" size="3"  styleClass="form-control"/>&nbsp;
+								</div>
+								
+								<div class="form-group">
+								<c:set var="answerIndex" value="${answerIndex+1}" />
+								<label><fmt:message key="label.learning.date.month" /></label>
+								<html:text property="answer[${answerIndex}]" size="3"  styleClass="form-control"/>&nbsp;
+								</div>
+								
+								<div class="form-group">
+								<c:set var="answerIndex" value="${answerIndex+1}" />
+								<label><fmt:message key="label.learning.date.year" /></label>
+								<html:text property="answer[${answerIndex}]" size="5"  styleClass="form-control"/>
+								</div>
+							</span>							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==5}"><%-- File --%>
@@ -152,7 +159,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="50" />
+							<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="50"/>
 							<c:set var="fileNumber" value="${fileNumber+1}" />
 						</c:when>
 						<c:when test="${question.type==6}"><%-- Image --%>
@@ -170,7 +177,8 @@
 							</c:if>
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 							<%-- It displays for example A) instead of 1) --%>
-							${fn:substring(ordinal,status.index,status.index+1)}) <html:radio property="answer[${answerIndex}]" value="${status.index+1}">&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></html:radio><br />
+							${fn:substring(ordinal,status.index,status.index+1)}) 
+							<html:radio property="answer[${answerIndex}]" value="${status.index+1}"><label>&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></label></html:radio><br />
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
@@ -179,8 +187,8 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:select property="answer[${answerIndex}]">
-							<html:option value="0"><fmt:message key="label.learning.dropdown.select" /></html:option>
+							<html:select property="answer[${answerIndex}]"  styleClass="form-control">
+							<html:option value="0"><fmt:message key="label.learning.dropdown.select"/></html:option>
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 								<html:option value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></html:option>
 							</c:forEach>
@@ -194,10 +202,10 @@
 							</c:if>
 							<html:hidden  styleId="checkbox-${questionStatus.index+1}" property="answer[${answerIndex}]" />
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-							${fn:substring(ordinal,status.index,status.index+1)})
-							<input type="checkbox" id="checkbox-${questionStatus.index+1}-${status.index+1}" value="${status.index+1}">
-								<c:out value="${answerOption.answerOption}" escapeXml="true"/>
-							</input><br />
+							${fn:substring(ordinal,status.index,status.index+1)}) 
+							<input type="checkbox" id="checkbox-${questionStatus.index+1}-${status.index+1}" value="${status.index+1}"/>
+							<label><c:out value="${answerOption.answerOption}" escapeXml="true"/>
+							</label><br/>
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
@@ -207,27 +215,28 @@
 								</td>
 								<td>
 							</c:if>
-							<table class="alternative-color-inner-table">
-								<tr>
-									<td width="80px">
-									<label><fmt:message key="label.learning.longlat.longitude" /></label>
-									</td>
-									<td>
-									<html:text property="answer[${answerIndex}]" size="10" />
-									<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
-									</td>									
-								</tr>
-								<c:set var="answerIndex" value="${answerIndex+1}" />
-								<tr>
-									<td>
-									<label><fmt:message key="label.learning.longlat.latitude" /></label>
-									</td>
-									<td>
-									<html:text property="answer[${answerIndex}]" size="10" />
-									<label><fmt:message key="label.learning.longlat.latitude.unit" /></label><br />
-									</td>
-								</tr>
-							</table>
+								<div class="form-horizontal">
+									<div class="form-group  no-gutter">
+									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.longitude" /></label>
+									<div class="col-sm-2">
+									<html:text property="answer[${answerIndex}]" size="10"  styleClass="form-control "/>
+									</div>
+									<div class="col-sm-1">
+									<p class="form-control-static"><fmt:message key="label.learning.longlat.longitude.unit" /></p>
+									</div>								
+									</div>
+									<c:set var="answerIndex" value="${answerIndex+1}" />
+												
+									<div class="form-group  no-gutter">
+									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.latitude" /></label>
+									<div class="col-sm-2">
+									<html:text property="answer[${answerIndex}]" size="10"  styleClass="form-control"/>
+									</div>
+									<div class="col-sm-1">
+									<p class="form-control-static"><fmt:message key="label.learning.longlat.latitude.unit" /></p>
+									</div>
+									</div>
+								</div>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 					</c:choose>

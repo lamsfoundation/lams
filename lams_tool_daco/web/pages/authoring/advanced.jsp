@@ -8,11 +8,11 @@
 </script>
 
 <!-- Advance Tab Content -->
-<div class="form-group  voffset10">
-<label><fmt:message key="label.authoring.advanced.record" /></label><BR/>
+<div class="form-group form-inline voffset10">
+<label><strong></strong><fmt:message key="label.authoring.advanced.record" /></strong></label><BR/>
 <!-- Minimum number of records learner must provide -->
-<label for="minRecords"><fmt:message key="label.common.min" /></label> 
-<html:select property="daco.minRecords" styleClass="roffset5">
+<label for="daco.minRecords"><fmt:message key="label.common.min" /></label> 
+<html:select property="daco.minRecords" styleClass="roffset5 form-control">
 	<html:option value="0">
 		<fmt:message key="label.authoring.advanced.record.nolimit" />
 	</html:option>
@@ -23,7 +23,7 @@
 <label for="maxRecords" style="space-left"> <fmt:message key="label.common.max" /> </label> 
 <!-- Maximum number of records learner must provide -->
 <html:select
-	property="daco.maxRecords" styleClass="noBorder">
+	property="daco.maxRecords" styleClass="form-control">
 	<html:option value="0">
 		<fmt:message key="label.authoring.advanced.record.nolimit" />
 	</html:option>
@@ -33,29 +33,29 @@
 </html:select>
 </div>
 
-<div class="form-group">
-<html:checkbox property="daco.notifyTeachersOnLearnerEntry"
-	styleId="notifyTeachersOnLearnerEntry">
-</html:checkbox> <label for="notifyTeachersOnLearnerEntry">&nbsp;<fmt:message key="label.authoring.advanced.notify.onlearnerentry" /> </label></p>
+<div class="form-horizontal">
+<div class="checkbox">
+<label for="notifyTeachersOnLearnerEntry"><html:checkbox property="daco.notifyTeachersOnLearnerEntry" styleId="notifyTeachersOnLearnerEntry" />
+<fmt:message key="label.authoring.advanced.notify.onlearnerentry" /></label>
 </div>
 
-<div class="form-group">
-<html:checkbox property="daco.notifyTeachersOnRecordSumbit"
-	styleId="notifyTeachersOnRecordSubmit">
-</html:checkbox> <label for="notifyTeachersOnRecordSubmit">&nbsp;<fmt:message key="label.authoring.advanced.notify.onrecordsubmit" /> </label></p>
+<div class="checkbox">
+<label for="notifyTeachersOnRecordSubmit"><html:checkbox property="daco.notifyTeachersOnRecordSumbit" styleId="notifyTeachersOnRecordSubmit"/> 
+<fmt:message key="label.authoring.advanced.notify.onrecordsubmit" /> </label>
 </div>
 
-<div class="form-group">
-<html:checkbox property="daco.lockOnFinished" 
-	styleId="lockOnFinished">
-</html:checkbox> <label for="lockOnFinished">&nbsp;<fmt:message key="label.authoring.advanced.lock.on.finished" /> </label>
+<div class="checkbox">
+<label for="lockOnFinished"><html:checkbox property="daco.lockOnFinished" styleId="lockOnFinished" />
+<fmt:message key="label.authoring.advanced.lock.on.finished" /></label>
+</div>
 </div>
 
+<div class="checkbox">
+<label for="reflectOn"><html:checkbox property="daco.reflectOnActivity" styleId="reflectOn"/>
+<fmt:message key="label.authoring.advanced.reflectOnActivity" /> </label>
 <div class="form-group">
-<html:checkbox property="daco.reflectOnActivity" styleId="reflectOn">
-</html:checkbox> <label for="reflectOn">&nbsp;<fmt:message key="label.authoring.advanced.reflectOnActivity" /> </label>
-<BR/>
-<div class="form-group">
-<html:textarea property="daco.reflectInstructions" styleId="reflectInstructions" cols="50" rows="3"
-	onkeyup="javascript:turnOnReflect()" />
+<html:textarea property="daco.reflectInstructions" styleId="reflectInstructions"  styleClass="form-control" cols="50" rows="3"
+	onkeyup="javascript:turnOnReflect()"/>
 </div>
+
+

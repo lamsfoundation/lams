@@ -5,7 +5,7 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-	<lams:css style="main" />
+	<lams:css/>
 	<!-- To use in external script files. -->
 	<script type="text/javascript">
 	   var msgShowAdditionalOptions = "<fmt:message key='label.authoring.basic.additionaloptions.show' />";
@@ -16,6 +16,13 @@
 </lams:head>
 <body class="tabpart">
 
+<div class="panel panel-default">
+<div class="panel-heading">
+	<div class="panel-title"><fmt:message key="label.authoring.basic.image" /></div>
+</div>
+
+<div class="panel-body">
+
 <!-- Add question form-->
 <%@ include file="/common/messages.jsp"%>
 <html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
@@ -23,30 +30,27 @@
 	<input type="hidden" id="questionType" name="questionType" value="6" />
 	<html:hidden property="questionIndex" />
 
-	<h2 class="no-space-left"><fmt:message key="label.authoring.basic.image" /></h2>
-	<div><fmt:message key="label.authoring.basic.image.help" /></div>
+	<p><fmt:message key="label.authoring.basic.image.help" /></p>
 
-	<div class="field-name space-top"><fmt:message key="label.authoring.basic.description" /></div>
-
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
-	<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.contentFolderID}"
-				   resizeParentFrameName="questionInputArea"></lams:CKEditor>
-	<div class="space-bottom-top"><a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()"><fmt:message
-		key="label.authoring.basic.additionaloptions.show" /> </a><br />
+	<%@ include file="description.jsp"%>
+  
+	<!--  Options -->  
+	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+	<div id="additionalOptionsArea" style="display: none;">
+		<div class="checkbox">
+		    <label>
+	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+		    </label>
+	  	</div>
 	</div>
-
-	<div id="additionalOptionsArea" style="display: none;"><html:checkbox property="questionRequired"
-		styleId="questionRequired" styleClass="noBorder">
-		<fmt:message key="label.authoring.basic.required" />
-	</html:checkbox></div>
+ 	<!--  end options -->
 </html:form>
 
-<lams:ImgButtonWrapper>
-	<a href="#" onclick="javascript:submitDacoQuestion()" class="button-add-item"><fmt:message
-		key="label.authoring.basic.image.add" /> </a>
-	<a href="#" onclick="javascript:cancelDacoQuestion()" class="button space-left"><fmt:message key="label.common.cancel" /> </a>
-</lams:ImgButtonWrapper>
+<c:set var="addButtonMessageKey" value="label.authoring.basic.image.add" />
+<%@ include file="buttons.jsp"%>
+
+</div>
+</div>
 
 </body>
 </lams:html>

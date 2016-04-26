@@ -416,6 +416,10 @@
        <path>/WEB-INF/tags/TabName.tag</path>
    	</tag-file>
    	<tag-file>
+       <name>TabBodyArea</name>
+       <path>/WEB-INF/tags/TabBodyArea.tag</path>
+   	</tag-file>
+   	<tag-file>
        <name>CKEditor</name>
        <path>/WEB-INF/tags/CKEditor.tag</path>
    	</tag-file>
@@ -446,27 +450,15 @@
    	<tag-file>
 	    <name>TSTable</name>
 		<path>/WEB-INF/tags/TSTable.tag</path>
-   	</tag-file>
+   	</tag-file>    
   	<tag-file>
 	    <name>Arrow</name>
 		<path>/WEB-INF/tags/Arrow.tag</path>
-   	</tag-file>  
-   	<tag-file>
-       <name>HybridTab</name>
-       <path>/WEB-INF/tags/HybridTab.tag</path>
-   	</tag-file>
-   	<tag-file>
-       <name>HybridTabHeader</name>
-       <path>/WEB-INF/tags/HybridTabHeader.tag</path>
-   	</tag-file>    
-   	<tag-file>
-       <name>HybridTabBody</name>
-       <path>/WEB-INF/tags/HybridTabBody.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AdvancedAccordian</name>
        <path>/WEB-INF/tags/AdvancedAccordian.tag</path>
-   	</tag-file>
+   	</tag-file>  
    	<tag-file>
 	    <name>ImgButtonWrapper</name>
 		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>
@@ -509,5 +501,13 @@
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
 	</tag-file>
+   	<tag-file>
+       <name>Comments</name>
+       <path>/WEB-INF/tags/Comments.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>CommentsAuthor</name>
+       <path>/WEB-INF/tags/CommentsAuthor.tag</path>
+   	</tag-file>
 
 </taglib>

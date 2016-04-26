@@ -4,20 +4,24 @@
 <c:set var="listSize" value="${fn:length(answerOptionList)}" />
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 
-<div id="answerOptionsArea" class="space-bottom-top">
+<div id="answerOptionsArea" class="voffset5">
 <form id="answerOptionsForm"><input type="hidden" id="answerOptionCount" name="answerOptionCount" value="${listSize}"/>
-<div class="field-name"><fmt:message key="label.authoring.basic.answeroption" /></div>
-<a href="#" onclick="javascript:addAnswerOption()" class="btn btn-default btn-sm pull-left"><fmt:message
-	key="label.authoring.basic.answeroption.add" /></a>
+
+<div class="form-group"><label><fmt:message key="label.authoring.basic.answeroption" /></label>
+<a href="#" onclick="javascript:addAnswerOption()" class="btn btn-default btn-xs loffset5">
+	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.answeroption.add" />
+</a>
+
+<%-- This image is shown when answer options are downloaded from a server. --%>
+<img src="${ctxPath}/includes/images/indicator.gif"
+	style="display:none;" id="answerOptionsArea_Busy" name="answerOptionsArea_Busy"/>
+
 	
-		<%-- This image is shown when answer options are downloaded from a server. --%>
-		<img src="${ctxPath}/includes/images/indicator.gif"
-			style="display:none;" id="answerOptionsArea_Busy" name="answerOptionsArea_Busy"/>
-<table class="table table-condensed">
+<table class="table table-condensed table-no-border table-nonfluid">
 	<c:forEach var="item" items="${answerOptionList}" varStatus="status">
 		<tr>
 			<td width="3px">${fn:substring(ordinal,status.index,status.index+1)})</td>
-			<td><input type="text" name="answerOptionItemDesc${status.index+1}" id="answerOptionItemDesc${status.index+1}" size="60" value="<c:out  value='${item}'/>"></td>
+			<td><input type="text" name="answerOptionItemDesc${status.index+1}" id="answerOptionItemDesc${status.index+1}" size="60" value="<c:out  value='${item}'/>" class="form-control"></td>
 
 			<td class="arrows">
 			<!-- Don't display up icon if first line -->
@@ -36,10 +40,12 @@
 		</tr>
 	</c:forEach>
 </table> 
+</div>
+
 </form>
 </div>
 
 <%-- This script will adjust question input area height according to the new answer option count. --%>
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 	resizeQuestionInputArea ();
-</script>
+</script> -->
