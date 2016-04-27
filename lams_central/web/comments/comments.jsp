@@ -34,14 +34,14 @@
 			    scrollDoneCallback();
 			    
    				$('#sortMenu').change(function(){
-			        var url = "<lams:LAMSURL />comments/viewTopic.do?pageSize=2&sessionMapID=${sessionMapID}&sticky=true&sortBy="+$(this).find("option:selected").attr('value');
+			        var url = "<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&sticky=true&sortBy="+$(this).find("option:selected").attr('value');
 			        reloadDivs(url);
 			    });
 			});
 			
 			function refreshComments(){
 				var reqIDVar = new Date();
-				reloadDivs('<lams:LAMSURL />comments/viewTopic.do?pageSize=2&sessionMapID=${sessionMapID}&sticky=true&reqUid='+reqIDVar.getTime());
+				reloadDivs('<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&sticky=true&reqUid='+reqIDVar.getTime());
 			}
 
 			function reloadDivs(url) {
