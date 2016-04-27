@@ -137,6 +137,13 @@
             column="comment_level"
         />
 
+        <property
+            name="sticky"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="sticky"
+        />
 
     </class>
 
