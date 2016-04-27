@@ -189,7 +189,7 @@
 	</c:if>
 
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-	<div>
+	<div style="text-align: center">
 	<c:set var="more"><lams:LAMSURL />/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}</c:set>
 	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>
 	</div>
