@@ -27,17 +27,12 @@
 	
 	
 	<target name="_build-war"
-	        depends="_build-webdoclet, _build-manifest, _copy-war-resources, _copy-planner, _copy-jsp">
+	        depends="_build-manifest, _copy-war-resources, _copy-planner, _copy-jsp">
 		
 		<!-- Internal target: Builds WAR without archivisation -->
 		<echo>${ant.project.name}: Building exploded WAR</echo>
 		<copy todir="${basedir}/build/lib/${product}.war">
-			<fileset dir="${basedir}/build/war/assembly">
-				<include name="**"/>
-			</fileset>
-			<fileset dir="${basedir}/build/war">
-				<include name="WEB-INF/web.xml"/>
-			</fileset>
+			<fileset dir="${basedir}/build/war/assembly" />
 		</copy>
 		<copy todir="${basedir}/build/lib/${product}.war/META-INF" verbose="true">
 			<fileset dir="${basedir}/build">
@@ -65,31 +60,9 @@
 		</copy>
 	</target>
 	
-	
-	<target name="build-tag-library" description="Generates Tag Library from Java source using XDoclet.">
-		<echo>Building LAMS Tag Library using XDoclet</echo>
-		<webdoclet destDir="${conf.web.dir}/WEB-INF/tlds/lams"
-			       mergeDir="${conf.dir}/xdoclet"
-			       >
-			<fileset dir="${src.java.dir}">
-				<include name="**/*.java" />
-				<exclude name="**/*Skeleton.java" />
-			</fileset>
-			
-			<jsptaglib jspversion="2.0"
-					   taglibversion="1.0"
-					   shortname="lams"
-			 		   displayname="LAMSTags"
-					   description="LAMS custom tags"
-			 		   filename="lams.tld"
-					   validatexml="true"
-			/>
-		</webdoclet>
-	</target>
-	
-	
+
 	<!-- Not needed. Does not even display warning to avoid confusion -->
-	<target name="_build-hbm" />
+	<target name="_copy-hbm" />
 	
 	
 	<target name="explode-war" depends="_target-not-available" description="Explodes deployed WAR to folder." />

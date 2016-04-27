@@ -3,51 +3,6 @@
 <project name="LAMS Common" basedir="." default="print-usage">
 	
 	<import file="../lams_build/build_base.xml"/>
-
-	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
-	<fileset id="hbm.fileset" dir="${src.java.dir}"
-		     description="List of Java files for _build-hbm target.">
-		<!-- Configuration -->
-		<include name="**/ConfigurationItem.java" />
-		<include name="**/Registration.java" />
-		<include name="**/Timezone.java" />
-		<!-- Event Notification and Pedagogical Planner -->
-		<include name="**/Event.java" />
-		<include name="**/Subscription.java" />
-		<include name="**/DeliveryPending.java" />
-		<include name="**/LogEvent.java" />
-		<include name="**/PedagogicalPlanner*.java" />
-		<include name="**/DataFlowObject.java" />
-		<!-- Gradebook -->
-		<include name="**/GradebookUserActivity.java" />
-		<include name="**/GradebookUserLesson.java" />
-		<!-- Integration -->
-		<include name="**/ExtServerLessonMap.java" />
-		<include name="**/ExtServerToolAdapterMap.java" />
-		<include name="**/ExtUserUseridMap.java" />
-		<!-- Learning Design -->
-		<include name="**/Competence.java" />
-		<include name="**/ActivityEvaluation.java" />
-		<include name="**/CompetenceMapping.java" />
-		<include name="**/LearningLibraryGroup.java" />
-		<!-- Notebook -->
-		<include name="**/NotebookEntry.java" />
-		<!-- Presence Chat -->
-		<include name="**/model/PresenceChat*.java" />
-		<include name="**/AuthenticationMethod*.java" />
-		<!-- User Management -->
-		<include name="**/OrganisationGrouping.java" />
-		<include name="**/OrganisationGroup.java" />
-	</fileset>
-		
-		
-	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
-		<echo>${ant.project.name}: Building main JAR</echo>
-		<jar jarfile="${basedir}/build/lib/${product}.jar"
-			 manifest="${basedir}/build/MANIFEST.MF">
-			<fileset dir="${basedir}/build/classes/java" />
-		</jar>
-	</target>
 	
 	<target name="build-db" depends="_clean-dirs"
 		description="Rebuilds LAMS database.">

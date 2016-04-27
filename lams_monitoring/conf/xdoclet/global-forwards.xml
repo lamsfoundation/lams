@@ -1,6 +1,0 @@
-<global-forwards>
-      <forward
-      	name="error"
-      	path=".systemError"
-      />
-</global-forwards>

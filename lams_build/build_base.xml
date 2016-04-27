@@ -63,10 +63,6 @@
 		<pathelement location="${basedir}/build/classes/java"/>
 	</path>
 
-	<fileset id="hbm.fileset" dir="${src.java.dir}"
-		     description="List of Java files for _build-hbm target.">
-		<include name="**/*.java" />
-	</fileset>
 	
 	<!-- ================================================================ -->
 	<!-- Print information								                  -->
@@ -180,72 +176,19 @@
 		</copy>
 	</target>
 
-	<!-- =================================================================== -->
-	<!-- XDoclet tasks			                             				 -->
-	<!-- =================================================================== -->
-	
-	<taskdef name="webdoclet"
-		     classname="xdoclet.modules.web.WebDocletTask"
-		     classpathref="libs.classpath"
-	/>
-	<target name="_build-webdoclet" depends="_clean-dirs">
-		<!-- Internal target: Generates XML files from Java source using XDoclet. -->
-		
-		<!-- First try to build struts-config.xml and web.xml from conf/xdoclet files
-		     If Tool is based on static (non-generated) version of these files, 
-		     they will still be generated, but will be overwritten by next step.
-		-->
-		<echo>${ant.project.name}: Building XML files using XDoclet</echo>
+	<!-- ================================================================ -->
+	<!-- Build archives        		    	          					  -->
+	<!-- ================================================================ -->
 
-		<webdoclet destDir="${basedir}/build/war/WEB-INF"
-			       mergeDir="${conf.dir}/xdoclet"
-			       >
-			<fileset dir="${src.java.dir}">
-				<include name="**/*.java" />
-				<exclude name="**/*Skeleton.java" />
-			</fileset>
-			<strutsconfigxml version="1.2" validateXML="true" />
-			<strutsdynaformvalidationxml version="1.1.3"  />
-		</webdoclet>
-		
-		<echo>Overwriting generated code with custom files for ${ant.project.name}, if exist</echo>
-	 	<copy todir="${basedir}/build/war/WEB-INF" overwrite="true" verbose="true">
-			<fileset dir="${conf.web.dir}/WEB-INF">
-				<include name="web.xml"/>
-				<include name="struts-config.xml"/>
-				<include name="validation.xml"/>
-			</fileset>
-	 	</copy>
-	</target>
-	
-	
-	<target name="_build-hbm">
-		<!-- Internal target: Generates Hibernate hbm.xml files from Java sources using XDoclet. -->
-		
-		<taskdef name="hibernatedoclet"
-			     classname="xdoclet.modules.hibernate.HibernateDocletTask"
-			     classpathref="libs.classpath"
-		/>
-		
-		<!-- Generate HBM files if annotations exist -->
-		<echo>${ant.project.name}: Building Hibernate XML files using XDoclet</echo>
-		<hibernatedoclet destdir="${basedir}/build/classes/java" excludedtags="@version,@author,@todo" force="true">
-			<fileset refid="hbm.fileset" />
-			<hibernate version="3.0" templateFile="../lams_build/conf/xdoclet-hibernate-template.xml" />
-		</hibernatedoclet>
-		
-		<!-- Copy remaining HBM non-generated files from conf directory -->
-		<echo>${ant.project.name}: Copying static Hibernate XML files</echo>
+	<target name="_copy-hbm">
+		<echo>${ant.project.name}: Copying Hibernate mapping files</echo>
 		<copy todir="${basedir}/build/classes/java" overwrite="true">
 			<fileset dir="${conf.dir}/hibernate/mappings" erroronmissingdir="false">
 				<include name="**/*.hbm.xml"/>
 			</fileset>
 		</copy>
 	</target>
-	
-	<!-- ================================================================ -->
-	<!-- Build archives        		    	          					  -->
-	<!-- ================================================================ -->
+					
 	
 	<target name="_copy-language" if="product.core">
 		<!-- Internal target: Copies language tags to build dir for easier EAR assembly.
@@ -258,6 +201,7 @@
 			</fileset>
 		</copy>
 	</target>
+	
 	
 	<target name="_build-manifest">
 		<!-- Internal target: Creates a JAR/WAR manifest out of a template. -->
@@ -274,7 +218,7 @@
 	</target>
 	
 	
-	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
+	<target name="_build-jar" depends="_compile-java, _copy-hbm, _build-manifest, _copy-language">
 		<!-- Internal target: Creates JAR file. -->
 		<echo>${ant.project.name}: Building JAR</echo>
 		<jar jarfile="${basedir}/build/lib/${product}.jar"
@@ -284,19 +228,17 @@
 	</target>
 
 	
-	<target name="_build-war" depends="_build-webdoclet, _build-manifest, _copy-language, _copy-jsp, _copy-libs">
+	<target name="_build-war" depends="_build-manifest, _copy-language, _copy-jsp, _copy-libs">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
 		
 		<!-- Add extra dir for CKEditor connector -->
-		<mkdir dir="${basedir}/build/war/assembly/userfiles"/>
+		<mkdir dir="${basedir}/build/war/userfiles"/>
 		
 		<war warfile="${basedir}/build/lib/${product}.war" 
   		     webxml="${basedir}/build/war/WEB-INF/web.xml"
 			 manifest="${basedir}/build/MANIFEST.MF">
-			<fileset dir="${basedir}/build/war/assembly">
-				<include name="**" />
-			</fileset>
+			<fileset dir="${basedir}/build/war" />
 		</war>
 	</target>
 	
@@ -401,26 +343,14 @@
 
 		<!-- No processing is needed so copy files straight to assembly dir to create WAR -->
 		<echo>Copying web resources</echo>
-	 	<copy todir="${basedir}/build/war/assembly">
-			<fileset dir="${basedir}/build/war">
-				<!-- Some XML files were created or copied in _build-webdoclet task --> 
-				<include name="**"/>
-				<exclude name="assembly/"/>
-				<exclude name="WEB-INF/web.xml"/>
-			</fileset>
-			<fileset dir="${conf.web.dir}">
-				<include name="**"/>
-				<exclude name="WEB-INF/classes/"/>
-				<exclude name="WEB-INF/web.xml"/>
-				<exclude name="WEB-INF/struts-config.xml"/>
-				<exclude name="WEB-INF/validation.xml"/>
-			</fileset>
+	 	<copy todir="${basedir}/build/war">
+			<fileset dir="${conf.web.dir}" />
 	 	</copy>
 	</target>
 	
 	<target name="_copy-libs">
 		<echo>${ant.project.name}: Copying additional libraries</echo>
-	 	<copy todir="${basedir}/build/war/assembly/WEB-INF/lib" flatten="true" verbose="true">
+	 	<copy todir="${basedir}/build/war/WEB-INF/lib" flatten="true" verbose="true">
 			<fileset dir="${basedir}/lib" erroronmissingdir="false">
 				<include name="**/*"/>
 			</fileset>
