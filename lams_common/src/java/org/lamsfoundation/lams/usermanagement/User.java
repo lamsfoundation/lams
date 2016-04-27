@@ -515,7 +515,10 @@ public class User implements Serializable, Comparable {
 		// not all orgs have a folder
 		Workspace workspace = userOrganisation.getOrganisation().getWorkspace();
 		if (workspace != null) {
-		    foundMemberFolder = checkFolders(workspace.getFolders(), workspaceFolderID);
+		    Set<WorkspaceFolder> folders = workspace.getFolders();
+		    // sometimes mapping is missing, make sure that the folder is taken into account
+		    folders.add(workspace.getDefaultFolder());
+		    foundMemberFolder = checkFolders(folders, workspaceFolderID);
 		}
 	    }
 	}
