@@ -238,8 +238,8 @@
 														<label><fmt:message key="label.learning.longlat.longitude" /></label>
 														</td>
 														<td>
-															<c:set var="longitude" value="<c:out  value='${answer.answer}'/>" />
-															<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
+															<c:set var="longitude"><c:out  value='${answer.answer}'/></c:set>
+															<input type="text" size="10" readonly="readonly" value="${longitude}"/>
 															<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
 														</td>
 														<c:if test="${not empty question.answerOptions and not empty longitude}">
