@@ -48,37 +48,27 @@
 		</c:otherwise>
 	</c:choose>
 
-	<div class="table-responsive">
-	<table id="horizontalListTable" class="table table-striped table-condensed table-bordered">
+	<table id="horizontalListTable" class="table table-striped table-bordered table-condensed">
 		<tr>
-			<th><fmt:message key="label.learning.tableheader.questions" /></th>
-			<th colspan="${fn:length(recordList)}"><fmt:message key="label.learning.tableheader.records" /></th>
-		</tr>
-		<tr>
-			<td class="fixedCellHeight" width="320px"><fmt:message key="label.learning.tableheader.recordnumber" /></td>
  			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
-				<td class="fixedCellHeight">
-					<div class="bigNumber" style="float: left; margin-right: 30px;">
+				<td style="height:50px">
+					<span class="bigNumber">
 						${recordStatus.index+1}
-					</div>
+					</span>
 					<c:if test='${includeMode=="learning" and not finishedLock}'>
-						<div >
+						<span class="pull-right roffset10">
 						<%-- If the record can be edited, display these links. --%>
-						<i class="fa fa-pencil pull-right roffset10" title="<fmt:message key="label.common.edit" />"
+						<i class="fa fa-pencil" title="<fmt:message key="label.common.edit" />"
 									onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})"></i>
-						<i class="fa fa-times  pull-right roffset10" title="<fmt:message key="label.common.delete" />"
+						<i class="fa fa-times" title="<fmt:message key="label.common.delete" />"
 									onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})"></i>
-						</div>
+						</span>
 					</c:if>
 				</td>
 			</c:forEach>
 		</tr>
 		<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">	
 		<tr>
-			<td class="fixedCellHeight" style="width: 160px">
-				<div class="bigNumber">${questionStatus.index+1}</div>
-				<c:out value="${question.description}" escapeXml="false"/>
-			</td>	
 			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
 			<%-- For comments on the structure, see "learning/listRecords.jsp" --%>
 				<c:set var="generated" value="false" />
@@ -92,16 +82,16 @@
 											<c:forEach var="selectedMap" items="${question.answerOptions}">
 												<c:choose>
 													<c:when test="${selectedMap.answerOption=='Google Maps'}">
-														'<a onclick="javascript:launchPopup('+"'http://maps.google.com/maps?q=${longitude},+${answer.answer}&iwloc=A&hl=en','LAMS');"+'" href="#">${selectedMap.answerOption}</a><br />'+
+														'<a onclick="javascript:launchPopup('+"'http://maps.google.com/maps?q=${longitude},+${answer.answer}&iwloc=A&hl=en','LAMS');"+'" href="#">${selectedMap.answerOption}</a> '+
 													</c:when>
 													<c:when test="${selectedMap.answerOption=='Geabios'}">
-														'<a onclick="javascript:launchPopup('+"'http://www.geabios.com/html/services/maps/PublicMap.htm?lat=${answer.answer}&lon=${longitude}&fov=0.3&title=LAMS','LAMS'); "+'" href="#">${selectedMap.answerOption}</a><br />'+
+														'<a onclick="javascript:launchPopup('+"'http://www.geabios.com/html/services/maps/PublicMap.htm?lat=${answer.answer}&lon=${longitude}&fov=0.3&title=LAMS','LAMS'); "+'" href="#">${selectedMap.answerOption}</a> '+
 													</c:when>
 													<c:when test="${selectedMap.answerOption=='Open Street Map'}">
-														'<a onclick="javascript:launchPopup('+"'http://www.openstreetmap.org/index.html?lat=${answer.answer}&lon=${longitude}&zoom=11','LAMS'); "+'" href="#">${selectedMap.answerOption}</a><br />'+
+														'<a onclick="javascript:launchPopup('+"'http://www.openstreetmap.org/index.html?lat=${answer.answer}&lon=${longitude}&zoom=11','LAMS'); "+'" href="#">${selectedMap.answerOption}</a> '+
 													</c:when>
 													<c:when test="${selectedMap.answerOption=='Multimap'}">
-														'<a onclick="javascript:launchPopup('+"'http://www.multimap.com/map/browse.cgi?scale=200000&lon=${longitude}&lat=${answer.answer}&icon=x','LAMS'); "+'" href="#">${selectedMap.answerOption}</a><br />'+
+														'<a onclick="javascript:launchPopup('+"'http://www.multimap.com/map/browse.cgi?scale=200000&lon=${longitude}&lat=${answer.answer}&icon=x','LAMS'); "+'" href="#">${selectedMap.answerOption}</a> '+
 													</c:when>
 												</c:choose>
 											</c:forEach>
@@ -117,30 +107,7 @@
 							</c:when>
 							<c:otherwise>
 								<c:set var="generated" value="true" />
-										<td class="fixedCellHeight"
-												<c:choose>
-												<%-- Iframes are displayed differently in some browsers, this code fixes it.
-													The last cell in a column is shorter to accomodate the horizontal scrollbar.
-												 --%>
-													<c:when test="${isIE}">
-														<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1 && fn:length(recordList)>1}">
-																id="lastHorizontalQuestion"
-														</c:if>
-													</c:when>
-													<c:otherwise>
-														<c:if test="${questionStatus.index==fn:length(daco.dacoQuestions)-1}">
-																<c:choose>
-																	<c:when test="${fn:length(recordList)>1}">
-																		style="height: 69px;"
-																	</c:when>
-																	<c:otherwise>
-																		style="height: 86px"
-																	</c:otherwise>
-																</c:choose>
-															</c:if>
-													</c:otherwise>
-												</c:choose>
-										 >
+										<td class="fixedCellHeight ${questionStatus.first ? 'border-thick' : ''}">
 										<c:choose>
 											<c:when test="${question.type==1}">
 												<input type="text" size="45" readonly="readonly" value="<c:out  value='${answer.answer}'/>" />
@@ -240,10 +207,6 @@
 															<input type="text" size="10" readonly="readonly" value="${longitude}"/>
 															<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
 														</td>
-														<c:if test="${not empty question.answerOptions and not empty longitude}">
-															<td rowspan="2" id="maplinks-record${recordStatus.index+1}-question${questionStatus.index+1}">
-															</td>
-														</c:if>										
 													</tr>
 													<tr>
 														<td>
@@ -255,6 +218,9 @@
 														</td>
 													</tr>
 												</table>
+												<c:if test="${not empty question.answerOptions and not empty longitude}">
+												<span id="maplinks-record${recordStatus.index+1}-question${questionStatus.index+1}"></span>
+												</c:if>										
 											</c:when>
 										</c:choose>
 										</td>
@@ -272,6 +238,6 @@
 			</tr>
 		</c:forEach>
 	</table>
-	</div>
+
 </body>
 </lams:html>

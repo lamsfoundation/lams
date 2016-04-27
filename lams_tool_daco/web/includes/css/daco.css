@@ -47,13 +47,33 @@ form#recordForm input, form#recordForm textarea, form#recordForm select{
 div.bigNumber{
 	font-weight: bold;
 	font-size: larger;
-	padding-top: 5px;
-}
-table#summaryTable table.alternative-color-inner-table{
-	/* centers the table in the outer table column */
-	margin: auto
 }
 
+table#recordListTable td, table#horizontalListTable td  {
+	/* cells must have the same height, otherwise they will be incorrectly aligned in horizontal record list*/
+	padding-left: 5px;
+	vertical-align: middle;
+	padding-right: 5px;
+}
+
+table#recordListTable td  {
+	background-color:#f9f9f9
+}
+
+
+table#recordListTable td.fixedCellHeight, table#horizontalListTable td.fixedCellHeight  {
+	/* cells must have the same height, otherwise they will be incorrectly aligned in horizontal record list*/
+	height: 150px;
+}
+
+table#summaryTable table.alternative-color-inner-table{
+	/* centers the table in the outer table column */
+	margin: auto;
+}
+
+table#recordListTable, table#recordListTable tr, table#recordListTable td{
+	border-right: none !important;
+}
 table#summaryTable td.singleSummaryCell {
 	vertical-align: middle;
 	text-align: center;
@@ -64,6 +84,6 @@ table#summaryTable th.singleSummaryCell {
 	text-align: center;
 }
 
-table#recordListTable td.fixedCellWidth{
-	width: 160px;
+border-thick { 
+	border-left-width: 3px;
 }
