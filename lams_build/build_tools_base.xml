@@ -52,48 +52,6 @@
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- XDoclet tasks			                             				 -->
-	<!-- =================================================================== -->
-	
-	<!-- This target seems to be rarely used and, as SQL files are maintained manually, probably is obsolete
-	     but leave it for future reference and automatic DB model creation -->
-	<target name="_schema-export" depends="_clean-dirs, _build-hbm">
-		<!-- Internal target: Exports hbm.xml files to the specified database and outputs executed SQL to a file. -->
-		
-		<taskdef
-			name="schemaexport" 
-			classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
-			classpathref="libs.classpath"
-		/>
-			
-		<echo>${ant.project.name}: Preparing Hibernate connection configuration</echo>
-		<copy todir="${basedir}/build" verbose="true">
-			<fileset dir="${conf.dir}/hibernate/mappings">
-				<include name="hibernate.cfg.xml" />
-			</fileset>
-	        <filterset>
-	        	<filter token="db.driver" value="com.mysql.jdbc.Driver"/>
-	        	<filter token="db.url.run" value="${db.url.run}"/>
-                <filter token="db.username" value="${db.username}"/>
-                <filter token="db.password" value="${db.password}"/>
-	        </filterset>
-		</copy>
-		
-		<echo>${ant.project.name}: Running schema export for all hbm.xml files in build dir</echo>
-		<schemaexport
-			config="${basedir}/build/hibernate.cfg.xml"
-			quiet="no"
-			text="no"
-			drop="no"
-			delimiter=";"
-			output="${db.scripts}/table-schema.sql">
-			<fileset dir="${basedir}/build/classes/java">
-				<include name="**/*.hbm.xml"/>
-			</fileset>
-		</schemaexport>	
-	</target>
-
-	<!-- =================================================================== -->
 	<!-- Product deployment			                                         -->
 	<!-- =================================================================== -->
 	

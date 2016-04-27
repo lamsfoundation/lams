@@ -1,8 +1,0 @@
-<global-exceptions>
-  <exception
-    handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
-    key="error.system"
-    path="/error.jsp"
-    scope="request"
-    type="java.lang.Exception"/>
-</global-exceptions>
