@@ -18,6 +18,16 @@
 		}
 	}
  </c:set>
+<c:set var="tableCommandSticky">expandable:true,initialState:'collapsed',
+	expanderTemplate:'<a class=\"btn btn-xs\" href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
+	stringCollapse:'${hide}',stringExpand:'${show}',
+	clickableNodeNames:true,indent:${indent},
+	onNodeInitialized:function() {
+		if (this.level() >= 2) {
+			this.collapse();
+		}
+	}
+ </c:set>
 
 <script type="text/javascript">
 
@@ -74,6 +84,18 @@
 	    });
 	}
 
+	function makeSticky(commentUid, url) {
+		$.ajax({ // create an AJAX call...
+		    type: 'GET', 
+		    url: url
+		})
+	    .done(function (response) {
+	    	refreshComments
+	    	
+			reloadThread(response, '<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
+	    });
+	}
+
 	function updateLike(commentUid, url, incValue) {
 		$.ajax({ // create an AJAX call...
 		    type: 'GET', 
@@ -116,6 +138,8 @@
 
 </script>
 
+<c:set var="isSticky" value="false"/>
+
 <c:forEach var="commentDto" items="${commentThread}">
 	<c:set var="msgLevel" value="${commentDto.level}" />
 	<c:set var="hidden" value="${commentDto.comment.hideFlag}" />
@@ -133,12 +157,13 @@
 		<c:if test='${messageTablename != ""}'>
 			</table>
 			<script> 
-				$("#${messageTablename}").treetable({${tableCommand}});
+				$("#${messageTablename}").treetable({${isSticky?tableCommandSticky:tableCommand}});
 			</script>	
 			</div>
 		</c:if>
 		<c:set var="messageTablename" value="tree${commentDto.comment.uid}"/>
 		<div id="thread${commentDto.comment.uid}" class="col-xs-12 voffset10">
+		<c:set var="isSticky" value="${commentDto.comment.sticky}"/>
 		<table id="${messageTablename}" class="col-xs-12">
 		<tr data-tt-id="${commentDto.comment.uid}"><td>	
 	</c:when>
@@ -158,7 +183,7 @@
 	<c:if test='${messageTablename != ""}'>
 		</table>
 		<script>
-			$("#${messageTablename}").treetable({${tableCommand}});
+			$("#${messageTablename}").treetable({${isSticky?tableCommandSticky:tableCommand}});
 		</script>	
 		</div>
 	</c:if>

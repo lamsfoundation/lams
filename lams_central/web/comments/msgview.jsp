@@ -25,7 +25,6 @@
       <div class="panel panel-default ${highlightClass} msg" id="msg${commentDto.comment.uid}">
         <div class="panel-heading">
           <h4 class="panel-title">
-            <i class="fa fa-user"></i> 
             <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
               <c:set var="author" value="${commentDto.authorname}" />
             </c:if>
@@ -33,11 +32,23 @@
               <c:set var="author">&nbsp;</c:set>
             </c:if>
 
-            <strong><c:out value="${author}" escapeXml="true"/></strong> - 
+          	<c:choose>
+            <c:when test="${isSticky}">
+				<c:set var="colourClass" value="text-primary"/>
+				<i class="fa fa-thumb-tack ${colourClass}"></i>
+            </c:when>
+            <c:otherwise>
+				<c:set var="colourClass" value=""/>
+	            <i class="fa fa-user"></i> 
+			</c:otherwise>
+			</c:choose>            
+
+            <span class="${colourClass}"><strong><c:out value="${author}" escapeXml="true"/></strong> - 
             <time class="timeago" datetime="<fmt:formatDate value='${commentDto.comment.updated}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>"><lams:Date value='${commentDto.comment.updated}' /></time>
             <c:if test='${commentDto.comment.created != commentDto.comment.updated}'>
               | <small>(<fmt:message key="label.edited"/>)</small>
-            </c:if>           
+            </c:if>  
+            </span>         
           </h4>
         </div>
         <div class="panel-body" id="pb-msg${commentDto.comment.uid}">
@@ -52,7 +63,7 @@
           <hr class="msg-hr">
           <div class="msg-footer">
 
-            <c:if test = '${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
+            <c:if test = '${not sessionMap.readOnly}'>
               <c:set var="replytopic"><lams:LAMSURL />comments/newReplyTopic.do?sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}</c:set>
               <a href="#nogo" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="comment">Reply</a>
               &middot; 
@@ -78,6 +89,13 @@
                   <html:link href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" styleClass="comment"><fmt:message key="label.hide" /></html:link>
                 </c:otherwise>
               </c:choose>
+              &middot; 
+            </c:if>
+
+            <c:if test='${sessionMap.mode == "teacher" && not sessionMap.readOnly && commentDto.comment.commentLevel == 1}'>
+              <c:set var="makesticky"><lams:LAMSURL />comments/makeSticky.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}&sticky=${!commentDto.comment.sticky}</c:set>
+              <a href="#nogo" onclick="javascript:makeSticky(${commentDto.comment.uid}, '${makesticky}');" class="comment">
+              	<fmt:message key="${commentDto.comment.sticky ? 'label.remove.sticky' : 'label.add.sticky' }"/></a> 
               &middot; 
             </c:if>
 

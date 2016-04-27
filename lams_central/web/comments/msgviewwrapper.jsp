@@ -16,6 +16,8 @@
 
 </script>
 
+<c:set var="isSticky" value="false"/> 
+
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:forEach var="msgDto" items="${topicThread}">
 

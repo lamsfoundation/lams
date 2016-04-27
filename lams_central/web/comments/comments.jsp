@@ -34,22 +34,19 @@
 			    scrollDoneCallback();
 			    
    				$('#sortMenu').change(function(){
-			        var url = "<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&sortBy="+$(this).find("option:selected").attr('value');
-			        reloadScroll(url);
+			        var url = "<lams:LAMSURL />comments/viewTopic.do?pageSize=2&sessionMapID=${sessionMapID}&sticky=true&sortBy="+$(this).find("option:selected").attr('value');
+			        reloadDivs(url);
 			    });
 			});
 			
 			function refreshComments(){
 				var reqIDVar = new Date();
-				reloadScroll('<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&reqUid='+reqIDVar.getTime());
+				reloadDivs('<lams:LAMSURL />comments/viewTopic.do?pageSize=2&sessionMapID=${sessionMapID}&sticky=true&reqUid='+reqIDVar.getTime());
 			}
 
-			function reloadScroll(url) {
-				$('#newcomments').children().remove();
-				$('.scroll').load(url, function() {
-					$('.scroll').data('jscroll', null);
-					$('.scroll').jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:false,callback:scrollDoneCallback});
-				});
+			function reloadDivs(url) {
+				$('.scroll').data('jscroll', null);
+				$('#commentDiv').load(url);
 			}
 			
 			function scrollDoneCallback() {
@@ -59,7 +56,7 @@
 	</lams:head>
 	<body>
 		
-			<c:if test='${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
+			<c:if test='${not sessionMap.readOnly}'>
               <hr>
               <div class="comments voffset10"> 
 			<%@ include file="new.jsp"%>
@@ -71,23 +68,9 @@
     			<option value='0' <c:if test='${sessionMap.sortBy == 0}'>selected</c:if>><fmt:message key="label.newest.first"/></option>
     			<option value='1' <c:if test='${sessionMap.sortBy == 1}'>selected</c:if>><fmt:message key="label.top.comments"/></option>
 			</select>
-			
-			<div id="newcomments"></div>			
 
-			<c:if test='${(empty commentThread) && (sessionMap.mode == "teacher")}'>
-				<fmt:message key="label.no.comments"/>
-			</c:if>
-					
-			<div class="space-bottom">
-			<div class="scroll" >
-			<c:if test="${! empty commentThread}">
-			<%@ include file="topicview.jsp"%>
-			</c:if>
-			</div>
-			</div>
-			<script>
-				$('.scroll').jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:false,callback:scrollDoneCallback});
-			</script>
-					
+			<div id="commentDiv">
+			<%@ include file="allview.jsp"%>
+			</div>	
 	</body>
 </lams:html>
