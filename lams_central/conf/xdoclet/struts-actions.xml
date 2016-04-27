@@ -20,6 +20,7 @@
       scope="request"
     >
     <forward name="success" path="/comments/comments.jsp" />
+    <forward name="successAll" path="/comments/comments.jsp" />
     </action>
 
     <action
@@ -30,6 +31,7 @@
       scope="request"
     >
     <forward name="success" path="/comments/topicviewwrapper.jsp" />
+    <forward name="successAll" path="/comments/allviewwrapper.jsp" />
     </action>
     <action
       path="/comments/viewTopicThread"
@@ -107,4 +109,11 @@
 		<!--  JSON response on success -->
 	</action>
 	
+	<action path="/comments/makeSticky"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="makeSticky" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
  

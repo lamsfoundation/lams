@@ -7,10 +7,7 @@ import org.lamsfoundation.lams.comments.Comment;
 
 public interface ICommentDAO {
 
-    /* Standard DAO call */
     public abstract void saveOrUpdate(Comment comment);
-
-    public abstract void update(Comment comment);
 
     public abstract Comment getById(Long commentId);
 
@@ -26,5 +23,7 @@ public interface ICommentDAO {
 
     public abstract SortedSet<Comment> getNextThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId, 
 	    Integer numberOfThreads, Integer sortBy, String extraSortParam, Integer userId);
+    
+    public abstract SortedSet<Comment> getStickyThreads(final Long rootTopicId, Integer sortBy, String extraSortParam, Integer userId);
 
 }

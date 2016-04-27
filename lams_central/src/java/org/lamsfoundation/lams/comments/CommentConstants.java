@@ -43,6 +43,7 @@ public class CommentConstants {
     public static final String ATTR_LIKE_AND_DISLIKE = "likeAndDislike";
     public static final String ATTR_READ_ONLY = "readOnly";
     public static final String ATTR_SORT_BY = "sortBy"; // 0 date, 1 likes
+    public static final String ATTR_STICKY = "sticky"; // 0 date, 1 likes
     
     // for paging long topics & inlining reply
     public static final String PAGE_LAST_ID = "pageLastId";

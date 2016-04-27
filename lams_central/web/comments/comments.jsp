@@ -42,22 +42,20 @@
 			    scrollDoneCallback();
 			    
    				$('#sortMenu').change(function(){
-			        var url = "<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&sortBy="+$(this).find("option:selected").attr('value');
-			        reloadScroll(url);
+   					var url = "<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&sticky=true&sortBy="+$(this).find("option:selected").attr('value');
+   				 	reloadDivs(url);
 			    });
 			});
 			
 			function refreshComments(){
 				var reqIDVar = new Date();
-				reloadScroll('<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&reqUid='+reqIDVar.getTime());
+				reloadDivs('<lams:LAMSURL />comments/viewTopic.do?sessionMapID=${sessionMapID}&sticky=true&reqUid='+reqIDVar.getTime());
 			}
 
-			function reloadScroll(url) {
+			function reloadDivs(url) {
 				$('#newcomments').children().remove();
-				$('.scroll').load(url, function() {
-					$('.scroll').data('jscroll', null);
-					$('.scroll').jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:false,callback:scrollDoneCallback});
-				});
+				$('.scroll').data('jscroll', null); 
+				$('#commentDiv').load(url);
 			}
 			
 			function scrollDoneCallback() {
@@ -68,7 +66,7 @@
 	<body>
 			<h2><fmt:message key="heading.comments"/></h2>
 		
-			<c:if test='${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
+			<c:if test='${not sessionMap.readOnly}'>
 			<%@ include file="new.jsp"%>
 			</c:if>
 
@@ -80,20 +78,9 @@
 			
 			<div id="newcomments"></div>			
 
-			<c:if test='${(empty commentThread) && (sessionMap.mode == "teacher")}'>
-				<fmt:message key="label.no.comments"/>
-			</c:if>
-					
-			<div class="space-bottom">
-			<div class="scroll" >
-			<c:if test="${! empty commentThread}">
-			<%@ include file="topicview.jsp"%>
-			</c:if>
-			</div>
-			</div>
-			<script>
-				$('.scroll').jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:false,callback:scrollDoneCallback});
-			</script>
-					
+			<div id="commentDiv">
+			<%@ include file="allview.jsp"%>
+			</div>  
+
 	</body>
 </lams:html>

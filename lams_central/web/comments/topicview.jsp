@@ -3,13 +3,23 @@
 <c:set var="maxThreadUid" value="0"/>
 <c:set var="minThreadLike" value="-1"/>
 <c:set var="messageTablename" value=""/>
-<c:set var="indent" value="30"/>
+<c:set var="indent" value="10"/>
 
 <c:set var="show"><fmt:message key="label.show" /></c:set>
 <c:set var="hide"><fmt:message key="label.hide" /></c:set>
 <c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
+	expanderTemplate:'<a class=\"btn btn-xs\" href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
+	stringCollapse:'${hide}',stringExpand:'${show}',
+	clickableNodeNames:true,indent:${indent},
+	onNodeInitialized:function() {
+		if (this.level() >= 2) {
+			this.collapse();
+		}
+	}
+ </c:set>
+<c:set var="tableCommandSticky">expandable:true,initialState:'collapsed',
+	expanderTemplate:'<a class=\"btn btn-xs\" href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
 	clickableNodeNames:true,indent:${indent},
 	onNodeInitialized:function() {
@@ -74,6 +84,18 @@
 	    });
 	}
 
+	function makeSticky(commentUid, url) {
+		$.ajax({ // create an AJAX call...
+		    type: 'GET', 
+		    url: url
+		})
+	    .done(function (response) {
+	    	refreshComments
+	    	
+			reloadThread(response, '<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
+	    });
+	}
+
 	function updateLike(commentUid, url, incValue) {
 		$.ajax({ // create an AJAX call...
 		    type: 'GET', 
@@ -116,6 +138,8 @@
 
 </script>
 
+<c:set var="isSticky" value="false"/>
+
 <c:forEach var="commentDto" items="${commentThread}">
 	<c:set var="msgLevel" value="${commentDto.level}" />
 	<c:set var="hidden" value="${commentDto.comment.hideFlag}" />
@@ -133,12 +157,13 @@
 		<c:if test='${messageTablename != ""}'>
 			</table>
 			<script> 
-				$("#${messageTablename}").treetable({${tableCommand}});
+				$("#${messageTablename}").treetable({${isSticky?tableCommandSticky:tableCommand}});
 			</script>	
 			</div>
 		</c:if>
 		<c:set var="messageTablename" value="tree${commentDto.comment.uid}"/>
 		<div id="thread${commentDto.comment.uid}">
+		<c:set var="isSticky" value="${commentDto.comment.sticky}"/>
 		<table id="${messageTablename}">
 		<tr data-tt-id="${commentDto.comment.uid}"><td>	
 	</c:when>
@@ -158,13 +183,13 @@
 	<c:if test='${messageTablename != ""}'>
 		</table>
 		<script>
-			$("#${messageTablename}").treetable({${tableCommand}});
+			$("#${messageTablename}").treetable({${isSticky?tableCommandSticky:tableCommand}});
 		</script>	
 		</div>
 	</c:if>
 
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-	<div class="float-right">
+	<div>
 	<c:set var="more"><lams:LAMSURL />/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}</c:set>
 	<a href="<c:out value="${more}"/>" class="button"><fmt:message key="label.show.more.messages" /></a>
 	</div>
