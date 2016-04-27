@@ -18,7 +18,7 @@
 	<target name="_copy-war-resources">
 		<!-- Internal target: Adds additional web content to WAR -->
 		<echo>${ant.project.name}: Copying favicon from conf to assembly</echo>
-		<copy todir="${basedir}/build/war/assembly">
+		<copy todir="${basedir}/build/war">
 			<fileset dir="${conf.dir}/favicon/lams">
 				<include name="**/*.ico"/>
 			</fileset>
@@ -32,7 +32,7 @@
 		<!-- Internal target: Builds WAR without archivisation -->
 		<echo>${ant.project.name}: Building exploded WAR</echo>
 		<copy todir="${basedir}/build/lib/${product}.war">
-			<fileset dir="${basedir}/build/war/assembly" />
+			<fileset dir="${basedir}/build/war" />
 		</copy>
 		<copy todir="${basedir}/build/lib/${product}.war/META-INF" verbose="true">
 			<fileset dir="${basedir}/build">
