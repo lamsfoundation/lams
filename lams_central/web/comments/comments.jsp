@@ -53,7 +53,6 @@
 			}
 
 			function reloadDivs(url) {
-				$('#newcomments').children().remove();
 				$('.scroll').data('jscroll', null); 
 				$('#commentDiv').load(url);
 			}
@@ -76,8 +75,6 @@
     			<option value='1' <c:if test='${sessionMap.sortBy == 1}'>selected</c:if>><fmt:message key="label.top.comments"/></option>
 			</select>
 			
-			<div id="newcomments"></div>			
-
 			<div id="commentDiv">
 			<%@ include file="allview.jsp"%>
 			</div>  
