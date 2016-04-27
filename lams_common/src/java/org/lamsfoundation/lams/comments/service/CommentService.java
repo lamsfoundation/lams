@@ -78,7 +78,23 @@ public class CommentService implements ICommentService {
 	SortedSet<Comment> comments =  commentDAO.getNextThreadByThreadId(rootTopic.getUid(), lastThreadMessageUid, pageSize, sortBy, extraSortParam, userId);
 	return getSortedCommentDTO(comments);
     }
-    
+
+    @Override
+    public List<CommentDTO> getTopicStickyThread(Long externalId, Integer externalType, String externalSignature, 
+	    Integer sortBy, String extraSortParam, Integer userId) {
+
+	// hidden root of all the threads!
+	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
+
+	// first time through - no root topic.
+	if ( rootTopic == null ) {
+	    return new ArrayList<CommentDTO>();
+	}
+
+	SortedSet<Comment> comments =  commentDAO.getStickyThreads(rootTopic.getUid(), sortBy, extraSortParam, userId);
+	return getSortedCommentDTO(comments);
+    }
+
     private List<CommentDTO> getSortedCommentDTO(SortedSet<Comment>  comments) {
 	
 	List<CommentDTO> msgDtoList = new ArrayList<CommentDTO>();
@@ -215,6 +231,19 @@ public class CommentService implements ICommentService {
 	}
     }
     
+    public Comment updateSticky(Long commentUid, Boolean newSticky) {
+
+	Comment comment = commentDAO.getById(commentUid);
+	if ( comment != null ) {
+	    comment.setSticky(newSticky);
+	    commentDAO.saveOrUpdate(comment);
+	    return comment;
+	} else {
+	    log.error("Unable to update comment as comment not found. Comment uid "+commentUid
+		    +" new sticky "+newSticky);
+	    return null;
+	}
+    }
     public CommentDTO getComment(Long commentUid){
 	Comment comment = commentDAO.getById(commentUid);
 	return comment != null ? CommentDTO.getCommentDTO(comment) : null;

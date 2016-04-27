@@ -52,7 +52,8 @@ public class Comment implements Cloneable {
     private Date lastReplyDate;
     private int replyNumber;
     private boolean hideFlag;
-
+    private boolean sticky;
+    
     private Comment rootComment;
     private Comment threadComment;
     private short commentLevel;
@@ -177,6 +178,13 @@ public class Comment implements Cloneable {
 	this.hideFlag = hideFlag;
     }
 
+    public boolean isSticky() {
+	return sticky;
+    }
+
+    public void setSticky(boolean sticky) {
+	this.sticky = sticky;
+    }
     public Comment getParent() {
 	return parent;
     }

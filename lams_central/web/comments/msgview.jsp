@@ -30,11 +30,24 @@
 					<c:if test="${empty author}">
 						<c:set var="author">&nbsp;</c:set>
 					</c:if>
-						<span id="author" class="comment-author"><c:out value="${author}" escapeXml="true"/></span>			
-						<span id="date" class="comment-date"><lams:Date value="${commentDto.comment.updated}"/>
-						<c:if test='${commentDto.comment.created != commentDto.comment.updated}'>
+					
+					<c:choose>
+           			<c:when test="${isSticky}">
+						<span class="comment-sticky">
+							<i class="fa fa-thumb-tack"></i>
+		            </c:when>
+        		    <c:otherwise>
+						<span>
+				            <i class="fa fa-user"></i> 
+					</c:otherwise>
+					</c:choose>
+				
+							<span id="author" class="comment-author"><c:out value="${author}" escapeXml="true"/></span>			
+							<span id="date" class="comment-date"><lams:Date value="${commentDto.comment.updated}"/>
+							<c:if test='${commentDto.comment.created != commentDto.comment.updated}'>
 							(<fmt:message key="label.edited"/>)
-						</c:if>
+							</c:if>
+							</span>
 						</span>
 				</td>
 			</tr>
@@ -53,7 +66,7 @@
 			</tr>
 			<tr>
 				<td>
-					<c:if test = '${sessionMap.mode == "learner" && not sessionMap.readOnly}'>
+					<c:if test = '${not sessionMap.readOnly}'>
 					<c:set var="replytopic"><lams:LAMSURL />comments/newReplyTopic.do?sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}</c:set>
 					<a href="#" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="comment">Reply</a>
 					&middot; 
@@ -82,6 +95,13 @@
 					&middot; 
 					</c:if>
 
+		           <c:if test='${sessionMap.mode == "teacher" && not sessionMap.readOnly && commentDto.comment.commentLevel == 1}'>
+  	  	  	  	 	 	<c:set var="makesticky"><lams:LAMSURL />comments/makeSticky.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}&sticky=${!commentDto.comment.sticky}</c:set>
+  	  	  	  	 	 	<html:link href="javascript:makeSticky(${commentDto.comment.uid}, '${makesticky}');" styleClass="comment">
+  	  	  	  	 	 	<fmt:message key="${commentDto.comment.sticky ? 'label.remove.sticky' : 'label.add.sticky' }"/></html:link> 
+  	  	  	  	 	 	 &middot; 
+  	  	  	  	  </c:if>
+  	  	  	  	 	 	
 					<span id="msglikeCount${commentDto.comment.uid}">${commentDto.comment.likeCount}</span> <fmt:message key="label.likes"/>
 					<c:if test = '${sessionMap.mode == "learner"}'>
 						<span id="msgvote${commentDto.comment.uid}">

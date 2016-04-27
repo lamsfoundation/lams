@@ -112,6 +112,9 @@ public class CommentAction extends Action {
 	if (param.equals("hide")) {
 	    return hideComment(mapping, form, request, response, false);
 	}
+	if (param.equals("makeSticky")) {
+	    return makeSticky(mapping, form, request, response);
+	}
 	
 	return mapping.findForward("error");
     }
@@ -188,7 +191,7 @@ public class CommentAction extends Action {
 
         Comment rootComment = getCommentService().createOrGetRoot(externalId, externalType, externalSignature,  user);
         sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
- 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy);
+ 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy, true);
     }
 
     private void throwException(String msg, String loginName, Long externalId, Integer externalType, String externalSignature) throws ServletException {
@@ -196,15 +199,26 @@ public class CommentAction extends Action {
 	log.error(error);
 	throw new ServletException(error);
     }
-    
+
+    private void throwException(String msg, String loginName) throws ServletException {
+	String error = msg+" User "+loginName;
+	log.error(error);
+	throw new ServletException(error);
+    }
+
     private boolean learnerInToolSession(Long toolSessionId, User user) {
 	GroupedToolSession toolSession = (GroupedToolSession) getCoreToolService().getToolSessionById(toolSessionId);
 	return toolSession.getSessionGroup().getUsers().contains(user);
     }
     
-    private boolean monitorInToolSession(Long toolSessionId, User user) {
-	GroupedToolSession toolSession = (GroupedToolSession) getCoreToolService().getToolSessionById(toolSessionId);
-	return getSecurityService().isLessonMonitor(toolSession.getLesson().getLessonId(), user.getUserId(), "Comment Monitoring Tasks", false);
+    private boolean monitorInToolSession(Long toolSessionId, User user, SessionMap<String, Object> sessionMap) {
+	
+	if ( ToolAccessMode.TEACHER.equals(WebUtil.getToolAccessMode((String)sessionMap.get(AttributeNames.ATTR_MODE))) ) {
+	    GroupedToolSession toolSession = (GroupedToolSession) getCoreToolService().getToolSessionById(toolSessionId);
+	    return getSecurityService().isLessonMonitor(toolSession.getLesson().getLessonId(), user.getUserId(), "Comment Monitoring Tasks", false);
+	} else {
+	    return false;
+	}
     }
     
     /**
@@ -226,14 +240,15 @@ public class CommentAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Integer pageSize = WebUtil.readIntParam(request, CommentConstants.PAGE_SIZE, true);
 	Integer sortBy = WebUtil.readIntParam(request, CommentConstants.ATTR_SORT_BY, true);
+	Boolean sticky = WebUtil.readBooleanParam(request, CommentConstants.ATTR_STICKY, false);
 	if ( sortBy != null )
 	    sessionMap.put( CommentConstants.ATTR_SORT_BY, sortBy);
- 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy);
+ 	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy, sticky);
 
     }
     
     private ActionForward viewTopicImpl(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, SessionMap<String, Object> sessionMap, Integer pageSize, Integer sortBy) {
+	    HttpServletResponse response, SessionMap<String, Object> sessionMap, Integer pageSize, Integer sortBy, boolean includeSticky) {
 
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
 	Integer externalType = (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE);
@@ -256,11 +271,17 @@ public class CommentAction extends Action {
 	List<CommentDTO> msgDtoList = commentService.getTopicThread(externalId, externalType, externalSignature, lastMsgSeqId, pageSize, sortBy, currentLikeCount, user.getUserID());
 	updateMessageFlag(msgDtoList, user.getUserID());
 	request.setAttribute(CommentConstants.ATTR_COMMENT_THREAD, msgDtoList);
+
+	if ( includeSticky ) {
+	    List<CommentDTO> stickyList = commentService.getTopicStickyThread(externalId, externalType, externalSignature,sortBy, currentLikeCount, user.getUserID());
+	    updateMessageFlag(stickyList, user.getUserID());
+	    request.setAttribute(CommentConstants.ATTR_STICKY, stickyList);
+	}
 	
 	// transfer SessionMapID as well
 	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	
-	return mapping.findForward("success");
+	return mapping.findForward(includeSticky ? "successAll" : "success");
     }
 
     @SuppressWarnings("unchecked")
@@ -363,7 +384,8 @@ public class CommentAction extends Action {
             commentService = getCommentService();
             
             User user = getCurrentUser(request);
-     	    if ( ! learnerInToolSession(externalId, user) ) 
+            boolean monitoringMode = ToolAccessMode.TEACHER.equals(WebUtil.getToolAccessMode((String)sessionMap.get(AttributeNames.ATTR_MODE)));
+     	    if ( ! learnerInToolSession(externalId, user) && ! monitorInToolSession(externalId, user, sessionMap) ) 
      		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(), externalId, externalType, externalSignature );
             
             Comment rootSeq = commentService.getRoot(externalId, externalType, externalSignature);
@@ -435,7 +457,7 @@ public class CommentAction extends Action {
 	    
 	    commentService = getCommentService();
             User user = getCurrentUser(request);
-     	    if ( ! learnerInToolSession(externalId, user) ) 
+     	    if ( ! learnerInToolSession(externalId, user) && ! monitorInToolSession(externalId, user, sessionMap) ) 
      		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(), externalId, externalType, externalSignature );
 
             // save message into database
@@ -517,12 +539,12 @@ public class CommentAction extends Action {
  
 	    CommentDTO originalComment = commentService.getComment(commentId);
 	    
-	    boolean monitoringMode = ToolAccessMode.TEACHER.equals(WebUtil.getToolAccessMode((String)sessionMap.get(AttributeNames.ATTR_MODE)));
 	    User user = getCurrentUser(request);
-	    if ( !  originalComment.getComment().getCreatedBy().equals(user) && ! ( monitoringMode && monitorInToolSession(externalId, user) ) ) 
+	    if ( !  originalComment.getComment().getCreatedBy().equals(user) && ! monitorInToolSession(externalId, user, sessionMap) ) 
 	            throwException("Update comment: User does not have the rights to update the comment "+commentId+". ", user.getLogin(), externalId, externalType, externalSignature );
 
-	    Comment updatedComment = commentService.updateComment(commentId, commentText, user, monitoringMode);
+	    Comment updatedComment = commentService.updateComment(commentId, commentText, user, 
+		    ToolAccessMode.TEACHER.equals(WebUtil.getToolAccessMode((String)sessionMap.get(AttributeNames.ATTR_MODE))));
 
 	    JSONObject = new JSONObject();
 	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, commentId);
@@ -579,9 +601,8 @@ public class CommentAction extends Action {
 
 	commentService = getCommentService();
 
-	boolean monitoringMode = ToolAccessMode.TEACHER.equals(WebUtil.getToolAccessMode((String)sessionMap.get(AttributeNames.ATTR_MODE)));
 	User user = getCurrentUser(request);
-	if ( ! monitoringMode || ! monitorInToolSession(externalId, user) ) 
+	if ( ! monitorInToolSession(externalId, user, sessionMap) ) 
 	    throwException("Update comment: User does not have the rights to hide the comment "+commentId+". ", user.getLogin(), externalId, 
 		    (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE), (String) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SIG) );
 
@@ -598,6 +619,39 @@ public class CommentAction extends Action {
 	return null;
     }
 
+    /**
+     * Make a topic sticky - the topic should be level 1 only.
+     * @throws ServletException 
+     */
+    public ActionForward makeSticky(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException, ServletException {
+
+	commentService = getCommentService();
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	Long commentId = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
+	Boolean sticky = WebUtil.readBooleanParam(request, CommentConstants.ATTR_STICKY);
+	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
+	
+	CommentDTO originalComment = commentService.getComment(commentId);
+	User user = getCurrentUser(request);
+	
+	if ( ! monitorInToolSession(externalId, user, sessionMap)) 
+            throwException("Make comment sticky: User does not have the rights to make the comment stick to the top of the list "+commentId+". ", user.getLogin());
+	if ( originalComment.getComment().getCommentLevel() != 1) 
+            throwException("Make comment sticky: Comment much be level 1 to stick to the top of the list "+commentId+" level "+originalComment.getLevel()+". ", user.getLogin());
+
+	Comment updatedComment = commentService.updateSticky(commentId, sticky);
+
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put(CommentConstants.ATTR_COMMENT_ID, commentId);
+	JSONObject.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	JSONObject.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
+	JSONObject.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;
+    }
     /**
      * Get login user information from system level session. 
      */

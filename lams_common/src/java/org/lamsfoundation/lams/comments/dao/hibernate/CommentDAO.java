@@ -53,11 +53,6 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
     }
 
     @Override
-    public void update(Comment comment) {
-	this.getHibernateTemplate().saveOrUpdate(comment);
-    }
-
-    @Override
     public Comment getById(Long commentId) {
 	return (Comment) getHibernateTemplate().get(Comment.class, commentId);
     }
@@ -128,10 +123,9 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
     }
 
     private static final String SQL_QUERY_FIND_FIRST_THREAD_TOP_BY_UID = "SELECT uid FROM lams_comment"
-	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1 ORDER BY uid DESC";
-
+	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1 AND sticky = 0 ORDER BY uid DESC";
     private static final String SQL_QUERY_FIND_NEXT_THREAD_TOP = "SELECT uid FROM lams_comment"
-	    + " WHERE root_comment_uid = :rootUid AND uid < :lastUid AND comment_level = 1 ORDER BY uid DESC";
+	    + " WHERE root_comment_uid = :rootUid AND uid < :lastUid AND comment_level = 1 AND sticky = 0 ORDER BY uid DESC";
 
     private static final String SQL_QUERY_FIND_NEXT_THREAD_MESSAGES = 
 	    "SELECT c.*, SUM(l.vote) likes_total, l2.vote user_vote FROM lams_comment c "
@@ -180,7 +174,7 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
 	    + " FROM lams_comment c "
 	    + " LEFT JOIN lams_comment_likes l ON c.uid = l.comment_uid "
 	    + " LEFT JOIN lams_comment_likes l2 ON c.uid = l2.comment_uid AND l2.user_id=:userId "
-	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1  "
+	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1 AND sticky = 0 "
 	    + " GROUP BY c.uid "
 	    + " ORDER BY likes_total DESC, c.uid DESC";
 
@@ -189,7 +183,7 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
 	    + " FROM lams_comment c "
 	    + " LEFT JOIN lams_comment_likes l ON c.uid = l.comment_uid "
 	    + " LEFT JOIN lams_comment_likes l2 ON c.uid = l2.comment_uid AND l2.user_id=:userId "
-	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1 "
+	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1 AND sticky = 0 "
 	    + " GROUP BY c.uid "
 	    + " ORDER BY likes_total DESC, c.uid DESC) cl "
 	    + " WHERE (cl.likes_total = :like AND cl.uid < :lastUid ) "
@@ -250,4 +244,81 @@ public class CommentDAO extends HibernateDaoSupport implements ICommentDAO {
 	}
 	return new TreeSet<Comment>();
     }
+    
+    @Override
+    public SortedSet<Comment> getStickyThreads(final Long rootTopicId, Integer sortBy, String extraSortParam, Integer userId) {
+
+	if (ICommentService.SORT_BY_LIKE.equals(sortBy)) {
+	    return getStickyByThreadIdLikes(rootTopicId, sortBy, extraSortParam, userId);
+	} else {
+	    return getStickyByThreadIdNewestFirst(rootTopicId, sortBy, userId);
+	}
+
+    }
+
+    private static final String SQL_QUERY_FIND_STICKY_BY_UID = "SELECT uid FROM lams_comment"
+	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1 AND sticky = 1 ORDER BY uid DESC";
+
+    @SuppressWarnings({"unchecked" })
+    private SortedSet<Comment> getStickyByThreadIdNewestFirst(final Long rootTopicId, Integer sortBy, Integer userId) {
+
+	// the search to get to the top level is quite light, so get just the uids
+	// then build a complete set.
+	List<Number> threadUidList = (List<Number>) getSession().
+		    createSQLQuery(SQL_QUERY_FIND_STICKY_BY_UID)
+		    .setLong("rootUid", rootTopicId)
+		    .list();
+
+	if (threadUidList != null && threadUidList.size() > 0) {
+	    SQLQuery query = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES);
+	    query.addEntity("comment", Comment.class)
+	    	.addScalar("likes_total", Hibernate.INTEGER)
+		.addScalar("user_vote", Hibernate.INTEGER)
+		.setLong("userId", userId != null ? userId : 0)
+		.setParameterList("threadIds", threadUidList);
+	    List<Object[]> results = query.list();
+	    return upgradeComments(results, sortBy);
+	}
+	return new TreeSet<Comment>();
+    }
+    
+    private static final String SQL_QUERY_FIND_STICKY_BY_LIKES = "SELECT c.*, COALESCE(SUM(l.vote),0) likes_total, l2.vote user_vote"
+	    + " FROM lams_comment c "
+	    + " LEFT JOIN lams_comment_likes l ON c.uid = l.comment_uid "
+	    + " LEFT JOIN lams_comment_likes l2 ON c.uid = l2.comment_uid AND l2.user_id=:userId "
+	    + " WHERE root_comment_uid = :rootUid AND comment_level = 1  AND c.sticky = 1 "
+	    + " GROUP BY c.uid "
+	    + " ORDER BY likes_total DESC, c.uid DESC";
+
+    @SuppressWarnings({ "unchecked" })
+    private SortedSet<Comment> getStickyByThreadIdLikes(final Long rootTopicId, Integer sortBy, String extraSortParam, Integer userId) {
+	
+	List<Object[]> topThreadObjects = (List<Object[]>) getSession().createSQLQuery(SQL_QUERY_FIND_STICKY_BY_LIKES)
+		    .addEntity("comment", Comment.class)
+		    .addScalar("likes_total", Hibernate.INTEGER)
+		    .addScalar("user_vote", Hibernate.INTEGER)
+		    .setLong("rootUid", rootTopicId)
+		    .setLong("userId", userId != null ? userId : 0)
+		    .list();
+
+	if (topThreadObjects != null && topThreadObjects.size() > 0) {
+	    // build the list of uids
+	    List<Number> threadUidList = new ArrayList<Number>();
+	    for ( Object[] rawObject : topThreadObjects ) {
+		Comment comment = (Comment) rawObject[0];
+		threadUidList.add(comment.getUid());
+	    }
+	    SQLQuery query = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES_REPLIES_ONLY);
+	    query.addEntity("comment", Comment.class)
+	    	.addScalar("likes_total", Hibernate.INTEGER)
+		.addScalar("user_vote", Hibernate.INTEGER)
+		.setLong("userId", userId != null ? userId : 0)
+		.setParameterList("threadIds", threadUidList);
+	    List<Object[]> results = query.list();
+	    topThreadObjects.addAll(results);
+	    return upgradeComments(topThreadObjects, sortBy);
+	}
+	return new TreeSet<Comment>();
+    }
+    
 }
