@@ -399,7 +399,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
+    public void setAttemptStarted(Assessment assessment, List<Set<AssessmentQuestion>> pagedQuestions,
+	    AssessmentUser assessmentUser, Long toolSessionId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
 	if (lastResult != null) {
 
@@ -407,7 +408,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    if (lastResult.getFinishDate() == null) {
 		return;
 
-		// mark previous attempt as not the latest anymore
+	    // mark previous attempt as being not the latest any longer
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -420,13 +421,31 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	result.setSessionId(toolSessionId);
 	result.setStartDate(new Timestamp(new Date().getTime()));
 	result.setLatest(true);
+
+	// create questionResult for each question
+	Set<AssessmentQuestionResult> questionResults = result.getQuestionResults();
+	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	    for (AssessmentQuestion question : questionsForOnePage) {
+		AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
+		questionResult.setAssessmentQuestion(question);
+		questionResults.add(questionResult);
+
+		// create optionAnswer for each option
+		Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
+		for (AssessmentQuestionOption option : question.getOptions()) {
+		    AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
+		    optionAnswer.setOptionUid(option.getUid());
+		    optionAnswers.add(optionAnswer);
+		}
+	    }
+	}
+	
 	assessmentResultDao.saveObject(result);
     }
 
     @Override
-    public boolean storeUserAnswers(Long assessmentUid, Long userId,
-	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
-	    boolean isAutosave) {
+    public boolean storeUserAnswers(Long assessmentUid, Long userId, List<Set<AssessmentQuestion>> pagedQuestions,
+	    Long singleMarkHedgingQuestionUid, boolean isAutosave) {
 
 	int maximumGrade = 0;
 	float grade = 0;
@@ -441,7 +460,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 
 	// store all answers (in all pages)
-	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 
 		// in case single MarkHedging question needs to be stored -- search for that question
@@ -508,26 +527,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	AssessmentQuestionResult questionResult = null;
 	// get questionResult from DB instance of AssessmentResult
-	for (AssessmentQuestionResult dbQuestionAnswer : assessmentResult.getQuestionResults()) {
-	    if (question.getUid().equals(dbQuestionAnswer.getAssessmentQuestion().getUid())) {
-		questionResult = dbQuestionAnswer;
+	for (AssessmentQuestionResult questionResultIter : assessmentResult.getQuestionResults()) {
+	    if (question.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
+		questionResult = questionResultIter;
 	    }
-	}
-
-	// create new questionAnswer if it's nonexistent
-	if (questionResult == null) {
-	    questionResult = new AssessmentQuestionResult();
-	    questionResult.setAssessmentQuestion(question);
-	    questionResult.setAssessmentResult(assessmentResult);
-
-	    Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
-	    for (AssessmentQuestionOption option : question.getOptions()) {
-		AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
-		optionAnswer.setOptionUid(option.getUid());
-		optionAnswers.add(optionAnswer);
-	    }
-
-	    assessmentQuestionResultDao.saveObject(questionResult);
 	}
 
 	// store question answer values
@@ -538,11 +541,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	int j = 0;
 	for (AssessmentQuestionOption option : question.getOptions()) {
 
-	    // get optionAnswer from questionAnswer
+	    // find according optionAnswer
 	    AssessmentOptionAnswer optionAnswer = null;
-	    for (AssessmentOptionAnswer dbOptionAnswer : questionResult.getOptionAnswers()) {
-		if (option.getUid().equals(dbOptionAnswer.getOptionUid())) {
-		    optionAnswer = dbOptionAnswer;
+	    for (AssessmentOptionAnswer optionAnswerIter : questionResult.getOptionAnswers()) {
+		if (option.getUid().equals(optionAnswerIter.getOptionUid())) {
+		    optionAnswer = optionAnswerIter;
 		}
 	    }
 

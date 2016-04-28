@@ -294,25 +294,25 @@ public class LearningAction extends Action {
 	}
 	
 	//sort questions
-	LinkedList<AssessmentQuestion> questionList = new LinkedList<AssessmentQuestion>();
+	LinkedList<AssessmentQuestion> questions = new LinkedList<AssessmentQuestion>();
 	for (QuestionReference questionReference : questionReferences) {
 	    AssessmentQuestion question = questionToReferenceMap.get(questionReference.getUid());
-	    // becuase in webpage will use this login name. Here is just initialize it to avoid session close error in proxy object.
+	    // initialize login name to avoid session close error in proxy object when displaying on a webpage
 	    if (question.getCreateBy() != null) {
 		question.getCreateBy().getLoginName();
 	    }
 	    question.setGrade(questionReference.getDefaultGrade());
 	    
-	    questionList.add(question);
+	    questions.add(question);
 	}
 
 	// shuffling
 	if (assessment.isShuffled()) {
-	    ArrayList<AssessmentQuestion> shuffledList = new ArrayList<AssessmentQuestion>(questionList);
+	    ArrayList<AssessmentQuestion> shuffledList = new ArrayList<AssessmentQuestion>(questions);
 	    Collections.shuffle(shuffledList);
-	    questionList = new LinkedList<AssessmentQuestion>(shuffledList);
+	    questions = new LinkedList<AssessmentQuestion>(shuffledList);
 	}
-	for (AssessmentQuestion question : questionList) {
+	for (AssessmentQuestion question : questions) {
 	    if (question.isShuffle() || (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
 		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(question.getOptions());
 		Collections.shuffle(shuffledList);
@@ -325,23 +325,17 @@ public class LearningAction extends Action {
 	    }	    
 	}
 	
-	//setAttemptStarted
-	if (!finishedLock && hasEditRight) {
-	    service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
-	}
-	
 	//paging
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = new ArrayList<LinkedHashSet<AssessmentQuestion>>();
+	List<Set<AssessmentQuestion>> pagedQuestions = new ArrayList<Set<AssessmentQuestion>>();
 	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight) ? assessment.getQuestionsPerPage()
-		: questionList.size();
+		: questions.size();
 	LinkedHashSet<AssessmentQuestion> questionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
 	pagedQuestions.add(questionsForOnePage);
-
 	int count = 0;
-	for (AssessmentQuestion question : questionList) {
+	for (AssessmentQuestion question : questions) {
 	    questionsForOnePage.add(question);
 	    count++;
-	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionList.size())) {
+	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questions.size())) {
 		questionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
 		pagedQuestions.add(questionsForOnePage);
 	    }
@@ -351,6 +345,11 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);	
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
+	
+	//set attempt started
+	if (!finishedLock && hasEditRight) {
+	    service.setAttemptStarted(assessment, pagedQuestions, assessmentUser, toolSessionId);
+	}
 	
 	// loadupLastAttempt for display purpose
 	loadupLastAttempt(sessionMap);
@@ -414,9 +413,9 @@ public class LearningAction extends Action {
 	}
 	
 	int questionNumberingOffset = 0;
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	for (int i = 0; i < pageNumber-1; i++) {
-	    LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(i);
+	    Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(i);
 	    questionNumberingOffset += questionsForOnePage.size();
 	}
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, ++questionNumberingOffset);
@@ -433,7 +432,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
@@ -454,7 +453,7 @@ public class LearningAction extends Action {
  	
  	//find according question in order to get its mark
 	AssessmentQuestion question = null;
-	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion questionIter : questionsForOnePage) {
 		if (questionIter.getUid().equals(singleMarkHedgingQuestionUid)) {
 		    question = questionIter;
@@ -532,17 +531,22 @@ public class LearningAction extends Action {
     } 
     
     /**
-     * Display same entire authoring page content from HttpSession variable.
+     * User pressed Resubmit button.
      */
     private ActionForward resubmit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
+	IAssessmentService service = getAssessmentService();
+	
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
-	IAssessmentService service = getAssessmentService();
-	service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
+	
+	//set attempt started: create a new one + mark previous as not being the latest any longer
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	service.setAttemptStarted(assessment, pagedQuestions, assessmentUser, toolSessionId);
 	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, false);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
@@ -601,8 +605,8 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
 	Long questionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
 	
 	AssessmentQuestion question = null;
@@ -727,8 +731,8 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
 	
 	for (int i = 0; i < questionsForOnePage.size(); i++) {
 	    Long assessmentQuestionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID + i);
@@ -821,7 +825,7 @@ public class LearningAction extends Action {
      */
     private int validateAnswers(SessionMap<String, Object> sessionMap){
 
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	
 	//array of missing required questions
 	boolean isAllQuestionsAnswered = true;
@@ -830,7 +834,7 @@ public class LearningAction extends Action {
 	//iterate through all pages to find first that contains missing required questions
 	int pageCount;
 	for (pageCount = 0; pageCount < pagedQuestions.size(); pageCount++) {
-	    LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageCount);
+	    Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageCount);
 
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		int questionType = question.getType();
@@ -913,7 +917,7 @@ public class LearningAction extends Action {
      * Prepare data for displaying results page
      */
     private void prepareResultsPageData(SessionMap<String, Object> sessionMap){
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
@@ -921,7 +925,7 @@ public class LearningAction extends Action {
 	//release object from the cache (it's required when we have modified result object in the same request) 
 	AssessmentResult result = service.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
 	
-	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		
 		//find corresponding questionResult
@@ -982,7 +986,7 @@ public class LearningAction extends Action {
     private void loadupLastAttempt(SessionMap<String, Object> sessionMap){
 	IAssessmentService service = getAssessmentService();
 	
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
@@ -999,7 +1003,7 @@ public class LearningAction extends Action {
 	    lastFinishedResult = service.getLastFinishedAssessmentResult(assessmentUid, userId);
 	}
 	
-	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for(Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		
 		//load last finished results for hedging type of questions (in order to prevent retry)
@@ -1047,8 +1051,8 @@ public class LearningAction extends Action {
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
      */
     private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) {
-	
-	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
+
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
