@@ -1111,9 +1111,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		    summaryTab.add(sessionTitle);
 
-		    ExcelCell[] summaryRowTitle = new ExcelCell[2];
-		    summaryRowTitle[0] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true);
-		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
+		    ExcelCell[] summaryRowTitle = new ExcelCell[3];
+		    summaryRowTitle[0] = new ExcelCell(getMessage("label.export.user.id"), true);
+		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true);
+		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
 		    summaryTab.add(summaryRowTitle);
 
 		    List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
@@ -1143,9 +1144,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    }
 
 		    for (AssessmentUserDTO userDto : userDtos) {
-			ExcelCell[] userResultRow = new ExcelCell[2];
-			userResultRow[0] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
-			userResultRow[1] = new ExcelCell(userDto.getGrade(), false);
+			ExcelCell[] userResultRow = new ExcelCell[3];
+			userResultRow[0] = new ExcelCell(userDto.getLogin(), false);
+			userResultRow[1] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
+			userResultRow[2] = new ExcelCell(userDto.getGrade(), false);
 			summaryTab.add(userResultRow);
 		    }
 
@@ -1214,7 +1216,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    Float maxMark = (questionResult.getMaxMark() == null) ? 0
 				    : new Float(questionResult.getMaxMark());
 			    userResultRow[3] = new ExcelCell(maxMark, false);
-			    userResultRow[4] = new ExcelCell(questionResult.getUser().getUserId(), false);
+			    userResultRow[4] = new ExcelCell(questionResult.getUser().getLoginName(), false);
 			    userResultRow[5] = new ExcelCell(questionResult.getUser().getFullName(), false);
 			    userResultRow[6] = new ExcelCell(questionResult.getFinishDate(), false);
 			    userResultRow[7] = new ExcelCell(
@@ -1450,7 +1452,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 				    if (showUserNames) {
 					ExcelCell[] userResultRow = new ExcelCell[6];
-					userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
+					userResultRow[0] = new ExcelCell(assessmentUser.getLoginName(), false);
 					userResultRow[1] = new ExcelCell(assessmentUser.getFullName(), false);
 					userResultRow[2] = new ExcelCell(assessmentResult.getStartDate(), false);
 					userResultRow[3] = new ExcelCell(

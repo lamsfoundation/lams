@@ -63,7 +63,7 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
 	    String searchString) {
 
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT DISTINCT user.user_id, user.last_name, user.first_name, result.grade" +
+	String LOAD_USERS_ORDERED_BY_NAME = "SELECT DISTINCT user.user_id, user.last_name, user.first_name, user.login_name, result.grade" +
 		    " FROM tl_laasse10_user user" + 
 		    " INNER JOIN tl_laasse10_session session" +
 		    " ON user.session_uid=session.uid" +
@@ -96,12 +96,14 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
 		Long userId = ((Number) element[0]).longValue();
 		String firstName = (String) element[1];
 		String lastName = (String) element[2];
-		float grade = element[3] == null ? 0 : ((Number) element[3]).floatValue();
+		String login = (String) element[3];
+		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(userId);
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
+		userDto.setLogin(login);
 		userDto.setGrade(grade);
 		userDtos.add(userDto);
 	    }
@@ -136,7 +138,7 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size, String sortBy, String sortOrder,
 	    String searchString) {
 
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, question_result.mark" +
+	String LOAD_USERS_ORDERED_BY_NAME = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name question_result.mark" +
 		    " FROM tl_laasse10_user user" + 
 		    " INNER JOIN tl_laasse10_session session" +
 		    " ON user.session_uid=session.uid" +
@@ -176,12 +178,14 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
 		Long questionResultUid = ((Number) element[0]).longValue();
 		String firstName = (String) element[1];
 		String lastName = (String) element[2];
-		float grade = element[3] == null ? 0 : ((Number) element[3]).floatValue();
+		String login = (String) element[3];
+		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setQuestionResultUid(questionResultUid);;
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
+		userDto.setLogin(login);
 		userDto.setGrade(grade);
 		userDtos.add(userDto);
 	    }
