@@ -320,14 +320,6 @@ public interface IAssessmentService {
      * @return
      */
     List<SessionDTO> getSessionDtos(Long contentId);
-
-    /**
-     * Return monitoring summary list. The return value is list of assessment summaries for each groups.
-     * 
-     * @param contentId
-     * @return
-     */
-    List<SessionDTO> getSessionDataForExport(Long contentId);
     
     AssessmentResult getUserMasterDetail(Long sessionId, Long userId);
     

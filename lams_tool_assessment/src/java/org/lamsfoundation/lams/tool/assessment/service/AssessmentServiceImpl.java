@@ -870,53 +870,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return sessionDtos;
     }
 
-    // remove method once we remove export portfolio
-    @Override
-    @Deprecated
-    public List<SessionDTO> getSessionDataForExport(Long contentId) {
-	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
-
-	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
-	for (AssessmentSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    Assessment assessment = session.getAssessment();
-	    // one new summary for one session.
-	    SessionDTO sessionDTO = new SessionDTO(sessionId, session.getSessionName());
-
-	    List<AssessmentUser> users = new LinkedList<AssessmentUser>();
-	    if (assessment.isUseSelectLeaderToolOuput()) {
-		AssessmentUser groupLeader = session.getGroupLeader();
-		if (groupLeader != null) {
-		    users.add(groupLeader);
-		}
-	    } else {
-		users = assessmentUserDao.getBySessionID(sessionId);
-	    }
-
-	    ArrayList<AssessmentResult> assessmentResults = new ArrayList<AssessmentResult>();
-	    for (AssessmentUser user : users) {
-		AssessmentResult assessmentResult = assessmentResultDao
-			.getLastFinishedAssessmentResultByUser(sessionId, user.getUserId());
-		if (assessmentResult == null) {
-		    assessmentResult = new AssessmentResult();
-		    assessmentResult.setUser(user);
-		} else {
-		    Set<AssessmentQuestionResult> sortedQuestionResults = new TreeSet<AssessmentQuestionResult>(
-			    new AssessmentQuestionResultComparator());
-		    sortedQuestionResults.addAll(assessmentResult.getQuestionResults());
-		    assessmentResult.setQuestionResults(sortedQuestionResults);
-		}
-		assessmentResults.add(assessmentResult);
-	    }
-	    sessionDTO.setAssessmentResults(assessmentResults);
-	    sessionDtos.add(sessionDTO);
-	}
-
-	AssessmentEscapeUtils.escapeQuotes(sessionDtos);
-
-	return sessionDtos;
-    }
-
     @Override
     public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
