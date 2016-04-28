@@ -104,7 +104,7 @@
 							<c:param name="includeMode" value="${includeMode}" />
 						</c:url>
 
-						<div class="col-xs-9" style="padding-left:0;overflow: scroll" id="${elementIdPrefix}horizontalRecordListFrame"></div>
+						<div class="col-xs-10" style="padding-left:0;overflow: scroll" id="${elementIdPrefix}horizontalRecordListFrame"></div>
 						<script type="text/javascript">
 							$("#${elementIdPrefix}horizontalRecordListFrame").load("${showRecordsUrl}");
 					    </script>
