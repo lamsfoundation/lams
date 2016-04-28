@@ -183,7 +183,8 @@ public interface IAssessmentService {
      * 
      * @param assessmentResult
      */
-    void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId);    
+    void setAttemptStarted(Assessment assessment, List<Set<AssessmentQuestion>> pagedQuestions,
+	    AssessmentUser assessmentUser, Long toolSessionId);
 
     /**
      * Store user answers into DB. It can be autosave and non-autosave requests.
@@ -196,9 +197,8 @@ public interface IAssessmentService {
      * 
      * @return whether storing results is allowed, false otherwise
      */
-    boolean storeUserAnswers(Long assessmentUid, Long userId,
-	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
-	    boolean isAutosave);
+    boolean storeUserAnswers(Long assessmentUid, Long userId, List<Set<AssessmentQuestion>> pagedQuestions,
+	    Long singleMarkHedgingQuestionUid, boolean isAutosave);
     
     /**
      * Return the latest result (it can be unfinished).
