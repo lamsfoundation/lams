@@ -40,17 +40,17 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 /**
  * @author jliew
  *
- * @struts:action path="/importexcelsave"
- *              name="ImportExcelForm"
- *              input=".importexcel"
- *              scope="request"
- * 				validate="false"
+ *
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="importresult" path=".importresult"
- * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
- * @struts:action-forward name="import" path="/importexcel.do"
- * @struts:action-forward name="status" path="/import/status.jsp"
- * @struts:action-forward name="results" path="/importuserresult.do"
+ *
+ *
+ *
+ *
+ *
  */
 public class ImportExcelSaveAction extends Action {
 	

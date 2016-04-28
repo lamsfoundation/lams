@@ -29,7 +29,7 @@ import org.apache.struts.upload.FormFile;
 /**
  * @author jliew
  *
- * @struts.form name="ImportExcelForm"
+ *
  */
 public class ImportExcelForm extends ActionForm {
 	

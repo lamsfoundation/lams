@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.tool.gmap.model;
 
 
 /**
- * @hibernate.class table="tl_lagmap10_configuration"
+ *
  */
 public class GmapConfigItem implements java.io.Serializable
 {
@@ -20,7 +20,7 @@ public class GmapConfigItem implements java.io.Serializable
 
 	
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * 
 	 */
 	public Long getId() {
@@ -36,8 +36,8 @@ public class GmapConfigItem implements java.io.Serializable
 
 
 	/** 
-     * @hibernate.property column="config_key" length="30"
-     *            		   not-null="false" unique="true"    
+     *
+     *
      */
 	public String getConfigKey() {
 		return configKey;
@@ -48,8 +48,8 @@ public class GmapConfigItem implements java.io.Serializable
 	}
 
 	/** 
-     * @hibernate.property column="config_value" length="255"
-     *            		   not-null="false"    
+     *
+     *
      */
 	public String getConfigValue() {
 		return configValue;

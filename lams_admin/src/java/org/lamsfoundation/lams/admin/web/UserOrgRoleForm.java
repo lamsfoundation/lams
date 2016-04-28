@@ -40,7 +40,7 @@ import org.apache.struts.action.ActionForm;
 /**
  * struts doclet
  * 
- * @struts.form name="UserOrgRoleForm"
+ *
  */
 public class UserOrgRoleForm extends ActionForm {
 

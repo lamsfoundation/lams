@@ -35,7 +35,7 @@ import org.apache.struts.validator.ValidatorForm;
 /**
  *
  * 	Reflection Form.
- *	@struts.form name="reflectionForm"
+ *
  *
  */
 public class ReflectionForm extends ValidatorForm {

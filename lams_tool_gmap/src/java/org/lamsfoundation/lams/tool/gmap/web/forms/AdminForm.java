@@ -9,7 +9,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 
 /**
- * @struts.form name="lagmap10AdminForm"
+ *
  */
 public class AdminForm extends ActionForm
 {

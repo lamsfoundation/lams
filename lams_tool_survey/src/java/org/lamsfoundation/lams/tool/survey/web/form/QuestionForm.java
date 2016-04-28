@@ -30,7 +30,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 /**
  *  Survey Item  Form.
- *	@struts.form name="questionForm"
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$

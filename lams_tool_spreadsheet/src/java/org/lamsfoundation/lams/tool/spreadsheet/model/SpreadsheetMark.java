@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * SpreadsheetMark
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_lasprd10_spreadsheet_mark"
+ *
  */
 public class SpreadsheetMark {
 
@@ -61,7 +61,7 @@ public class SpreadsheetMark {
     }
 
     /** 
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      */
     public Long getUid() {
         return this.uid;
@@ -72,7 +72,7 @@ public class SpreadsheetMark {
     }
     
     /** 
-     * @hibernate.property column="marks"
+     *
      */
     public Float getMarks() {
         return this.marks;
@@ -83,7 +83,7 @@ public class SpreadsheetMark {
     }
 
     /** 
-     * @hibernate.property column="comments" type="text"
+     *
      */
     public String getComments() {
         return this.comments;
@@ -94,7 +94,7 @@ public class SpreadsheetMark {
     }
 
     /** 
-     * @hibernate.property column="date_marks_released"
+     *
      */
     public Date getDateMarksReleased() {
         return this.dateMarksReleased;

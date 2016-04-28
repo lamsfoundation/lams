@@ -73,13 +73,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * occurs when making a call to leaveToolSession(). Will have to wait until
  * the learner side of things is tested first.
  * 
- * ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/learner" name="NbLearnerForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
- *                input=".learnerContent" validate="false" parameter="method"
- * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
- * @struts:action-forward name="reflectOnActivity" path=".reflectOnActivity"
- * ----------------XDoclet Tags--------------------
+ *
+ *
+ *
+ *
+ *
  */
 public class NbLearnerAction extends LamsDispatchAction {
 

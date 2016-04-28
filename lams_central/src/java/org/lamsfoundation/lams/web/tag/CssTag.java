@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.web.filter.LocaleFilter;
  * default. This way, if the user's entry points to a stylesheet that doesn't exist, the default one is always
  * available.
  * 
- * @jsp.tag name="css" body-content="empty" display-name="User's chosen stylesheet" description="Output stylesheet based
+ *
  *          on the user preferences."
  * 
  * @author Fiona Malikoff
@@ -128,7 +128,7 @@ public class CssTag extends TagSupport {
     }
 
     /**
-     * @jsp.attribute required="false" rtexprvalue="true" description="Learner pages use learner, fancy pages such as
+     *
      *                index page use core"
      * 
      *                Sets whether to use blah.css (style="core") or blah_learner.css (style=learner). If this parameter

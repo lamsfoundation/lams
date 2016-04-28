@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * TaskList
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_latask10_item_comment"
+ *
  *
  */
 public class TaskListItemComment  implements Cloneable{
@@ -90,7 +90,7 @@ public class TaskListItemComment  implements Cloneable{
 	//  **********************************************************
 	
 	/**
-	 * @hibernate.property column="create_date"
+	 *
 	 * @return
 	 */
 	public Date getCreateDate() {
@@ -101,7 +101,7 @@ public class TaskListItemComment  implements Cloneable{
 	}
 
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the log Uid.
 	 */
 	public Long getUid() {
@@ -111,8 +111,8 @@ public class TaskListItemComment  implements Cloneable{
 		this.uid = uid;
 	}
 	/**
-	 * @hibernate.many-to-one  column="create_by"
- 	 * cascade="save-update"
+	 *
+ 	 *
 	 * @return
 	 */
 	public TaskListUser getCreateBy() {
@@ -122,8 +122,8 @@ public class TaskListItemComment  implements Cloneable{
 		this.createBy = createBy;
 	}
 	/**
-	 * @hibernate.property column="comment"
-	 * 					   type="text"
+	 *
+	 *
 	 * @return
 	 */
 	public String getComment() {

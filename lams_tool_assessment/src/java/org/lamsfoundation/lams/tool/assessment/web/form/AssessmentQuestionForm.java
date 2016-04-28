@@ -28,7 +28,7 @@ import org.apache.struts.action.ActionForm;
 /**
  * Assessment Question Form.
  * 
- * @struts.form name="assessmentQuestionForm"
+ *
  * @author Andrey Balan
  */
 public class AssessmentQuestionForm extends ActionForm {

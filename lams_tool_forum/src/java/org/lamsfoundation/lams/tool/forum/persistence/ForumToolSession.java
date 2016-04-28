@@ -30,8 +30,8 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 /**
- * @hibernate.class table="tl_lafrum11_tool_session"
- * @hibernate.cache usage = "transactional" 
+ *
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$
@@ -72,7 +72,7 @@ public class ForumToolSession implements Cloneable{
   	//		Get/Set methods
 //  **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the learnerID.
 	 */
 	public Long getUid() {
@@ -83,7 +83,7 @@ public class ForumToolSession implements Cloneable{
 	}
 	
 	/**
-	 * @hibernate.property column="session_end_date"
+	 *
 	 * @return
 	 */
 	public Date getSessionEndDate() {
@@ -93,7 +93,7 @@ public class ForumToolSession implements Cloneable{
 		this.sessionEndDate = sessionEndDate;
 	}
 	/**
-	 * @hibernate.property column="session_start_date"
+	 *
 	 * 
 	 * @return
 	 */
@@ -104,7 +104,7 @@ public class ForumToolSession implements Cloneable{
 		this.sessionStartDate = sessionStartDate;
 	}
 	/**
-	 * @hibernate.property
+	 *
 	 * @return
 	 */
 	public int getStatus() {
@@ -115,8 +115,8 @@ public class ForumToolSession implements Cloneable{
 	}
 
 	/**
- 	 * @hibernate.many-to-one  column="forum_uid"
- 	 * cascade="none"
+ 	 *
+ 	 *
 	 * @return
 	 */
 	public Forum getForum() {
@@ -126,7 +126,7 @@ public class ForumToolSession implements Cloneable{
 		this.forum = forum;
 	}
 	/**
-	 * @hibernate.property column="session_id"
+	 *
 	 * @return
 	 */
 	public Long getSessionId() {
@@ -137,7 +137,7 @@ public class ForumToolSession implements Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="session_name" length="250"
+	 *
 	 * @return Returns the session name
 	 */
 	public String getSessionName() {
@@ -153,7 +153,7 @@ public class ForumToolSession implements Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="mark_released" 
+	 *
 	 * @return Returns the mark released flag
 	 */
 	public boolean isMarkReleased() {
@@ -164,7 +164,7 @@ public class ForumToolSession implements Cloneable{
 	}
 
 	/**
-	 * @hibernate.version column="version" 
+	 *
 	 */
 	public int getVersion() {
 		return version;

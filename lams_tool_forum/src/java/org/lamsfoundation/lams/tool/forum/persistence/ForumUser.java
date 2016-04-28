@@ -34,8 +34,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * 
- * @hibernate.class table="tl_lafrum11_forum_user"
- * @hibernate.cache usage = "transactional" 
+ *
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$
@@ -101,7 +101,7 @@ public class ForumUser implements Serializable, Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -117,7 +117,7 @@ public class ForumUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -133,7 +133,7 @@ public class ForumUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="last_name"
+     *
      * @return
      */
     public String getLastName() {
@@ -145,7 +145,7 @@ public class ForumUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="first_name"
+     *
      * @return
      */
     public String getFirstName() {
@@ -157,7 +157,7 @@ public class ForumUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="session_id" cascade="none"
+     *
      * @return
      */
     public ForumToolSession getSession() {
@@ -169,7 +169,7 @@ public class ForumUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="login_name"
+     *
      * @return
      */
     public String getLoginName() {
@@ -181,7 +181,7 @@ public class ForumUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="session_finished"
+     *
      * @return
      */
     public boolean isSessionFinished() {

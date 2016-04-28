@@ -28,7 +28,7 @@ import java.io.Serializable;
 
 /** 
  * 
- * @hibernate.class table="lams_configuration"
+ *
  */
 public class ConfigurationItem implements Serializable {
 
@@ -70,7 +70,7 @@ public class ConfigurationItem implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="assigned" type="java.lang.String" length="30" column="config_key"
+     *
      */
     public String getKey() {
         return this.key;
@@ -81,8 +81,8 @@ public class ConfigurationItem implements Serializable {
     }
 
     /** 
-     * @hibernate.property column="config_value" length="255"
-     *            		   not-null="false"    
+     *
+     *
      */
     public String getValue() {
         return this.value;
@@ -93,7 +93,7 @@ public class ConfigurationItem implements Serializable {
     }
 
     /** 
-     * @hibernate.property column="description_key" length="255"
+     *
      */
 	public String getDescriptionKey() {
 		return descriptionKey;
@@ -104,7 +104,7 @@ public class ConfigurationItem implements Serializable {
 	}
 
     /** 
-     * @hibernate.property column="header_name" length="255"
+     *
      */
 	public String getHeaderName() {
 		return headerName;
@@ -115,7 +115,7 @@ public class ConfigurationItem implements Serializable {
 	}
 
    /** 
-     * @hibernate.property column="format" length="30"
+     *
      */
 	public String getFormat() {
 		return format;
@@ -126,7 +126,7 @@ public class ConfigurationItem implements Serializable {
 	}
 
 	/** 
-     * @hibernate.property column="required" not-null="true"
+     *
      */
 	public Boolean getRequired() {
 		return required;

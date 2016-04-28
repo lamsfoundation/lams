@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.forum.web.forms;
 
 import org.apache.struts.action.ActionForm;
 /**
- * @struts.form name="markForm"
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$

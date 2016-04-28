@@ -44,11 +44,11 @@ import org.apache.struts.action.ActionMapping;
 /**
  * Creation Date: 12-07-05
  *  
- * ----------------XDoclet Tags--------------------
- * 
- * @struts:form name="NbMonitoringForm" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringForm"
  *
- * ----------------XDoclet Tags--------------------
+ * 
+ *
+ *
+ *
  */ 
 public class NbMonitoringForm extends ActionForm {
 

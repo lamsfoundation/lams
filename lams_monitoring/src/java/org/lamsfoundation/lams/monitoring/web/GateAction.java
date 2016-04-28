@@ -75,13 +75,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @since 2005-4-15
  * @version 1.1
  * 
- *          ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action name="GateForm" path="/gate" parameter="method" scope="session" validate="false"
- * @struts:action-forward name="viewSynchGate" path=".viewSynchGate"
- * @struts:action-forward name="viewPermissionGate" path=".viewPermissionGate"
- * @struts:action-forward name="viewScheduleGate" path=".viewScheduleGate"
- * @struts:action-forward name="viewConditionGate" path=".viewConditionGate"
+ *
+ *
+ *
+ *
+ *
  */
 public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------

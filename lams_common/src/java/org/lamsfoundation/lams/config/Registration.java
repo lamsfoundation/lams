@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.config;
 
 /** 
  * 
- * @hibernate.class table="lams_registration"
+ *
  */
 public class Registration {
     private long uid;
@@ -44,7 +44,7 @@ public class Registration {
     public Registration() {}
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public long getUid() {
@@ -56,7 +56,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="site_name" length="255"
+     *
      * 
      */
     public String getSiteName() {
@@ -68,7 +68,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="organisation" length="255"
+     *
      * 
      */
     public String getOrganisation() {
@@ -80,7 +80,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="name" length="255"
+     *
      * 
      */
     public String getName() {
@@ -92,7 +92,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="email" length="255"
+     *
      * 
      */
     public String getEmail() {
@@ -104,7 +104,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="server_country" length="2"
+     *
      * 
      */
     public String getServerCountry() {
@@ -116,7 +116,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="public_directory" length="1"
+     *
      * 
      */
     public boolean isPublicDirectory() {
@@ -128,7 +128,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="enable_lams_community" length="1"
+     *
      * 
      */
     public boolean isEnableLamsCommunityIntegration() {
@@ -140,7 +140,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="server_key" length="255"
+     *
      * 
      */
     public String getServerKey() {
@@ -152,7 +152,7 @@ public class Registration {
     }
 
     /**
-     * @hibernate.property column="server_id" length="255"
+     *
      * 
      */
     public String getServerID() {

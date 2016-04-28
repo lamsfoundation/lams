@@ -31,7 +31,7 @@ import java.util.Date;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_answer_log"
+ *
  * 
  */
 public class ScratchieAnswerVisitLog {
@@ -42,7 +42,7 @@ public class ScratchieAnswerVisitLog {
     private Long sessionId;
 
     /**
-     * @hibernate.property column="access_date"
+     *
      * @return
      */
     public Date getAccessDate() {
@@ -54,7 +54,7 @@ public class ScratchieAnswerVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="scratchie_answer_uid" cascade="none"
+     *
      * @return
      */
     public ScratchieAnswer getScratchieAnswer() {
@@ -66,7 +66,7 @@ public class ScratchieAnswerVisitLog {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -78,7 +78,7 @@ public class ScratchieAnswerVisitLog {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {

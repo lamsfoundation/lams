@@ -43,11 +43,11 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  *         Gives the overall statistics for a LAMS server
  * 
- * @struts.action path="/statistics" parameter="method" name="statistics"
- *                input=".statistics" scope="request" validate="false"
- * @struts.action-forward name="success" path=".statistics"
- * @struts.action-forward name="groupStats" path="/groupStatistics.jsp"
- * @struts.action-forward name="error" path=".error"
+ *
+ *
+ *
+ *
+ *
  */
 public class StatisticsAction extends LamsDispatchAction {
 

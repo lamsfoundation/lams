@@ -61,8 +61,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  * 
- * @struts.action path="/serversave" input=".servermaintain" name="ServerOrgMapForm" scope="request" validate="false"
- * @struts.action-forward name="success" path="/serverlist.do"
+ *
+ *
  */
 public class ServerSaveAction extends Action {
 

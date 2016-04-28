@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_lasurv11_user"
+ *
  */
 public class SurveyUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;
@@ -107,7 +107,7 @@ public class SurveyUser implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -123,7 +123,7 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -139,7 +139,7 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="last_name"
+     *
      * @return
      */
     public String getLastName() {
@@ -151,7 +151,7 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="first_name"
+     *
      * @return
      */
     public String getFirstName() {
@@ -163,7 +163,7 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="login_name"
+     *
      * @return
      */
     public String getLoginName() {
@@ -175,7 +175,7 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="session_uid" cascade="none"
+     *
      * @return
      */
     public SurveySession getSession() {
@@ -187,7 +187,7 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="survey_uid" cascade="none"
+     *
      * @return
      */
     public Survey getSurvey() {
@@ -199,7 +199,7 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="session_finished"
+     *
      * @return
      */
     public boolean isSessionFinished() {
@@ -211,7 +211,7 @@ public class SurveyUser implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="response_finalized"
+     *
      * @return Returns the responseFinalized.
      */
     public boolean isResponseFinalized() {

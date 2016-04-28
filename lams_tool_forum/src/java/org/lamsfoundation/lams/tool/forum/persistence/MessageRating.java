@@ -33,8 +33,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lafrum11_message_rating"
- * @hibernate.cache usage = "transactional"
+ *
+ *
  * 
  */
 public class MessageRating implements Serializable {
@@ -71,7 +71,7 @@ public class MessageRating implements Serializable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -85,7 +85,7 @@ public class MessageRating implements Serializable {
     /**
      * Returns user rated this message.
      * 
-     * @hibernate.many-to-one column="user_id" cascade="none"
+     *
      * @return
      */
     public ForumUser getUser() {
@@ -97,7 +97,7 @@ public class MessageRating implements Serializable {
     }
 
     /**
-     * @hibernate.property column="rating"
+     *
      * @return
      */
     public float getRating() {
@@ -109,7 +109,7 @@ public class MessageRating implements Serializable {
     }
     
     /**
-     * @hibernate.many-to-one column="message_id" cascade="none"
+     *
      * @return
      */
     public Message getMessage() {

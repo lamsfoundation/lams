@@ -78,13 +78,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request"
- *                name="learningForm"
- * @struts.action-forward name="pixlr" path="tiles:/learning/main"
- * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
- * @struts.action-forward name="success" path="/pages/learning/success.jsp"
- * @struts.action-forward name="notebook" path="/pages/learning/notebook.jsp"
- * @struts.action-forward name="viewAll" path="/pages/learning/viewAll.jsp"
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class LearningAction extends LamsDispatchAction {
 

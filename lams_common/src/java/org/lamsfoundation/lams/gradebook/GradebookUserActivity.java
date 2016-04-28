@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * 
  * This class maps to one activity mark for a learner
  * 
- * @hibernate.class table="lams_gradebook_user_activity"
+ *
  */
 public class GradebookUserActivity {
 
@@ -58,7 +58,7 @@ public class GradebookUserActivity {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
+     *
      */
     public long getUid() {
 	return uid;
@@ -69,8 +69,8 @@ public class GradebookUserActivity {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="activity_id"
+     *
+     *
      */
     public ToolActivity getActivity() {
 	return activity;
@@ -81,8 +81,8 @@ public class GradebookUserActivity {
     }
 
     /** 
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="user_id"      
+     *
+     *
      */
     public User getLearner() {
 	return learner;
@@ -93,7 +93,7 @@ public class GradebookUserActivity {
     }
 
     /**
-     * @hibernate.property column="mark"
+     *
      */
     public Double getMark() {
 	return mark;
@@ -104,7 +104,7 @@ public class GradebookUserActivity {
     }
 
     /**
-     * @hibernate.property column="feedback" length="65535"
+     *
      */
     public String getFeedback() {
         return feedback;
@@ -115,7 +115,7 @@ public class GradebookUserActivity {
     }
 
     /**
-     * @hibernate.property column="marked_in_gradebook" length="1"
+     *
      */
     public Boolean getMarkedInGradebook() {
         return markedInGradebook;
@@ -126,7 +126,7 @@ public class GradebookUserActivity {
     }
     
     /**
-     * @hibernate.property column="update_date"
+     *
      * @return
      */
     public Date getUpdateDate() {

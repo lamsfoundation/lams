@@ -35,12 +35,12 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * @author jliew
  *
- * @struts:action path="/importexcel"
- *              name="ImportExcelForm"
- *              scope="request"
- * 				validate="false"
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="importexcel" path=".importexcel"
+ *
  */
 public class ImportExcelAction extends Action {
 	

@@ -63,7 +63,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * </UL>
  * 
  * Due to how XDoclet works, we have to have a separate subclass of BranchingAction for each branching type, and include
- * the XDoclet tags in the subclasses.
+ *
  *
  * @author Fiona Malikoff
  */

@@ -47,8 +47,8 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 /**
  * @author Andrey Balan
  * 
- * @web:servlet name="jlatexmath"
- * @web:servlet-mapping url-pattern="/servlet/jlatexmath"
+ *
+ *
  */
 public class JlatexmathServlet extends HttpServlet {
 

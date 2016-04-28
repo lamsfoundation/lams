@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * to search the history and do reverts.
  * 
  * @author lfoxton
- * @hibernate.class table="tl_lawiki10_wiki_page_content"
+ *
  */
 public class WikiPageContent implements java.io.Serializable, Cloneable {
 
@@ -52,7 +52,7 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -64,8 +64,8 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="wiki_page_uid"
+     *
+     *
      * 
      */
     public WikiPage getWikiPage() {
@@ -78,7 +78,7 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
 
     /**
      * 
-     * @hibernate.property column="body" length="65535"
+     *
      */
     public String getBody() {
 	return body;
@@ -89,8 +89,8 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="editor"
+     *
+     *
      * 
      */
     public WikiUser getEditor() {
@@ -103,7 +103,7 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
 
     /**
      * 
-     * @hibernate.property column="edit_date"
+     *
      */
     public Date getEditDate() {
 	return editDate;
@@ -115,7 +115,7 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
 
     /**
      * 
-     * @hibernate.property column="version"
+     *
      */
     public Long getVersion() {
 	return version;

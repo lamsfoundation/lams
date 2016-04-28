@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.qa;
 
 /**
- * @hibernate.class table="tl_laqa11_configuration"
+ *
  */
 public class QaConfigItem {
 
@@ -45,7 +45,7 @@ public class QaConfigItem {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -57,8 +57,8 @@ public class QaConfigItem {
     }
 
     /**
-     * @hibernate.property column="config_key" length="30" not-null="false"
-     *                     unique="true"
+     *
+     *
      */
     public String getConfigKey() {
 	return configKey;
@@ -69,7 +69,7 @@ public class QaConfigItem {
     }
 
     /**
-     * @hibernate.property column="config_value" length="255" not-null="false"
+     *
      */
     public String getConfigValue() {
 	return configValue;

@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 /**
  *
  * 	Spreadsheet Form.
- *	@struts.form name="spreadsheetForm"
+ *
  *
  * User: Andrey Balan
  */

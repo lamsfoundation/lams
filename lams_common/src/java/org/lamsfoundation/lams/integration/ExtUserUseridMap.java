@@ -5,7 +5,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * @hibernate.class table="lams_ext_user_userid_map"
+ *
  */
 public class ExtUserUseridMap implements Serializable {
 
@@ -35,7 +35,7 @@ public class ExtUserUseridMap implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Integer" column="sid"
+     *
      * 
      */
     public Integer getSid() {
@@ -47,7 +47,7 @@ public class ExtUserUseridMap implements Serializable {
     }
 
     /**
-     * @hibernate.property column="external_username" length="250" not-null="true"
+     *
      * 
      */
     public String getExtUsername() {
@@ -59,8 +59,8 @@ public class ExtUserUseridMap implements Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="user_id" lazy="true"
+     *
+     *
      * 
      */
     public User getUser() {
@@ -72,8 +72,8 @@ public class ExtUserUseridMap implements Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="ext_server_org_map_id"
+     *
+     *
      * 
      */
     public ExtServerOrgMap getExtServerOrgMap() {

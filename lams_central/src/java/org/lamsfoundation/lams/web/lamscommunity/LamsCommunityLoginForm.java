@@ -29,7 +29,7 @@ import org.apache.struts.action.ActionForm;
  * 
  * @author lfoxton
  * 
- * @struts.form name="lamsCommunityLoginForm" include-pk="true" include-all="true"
+ *
  */
 public class LamsCommunityLoginForm extends ActionForm {
     

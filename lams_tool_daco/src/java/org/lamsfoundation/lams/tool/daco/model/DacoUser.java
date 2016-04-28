@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_ladaco10_users"
+ *
  * 
  */
 public class DacoUser implements Cloneable {
@@ -109,7 +109,7 @@ public class DacoUser implements Cloneable {
 	// Get/Set methods
 	// **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the uid.
 	 */
 	public Long getUid() {
@@ -125,7 +125,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="user_id" length="20"
+	 *
 	 * @return Returns the userId.
 	 */
 	public Long getUserId() {
@@ -141,7 +141,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property length="255" column="last_name"
+	 *
 	 * @return
 	 */
 	public String getLastName() {
@@ -153,7 +153,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property length="255" column="first_name"
+	 *
 	 * @return
 	 */
 	public String getFirstName() {
@@ -165,7 +165,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="login_name"
+	 *
 	 * @return
 	 */
 	public String getLoginName() {
@@ -177,7 +177,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.many-to-one column="session_uid" cascade="none" foreign-key="UserToSession"
+	 *
 	 * @return
 	 */
 	public DacoSession getSession() {
@@ -189,7 +189,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.many-to-one column="content_uid" cascade="none" foreign-key="UserToDaco"
+	 *
 	 * @return
 	 */
 	public Daco getDaco() {
@@ -201,7 +201,7 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="session_finished"
+	 *
 	 * @return
 	 */
 	public boolean isSessionFinished() {
@@ -242,9 +242,9 @@ public class DacoUser implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.set  cascade="none" inverse="true" order-by="record_id asc, uid asc" outer-join="true"
-	 * @hibernate.collection-key column="user_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAnswer"
+	 *
+	 *
+	 *
 	 */
 
 	public Set<DacoAnswer> getAnswers() {

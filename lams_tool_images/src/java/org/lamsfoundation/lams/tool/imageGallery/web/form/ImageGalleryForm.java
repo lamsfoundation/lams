@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
  * 
  * ImageGallery Form.
  * 
- * @struts.form name="imageGalleryForm"
+ *
  * 
  * User: Andrey Balan
  */

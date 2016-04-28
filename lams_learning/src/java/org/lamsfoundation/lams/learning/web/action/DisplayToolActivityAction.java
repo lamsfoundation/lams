@@ -45,7 +45,7 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  * 
  *         XDoclet definition:
  * 
- * @struts:action path="/DisplayToolActivity" name="activityForm" validate="false" scope="request"
+ *
  * 
  */
 public class DisplayToolActivityAction extends ActivityAction {

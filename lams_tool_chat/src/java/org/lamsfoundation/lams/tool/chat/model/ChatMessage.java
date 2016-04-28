@@ -34,7 +34,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Anthony Sukkar
  * 
- * @hibernate.class table="tl_lachat11_message"
+ *
  */
 public class ChatMessage implements java.io.Serializable {
 
@@ -71,7 +71,7 @@ public class ChatMessage implements java.io.Serializable {
 	// Property accessors
 
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 */
 	public Long getUid() {
 		return uid;
@@ -82,7 +82,7 @@ public class ChatMessage implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.many-to-one column="chat_session_uid" not-null="true"
+	 *
 	 */
 	public ChatSession getChatSession() {
 		return chatSession;
@@ -93,8 +93,8 @@ public class ChatMessage implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="from_user_uid"
+	 *
+	 *
 	 * 
 	 */
 	public ChatUser getFromUser() {
@@ -106,8 +106,8 @@ public class ChatMessage implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.many-to-one not-null="false"
-	 * @hibernate.column name="to_user_uid"
+	 *
+	 *
 	 * 
 	 * The toUser field is null when the type is "groupchat", and non null when
 	 * the type is "chat"
@@ -121,7 +121,7 @@ public class ChatMessage implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="type" length="255"
+	 *
 	 */
 	public String getType() {
 		return type;
@@ -132,7 +132,7 @@ public class ChatMessage implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="body" type="text"
+	 *
 	 */
 	public String getBody() {
 		return body;
@@ -143,7 +143,7 @@ public class ChatMessage implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="send_date"
+	 *
 	 */
 	public Date getSendDate() {
 		return sendDate;
@@ -155,7 +155,7 @@ public class ChatMessage implements java.io.Serializable {
 
 	/**
 	 * 
-	 * @hibernate.property column="hidden"
+	 *
 	 */
 	public boolean isHidden() {
 		return hidden;

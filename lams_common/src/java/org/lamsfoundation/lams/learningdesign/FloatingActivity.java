@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.SystemTool;
  * @author Mitchell Seaton
  * @version 2.3
  * 
- * @hibernate.class
+ *
  */
 public class FloatingActivity extends ComplexActivity implements Serializable {
 
@@ -90,7 +90,7 @@ public class FloatingActivity extends ComplexActivity implements Serializable {
     }
 
     /**
-     * @hibernate.property column="max_number_of_options" length="5"
+     *
      */
     public Integer getMaxNumberOfActivities() {
 	return this.maxNumberOfActivities;
@@ -109,8 +109,8 @@ public class FloatingActivity extends ComplexActivity implements Serializable {
     }
 
     /**
-     * @hibernate.many-to-one lazy="false"
-     * @hibernate.column name="system_tool_id"
+     *
+     *
      */
     public SystemTool getSystemTool() {
 	return systemTool;

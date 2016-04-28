@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> title;

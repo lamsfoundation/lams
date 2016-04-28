@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
  * 
- * @struts:action path="/clearsession" validate="false"
+ *
  * 
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction {

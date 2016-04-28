@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.pixlr.service.PixlrService;
 
 /**
- * @hibernate.class table="tl_lapixl10_pixlr"
+ *
  */
 
 public class Pixlr implements java.io.Serializable, Cloneable {
@@ -115,7 +115,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
 
@@ -128,7 +128,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
 
@@ -141,7 +141,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
 
@@ -154,7 +154,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by" length="20"
+     *
      * 
      */
 
@@ -167,7 +167,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
 
@@ -180,7 +180,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
 
@@ -193,7 +193,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      * 
      */
 
@@ -206,7 +206,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity" length="1"
+     *
      */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
@@ -217,7 +217,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_view_others_images" length="1"
+     *
      */
     public boolean isAllowViewOthersImages() {
         return allowViewOthersImages;
@@ -228,7 +228,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * 
      */
 
@@ -241,7 +241,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      * 
      */
 
@@ -254,7 +254,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      * 
      */
 
@@ -267,9 +267,9 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="pixlr_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.pixlr.model.PixlrSession"
+     *
+     *
+     *
      * 
      */
 
@@ -349,7 +349,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="image_file_name" length="511"
+     *
      * 
      */
 
@@ -362,7 +362,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="image_width" 
+     *
      * 
      */
 
@@ -375,7 +375,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="image_height" 
+     *
      * 
      */
     
@@ -388,7 +388,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions" length="65535"
+     *
      */
     public String getReflectInstructions() {
 	return reflectInstructions;

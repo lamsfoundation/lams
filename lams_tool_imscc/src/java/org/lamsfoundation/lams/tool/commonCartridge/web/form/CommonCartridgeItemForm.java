@@ -29,7 +29,7 @@ import org.apache.struts.upload.FormFile;
 /**
  * CommonCartridge Item Form.
  * 
- * @struts.form name="commonCartridgeItemForm"
+ *
  * @author Steve.Ni
  */
 public class CommonCartridgeItemForm extends ActionForm {

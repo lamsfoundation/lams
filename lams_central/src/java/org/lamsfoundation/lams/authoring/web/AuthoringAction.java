@@ -85,9 +85,9 @@ import com.google.gson.GsonBuilder;
 /**
  * @author Manpreet Minhas
  * 
- * @struts.action path = "/authoring/author" parameter = "method" validate = "false"
- * @struts:action-forward name="openAutoring" path="/authoring/authoring.jsp"
- * @struts:action-forward name="svgGenerator" path="/authoring/svgGenerator.jsp"
+ *
+ *
+ *
  */
 public class AuthoringAction extends LamsDispatchAction {
 

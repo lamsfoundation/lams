@@ -26,7 +26,7 @@
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
 /**
- * @struts.form name="monitoringForm"
+ *
  */
 public class MonitoringForm extends WikiPageForm {
 

@@ -53,11 +53,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author Fei Yang
  *
- * @struts:action path="/organisation" name="OrganisationForm" scope="request" parameter="method" validate="false"
+ *
  * 
- * @struts:action-forward name="organisation" path=".organisation"
- * @struts:action-forward name="organisationCourseAdmin" path=".organisationCourseAdmin"
- * @struts:action-forward name="orglist" path="/orgmanage.do"
+ *
+ *
+ *
  */
 public class OrganisationAction extends LamsDispatchAction {
 

@@ -44,8 +44,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jliew
  *
- * @web:servlet name="updateCollapsedGroup"
- * @web:servlet-mapping url-pattern="/servlet/updateCollapsedGroup"
+ *
+ *
  */
 public class UpdateCollapsedGroupServlet extends HttpServlet {
 

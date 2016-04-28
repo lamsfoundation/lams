@@ -59,8 +59,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author Andrey Balan
  * 
- * @web:servlet name="ratingServlet"
- * @web:servlet-mapping url-pattern="/servlet/rateItem"
+ *
+ *
  */
 public class RatingServlet extends HttpServlet {
 

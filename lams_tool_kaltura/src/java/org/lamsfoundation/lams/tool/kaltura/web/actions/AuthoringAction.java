@@ -73,11 +73,11 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Andrey Balan
  * 
- * @struts.action path="/authoring" name="authoringForm" parameter="dispatch" scope="request" validate="false"
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/authoring/main"
- * @struts.action-forward name="itemlist" path="/pages/authoring/itemlist.jsp"
- * @struts.action-forward name="preview" path="/pages/authoring/preview.jsp"
+ *
+ *
+ *
  */
 public class AuthoringAction extends LamsDispatchAction {
 

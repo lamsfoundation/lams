@@ -39,12 +39,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jliew
  *
- * @struts:action path="/portrait"
- *                name="PortraitActionForm"
- * 	              scope="request"
- * 				  validate="false"
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="portrait" path=".portrait"
+ *
  */
 public class PortraitAction extends Action {
 	

@@ -30,7 +30,7 @@ import org.apache.struts.upload.FormFile;
 /**
  * @author jliew
  *  
- * @struts.form name="PortraitActionForm"
+ *
  */
 public class PortraitActionForm extends ActionForm {
 	

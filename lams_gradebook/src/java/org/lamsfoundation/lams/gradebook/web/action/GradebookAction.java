@@ -67,10 +67,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *         Handles the general requests for content in gradebook
  * 
  * 
- * @struts.action path="/gradebook" parameter="dispatch" scope="request" validate="false"
+ *
  * 
- * @struts:action-forward name="error" path=".error"
- * @struts:action-forward name="message" path=".message"
+ *
+ *
  */
 public class GradebookAction extends LamsDispatchAction {
 

@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.integration;
 /**
  * Maps a lesson to multiple integrated server instances
  * 
- * @hibernate.class table="lams_ext_server_lesson_map"
+ *
  */
 public class ExtServerLessonMap {
 
@@ -38,7 +38,7 @@ public class ExtServerLessonMap {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -50,7 +50,7 @@ public class ExtServerLessonMap {
     }
 
     /**
-     * @hibernate.property column="lesson_id" type="java.lang.Long" not-null="true"
+     *
      * 
      */
     public Long getLessonId() {
@@ -62,8 +62,8 @@ public class ExtServerLessonMap {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="ext_server_org_map_id"
+     *
+     *
      * 
      */
     public ExtServerOrgMap getExtServer() {

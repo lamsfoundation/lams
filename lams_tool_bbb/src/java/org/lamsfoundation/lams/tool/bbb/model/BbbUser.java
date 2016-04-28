@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
  * people's names change, they won't change in the "old" tool data.
  * 
- * @hibernate.class table="tl_labbb10_user"
+ *
  */
 
 public class BbbUser implements java.io.Serializable {
@@ -74,7 +74,7 @@ public class BbbUser implements java.io.Serializable {
     // Property accessors
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      */
     public Long getUid() {
 	return this.uid;
@@ -85,7 +85,7 @@ public class BbbUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * 
      */
     public Long getUserId() {
@@ -97,7 +97,7 @@ public class BbbUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="last_name" length="255"
+     *
      * 
      */
     public String getLastName() {
@@ -109,7 +109,7 @@ public class BbbUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="login_name" length="255"
+     *
      * 
      */
     public String getLoginName() {
@@ -121,7 +121,7 @@ public class BbbUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="first_name" length="255"
+     *
      * 
      */
     public String getFirstName() {
@@ -133,7 +133,7 @@ public class BbbUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="finishedActivity"
+     *
      */
     public boolean isFinishedActivity() {
 	return finishedActivity;
@@ -144,8 +144,8 @@ public class BbbUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true" foreign-key="fk_labbb10_bbb_user_to_bbb_session"
-     * @hibernate.column name="bbb_session_uid"
+     *
+     *
      * 
      */
     public BbbSession getBbbSession() {
@@ -157,7 +157,7 @@ public class BbbUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="notebook_entry_uid"
+     *
      */
     public Long getNotebookEntryUID() {
 	return notebookEntryUID;

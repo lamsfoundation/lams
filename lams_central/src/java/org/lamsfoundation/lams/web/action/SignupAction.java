@@ -28,13 +28,13 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @struts:action path="/signup/signup" name="SignupForm" scope="request" validate="false" parameter="method"
+ *
  * 
- * @struts:action-forward name="signup" path=".signup"
- * @struts:action-forward name="index" path="/"
- * @struts:action-forward name="success" path=".successfulSignup"
- * @struts:action-forward name="error" path=".error"
- * @struts:action-forward name="message" path=".message"
+ *
+ *
+ *
+ *
+ *
  */
 public class SignupAction extends Action {
 

@@ -30,7 +30,7 @@ import java.util.Date;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lakalt11_item_log"
+ *
  * 
  */
 public class KalturaItemVisitLog {
@@ -43,7 +43,7 @@ public class KalturaItemVisitLog {
     private Long sessionId;
 
     /**
-     * @hibernate.property column="access_date"
+     *
      * @return
      */
     public Date getAccessDate() {
@@ -55,7 +55,7 @@ public class KalturaItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="kaltura_item_uid" cascade="none"
+     *
      * @return
      */
     public KalturaItem getKalturaItem() {
@@ -67,7 +67,7 @@ public class KalturaItemVisitLog {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -79,7 +79,7 @@ public class KalturaItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="user_uid" cascade="none"
+     *
      * @return
      */
     public KalturaUser getUser() {
@@ -91,7 +91,7 @@ public class KalturaItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="complete"
+     *
      * @return
      */
     public boolean isComplete() {
@@ -103,7 +103,7 @@ public class KalturaItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {

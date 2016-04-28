@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_assessment"
+ *
  * 
  */
 public class Assessment implements Cloneable {
@@ -251,7 +251,7 @@ public class Assessment implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -270,7 +270,7 @@ public class Assessment implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -289,7 +289,7 @@ public class Assessment implements Cloneable {
      * Returns deadline for learner's submission
      * 
      * @return submissionDeadline
-     * @hibernate.property column="submission_deadline"
+     *
      */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
@@ -307,7 +307,7 @@ public class Assessment implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Share assessment.
      * 
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
+     *
      * 
      */
     public AssessmentUser getCreatedBy() {
@@ -323,7 +323,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -336,7 +336,7 @@ public class Assessment implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
+     *
      * 
      */
     public String getTitle() {
@@ -355,7 +355,7 @@ public class Assessment implements Cloneable {
      * If the tool utilizes leaders from Select Leader tool.
      * 
      * @return
-     * @hibernate.property column="use_select_leader_tool_ouput"
+     *
      */
     public boolean isUseSelectLeaderToolOuput() {
         return useSelectLeaderToolOuput;
@@ -368,7 +368,7 @@ public class Assessment implements Cloneable {
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      * 
-     * @hibernate.property column="time_limit"
+     *
      * 
      */
     public int getTimeLimit() {
@@ -386,7 +386,7 @@ public class Assessment implements Cloneable {
     /**
      * @return Returns the instructions set by the teacher.
      * 
-     * @hibernate.property column="instructions" type="text"
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -398,9 +398,9 @@ public class Assessment implements Cloneable {
 
     /**
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="sequence_id asc"
-     * @hibernate.collection-key column="assessment_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -414,9 +414,9 @@ public class Assessment implements Cloneable {
     
     /**
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="sequence_id asc"
-     * @hibernate.collection-key column="assessment_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.QuestionReference"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -430,9 +430,9 @@ public class Assessment implements Cloneable {
     
     /**
      * 
-     * @hibernate.set cascade="all" order-by="sequence_id asc"
-     * @hibernate.collection-key column="assessment_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback"
+     *
+     *
+     *
      * 
      * @return a set of OverallFeedbacks for this Assessment.
      */    
@@ -445,7 +445,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
+     *
      * @return
      */
     public boolean isDefineLater() {
@@ -457,7 +457,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
+     *
      * @return
      */
     public Long getContentId() {
@@ -469,7 +469,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_question_feedback"
+     *
      * @return
      */
     public boolean isAllowQuestionFeedback() {
@@ -481,7 +481,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_overall_feedback"
+     *
      * @return
      */
     public boolean isAllowOverallFeedbackAfterQuestion() {
@@ -493,7 +493,7 @@ public class Assessment implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_right_answers"
+     *
      * @return
      */
     public boolean isAllowRightAnswersAfterQuestion() {
@@ -505,7 +505,7 @@ public class Assessment implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_wrong_answers"
+     *
      * @return
      */
     public boolean isAllowWrongAnswersAfterQuestion() {
@@ -519,7 +519,7 @@ public class Assessment implements Cloneable {
     
     
     /**
-     * @hibernate.property column="allow_grades_after_attempt"
+     *
      * @return
      */
     public boolean isAllowGradesAfterAttempt() {
@@ -531,7 +531,7 @@ public class Assessment implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_history_responses"
+     *
      * @return
      */
     public boolean isAllowHistoryResponses() {
@@ -543,7 +543,7 @@ public class Assessment implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="display_summary"
+     *
      * @return
      */
 	public boolean isDisplaySummary() {
@@ -557,7 +557,7 @@ public class Assessment implements Cloneable {
 	
 
 	/**
-     * @hibernate.property column="questions_per_page"
+     *
      * @return
      */
     public int getQuestionsPerPage() {
@@ -571,7 +571,7 @@ public class Assessment implements Cloneable {
     /**
      * number of allow students attempts
      * 
-     * @hibernate.property column="attempts_allowed"
+     *
      * @return
      */
     public int getAttemptsAllowed() {
@@ -585,7 +585,7 @@ public class Assessment implements Cloneable {
     /**
      * passing mark based on which we decide either user has failed or passed
      * 
-     * @hibernate.property column="passing_mark"
+     *
      * @return
      */
     public int getPassingMark() {
@@ -597,7 +597,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="shuffled"
+     *
      * @return
      */
     public boolean isShuffled() {
@@ -611,7 +611,7 @@ public class Assessment implements Cloneable {
     /**
      * If this is checked, then in learner we display the numbering for learners.
      * 
-     * @hibernate.property column="numbered"
+     *
      * @return
      */
     public boolean isNumbered() {
@@ -623,7 +623,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="attempt_completion_notify"
+     *
      * @return
      */
     public boolean isNotifyTeachersOnAttemptCompletion() {
@@ -635,7 +635,7 @@ public class Assessment implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -647,7 +647,7 @@ public class Assessment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {

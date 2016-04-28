@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.spreadsheet.model;
  * Spreadsheet
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_lasprd10_user_modified_spreadsheet"
+ *
  *
  */
 public class UserModifiedSpreadsheet {
@@ -39,7 +39,7 @@ public class UserModifiedSpreadsheet {
 	
 	
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
 	public Long getUid() {
 		return uid;
@@ -49,7 +49,7 @@ public class UserModifiedSpreadsheet {
 	}
 	
 	/**
-	 * @hibernate.property column="user_modified_spreadsheet" type="text"
+	 *
 	 * 
 	 * @return
 	 */
@@ -61,8 +61,8 @@ public class UserModifiedSpreadsheet {
 	}
 	
 	/**
-	 * @hibernate.many-to-one column="mark_id" 
-	 * 			cascade="all"	
+	 *
+	 *
      */
 	public SpreadsheetMark getMark() {
 		return mark;

@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * This class maps to a single cognitive skill in the q&a wizard, it contains a
  * set of questions
  * 
- * @hibernate.class table="tl_laqa11_wizard_cognitive_skill"
+ *
  */
 public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizardCognitiveSkill>, Cloneable {
 
@@ -59,7 +59,7 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -71,7 +71,7 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
     }
 
     /**
-     * @hibernate.property column="title" length="255" not-null="true"
+     *
      */
     public String getTitle() {
 	return title;
@@ -83,9 +83,9 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
 
     /**
      * 
-     * @hibernate.many-to-one cascade="none"
-     *                        class="org.lamsfoundation.lams.tool.qa.QaWizardCategory"
-     *                        column="category_uid"
+     *
+     *
+     *
      * 
      */
     public QaWizardCategory getCategory() {
@@ -97,10 +97,10 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     *                order-by="uid asc"
-     * @hibernate.collection-key column="cognitive_skill_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.qa.QaWizardQuestion"
+     *
+     *
+     *
+     *
      * 
      */
     public Set<QaWizardQuestion> getQuestions() {

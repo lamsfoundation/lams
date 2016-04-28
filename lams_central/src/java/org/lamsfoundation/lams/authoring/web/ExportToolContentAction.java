@@ -50,10 +50,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * 
- * @struts.action path = "/authoring/exportToolContent" validate = "false"
- * @struts.action-forward name = "choice" path = "/toolcontent/exportchoice.jsp"
- * @struts.action-forward name = "loading" path = "/toolcontent/exportloading.jsp"
- * @struts.action-forward name = "result" path = "/toolcontent/exportresult.jsp"
+ *
+ *
+ *
+ *
  * 
  *                        Export tool content action. It needs learingDesignID as input parameter.
  * @author Steve.Ni

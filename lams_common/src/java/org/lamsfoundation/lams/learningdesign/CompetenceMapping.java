@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 /** 
  * 
- * @hibernate.class table="lams_competence_mapping"
+ *
  */
 public class CompetenceMapping 
 {
@@ -25,8 +25,8 @@ public class CompetenceMapping
 	}
 
 	/** 
-     * @hibernate.id  generator-class="native" type="java.lang.Long"
-     *                column="competence_mapping_id"
+     *
+     *
      */
 	public Long getCompetenceMappingId() {
 		return competenceMappingId;
@@ -38,8 +38,8 @@ public class CompetenceMapping
 
 	/** 
      * 
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="competence_id"      
+     *
+     *
      */
 	public Competence getCompetence() {
 		return competence;
@@ -51,8 +51,8 @@ public class CompetenceMapping
 
 	/** 
      * 
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="activity_id"      
+     *
+     *
      */
     public ToolActivity getToolActivity() {
         return this.toolActivity;

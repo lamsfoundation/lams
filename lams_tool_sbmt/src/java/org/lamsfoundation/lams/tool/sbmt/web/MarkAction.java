@@ -55,14 +55,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author lfoxton
- * @struts.action path="/mark" parameter="method" scope="request"
- *                validate="false" name="sbmtMarkForm"
+ *
+ *
  * 
- * @struts.action-forward name="listMark" path="/monitoring/mark/mark.jsp"
- * @struts.action-forward name="updateMark"
- *                        path="/monitoring/mark/updatemark.jsp"
- * @struts.action-forward name="listAllMarks"
- *                        path="/monitoring/mark/allmarks.jsp"
+ *
+ *
+ *
+ *
+ *
  * 
  */
 public class MarkAction extends LamsDispatchAction {

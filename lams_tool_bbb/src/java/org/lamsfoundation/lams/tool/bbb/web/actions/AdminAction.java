@@ -40,15 +40,15 @@ import org.lamsfoundation.lams.tool.bbb.web.forms.AdminForm;
 
 
 /**
- * @struts.action path="/admin/view" name="adminForm" parameter="view" scope="request" validate="false"
- * @struts.action-forward name="view-success" path="tiles:/admin/view"
+ *
+ *
  * 
- * @struts.action path="/admin/edit" name="adminForm" parameter="edit" scope="request" validate="false"
- * @struts.action-forward name="edit-success" path="tiles:/admin/edit"
+ *
+ *
  * 
- * @struts.action path="/admin/save" name="adminForm" parameter="save" scope="request" validate="true"
- *                input="tiles:/admin/edit"
- * @struts.action-forward name="save-success" redirect="true" path="/admin/view.do"
+ *
+ *
+ *
  * 
  * @author Ernie Ghiglione
  * 

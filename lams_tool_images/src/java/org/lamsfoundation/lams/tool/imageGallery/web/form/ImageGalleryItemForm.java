@@ -29,7 +29,7 @@ import org.apache.struts.upload.FormFile;
 /**
  * ImageGallery Item Form.
  * 
- * @struts.form name="imageGalleryItemForm"
+ *
  * @author Andrey Balan
  */
 public class ImageGalleryItemForm extends ActionForm {

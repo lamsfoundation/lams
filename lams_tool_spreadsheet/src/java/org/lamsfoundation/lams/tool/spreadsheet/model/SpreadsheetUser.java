@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Spreadsheet
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_lasprd10_user"
+ *
  *
  */
 public class SpreadsheetUser implements Cloneable, Serializable{
@@ -97,7 +97,7 @@ public class SpreadsheetUser implements Cloneable, Serializable{
   	//		Get/Set methods
 //  **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the uid.
 	 */
 	public Long getUid() {
@@ -111,7 +111,7 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 	}
 
 	/**
-	 * @hibernate.property column="user_id" length="20"
+	 *
 	 * @return Returns the userId.
 	 */
 	public Long getUserId() {
@@ -126,7 +126,7 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 	}
 
 	/**
-	 * @hibernate.property length="255" column="last_name"
+	 *
 	 * @return
 	 */
 	public String getLastName() {
@@ -136,7 +136,7 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 		this.lastName = lastName;
 	}
 	/**
-	 * @hibernate.property length="255" column="first_name"
+	 *
 	 * @return
 	 */
 	public String getFirstName() {
@@ -148,7 +148,7 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 	
 
 	/**
-	 * @hibernate.property column="login_name"
+	 *
 	 * @return
 	 */
 	public String getLoginName() {
@@ -159,8 +159,8 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 		this.loginName = loginName;
 	}
 	/**
-	 * @hibernate.many-to-one column="session_uid"
-	 * 			cascade="none"
+	 *
+	 *
 	 * @return
 	 */
 	public SpreadsheetSession getSession() {
@@ -171,8 +171,8 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 		this.session = session;
 	}
 	/**
-	 * @hibernate.many-to-one column="spreadsheet_uid"
-	 * 			cascade="none"
+	 *
+	 *
 	 * @return
 	 */
 	public Spreadsheet getSpreadsheet() {
@@ -182,8 +182,8 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 		this.spreadsheet = spreadsheet;
 	}
 	/**
-	 * @hibernate.many-to-one column="user_modified_spreadsheet_uid" 
-	 * 			cascade="all"
+	 *
+	 *
 	 *  
 	 * @return
 	 */
@@ -194,7 +194,7 @@ public class SpreadsheetUser implements Cloneable, Serializable{
 		this.userModifiedSpreadsheet = userModifiedSpreadsheet;
 	}
 	/**
-	 * @hibernate.property column="session_finished"
+	 *
 	 * @return
 	 */
 	public boolean isSessionFinished() {

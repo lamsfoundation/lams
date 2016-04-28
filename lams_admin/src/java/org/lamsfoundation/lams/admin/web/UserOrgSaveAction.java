@@ -55,10 +55,10 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * struts doclets
  * 
- * @struts:action path="/userorgsave" name="UserOrgForm" input=".userorg" scope="request" validate="false"
+ *
  * 
- * @struts:action-forward name="userlist" path="/usermanage.do"
- * @struts:action-forward name="userorgrole" path="/userorgrole.do"
+ *
+ *
  */
 public class UserOrgSaveAction extends Action {
 

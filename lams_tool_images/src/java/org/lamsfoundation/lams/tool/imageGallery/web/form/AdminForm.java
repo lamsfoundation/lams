@@ -32,7 +32,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 
 /**
- * @struts.form name="imageGalleryAdminForm"
+ *
  */
 public class AdminForm extends ActionForm {
     private static final long serialVersionUID = 414425664356226L;

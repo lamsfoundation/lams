@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Mitchell Seaton
  * @version 2.1
  * 
- * @hibernate.class
+ *
  */
 public class ToolBranchingActivity extends BranchingActivity implements Serializable {
 

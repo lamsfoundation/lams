@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 /**
  * A text search form with additional parameters for Survey needs.
  * 
- * @struts.form name="surveyConditionForm"
+ *
  * @author Marcin Cieslak
  * 
  */

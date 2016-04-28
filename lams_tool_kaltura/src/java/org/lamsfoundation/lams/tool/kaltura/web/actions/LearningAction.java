@@ -77,14 +77,14 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Andrey Balan
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request" name="reflectionForm" validate="false"
- * @struts.action-forward name="success" path="tiles:/learning/main"
- * @struts:action-forward name ="viewitem" path="/learning.do?dispatch=viewItem" redirect="true"
- * @struts.action-forward name="commentlist" path="tiles:/learning/commentlist"
- * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
- * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
- * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
- * @struts.action-forward name="finish" path="tiles:/learning/finish"
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class LearningAction extends LamsDispatchAction {
 

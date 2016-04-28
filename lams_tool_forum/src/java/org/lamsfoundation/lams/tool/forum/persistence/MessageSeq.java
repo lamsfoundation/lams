@@ -28,8 +28,8 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 /**
  * @author Steve.Ni
  *
- * @hibernate.class table="tl_lafrum11_message_seq"
- * @hibernate.cache usage = "transactional"
+ *
+ *
  * 
  */
 public class MessageSeq {
@@ -41,7 +41,7 @@ public class MessageSeq {
 	private short messageLevel;
 	
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
 	public Long getUid() {
 		return uid;
@@ -50,8 +50,8 @@ public class MessageSeq {
 		this.uid = uid;
 	}
 	/**
-	 * @hibernate.many-to-one column="root_message_uid" outer-join="true" 
-	 * 	cascade="none"
+	 *
+	 *
 	 */
 	public Message getRootMessage() {
 		return rootMessage;
@@ -60,8 +60,8 @@ public class MessageSeq {
 		this.rootMessage = rootTopicUid;
 	}
 	/**
-	 * @hibernate.many-to-one column="message_uid" outer-join="true" 
-	 * 	cascade="none"
+	 *
+	 *
 	 */
 	public Message getMessage() {
 		return message;
@@ -70,8 +70,8 @@ public class MessageSeq {
 		this.message = topicUid;
 	}
 	/**
-	 * @hibernate.many-to-one column="thread_message_uid" outer-join="true" 
-	 * 	cascade="none"
+	 *
+	 *
 	 */
 	public Message getThreadMessage() {
 		return threadMessage;
@@ -80,7 +80,7 @@ public class MessageSeq {
 		this.threadMessage = threadTopMessageUid;
 	}
 	/**
-	 * @hibernate.property column="message_level"
+	 *
 	 */
 	public short getMessageLevel() {
 		return messageLevel;

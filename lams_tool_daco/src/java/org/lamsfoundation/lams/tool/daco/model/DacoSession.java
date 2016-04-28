@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_ladaco10_sessions"
+ *
  * 
  */
 public class DacoSession {
@@ -55,7 +55,7 @@ public class DacoSession {
 	// Get/Set methods
 	// **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" column="uid"
+	 *
 	 * @return Returns the learnerID.
 	 */
 	public Long getUid() {
@@ -67,7 +67,7 @@ public class DacoSession {
 	}
 
 	/**
-	 * @hibernate.property column="session_end_date"
+	 *
 	 * @return
 	 */
 	public Date getSessionEndDate() {
@@ -79,7 +79,7 @@ public class DacoSession {
 	}
 
 	/**
-	 * @hibernate.property column="session_start_date"
+	 *
 	 * 
 	 * @return
 	 */
@@ -92,7 +92,7 @@ public class DacoSession {
 	}
 
 	/**
-	 * @hibernate.property
+	 *
 	 * @return
 	 */
 	public int getStatus() {
@@ -104,7 +104,7 @@ public class DacoSession {
 	}
 
 	/**
-	 * @hibernate.many-to-one column="content_uid" cascade="none" foreign-key="SessionToDaco"
+	 *
 	 * @return
 	 */
 	public Daco getDaco() {
@@ -116,7 +116,7 @@ public class DacoSession {
 	}
 
 	/**
-	 * @hibernate.property column="session_id"
+	 *
 	 * @return
 	 */
 	public Long getSessionId() {
@@ -128,7 +128,7 @@ public class DacoSession {
 	}
 
 	/**
-	 * @hibernate.property column="session_name" length="250"
+	 *
 	 * @return Returns the session name
 	 */
 	public String getSessionName() {
@@ -147,9 +147,9 @@ public class DacoSession {
 	/**
 	 * 
 	 * 
-	 * @hibernate.set lazy="true"  cascade="all" order-by="create_date desc"
-	 * @hibernate.collection-key column="session_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoQuestion"
+	 *
+	 *
+	 *
 	 * 
 	 * @return
 	 */

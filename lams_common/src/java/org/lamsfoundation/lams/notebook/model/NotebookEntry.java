@@ -30,7 +30,7 @@ import java.util.Date;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * @hibernate.class table="lams_notebook_entry"
+ *
  */
 public class NotebookEntry implements java.io.Serializable, Cloneable {
 
@@ -69,7 +69,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 */
 	public Long getUid() {
 		return uid;
@@ -80,7 +80,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 	
 	/**
-	 * @hibernate.property column="external_id"
+	 *
 	 */
 	public Long getExternalID() {
 		return externalID;
@@ -91,7 +91,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 	
 	/**
-	 * @hibernate.property column="external_id_type"
+	 *
 	 */
 	public Integer getExternalIDType() {
 		return externalIDType;
@@ -102,7 +102,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 	
 	/**
-	 * @hibernate.property column="external_signature"
+	 *
 	 */
 	public String getExternalSignature() {
 		return externalSignature;
@@ -113,8 +113,8 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}	
 
 	/**
-	 * @hibernate.many-to-one not-null="true" cascade="none"
-     * @hibernate.column name="user_id"  
+	 *
+     *
 	 */
 	public User getUser() {
 		return user;
@@ -127,7 +127,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	
 
 	/**
-	 * @hibernate.property column="title"
+	 *
 	 */
 	public String getTitle() {
 		return title;
@@ -138,7 +138,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="entry" type="text"
+	 *
 	 */
 	public String getEntry() {
 		return entry;
@@ -149,7 +149,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="create_date"
+	 *
 	 */
 	public Date getCreateDate() {
 		return createDate;
@@ -160,7 +160,7 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="last_modified"
+	 *
 	 */
 	public Date getLastModified() {
 		return lastModified;

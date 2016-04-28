@@ -59,12 +59,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @author Fiona Malikoff
  * 
- *         ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/grouping" parameter="method" validate="false"
- * @struts.action-forward name = "chosenGrouping" path = "/grouping/chosenGrouping.jsp"
+ *
+ *
  * 
- *                        ----------------XDoclet Tags--------------------
+ *
  */
 public class GroupingAJAXAction extends LamsDispatchAction {
 

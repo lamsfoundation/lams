@@ -66,12 +66,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * *
  * 
- * @struts.action path = "/authoring/importToolContent" validate = "false"
- * @struts.action-forward name="upload" path="/toolcontent/import.jsp"
- * @struts.action-forward name="success" path="/toolcontent/importresult.jsp"
- * @struts.action-forward name="successLC"
- *                        path="/toolcontent/importresultLC.jsp"
- * @struts.action-forward name="importLC" path="/toolcontent/importLC.jsp"
+ *
+ *
+ *
+ *
+ *
+ *
  * 
  * Import tool content servlet. It needs an uploaded learning design zip file.
  * @author Steve.Ni

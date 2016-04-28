@@ -61,9 +61,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  * 
- * @struts:action path="/orgmanage" parameter="dispatch" name="OrgManageForm" input=".orglist" scope="request" validate="false"
  *
- * @struts:action-forward name="orglist" path=".orglist"
+ *
+ *
  */
 public class OrgManageAction extends LamsDispatchAction {
     

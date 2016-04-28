@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * @hibernate.class table="lams_planner_node_role"
+ *
  * 
  */
 public class PedagogicalPlannerNodeRole {
@@ -49,7 +49,7 @@ public class PedagogicalPlannerNodeRole {
     }
     
     /**
-     * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
+     *
      */
     public Long getUid() {
         return uid;
@@ -60,7 +60,7 @@ public class PedagogicalPlannerNodeRole {
     }
 
     /**
-     * @hibernate.many-to-one column="node_uid" not-null="true"
+     *
      */
     public PedagogicalPlannerSequenceNode getNode() {
 	return node;
@@ -71,7 +71,7 @@ public class PedagogicalPlannerNodeRole {
     }
 
     /**
-     * @hibernate.many-to-one column="user_id" not-null="true"
+     *
      */
     public User getUser() {
 	return user;
@@ -82,7 +82,7 @@ public class PedagogicalPlannerNodeRole {
     }
 
     /**
-     * @hibernate.many-to-one column="role_id" not-null="true"
+     *
      */
     public Role getRole() {
 	return role;

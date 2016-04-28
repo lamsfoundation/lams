@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 
 
 /**
- * @hibernate.class table="tl_lasbmt11_submission_details"
+ *
  * @serial 5093528405144051727L
  */
 public class SubmissionDetails implements Serializable,Cloneable{
@@ -74,8 +74,8 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	public SubmissionDetails() {
 	}
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long"
-	 *               column="submission_id"
+	 *
+	 *
 	 */
 	public Long getSubmissionID() {
 		return this.submissionID;
@@ -86,7 +86,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="filePath" length="250"
+	 *
 	 */
 	public String getFilePath() {
 		return this.filePath;
@@ -97,7 +97,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="fileDescription" length="250"
+	 *
 	 */
 	public String getFileDescription() {
 		return this.fileDescription;
@@ -108,7 +108,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="date_of_submission" length="19"
+	 *
 	 */
 	public Date getDateOfSubmission() {
 		return this.dateOfSubmission;
@@ -119,7 +119,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="uuid" length="20"
+	 *
 	 */
 	public Long getUuid() {
 		return this.uuid;
@@ -130,7 +130,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="version_id" length="20"
+	 *
 	 */
 	public Long getVersionID() {
 		return this.versionID;
@@ -176,7 +176,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.one-to-one  cascade="all" not-null="false"
+	 *
 	 * foreign-key="report_id"
 	 * @return Returns the report.
 	 */
@@ -211,7 +211,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.many-to-one column="session_id" cascade="save-update" 
+	 *
 	 * @return Returns the submitFileSession.
 	 */
 	public SubmitFilesSession getSubmitFileSession() {
@@ -225,7 +225,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 	/**
 	/**
-	 * @hibernate.many-to-one column="learner_id" cascade="none"
+	 *
 	 * @return Returns the learner.
 	 */
 	public SubmitUser getLearner() {

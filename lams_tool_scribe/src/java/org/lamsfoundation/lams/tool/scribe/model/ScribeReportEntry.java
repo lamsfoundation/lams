@@ -29,7 +29,7 @@ import java.io.Serializable;
 /**
  * @author Anthony Sukkar
  *
- * @hibernate.class table="tl_lascrb11_report_entry"
+ *
  * 
  */
 public class ScribeReportEntry implements Serializable {
@@ -50,7 +50,7 @@ public class ScribeReportEntry implements Serializable {
 	// Getters / Setters
 	
 	/**
-	 * @hibernate.property column="entry_text" type="text"
+	 *
 	 */
 	public String getEntryText() {
 		return entryText;
@@ -61,8 +61,8 @@ public class ScribeReportEntry implements Serializable {
 	}
 	
 	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="scribe_heading_uid"
+	 *
+	 *
 	 */
 	public ScribeHeading getScribeHeading() {
 		return scribeHeading;
@@ -73,7 +73,7 @@ public class ScribeReportEntry implements Serializable {
 	}
 	
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 */
 	public Long getUid() {
 		return uid;
@@ -84,8 +84,8 @@ public class ScribeReportEntry implements Serializable {
 	}
 
 	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="scribe_session_uid" 
+	 *
+	 *
 	 */
 	public ScribeSession getScribeSession() {
 		return scribeSession;

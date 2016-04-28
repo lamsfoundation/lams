@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.kaltura.service.KalturaService;
 
 /**
- * @hibernate.class table="tl_lakalt11_kaltura"
+ *
  */
 
 public class Kaltura implements java.io.Serializable, Cloneable {
@@ -98,7 +98,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -110,7 +110,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
     public Date getCreateDate() {
@@ -122,7 +122,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
     public Date getUpdateDate() {
@@ -134,7 +134,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
+     *
      * 
      */
     public KalturaUser getCreatedBy() {
@@ -146,7 +146,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
     public String getTitle() {
@@ -158,7 +158,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
     public String getInstructions() {
@@ -170,7 +170,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      */
     public boolean isLockOnFinished() {
 	return lockOnFinished;
@@ -181,7 +181,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_contribute_videos" length="1"
+     *
      */
     public boolean isAllowContributeVideos() {
 	return allowContributeVideos;
@@ -192,7 +192,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_seeing_other_users_recordings" length="1"
+     *
      */
     public boolean isAllowSeeingOtherUsersRecordings() {
 	return allowSeeingOtherUsersRecordings;
@@ -203,7 +203,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="learner_contribution_limit"
+     *
      * @return learnerContributionLimit can be from 1 to 10 or -1 in case of unlimited
      */
     public int getLearnerContributionLimit() {
@@ -215,7 +215,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_comments" length="1"
+     *
      */
     public boolean isAllowComments() {
 	return allowComments;
@@ -226,7 +226,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_ratings" length="1"
+     *
      */
     public boolean isAllowRatings() {
 	return allowRatings;
@@ -237,7 +237,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      */
     public boolean isContentInUse() {
 	return contentInUse;
@@ -248,7 +248,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      */
     public boolean isDefineLater() {
 	return defineLater;
@@ -264,7 +264,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     /**
      * 
-     * @hibernate.property column="submission_deadline"
+     *
      * @return date submissionDeadline
      */
     public Date getSubmissionDeadline() {
@@ -272,7 +272,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      */
     public Long getToolContentId() {
 	return toolContentId;
@@ -283,7 +283,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -295,7 +295,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {
@@ -307,9 +307,9 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="kaltura_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.kaltura.model.KalturaSession"
+     *
+     *
+     *
      */
    public Set getKalturaSessions() {
 	return kalturaSessions;
@@ -320,9 +320,9 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="kaltura_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.kaltura.model.KalturaItem"
+     *
+     *
+     *
      */
     public Set getKalturaItems() {
 	return kalturaItems;

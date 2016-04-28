@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_lasurv11_question"
+ *
  * 
  */
 public class SurveyQuestion implements Cloneable {
@@ -94,7 +94,7 @@ public class SurveyQuestion implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -110,7 +110,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description" type="text"
+     *
      * @return
      */
     public String getDescription() {
@@ -122,9 +122,9 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="false" cascade="all-delete-orphan" inverse="false" order-by="sequence_id asc"
-     * @hibernate.collection-key column="question_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyOption"
+     *
+     *
+     *
      * @return
      */
     public Set<SurveyOption> getOptions() {
@@ -136,7 +136,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      * @return
      */
@@ -149,7 +149,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -161,7 +161,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="question_type"
+     *
      * @return
      */
     public short getType() {
@@ -173,7 +173,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="append_text"
+     *
      * @return
      */
     public boolean isAppendText() {
@@ -185,7 +185,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="optional"
+     *
      * @return
      */
     public boolean isOptional() {
@@ -197,7 +197,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_multiple_answer"
+     *
      * @return
      */
     public boolean isAllowMultipleAnswer() {
@@ -209,7 +209,7 @@ public class SurveyQuestion implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="sequence_id"
+     *
      * @return
      */
     public int getSequenceId() {

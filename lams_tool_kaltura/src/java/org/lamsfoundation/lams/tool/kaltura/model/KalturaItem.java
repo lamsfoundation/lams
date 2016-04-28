@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.kaltura.dto.AverageRatingDTO;
 /**
  * KalturaItem
  * 
- * @hibernate.class table="tl_lakalt11_kaltura_item"
+ *
  * 
  * @author Andrey Balan
  * 
@@ -134,7 +134,7 @@ public class KalturaItem implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -150,7 +150,7 @@ public class KalturaItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * @return
      */
     public String getTitle() {
@@ -162,7 +162,7 @@ public class KalturaItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="duration"
+     *
      * @return duration of the corresponding Kaltura video
      */
     public int getDuration() {
@@ -181,7 +181,7 @@ public class KalturaItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="entry_id" length="255"
+     *
      * @return
      */
     public String getEntryId() {
@@ -197,7 +197,7 @@ public class KalturaItem implements Cloneable {
      * 
      * @return item sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -214,7 +214,7 @@ public class KalturaItem implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      * @return
      */
@@ -227,7 +227,7 @@ public class KalturaItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -239,7 +239,7 @@ public class KalturaItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by_author"
+     *
      * @return
      */
     public boolean isCreateByAuthor() {
@@ -251,7 +251,7 @@ public class KalturaItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property type="java.lang.Long" column="kaltura_uid"
+     *
      * @return
      */
     public Long getKalturaUid() {
@@ -263,7 +263,7 @@ public class KalturaItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property type="java.lang.Long" column="mark"
+     *
      * @return
      */
     public Long getMark() {
@@ -275,7 +275,7 @@ public class KalturaItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_hidden"
+     *
      * @return
      */
     public boolean isHidden() {
@@ -287,9 +287,9 @@ public class KalturaItem implements Cloneable {
     }
     
     /**
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date asc"
-     * @hibernate.collection-key column="kaltura_item_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.kaltura.model.KalturaComment"
+     *
+     *
+     *
      * 
      * @return a set of Comments to this Image.
      */

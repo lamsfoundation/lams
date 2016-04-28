@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.learning.presence.model;
 import java.util.Date;
 
 /**
- * @hibernate.class table="lams_presence_chat_msgs"
+ *
  */
 public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 
@@ -58,7 +58,7 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -69,7 +69,7 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lesson_id"
+     *
      */
     public Long getLessonId() {
 	return lessonId;
@@ -80,7 +80,7 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="from_user"
+     *
      */
     public String getFrom() {
 	return from;
@@ -91,7 +91,7 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="to_user"
+     *
      */
     public String getTo() {
 	return to;
@@ -102,7 +102,7 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="date_sent"
+     *
      */
     public Date getDateSent() {
 	return dateSent;
@@ -113,7 +113,7 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="message"
+     *
      */
     public String getMessage() {
 	return message;

@@ -27,9 +27,9 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 /**
  * Runs extraction of chosen IMS QTI zip file and prepares form for user to manually choose interesting question.
  * 
- * @struts.action path="/questions" validate="false"
- * @struts.action-forward name="questionChoice" path="/questions/questionChoice.jsp"
- * @struts.action-forward name="questionFile" path="/questions/questionFile.jsp"
+ *
+ *
+ *
  */
 public class QuestionsAction extends Action {
     @SuppressWarnings("unchecked")

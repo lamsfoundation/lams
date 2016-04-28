@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_larsrc11_user"
+ *
  */
 public class ResourceUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;
@@ -104,7 +104,7 @@ public class ResourceUser implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -120,7 +120,7 @@ public class ResourceUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -136,7 +136,7 @@ public class ResourceUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="last_name"
+     *
      * @return
      */
     public String getLastName() {
@@ -148,7 +148,7 @@ public class ResourceUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="first_name"
+     *
      * @return
      */
     public String getFirstName() {
@@ -160,7 +160,7 @@ public class ResourceUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="login_name"
+     *
      * @return
      */
     public String getLoginName() {
@@ -172,7 +172,7 @@ public class ResourceUser implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="session_uid" cascade="none"
+     *
      * @return
      */
     public ResourceSession getSession() {
@@ -184,7 +184,7 @@ public class ResourceUser implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="resource_uid" cascade="none"
+     *
      * @return
      */
     public Resource getResource() {
@@ -196,7 +196,7 @@ public class ResourceUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="session_finished"
+     *
      * @return
      */
     public boolean isSessionFinished() {

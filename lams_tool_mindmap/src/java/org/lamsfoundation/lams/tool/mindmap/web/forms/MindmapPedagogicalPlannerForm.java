@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class MindmapPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     String instructions;

@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class ChatPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private String instructions;

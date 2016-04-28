@@ -24,12 +24,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @struts:action path="/signupManagement" name="SignupManagementForm" scope="request" validate="false"
- *                parameter="method"
+ *
+ *
  * 
- * @struts:action-forward name="signupPageList" path=".signupPageList"
- * @struts:action-forward name="addSignupPage" path=".addSignupPage"
- * @struts:action-forward name="signupPageListMethod" path="/signupManagement.do?method=list"
+ *
+ *
+ *
  */
 public class SignupManagementAction extends Action {
 

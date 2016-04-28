@@ -19,9 +19,9 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
  *         A servlet that loads at startup to do some maintainence like removing
  *         temp directories
  * 
- * @web:servlet name="lamsStartupServlet" load-on-startup = "1"
+ *
  * 
- * @web:servlet-mapping url-pattern="/lamsstartupservlet"
+ *
  */
 
 public class LamsStartupServlet extends HttpServlet {

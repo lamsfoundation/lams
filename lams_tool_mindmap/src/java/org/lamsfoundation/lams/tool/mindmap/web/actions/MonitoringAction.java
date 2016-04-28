@@ -65,10 +65,10 @@ import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvide
  * @author Ruslan Kazakov
  * @version 1.0.1
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request" name="monitoringForm" validate="false"
- * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="mindmap_display" path="tiles:/monitoring/mindmap_display"
- * @struts.action-forward name="reflect" path="tiles:/monitoring/reflect"
+ *
+ *
+ *
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 

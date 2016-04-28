@@ -35,7 +35,7 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 
 /**
- * @struts.form name="authoringForm"
+ *
  */
 public class AuthoringForm extends ActionForm {
 

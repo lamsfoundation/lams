@@ -37,8 +37,8 @@ import org.apache.log4j.Logger;
  * and must belong to a Forum.
  * 
  *
- * @hibernate.class table="tl_lafrum11_attachment"
- * @hibernate.cache usage = "transactional" 
+ *
+ *
  *
  */
 public class Attachment implements Cloneable{
@@ -95,7 +95,7 @@ public class Attachment implements Cloneable{
   	//		get/set methods
 //  **********************************************************
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
         return uid;
@@ -106,7 +106,7 @@ public class Attachment implements Cloneable{
     }
 
     /**
-     * @hibernate.property column="file_version_id"
+     *
      *
      */
     public Long getFileVersionId() {
@@ -118,7 +118,7 @@ public class Attachment implements Cloneable{
     }
 
     /**
-     * @hibernate.property column="file_type"
+     *
      */
     public String getFileType() {
         return fileType;
@@ -129,7 +129,7 @@ public class Attachment implements Cloneable{
     }
 
     /**
-     * @hibernate.property column="file_name"
+     *
      */
     public String getFileName() {
         return fileName;
@@ -141,7 +141,7 @@ public class Attachment implements Cloneable{
 
 
 	/**
-	 * @hibernate.property column="file_uuid"
+	 *
 	 * @return
 	 */
 	public Long getFileUuid() {
@@ -152,7 +152,7 @@ public class Attachment implements Cloneable{
 		this.fileUuid = uuid;
 	}
 	/**
-	 * @hibernate.property column="create_date"
+	 *
 	 * @return
 	 */
 	public Date getCreated() {

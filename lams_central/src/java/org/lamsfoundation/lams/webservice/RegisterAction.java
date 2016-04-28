@@ -77,10 +77,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author Andrey Balan
  * 
- *         ----------------XDoclet Tags--------------------
+ *
  * 
- * @web:servlet name="RegisterServlet"
- * @web:servlet-mapping url-pattern="/services/Register/*"
+ *
+ *
  * 
  */
 public class RegisterAction extends HttpServlet {

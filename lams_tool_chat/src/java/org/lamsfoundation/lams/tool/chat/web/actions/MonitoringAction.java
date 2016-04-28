@@ -62,13 +62,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request" name="monitoringForm" validate="false"
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="chat_client" path="tiles:/monitoring/chat_client"
- * @struts.action-forward name="chat_history" path="tiles:/monitoring/chat_history"
+ *
+ *
+ *
  * 
- * @struts.action-forward name="notebook" path="tiles:/monitoring/notebook"
+ *
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {

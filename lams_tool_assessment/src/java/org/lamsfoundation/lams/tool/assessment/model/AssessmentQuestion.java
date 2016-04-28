@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_assessment_question"
+ *
  */
 public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
@@ -209,7 +209,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -225,7 +225,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="question_type"
+     *
      * @return
      */
     public short getType() {
@@ -237,7 +237,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * @return
      */
     public String getTitle() {
@@ -249,7 +249,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="question" type="text"
+     *
      * @return
      */
     public String getQuestion() {
@@ -265,7 +265,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
      * 
      * @return image sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -284,7 +284,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     /**
      * Default grade set in author. To be used only in author
      * 
-     * @hibernate.property column="default_grade"
+     *
      * 
      * @return
      */
@@ -301,7 +301,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="penalty_factor"
+     *
      * @return
      */
     public float getPenaltyFactor() {
@@ -313,7 +313,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="answer_required"
+     *
      * @return
      */
     public boolean isAnswerRequired() {
@@ -325,7 +325,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="general_feedback" type="text"
+     *
      * @return
      */
     public String getGeneralFeedback() {
@@ -337,7 +337,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="feedback" type="text"
+     *
      * @return
      */
     public String getFeedback() {
@@ -349,7 +349,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="multiple_answers_allowed"
+     *
      * @return
      */
     public boolean isMultipleAnswersAllowed() {
@@ -361,7 +361,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="incorrect_answer_nullifies_mark"
+     *
      * @return
      */
     public boolean isIncorrectAnswerNullifiesMark() {
@@ -373,7 +373,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="feedback_on_correct" type="text"
+     *
      * @return
      */
     public String getFeedbackOnCorrect() {
@@ -385,7 +385,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="feedback_on_partially_correct" type="text"
+     *
      * @return
      */
     public String getFeedbackOnPartiallyCorrect() {
@@ -397,7 +397,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="feedback_on_incorrect" type="text"
+     *
      * @return
      */
     public String getFeedbackOnIncorrect() {
@@ -409,7 +409,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="shuffle"
+     *
      * @return
      */
     public boolean isShuffle() {
@@ -421,7 +421,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="case_sensitive"
+     *
      * @return
      */
     public boolean isCaseSensitive() {
@@ -433,7 +433,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="correct_answer"
+     *
      * @return
      */
     public boolean getCorrectAnswer() {
@@ -445,7 +445,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="allow_rich_editor"
+     *
      * @return
      */
     public boolean isAllowRichEditor() {
@@ -457,7 +457,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -469,7 +469,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      * @return
      */
@@ -483,9 +483,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * 
-     * @hibernate.set cascade="all" order-by="sequence_id asc"
-     * @hibernate.collection-key column="question_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption"
+     *
+     *
+     *
      * 
      * @return a set of options to this AssessmentQuestion.
      */
@@ -503,9 +503,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * 
-     * @hibernate.set cascade="all" order-by="sequence_id asc"
-     * @hibernate.collection-key column="question_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit"
+     *
+     *
+     *
      * 
      * @return a set of units to this AssessmentQuestion.
      */
@@ -524,7 +524,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     /**
      * maxWordsLimit set in author. Used only for essay type of questions
      * 
-     * @hibernate.property column="max_words_limit"
+     *
      * 
      * @return
      */
@@ -543,7 +543,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     /**
      * minWordsLimit set in author. Used only for essay type of questions
      * 
-     * @hibernate.property column="min_words_limit"
+     *
      * 
      * @return
      */
@@ -560,7 +560,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * @hibernate.property column="hedging_justification_enabled"
+     *
      * @return
      */
     public boolean isHedgingJustificationEnabled() {

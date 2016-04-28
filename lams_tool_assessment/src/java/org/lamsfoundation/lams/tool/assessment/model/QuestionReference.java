@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_question_reference"
+ *
  * 
  */
 public class QuestionReference implements Cloneable, Sequencable {
@@ -75,7 +75,7 @@ public class QuestionReference implements Cloneable, Sequencable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -91,7 +91,7 @@ public class QuestionReference implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.many-to-one cascade="save-update" column="question_uid"
+     *
      * 
      * @return
      */
@@ -104,7 +104,7 @@ public class QuestionReference implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.property column="question_type"
+     *
      * @return
      */
     public short getType() {
@@ -116,7 +116,7 @@ public class QuestionReference implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * @return
      */
     public String getTitle() {
@@ -132,7 +132,7 @@ public class QuestionReference implements Cloneable, Sequencable {
      * 
      * @return image sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -149,7 +149,7 @@ public class QuestionReference implements Cloneable, Sequencable {
     }
 
     /**
-     * @hibernate.property column="default_grade"
+     *
      * 
      * @return
      */
@@ -163,7 +163,7 @@ public class QuestionReference implements Cloneable, Sequencable {
 
    
     /**
-     * @hibernate.property column="random_question"
+     *
      * @return
      */
     public boolean isRandomQuestion() {

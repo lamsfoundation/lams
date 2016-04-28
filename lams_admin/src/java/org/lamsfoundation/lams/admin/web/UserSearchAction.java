@@ -50,9 +50,9 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 /**
  * @author jliew
  * 
- * @struts:action path="/usersearch" parameter="dispatch" input=".usersearchlist" scope="request" validate="false"
  *
- * @struts:action-forward name="usersearchlist" path=".usersearchlist"
+ *
+ *
  */
 public class UserSearchAction extends LamsDispatchAction {
 

@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * displaying user names but means that when people's names change, they won't
  * change in the "old" tool data.
  * 
- * @hibernate.class table="tl_lawiki10_user"
+ *
  */
 
 public class WikiUser implements java.io.Serializable {
@@ -88,7 +88,7 @@ public class WikiUser implements java.io.Serializable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      */
     public Long getUid() {
 	return this.uid;
@@ -99,7 +99,7 @@ public class WikiUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * 
      */
     public Long getUserId() {
@@ -111,7 +111,7 @@ public class WikiUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="last_name" length="255"
+     *
      * 
      */
     public String getLastName() {
@@ -123,7 +123,7 @@ public class WikiUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="login_name" length="255"
+     *
      * 
      */
     public String getLoginName() {
@@ -135,7 +135,7 @@ public class WikiUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="first_name" length="255"
+     *
      * 
      */
     public String getFirstName() {
@@ -147,7 +147,7 @@ public class WikiUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="finishedActivity"
+     *
      */
     public boolean isFinishedActivity() {
 	return finishedActivity;
@@ -158,8 +158,8 @@ public class WikiUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="wiki_session_uid"
+     *
+     *
      * 
      */
     public WikiSession getWikiSession() {
@@ -171,7 +171,7 @@ public class WikiUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="entry_uid"
+     *
      */
     public Long getEntryUID() {
 	return entryUID;
@@ -183,7 +183,7 @@ public class WikiUser implements java.io.Serializable {
     
     
     /**
-     * @hibernate.property column="wiki_edits"
+     *
      */
     public Integer getWikiEdits() {
         return wikiEdits;

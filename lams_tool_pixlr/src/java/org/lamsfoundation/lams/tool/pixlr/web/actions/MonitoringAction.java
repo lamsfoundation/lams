@@ -49,12 +49,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request"
- *                name="monitoringForm" validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="pixlr_display"
- *                        path="tiles:/monitoring/pixlr_display"
+ *
+ *
+ *
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {

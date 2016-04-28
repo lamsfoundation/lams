@@ -29,7 +29,7 @@ import java.io.Serializable;
  * Similar to DataOutputDefinition. It's bound with DataTransitions. It defines what outputs the source tool can
  * provide. Teacher can rename the data flow object so it's more meaningful to him.
  * 
- * @hibernate.class table="lams_data_flow"
+ *
  */
 public class DataFlowObject implements Serializable {
     /** identifier field */
@@ -68,7 +68,7 @@ public class DataFlowObject implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="data_flow_object_id"
+     *
      * 
      */
     public Long getDataFlowObjectId() {
@@ -80,8 +80,8 @@ public class DataFlowObject implements Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="transition_id"
+     *
+     *
      * 
      */
     public DataTransition getDataTransition() {
@@ -93,7 +93,7 @@ public class DataFlowObject implements Serializable {
     }
 
     /**
-     * @hibernate.property column="name" length="255"
+     *
      */
     public String getName() {
 	return name;
@@ -104,7 +104,7 @@ public class DataFlowObject implements Serializable {
     }
 
     /**
-     * @hibernate.property column="display_name" length="255"
+     *
      */
     public String getDisplayName() {
 	return displayName;
@@ -115,7 +115,7 @@ public class DataFlowObject implements Serializable {
     }
 
     /**
-     * @hibernate.property column="order_id" length="11"
+     *
      */
     public Integer getOrderId() {
 	return orderId;
@@ -126,7 +126,7 @@ public class DataFlowObject implements Serializable {
     }
 
     /**
-     * @hibernate.property column="tool_assigment_id" length="11"
+     *
      */
     public Integer getToolAssigmentId() {
 	return toolAssigmentId;

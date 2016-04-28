@@ -5,7 +5,7 @@ import org.apache.struts.validator.ValidatorForm;
 /**
 *
 * 	Learner Form.
-*	@struts.form name="learnerForm"
+*
 *
 */
 public class LearnerForm extends ValidatorForm {

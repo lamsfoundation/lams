@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class
+ *
  */
 public abstract class SimpleActivity extends Activity implements Serializable {
     protected SimpleActivityStrategy simpleActivityStrategy;

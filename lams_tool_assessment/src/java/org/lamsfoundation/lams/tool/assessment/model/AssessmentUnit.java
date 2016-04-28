@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_assessment_unit"
+ *
  */
 public class AssessmentUnit implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentUnit.class);
@@ -48,7 +48,7 @@ public class AssessmentUnit implements Cloneable, Sequencable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" column="uid"
+     *
      * @return Returns the answer ID.
      */
     public Long getUid() {
@@ -64,7 +64,7 @@ public class AssessmentUnit implements Cloneable, Sequencable {
      * 
      * @return image sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -81,7 +81,7 @@ public class AssessmentUnit implements Cloneable, Sequencable {
     }
 
     /**
-     * @hibernate.property column="multiplier"
+     *
      * 
      * @return Returns multiplier.
      */
@@ -94,7 +94,7 @@ public class AssessmentUnit implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.property column="unit"
+     *
      * 
      * @return Returns unit.
      */

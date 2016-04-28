@@ -47,13 +47,13 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * struts doclets
  * 
- * @struts:action path="/userorg"
- *                name="UserOrgForm"
- *                scope="request"
- *                validate="false"
  *
- * @struts:action-forward name="userorg"
- *                        path=".userorg"
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class UserOrgAction extends Action {
 	

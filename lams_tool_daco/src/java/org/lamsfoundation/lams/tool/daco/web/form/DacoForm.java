@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.daco.model.Daco;
  * 
  * Daco Form.
  * 
- * @struts.form name="dacoForm"
+ *
  * 
  * User: Dapeng.Ni
  */

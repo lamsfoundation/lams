@@ -57,9 +57,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * struts doclets
  * 
- * @struts:action path="/usermanage" validate="false"
  *
- * @struts:action-forward name="userlist" path=".userlist"
+ *
+ *
  */
 public class UserManageAction extends Action {
 

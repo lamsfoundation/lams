@@ -4,7 +4,7 @@ import org.lamsfoundation.lams.learningdesign.dto.CompetenceDTO;
 
 /**
  * 
- * @hibernate.class table="lams_competence"
+ *
  */
 public class Competence {
 
@@ -17,8 +17,8 @@ public class Competence {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long"
-     *               column="competence_id"
+     *
+     *
      */
     public Long getCompetenceId() {
 	return this.competenceId;
@@ -29,7 +29,7 @@ public class Competence {
     }
 
     /**
-     * @hibernate.property column="title" length="255" not-null="true"
+     *
      */
     public String getTitle() {
 	return title;
@@ -40,7 +40,7 @@ public class Competence {
     }
 
     /**
-     * @hibernate.property column="description" length="65535" not-null="false"
+     *
      */
     public String getDescription() {
 	return description;
@@ -51,8 +51,8 @@ public class Competence {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="learning_design_id"
+     *
+     *
      * 
      */
     public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {

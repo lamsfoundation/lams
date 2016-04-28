@@ -17,7 +17,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 /**
  * 
  * @author Dapeng.Ni
- * @struts.form name="SbmtAuthoringForm"
+ *
  */
 public class AuthoringForm extends ValidatorForm {
 

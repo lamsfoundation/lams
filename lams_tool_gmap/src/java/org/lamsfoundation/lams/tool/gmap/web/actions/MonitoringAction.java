@@ -56,13 +56,13 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
  * @author
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request"
- *                name="monitoringForm" validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="gmap_display"
- *                        path="tiles:/monitoring/gmap_display"
- * @struts.action-forward name="notebook" path="/pages/monitoring/notebook.jsp"
+ *
+ *
+ *
+ *
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {

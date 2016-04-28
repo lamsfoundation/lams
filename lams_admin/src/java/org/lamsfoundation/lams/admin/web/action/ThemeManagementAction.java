@@ -47,10 +47,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  *         Actions for maintaining and altering system themes
  * 
- * @struts.action path="/themeManagement" parameter="method" name="themeForm" input=".themeManagement" scope="request"
- *                validate="false"
- * @struts.action-forward name="success" path=".themeManagement"
- * @struts.action-forward name="error" path=".error"
+ *
+ *
+ *
+ *
  */
 public class ThemeManagementAction extends LamsDispatchAction {
 

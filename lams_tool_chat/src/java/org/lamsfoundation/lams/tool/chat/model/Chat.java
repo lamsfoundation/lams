@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
 /**
- * @hibernate.class table="tl_lachat11_chat"
+ *
  */
 
 public class Chat implements java.io.Serializable, Cloneable {
@@ -111,7 +111,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
 
@@ -124,7 +124,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
 
@@ -137,7 +137,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
 
@@ -150,7 +150,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by" length="20"
+     *
      * 
      */
 
@@ -163,7 +163,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
 
@@ -176,7 +176,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
 
@@ -189,7 +189,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      * 
      */
 
@@ -202,7 +202,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity" length="1"
+     *
      */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
@@ -213,7 +213,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions" length="65535"
+     *
      */
     public String getReflectInstructions() {
 	return reflectInstructions;
@@ -224,7 +224,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * 
      */
 
@@ -237,7 +237,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      * 
      */
 
@@ -250,7 +250,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      * 
      */
 
@@ -263,9 +263,9 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="chat_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
+     *
+     *
+     *
      * 
      */
 
@@ -278,7 +278,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="filtering_enabled" length="1"
+     *
      */
     public boolean isFilteringEnabled() {
 	return filteringEnabled;
@@ -289,7 +289,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="filter_keywords" length="65535"
+     *
      */
     public String getFilterKeywords() {
 	return filterKeywords;
@@ -300,7 +300,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
 	/**
-	 * @hibernate.property column="submission_deadline"
+	 *
 	 * @return
 	 */
 	public Date getSubmissionDeadline() {
@@ -388,10 +388,10 @@ public class Chat implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" cascade="all"
+     *
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
-     * @hibernate.collection-key column="content_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatCondition"
+     *
+     *
      * 
      */
     public Set<ChatCondition> getConditions() {

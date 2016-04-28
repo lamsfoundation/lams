@@ -52,10 +52,10 @@ import org.springframework.transaction.UnexpectedRollbackException;
  * 
  * XDoclet definition:
  * 
- * @struts:action path="/LoadToolActivity" name="activityForm" validate="false" scope="request"
+ *
  * 
- * @struts:action-forward name="displayTool" path=".loadToolActivity"
- * @struts:action-forward name="message" path=".message"
+ *
+ *
  * 
  */
 public class LoadToolActivityAction extends ActivityAction {

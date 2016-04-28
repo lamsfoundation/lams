@@ -3,7 +3,7 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 /**
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_burning_que_like"
+ *
  */
 public class BurningQuestionLike {
 
@@ -12,7 +12,7 @@ public class BurningQuestionLike {
     private Long sessionId;
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -24,7 +24,7 @@ public class BurningQuestionLike {
     }
 
     /**
-     * @hibernate.many-to-one column="burning_question_uid" cascade="none"
+     *
      * @return
      */
     public ScratchieBurningQuestion getBurningQuestion() {
@@ -36,7 +36,7 @@ public class BurningQuestionLike {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {

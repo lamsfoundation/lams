@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Marcin Cieslak
  * 
- * @hibernate.class table="tl_ladaco10_questions"
+ *
  * 
  */
 public class DacoQuestion implements Cloneable {
@@ -93,7 +93,7 @@ public class DacoQuestion implements Cloneable {
 	// Get/Set methods
 	// **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the uid.
 	 */
 	public Long getUid() {
@@ -109,7 +109,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="description"
+	 *
 	 * @return
 	 */
 	public String getDescription() {
@@ -121,7 +121,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.many-to-one cascade="none" column="create_by" foreign-key="QuestionToUser"
+	 *
 	 * 
 	 * @return
 	 */
@@ -134,7 +134,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="create_date"
+	 *
 	 * @return
 	 */
 	public Date getCreateDate() {
@@ -146,7 +146,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="is_required"
+	 *
 	 * @return
 	 */
 	public boolean isRequired() {
@@ -158,7 +158,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="question_type"
+	 *
 	 * @return
 	 */
 	public short getType() {
@@ -170,7 +170,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="min_constraint"
+	 *
 	 * @return
 	 */
 	public Float getMin() {
@@ -182,7 +182,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="max_constraint"
+	 *
 	 * @return
 	 */
 	public Float getMax() {
@@ -194,7 +194,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="digits_decimal"
+	 *
 	 * @return
 	 */
 	public Short getDigitsDecimal() {
@@ -206,7 +206,7 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="summary"
+	 *
 	 * @return
 	 */
 	public Short getSummary() {
@@ -218,9 +218,9 @@ public class DacoQuestion implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.set cascade="all" order-by="sequence_num asc"
-	 * @hibernate.collection-key column="question_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption"
+	 *
+	 *
+	 *
 	 * @return
 	 */
 	public Set<DacoAnswerOption> getAnswerOptions() {
@@ -241,7 +241,7 @@ public class DacoQuestion implements Cloneable {
 		}*/
 
 	/**
-	 * @hibernate.many-to-one column="content_uid" cascade="none" foreign-key="QuestionToDaco" insert="false" update="false"
+	 *
 	 * @return
 	 */
 	public Daco getDaco() {

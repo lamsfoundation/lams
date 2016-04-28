@@ -57,9 +57,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author jliew
  *
- * @struts:action path="/complexProgress" validate="false"
- * @struts.action-forward name = "complexProgress" path = ".complexProgress"
- * @struts.action-forward name = "parallelProgress" path = "/parallelProgress.jsp"
+ *
+ *
+ *
  */
 public class ComplexLearnerProgressAction extends Action {
 

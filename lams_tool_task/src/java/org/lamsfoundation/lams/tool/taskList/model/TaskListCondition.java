@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_latask10_condition"
+ *
  */
 public class TaskListCondition implements Cloneable{
 	
@@ -127,7 +127,7 @@ public class TaskListCondition implements Cloneable{
 	 * 
 	 * @return tasklistCondition id
 	 * 
-	 * @hibernate.id column="condition_uid" generator-class="native"
+	 *
 	 */
 	public Long getUid() {
 		return uid;
@@ -147,8 +147,8 @@ public class TaskListCondition implements Cloneable{
 	 * 
 	 * @return condition's name.
 	 *
-	 * @hibernate.property
-	 * 		column="name"
+	 *
+	 *
 	 *
 	 */
 	public String getName() {
@@ -168,12 +168,12 @@ public class TaskListCondition implements Cloneable{
 	 * 
 	 * @return set of TaskListItems
 	 * 
-	 * @hibernate.set lazy="true"
-	 * 				  inverse="false"
-	 * 				  cascade="none"
-     * 				  table = "tl_latask10_condition_tl_item"
-     * @hibernate.collection-key column="condition_uid"
-     * @hibernate.collection-many-to-many column="uid" class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
+	 *
+	 *
+	 *
+     *
+     *
+     *
 	 */
 	public Set getTaskListItems() {
 		return taskListItems;
@@ -194,9 +194,9 @@ public class TaskListCondition implements Cloneable{
 //	 * 
 //	 * @return taskList to which this condition applies
 //	 * 
-//     * @hibernate.many-to-one
-//     *     	cascade="none"
-//     * 		column="taskList_uid"
+//     *
+//     *
+//     *
 //	 */
 //	public TaskList getTaskList() {
 //		return taskList;
@@ -217,7 +217,7 @@ public class TaskListCondition implements Cloneable{
 	 * 
 	 * @return condition's sequence number
 	 * 
-	 * @hibernate.property column="sequence_id"
+	 *
 	 */
 	public int getSequenceId() {
 		return sequenceId;

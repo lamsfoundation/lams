@@ -39,8 +39,8 @@ import org.lamsfoundation.lams.tool.forum.util.AttachmentComparator;
 /**
  * @author conradb
  * 
- * @hibernate.class table="tl_lafrum11_message"
- * @hibernate.cache usage = "transactional"
+ *
+ *
  * 
  */
 public class Message implements Cloneable {
@@ -202,7 +202,7 @@ public class Message implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -221,7 +221,7 @@ public class Message implements Cloneable {
      * Returns this topic last reply date
      * 
      * @return date
-     * @hibernate.property column="last_reply_date"
+     *
      */
     public Date getLastReplyDate() {
 	return lastReplyDate;
@@ -235,7 +235,7 @@ public class Message implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -253,7 +253,7 @@ public class Message implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Forum.
      * 
-     * @hibernate.many-to-one column="create_by" cascade="none"
+     *
      * 
      */
     public ForumUser getCreatedBy() {
@@ -269,7 +269,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="modified_by" cascade="none"
+     *
      * 
      * @return Returns the userid of the user who modified the posting.
      */
@@ -286,7 +286,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -299,7 +299,7 @@ public class Message implements Cloneable {
     /**
      * @return Returns the subject of the Message.
      * 
-     * @hibernate.property column="subject"
+     *
      * 
      */
     public String getSubject() {
@@ -317,7 +317,7 @@ public class Message implements Cloneable {
     /**
      * @return Returns the body of the Message.
      * 
-     * @hibernate.property column="body" type="text"
+     *
      * 
      */
     public String getBody() {
@@ -337,7 +337,7 @@ public class Message implements Cloneable {
      * 
      * @return Message sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -356,7 +356,7 @@ public class Message implements Cloneable {
     /**
      * @return Returns true if the Message was an Authored Message.
      * 
-     * @hibernate.property column="is_authored"
+     *
      * 
      */
     public boolean getIsAuthored() {
@@ -374,7 +374,7 @@ public class Message implements Cloneable {
     /**
      * @return Returns whether the Message should be shown as an Annonymous message.
      * 
-     * @hibernate.property column="is_anonymous"
+     *
      * 
      */
     public boolean getIsAnonymous() {
@@ -392,8 +392,8 @@ public class Message implements Cloneable {
     /**
      * Gets the toolSession
      * 
-     * @hibernate.many-to-one cascade="none" class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession"
-     *                        column="forum_session_uid"
+     *
+     *
      * 
      */
     public ForumToolSession getToolSession() {
@@ -417,7 +417,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="parent_uid"
+     *
      * @return
      */
     public Message getParent() {
@@ -427,9 +427,9 @@ public class Message implements Cloneable {
     /**
      * @return a set of Attachments to this Message.
      * 
-     * @hibernate.set table="ATTACHMENT" inverse="false" lazy="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="message_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+     *
+     *
+     *
      * 
      */
     public Set getAttachments() {
@@ -444,7 +444,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="forum_uid" cascade="none"
+     *
      * @return
      */
     public Forum getForum() {
@@ -456,7 +456,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reply_number"
+     *
      * @return
      */
     public int getReplyNumber() {
@@ -468,7 +468,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="hide_flag"
+     *
      * @return
      */
     public boolean isHideFlag() {
@@ -480,7 +480,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="report_id" cascade="all"
+     *
      * @return
      */
     public ForumReport getReport() {
@@ -494,9 +494,9 @@ public class Message implements Cloneable {
     /**
      * @return the set of all messages cloned from this message.
      * 
-     * @hibernate.set cascade="none" inverse="false"
-     * @hibernate.collection-key column="authored_parent_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+     *
+     *
+     *
      * 
      */
     public Set getSessionClones() {

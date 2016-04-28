@@ -38,10 +38,10 @@ import org.apache.log4j.Logger;
 
 
 /** 
- *        @hibernate.class
- *         table="lams_cr_node_version_property"
+ *
+ *
  * 
- * 		  @hibernate.cache usage = "transactional"
+ *
 */
 public class CrNodeVersionProperty implements IValue,Serializable {
 
@@ -73,11 +73,11 @@ public class CrNodeVersionProperty implements IValue,Serializable {
     }
 
     /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="id"
-     *             unsaved-value="0"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Long getId() {
@@ -89,10 +89,10 @@ public class CrNodeVersionProperty implements IValue,Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="name"
-     *             length="255"
-     *             not-null="true"
+     *
+     *
+     *
+     *
      *         
      */
     public String getName() {
@@ -104,10 +104,10 @@ public class CrNodeVersionProperty implements IValue,Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="value"
-     *             length="255"
-     *             not-null="true"
+     *
+     *
+     *
+     *
      *         
      */
     public String getValue() {
@@ -119,10 +119,10 @@ public class CrNodeVersionProperty implements IValue,Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="type"
-     *             length="3"
-     *             not-null="true"
+     *
+     *
+     *
+     *
      *         
      */
     public int getType() {
@@ -141,9 +141,9 @@ public class CrNodeVersionProperty implements IValue,Serializable {
     /** 
      * bi-directional many-to-one association to CrNodeVersion
      * 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="nv_id"         
+     *
+     *
+     *
      *         
      */
     public org.lamsfoundation.lams.contentrepository.CrNodeVersion getCrNodeVersion() {

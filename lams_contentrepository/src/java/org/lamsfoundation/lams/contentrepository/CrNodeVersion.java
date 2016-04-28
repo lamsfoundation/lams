@@ -35,10 +35,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /** 
- *        @hibernate.class
- *         table="lams_cr_node_version"
+ *
+ *
  *     
- * 		  @hibernate.cache usage = "transactional"
+ *
 */
 public class CrNodeVersion implements Serializable {
 
@@ -100,11 +100,11 @@ public class CrNodeVersion implements Serializable {
     } */
 
     /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="nv_id"
-     *             unsaved-value="0"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Long getNvId() {
@@ -116,11 +116,11 @@ public class CrNodeVersion implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="version_id"
-     *             type="java.lang.Long"
-     *             length="20"
-     *             not-null="true"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Long getVersionId() {
@@ -132,10 +132,10 @@ public class CrNodeVersion implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="created_date_time"
-     *             type="java.sql.Timestamp"
-     *             length="14"
+     *
+     *
+     *
+     *
      *         
      */
     public Date getCreatedDateTime() {
@@ -147,10 +147,10 @@ public class CrNodeVersion implements Serializable {
     }
 
 	/** 
-     *            @hibernate.property
-     *		       type="java.lang.Integer"
-     *		       column="user_id"
-     *			   not-null="true"
+     *
+     *
+     *
+     *
      */
 	public Integer getUserId() {
 		return userId;
@@ -164,9 +164,9 @@ public class CrNodeVersion implements Serializable {
     /** 
      * bi-directional many-to-one association to CrNode
      * 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="node_id"         
+     *
+     *
+     *
      *         
      */
     public org.lamsfoundation.lams.contentrepository.CrNode getNode() {
@@ -180,15 +180,15 @@ public class CrNodeVersion implements Serializable {
     /** 
      * bi-directional one-to-many association to CrNodeVersionProperty
      * 
-     *            @hibernate.set
-     *             lazy="false"
-     *             inverse="true"
-     *             cascade="all-delete-orphan"
-     *            @hibernate.collection-key
-     *             column="nv_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty"
-     *         	  @hibernate.collection-cache	
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      * 			   usage = "transactional"
      */
     public Set getCrNodeVersionProperties() {
@@ -207,14 +207,14 @@ public class CrNodeVersion implements Serializable {
      * This is lazy loaded, so will need special care when you need these
      * details.
      * 
-     *            @hibernate.set
-     *             lazy="false"
-     *             inverse="true"
-     *             cascade="all-delete-orphan"
-     *            @hibernate.collection-key
-     *             column="parent_nv_id "
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      *         
     public Set getChildNodes() {
         return this.childNodes;
@@ -350,7 +350,7 @@ public class CrNodeVersion implements Serializable {
     /** Remove a property.
      * 
      * Removes it from the collection, and as the collection
-     * is cascade="all-delete-orphan", the property should be 
+     *
      * removed from the db automatically.
      */
     private void removeProperty(String name) {

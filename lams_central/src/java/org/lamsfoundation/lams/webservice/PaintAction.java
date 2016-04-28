@@ -41,13 +41,13 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 /** 
 * @author Paul Georges
 
-* ----------------XDoclet Tags--------------------
+*
 * 
-* @struts:action path="/Paint" 
-*                parameter="method" 
-*                validate="false"
+*
+*
+*
 * 
-* ----------------XDoclet Tags--------------------
+*
 * 
 * Currently this action class is unused, but we will retain it in the source for any future use
 * with the Paint FCKEditor plugin.

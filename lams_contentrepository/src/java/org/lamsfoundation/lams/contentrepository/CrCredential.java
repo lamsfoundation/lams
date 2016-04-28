@@ -32,8 +32,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /** 
- *        @hibernate.class
- *         table="lams_cr_credential"
+ *
+ *
  *     
 */
 public class CrCredential implements Serializable {
@@ -62,11 +62,11 @@ public class CrCredential implements Serializable {
     }
 
     /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="credential_id"
-     *             unsaved-value="0"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Long getCredentialId() {
@@ -78,11 +78,11 @@ public class CrCredential implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="name"
-     *             unique="true"
-     *             length="255"
-     *             not-null="true"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public String getName() {
@@ -94,10 +94,10 @@ public class CrCredential implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="password"
-     *             length="255"
-     *             not-null="true"
+     *
+     *
+     *
+     *
      *         
      */
     public String getPassword() {
@@ -111,14 +111,14 @@ public class CrCredential implements Serializable {
     /** 
      * bi-directional one-to-many association to CrWorkspaceCredential 
      * 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="credential_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential"
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Set getCrWorkspaceCredentials() {

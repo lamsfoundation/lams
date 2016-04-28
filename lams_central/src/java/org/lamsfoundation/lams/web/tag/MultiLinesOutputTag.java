@@ -10,9 +10,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 /**
  * JSP tag. It converts text from \n or \r\n to &lt;BR&gt; before rendering.
  * 
- * @jsp.tag name="out" body-content="empty" 
- * 			display-name="Converts text from \n or \r\n to &lt;BR&gt; before rendering" 
- *          description="Converts text from \n or \r\n to &lt;BR&gt; before rendering"
+ *
+ *
+ * Converts text from \n or \r\n to &lt;BR&gt; before rendering
  * 
  * @author steven
  */
@@ -31,7 +31,7 @@ public class MultiLinesOutputTag extends SimpleTagSupport {
 	}
 
 	/**
-	 * @jsp.attribute required="true" rtexprvalue="true"
+	 *
 	 * @return
 	 */
 	public String getValue() {
@@ -43,7 +43,7 @@ public class MultiLinesOutputTag extends SimpleTagSupport {
 	}
 
 	/**
-	 * @jsp.attribute required="false" rtexprvalue="true" description="escape html characters"
+	 *
 	 */
 	public boolean getEscapeHtml() {
 		return this.escapeHtml;

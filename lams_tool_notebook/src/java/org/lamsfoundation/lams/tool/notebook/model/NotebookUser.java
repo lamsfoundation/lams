@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
  * people's names change, they won't change in the "old" tool data.
  * 
- * @hibernate.class table="tl_lantbk11_user"
+ *
  */
 public class NotebookUser implements java.io.Serializable {
 
@@ -80,7 +80,7 @@ public class NotebookUser implements java.io.Serializable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      */
     public Long getUid() {
 	return this.uid;
@@ -91,7 +91,7 @@ public class NotebookUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * 
      */
     public Long getUserId() {
@@ -103,7 +103,7 @@ public class NotebookUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="last_name" length="255"
+     *
      * 
      */
     public String getLastName() {
@@ -115,7 +115,7 @@ public class NotebookUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="login_name" length="255"
+     *
      * 
      */
     public String getLoginName() {
@@ -127,7 +127,7 @@ public class NotebookUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="first_name" length="255"
+     *
      * 
      */
     public String getFirstName() {
@@ -139,7 +139,7 @@ public class NotebookUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="finishedActivity"
+     *
      */
     public boolean isFinishedActivity() {
 	return finishedActivity;
@@ -150,8 +150,8 @@ public class NotebookUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="notebook_session_uid"
+     *
+     *
      * 
      */
     public NotebookSession getNotebookSession() {
@@ -163,7 +163,7 @@ public class NotebookUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="entry_uid"
+     *
      */
     public Long getEntryUID() {
 	return entryUID;
@@ -174,7 +174,7 @@ public class NotebookUser implements java.io.Serializable {
     }
     
     /**
-     * @hibernate.property column="teachers_comment" length="65535"
+     *
      * 
      */
     public String getTeachersComment() {

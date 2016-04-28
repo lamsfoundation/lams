@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * 
  * @author  Andrey Balan 
  * 
- * @struts:action path="/clearsession" validate="false"
+ *
  * 
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction {

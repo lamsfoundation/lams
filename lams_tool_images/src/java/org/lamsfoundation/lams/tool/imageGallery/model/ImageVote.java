@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimag10_image_vote"
+ *
  */
 public class ImageVote implements Cloneable {
 
@@ -85,7 +85,7 @@ public class ImageVote implements Cloneable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -97,7 +97,7 @@ public class ImageVote implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="create_by" cascade="none"
+     *
      * @return
      */
     public ImageGalleryUser getCreateBy() {
@@ -109,7 +109,7 @@ public class ImageVote implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_voted"
+     *
      * @return
      */
     public boolean isVoted() {
@@ -121,7 +121,7 @@ public class ImageVote implements Cloneable {
     }
     
     /**
-     * @hibernate.many-to-one column="imageGallery_item_uid" cascade="none"
+     *
      * @return
      */
     public ImageGalleryItem getImageGalleryItem() {

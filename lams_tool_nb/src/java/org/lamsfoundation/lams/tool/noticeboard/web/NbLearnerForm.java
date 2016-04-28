@@ -31,11 +31,11 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 /**
  * Creation Date: 19-05-05
  *  
- * ----------------XDoclet Tags--------------------
- * 
- * @struts:form name="NbLearnerForm" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm"
  *
- * ----------------XDoclet Tags--------------------
+ * 
+ *
+ *
+ *
  */
 
 public class NbLearnerForm extends ActionForm{

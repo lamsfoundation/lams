@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_laimag10_user"
+ *
  * 
  */
 public class ImageGalleryUser implements Cloneable {
@@ -102,7 +102,7 @@ public class ImageGalleryUser implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -118,7 +118,7 @@ public class ImageGalleryUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -134,7 +134,7 @@ public class ImageGalleryUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="last_name"
+     *
      * @return
      */
     public String getLastName() {
@@ -146,7 +146,7 @@ public class ImageGalleryUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property length="255" column="first_name"
+     *
      * @return
      */
     public String getFirstName() {
@@ -158,7 +158,7 @@ public class ImageGalleryUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="login_name"
+     *
      * @return
      */
     public String getLoginName() {
@@ -170,7 +170,7 @@ public class ImageGalleryUser implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="session_uid" cascade="none"
+     *
      * @return
      */
     public ImageGallerySession getSession() {
@@ -182,7 +182,7 @@ public class ImageGalleryUser implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="imageGallery_uid" cascade="none"
+     *
      * @return
      */
     public ImageGallery getImageGallery() {
@@ -194,7 +194,7 @@ public class ImageGalleryUser implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="session_finished"
+     *
      * @return
      */
     public boolean isSessionFinished() {

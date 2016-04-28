@@ -48,10 +48,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @struts.action path="/monitoring" parameter="dispatch" scope="request" name="monitoringForm" validate="false"
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="manageLeaders" path="/pages/monitoring/manageLeaders.jsp"
+ *
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 

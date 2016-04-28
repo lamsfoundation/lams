@@ -74,13 +74,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author lfoxton
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request"
- *                name="learningForm" validate="false"
- * @struts.action-forward name="wiki" path="tiles:/learning/main"
- * @struts.action-forward name="compareWiki" path="/pages/wiki/compare.jsp"
- * @struts.action-forward name="viewWiki" path="/pages/wiki/viewWiki.jsp"
- * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
- * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class LearningAction extends WikiPageAction {
 

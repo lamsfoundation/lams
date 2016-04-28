@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolCont
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimsc11_commoncartridge"
+ *
  * 
  */
 public class CommonCartridge implements Cloneable {
@@ -185,7 +185,7 @@ public class CommonCartridge implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -204,7 +204,7 @@ public class CommonCartridge implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -222,7 +222,7 @@ public class CommonCartridge implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Share commonCartridge.
      * 
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
+     *
      * 
      */
     public CommonCartridgeUser getCreatedBy() {
@@ -238,7 +238,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -251,7 +251,7 @@ public class CommonCartridge implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
+     *
      * 
      */
     public String getTitle() {
@@ -269,7 +269,7 @@ public class CommonCartridge implements Cloneable {
     /**
      * @return Returns the lockWhenFinish.
      * 
-     * @hibernate.property column="lock_on_finished"
+     *
      * 
      */
     public boolean getLockWhenFinished() {
@@ -287,7 +287,7 @@ public class CommonCartridge implements Cloneable {
     /**
      * @return Returns the instructions set by the teacher.
      * 
-     * @hibernate.property column="instructions" type="text"
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -300,9 +300,9 @@ public class CommonCartridge implements Cloneable {
     /**
      * 
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="commonCartridge_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -315,7 +315,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use"
+     *
      * @return
      */
     public boolean isContentInUse() {
@@ -327,7 +327,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
+     *
      * @return
      */
     public boolean isDefineLater() {
@@ -339,7 +339,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
+     *
      * @return
      */
     public Long getContentId() {
@@ -351,7 +351,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="mini_view_commonCartridge_number"
+     *
      * @return
      */
     public int getMiniViewCommonCartridgeNumber() {
@@ -363,7 +363,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_auto_run"
+     *
      * @return
      */
     public boolean isRunAuto() {
@@ -388,7 +388,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -400,7 +400,7 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {

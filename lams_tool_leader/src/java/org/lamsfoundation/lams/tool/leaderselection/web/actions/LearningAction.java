@@ -54,9 +54,9 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * @struts.action path="/learning" parameter="dispatch" scope="request"
- * @struts.action-forward name="leaderselection" path="tiles:/learning/main"
- * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
+ *
+ *
+ *
  */
 public class LearningAction extends LamsDispatchAction {
 

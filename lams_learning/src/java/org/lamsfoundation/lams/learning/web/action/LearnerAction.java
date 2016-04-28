@@ -74,12 +74,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @since 3/03/2005
  * @version 1.1
  * 
- *          ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/learner" parameter="method" validate="false"
- * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
- * @struts:action-forward name="displayProgress" path="/mobile/progress.jsp"
- * @struts:action-forward name="message" path=".message"
+ *
+ *
+ *
+ *
  */
 public class LearnerAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------

@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
  * @author daveg
  * 
  *         XDoclet definition:
- * @struts:form name="activityForm"
+ *
  */
 public class ActivityForm extends ActionForm {
 

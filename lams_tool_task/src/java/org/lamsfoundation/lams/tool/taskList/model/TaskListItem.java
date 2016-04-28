@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_latask10_tasklist_item"
+ *
  * 
  */
 public class TaskListItem implements Cloneable {
@@ -157,7 +157,7 @@ public class TaskListItem implements Cloneable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -173,7 +173,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description" type="text"
+     *
      * @return
      */
     public String getDescription() {
@@ -185,7 +185,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="init_item"
+     *
      * @return
      */
     public String getInitialItem() {
@@ -197,7 +197,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="organization_xml" length="65535"
+     *
      * @return
      */
     public String getOrganizationXml() {
@@ -209,7 +209,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * @return
      */
     public String getTitle() {
@@ -221,7 +221,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      * @return
      */
@@ -234,7 +234,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -246,7 +246,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by_author"
+     *
      * @return
      */
     public boolean isCreateByAuthor() {
@@ -270,7 +270,7 @@ public class TaskListItem implements Cloneable {
      * 
      * @return taskListItem sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -287,7 +287,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_required"
+     *
      * @return
      */
     public boolean isRequired() {
@@ -299,7 +299,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_comments_allowed"
+     *
      * @return
      */
     public boolean isCommentsAllowed() {
@@ -311,7 +311,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_comments_required"
+     *
      * @return
      */
     public boolean isCommentsRequired() {
@@ -323,7 +323,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_files_allowed"
+     *
      * @return
      */
     public boolean isFilesAllowed() {
@@ -335,7 +335,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_files_required"
+     *
      * @return
      */
     public boolean isFilesRequired() {
@@ -347,7 +347,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_child_task"
+     *
      * @return
      */
     public boolean isChildTask() {
@@ -359,7 +359,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="parent_task_name"
+     *
      * @return
      */
     public String getParentTaskName() {
@@ -371,7 +371,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="show_comments_to_all"
+     *
      * @return
      */
     public boolean getShowCommentsToAll() {
@@ -383,7 +383,7 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_comments_files_allowed"
+     *
      * @return
      */
     public boolean isCommentsFilesAllowed() {
@@ -397,9 +397,9 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date asc"
-     * @hibernate.collection-key column="taskList_item_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment"
+     *
+     *
+     *
      * 
      * @return a set of Attachments to this TaskListItem.
      */
@@ -412,9 +412,9 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date asc"
-     * @hibernate.collection-key column="taskList_item_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment"
+     *
+     *
+     *
      * 
      * @return a set of Comments to this TaskListItem.
      */

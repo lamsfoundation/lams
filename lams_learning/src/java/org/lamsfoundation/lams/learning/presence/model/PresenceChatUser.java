@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.learning.presence.model;
 import java.util.Date;
 
 /**
- * @hibernate.class table="lams_presence_user"
+ *
  */
 public class PresenceChatUser implements java.io.Serializable, Cloneable {
 
@@ -48,7 +48,7 @@ public class PresenceChatUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.id generator-class="assigned" column="nickname"
+     *
      */
     public String getNickname() {
 	return nickname;
@@ -59,7 +59,7 @@ public class PresenceChatUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lesson_id"
+     *
      */
     public Long getLessonId() {
 	return lessonId;
@@ -70,7 +70,7 @@ public class PresenceChatUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="last_presence"
+     *
      */
     public Date getLastPresence() {
 	return lastPresence;

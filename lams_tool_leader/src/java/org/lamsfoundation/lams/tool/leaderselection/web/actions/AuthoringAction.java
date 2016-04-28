@@ -56,9 +56,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @struts.action path="/authoring" name="authoringForm" parameter="dispatch" scope="request" validate="false"
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/authoring/main"
+ *
  */
 public class AuthoringAction extends LamsDispatchAction {
 

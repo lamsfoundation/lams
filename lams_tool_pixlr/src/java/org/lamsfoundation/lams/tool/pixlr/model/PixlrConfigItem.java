@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.pixlr.model;
 
 /**
- * @hibernate.class table="tl_lapixl10_configuration"
+ *
  */
 public class PixlrConfigItem {
 
@@ -39,7 +39,7 @@ public class PixlrConfigItem {
     public PixlrConfigItem() {}
     
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getId() {
@@ -51,8 +51,8 @@ public class PixlrConfigItem {
     }
 
     /**
-     * @hibernate.property column="config_key" length="30" not-null="false"
-     *                     unique="true"
+     *
+     *
      */
     public String getConfigKey() {
 	return configKey;
@@ -63,7 +63,7 @@ public class PixlrConfigItem {
     }
 
     /**
-     * @hibernate.property column="config_value" length="511" not-null="false"
+     *
      */
     public String getConfigValue() {
 	return configValue;

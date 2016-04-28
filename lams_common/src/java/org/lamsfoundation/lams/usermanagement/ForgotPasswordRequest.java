@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 		@hibernate.class
- *		table="lams_password_request"
+ *
+ *
  * 
  * 
  * @author lfoxton

@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
  * 
  * Resource Form.
  * 
- * @struts.form name="resourceForm"
+ *
  * 
  *              User: Dapeng.Ni
  */

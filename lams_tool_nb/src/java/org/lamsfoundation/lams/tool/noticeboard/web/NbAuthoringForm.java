@@ -56,11 +56,11 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
 /**
  * Creation Date: 19-05-05
  *  
- * ----------------XDoclet Tags--------------------
- * 
- * @struts:form name="NbAuthoringForm" type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringForm"
  *
- * ----------------XDoclet Tags--------------------
+ * 
+ *
+ *
+ *
  */
 
 public class NbAuthoringForm extends ActionForm {

@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_lasurv11_survey"
+ *
  * 
  */
 public class Survey implements Cloneable {
@@ -180,7 +180,7 @@ public class Survey implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -199,7 +199,7 @@ public class Survey implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -217,7 +217,7 @@ public class Survey implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Share surveys.
      * 
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
+     *
      * 
      */
     public SurveyUser getCreatedBy() {
@@ -233,7 +233,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -246,7 +246,7 @@ public class Survey implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
+     *
      * 
      */
     public String getTitle() {
@@ -264,7 +264,7 @@ public class Survey implements Cloneable {
     /**
      * @return Returns the lockWhenFinish.
      * 
-     * @hibernate.property column="lock_on_finished"
+     *
      * 
      */
     public boolean getLockWhenFinished() {
@@ -282,7 +282,7 @@ public class Survey implements Cloneable {
     /**
      * @return Returns the instructions set by the teacher.
      * 
-     * @hibernate.property column="instructions" type="text"
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -295,9 +295,9 @@ public class Survey implements Cloneable {
     /**
      * 
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="sequence_id asc"
-     * @hibernate.collection-key column="survey_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -310,7 +310,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use"
+     *
      * @return
      */
     public boolean isContentInUse() {
@@ -322,7 +322,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
+     *
      * @return
      */
     public boolean isDefineLater() {
@@ -334,7 +334,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
+     *
      * @return
      */
     public Long getContentId() {
@@ -346,7 +346,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -358,7 +358,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {
@@ -370,7 +370,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="show_questions_on_one_page"
+     *
      * @return
      */
     public boolean isShowOnePage() {
@@ -382,7 +382,7 @@ public class Survey implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="show_other_users_answers"
+     *
      * @return
      */
     public boolean isShowOtherUsersAnswers() {
@@ -394,7 +394,7 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="answer_submit_notify"
+     *
      * @return
      */
     public boolean isNotifyTeachersOnAnswerSumbit() {
@@ -406,10 +406,10 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" cascade="all"
+     *
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
-     * @hibernate.collection-key column="content_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyCondition"
+     *
+     *
      * 
      */
     public Set<SurveyCondition> getConditions() {
@@ -423,7 +423,7 @@ public class Survey implements Cloneable {
 
     
 	/**
-     * @hibernate.property column="submission_deadline"
+     *
 	 * @return date submissionDeadline
 	 */
 	public Date getSubmissionDeadline() {

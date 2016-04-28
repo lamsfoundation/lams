@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Mitchell Seaton
  * @version 2.1
  * 
- * @hibernate.class
+ *
  */
 abstract public class BranchingActivity extends ComplexActivity implements Serializable, ISystemToolActivity {
 
@@ -97,7 +97,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
     }
 
     /**
-     * @hibernate.property column="end_xcoord" length="11"
+     *
      */
     public Integer getEndXcoord() {
 	return endXcoord;
@@ -108,7 +108,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
     }
 
     /**
-     * @hibernate.property column="end_ycoord" length="11"
+     *
      */
     public Integer getEndYcoord() {
 	return endYcoord;
@@ -119,7 +119,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
     }
 
     /**
-     * @hibernate.property column="start_xcoord" length="11"
+     *
      */
     public Integer getStartXcoord() {
 	return startXcoord;
@@ -130,7 +130,7 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
     }
 
     /**
-     * @hibernate.property column="start_ycoord" length="11"
+     *
      */
     public Integer getStartYcoord() {
 	return startYcoord;
@@ -141,8 +141,8 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
     }
 
     /**
-     * @hibernate.many-to-one lazy="false"
-     * @hibernate.column name="system_tool_id"
+     *
+     *
      */
     public SystemTool getSystemTool() {
 	return systemTool;

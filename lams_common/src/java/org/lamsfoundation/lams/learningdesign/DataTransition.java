@@ -58,10 +58,10 @@ public class DataTransition extends Transition {
     }
 
     /**
-     * @hibernate.set lazy="true" cascade="all" inverse="true"
+     *
      *                sort="org.lamsfoundation.lams.learningdesign.DataFlowObjectComparator"
-     * @hibernate.collection-key column="transition_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.DataFlowObject"
+     *
+     *
      * 
      */
     public Set<DataFlowObject> getDataFlowObjects() {

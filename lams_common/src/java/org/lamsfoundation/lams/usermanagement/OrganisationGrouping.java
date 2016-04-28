@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * This is a course-level group of groups of learners, i.e. a grouping.
  * 
- * @hibernate.class table="lams_organisation_grouping"
+ *
  */
 public class OrganisationGrouping implements Serializable {
 
@@ -55,7 +55,7 @@ public class OrganisationGrouping implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="grouping_id"
+     *
      */
     public Long getGroupingId() {
 	return groupingId;
@@ -66,7 +66,7 @@ public class OrganisationGrouping implements Serializable {
     }
 
     /**
-     * @hibernate.property column="organisation_id"
+     *
      */
     public Integer getOrganisationId() {
 	return this.organisationId;
@@ -77,7 +77,7 @@ public class OrganisationGrouping implements Serializable {
     }
 
     /**
-     * @hibernate.property column="name"
+     *
      */
     public String getName() {
 	return this.name;
@@ -88,9 +88,9 @@ public class OrganisationGrouping implements Serializable {
     }
 
     /**
-     * @hibernate.set cascade="all-delete-orphan" inverse="true"
-     * @hibernate.collection-key column="grouping_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.OrganisationGroup"
+     *
+     *
+     *
      */
     public Set<OrganisationGroup> getGroups() {
 	return groups;

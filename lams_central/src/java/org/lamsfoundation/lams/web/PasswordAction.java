@@ -35,12 +35,12 @@ import org.apache.struts.action.ActionMapping;
 /**
  * @author jliew
  *
- * @struts:action path="/password"
- *  			name="PasswordChangeActionForm"
- *  			scope="request"
- * 				validate="false"
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="passwordChange" path=".passwordChange"
+ *
  */
 public class PasswordAction extends Action {
 		

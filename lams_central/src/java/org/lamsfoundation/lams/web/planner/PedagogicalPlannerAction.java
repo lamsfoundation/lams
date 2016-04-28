@@ -132,16 +132,16 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  * 
  * @author Marcin Cieslak
  * 
- * @struts:action path="/pedagogicalPlanner" scope="request" parameter="method"
- *                name="PedagogicalPlannerSequenceNodeForm"
- * @struts:action-forward name="template" path="/pedagogical_planner/templateBase.jsp"
- * @struts:action-forward name="preview" path="/home.do?method=learner"
- * @struts:action-forward name="sequenceChooser" path="/pedagogical_planner/sequenceChooser.jsp"
+ *
+ *
+ *
+ *
+ *
  * 
- * @struts:action path="/pedagogicalPlanner/grouping" scope="request" name="PedagogicalPlannerGroupingForm"
- *                validate="false" parameter="method"
- * @struts:action-forward name="grouping" path="/pedagogical_planner/grouping.jsp"
- * @struts:action-forward name="editAuthors" path="/pedagogical_planner/editAuthors.jsp"
+ *
+ *
+ *
+ *
  */
 public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(PedagogicalPlannerAction.class);

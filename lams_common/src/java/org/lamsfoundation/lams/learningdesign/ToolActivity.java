@@ -48,7 +48,7 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class
+ *
  */
 public class ToolActivity extends SimpleActivity implements Serializable {
 

@@ -68,13 +68,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *         This is where marking for an activity/lesson takes place
  * 
  * 
- * @struts.action path="/gradebookMonitoring" parameter="dispatch" scope="request" name="monitoringForm"
- *                validate="false"
+ *
+ *
  * 
- * @struts:action-forward name="monitorgradebook" path="/gradebookMonitor.jsp"
- * @struts:action-forward name="monitorcoursegradebook" path="/gradebookCourseMonitor.jsp"
- * @struts:action-forward name="error" path=".error"
- * @struts:action-forward name="message" path=".message"
+ *
+ *
+ *
+ *
  */
 public class GradebookMonitoringAction extends LamsDispatchAction {
 

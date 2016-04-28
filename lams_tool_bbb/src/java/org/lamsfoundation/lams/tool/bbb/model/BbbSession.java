@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * 
  * Represents the tool session.
  * 
- * @hibernate.class table="tl_labbb10_session"
+ *
  */
 
 public class BbbSession implements java.io.Serializable {
@@ -70,7 +70,7 @@ public class BbbSession implements java.io.Serializable {
     // Property accessors
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -82,7 +82,7 @@ public class BbbSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_end_date"
+     *
      * 
      */
     public Date getSessionEndDate() {
@@ -94,7 +94,7 @@ public class BbbSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_start_date"
+     *
      * 
      */
     public Date getSessionStartDate() {
@@ -106,7 +106,7 @@ public class BbbSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="status" length="11"
+     *
      * 
      */
     public Integer getStatus() {
@@ -118,7 +118,7 @@ public class BbbSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_id" length="20"
+     *
      * 
      */
     public Long getSessionId() {
@@ -130,7 +130,7 @@ public class BbbSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_name" length="250"
+     *
      * 
      */
     public String getSessionName() {
@@ -142,8 +142,8 @@ public class BbbSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true" foreign-key="fk_labbb10_bbb_session_to_bbb"
-     * @hibernate.column name="bbb_uid"
+     *
+     *
      * 
      */
     public Bbb getBbb() {
@@ -155,9 +155,9 @@ public class BbbSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="bbb_session_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.bbb.model.BbbUser"
+     *
+     *
+     *
      * 
      */
     public Set<BbbUser> getBbbUsers() {
@@ -169,7 +169,7 @@ public class BbbSession implements java.io.Serializable {
     }
     
     /**
-     * @hibernate.property column="meeting_created"
+     *
      * @return
      */
     public boolean isMeetingCreated() {
@@ -181,7 +181,7 @@ public class BbbSession implements java.io.Serializable {
     }
     
     /**
-	 * @hibernate.property column="attendee_password"
+	 *
 	 * @return the attendeePassword
 	 */
 	public String getAttendeePassword() {
@@ -193,7 +193,7 @@ public class BbbSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="moderator_password"
+	 *
 	 * @return the moderatorPassword
 	 */
 	public String getModeratorPassword() {

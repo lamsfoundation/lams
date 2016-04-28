@@ -32,8 +32,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /** 
- *        @hibernate.class
- *         table="lams_tool_content"
+ *
+ *
  *     
 */
 public class ToolContent implements Serializable {
@@ -62,10 +62,10 @@ public class ToolContent implements Serializable {
     }
 
     /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="tool_content_id"
+     *
+     *
+     *
+     *
      *         
      */
     public Long getToolContentId() {
@@ -77,8 +77,8 @@ public class ToolContent implements Serializable {
     }
 
     /** 
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="tool_id"     
+     *
+     *
      */
     public Tool getTool() {
         return this.tool;
@@ -89,14 +89,14 @@ public class ToolContent implements Serializable {
     }
 
     /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="tool_content_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.learningdesign.Activity"
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Set getActivities() {

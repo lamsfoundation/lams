@@ -7,7 +7,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
  * A text search form with additional parameters for Chat needs.
  * 
  * @author Marcin Cieslak
- * @struts.form name="chatConditionForm"
+ *
  */
 public class ChatConditionForm extends TextSearchActionForm {
 

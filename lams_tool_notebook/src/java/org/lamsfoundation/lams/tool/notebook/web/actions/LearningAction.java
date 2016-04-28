@@ -63,10 +63,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
- * @struts.action-forward name="notebook" path="tiles:/learning/main"
- * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
- * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
+ *
+ *
+ *
+ *
  */
 public class LearningAction extends LamsDispatchAction {
 

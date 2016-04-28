@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.survey.model;
 
 import org.apache.log4j.Logger;
 /**
- * @hibernate.class table="tl_lasurv11_option"
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$
@@ -58,7 +58,7 @@ public class SurveyOption  implements Cloneable{
 	  	//		Get/Set methods
 //	  **********************************************************
 		/**
-		 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+		 *
 		 * @return Returns the uid.
 		 */
 		public Long getUid() {
@@ -71,7 +71,7 @@ public class SurveyOption  implements Cloneable{
 			this.uid = userID;
 		}
 		/**
-		 * @hibernate.property column="description" type="text"
+		 *
 		 * @return
 		 */
 		public String getDescription() {
@@ -81,7 +81,7 @@ public class SurveyOption  implements Cloneable{
 			this.description = description;
 		}
 		/**
-		 * @hibernate.property column="sequence_id"
+		 *
 		 * @return
 		 */
 		public int getSequenceId() {

@@ -48,7 +48,7 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  * Normally this will display the first activity inside a sequence activity. If there are no activities within the
  * sequence activity then it will display an "empty" message.
  * 
- * @struts:action path="/SequenceActivity" name="activityForm" validate="false" scope="request"
+ *
  * 
  */
 public class SequenceActivityAction extends ActivityAction {

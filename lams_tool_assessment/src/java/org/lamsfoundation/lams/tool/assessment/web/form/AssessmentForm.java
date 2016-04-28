@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.assessment.model.Assessment;
  * 
  * Assessment Form.
  * 
- * @struts.form name="assessmentForm"
+ *
  * 
  * @author Andrey Balan
  */

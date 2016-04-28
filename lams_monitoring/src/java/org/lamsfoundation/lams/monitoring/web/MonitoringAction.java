@@ -107,15 +107,15 @@ import com.google.gson.GsonBuilder;
  * @since 2005-4-15
  * @version 1.1
  * 
- *          ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/monitoring" parameter="method" validate="false"
- * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
- * @struts.action-forward name = "notsupported" path = ".notsupported"
- * @struts.action-forward name = "timeChart" path = "/timeChart.jsp"
- * @struts.action-forward name = "monitorLesson" path = "/monitor.jsp"
+ *
+ *
+ *
+ *
+ *
  * 
- *                        ----------------XDoclet Tags--------------------
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 

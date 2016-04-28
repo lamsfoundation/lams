@@ -73,15 +73,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * <p> The save, upload and delete method is the same as that of NbAuthoringAction, to see its explanation,
  * please see org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction </p>
  *
- * ----------------XDoclet Tags--------------------
- * 
- * @struts:action path="/authoring" name="NbAuthoringForm" scope="request"
- * 				  type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
- *                parameter="method" validate="true" input="/author_page.jsp"
  *
- * @struts:action-forward name="authoringContent" path="/authoring/authoring.jsp"
  * 
- * ----------------XDoclet Tags--------------------
+ *
+ *
+ *
+ *
+ *
+ * 
+ *
  */
 
 public class NbAuthoringAction extends LamsDispatchAction {

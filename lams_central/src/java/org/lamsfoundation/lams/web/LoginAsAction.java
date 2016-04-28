@@ -47,8 +47,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jliew
  * 
- * @struts.action path="/loginas" validate="false"
- * @struts.action-forward name="usersearch" path="/admin/usersearch.do"
+ *
+ *
  */
 public class LoginAsAction extends Action {
 

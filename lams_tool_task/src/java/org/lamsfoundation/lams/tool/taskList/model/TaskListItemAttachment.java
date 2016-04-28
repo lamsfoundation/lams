@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  *         TaskListItem.
  * 
  *
- * @hibernate.class table="tl_latask10_item_attachment"
+ *
  *
  */
 public class TaskListItemAttachment implements Cloneable {
@@ -99,7 +99,7 @@ public class TaskListItemAttachment implements Cloneable {
     //  **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -111,7 +111,7 @@ public class TaskListItemAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_version_id"
+     *
      *
      */
     public Long getFileVersionId() {
@@ -123,7 +123,7 @@ public class TaskListItemAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_type"
+     *
      */
     public String getFileType() {
 	return fileType;
@@ -134,7 +134,7 @@ public class TaskListItemAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_name"
+     *
      */
     public String getFileName() {
 	return fileName;
@@ -145,7 +145,7 @@ public class TaskListItemAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_uuid"
+     *
      * @return
      */
     public Long getFileUuid() {
@@ -157,7 +157,7 @@ public class TaskListItemAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreated() {
@@ -169,7 +169,7 @@ public class TaskListItemAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="create_by" cascade="save-update"
+     *
      * @return
      */
     public TaskListUser getCreateBy() {

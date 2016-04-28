@@ -49,10 +49,10 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 /**
  * @author jliew
  * 
- * @struts:action path="/ldap" scope="request" validate="false"
+ *
  * 
- * @struts:action-forward name="ldap" path=".ldap"
- * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
+ *
+ *
  */
 public class LdapConfigAction extends Action {
 

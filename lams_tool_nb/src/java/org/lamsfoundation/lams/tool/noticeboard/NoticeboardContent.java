@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
  * to get/set noticeboard attributes
  * </p>
  * 
- * @hibernate.class table="tl_lanb11_content"
+ *
  * @author mtruong
  */
 public class NoticeboardContent implements Serializable {
@@ -126,7 +126,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="content" length="65535"
+     *
      */
 
     public String getContent() {
@@ -139,7 +139,7 @@ public class NoticeboardContent implements Serializable {
 
     /**
      * 
-     * @hibernate.property column="creator_user_id" length="20"
+     *
      */
     public Long getCreatorUserId() {
 	return creatorUserId;
@@ -151,7 +151,7 @@ public class NoticeboardContent implements Serializable {
 
     /**
      * 
-     * @hibernate.property column="date_created" length="19"
+     *
      */
     public Date getDateCreated() {
 	return dateCreated;
@@ -163,7 +163,7 @@ public class NoticeboardContent implements Serializable {
 
     /**
      * 
-     * @hibernate.property column="date_updated" length="19"
+     *
      */
     public Date getDateUpdated() {
 	return dateUpdated;
@@ -174,7 +174,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      */
     public boolean isDefineLater() {
 	return defineLater;
@@ -185,7 +185,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity" length="1"
+     *
      */
     public boolean getReflectOnActivity() {
 	return reflectOnActivity;
@@ -196,7 +196,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions" length="65535"
+     *
      */
     public String getReflectInstructions() {
 	return reflectInstructions;
@@ -207,7 +207,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      */
 
     public boolean isContentInUse() {
@@ -223,7 +223,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="allow_comments" length="1"
+     *
      */
 
     public boolean isAllowComments() {
@@ -239,7 +239,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="comments_like_dislike" length="1"
+     *
      */
 
     public boolean isCommentsLikeAndDislike() {
@@ -255,7 +255,7 @@ public class NoticeboardContent implements Serializable {
     }
     
     /**
-     * @hibernate.property column="nb_content_id" length="20" not-null="true"
+     *
      */
 
     public Long getNbContentId() {
@@ -267,9 +267,9 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="nb_content_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
+     *
+     *
+     *
      */
     public Set<NoticeboardSession> getNbSessions() {
 	if (this.nbSessions == null) {
@@ -283,7 +283,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="title" length="65535"
+     *
      */
     public String getTitle() {
 	return title;
@@ -294,7 +294,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid" unsaved-value="0"
+     *
      */
     public Long getUid() {
 	return uid;

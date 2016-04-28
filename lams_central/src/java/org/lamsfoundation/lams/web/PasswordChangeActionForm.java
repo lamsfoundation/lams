@@ -34,9 +34,9 @@ import org.apache.struts.action.ActionMapping;
  * @author fmalikoff
  * @Modified by Fei Yang	
  * 
- * @struts:form name="PasswordChangeActionForm"
- * 		include-pk="true"
- * 		include-all="true"
+ *
+ *
+ *
  */
 public class PasswordChangeActionForm extends ActionForm {
 

@@ -66,14 +66,14 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
  * @author
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
- * @struts.action-forward name="learning" path="tiles:/learning/main"
- * @struts.action-forward name="scribe" path="tiles:/learning/scribe"
- * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
- * @struts.action-forward name="waitForScribe" path="tiles:/learning/waitForScribe"
- * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
- * @struts.action-forward name="report" path="tiles:/learning/report"
- * @struts.action-forward name="instructions" path="tiles:/learning/instructions"
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class LearningAction extends LamsDispatchAction {
 

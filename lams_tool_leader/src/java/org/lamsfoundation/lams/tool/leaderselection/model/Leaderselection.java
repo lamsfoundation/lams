@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionService;
 
 /**
- * @hibernate.class table="tl_lalead11_leaderselection"
+ *
  */
 
 public class Leaderselection implements java.io.Serializable, Cloneable {
@@ -66,7 +66,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -78,7 +78,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
     public Date getCreateDate() {
@@ -90,7 +90,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
     public Date getUpdateDate() {
@@ -102,7 +102,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by" length="20"
+     *
      * 
      */
     public Long getCreateBy() {
@@ -114,7 +114,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
     public String getTitle() {
@@ -126,7 +126,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
     public String getInstructions() {
@@ -138,7 +138,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * 
      */
     public boolean isContentInUse() {
@@ -150,7 +150,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      * 
      */
     public boolean isDefineLater() {
@@ -162,7 +162,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      * 
      */
     public Long getToolContentId() {
@@ -174,10 +174,10 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="leaderselection_uid"
-     * @hibernate.collection-one-to-many 
-     *                                   class="org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession"
+     *
+     *
+     *
+     *
      * 
      */
     public Set getLeaderselectionSessions() {

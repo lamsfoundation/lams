@@ -63,14 +63,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * is that if the defineLater flag is set, it will not be able to see the noticeboard screen
  * </p>
  * 
- * ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/starter/learner" name="NbLearnerForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
- *               validate="false" parameter="mode"
- * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
- * @struts:action-forward name="displayMessage" path=".message"
- * @struts:action-forward name="defineLater" path=".defineLater"
- * ----------------XDoclet Tags--------------------
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
 public class NbLearnerStarterAction extends LamsDispatchAction {

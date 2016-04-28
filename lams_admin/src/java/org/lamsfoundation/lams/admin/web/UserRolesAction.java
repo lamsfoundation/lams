@@ -54,14 +54,14 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * @author jliew
  *
- * @struts:action path="/userroles"
- *              name="UserRolesForm"
- *              scope="request"
- *              parameter="method"
- * 				validate="false"
+ *
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="userrole" path=".userrole"
- * @struts:action-forward name="userlist" path="/usermanage.do"
+ *
+ *
  */
 public class UserRolesAction extends Action {
 	

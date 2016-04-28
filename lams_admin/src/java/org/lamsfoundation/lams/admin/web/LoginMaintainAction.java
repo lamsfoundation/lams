@@ -51,10 +51,10 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 /**
  * struts doclets
  * 
- * @struts:action path="/loginmaintain" name = "LoginMaintainForm" scope =
- *                "request" validate="false"
+ *
+ *
  * 
- * @struts:action-forward name="loginmaintain" path=".loginmaintain"
+ *
  * 
  */
 public class LoginMaintainAction extends Action {

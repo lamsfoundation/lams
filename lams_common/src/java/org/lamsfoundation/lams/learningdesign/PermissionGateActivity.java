@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.SystemTool;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class
+ *
  */
 public class PermissionGateActivity extends GateActivity implements Serializable {
 

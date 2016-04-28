@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_user"
+ *
  * 
  */
 public class ScratchieUser implements Cloneable, Comparable {
@@ -90,7 +90,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -106,7 +106,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -122,7 +122,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     }
 
     /**
-     * @hibernate.property length="255" column="last_name"
+     *
      * @return
      */
     public String getLastName() {
@@ -134,7 +134,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     }
 
     /**
-     * @hibernate.property length="255" column="first_name"
+     *
      * @return
      */
     public String getFirstName() {
@@ -146,7 +146,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     }
 
     /**
-     * @hibernate.property column="login_name"
+     *
      * @return
      */
     public String getLoginName() {
@@ -158,7 +158,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     }
 
     /**
-     * @hibernate.many-to-one column="session_uid" cascade="none"
+     *
      * @return
      */
     public ScratchieSession getSession() {
@@ -170,7 +170,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     }
 
     /**
-     * @hibernate.many-to-one column="scratchie_uid" cascade="none"
+     *
      * @return
      */
     public Scratchie getScratchie() {
@@ -182,7 +182,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     }
 
     /**
-     * @hibernate.property column="session_finished"
+     *
      * @return
      */
     public boolean isSessionFinished() {

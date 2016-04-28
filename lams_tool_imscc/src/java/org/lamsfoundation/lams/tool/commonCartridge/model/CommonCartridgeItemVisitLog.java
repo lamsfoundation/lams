@@ -29,7 +29,7 @@ import java.util.Date;
  * CommonCartridge
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_laimsc11_item_log"
+ *
  *
  */
 public class CommonCartridgeItemVisitLog {
@@ -42,7 +42,7 @@ public class CommonCartridgeItemVisitLog {
 	private Long sessionId;
 	
 	/**
-	 * @hibernate.property column="access_date"
+	 *
 	 * @return
 	 */
 	public Date getAccessDate() {
@@ -52,8 +52,8 @@ public class CommonCartridgeItemVisitLog {
 		this.accessDate = accessDate;
 	}
 	/**
-	 * @hibernate.many-to-one  column="commonCartridge_item_uid"
- 	 * cascade="none"
+	 *
+ 	 *
 	 * @return
 	 */
 	public CommonCartridgeItem getCommonCartridgeItem() {
@@ -64,7 +64,7 @@ public class CommonCartridgeItemVisitLog {
 	}
 	
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the log Uid.
 	 */
 	public Long getUid() {
@@ -74,8 +74,8 @@ public class CommonCartridgeItemVisitLog {
 		this.uid = uid;
 	}
 	/**
-	 * @hibernate.many-to-one  column="user_uid"
- 	 * cascade="none"
+	 *
+ 	 *
 	 * @return
 	 */
 	public CommonCartridgeUser getUser() {
@@ -85,7 +85,7 @@ public class CommonCartridgeItemVisitLog {
 		this.user = user;
 	}
 	/**
-	 * @hibernate.property column="complete"
+	 *
 	 * @return
 	 */
 	public boolean isComplete() {
@@ -95,7 +95,7 @@ public class CommonCartridgeItemVisitLog {
 		this.complete = complete;
 	}
 	/**
-	 * @hibernate.property column="session_id"
+	 *
 	 * @return
 	 */
 	public Long getSessionId() {

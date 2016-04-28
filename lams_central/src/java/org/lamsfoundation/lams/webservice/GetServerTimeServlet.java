@@ -36,8 +36,8 @@ import org.apache.log4j.Logger;
 /**
  * @author Andrey Balan
  * 
- * @web:servlet name="GetServerTimeServlet"
- * @web:servlet-mapping url-pattern="/services/getServerTime"
+ *
+ *
  */
 public class GetServerTimeServlet extends HttpServlet {
 

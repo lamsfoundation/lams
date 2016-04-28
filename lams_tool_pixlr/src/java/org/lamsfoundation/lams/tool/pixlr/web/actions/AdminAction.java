@@ -16,10 +16,10 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @author
  * @version
  * 
- * @struts.action path="/lapixl10admin" parameter="dispatch" scope="request"
- *                name="lapixl10AdminForm" validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="config" path="/pages/admin/config.jsp"
+ *
  */
 public class AdminAction extends LamsDispatchAction {
     public IPixlrService pixlrService;

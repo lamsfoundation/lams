@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimsc11_commoncartridge_item"
+ *
  * 
  */
 public class CommonCartridgeItem implements Cloneable {
@@ -117,7 +117,7 @@ public class CommonCartridgeItem implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -133,7 +133,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_uuid"
+     *
      * 
      * @return
      */
@@ -146,7 +146,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_version_id"
+     *
      * @return
      */
     public Long getFileVersionId() {
@@ -158,7 +158,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description"
+     *
      * @return
      */
     public String getDescription() {
@@ -170,7 +170,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="ims_schema"
+     *
      * @return
      */
     public String getImsSchema() {
@@ -182,7 +182,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="init_item"
+     *
      * @return
      */
     public String getInitialItem() {
@@ -194,10 +194,10 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="false" cascade="all-delete-orphan" inverse="false" order-by="sequence_id asc"
-     * @hibernate.collection-key column="item_uid"
-     * @hibernate.collection-one-to-many 
-     *                                   class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemInstruction"
+     *
+     *
+     *
+     *
      * @return
      */
     public Set getItemInstructions() {
@@ -209,7 +209,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="organization_xml" length="65535"
+     *
      * @return
      */
     public String getOrganizationXml() {
@@ -221,7 +221,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * @return
      */
     public String getTitle() {
@@ -233,7 +233,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="url" length="65535"
+     *
      * @return
      */
     public String getUrl() {
@@ -245,7 +245,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      * @return
      */
@@ -258,7 +258,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -270,7 +270,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by_author"
+     *
      * @return
      */
     public boolean isCreateByAuthor() {
@@ -282,7 +282,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_hide"
+     *
      * @return
      */
     public boolean isHide() {
@@ -294,7 +294,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="item_type"
+     *
      * @return
      */
     public short getType() {
@@ -306,7 +306,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_type"
+     *
      */
     public String getFileType() {
 	return fileType;
@@ -317,7 +317,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_name"
+     *
      */
     public String getFileName() {
 	return fileName;
@@ -328,7 +328,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="open_url_new_window"
+     *
      * @return
      */
     public boolean isOpenUrlNewWindow() {
@@ -340,7 +340,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="launch_url" length="255"
+     *
      * @return
      */
     public String getLaunchUrl() {
@@ -352,7 +352,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="secure_launch_url" length="255"
+     *
      * @return
      */
     public String getSecureLaunchUrl() {
@@ -364,7 +364,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="tool_key" length="255"
+     *
      * @return
      */
     public String getKey() {
@@ -376,7 +376,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="tool_secret" length="255"
+     *
      * @return
      */
     public String getSecret() {
@@ -388,7 +388,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="custom_str" length="65535"
+     *
      * @return
      */
     public String getCustomStr() {
@@ -400,7 +400,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="button_text" length="255"
+     *
      * @return
      */
     public String getButtonText() {
@@ -412,7 +412,7 @@ public class CommonCartridgeItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="frame_height"
+     *
      * @return
      */
     public int getFrameHeight() {

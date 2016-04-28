@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
 /**
- * @hibernate.class table="tl_lasbmt11_report"
+ *
  * @serial -3415065437595925246L
  */
 public class SubmitFilesReport implements Serializable, Cloneable {
@@ -75,8 +75,8 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long"
-     *               column="report_id"
+     *
+     *
      */
     public Long getReportID() {
 	return this.reportID;
@@ -87,7 +87,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="comments" length="65535"
+     *
      */
     public String getComments() {
 	return this.comments;
@@ -98,7 +98,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="marks"
+     *
      */
     public Float getMarks() {
 	return this.marks;
@@ -109,7 +109,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="date_marks_released" length="19"
+     *
      */
     public Date getDateMarksReleased() {
 	return this.dateMarksReleased;
@@ -120,7 +120,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="mark_file_uuid"
+     *
      */
     public Long getMarkFileUUID() {
         return markFileUUID;
@@ -131,7 +131,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="mark_file_name" length="255"
+     *
      */
     public String getMarkFileName() {
         return markFileName;
@@ -142,7 +142,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="mark_file_version_id"
+     *
      */
     public Long getMarkFileVersionID() {
         return markFileVersionID;

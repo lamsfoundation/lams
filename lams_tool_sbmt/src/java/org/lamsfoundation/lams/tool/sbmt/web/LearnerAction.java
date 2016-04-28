@@ -78,12 +78,12 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Manpreet Minhas
  * @author Steve.Ni
- * @struts.action path="/learner" parameter="method" name="learnerForm" input="/learner/sbmtlearner.jsp" scope="request"
- *                validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="/learner/sbmtlearner.jsp"
- * @struts.action-forward name="defineLater" path="/learner/definelater.jsp"
- * @struts.action-forward name="submissionDeadline" path="/learner/submissionDeadline.jsp"
+ *
+ *
+ *
  * 
  * 
  */

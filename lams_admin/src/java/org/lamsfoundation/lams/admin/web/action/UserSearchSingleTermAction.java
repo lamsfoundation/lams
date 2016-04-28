@@ -48,9 +48,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author jliew
  * 
- * @struts:action path="/user/searchsingle" validate="false"
  *
- * @struts:action-forward name="basiclist" path="/user/basiclist.jsp"
+ *
+ *
  */
 public class UserSearchSingleTermAction extends Action {
 

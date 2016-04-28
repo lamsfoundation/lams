@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Marcin Cieslak
  * 
- * @hibernate.class table="tl_ladaco10_answer_options"
+ *
  * 
  */
 public class DacoAnswerOption implements Cloneable {
@@ -46,7 +46,7 @@ public class DacoAnswerOption implements Cloneable {
 	// **********************************************************
 
 	/**
-	 * @hibernate.id generator-class="native" column="uid"
+	 *
 	 * @return Returns the answer ID.
 	 */
 	public Long getUid() {
@@ -58,7 +58,7 @@ public class DacoAnswerOption implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="sequence_num"
+	 *
 	 * @return Returns the sequence number.
 	 */
 	public Integer getSequenceNumber() {
@@ -70,7 +70,7 @@ public class DacoAnswerOption implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="answer_option"
+	 *
 	 * @return Returns the possible answer.
 	 */
 	public String getAnswerOption() {

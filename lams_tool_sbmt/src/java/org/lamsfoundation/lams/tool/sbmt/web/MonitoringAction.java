@@ -80,17 +80,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Manpreet Minhas
- * @struts.action path="/monitoring" parameter="method" scope="request"
- *                validate="false" name="SbmtMonitoringForm"
+ *
+ *
  * 
- * @struts.action-forward name="listMark" path="/monitoring/mark/mark.jsp"
- * @struts.action-forward name="listAllMarks" path="/monitoring/mark/allmarks.jsp"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="/monitoring/monitoring.jsp"
+ *
  * 
- * @struts.action-forward name="statistic" path="/monitoring/parts/statisticpart.jsp"
+ *
  * 
- * @struts.action-forward name="viewReflect" path="/monitoring/notebook.jsp"
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 

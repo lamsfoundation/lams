@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * 
  * @author lfoxton
  * 
- * @hibernate.class table="lams_user_group"
+ *
  */
 public class GroupUser implements Serializable {
     
@@ -47,8 +47,8 @@ public class GroupUser implements Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true" lazy="false"
-     * @hibernate.column name="group_id"
+     *
+     *
      * 
      */
     public Group getGroup() {
@@ -60,8 +60,8 @@ public class GroupUser implements Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true" lazy="false"
-     * @hibernate.column name="user_id"
+     *
+     *
      * 
      */
     public User getUser() {
@@ -73,7 +73,7 @@ public class GroupUser implements Serializable {
     }
     
     /**
-     * @hibernate.property type="java.sql.Timestamp" column="scheduled_lesson_end_date" length="19"
+     *
      * 
      * @return Returns the scheduledLessonEndDate.
      */

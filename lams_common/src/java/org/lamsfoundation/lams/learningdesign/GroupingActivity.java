@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.GroupingActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
 
 /**
- * @hibernate.class
+ *
  * 
  *                  A GroupingActivity creates Grouping.
  * @author Manpreet Minhas

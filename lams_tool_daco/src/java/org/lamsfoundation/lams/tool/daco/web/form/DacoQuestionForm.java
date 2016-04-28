@@ -28,7 +28,7 @@ import org.apache.struts.action.ActionForm;
 /**
  * Daco Question Form.
  * 
- * @struts.form name="dacoQuestionForm"
+ *
  * @author Marcin Cieslak
  * 
  * @version $Revision$

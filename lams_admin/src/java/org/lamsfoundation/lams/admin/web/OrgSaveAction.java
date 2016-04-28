@@ -71,15 +71,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * struts doclets
  * 
- * @struts:action path="/orgsave"
- *                name="OrganisationForm"
- *                input=".organisation"
- *                scope="request"
- *                validate="false"
  *
- * @struts:action-forward name="organisation" path="/organisation.do?method=edit"                
- * @struts:action-forward name="orglist" path="/orgmanage.do"
- * @struts:action-forward name="userlist" path="/usermanage.do"
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
 public class OrgSaveAction extends Action {

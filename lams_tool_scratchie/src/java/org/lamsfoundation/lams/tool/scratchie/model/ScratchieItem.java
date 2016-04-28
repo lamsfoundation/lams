@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_scratchie_item"
+ *
  * 
  */
 public class ScratchieItem implements Cloneable {
@@ -104,7 +104,7 @@ public class ScratchieItem implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -120,7 +120,7 @@ public class ScratchieItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="title"
+     *
      * @return
      */
     public String getTitle() {
@@ -132,7 +132,7 @@ public class ScratchieItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description" type="text"
+     *
      * @return
      */
     public String getDescription() {
@@ -144,7 +144,7 @@ public class ScratchieItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -156,7 +156,7 @@ public class ScratchieItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by_author"
+     *
      * @return
      */
     public boolean isCreateByAuthor() {
@@ -168,7 +168,7 @@ public class ScratchieItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="order_id"
+     *
      * @return
      */
     public Integer getOrderId() {
@@ -180,9 +180,9 @@ public class ScratchieItem implements Cloneable {
     }
     
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="order_id asc"
-     * @hibernate.collection-key column="scratchie_item_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer"
+     *
+     *
+     *
      * 
      * @return
      */

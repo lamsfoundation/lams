@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 /**
  * 
  * 
- * @hibernate.class table="tl_labbb10_bbb"
+ *
  */
 
 public class Bbb implements java.io.Serializable, Cloneable {
@@ -75,7 +75,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
 
@@ -88,7 +88,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
 
@@ -101,7 +101,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
 
@@ -114,7 +114,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by" length="20"
+     *
      * 
      */
 
@@ -127,7 +127,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
 
@@ -140,7 +140,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
 
@@ -153,7 +153,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      * 
      */
 
@@ -166,7 +166,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity" length="1"
+     *
      */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
@@ -177,7 +177,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions" length="65535"
+     *
      */
     public String getReflectInstructions() {
 	return reflectInstructions;
@@ -188,7 +188,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * 
      */
 
@@ -201,7 +201,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      * 
      */
 
@@ -214,7 +214,7 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      * 
      */
 
@@ -227,9 +227,9 @@ public class Bbb implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="bbb_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.bbb.model.BbbSession"
+     *
+     *
+     *
      * 
      */
     public Set<BbbSession> getBbbSessions() {

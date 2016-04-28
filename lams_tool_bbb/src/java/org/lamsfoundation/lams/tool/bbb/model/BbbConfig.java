@@ -25,7 +25,7 @@
 package org.lamsfoundation.lams.tool.bbb.model;
 
 /**
- * @hibernate.class table="tl_labbb10_config"
+ *
  */
 public class BbbConfig {
 
@@ -45,7 +45,7 @@ public class BbbConfig {
     }
     
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -56,7 +56,7 @@ public class BbbConfig {
     }
 
     /**
-     * @hibernate.property column="config_key"
+     *
      * @return
      */
     public String getKey() {
@@ -68,7 +68,7 @@ public class BbbConfig {
     }
 
     /**
-     * @hibernate.property column="config_value"
+     *
      * @return
      */
     public String getValue() {

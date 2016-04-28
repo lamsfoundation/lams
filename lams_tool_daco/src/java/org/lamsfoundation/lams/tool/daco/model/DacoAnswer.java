@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Marcin Cieslak
  * 
- * @hibernate.class table="tl_ladaco10_answers"
+ *
  */
 public class DacoAnswer implements Cloneable {
     private static final Logger log = Logger.getLogger(DacoQuestion.class);
@@ -74,7 +74,7 @@ public class DacoAnswer implements Cloneable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the answer ID.
      */
     public Long getUid() {
@@ -86,7 +86,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="user_uid" cascade="none" foreign-key="AnswerToUser"
+     *
      * @return
      */
     public DacoUser getUser() {
@@ -98,7 +98,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="record_id"
+     *
      * @return Returns the record ID.
      */
     public Integer getRecordId() {
@@ -110,7 +110,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="answer"
+     *
      * @return Returns the answer.
      */
     public String getAnswer() {
@@ -122,7 +122,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="question_uid" cascade="none" foreign-key="AnswerToQuestion"
+     *
      * @return
      */
     public DacoQuestion getQuestion() {
@@ -134,7 +134,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_uuid"
+     *
      * 
      * @return
      */
@@ -147,7 +147,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_version_id"
+     *
      * @return
      */
     public Long getFileVersionId() {
@@ -159,7 +159,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_type"
+     *
      */
     public String getFileType() {
 	return fileType;
@@ -170,7 +170,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_name"
+     *
      */
     public String getFileName() {
 	return fileName;
@@ -181,7 +181,7 @@ public class DacoAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreateDate() {
 	return createDate;
