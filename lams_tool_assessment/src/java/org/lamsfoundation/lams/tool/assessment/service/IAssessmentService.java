@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -43,6 +45,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
  * @author Andrey Balan
@@ -160,14 +163,6 @@ public interface IAssessmentService {
     void deleteQuestionReference(Long uid);
 
     /**
-     * Return all reource questions within the given toolSessionID.
-     * 
-     * @param sessionId
-     * @return
-     */
-    List<AssessmentQuestion> getAssessmentQuestionsBySessionId(Long sessionId);
-
-    /**
      * Get assessment which is relative with the special toolSession.
      * 
      * @param sessionId
@@ -182,13 +177,6 @@ public interface IAssessmentService {
      * @return
      */
     AssessmentSession getAssessmentSessionBySessionId(Long sessionId);
-
-    /**
-     * Save or update assessment session.
-     * 
-     * @param resSession
-     */
-    void saveOrUpdateAssessmentSession(AssessmentSession resSession);
     
     /**
      * Save or update assessment result.
@@ -324,8 +312,6 @@ public interface IAssessmentService {
      * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException;
-
-    AssessmentQuestion getAssessmentQuestionByUid(Long questionUid);
     
     /**
      * Returns sessionDtos containing only session ids and session names.
@@ -370,30 +356,21 @@ public interface IAssessmentService {
      * @param questionUid
      * @return
      */
-    QuestionSummary getQuestionDataForExport(Long contentId, Long questionUid);
+    Map<Long, QuestionSummary> getQuestionSummaryForExport(Assessment assessment);
+    
+    /**
+     * Prepares data for Summary excel export 
+     * 
+     * @param assessment
+     * @param sessionDtos
+     * @param showUserNames
+     * @return
+     */
+    LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames);
     
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 
-    /**
-     * Get user by UID
-     * 
-     * @param uid
-     * @return
-     */
-    AssessmentUser getUser(Long uid);
-
     void notifyTeachersOnAttemptCompletion(Long sessionId, String userName);
-
-    /**
-     * Gets a message from assessment bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
-     * @param key
-     *            key of the message
-     * @param args
-     *            arguments for the message
-     * @return message content
-     */
-    String getLocalisedMessage(String key, Object[] args);
     
     /**
      * Get a message from the language files with the given key
