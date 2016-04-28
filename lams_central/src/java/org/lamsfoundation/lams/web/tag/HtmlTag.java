@@ -48,10 +48,10 @@ import org.lamsfoundation.lams.web.filter.LocaleFilter;
  * It has been done as a class rather than a .tag file as so that the body of the
  * page can contain scriptlets. The code is based on the Struts HTML tag.
  * 
- * @jsp.tag name="html"
- * 		body-content="JSP"
- * 		display-name="Render html tag with direction and language"
- * 		description="Render html tag with direction and language"
+ *
+ *
+ *
+ * Render html tag with direction and language
  */
 public class HtmlTag extends TagSupport {
 
@@ -60,8 +60,8 @@ public class HtmlTag extends TagSupport {
 	protected boolean xhtml = false;
 	
 	/**
-	 * @jsp.attribute required="false" rtexprvalue="true" 
-	 * description="Is this an xhtml file?"
+	 *
+	 * Is this an xhtml file?
 	 */
 	public boolean getXhtml() {
 	    return this.xhtml;

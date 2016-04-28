@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lasprd10_spreadsheet"
+ *
  * 
  */
 public class Spreadsheet implements Cloneable {
@@ -135,7 +135,7 @@ public class Spreadsheet implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -154,7 +154,7 @@ public class Spreadsheet implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -172,7 +172,7 @@ public class Spreadsheet implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Share spreadsheet.
      * 
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
+     *
      */
     public SpreadsheetUser getCreatedBy() {
 	return createdBy;
@@ -187,7 +187,7 @@ public class Spreadsheet implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -200,7 +200,7 @@ public class Spreadsheet implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
+     *
      */
     public String getTitle() {
 	return title;
@@ -217,7 +217,7 @@ public class Spreadsheet implements Cloneable {
     /**
      * @return Returns whether learner is allowed to save spreadsheet.
      * 
-     * @hibernate.property column="is_learner_allowed_to_save"
+     *
      */
     public boolean isLearnerAllowedToSave() {
 	return isLearnerAllowedToSave;
@@ -234,7 +234,7 @@ public class Spreadsheet implements Cloneable {
     /**
      * @return Returns whether the marking is enabled.
      * 
-     * @hibernate.property column="is_marking_enabled"
+     *
      */
     public boolean isMarkingEnabled() {
 	return isMarkingEnabled;
@@ -251,7 +251,7 @@ public class Spreadsheet implements Cloneable {
     /**
      * @return Returns the lockWhenFinish.
      * 
-     * @hibernate.property column="lock_on_finished"
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -268,7 +268,7 @@ public class Spreadsheet implements Cloneable {
     /**
      * @return Returns the instructions set by the teacher.
      * 
-     * @hibernate.property column="instructions" type="text"
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -281,7 +281,7 @@ public class Spreadsheet implements Cloneable {
     /**
      * @return Returns spreadsheet code.
      * 
-     * @hibernate.property column="code" type="text"
+     *
      */
     public String getCode() {
 	return code;
@@ -293,7 +293,7 @@ public class Spreadsheet implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use"
+     *
      * @return
      */
     public boolean isContentInUse() {
@@ -305,7 +305,7 @@ public class Spreadsheet implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
+     *
      * @return
      */
     public boolean isDefineLater() {
@@ -317,7 +317,7 @@ public class Spreadsheet implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
+     *
      * @return
      */
     public Long getContentId() {
@@ -329,7 +329,7 @@ public class Spreadsheet implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -341,7 +341,7 @@ public class Spreadsheet implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {

@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * A event that users can subscribe to and at some point can be triggered, notifing the users.
  * 
- * @hibernate.class table="lams_notification_event"
+ *
  * @author Marcin Cieslak
  * 
  */
@@ -105,7 +105,7 @@ public class Event {
     }
 
     /**
-     * @hibernate.property column="event_session_id"
+     *
      * @return
      */
     public Long getEventSessionId() {
@@ -113,7 +113,7 @@ public class Event {
     }
 
     /**
-     * @hibernate.property column="fail_time"
+     *
      * @return
      */
     public Date getFailTime() {
@@ -121,7 +121,7 @@ public class Event {
     }
 
     /**
-     * @hibernate.property column="message"
+     *
      * @return
      */
     public String getMessage() {
@@ -129,7 +129,7 @@ public class Event {
     }
 
     /**
-     * @hibernate.property column="name" length="128"
+     *
      * @return
      */
     public String getName() {
@@ -137,7 +137,7 @@ public class Event {
     }
 
     /**
-     * @hibernate.property column="scope" length="128"
+     *
      * @return
      */
     public String getScope() {
@@ -145,7 +145,7 @@ public class Event {
     }
 
     /**
-     * @hibernate.property column="subject"
+     *
      * @return
      */
     public String getSubject() {
@@ -154,9 +154,9 @@ public class Event {
 
     /**
      * 
-     * @hibernate.set cascade="all-delete-orphan" outer-join="true"
-     * @hibernate.collection-key column="event_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.events.Subscription"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -165,14 +165,14 @@ public class Event {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
     }
 
     /**
-     * @hibernate.property column="html_format" length="1"
+     *
      * @return
      */
     public boolean isHtmlFormat() {

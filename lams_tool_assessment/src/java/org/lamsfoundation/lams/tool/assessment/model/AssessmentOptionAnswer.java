@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_option_answer"
+ *
  */
 public class AssessmentOptionAnswer implements Cloneable {
     private static final Logger log = Logger.getLogger(AssessmentOptionAnswer.class);
@@ -48,7 +48,7 @@ public class AssessmentOptionAnswer implements Cloneable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" column="uid"
+     *
      * @return Returns the answer ID.
      */
     public Long getUid() {
@@ -64,7 +64,7 @@ public class AssessmentOptionAnswer implements Cloneable {
      * 
      * @return question Option's Uid
      * 
-     * @hibernate.property column="question_option_uid"
+     *
      */
     public Long getOptionUid() {
 	return optionUid;
@@ -81,7 +81,7 @@ public class AssessmentOptionAnswer implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="answer_int"
+     *
      * 
      * @return Returns the possible numeric answer.
      */
@@ -94,7 +94,7 @@ public class AssessmentOptionAnswer implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="answer_boolean"
+     *
      * 
      * @return Returns the boolean answer.
      */

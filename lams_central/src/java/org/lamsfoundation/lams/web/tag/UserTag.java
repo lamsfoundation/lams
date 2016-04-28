@@ -47,7 +47,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * Doesn't support theme yet - to be added when we work out what we want from the theme details.
  * 
- * @jsp.tag name="user" body-content="empty" display-name="user details" description=
+ *
  *          "Output details from the shared session UserDTO object"
  * 
  * @author Fiona Malikoff
@@ -130,7 +130,7 @@ public class UserTag extends TagSupport {
     }
 
     /**
-     * @jsp.attribute required="true" rtexprvalue="true" description="Property of UserDTO to be accessed."
+     *
      * 
      * @return Returns the property.
      */

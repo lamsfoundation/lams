@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
  * 
  * @author Marcin Cieslak
  * 
- * @struts:form name="TextSearchActionForm" include-pk="true" include-all="true"
+ *
  */
 public class TextSearchActionForm extends ActionForm {
 

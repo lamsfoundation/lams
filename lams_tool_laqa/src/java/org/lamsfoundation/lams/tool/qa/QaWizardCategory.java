@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * This class maps to a single category in the q&a wizard, it contains a set of
  * cognitive skills
  * 
- * @hibernate.class table="tl_laqa11_wizard_category"
+ *
  */
 public class QaWizardCategory implements Serializable, Comparable<QaWizardCategory>, Cloneable {
 
@@ -55,7 +55,7 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -67,7 +67,7 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
     }
 
     /**
-     * @hibernate.property column="title" length="255" not-null="true"
+     *
      */
     public String getTitle() {
 	return title;
@@ -78,9 +78,9 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="category_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill"
+     *
+     *
+     *
      * 
      */
     public Set<QaWizardCognitiveSkill> getCognitiveSkills() {

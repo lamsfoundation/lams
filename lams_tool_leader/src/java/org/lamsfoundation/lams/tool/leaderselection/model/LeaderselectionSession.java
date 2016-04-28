@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * 
  * Represents the tool session.
  * 
- * @hibernate.class table="tl_lalead11_session"
+ *
  */
 
 public class LeaderselectionSession implements java.io.Serializable {
@@ -81,7 +81,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
 
@@ -94,7 +94,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_end_date"
+     *
      * 
      */
 
@@ -107,7 +107,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_start_date"
+     *
      * 
      */
 
@@ -120,7 +120,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="status" length="11"
+     *
      * 
      */
 
@@ -133,7 +133,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_id" length="20"
+     *
      * 
      */
 
@@ -146,7 +146,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="session_name" length="250"
+     *
      * 
      */
 
@@ -159,8 +159,8 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="leaderselection_uid"
+     *
+     *
      * 
      */
 
@@ -173,9 +173,9 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="leaderselection_session_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser"
+     *
+     *
+     *
      * 
      */
 
@@ -188,8 +188,8 @@ public class LeaderselectionSession implements java.io.Serializable {
     }
     
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="group_leader_uid"
+     *
+     *
      */
     public LeaderselectionUser getGroupLeader() {
 	return this.groupLeader;

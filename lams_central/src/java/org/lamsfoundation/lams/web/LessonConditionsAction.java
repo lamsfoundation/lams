@@ -68,8 +68,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author Marcin Cieslak
  * 
- * @struts.action path="/lessonConditions" parameter="method" validate="false"
- * @struts.action-forward name="indexLessonConditions" path="/indexLessonConditions.jsp"
+ *
+ *
  */
 public class LessonConditionsAction extends DispatchAction {
     private static final Logger logger = Logger.getLogger(LessonConditionsAction.class);

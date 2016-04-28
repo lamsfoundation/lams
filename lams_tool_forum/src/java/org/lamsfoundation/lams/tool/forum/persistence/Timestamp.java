@@ -31,8 +31,8 @@ import java.util.Date;
  * 
  * @author ruslan
  * 
- * @hibernate.class table="tl_lafrum11_timestamp"
- * @hibernate.cache usage = "transactional"
+ *
+ *
  * 
  */
 public class Timestamp implements Cloneable {
@@ -52,7 +52,7 @@ public class Timestamp implements Cloneable {
     // get/set methods
     // **********************************************************
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -66,7 +66,7 @@ public class Timestamp implements Cloneable {
      * Returns the user's timestamp
      * 
      * @return timestamp
-     * @hibernate.property column="timestamp_date"
+     *
      */
     public Date getTimestamp() {
 	return timestamp;
@@ -84,7 +84,7 @@ public class Timestamp implements Cloneable {
     /**
      * @return Returns the user of the user who saved the timestamp
      * 
-     * @hibernate.many-to-one cascade="none" column="forum_user_uid"
+     *
      * 
      */
     public ForumUser getForumUser() {
@@ -100,8 +100,8 @@ public class Timestamp implements Cloneable {
     }
     
     /**
-     * @hibernate.many-to-one column="message_uid"
-     * cascade="none"
+     *
+     *
      */
     public Message getMessage() {
 	return message;

@@ -27,7 +27,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
 /**
  *  Resource Item  Form.
- *	@struts.form name="resourceItemForm"
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$

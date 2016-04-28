@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lakalt11_comment"
+ *
  */
 public class KalturaComment implements Cloneable {
 
@@ -88,7 +88,7 @@ public class KalturaComment implements Cloneable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -100,7 +100,7 @@ public class KalturaComment implements Cloneable {
     }    
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -112,7 +112,7 @@ public class KalturaComment implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="create_by" cascade="none"
+     *
      * @return
      */
     public KalturaUser getCreateBy() {
@@ -124,7 +124,7 @@ public class KalturaComment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="comment" type="text"
+     *
      * @return
      */
     public String getComment() {
@@ -136,7 +136,7 @@ public class KalturaComment implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="is_hidden"
+     *
      * @return
      */
     public boolean isHidden() {

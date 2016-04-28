@@ -70,8 +70,8 @@ import org.w3c.dom.Element;
 /**
  * @author jliew
  * 
- * @web:servlet name="LessonJoinServlet"
- * @web:servlet-mapping url-pattern="/services/xml/LessonJoin/*"
+ *
+ *
  */
 public class LessonJoinServlet extends HttpServlet {
 

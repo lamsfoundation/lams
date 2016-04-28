@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 /**
  * Scratchie Form.
  * 
- * @struts.form name="scratchieForm"
+ *
  */
 public class ScratchieForm extends ActionForm {
     private static final long serialVersionUID = 3599879328307492312L;

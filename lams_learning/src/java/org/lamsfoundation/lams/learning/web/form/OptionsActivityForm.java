@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.learning.web.form;
  * @author daveg
  *
  * XDoclet definition:
- * @struts:form name="optionsActivityForm"
+ *
  */
 public class OptionsActivityForm extends ActivityForm {
 

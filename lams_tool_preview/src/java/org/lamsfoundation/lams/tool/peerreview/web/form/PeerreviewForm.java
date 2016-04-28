@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
  * 
  * Peerreview Form.
  * 
- * @struts.form name="peerreviewForm"
+ *
  * 
  * User: Andrey Balan
  */

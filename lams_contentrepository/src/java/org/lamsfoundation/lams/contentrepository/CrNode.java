@@ -39,9 +39,9 @@ import org.apache.log4j.Logger;
 
 
 /** 
- *        @hibernate.class table="lams_cr_node"
+ *
  * 
- * 		  @hibernate.cache usage = "transactional"
+ *
  *     
 */
 public class CrNode implements Serializable {
@@ -107,11 +107,11 @@ public class CrNode implements Serializable {
     }
 */
     /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="node_id"
-     *             unsaved-value="0"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Long getNodeId() {
@@ -123,9 +123,9 @@ public class CrNode implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="path"
-     *             length="255"
+     *
+     *
+     *
      *         
      */
     public String getPath() {
@@ -137,10 +137,10 @@ public class CrNode implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="type"
-     *             length="255"
-     *             not-null="true"
+     *
+     *
+     *
+     *
      *         
      */
     public String getType() {
@@ -152,9 +152,9 @@ public class CrNode implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="created_date_time"
-     * 			   type="java.sql.Timestamp"
+     *
+     *
+     *
      *         
      */
     public Date getCreatedDateTime() {
@@ -166,9 +166,9 @@ public class CrNode implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             type="java.lang.Long"
-     *             column="next_version_id"
+     *
+     *
+     *
      *         
      */
     public Long getNextVersionId() {
@@ -182,9 +182,9 @@ public class CrNode implements Serializable {
     /**
      * bi-directional many-to-one association to CrWorkspace
      *  
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="workspace_id"         
+     *
+     *
+     *
      *         
      */
     public org.lamsfoundation.lams.contentrepository.CrWorkspace getCrWorkspace() {
@@ -199,11 +199,11 @@ public class CrNode implements Serializable {
      * Get the parent node/version to this node.
      * bi-directional many-to-one association to CrNodeVersion.
      *  
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     * 			   lazy="false"
-     * 			   inversion="true"
-     *            @hibernate.column name="parent_nv_id"         
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public org.lamsfoundation.lams.contentrepository.CrNodeVersion getParentNodeVersion() {
@@ -218,15 +218,15 @@ public class CrNode implements Serializable {
     /** 
      * bi-directional one-to-many association to CrNodeVersion
      * 
-     *            @hibernate.set
-     *             lazy="false"
-     *             inverse="true"
-     *             cascade="all-delete-orphan"
-     *            @hibernate.collection-key
-     *             column="node_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-     *         	  @hibernate.collection-cache	
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      * 			   usage = "transactional"
      *         
      */

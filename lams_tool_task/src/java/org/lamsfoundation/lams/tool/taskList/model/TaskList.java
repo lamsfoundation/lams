@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * @author Dapeng Ni
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_latask10_tasklist"
+ *
  */
 public class TaskList implements Cloneable{
 	
@@ -219,7 +219,7 @@ public class TaskList implements Cloneable{
 	 * Returns the object's creation date
 	 *
 	 * @return date
-	 * @hibernate.property column="create_date"
+	 *
 	 */
 	public Date getCreated() {
       return created;
@@ -237,7 +237,7 @@ public class TaskList implements Cloneable{
 	 * Returns the object's date of last update
 	 *
 	 * @return date updated
-	 * @hibernate.property column="update_date"
+	 *
 	 */
 	public Date getUpdated() {
         return updated;
@@ -256,9 +256,9 @@ public class TaskList implements Cloneable{
      * 
      * @return id of a user
      *
-     * @hibernate.many-to-one
-     *      cascade="save-update"
-     * 		column="create_by"
+     *
+     *
+     *
      *
      */
     public TaskListUser getCreatedBy() {
@@ -278,7 +278,7 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return tasklist id
 	 * 
-	 * @hibernate.id column="uid" generator-class="native"
+	 *
 	 */
 	public Long getUid() {
 		return uid;
@@ -297,8 +297,8 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return tasklist title.
 	 *
-	 * @hibernate.property
-	 * 		column="title"
+	 *
+	 *
 	 *
 	 */
 	public String getTitle() {
@@ -318,9 +318,9 @@ public class TaskList implements Cloneable{
      * 
      * @return tasklist instructions set by teacher
      *
-     * @hibernate.property
-     * 		column="instructions"
-     *      type="text"
+     *
+     *
+     *
      */
     public String getInstructions() {
         return instructions;
@@ -339,12 +339,12 @@ public class TaskList implements Cloneable{
      *
      * @return a set of conditions belong to this tasklist.
      *
-     * @hibernate.set   lazy="true"
-     * 					cascade="all"
-     * 					inverse="false"
-     * 					order-by="sequence_id asc"
-     * @hibernate.collection-key column="taskList_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListCondition"
+     *
+     *
+     *
+     *
+     *
+     *
      */
 	public Set getConditions() {
 		return conditions;
@@ -363,12 +363,12 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return set of TaskListItems
 	 * 
-	 * @hibernate.set lazy="true"
-	 *                inverse="false"
-	 *                cascade="all"
-	 *                order-by="sequence_id asc"
-	 * @hibernate.collection-key column="taskList_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
 	 */
 	public Set getTaskListItems() {
 		return taskListItems;
@@ -387,7 +387,7 @@ public class TaskList implements Cloneable{
 	 *
 	 * @return 
 	 * 
-	 * @hibernate.property  column="content_in_use"
+	 *
 	 */
 	public boolean isContentInUse() {
 		return contentInUse;
@@ -406,7 +406,7 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return whether this tasklist should be defined later
 	 * 
-	 * @hibernate.property column="define_later"
+	 *
 	 */
 	public boolean isDefineLater() {
 		return defineLater;
@@ -425,7 +425,7 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return ContentId
 	 * 
-	 * @hibernate.property column="content_id" unique="true" 
+	 *
 	 */
 	public Long getContentId() {
 		return contentId;
@@ -444,8 +444,8 @@ public class TaskList implements Cloneable{
      * 
      * @return if the tasklist should be locked after being finished or not
      *
-     * @hibernate.property
-     * 		column="lock_when_finished"
+     *
+     *
      */
     public boolean getLockWhenFinished() {
         return lockWhenFinished;
@@ -464,7 +464,7 @@ public class TaskList implements Cloneable{
 	 *
 	 * @return whether learners are allowed to contribute tasks
 	 * 
-	 * @hibernate.property column="allow_contribute_tasks"
+	 *
 	 */
 	public boolean isAllowContributeTasks() {
 		return allowContributeTasks;
@@ -483,7 +483,7 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return whether the learners should be verified by monitor before they can finish tasklist
 	 * 
-	 * @hibernate.property column="is_monitor_verification_required"
+	 *
 	 */
 	public boolean isMonitorVerificationRequired() {
 		return monitorVerificationRequired;
@@ -502,7 +502,7 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return if the tasks should be done in a sequential order
 	 * 
-	 * @hibernate.property column="is_sequential_order"
+	 *
 	 */
 	public boolean isSequentialOrder() {
 		return sequentialOrder;
@@ -521,7 +521,7 @@ public class TaskList implements Cloneable{
 	 * 
 	 * @return the minimum number of tasks needed to be completed to finish this activity
 	 * 
-	 * @hibernate.property column="minimum_number_tasks"
+	 *
 	 */
 	public int getMinimumNumberTasks() {
 		return minimumNumberTasks;
@@ -536,7 +536,7 @@ public class TaskList implements Cloneable{
 	}
 	
 	/**
-	 * @hibernate.property column="reflect_instructions"
+	 *
 	 * @return
 	 */	
 	public String getReflectInstructions() {
@@ -547,7 +547,7 @@ public class TaskList implements Cloneable{
 	}
 	
 	/**
-	 * @hibernate.property column="reflect_on_activity"
+	 *
 	 * @return
 	 */		
 	public boolean isReflectOnActivity() {
@@ -558,7 +558,7 @@ public class TaskList implements Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="submission_deadline"
+	 *
 	 * @return date submissionDeadline
 	 */
 	public Date getSubmissionDeadline() {

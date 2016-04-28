@@ -75,10 +75,10 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @struts.action path = "/OrganisationGroup" parameter = "method" validate = "false"
- * @struts.action-forward name = "viewGroupings" path = "/orgGrouping.jsp"
- * @struts.action-forward name = "viewGroups" path = "/orgGroup.jsp"
- * @struts.action-forward name = "viewExtGroups" path = "/extGroups.jsp"
+ *
+ *
+ *
+ *
  */
 public class OrganisationGroupAction extends DispatchAction {
     /**

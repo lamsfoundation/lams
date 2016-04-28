@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * Spreadsheet
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_lasprd10_session"
+ *
  *
  */
 public class SpreadsheetSession{
@@ -52,7 +52,7 @@ public class SpreadsheetSession{
   	//		Get/Set methods
 //  **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the learnerID.
 	 */
 	public Long getUid() {
@@ -63,7 +63,7 @@ public class SpreadsheetSession{
 	}
 	
 	/**
-	 * @hibernate.property column="session_end_date"
+	 *
 	 * @return
 	 */
 	public Date getSessionEndDate() {
@@ -73,7 +73,7 @@ public class SpreadsheetSession{
 		this.sessionEndDate = sessionEndDate;
 	}
 	/**
-	 * @hibernate.property column="session_start_date"
+	 *
 	 * 
 	 * @return
 	 */
@@ -84,7 +84,7 @@ public class SpreadsheetSession{
 		this.sessionStartDate = sessionStartDate;
 	}
 	/**
-	 * @hibernate.property
+	 *
 	 * @return
 	 */
 	public int getStatus() {
@@ -95,8 +95,8 @@ public class SpreadsheetSession{
 	}
 
 	/**
- 	 * @hibernate.many-to-one  column="spreadsheet_uid"
- 	 * cascade="none"
+ 	 *
+ 	 *
 	 * @return
 	 */
 	public Spreadsheet getSpreadsheet() {
@@ -106,7 +106,7 @@ public class SpreadsheetSession{
 		this.spreadsheet = spreadsheet;
 	}
 	/**
-	 * @hibernate.property column="session_id"
+	 *
 	 * @return
 	 */
 	public Long getSessionId() {
@@ -117,7 +117,7 @@ public class SpreadsheetSession{
 	}
 
 	/**
-	 * @hibernate.property column="session_name" length="250"
+	 *
 	 * @return Returns the session name
 	 */
 	public String getSessionName() {

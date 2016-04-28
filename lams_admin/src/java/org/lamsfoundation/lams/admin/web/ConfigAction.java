@@ -44,10 +44,10 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 /**
  * struts doclets
  * 
- * @struts.action path="/config" parameter="method" name="ConfigForm" input=".editconfig" scope="request" validate="false"
- * @struts.action-forward name="config" path=".editconfig"
- * @struts.action-forward name="ldap" path=".ldap"
- * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
+ *
+ *
+ *
+ *
  */
 public class ConfigAction extends LamsDispatchAction {
 

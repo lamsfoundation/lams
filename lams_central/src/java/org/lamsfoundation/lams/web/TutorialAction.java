@@ -47,7 +47,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Manages tutorial videos - the ones displayed on top of pages, explaining how to use certain features of LAMS.
  * 
- * @struts:action path="/tutorial" parameter="method"
+ *
  */
 public class TutorialAction extends DispatchAction {
     private static Logger log = Logger.getLogger(TutorialAction.class);

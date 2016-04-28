@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * Represents a tool (learning library) group for use in Authoring.
  * 
- * @hibernate.class table="lams_learning_library_group"
+ *
  */
 public class LearningLibraryGroup implements Serializable {
     private Long groupId;
@@ -41,7 +41,7 @@ public class LearningLibraryGroup implements Serializable {
     private Set<LearningLibrary> learningLibraries;
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="group_id"
+     *
      */
     public Long getGroupId() {
 	return groupId;
@@ -52,7 +52,7 @@ public class LearningLibraryGroup implements Serializable {
     }
 
     /**
-     * @hibernate.property column="name"
+     *
      */
     public String getName() {
 	return this.name;
@@ -63,10 +63,10 @@ public class LearningLibraryGroup implements Serializable {
     }
 
     /**
-     * @hibernate.set cascade="none" table="lams_learning_library_to_group"
-     * @hibernate.collection-key column="group_id"
-     * @hibernate.collection-many-to-many column="learning_library_id"
-     *                                    class="org.lamsfoundation.lams.learningdesign.LearningLibrary"
+     *
+     *
+     *
+     *
      */
     public Set<LearningLibrary> getLearningLibraries() {
 	return learningLibraries;

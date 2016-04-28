@@ -31,7 +31,7 @@ import org.apache.struts.util.LabelValueBean;
  * 
  * @author Andrey Balan
  * 
- * @struts.form name="taskListConditionForm"
+ *
  */
 public class TaskListConditionForm extends ActionForm {
 	

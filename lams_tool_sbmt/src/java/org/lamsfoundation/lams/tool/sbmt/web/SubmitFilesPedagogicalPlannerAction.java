@@ -48,10 +48,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/pedagogicalPlanner" name="SbmtPedagogicalPlannerForm" parameter="dispatch" scope="request"
- *                validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="/authoring/pedagogicalPlannerForm.jsp"
+ *
  */
 public class SubmitFilesPedagogicalPlannerAction extends LamsDispatchAction {
 

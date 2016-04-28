@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 
 
 /** 
- * @hibernate.class table="tl_lasbmt11_session"
+ *
  * @serial 3399851325547422573L
 */
 public class SubmitFilesSession implements Serializable,Cloneable{
@@ -74,7 +74,7 @@ public class SubmitFilesSession implements Serializable,Cloneable{
     }
 
     /** 
-     * @hibernate.id generator-class="assigned" type="java.lang.Long" column="session_id"
+     *
      */
     public Long getSessionID() {
         return this.sessionID;
@@ -85,7 +85,7 @@ public class SubmitFilesSession implements Serializable,Cloneable{
     }
 
     /** 
-     * @hibernate.property column="status" length="11" not-null="true" 
+     *
      */
     public Integer getStatus() {
         return this.status;
@@ -144,10 +144,10 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 		return obj;
 	}
 	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
-	 * @hibernate.collection-one-to-many 
-	 * class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
-	 * @hibernate.collection-key column="session_id"
+	 *
+	 *
+	 *
+	 *
 	 * @return Returns the submissionDetails.
 	 */
 	public Set getSubmissionDetails() {
@@ -161,7 +161,7 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.many-to-one column="content_id" cascade="none"
+	 *
 	 * 
 	 * @return Returns the content.
 	 */
@@ -176,7 +176,7 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 	}
 	
 	/**
-	 * @hibernate.property column="session_name" length="250"
+	 *
 	 * 
 	 * @return Returns the session name.
 	 */

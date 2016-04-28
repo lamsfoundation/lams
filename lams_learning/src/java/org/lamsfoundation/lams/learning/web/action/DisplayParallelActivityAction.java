@@ -51,9 +51,9 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  * XDoclet definition:
  * 
  * @author daveg
- * @struts:action path="/DisplayParallelActivity" name="activityForm" validate="false" scope="request"
+ *
  * 
- * @struts:action-forward name="displayParallel" path=".parallelActivity"
+ *
  * 
  */
 public class DisplayParallelActivityAction extends ActivityAction {

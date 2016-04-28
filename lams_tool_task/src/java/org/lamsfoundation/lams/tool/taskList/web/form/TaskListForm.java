@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 /**
  *
  * 	TaskList Form.
- *	@struts.form name="taskListForm"
+ *
  *
  * User: Dapeng.Ni
  */

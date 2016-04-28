@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_scratchie_answer"
+ *
  * 
  */
 public class ScratchieAnswer implements Cloneable {
@@ -56,7 +56,7 @@ public class ScratchieAnswer implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -72,7 +72,7 @@ public class ScratchieAnswer implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description" type="text"
+     *
      * @return
      */
     public String getDescription() {
@@ -84,7 +84,7 @@ public class ScratchieAnswer implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="correct"
+     *
      * @return
      */
     public boolean isCorrect() {
@@ -96,7 +96,7 @@ public class ScratchieAnswer implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="order_id"
+     *
      * @return
      */
     public Integer getOrderId() {
@@ -108,7 +108,7 @@ public class ScratchieAnswer implements Cloneable {
     }
     
     /**
-     * @hibernate.many-to-one column="scratchie_item_uid" cascade="none"
+     *
      */
     public ScratchieItem getScratchieItem() {
 	return scratchieItem;

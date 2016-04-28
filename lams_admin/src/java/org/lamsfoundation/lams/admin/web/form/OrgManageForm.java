@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.admin.web.OrgManageBean;
  *
  * Created at 20:56:24 on 2006-6-5
  * 
- * @struts.form name="OrgManageForm"
+ *
  */
 
 public class OrgManageForm extends ActionForm {

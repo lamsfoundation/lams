@@ -29,7 +29,7 @@ import java.util.Date;
  * Survey
  * @author Dapeng Ni
  *
- * @hibernate.class  table="tl_lasurv11_session"
+ *
  *
  */
 public class SurveySession{
@@ -46,7 +46,7 @@ public class SurveySession{
   	//		Get/Set methods
 //  **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the learnerID.
 	 */
 	public Long getUid() {
@@ -57,7 +57,7 @@ public class SurveySession{
 	}
 	
 	/**
-	 * @hibernate.property column="session_end_date"
+	 *
 	 * @return
 	 */
 	public Date getSessionEndDate() {
@@ -67,7 +67,7 @@ public class SurveySession{
 		this.sessionEndDate = sessionEndDate;
 	}
 	/**
-	 * @hibernate.property column="session_start_date"
+	 *
 	 * 
 	 * @return
 	 */
@@ -80,8 +80,8 @@ public class SurveySession{
 
 
 	/**
- 	 * @hibernate.many-to-one  column="survey_uid"
- 	 * cascade="none"
+ 	 *
+ 	 *
 	 * @return
 	 */
 	public Survey getSurvey() {
@@ -91,7 +91,7 @@ public class SurveySession{
 		this.survey = survey;
 	}
 	/**
-	 * @hibernate.property column="session_id"
+	 *
 	 * @return
 	 */
 	public Long getSessionId() {
@@ -102,7 +102,7 @@ public class SurveySession{
 	}
 
 	/**
-	 * @hibernate.property column="session_name" length="250"
+	 *
 	 * @return Returns the session name
 	 */
 	public String getSessionName() {

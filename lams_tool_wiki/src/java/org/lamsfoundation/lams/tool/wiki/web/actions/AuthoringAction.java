@@ -71,11 +71,11 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author lfoxton
  * @version
  * 
- * @struts.action path="/authoring" name="authoringForm" parameter="dispatch" scope="request" validate="false"
- * @struts.action-forward name="success" path="tiles:/authoring/main"
- * @struts.action-forward name="compareWiki" path="/pages/wiki/compare.jsp"
- * @struts.action-forward name="viewWiki" path="/pages/wiki/viewWiki.jsp"
- * @struts.action-forward name="message_page" path="tiles:/generic/message"
+ *
+ *
+ *
+ *
+ *
  */
 public class AuthoringAction extends WikiPageAction {
 

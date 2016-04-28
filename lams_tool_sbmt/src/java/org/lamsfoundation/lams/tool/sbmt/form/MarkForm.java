@@ -29,7 +29,7 @@ import org.apache.struts.upload.FormFile;
 /**
  * @author lfoxton
  * 
- * @struts.form name="sbmtMarkForm"
+ *
  */
 public class MarkForm extends ActionForm {
 

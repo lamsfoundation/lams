@@ -29,8 +29,8 @@ import java.util.Date;
 
 /**
  *
- * @hibernate.class  table="tl_lafrum11_report"
- * @hibernate.cache usage = "transactional"
+ *
+ *
  *  
  */
 public class ForumReport {
@@ -40,7 +40,7 @@ public class ForumReport {
 	private String comment;
 	private Date dateMarksReleased;
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
 	public Long getUid() {
 		return uid;
@@ -49,7 +49,7 @@ public class ForumReport {
 		this.uid = uid;
 	}
 	/**
-	 * @hibernate.property column="comment"  type="text"
+	 *
 	 * @return
 	 */
 	public String getComment() {
@@ -59,7 +59,7 @@ public class ForumReport {
 		this.comment = comment;
 	}
 	/**
-	 * @hibernate.property column="release_date" 
+	 *
 	 * @return
 	 */
 	public Date getDateMarksReleased() {
@@ -69,7 +69,7 @@ public class ForumReport {
 		this.dateMarksReleased = dateMarksReleased;
 	}
 	/**
-	 * @hibernate.property column="mark" 
+	 *
 	 * @return
 	 */
 	public Float getMark() {

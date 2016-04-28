@@ -48,11 +48,11 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * @author Andrey Balan
  * 
- * @struts.action path="/timezonemanagement" parameter="method" name="TimezoneForm" input=".config" scope="request"
- *                validate="false"
- * @struts.action-forward name="timezoneManagement" path=".timezoneManagement"
- * @struts.action-forward name="timezoneServerManagement" path="/timezoneServerManagement.jsp"
- * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
+ *
+ *
+ *
+ *
+ *
  */
 public class TimezoneManagementAction extends LamsDispatchAction {
     

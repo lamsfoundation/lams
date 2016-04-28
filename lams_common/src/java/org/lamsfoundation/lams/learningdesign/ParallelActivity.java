@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.ParallelActivityStrategy;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class
+ *
  */
 public class ParallelActivity extends ComplexActivity implements Serializable {
 

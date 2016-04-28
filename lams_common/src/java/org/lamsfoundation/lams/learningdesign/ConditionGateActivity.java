@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * Gate activity that is based on tools' output and conditions.
  * 
  * @author Marcin Cieslak
- * @hibernate.class
+ *
  */
 public class ConditionGateActivity extends GateActivity implements Serializable {
 

@@ -36,7 +36,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @struts.form name="authoringForm"
+ *
  */
 @SuppressWarnings("unchecked")
 public class AuthoringForm extends ActionForm {

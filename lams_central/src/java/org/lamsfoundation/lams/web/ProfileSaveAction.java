@@ -56,10 +56,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 
 /**
- * @struts.action path="/saveprofile" name="UserForm" input=".editprofile" scope="request" validate="false"
+ *
  * 
- * @struts.action-forward name="profile" path="/index.do?state=active&amp;tab=profile" redirect="true"
- * @struts.action-forward name="editprofile" path="/index.do?state=active&amp;tab=editprofile"
+ *
+ *
  */
 public class ProfileSaveAction extends Action {
 

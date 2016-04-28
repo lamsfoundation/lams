@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  *
  * 	Message Form.
- *	@struts.form name="forumForm"
+ *
  *
  * User: conradb
  * Date: 10/06/2005

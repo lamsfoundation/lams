@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class ScribePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> headings;

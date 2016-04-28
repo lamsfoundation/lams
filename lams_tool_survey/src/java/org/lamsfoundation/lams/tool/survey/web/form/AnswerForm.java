@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.survey.web.form;
 import org.apache.struts.action.ActionForm;
 /**
  *  Survey Item  Form.
- *	@struts.form name="answerForm"
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$

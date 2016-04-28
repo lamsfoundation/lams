@@ -50,7 +50,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Processes notification sent from Tools to users.
  * 
- * @struts:action path="/notification" validate="false" parameter="method"
+ *
  */
 public class NotificationAction extends DispatchAction {
 

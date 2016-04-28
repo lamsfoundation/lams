@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Anthony Sukkar
  * 
- * @hibernate.class table="tl_lascrb11_heading"
+ *
  * 
  */
 public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHeading>, Cloneable{
@@ -57,7 +57,7 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 	// Getters / Setters
 
 	/**
-	 * @hibernate.property column="heading" type="text"
+	 *
 	 */
 	public String getHeadingText() {
 		return headingText;
@@ -69,8 +69,8 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 
 	/**
 	 * 
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="scribe_uid"
+	 *
+	 *
 	 */
 	public Scribe getScribe() {
 		return scribe;
@@ -81,7 +81,7 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 	}
 
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * 
 	 */
 	public Long getUid() {
@@ -94,7 +94,7 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 
 	/**
 	 * 
-	 * @hibernate.property column="display_order"
+	 *
 	 */
 	public int getDisplayOrder() {
 		return displayOrder;

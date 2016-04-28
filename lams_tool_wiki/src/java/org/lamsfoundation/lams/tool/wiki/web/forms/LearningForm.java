@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.wiki.web.forms;
 /**
  * 
  * @author lfoxton
- * @struts.form name="learningForm"
+ *
  */
 public class LearningForm extends WikiPageForm {
 

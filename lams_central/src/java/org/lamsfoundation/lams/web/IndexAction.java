@@ -66,16 +66,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * struts doclet
  * 
- * @struts.action path="/index" validate="false"
+ *
  * 
- * @struts.action-forward name="main" path="/main.jsp"
- * @struts.action-forward name="community" path=".community"
- * @struts.action-forward name="profile" path="/profile.do?method=view"
- * @struts.action-forward name="editprofile" path="/profile.do?method=edit"
- * @struts.action-forward name="password" path="/password.do"
- * @struts.action-forward name="passwordChanged" path=".passwordChangeOk"
- * @struts.action-forward name="portrait" path="/portrait.do"
- * @struts.action-forward name="lessons" path="/profile.do?method=lessons"
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class IndexAction extends Action {
 

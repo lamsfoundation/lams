@@ -59,10 +59,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author jliew
  * @author Andrey Balan
  * 
- * @struts:action path="/saveportrait" parameter="method" name="PortraitActionForm" input=".portrait" scope="request" validate="false"
+ *
  * 
- * @struts:action-forward name="profile" path="/index.do?state=active&amp;tab=profile"
- * @struts:action-forward name="errors" path="/index.do?state=active&amp;tab=portrait"
+ *
+ *
  */
 public class PortraitSaveAction extends LamsDispatchAction {
 

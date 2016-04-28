@@ -6,7 +6,7 @@ import java.security.InvalidParameterException;
  * Subscription for an event notification. This class binds an user to an event and stores some information on the
  * notification attempts.
  * 
- * @hibernate.class table="lams_notification_subscription"
+ *
  * @author Marcin Cieslak
  * 
  */
@@ -78,7 +78,7 @@ public class Subscription {
     }
 
     /**
-     * @hibernate.property column="delivery_method_id"
+     *
      * @return
      */
     public Short getDeliveryMethodId() {
@@ -86,8 +86,8 @@ public class Subscription {
     }
 
     /**
-     * @hibernate.many-to-one
-     * @hibernate.column name="event_uid"
+     *
+     *
      * @return
      */
     public Event getEvent() {
@@ -95,7 +95,7 @@ public class Subscription {
     }
 
     /**
-     * @hibernate.property column="last_operation_message"
+     *
      * @return
      */
     public String getLastOperationMessage() {
@@ -103,14 +103,14 @@ public class Subscription {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
     }
 
     /**
-     * @hibernate.property column="user_id"
+     *
      * @return
      */
     public Integer getUserId() {

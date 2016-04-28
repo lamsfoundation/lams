@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_session"
+ *
  * 
  */
 public class ScratchieSession {
@@ -59,7 +59,7 @@ public class ScratchieSession {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the learnerID.
      */
     public Long getUid() {
@@ -71,7 +71,7 @@ public class ScratchieSession {
     }
 
     /**
-     * @hibernate.property column="session_end_date"
+     *
      * @return
      */
     public Date getSessionEndDate() {
@@ -83,7 +83,7 @@ public class ScratchieSession {
     }
 
     /**
-     * @hibernate.property column="session_start_date"
+     *
      * 
      * @return
      */
@@ -96,7 +96,7 @@ public class ScratchieSession {
     }
 
     /**
-     * @hibernate.property
+     *
      * @return
      */
     public int getStatus() {
@@ -108,7 +108,7 @@ public class ScratchieSession {
     }
 
     /**
-     * @hibernate.many-to-one column="scratchie_uid" cascade="none"
+     *
      * @return
      */
     public Scratchie getScratchie() {
@@ -120,7 +120,7 @@ public class ScratchieSession {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {
@@ -132,7 +132,7 @@ public class ScratchieSession {
     }
 
     /**
-     * @hibernate.property column="session_name" length="250"
+     *
      * @return Returns the session name
      */
     public String getSessionName() {
@@ -151,9 +151,9 @@ public class ScratchieSession {
     /**
      * 
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="session_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -166,8 +166,8 @@ public class ScratchieSession {
     }
     
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="group_leader_uid"
+     *
+     *
      */
     public ScratchieUser getGroupLeader() {
 	return this.groupLeader;
@@ -186,7 +186,7 @@ public class ScratchieSession {
     /**
      * Mark scored by a leader and shared by all users in a group.
      * 
-     * @hibernate.property column="mark"
+     *
      * @return
      */
     public int getMark() {
@@ -201,7 +201,7 @@ public class ScratchieSession {
      * Indicates whether leader has pressed Continue button in learning thus finishing scratching. And is shared by all
      * users in a group.
      * 
-     * @hibernate.property column="scratching_finished"
+     *
      * @return
      */
     public boolean isScratchingFinished() {

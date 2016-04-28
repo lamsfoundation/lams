@@ -62,12 +62,12 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 /**
  * struts doclet
  * 
- * @struts.action path = "/loginsave" name = "LoginMaintainForm" parameter =
+ *
  *                "method" scope = "request" input = ".loginmaintian" validate =
  *                "false"
  * 
- * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
- * @struts.action-forward name="loginmaintain" path=".loginmaintain"
+ *
+ *
  */
 public class LoginSaveAction extends LamsDispatchAction {
 

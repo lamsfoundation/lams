@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.util.FileValidatorUtil;
  * 
  * Message Form.
  * 
- * @struts.form name="messageForm"
+ *
  * 
  *              User: conradb Date: 10/06/2005 Time: 15:44:47
  */

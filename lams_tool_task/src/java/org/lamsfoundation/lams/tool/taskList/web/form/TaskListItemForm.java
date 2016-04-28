@@ -32,7 +32,7 @@ import org.apache.struts.upload.FormFile;
  * @author Steve.Ni
  * @author Andrey Balan
  * 
- * @struts.form name="taskListItemForm"
+ *
  */
 public class TaskListItemForm extends ActionForm {
 	private String itemIndex;

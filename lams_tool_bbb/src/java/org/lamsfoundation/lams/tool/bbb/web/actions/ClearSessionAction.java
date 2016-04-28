@@ -34,9 +34,9 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * 
  * @author Steve.Ni
  * 
- *         ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/clearsession" validate="false"
+ *
  * 
  * @version $Revision$
  */

@@ -66,11 +66,11 @@ import org.w3c.dom.Node;
  * @author Simone Chiaretta (simo@users.sourceforge.net)
  * @author Mitchell Seaton
  * 
- * @web:servlet name="Connector" load-on-startup = "1"
- * @web.servlet-init-param name = "baseDir" value = "secure"
- * @web.servlet-init-param name = "debug" value = "true"
+ *
+ *
+ *
  * 
- * @web:servlet-mapping url-pattern="/ckeditor/filemanager/browser/default/connectors/jsp/connector"
+ *
  */
 
 public class LAMSConnectorServlet extends HttpServlet {

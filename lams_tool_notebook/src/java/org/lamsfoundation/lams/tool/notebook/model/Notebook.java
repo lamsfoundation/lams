@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookService;
 
 /**
- * @hibernate.class table="tl_lantbk11_notebook"
+ *
  */
 public class Notebook implements java.io.Serializable, Cloneable {
 
@@ -73,7 +73,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -85,7 +85,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
     public Date getCreateDate() {
@@ -97,7 +97,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
     public Date getUpdateDate() {
@@ -109,7 +109,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by" length="20"
+     *
      * 
      */
 
@@ -122,7 +122,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
 
@@ -135,7 +135,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
 
@@ -148,7 +148,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      * 
      */
 
@@ -161,7 +161,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_rich_editor" length="1"
+     *
      * @return
      */
     public boolean isAllowRichEditor() {
@@ -173,7 +173,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * 
      */
 
@@ -186,7 +186,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      * 
      */
 
@@ -204,7 +204,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
     /**
      * 
-     * @hibernate.property column="submission_deadline"
+     *
      * @return date submissionDeadline
      * 
      */
@@ -214,7 +214,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      * 
      */
 
@@ -227,9 +227,9 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="notebook_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.notebook.model.NotebookSession"
+     *
+     *
+     *
      * 
      */
 
@@ -242,10 +242,10 @@ public class Notebook implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" cascade="all"
+     *
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
-     * @hibernate.collection-key column="content_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.notebook.model.NotebookCondition"
+     *
+     *
      * 
      */
     public Set<NotebookCondition> getConditions() {

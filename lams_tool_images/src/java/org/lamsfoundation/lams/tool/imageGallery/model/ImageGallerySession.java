@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimag10_session"
+ *
  * 
  */
 public class ImageGallerySession {
@@ -52,7 +52,7 @@ public class ImageGallerySession {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the learnerID.
      */
     public Long getUid() {
@@ -64,7 +64,7 @@ public class ImageGallerySession {
     }
 
     /**
-     * @hibernate.property column="session_end_date"
+     *
      * @return
      */
     public Date getSessionEndDate() {
@@ -76,7 +76,7 @@ public class ImageGallerySession {
     }
 
     /**
-     * @hibernate.property column="session_start_date"
+     *
      * 
      * @return
      */
@@ -89,7 +89,7 @@ public class ImageGallerySession {
     }
 
     /**
-     * @hibernate.property
+     *
      * @return
      */
     public int getStatus() {
@@ -101,7 +101,7 @@ public class ImageGallerySession {
     }
 
     /**
-     * @hibernate.many-to-one column="imageGallery_uid" cascade="none"
+     *
      * @return
      */
     public ImageGallery getImageGallery() {
@@ -113,7 +113,7 @@ public class ImageGallerySession {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {
@@ -125,7 +125,7 @@ public class ImageGallerySession {
     }
 
     /**
-     * @hibernate.property column="session_name" length="250"
+     *
      * @return Returns the session name
      */
     public String getSessionName() {

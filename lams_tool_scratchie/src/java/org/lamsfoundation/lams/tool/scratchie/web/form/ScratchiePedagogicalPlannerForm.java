@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class ScratchiePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private String instructions;

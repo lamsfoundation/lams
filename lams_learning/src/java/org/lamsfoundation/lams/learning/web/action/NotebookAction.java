@@ -57,16 +57,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author M Seaton
  * 
- *         ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action name="NotebookForm" path="/notebook" parameter="method" validate="false"
+ *
  * 
- * @struts.action-forward name = "viewAll" path = ".notebookViewAll"
- * @struts.action-forward name= "viewSingle" path = ".notebookViewSingle"
- * @struts.action-forward name= "viewJournals" path = ".notebookViewJournals"
- * @struts.action-forward name = "addNew" path = ".notebookAddNew"
- * @struts.action-forward name = "saveSuccess" path = ".notebookSaveSuccess" ----------------XDoclet
- *                        Tags--------------------
+ *
+ *
+ *
+ *
+ *
+ *
  * 
  */
 public class NotebookAction extends LamsDispatchAction {

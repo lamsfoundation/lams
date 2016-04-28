@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * CommonCartridge
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_laimsc11_user"
+ *
  *
  */
 public class CommonCartridgeUser implements Cloneable{
@@ -95,7 +95,7 @@ public class CommonCartridgeUser implements Cloneable{
   	//		Get/Set methods
 //  **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the uid.
 	 */
 	public Long getUid() {
@@ -109,7 +109,7 @@ public class CommonCartridgeUser implements Cloneable{
 	}
 
 	/**
-	 * @hibernate.property column="user_id" length="20"
+	 *
 	 * @return Returns the userId.
 	 */
 	public Long getUserId() {
@@ -124,7 +124,7 @@ public class CommonCartridgeUser implements Cloneable{
 	}
 
 	/**
-	 * @hibernate.property length="255" column="last_name"
+	 *
 	 * @return
 	 */
 	public String getLastName() {
@@ -134,7 +134,7 @@ public class CommonCartridgeUser implements Cloneable{
 		this.lastName = lastName;
 	}
 	/**
-	 * @hibernate.property length="255" column="first_name"
+	 *
 	 * @return
 	 */
 	public String getFirstName() {
@@ -146,7 +146,7 @@ public class CommonCartridgeUser implements Cloneable{
 	
 
 	/**
-	 * @hibernate.property column="login_name"
+	 *
 	 * @return
 	 */
 	public String getLoginName() {
@@ -157,8 +157,8 @@ public class CommonCartridgeUser implements Cloneable{
 		this.loginName = loginName;
 	}
 	/**
-	 * @hibernate.many-to-one column="session_uid"
-	 * 			cascade="none"
+	 *
+	 *
 	 * @return
 	 */
 	public CommonCartridgeSession getSession() {
@@ -169,8 +169,8 @@ public class CommonCartridgeUser implements Cloneable{
 		this.session = session;
 	}
 	/**
-	 * @hibernate.many-to-one column="commonCartridge_uid"
-	 * 			cascade="none"
+	 *
+	 *
 	 * @return
 	 */
 	public CommonCartridge getCommonCartridge() {
@@ -180,7 +180,7 @@ public class CommonCartridgeUser implements Cloneable{
 		this.commonCartridge = content;
 	}
 	/**
-	 * @hibernate.property column="session_finished"
+	 *
 	 * @return
 	 */
 	public boolean isSessionFinished() {

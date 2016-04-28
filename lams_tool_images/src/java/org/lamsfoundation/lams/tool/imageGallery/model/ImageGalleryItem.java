@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 /**
  * ImageGallery
  * 
- * @hibernate.class table="tl_laimag10_imagegallery_item"
+ *
  * 
  * @author Andrey Balan
  */
@@ -113,7 +113,7 @@ public class ImageGalleryItem implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -129,7 +129,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * @return
      */
     public String getTitle() {
@@ -141,7 +141,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description" type="text"
+     *
      * @return
      */
     public String getDescription() {
@@ -157,7 +157,7 @@ public class ImageGalleryItem implements Cloneable {
      * 
      * @return image sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -174,7 +174,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      * @return
      */
@@ -187,7 +187,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -199,7 +199,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by_author"
+     *
      * @return
      */
     public boolean isCreateByAuthor() {
@@ -211,7 +211,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_hide"
+     *
      * @return
      */
     public boolean isHide() {
@@ -223,7 +223,7 @@ public class ImageGalleryItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="original_file_uuid"
+     *
      * 
      * @return
      */
@@ -236,7 +236,7 @@ public class ImageGalleryItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="original_image_width"
+     *
      * 
      * @return
      */
@@ -249,7 +249,7 @@ public class ImageGalleryItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="original_image_height"
+     *
      * 
      * @return
      */
@@ -262,7 +262,7 @@ public class ImageGalleryItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="medium_file_uuid"
+     *
      * 
      * @return
      */
@@ -275,7 +275,7 @@ public class ImageGalleryItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="medium_image_width"
+     *
      * 
      * @return
      */
@@ -288,7 +288,7 @@ public class ImageGalleryItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="medium_image_height"
+     *
      * 
      * @return
      */
@@ -301,7 +301,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="thumbnail_file_uuid"
+     *
      * 
      * @return
      */
@@ -314,7 +314,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_version_id"
+     *
      * @return
      */
     public Long getFileVersionId() {
@@ -326,7 +326,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_type"
+     *
      */
     public String getFileType() {
 	return fileType;
@@ -337,7 +337,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_name"
+     *
      */
     public String getFileName() {
 	return fileName;

@@ -31,8 +31,8 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
  * Holds additional information about activities used in Pedagogical Planner only.
  * 
  * @author Marcin Cieslak
- * @hibernate.class table="lams_planner_activity_metadata"
- * @hibernate.cache usage = "transactional" 
+ *
+ *
  */
 public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneable {
 
@@ -77,8 +77,8 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
     }
 
     /**
-     * @hibernate.id column="activity_id" generator-class="foreign" type="java.lang.Long"
-     * @hibernate.generator-param name="property" value="activity"
+     *
+     *
      */
     public Long getId() {
 	return id;
@@ -89,7 +89,7 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
     }
 
     /**
-     * @hibernate.property column="collapsed" type="java.lang.Boolean" length="1"
+     *
      */
     public Boolean getCollapsed() {
 	return collapsed;
@@ -100,7 +100,7 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
     }
 
     /**
-     * @hibernate.property column="expanded" type="java.lang.Boolean" length="1"
+     *
      */
     public Boolean getExpanded() {
 	return expanded;
@@ -111,7 +111,7 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
     }
 
     /**
-     * @hibernate.property column="hidden" type="java.lang.Boolean" length="1"
+     *
      */
     public Boolean getHidden() {
 	return hidden;
@@ -122,7 +122,7 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
     }
 
     /**
-     * @hibernate.property column="editing_advice" type="java.lang.String" length="255"
+     *
      */
     public String getEditingAdvice() {
 	return editingAdvice;
@@ -133,7 +133,7 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
     }
 
     /**
-     * @hibernate.one-to-one constrained="true" foreign-key="FK_lams_planner_metadata_primary"
+     *
      * @return
      */
     public ToolActivity getActivity() {

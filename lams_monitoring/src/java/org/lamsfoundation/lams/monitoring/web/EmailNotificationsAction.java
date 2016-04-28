@@ -86,15 +86,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author Andrey Balan
  * 
- *         ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/emailNotifications" parameter="method" validate="false"
- * @struts.action-forward name = "lessonView" path = "/emailnotifications/lessonNotifications.jsp"
- * @struts.action-forward name = "courseView" path = "/emailnotifications/courseNotifications.jsp"
- * @struts.action-forward name = "userList" path = "/emailnotifications/userList.jsp"
- * @struts.action-forward name = "scheduledEmailList" path = "/emailnotifications/scheduledEmailList.jsp"
+ *
+ *
+ *
+ *
+ *
  * 
- *                        ----------------XDoclet Tags--------------------
+ *
  */
 public class EmailNotificationsAction extends LamsDispatchAction {
 

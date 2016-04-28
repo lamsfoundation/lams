@@ -52,8 +52,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author jliew
  *
- * @web:servlet name="saveLessonOrder"
- * @web:servlet-mapping url-pattern="/servlet/saveLessonOrder"
+ *
+ *
  */
 public class LessonOrderServlet extends HttpServlet {
 

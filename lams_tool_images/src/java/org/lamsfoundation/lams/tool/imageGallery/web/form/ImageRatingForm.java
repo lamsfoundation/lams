@@ -28,7 +28,7 @@ import org.apache.struts.action.ActionForm;
 /**
  * Image star rating Form.
  * 
- * @struts.form name="imageRatingForm"
+ *
  * @author Andrey Balan
  */
 public class ImageRatingForm extends ActionForm {

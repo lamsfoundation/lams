@@ -48,15 +48,15 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * @author jliew
  *
- * @struts:action path="/userrolessave"
- *              name="UserRolesForm"
- *              input=".userroles"
- *              scope="request"
- *              parameter="method"
- * 				validate="false"
+ *
+ *
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="userroles" path="/userroles.do"
- * @struts:action-forward name="userlist" path="/usermanage.do"
+ *
+ *
  */
 public class UserRolesSaveAction extends Action {
 	

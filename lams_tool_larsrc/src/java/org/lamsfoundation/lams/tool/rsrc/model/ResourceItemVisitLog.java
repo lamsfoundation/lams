@@ -31,7 +31,7 @@ import java.util.Date;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_larsrc11_item_log"
+ *
  * 
  */
 public class ResourceItemVisitLog {
@@ -45,7 +45,7 @@ public class ResourceItemVisitLog {
     private Long sessionId;
 
     /**
-     * @hibernate.property column="access_date"
+     *
      * @return
      */
     public Date getAccessDate() {
@@ -57,7 +57,7 @@ public class ResourceItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="complete_date"
+     *
      * @return
      */
     public Date getCompleteDate() {
@@ -69,7 +69,7 @@ public class ResourceItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="resource_item_uid" cascade="none"
+     *
      * @return
      */
     public ResourceItem getResourceItem() {
@@ -81,7 +81,7 @@ public class ResourceItemVisitLog {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -93,7 +93,7 @@ public class ResourceItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="user_uid" cascade="none"
+     *
      * @return
      */
     public ResourceUser getUser() {
@@ -105,7 +105,7 @@ public class ResourceItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="complete"
+     *
      * @return
      */
     public boolean isComplete() {
@@ -117,7 +117,7 @@ public class ResourceItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {

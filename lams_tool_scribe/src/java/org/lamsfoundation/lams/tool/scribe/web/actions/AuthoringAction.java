@@ -60,15 +60,15 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * 
- * @struts.action path="/authoring" name="authoringForm" parameter="dispatch"
- *                scope="request" validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/authoring/main"
- * @struts.action-forward name="message_page" path="tiles:/generic/message"
- * @struts.action-forward name="heading_form"
- *                        path="tiles:/authoring/headingForm"
- * @struts.action-forward name="heading_response"
- *                        path="tiles:/authoring/headingResponse"
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class AuthoringAction extends LamsDispatchAction {
 

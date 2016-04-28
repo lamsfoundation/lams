@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.OptionsActivityStrategy;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class
+ *
  */
 public class OptionsActivity extends ComplexActivity implements Serializable {
 

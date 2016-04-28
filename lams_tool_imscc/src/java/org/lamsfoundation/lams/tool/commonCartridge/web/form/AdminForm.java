@@ -32,7 +32,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 
 /**
- * @struts.form name="commonCartridgeAdminForm"
+ *
  * 
  * @author Andrey Balan
  */

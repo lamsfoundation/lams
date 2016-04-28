@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.tool.mindmap.service.MindmapService;
 //import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
- * @hibernate.class table="tl_lamind10_mindmap"
+ *
  */
 public class Mindmap implements java.io.Serializable, Cloneable {
 
@@ -83,7 +83,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -95,7 +95,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
     public Date getCreateDate() {
@@ -107,7 +107,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
     public Date getUpdateDate() {
@@ -122,7 +122,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
      * Returns deadline for learner's submission
      * 
      * @return submissionDeadline
-     * @hibernate.property column="submission_deadline"
+     *
      */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
@@ -138,7 +138,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by" length="20"
+     *
      * 
      */
     public Long getCreateBy() {
@@ -150,7 +150,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
     public String getTitle() {
@@ -162,7 +162,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
     public String getInstructions() {
@@ -174,7 +174,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      * 
      */
     public boolean isLockOnFinished() {
@@ -186,7 +186,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="multiuser_mode" length="1"
+     *
      * @return
      */
     public boolean isMultiUserMode() {
@@ -198,7 +198,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * 
      */
     public boolean isContentInUse() {
@@ -210,7 +210,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      * 
      */
     public boolean isDefineLater() {
@@ -222,7 +222,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      */
     public Long getToolContentId() {
 	return toolContentId;
@@ -233,7 +233,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="export_content"
+     *
      */
     public String getMindmapExportContent() {
 	return mindmapExportContent;
@@ -244,7 +244,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity" length="1"
+     *
      */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
@@ -255,7 +255,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      */
     public String getReflectInstructions() {
 	return reflectInstructions;
@@ -266,9 +266,9 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="mindmap_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.mindmap.model.MindmapSession"
+     *
+     *
+     *
      * 
      */
     public Set getMindmapSessions() {

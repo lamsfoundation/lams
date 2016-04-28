@@ -78,11 +78,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 
 /**
- * @struts:action path="/profile" name="UserForm" scope="request" parameter="method" validate="false"
+ *
  * 
- * @struts:action-forward name="view" path=".profile"
- * @struts:action-forward name="lessons" path=".lessons"
- * @struts:action-forward name="edit" path=".editprofile"
+ *
+ *
+ *
  */
 public class ProfileAction extends LamsDispatchAction {
 

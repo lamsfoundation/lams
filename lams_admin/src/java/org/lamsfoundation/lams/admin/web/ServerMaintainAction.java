@@ -55,9 +55,9 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 /**
  * struts doclets
  * 
- * @struts.action path="/servermaintain" parameter="method" name="ServerOrgMapForm" scope="request" validate="false"
- * @struts.action-forward name="servermaintain" path=".servermaintain"
- * @struts.action-forward name="serverlist" path="/serverlist.do"
+ *
+ *
+ *
  */
 public class ServerMaintainAction extends LamsDispatchAction {
 

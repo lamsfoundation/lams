@@ -61,9 +61,9 @@ import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvide
  * @author Ruslan Kazakov
  * @version 1.0.1
  * 
- * @struts.action path="/authoring" name="authoringForm" parameter="dispatch" scope="request" validate="false"
- * @struts.action-forward name="success" path="tiles:/authoring/main"
- * @struts.action-forward name="message_page" path="tiles:/generic/message"
+ *
+ *
+ *
  */
 public class AuthoringAction extends LamsDispatchAction {
 

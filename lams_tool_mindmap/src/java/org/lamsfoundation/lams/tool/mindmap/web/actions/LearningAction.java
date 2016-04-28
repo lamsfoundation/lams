@@ -77,11 +77,11 @@ import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvide
  * @author Ruslan Kazakov
  * @version 1.0.1
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
- * @struts.action-forward name="mindmap" path="tiles:/learning/main"
- * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
- * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
- * @struts.action-forward name="reflect" path="tiles:/learning/reflect"
+ *
+ *
+ *
+ *
+ *
  */
 public class LearningAction extends LamsDispatchAction {
 

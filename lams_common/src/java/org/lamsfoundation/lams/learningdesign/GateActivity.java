@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * @hibernate.class
+ *
  */
 public abstract class GateActivity extends SimpleActivity implements Serializable, ISystemToolActivity {
 
@@ -87,8 +87,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="gate_activity_level_id"
+     *
+     *
      * 
      */
     public Integer getGateActivityLevelId() {

@@ -70,13 +70,13 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  */
 
 /**
- * @struts:action path="/user" name="UserForm" scope="request" parameter="method" validate="false"
+ *
  * 
- * @struts:action-forward name="user" path=".user"
- * @struts:action-forward name="userlist" path="/usermanage.do"
- * @struts:action-forward name="remove" path=".remove"
- * @struts:action-forward name="disabledlist" path="/disabledmanage.do"
- * @struts:action-forward name="usersearch" path="/usersearch.do"
+ *
+ *
+ *
+ *
+ *
  */
 public class UserAction extends LamsDispatchAction {
 

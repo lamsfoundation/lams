@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComp
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_assessment_result"
+ *
  * 
  */
 public class AssessmentResult {
@@ -60,7 +60,7 @@ public class AssessmentResult {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the result Uid.
      */
     public Long getUid() {
@@ -72,7 +72,7 @@ public class AssessmentResult {
     }
     
     /**
-     * @hibernate.many-to-one column="assessment_uid" cascade="none"
+     *
      * @return
      */
     public Assessment getAssessment() {
@@ -84,7 +84,7 @@ public class AssessmentResult {
     }
 
     /**
-     * @hibernate.many-to-one column="user_uid" cascade="none"
+     *
      * @return
      */
     public AssessmentUser getUser() {
@@ -96,7 +96,7 @@ public class AssessmentResult {
     }
 
     /**
-     * @hibernate.property column="start_date"
+     *
      * @return
      */
     public Date getStartDate() {
@@ -108,7 +108,7 @@ public class AssessmentResult {
     }
     
     /**
-     * @hibernate.property column="latest"
+     *
      * @return
      */
     public boolean isLatest() {
@@ -120,7 +120,7 @@ public class AssessmentResult {
     }
     
     /**
-     * @hibernate.property column="finish_date"
+     *
      * @return
      */
     public Date getFinishDate() {
@@ -132,7 +132,7 @@ public class AssessmentResult {
     }    
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {
@@ -144,7 +144,7 @@ public class AssessmentResult {
     }
     
     /**
-     * @hibernate.property column="maximum_grade"
+     *
      * @return
      */
     public int getMaximumGrade() {
@@ -158,7 +158,7 @@ public class AssessmentResult {
     /**
      * Overall assessment grade (incl all penalties)
      * 
-     * @hibernate.property column="grade"
+     *
      * @return
      */
     public float getGrade() {
@@ -176,9 +176,9 @@ public class AssessmentResult {
     
     /**
      * 
-     * @hibernate.set cascade="all" 
-     * @hibernate.collection-key column="result_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult"
+     *
+     *
+     *
      * 
      * @return a set of answerOptions to this AssessmentQuestion.
      */

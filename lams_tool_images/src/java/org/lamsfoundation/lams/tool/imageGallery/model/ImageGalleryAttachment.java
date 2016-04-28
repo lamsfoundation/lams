@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * A Wrapper class for uploaded files. An Attachment cannot exist independently and must belong to a ImageGallery.
  * 
  * 
- * @hibernate.class table="tl_laimag10_attachment"
+ *
  * 
  */
 public class ImageGalleryAttachment implements Cloneable {
@@ -95,7 +95,7 @@ public class ImageGalleryAttachment implements Cloneable {
     // get/set methods
     // **********************************************************
     /**
-     * @hibernate.id column="attachment_uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -106,7 +106,7 @@ public class ImageGalleryAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_version_id"
+     *
      * 
      */
     public Long getFileVersionId() {
@@ -118,7 +118,7 @@ public class ImageGalleryAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_type"
+     *
      */
     public String getFileType() {
 	return fileType;
@@ -129,7 +129,7 @@ public class ImageGalleryAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_name"
+     *
      */
     public String getFileName() {
 	return fileName;
@@ -140,7 +140,7 @@ public class ImageGalleryAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_uuid"
+     *
      * @return
      */
     public Long getFileUuid() {
@@ -152,7 +152,7 @@ public class ImageGalleryAttachment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreated() {

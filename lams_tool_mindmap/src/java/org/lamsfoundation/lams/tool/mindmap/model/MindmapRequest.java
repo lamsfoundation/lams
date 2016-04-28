@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.mindmap.model;
 /**
  * @author Ruslan Kazakov
  *
- * @hibernate.class table="tl_lamind10_request"
+ *
  *
  */
 public class MindmapRequest implements Cloneable {
@@ -61,7 +61,7 @@ public class MindmapRequest implements Cloneable {
 	//  **********************************************************
 	
 	/**
-	 * @hibernate.id column="uid" generator-class="native"
+	 *
 	 */
 	public Long getUid() {
 	    return uid;
@@ -73,7 +73,7 @@ public class MindmapRequest implements Cloneable {
 	
 	/**
 	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="unique_id"
+	 *
 	 */
 	public Long getUniqueId() {
 	    return uniqueId;
@@ -88,7 +88,7 @@ public class MindmapRequest implements Cloneable {
 	
 	/**
 	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="global_id"
+	 *
 	 */
 	public Long getGlobalId() {
 	    return globalId;
@@ -103,7 +103,7 @@ public class MindmapRequest implements Cloneable {
 	
 	/**
 	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="request_type"
+	 *
 	 */
 	public int getType() {
 	    return type;
@@ -118,7 +118,7 @@ public class MindmapRequest implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.property column="node_id"
+	 *
 	 */
 	public Long getNodeId() {
 	    return nodeId;
@@ -133,7 +133,7 @@ public class MindmapRequest implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.property column="node_child_id"
+	 *
 	 */
 	public Long getNodeChildId() {
 	    return nodeChildId;
@@ -145,7 +145,7 @@ public class MindmapRequest implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="user_id" cascade="all"
+	 *
 	 */
 	public MindmapUser getUser() {
 	    return user;
@@ -160,7 +160,7 @@ public class MindmapRequest implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="mindmap_id" cascade="all"
+	 *
 	 */
 	public Mindmap getMindmap() {
 	    return mindmap;

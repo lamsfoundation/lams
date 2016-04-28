@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_question_option"
+ *
  */
 public class AssessmentQuestionOption implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentQuestionOption.class);
@@ -67,7 +67,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" column="uid"
+     *
      * @return Returns the answer ID.
      */
     public Long getUid() {
@@ -83,7 +83,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
      * 
      * @return option's sequence number
      * 
-     * @hibernate.property column="sequence_id"
+     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -100,7 +100,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
 
     /**
-     * @hibernate.property column="question" type="text"
+     *
      * 
      * @return Returns the possible answer.
      */
@@ -113,7 +113,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.property column="option_string" type="text"
+     *
      * 
      * @return Returns the possible answer.
      */
@@ -126,7 +126,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.property column="option_float"
+     *
      * 
      * @return Returns the possible numeric answer.
      */
@@ -139,7 +139,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
 
     /**
-     * @hibernate.property column="accepted_error"
+     *
      * 
      * @return Returns the possible  answer.
      */
@@ -156,7 +156,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
      * 
      * @return image grade
      * 
-     * @hibernate.property column="grade"
+     *
      */
     public float getGrade() {
 	return grade;
@@ -173,7 +173,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.property column="correct"
+     *
      * @return
      */
     public boolean isCorrect() {
@@ -185,7 +185,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
     
     /**
-     * @hibernate.property column="feedback" type="text"
+     *
      * 
      * @return Returns feedback on this answer option.
      */

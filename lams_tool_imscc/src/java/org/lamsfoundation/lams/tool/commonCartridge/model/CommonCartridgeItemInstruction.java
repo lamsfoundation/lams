@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.commonCartridge.model;
 
 import org.apache.log4j.Logger;
 /**
- * @hibernate.class table="tl_laimsc11_item_instruction"
+ *
  * @author Andrey Balan
  */
 public class CommonCartridgeItemInstruction  implements Cloneable{
@@ -50,7 +50,7 @@ public class CommonCartridgeItemInstruction  implements Cloneable{
 	  	//		Get/Set methods
 //	  **********************************************************
 		/**
-		 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+		 *
 		 * @return Returns the uid.
 		 */
 		public Long getUid() {
@@ -63,7 +63,7 @@ public class CommonCartridgeItemInstruction  implements Cloneable{
 			this.uid = userID;
 		}
 		/**
-		 * @hibernate.property column="description"
+		 *
 		 * @return
 		 */
 		public String getDescription() {
@@ -73,7 +73,7 @@ public class CommonCartridgeItemInstruction  implements Cloneable{
 			this.description = description;
 		}
 		/**
-		 * @hibernate.property column="sequence_id"
+		 *
 		 * @return
 		 */
 		public int getSequenceId() {

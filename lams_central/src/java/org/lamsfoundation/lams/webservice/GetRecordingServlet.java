@@ -40,8 +40,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * @author pgeorges
  *
- * @web:servlet name="GetRecordingServlet"
- * @web:servlet-mapping url-pattern="/GetRecording"
+ *
+ *
  */
 public class GetRecordingServlet extends HttpServlet {
 	

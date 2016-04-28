@@ -29,7 +29,7 @@ import org.apache.struts.action.ActionForm;
  * 
  * Scratchie Item Form.
  * 
- * @struts.form name="scratchieItemForm"
+ *
  */
 public class ScratchieItemForm extends ActionForm {
     private static final long serialVersionUID = 3599879328307492312L;

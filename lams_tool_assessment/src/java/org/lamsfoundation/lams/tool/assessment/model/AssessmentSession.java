@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_session"
+ *
  * 
  */
 public class AssessmentSession {
@@ -57,7 +57,7 @@ public class AssessmentSession {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the learnerID.
      */
     public Long getUid() {
@@ -69,7 +69,7 @@ public class AssessmentSession {
     }
 
     /**
-     * @hibernate.property column="session_end_date"
+     *
      * @return
      */
     public Date getSessionEndDate() {
@@ -81,7 +81,7 @@ public class AssessmentSession {
     }
 
     /**
-     * @hibernate.property column="session_start_date"
+     *
      * 
      * @return
      */
@@ -94,7 +94,7 @@ public class AssessmentSession {
     }
 
     /**
-     * @hibernate.property
+     *
      * @return
      */
     public int getStatus() {
@@ -106,7 +106,7 @@ public class AssessmentSession {
     }
 
     /**
-     * @hibernate.many-to-one column="assessment_uid" cascade="none"
+     *
      * @return
      */
     public Assessment getAssessment() {
@@ -118,7 +118,7 @@ public class AssessmentSession {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {
@@ -130,7 +130,7 @@ public class AssessmentSession {
     }
 
     /**
-     * @hibernate.property column="session_name" length="250"
+     *
      * @return Returns the session name
      */
     public String getSessionName() {
@@ -149,9 +149,9 @@ public class AssessmentSession {
     /**
      * 
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="session_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -165,9 +165,9 @@ public class AssessmentSession {
 
     
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="last_name asc"
-     * @hibernate.collection-key column="session_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -180,7 +180,7 @@ public class AssessmentSession {
     }
     
     /**
-     * @hibernate.many-to-one column="group_leader_uid" cascade="all"
+     *
      * @return
      */
     public AssessmentUser getGroupLeader() {

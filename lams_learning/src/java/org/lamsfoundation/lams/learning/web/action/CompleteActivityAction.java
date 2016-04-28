@@ -48,7 +48,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  *         XDoclet definition:
  * 
- * @struts:action path="/CompleteActivity" name="activityForm" validate="false" scope="request"
+ *
  * 
  */
 public class CompleteActivityAction extends ActivityAction {

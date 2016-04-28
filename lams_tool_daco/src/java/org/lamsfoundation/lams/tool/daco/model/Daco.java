@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
  * 
  * @author Marcin Cieslak
  * 
- * @hibernate.class table="tl_ladaco10_contents"
+ *
  * 
  */
 public class Daco implements Cloneable {
@@ -172,7 +172,7 @@ public class Daco implements Cloneable {
 	 * Returns the object's creation date
 	 * 
 	 * @return date
-	 * @hibernate.property column="create_date"
+	 *
 	 */
 	public Date getCreated() {
 		return created;
@@ -191,7 +191,7 @@ public class Daco implements Cloneable {
 	 * Returns the object's date of last update
 	 * 
 	 * @return date updated
-	 * @hibernate.property column="update_date"
+	 *
 	 */
 	public Date getUpdated() {
 		return updated;
@@ -207,7 +207,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.many-to-one cascade="all" column="create_by" foreign-key="DacoToUser"
+	 *
 	 * @return Returns the userid of the user who created the Share daco.
 	 * 
 	 */
@@ -224,7 +224,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.id column="uid" generator-class="native"
+	 *
 	 */
 	public Long getUid() {
 		return uid;
@@ -237,7 +237,7 @@ public class Daco implements Cloneable {
 	/**
 	 * @return Returns the title.
 	 * 
-	 * @hibernate.property column="title"
+	 *
 	 * 
 	 */
 	public String getTitle() {
@@ -255,7 +255,7 @@ public class Daco implements Cloneable {
 	/**
 	 * @return Returns the lockOnFinish.
 	 * 
-	 * @hibernate.property column="lock_on_finished"
+	 *
 	 * 
 	 */
 	public boolean getLockOnFinished() {
@@ -273,7 +273,7 @@ public class Daco implements Cloneable {
 	/**
 	 * @return Returns the instructions set by the teacher.
 	 * 
-	 * @hibernate.property column="instructions" type="text"
+	 *
 	 */
 	public String getInstructions() {
 		return instructions;
@@ -286,9 +286,9 @@ public class Daco implements Cloneable {
 	/**
 	 * 
 	 * 
-	 * @hibernate.set   cascade="all" order-by="uid asc" outer-join="true"
-	 * @hibernate.collection-key column="content_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.daco.model.DacoQuestion"
+	 *
+	 *
+	 *
 	 * 
 	 * @return
 	 */
@@ -301,7 +301,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="content_in_use"
+	 *
 	 * @return
 	 */
 	public boolean isContentInUse() {
@@ -313,7 +313,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="define_later"
+	 *
 	 * @return
 	 */
 	public boolean isDefineLater() {
@@ -325,7 +325,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="content_id" unique="true"
+	 *
 	 * @return
 	 */
 	public Long getContentId() {
@@ -337,7 +337,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="reflect_instructions"
+	 *
 	 * @return
 	 */
 	public String getReflectInstructions() {
@@ -349,7 +349,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="reflect_on_activity"
+	 *
 	 * @return
 	 */
 	public boolean isReflectOnActivity() {
@@ -363,7 +363,7 @@ public class Daco implements Cloneable {
 	/**
 	 * @return Returns the instructions set by the teacher.
 	 * 
-	 * @hibernate.property column="min_records"
+	 *
 	 */
 	public Short getMinRecords() {
 		return minRecords;
@@ -376,7 +376,7 @@ public class Daco implements Cloneable {
 	/**
 	 * @return Returns the instructions set by the teacher.
 	 * 
-	 * @hibernate.property column="max_records"
+	 *
 	 */
 	public Short getMaxRecords() {
 		return maxRecords;
@@ -387,7 +387,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="learner_entry_notify"
+	 *
 	 * @return
 	 */
 	public boolean isNotifyTeachersOnLearnerEntry() {
@@ -399,7 +399,7 @@ public class Daco implements Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="record_submit_notify"
+	 *
 	 * @return
 	 */
 	public boolean isNotifyTeachersOnRecordSumbit() {

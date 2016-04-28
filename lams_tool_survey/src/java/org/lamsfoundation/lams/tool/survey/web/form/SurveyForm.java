@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.survey.model.Survey;
 /**
  * Survey Form.
  * 
- * @struts.form name="surveyForm"
+ *
  * 
  * User: Dapeng.Ni
  */

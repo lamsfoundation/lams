@@ -69,14 +69,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author lfoxton
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request"
- *                name="monitoringForm" validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="wiki_display"
- *                        path="tiles:/monitoring/wiki_display"
- * @struts.action-forward name="compareWiki" path="/pages/wiki/compare.jsp"
- * @struts.action-forward name="viewWiki" path="/pages/wiki/viewWiki.jsp"
+ *
+ *
+ *
+ *
+ *
  * 
  */
 public class MonitoringAction extends WikiPageAction {

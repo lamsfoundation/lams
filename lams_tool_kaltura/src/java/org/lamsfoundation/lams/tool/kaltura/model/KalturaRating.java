@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lakalt11_rating"
+ *
  */
 public class KalturaRating implements Cloneable {
 
@@ -85,7 +85,7 @@ public class KalturaRating implements Cloneable {
     // **********************************************************
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -97,7 +97,7 @@ public class KalturaRating implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="create_by" cascade="none"
+     *
      * @return
      */
     public KalturaUser getCreateBy() {
@@ -109,7 +109,7 @@ public class KalturaRating implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="rating"
+     *
      * @return
      */
     public float getRating() {
@@ -121,7 +121,7 @@ public class KalturaRating implements Cloneable {
     }
     
     /**
-     * @hibernate.many-to-one column="kaltura_item_uid" cascade="none"
+     *
      * @return
      */
     public KalturaItem getKalturaItem() {

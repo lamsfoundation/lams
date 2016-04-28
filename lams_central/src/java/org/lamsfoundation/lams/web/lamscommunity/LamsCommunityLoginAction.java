@@ -68,11 +68,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author lfoxton
  * 
- * @struts.action name="lamsCommunityLoginForm" path="/lamsCommunityLogin" 
- *                scope="request" validate="false" parameter="dispatch"
+ *
+ *
  * 
- * @struts.action-forward name="lamsCommunityLogin"
- *                        path="/lamscommunity/lamscommunityLogin.jsp"
+ *
+ *
  * 
  */
 public class LamsCommunityLoginAction extends LamsDispatchAction {

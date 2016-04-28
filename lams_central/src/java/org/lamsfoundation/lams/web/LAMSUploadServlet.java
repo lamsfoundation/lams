@@ -40,8 +40,8 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
  * @author Simone Chiaretta (simo@users.sourceforge.net)
  * @author Mitchell Seaton
  * 
- * @web:servlet name="SimpleUploader" load-on-startup = "1"
- * @web:servlet-mapping url-pattern="/ckeditor/filemanager/upload/simpleuploader"
+ *
+ *
  * 
  */
 

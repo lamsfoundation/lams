@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
- * @hibernate.class
+ *
  */
 public abstract class ComplexActivity extends Activity implements Serializable {
 
@@ -83,10 +83,10 @@ public abstract class ComplexActivity extends Activity implements Serializable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="save-update"
+     *
      *                sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator"
-     * @hibernate.collection-key column="parent_activity_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"
+     *
+     *
      * 
      */
     public Set getActivities() {
@@ -105,8 +105,8 @@ public abstract class ComplexActivity extends Activity implements Serializable {
      * A tool based branching activity has to have a default branch in case the conditions don't match to any other
      * branch.
      * 
-     * @hibernate.many-to-one not-null="false"
-     * @hibernate.column name="default_activity_id"
+     *
+     *
      */
     public Activity getDefaultActivity() {
 	return defaultActivity;

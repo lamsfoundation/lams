@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * CommonCartridge
  * @author Andrey Balan
  *
- * @hibernate.class  table="tl_laimsc11_session"
+ *
  *
  */
 public class CommonCartridgeSession{
@@ -55,7 +55,7 @@ public class CommonCartridgeSession{
   	//		Get/Set methods
 //  **********************************************************
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * @return Returns the learnerID.
 	 */
 	public Long getUid() {
@@ -66,7 +66,7 @@ public class CommonCartridgeSession{
 	}
 	
 	/**
-	 * @hibernate.property column="session_end_date"
+	 *
 	 * @return
 	 */
 	public Date getSessionEndDate() {
@@ -76,7 +76,7 @@ public class CommonCartridgeSession{
 		this.sessionEndDate = sessionEndDate;
 	}
 	/**
-	 * @hibernate.property column="session_start_date"
+	 *
 	 * 
 	 * @return
 	 */
@@ -87,7 +87,7 @@ public class CommonCartridgeSession{
 		this.sessionStartDate = sessionStartDate;
 	}
 	/**
-	 * @hibernate.property
+	 *
 	 * @return
 	 */
 	public int getStatus() {
@@ -98,8 +98,8 @@ public class CommonCartridgeSession{
 	}
 
 	/**
- 	 * @hibernate.many-to-one  column="commonCartridge_uid"
- 	 * cascade="none"
+ 	 *
+ 	 *
 	 * @return
 	 */
 	public CommonCartridge getCommonCartridge() {
@@ -109,7 +109,7 @@ public class CommonCartridgeSession{
 		this.commonCartridge = commonCartridge;
 	}
 	/**
-	 * @hibernate.property column="session_id"
+	 *
 	 * @return
 	 */
 	public Long getSessionId() {
@@ -120,7 +120,7 @@ public class CommonCartridgeSession{
 	}
 
 	/**
-	 * @hibernate.property column="session_name" length="250"
+	 *
 	 * @return Returns the session name
 	 */
 	public String getSessionName() {
@@ -138,12 +138,12 @@ public class CommonCartridgeSession{
 	/**
 	 * 
 	 * 
-	 * @hibernate.set lazy="true"
-	 *                inverse="false"
-	 *                cascade="all"
-	 *                order-by="create_date desc"
-	 * @hibernate.collection-key column="session_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem"
+	 *
+	 *
+	 *
+	 *
+	 *
+	 *
 	 * 
 	 * @return
 	 */

@@ -8,10 +8,10 @@ import javax.servlet.jsp.tagext.SimpleTagSupport;
 import org.apache.commons.lang.StringUtils;
 /**
  * JSP tag. Converts role name into form usable as message resources key.
- * @jsp.tag name="role"
- * 		body-content="empty"
- * 		display-name="Converts role name into form usable as message resources key"
- * 		description="Converts role name into form usable as message resources key"
+ *
+ *
+ *
+ * Converts role name into form usable as message resources key
  * 
  * @author jliew
  *
@@ -30,10 +30,10 @@ public class RoleTag extends SimpleTagSupport{
 	}
 
 	/**
-	 * @jsp.attribute 
-	 * 		required="true" 
-	 * 		rtexprvalue="true"
-	 * 		description="Role name as given from database"
+	 *
+	 *
+	 *
+	 * Role name as given from database
 	 * @return
 	 */
 	public String getRole() {

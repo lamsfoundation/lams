@@ -31,7 +31,7 @@ import java.util.Date;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimag10_item_log"
+ *
  * 
  */
 public class ImageGalleryItemVisitLog {
@@ -44,7 +44,7 @@ public class ImageGalleryItemVisitLog {
     private Long sessionId;
 
     /**
-     * @hibernate.property column="access_date"
+     *
      * @return
      */
     public Date getAccessDate() {
@@ -56,7 +56,7 @@ public class ImageGalleryItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="imageGallery_item_uid" cascade="none"
+     *
      * @return
      */
     public ImageGalleryItem getImageGalleryItem() {
@@ -68,7 +68,7 @@ public class ImageGalleryItemVisitLog {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -80,7 +80,7 @@ public class ImageGalleryItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="user_uid" cascade="none"
+     *
      * @return
      */
     public ImageGalleryUser getUser() {
@@ -92,7 +92,7 @@ public class ImageGalleryItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="complete"
+     *
      * @return
      */
     public boolean isComplete() {
@@ -104,7 +104,7 @@ public class ImageGalleryItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {

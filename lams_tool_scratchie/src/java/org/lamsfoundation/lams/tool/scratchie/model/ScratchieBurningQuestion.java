@@ -30,7 +30,7 @@ import java.util.Date;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_burning_question"
+ *
  * 
  */
 public class ScratchieBurningQuestion {
@@ -43,7 +43,7 @@ public class ScratchieBurningQuestion {
     private boolean generalQuestion;
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -55,7 +55,7 @@ public class ScratchieBurningQuestion {
     }
     
     /**
-     * @hibernate.property column="access_date"
+     *
      * @return
      */
     public Date getAccessDate() {
@@ -67,7 +67,7 @@ public class ScratchieBurningQuestion {
     }
 
     /**
-     * @hibernate.many-to-one column="scratchie_item_uid" cascade="none"
+     *
      * @return
      */
     public ScratchieItem getScratchieItem() {
@@ -79,7 +79,7 @@ public class ScratchieBurningQuestion {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {
@@ -91,7 +91,7 @@ public class ScratchieBurningQuestion {
     }
     
     /**
-     * @hibernate.property column="question" type="text"
+     *
      * @return
      */
     public String getQuestion() {
@@ -103,7 +103,7 @@ public class ScratchieBurningQuestion {
     }
     
     /**
-     * @hibernate.property column="general_question"
+     *
      * @return
      */
     public boolean isGeneralQuestion() {

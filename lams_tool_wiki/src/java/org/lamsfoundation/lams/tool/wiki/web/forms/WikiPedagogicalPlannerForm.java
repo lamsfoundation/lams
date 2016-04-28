@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     String title;

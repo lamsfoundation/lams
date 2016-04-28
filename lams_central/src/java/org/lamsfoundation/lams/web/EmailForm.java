@@ -31,7 +31,7 @@ import org.apache.struts.action.ActionForm;
  * 
  * @author Andrey Balan
  * 
- * @struts.form name="emailForm"
+ *
  */
 public class EmailForm extends ActionForm {
     private static final long serialVersionUID = 7775887425863041037L;

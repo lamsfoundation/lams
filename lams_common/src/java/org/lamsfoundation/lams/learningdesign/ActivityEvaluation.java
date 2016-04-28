@@ -31,7 +31,7 @@ package org.lamsfoundation.lams.learningdesign;
  * @author lfoxton
  * 
  * 
- * @hibernate.class table="lams_activity_evaluation"
+ *
  */
 public class ActivityEvaluation {
 
@@ -45,7 +45,7 @@ public class ActivityEvaluation {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="activity_evaluation_id"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -56,9 +56,9 @@ public class ActivityEvaluation {
     }
 
     /**
-     * @hibernate.many-to-one cascade="save-update"
-     *                        class="org.lamsfoundation.lams.learningdesign.ToolActivity"
-     *                        column="activity_id" not-null="true"
+     *
+     *
+     *
      */
     public Activity getActivity() {
 	return activity;
@@ -69,7 +69,7 @@ public class ActivityEvaluation {
     }
 
     /**
-     * @hibernate.property column="tool_output_definition" length="255"
+     *
      */
     public String getToolOutputDefinition() {
 	return toolOutputDefinition;

@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> topic;

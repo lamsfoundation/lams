@@ -40,13 +40,13 @@ import org.lamsfoundation.lams.admin.web.ImportExcelForm;
 /**
  * @author jliew
  * 
- * @struts:action path="/importgroups"
- * 					name="ImportGroupsForm"
- * 					scope="request"
- * 					validate="false"
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="importGroups" path=".importGroups"
- * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
+ *
+ *
  *
  */
 public class ImportGroupsAction extends Action {

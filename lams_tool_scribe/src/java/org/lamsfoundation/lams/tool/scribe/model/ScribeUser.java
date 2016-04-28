@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * displaying user names but means that when people's names change, they won't
  * change in the "old" tool data.
  * 
- * @hibernate.class table="tl_lascrb11_user"
+ *
  */
 
 public class ScribeUser implements java.io.Serializable {
@@ -88,7 +88,7 @@ public class ScribeUser implements java.io.Serializable {
 
 	// Property accessors
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 */
 	public Long getUid() {
 		return this.uid;
@@ -99,7 +99,7 @@ public class ScribeUser implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="user_id" length="20"
+	 *
 	 * 
 	 */
 	public Long getUserId() {
@@ -110,7 +110,7 @@ public class ScribeUser implements java.io.Serializable {
 		this.userId = userId;
 	}
 	/**
-	 * @hibernate.property column="last_name" length="255"
+	 *
 	 * 
 	 */
 	public String getLastName() {
@@ -122,7 +122,7 @@ public class ScribeUser implements java.io.Serializable {
 	}
 	
 	/**
-	 * @hibernate.property column="login_name" length="255"
+	 *
 	 * 
 	 */
 	public String getLoginName() {
@@ -134,7 +134,7 @@ public class ScribeUser implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="first_name" length="255"
+	 *
 	 * 
 	 */
 	public String getFirstName() {
@@ -146,7 +146,7 @@ public class ScribeUser implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="finishedActivity" 
+	 *
 	 */
 	public boolean isFinishedActivity() {
 		return finishedActivity;
@@ -157,8 +157,8 @@ public class ScribeUser implements java.io.Serializable {
 	}
 	
 	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="scribe_session_uid"
+	 *
+	 *
 	 * 
 	 */
 	public ScribeSession getScribeSession() {
@@ -170,7 +170,7 @@ public class ScribeUser implements java.io.Serializable {
 	}
 	
 	/**
-	 * @hibernate.property column="report_approved" 
+	 *
 	 */
 	public boolean isReportApproved() {
 		return reportApproved;
@@ -181,7 +181,7 @@ public class ScribeUser implements java.io.Serializable {
 	}
 	
 	/**
-	 * @hibernate.property column="started_activity" 
+	 *
 	 */
 	public boolean isStartedActivity() {
 		return startedActivity;

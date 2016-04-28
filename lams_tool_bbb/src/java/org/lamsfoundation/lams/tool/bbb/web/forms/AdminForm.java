@@ -36,7 +36,7 @@ import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.tool.bbb.util.Constants;
 
 /**
- * @struts.form name="adminForm"
+ *
  * @author Ernie Ghiglione
  */
 public class AdminForm extends ActionForm {

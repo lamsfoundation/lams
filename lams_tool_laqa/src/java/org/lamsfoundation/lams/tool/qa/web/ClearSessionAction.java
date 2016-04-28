@@ -33,9 +33,9 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * This class give a chance to clear HttpSession when user save/close authoring
  * page.
  * 
- * @author Steve.Ni ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/clearsession" validate="false"
+ *
  * 
  * @version $Revision$
  */

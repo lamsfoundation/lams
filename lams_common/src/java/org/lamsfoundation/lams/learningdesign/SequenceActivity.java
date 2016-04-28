@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class
+ *
  */
 public class SequenceActivity extends ComplexActivity implements Serializable, ISystemToolActivity {
 
@@ -126,8 +126,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     }
 
     /**
-     * @hibernate.many-to-one lazy="false"
-     * @hibernate.column name="system_tool_id"
+     *
+     *
      */
     public SystemTool getSystemTool() {
 	return systemTool;
@@ -141,9 +141,9 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      * Get the set of the branch to group mappings used for this branching activity. The set contains
      * BranchActivityEntry entries
      * 
-     * @hibernate.set lazy="true" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="sequence_activity_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
+     *
+     *
+     *
      */
     public Set<BranchActivityEntry> getBranchEntries() {
 	return branchEntries;

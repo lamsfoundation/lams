@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * Base class for all activities. If you add another subclass, you must update
  * ActivityDAO.getActivityByActivityId() and add a ACTIVITY_TYPE constant.
  * 
- * @hibernate.class table="lams_log_event"
+ *
  */
 public class LogEvent implements Serializable {
 
@@ -84,7 +84,7 @@ public class LogEvent implements Serializable {
     // Getters and Setters
     // ---------------------------------------------------------------------
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="id"
+     *
      */
     public Long getId() {
 	return id;
@@ -94,7 +94,7 @@ public class LogEvent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="log_event_type_id" length="5"
+     *
      */
     public Integer getLogEventTypeId() {
 	return logEventTypeId;
@@ -104,8 +104,8 @@ public class LogEvent implements Serializable {
     }
     
     /** 
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="user_id"     
+     *
+     *
      */
     public User getUser() {
         return this.user;
@@ -115,7 +115,7 @@ public class LogEvent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="occurred_date_time" length="19" not-null="true"
+     *
      */
     public Date getOccurredDateTime() {
 	return occurredDateTime;
@@ -126,7 +126,7 @@ public class LogEvent implements Serializable {
     }
 
     /**
-     * @hibernate.property column="learning_design_id"
+     *
      */
     public Long getLearningDesignId() {
 	return learningDesignId;
@@ -136,7 +136,7 @@ public class LogEvent implements Serializable {
     }
     
     /**
-     * @hibernate.property column="lesson_id"
+     *
      */
     public Long getLessonId() {
 	return lessonId;
@@ -146,7 +146,7 @@ public class LogEvent implements Serializable {
     }
     
     /**
-     * @hibernate.property column="activity_id"
+     *
      */
     public Long getActivityId() {
 	return activityId;

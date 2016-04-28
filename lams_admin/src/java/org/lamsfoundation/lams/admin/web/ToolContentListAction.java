@@ -64,11 +64,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jliew
  * 
- * @struts:action path="/toolcontentlist" scope="request" validate="false"
+ *
  * 
- * @struts:action-forward name="toolcontentlist" path=".toolcontentlist"
- * @struts:action-forward name="groups" path="/toolcontent/learningLibraryGroup.jsp"
- * @struts.action-forward name="error" path=".error"
+ *
+ *
+ *
  */
 public class ToolContentListAction extends Action {
 

@@ -32,10 +32,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /** 
- *        @hibernate.class
- *         table="lams_cr_workspace"
+ *
+ *
  * 
- * 		  @hibernate.cache usage = "transactional"
+ *
 */
 public class CrWorkspace implements IWorkspace,Serializable {
 
@@ -63,11 +63,11 @@ public class CrWorkspace implements IWorkspace,Serializable {
     }
 
     /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="workspace_id"
-     *             unsaved-value="0"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Long getWorkspaceId() {
@@ -79,10 +79,10 @@ public class CrWorkspace implements IWorkspace,Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="name"
-     *             length="255"
-     *             not-null="true"
+     *
+     *
+     *
+     *
      *         
      */
     public String getName() {
@@ -96,11 +96,11 @@ public class CrWorkspace implements IWorkspace,Serializable {
     /** 
      * bi-directional one-to-many association to CrWorkspaceCredential
      * 
-     *            @hibernate.set lazy="true" inverse="true" cascade="none"
-     *            @hibernate.collection-key
-     *             column="workspace_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Set getCrWorkspaceCredentials() {
@@ -114,11 +114,11 @@ public class CrWorkspace implements IWorkspace,Serializable {
     /** 
      * bi-directional one-to-many association to CrNode
      * 
-     *            @hibernate.set lazy="true" inverse="true" cascade="none"
-     *            @hibernate.collection-key
-     *             column="workspace_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrNode"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Set getCrNodes() {

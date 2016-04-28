@@ -46,8 +46,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * The action servlet that provides the support for the Sequence activities. At present, this is only a basic view
  * screen that lists the user's in the sequence.
  * 
- * @struts:action path="/sequence" parameter="method" validate="false"
- * @struts.action-forward name = "viewSequence" path = ".viewSequence"
+ *
+ *
  *
  * @author Fiona Malikoff
  */

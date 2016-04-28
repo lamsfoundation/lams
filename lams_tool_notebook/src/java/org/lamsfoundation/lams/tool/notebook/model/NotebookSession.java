@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * 
  * Represents the tool session.
  * 
- * @hibernate.class table="tl_lantbk11_session"
+ *
  */
 
 public class NotebookSession implements java.io.Serializable {
@@ -83,7 +83,7 @@ public class NotebookSession implements java.io.Serializable {
 
 	// Property accessors
 	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 *
 	 * 
 	 */
 
@@ -96,7 +96,7 @@ public class NotebookSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="session_end_date"
+	 *
 	 * 
 	 */
 
@@ -109,7 +109,7 @@ public class NotebookSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="session_start_date"
+	 *
 	 * 
 	 */
 
@@ -122,7 +122,7 @@ public class NotebookSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="status" length="11"
+	 *
 	 * 
 	 */
 
@@ -135,7 +135,7 @@ public class NotebookSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="session_id" length="20"
+	 *
 	 * 
 	 */
 
@@ -148,7 +148,7 @@ public class NotebookSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="session_name" length="250"
+	 *
 	 * 
 	 */
 
@@ -161,8 +161,8 @@ public class NotebookSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="notebook_uid"
+	 *
+	 *
 	 * 
 	 */
 
@@ -175,9 +175,9 @@ public class NotebookSession implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="none"
-	 * @hibernate.collection-key column="notebook_session_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.notebook.model.NotebookUser"
+	 *
+	 *
+	 *
 	 * 
 	 */
 

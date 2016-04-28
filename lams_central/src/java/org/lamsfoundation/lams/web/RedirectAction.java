@@ -69,9 +69,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *         required, and hopefully prevent email clients cutting them off and making a newline which sometimes breaks
  *         links.
  * 
- * @struts:action path="/r" validate="false"
- * @struts:action-forward name="error" path=".error"
- * @struts:action-forward name="message" path=".message"
+ *
+ *
+ *
  * 
  */
 public class RedirectAction extends LamsAction {

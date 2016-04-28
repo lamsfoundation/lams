@@ -54,13 +54,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * struts doclets
  * 
- * @struts:action path="/userorgrole"
- *                name="UserOrgRoleForm"
- *                scope="session"
- *                validate="false"
  *
- * @struts:action-forward name="userorgrole"
- *                        path=".userorgrole"
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class UserOrgRoleAction extends Action {
 	

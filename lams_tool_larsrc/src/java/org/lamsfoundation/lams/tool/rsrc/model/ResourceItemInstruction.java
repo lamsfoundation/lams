@@ -28,7 +28,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
- * @hibernate.class table="tl_larsrc11_item_instruction"
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$
@@ -56,7 +56,7 @@ public class ResourceItemInstruction implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -72,7 +72,7 @@ public class ResourceItemInstruction implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description" type="text"
+     *
      * @return
      */
     public String getDescription() {
@@ -84,7 +84,7 @@ public class ResourceItemInstruction implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="sequence_id"
+     *
      * @return
      */
     public int getSequenceId() {

@@ -58,12 +58,12 @@ import org.lamsfoundation.lams.util.ValidationUtil;
 /**
  * struts doclets
  * 
- * @struts:action path="/usersave" name="UserForm" input=".user" scope="request" validate="false"
+ *
  * 
- * @struts:action-forward name="user" path="/user.do?method=edit"
- * @struts:action-forward name="userlist" path="/usermanage.do"
- * @struts:action-forward name="userroles" path="/userroles.do"
- * @struts:action-forward name="usersearch" path="/usersearch.do"
+ *
+ *
+ *
+ *
  */
 public class UserSaveAction extends Action {
 

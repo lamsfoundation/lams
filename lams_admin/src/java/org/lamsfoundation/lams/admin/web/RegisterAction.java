@@ -65,13 +65,13 @@ import org.apache.commons.codec.binary.Base64;
  */
 
 /**
- * @struts.action path="/register" parameter="method" name="RegisterForm"
- *                input=".register" scope="request" validate="false"
- * @struts.action-forward name="register" path=".register"
- * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
- * @struts.action-forward name="success"
- *                        path="http://lamscommunity.org/registration"
- * @struts.action-forward name="error" path=".error"
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class RegisterAction extends LamsDispatchAction {
 

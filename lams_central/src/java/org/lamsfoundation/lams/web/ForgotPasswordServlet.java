@@ -36,8 +36,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author lfoxton
  *
- * @web:servlet name="forgotPasswordServlet"
- * @web:servlet-mapping url-pattern="/ForgotPasswordRequest"
+ *
+ *
  */
 public class ForgotPasswordServlet extends HttpServlet {
     private static final long serialVersionUID = -4833236166181290760L;

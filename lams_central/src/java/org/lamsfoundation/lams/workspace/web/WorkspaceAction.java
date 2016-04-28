@@ -50,8 +50,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Manpreet Minhas
- * @struts.action path = "/workspace" parameter = "method" validate = "false"
- * @struts.action-forward name = "success" path = "/index.jsp"
+ *
+ *
  */
 public class WorkspaceAction extends LamsDispatchAction {
 

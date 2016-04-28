@@ -53,13 +53,13 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * @author jliew
  * 
- * @struts:action path="/clone" scope="request" validate="false"
+ *
  * 
- * @struts:action-forward name="start" path=".clone-start"
- * @struts:action-forward name="availableLessonsPart" path="/organisation/parts/availableLessons.jsp"
- * @struts:action-forward name="selectStaffPart" path="/organisation/parts/selectStaff.jsp"
- * @struts:action-forward name="selectLearnersPart" path="/organisation/parts/selectLearners.jsp"
- * @struts:action-forward name="result" path=".clone-result"
+ *
+ *
+ *
+ *
+ *
  */
 public class CloneLessonsAction extends Action {
 

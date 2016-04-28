@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * This is a course-level group of learners.
  * 
- * @hibernate.class table="lams_organisation_group"
+ *
  */
 public class OrganisationGroup implements Serializable {
 
@@ -56,7 +56,7 @@ public class OrganisationGroup implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="group_id"
+     *
      */
     public Long getGroupId() {
 	return groupId;
@@ -67,7 +67,7 @@ public class OrganisationGroup implements Serializable {
     }
 
     /**
-     * @hibernate.property column="grouping_id"
+     *
      */
     public Long getGroupingId() {
 	return this.groupingId;
@@ -78,7 +78,7 @@ public class OrganisationGroup implements Serializable {
     }
 
     /**
-     * @hibernate.property column="name"
+     *
      */
     public String getName() {
 	return this.name;
@@ -89,9 +89,9 @@ public class OrganisationGroup implements Serializable {
     }
 
     /**
-     * @hibernate.set cascade="none" table="lams_user_organisation_group"
-     * @hibernate.collection-key column="group_id"
-     * @hibernate.collection-many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"
+     *
+     *
+     *
      */
     public Set<User> getUsers() {
 	return users;

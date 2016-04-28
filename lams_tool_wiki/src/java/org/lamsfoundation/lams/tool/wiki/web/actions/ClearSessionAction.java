@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * 
  * @author lfoxton
  * 
- * @struts:action path="/clearsession" validate="false"
+ *
  * 
  * @version $Revision$
  */

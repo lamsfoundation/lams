@@ -44,8 +44,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Edit lesson intro page.
  * 
- * @struts:action path="/editLessonIntro" validate="false" parameter="method"
- * @struts:action-forward name="editLessonIntro" path="/editLessonIntro.jsp"
+ *
+ *
  * 
  */
 public class EditLessonIntroAction extends DispatchAction {

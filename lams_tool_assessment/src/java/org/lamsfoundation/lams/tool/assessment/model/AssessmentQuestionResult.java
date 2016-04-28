@@ -36,7 +36,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_question_result"
+ *
  * 
  */
 public class AssessmentQuestionResult {
@@ -81,7 +81,7 @@ public class AssessmentQuestionResult {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the result Uid.
      */
     public Long getUid() {
@@ -93,7 +93,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.many-to-one column="assessment_question_uid" cascade="none"
+     *
      * @return
      */
     public AssessmentQuestion getAssessmentQuestion() {
@@ -105,7 +105,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.many-to-one column="result_uid" cascade="none"
+     *
      * @return
      */
     public AssessmentResult getAssessmentResult() {
@@ -117,7 +117,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.property column="answer_string" type="text"
+     *
      * 
      * @return Returns the possible answer.
      */
@@ -130,7 +130,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.property column="answer_float"
+     *
      * 
      * @return Returns the possible answer.
      */
@@ -143,7 +143,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.property column="answer_boolean"
+     *
      * 
      * @return Returns the possible answer.
      */
@@ -156,7 +156,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.property column="submitted_option_uid"
+     *
      * 
      * @return Returns submittedOptionUid.
      */
@@ -169,7 +169,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.property column="mark"
+     *
      * 
      * @return Returns the mark.
      */
@@ -185,7 +185,7 @@ public class AssessmentQuestionResult {
      * Maximum mark user could have scored for this question. (It is stored in AssessmentQuestionResult class due to
      * existence of random questions which makes it's impossible to obtain this info from question)
      * 
-     * @hibernate.property column="max_mark"
+     *
      * 
      * @return Returns the mark.
      */
@@ -198,7 +198,7 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.property column="penalty"
+     *
      * 
      * @return Returns the possible numeric answer.
      */
@@ -212,9 +212,9 @@ public class AssessmentQuestionResult {
     
     /**
      * 
-     * @hibernate.set cascade="all" 
-     * @hibernate.collection-key column="question_result_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer"
+     *
+     *
+     *
      * 
      * @return a set of answerOptions to this AssessmentQuestion.
      */
@@ -231,7 +231,7 @@ public class AssessmentQuestionResult {
     
     
     /**
-     * @hibernate.property column="finish_date"
+     *
      * 
      * @return Returns submittedOptionUid.
      */

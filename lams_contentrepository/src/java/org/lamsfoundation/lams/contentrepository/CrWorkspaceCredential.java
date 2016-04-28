@@ -31,8 +31,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /** 
- *        @hibernate.class
- *         table="lams_cr_workspace_credential"
+ *
+ *
  *     
 */
 public class CrWorkspaceCredential implements Serializable {
@@ -57,11 +57,11 @@ public class CrWorkspaceCredential implements Serializable {
     }
 
     /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="wc_id"
-     *             unsaved-value="0"
+     *
+     *
+     *
+     *
+     *
      *         
      */
     public Long getWcId() {
@@ -75,9 +75,9 @@ public class CrWorkspaceCredential implements Serializable {
     /** 
      * bi-directional many-to-one association to CrWorkspace
      * 
-     *            @hibernate.many-to-one not-null="true"
+     *
      * 
-     *            @hibernate.column name="workspace_id"         
+     *
      *         
      */
     public org.lamsfoundation.lams.contentrepository.CrWorkspace getCrWorkspace() {
@@ -91,9 +91,9 @@ public class CrWorkspaceCredential implements Serializable {
     /** 
      * bi-directional many-to-one association to CrCredential
      * 
-     *            @hibernate.many-to-one not-null="true"
+     *
      * 
-     *            @hibernate.column name="credential_id"         
+     *
      *         
      */
     public org.lamsfoundation.lams.contentrepository.CrCredential getCrCredential() {

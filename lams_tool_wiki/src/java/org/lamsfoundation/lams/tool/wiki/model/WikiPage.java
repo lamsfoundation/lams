@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  * WikiContent instances
  * 
  * @author lfoxton
- * @hibernate.class table="tl_lawiki10_wiki_page"
+ *
  */
 public class WikiPage implements java.io.Serializable, Cloneable {
     private static final long serialVersionUID = 2980989002817635889L;
@@ -32,7 +32,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -44,8 +44,8 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="wiki_uid"
+     *
+     *
      * 
      */
     public Wiki getParentWiki() {
@@ -57,7 +57,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
     public String getTitle() {
@@ -69,7 +69,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="editable" length="1"
+     *
      * 
      */
     public Boolean getEditable() {
@@ -81,7 +81,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="deleted" length="1"
+     *
      * 
      */
     public Boolean getDeleted() {
@@ -93,10 +93,10 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
-     *                order-by="uid asc"
-     * @hibernate.collection-key column="wiki_page_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiPageContent"
+     *
+     *
+     *
+     *
      * 
      */
     public Set<WikiPageContent> getWikiContentVersions() {
@@ -108,8 +108,8 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="wiki_current_content"
+     *
+     *
      * 
      */
     public WikiPageContent getCurrentWikiContent() {
@@ -122,8 +122,8 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="added_by"
+     *
+     *
      * 
      */
     public WikiUser getAddedBy() {
@@ -137,9 +137,9 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     /**
      * Gets the toolSession
      * 
-     * @hibernate.many-to-one cascade="none"
-     *                        class="org.lamsfoundation.lams.tool.wiki.model.WikiSession"
-     *                        column="wiki_session_uid"
+     *
+     *
+     *
      * 
      */
     public WikiSession getWikiSession() {

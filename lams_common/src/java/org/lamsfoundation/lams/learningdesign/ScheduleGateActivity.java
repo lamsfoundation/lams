@@ -51,7 +51,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Chris Perfect
  * @author Jacky Fang
  * 
- * @hibernate.class
+ *
  */
 public class ScheduleGateActivity extends GateActivity implements Serializable {
 
@@ -139,7 +139,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
 
     /**
-     * @hibernate.property column="gate_start_date_time" length="20"
+     *
      */
     public Long getGateStartTimeOffset() {
 	return this.gateStartTimeOffset;
@@ -150,7 +150,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
 
     /**
-     * @hibernate.property column="gate_end_date_time" length="20"
+     *
      */
     public Long getGateEndTimeOffset() {
 	return this.gateEndTimeOffset;

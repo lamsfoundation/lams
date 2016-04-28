@@ -65,11 +65,11 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Manpreet Minhas
  * @author Steve Ni
  * 
- * @struts.action path="/authoring" name="SbmtAuthoringForm" parameter="dispatch" input="/authoring/authoring.jsp"
- *                scope="request" validate="true"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="/authoring/authoring.jsp"
- * @struts.action-forward name="instructionFileList" path="/authoring/parts/instructionfilelist.jsp"
+ *
+ *
  */
 public class AuthoringAction extends LamsDispatchAction {
     private Logger log = Logger.getLogger(AuthoringAction.class);

@@ -47,7 +47,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Generates a help link to a contextualised tool help page.
  * 
- * @jsp.tag name="help" body-content="empty" display-name="Help tag" description="Help tag"
+ *
  * 
  * @author Fiona Malikoff
  */
@@ -147,7 +147,7 @@ public class HelpTag extends TagSupport {
     /**
      * @return module
      * 
-     * @jsp.attribute required="false" rtexprvalue="true" description="Module Name"
+     *
      */
     public String getModule() {
 	return module;
@@ -170,7 +170,7 @@ public class HelpTag extends TagSupport {
     /**
      * @return
      * 
-     * @jsp.attribute required="false" rtexprvalue="true" description="Tool Signature"
+     *
      */
     public String getToolSignature() {
 	return toolSignature;
@@ -187,7 +187,7 @@ public class HelpTag extends TagSupport {
     /**
      * @return page
      * 
-     * @jsp.attribute required="false" rtexprvalue="true" description="Page Name"
+     *
      */
     public String getPage() {
 	return module;
@@ -204,7 +204,7 @@ public class HelpTag extends TagSupport {
     /**
      * @return style
      * 
-     * @jsp.attribute required="false" rtexprvalue="true" description="Style"
+     *
      */
     public String getStyle() {
 	return style;

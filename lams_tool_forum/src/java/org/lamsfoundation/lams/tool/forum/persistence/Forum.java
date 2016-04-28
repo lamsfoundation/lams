@@ -40,8 +40,8 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
  * 
  * @author conradb
  * 
- * @hibernate.class table="tl_lafrum11_forum"
- * @hibernate.cache usage = "transactional" 
+ *
+ *
  * 
  */
 public class Forum implements Cloneable {
@@ -185,7 +185,7 @@ public class Forum implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -204,7 +204,7 @@ public class Forum implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -222,7 +222,7 @@ public class Forum implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Forum.
      * 
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      */
     public ForumUser getCreatedBy() {
@@ -238,7 +238,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -251,7 +251,7 @@ public class Forum implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
+     *
      * 
      */
     public String getTitle() {
@@ -269,7 +269,7 @@ public class Forum implements Cloneable {
     /**
      * @return Returns the allowAnonym.
      * 
-     * @hibernate.property column="allow_anonym"
+     *
      * 
      */
     public boolean getAllowAnonym() {
@@ -288,7 +288,7 @@ public class Forum implements Cloneable {
     /**
      * @return Returns the lockWhenFinish.
      * 
-     * @hibernate.property column="lock_on_finished"
+     *
      * 
      */
     public boolean getLockWhenFinished() {
@@ -306,7 +306,7 @@ public class Forum implements Cloneable {
     /**
      * @return Returns the instructions set by the teacher.
      * 
-     * @hibernate.property column="instructions" type="text"
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -320,9 +320,9 @@ public class Forum implements Cloneable {
      * NOTE: The reason that relation don't use save-update to persist message is MessageSeq table need save a record as
      * well.
      * 
-     * @hibernate.set lazy="true" inverse="true" cascade="none" order-by="create_date desc"
-     * @hibernate.collection-key column="forum_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -347,7 +347,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use"
+     *
      * @return
      */
     public boolean isContentInUse() {
@@ -359,7 +359,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
+     *
      * @return
      */
     public boolean isDefineLater() {
@@ -371,7 +371,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
+     *
      * @return
      */
     public Long getContentId() {
@@ -383,7 +383,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_edit"
+     *
      * @return
      */
     public boolean isAllowEdit() {
@@ -395,7 +395,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_rich_editor"
+     *
      * @return
      */
     public boolean isAllowRichEditor() {
@@ -425,7 +425,7 @@ public class Forum implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="min_characters"
+     *
      * @return
      */
     public int getMinCharacters() {
@@ -437,7 +437,7 @@ public class Forum implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="limited_min_characters"
+     *
      * @return
      */
     public boolean isLimitedMinCharacters() {
@@ -449,7 +449,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="limited_of_chars"
+     *
      * @return
      */
     public int getMaxCharacters() {
@@ -461,7 +461,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="limited_input_flag"
+     *
      * @return
      */
     public boolean isLimitedMaxCharacters() {
@@ -473,7 +473,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_new_topic"
+     *
      * @return
      */
     public boolean isAllowNewTopic() {
@@ -485,7 +485,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_upload"
+     *
      * @return
      */
     public boolean isAllowUpload() {
@@ -497,7 +497,7 @@ public class Forum implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_rate_messages"
+     *
      * @return
      */
     public boolean isAllowRateMessages() {
@@ -510,7 +510,7 @@ public class Forum implements Cloneable {
     
 
     /**
-     * @hibernate.property column="maximum_reply"
+     *
      * @return
      */
     public int getMaximumReply() {
@@ -522,7 +522,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="minimum_reply"
+     *
      * @return
      */
     public int getMinimumReply() {
@@ -534,7 +534,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -546,7 +546,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {
@@ -558,7 +558,7 @@ public class Forum implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="notify_learners_on_forum_posting"
+     *
      * @return
      */
     public boolean isNotifyLearnersOnForumPosting() {
@@ -570,7 +570,7 @@ public class Forum implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="notify_teachers_on_forum_posting"
+     *
      * @return
      */
     public boolean isNotifyTeachersOnForumPosting() {
@@ -582,7 +582,7 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="mark_release_notify"
+     *
      * @return
      */
     public boolean isNotifyLearnersOnMarkRelease() {
@@ -594,10 +594,10 @@ public class Forum implements Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" cascade="all"
+     *
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
-     * @hibernate.collection-key column="content_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.ForumCondition"
+     *
+     *
      * 
      */
     public Set<ForumCondition> getConditions() {
@@ -609,7 +609,7 @@ public class Forum implements Cloneable {
     }
     
 	/**
-     * @hibernate.property column="submission_deadline"
+     *
 	 * @return date submissionDeadline
 	 */
 	public Date getSubmissionDeadline() {
@@ -621,7 +621,7 @@ public class Forum implements Cloneable {
 	}
 
     /**
-     * @hibernate.property column="maximum_rate"
+     *
      * @return
      */
 	public int getMaximumRate() {
@@ -633,7 +633,7 @@ public class Forum implements Cloneable {
 	}
 
     /**
-     * @hibernate.property column="minimum_rate"
+     *
      * @return
      */	
 	public int getMinimumRate() {

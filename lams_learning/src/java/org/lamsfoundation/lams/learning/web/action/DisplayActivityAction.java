@@ -51,17 +51,17 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * XDoclet definition:
  * 
- * ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/DisplayActivity" name="activityForm" validate="false" scope="request"
- * @struts:action-forward name="displayParallelActivity" path="/DisplayParallelActivity.do"
- * @struts:action-forward name="displayOptionsActivity" path="/DisplayOptionsActivity.do"
- * @struts:action-forward name="loadToolActivity" path="/LoadToolActivity.do"
- * @struts:action-forward name="parallelWait" path="/parallelWait.do"
- * @struts:action-forward name="lessonComplete" path="/lessonComplete.do"
+ *
+ *
+ *
+ *
+ *
+ *
  * 
  * 
- *                        ----------------XDoclet Tags--------------------
+ *
  */
 public class DisplayActivityAction extends ActivityAction {
 

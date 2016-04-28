@@ -46,13 +46,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * XDoclet definition:
  * 
- * ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/LessonComplete" name="activityForm" validate="false" scope="request"
- * @struts:action-forward name="lessonComplete" path=".lessonComplete"
+ *
+ *
  * 
  * 
- *                        ----------------XDoclet Tags--------------------
+ *
  */
 public class LessonCompleteActivityAction extends ActivityAction {
 

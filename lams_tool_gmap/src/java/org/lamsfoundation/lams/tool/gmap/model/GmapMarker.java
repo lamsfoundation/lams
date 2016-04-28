@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * This is a POJO class for a marker object that represents a marker on a 
  * google map.
  * 
- * @hibernate.class table="tl_lagmap10_marker"
+ *
  */
 public class GmapMarker implements java.io.Serializable, Cloneable{
 
@@ -93,7 +93,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.id column="uid" generator-class="native"
+	 *
 	 */
 	public Long getUid() {
 		return uid;
@@ -106,7 +106,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="longitude"
+	 *
 	 */
 	public Double getLongitude() {
 		return longitude;
@@ -119,7 +119,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="latitude"
+	 *
 	 */
 	public Double getLatitude() {
 		return latitude;
@@ -132,7 +132,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="info_window_message" length="65535"
+	 *
 	 */
 	public String getInfoWindowMessage() {
 		return infoWindowMessage;
@@ -146,7 +146,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="create_date"
+	 *
 	 */
 	public Date getCreated() {
 		return created;
@@ -159,7 +159,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="update_date"
+	 *
 	 */
 	public Date getUpdated() {
 		return updated;
@@ -172,7 +172,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="is_authored"
+	 *
 	 */
 	public boolean isAuthored() {
 		return isAuthored;
@@ -185,9 +185,9 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 
 	
 	/**
-	 * @hibernate.many-to-one	cascade="none"
-	 * 							not-null="true"
-	 * @hibernate.column name="gmap_uid"
+	 *
+	 *
+	 *
 	 * @return
 	 */
 	public Gmap getGmap() {
@@ -201,7 +201,7 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
 	 * 
 	 * @return
-	 * @hibernate.property column="title" length="55"
+	 *
 	 */
 	public String getTitle() {
 		return title;
@@ -215,9 +215,9 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
      * @return Returns the userid of the user who created the Forum.
      *
-     * @hibernate.many-to-one
-     * 		column="created_by"
-     *  	cascade="none"
+     *
+     *
+     *
      *
      */
 	public GmapUser getCreatedBy() {
@@ -231,9 +231,9 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
      * @return Returns the userid of the user who created the Forum.
      *
-     * @hibernate.many-to-one
-     * 		column="updated_by"
-     *  	cascade="none"
+     *
+     *
+     *
      *
      */
 	public GmapUser getUpdatedBy() {
@@ -247,9 +247,9 @@ public class GmapMarker implements java.io.Serializable, Cloneable{
 	/**
      * Gets the toolSession
      *
-     * @hibernate.many-to-one cascade="none"
-     *	class="org.lamsfoundation.lams.tool.gmap.model.GmapSession"
-     *	              column="gmap_session_uid"
+     *
+     *
+     *
      *
      */
 	public GmapSession getGmapSession() {

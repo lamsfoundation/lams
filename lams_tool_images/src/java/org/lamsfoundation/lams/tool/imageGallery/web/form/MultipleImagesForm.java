@@ -29,7 +29,7 @@ import org.apache.struts.upload.FormFile;
 /**
  * Multiple Images Form.
  * 
- * @struts.form name="multipleImagesForm"
+ *
  * @author Andrey Balan
  */
 public class MultipleImagesForm extends ActionForm {

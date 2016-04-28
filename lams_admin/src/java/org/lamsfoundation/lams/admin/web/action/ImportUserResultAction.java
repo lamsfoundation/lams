@@ -44,8 +44,8 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 /**
  * @author jliew
  *
- * @struts:action path="/importuserresult" validate="false"
- * @struts:action-forward name="importresult" path=".importresult"
+ *
+ *
  */
 public class ImportUserResultAction extends Action {
 

@@ -59,11 +59,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author Andrey Balan
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request" 
+ *
  * 
- * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="kalturaDisplay" path="tiles:/monitoring/kalturaDisplay"
- * @struts:action-forward name ="groupLearning" path="/learning.do" redirect="true"
+ *
+ *
+ *
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {

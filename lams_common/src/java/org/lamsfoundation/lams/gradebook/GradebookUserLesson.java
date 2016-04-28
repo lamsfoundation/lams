@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * 
  * This class maps to one learner's entire mark for a lesson
  * 
- * @hibernate.class table="lams_gradebook_user_lesson"	
+ *
  */
 public class GradebookUserLesson {
     private long uid;
@@ -48,7 +48,7 @@ public class GradebookUserLesson {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
+     *
      */
     public long getUid() {
         return uid;
@@ -59,8 +59,8 @@ public class GradebookUserLesson {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="lesson_id"
+     *
+     *
      */
     public Lesson getLesson() {
         return lesson;
@@ -71,8 +71,8 @@ public class GradebookUserLesson {
     }
 
     /** 
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="user_id"      
+     *
+     *
      */
     public User getLearner() {
         return learner;
@@ -83,7 +83,7 @@ public class GradebookUserLesson {
     }
 
     /**
-     * @hibernate.property column="mark"
+     *
      */
     public Double getMark() {
         return mark;
@@ -94,7 +94,7 @@ public class GradebookUserLesson {
     }
     
     /**
-     * @hibernate.property column="feedback" length="65535"
+     *
      */
     public String getFeedback() {
         return feedback;

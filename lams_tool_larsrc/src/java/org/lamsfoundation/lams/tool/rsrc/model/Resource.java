@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_larsrc11_resource"
+ *
  * 
  */
 public class Resource implements Cloneable {
@@ -189,7 +189,7 @@ public class Resource implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -208,7 +208,7 @@ public class Resource implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -226,7 +226,7 @@ public class Resource implements Cloneable {
     /**
      * @return Returns the userid of the user who created the Share resources.
      * 
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
+     *
      * 
      */
     public ResourceUser getCreatedBy() {
@@ -242,7 +242,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -255,7 +255,7 @@ public class Resource implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
+     *
      * 
      */
     public String getTitle() {
@@ -273,7 +273,7 @@ public class Resource implements Cloneable {
     /**
      * @return Returns the lockWhenFinish.
      * 
-     * @hibernate.property column="lock_on_finished"
+     *
      * 
      */
     public boolean getLockWhenFinished() {
@@ -291,7 +291,7 @@ public class Resource implements Cloneable {
     /**
      * @return Returns the instructions set by the teacher.
      * 
-     * @hibernate.property column="instructions" type="text"
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -304,9 +304,9 @@ public class Resource implements Cloneable {
     /**
      * 
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="resource_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -319,7 +319,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use"
+     *
      * @return
      */
     public boolean isContentInUse() {
@@ -331,7 +331,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
+     *
      * @return
      */
     public boolean isDefineLater() {
@@ -343,7 +343,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
+     *
      * @return
      */
     public Long getContentId() {
@@ -355,7 +355,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_add_files"
+     *
      * @return
      */
     public boolean isAllowAddFiles() {
@@ -367,7 +367,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_add_urls"
+     *
      * @return
      */
     public boolean isAllowAddUrls() {
@@ -379,7 +379,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="mini_view_resource_number"
+     *
      * @return
      */
     public int getMiniViewResourceNumber() {
@@ -391,7 +391,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_auto_run"
+     *
      * @return
      */
     public boolean isRunAuto() {
@@ -416,7 +416,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -428,7 +428,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {
@@ -440,7 +440,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="assigment_submit_notify"
+     *
      */
     public boolean isNotifyTeachersOnAssigmentSumbit() {
 	return notifyTeachersOnAssigmentSumbit;
@@ -451,7 +451,7 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_upload_notify"
+     *
      */
     public boolean isNotifyTeachersOnFileUpload() {
 	return notifyTeachersOnFileUpload;

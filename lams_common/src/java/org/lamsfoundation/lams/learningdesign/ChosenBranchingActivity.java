@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.tool.SystemTool;
  * @author Mitchell Seaton
  * @version 2.1
  * 
- * @hibernate.class
+ *
  */
 public class ChosenBranchingActivity extends BranchingActivity implements Serializable {
 

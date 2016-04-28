@@ -51,8 +51,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Sends redirect to lams learner. Format: launchlearner.do?lessonID=<encodedLessonId>
  * 
- * @web:servlet name="LaunchLearnerUrlServlet"
- * @web:servlet-mapping url-pattern="/r/*"
+ *
+ *
  */
 public class LaunchLearnerUrlServlet extends HttpServlet {
 

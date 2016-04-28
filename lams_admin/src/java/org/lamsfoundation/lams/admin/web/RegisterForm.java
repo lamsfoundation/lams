@@ -34,7 +34,7 @@ import org.apache.struts.action.ActionForm;
  */
 
 /**
- * @struts.form name="RegisterForm"
+ *
  */
 public class RegisterForm extends ActionForm {
 

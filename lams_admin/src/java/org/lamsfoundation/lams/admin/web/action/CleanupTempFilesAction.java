@@ -47,13 +47,13 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * @author jliew
  *
- * @struts:action path="/cleanup"
- *              name="CleanupForm"
- *              scope="request"
- * 				validate="false"
+ *
+ *
+ *
+ *
  * 
- * @struts:action-forward name="cleanup" path=".cleanup"
- * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
+ *
+ *
  */
 public class CleanupTempFilesAction extends Action {
 	

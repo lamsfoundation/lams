@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
- * @hibernate.class table="tl_lawiki10_wiki"
+ *
  */
 
 public class Wiki implements java.io.Serializable, Cloneable {
@@ -106,7 +106,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
 
@@ -119,7 +119,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * 
      */
 
@@ -132,7 +132,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="update_date"
+     *
      * 
      */
 
@@ -145,7 +145,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by" length="20"
+     *
      * 
      */
 
@@ -158,7 +158,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * 
      */
 
@@ -171,7 +171,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instructions" length="65535"
+     *
      * 
      */
 
@@ -184,7 +184,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      * 
      */
 
@@ -197,7 +197,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_learner_create_pages" length="1"
+     *
      * 
      */
     public boolean isAllowLearnerCreatePages() {
@@ -209,7 +209,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_learner_insert_links" length="1"
+     *
      * 
      */
     public boolean isAllowLearnerInsertLinks() {
@@ -221,7 +221,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="allow_learner_attach_images" length="1"
+     *
      * 
      */
     public boolean isAllowLearnerAttachImages() {
@@ -233,7 +233,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.property column="notify_updates" length="1" default="0"
+     *
      * 
      */
     public boolean isNotifyUpdates() {
@@ -245,7 +245,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity" length="1"
+     *
      */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
@@ -256,7 +256,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions" length="65535"
+     *
      */
     public String getReflectInstructions() {
 	return reflectInstructions;
@@ -267,7 +267,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="minimum_edits"
+     *
      */
     public Integer getMinimumEdits() {
 	return minimumEdits;
@@ -278,7 +278,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="maximum_edits"
+     *
      */
     public Integer getMaximumEdits() {
 	return maximumEdits;
@@ -289,7 +289,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * 
      */
 
@@ -302,7 +302,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1"
+     *
      * 
      */
 
@@ -315,7 +315,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="tool_content_id" length="20"
+     *
      * 
      */
 
@@ -328,9 +328,9 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="wiki_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiSession"
+     *
+     *
+     *
      * 
      */
 
@@ -343,10 +343,10 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none" order-by="uid
+     *
      *                asc"
-     * @hibernate.collection-key column="wiki_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiPage"
+     *
+     *
      * 
      */
 
@@ -359,8 +359,8 @@ public class Wiki implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="wiki_main_page_uid"
+     *
+     *
      * 
      */
     public WikiPage getMainPage() {

@@ -47,7 +47,7 @@ import java.util.Set;
  * </p>
  * 
  * @author mtruong
- * @hibernate.class table="tl_lanb11_session"
+ *
  */
 
 public class NoticeboardSession implements Serializable {
@@ -135,8 +135,8 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="nb_content_uid"
+     *
+     *
      */
     public NoticeboardContent getNbContent() {
 	return nbContent;
@@ -147,7 +147,7 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.property column="nb_session_id" length="20" not-null="true"
+     *
      */
     public Long getNbSessionId() {
 	return nbSessionId;
@@ -158,7 +158,7 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.property column="nb_session_name" length="255" not-null="true"
+     *
      */
     public String getNbSessionName() {
 	return nbSessionName;
@@ -169,7 +169,7 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.property column="session_end_date" length="19"
+     *
      */
     public Date getSessionEndDate() {
 	return sessionEndDate;
@@ -180,7 +180,7 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.property column="session_start_date" length="19"
+     *
      */
     public Date getSessionStartDate() {
 	return sessionStartDate;
@@ -191,7 +191,7 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.property column="session_status" length="100"
+     *
      */
     public String getSessionStatus() {
 	return sessionStatus;
@@ -202,7 +202,7 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid" unsaved-value="0"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -213,10 +213,10 @@ public class NoticeboardSession implements Serializable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
      *
-     * @hibernate.collection-key column="nb_session_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser"
+     *
+     *
+     *
      */
     public Set<NoticeboardUser> getNbUsers() {
 	if (this.nbUsers == null) {

@@ -46,10 +46,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author Marcin Cieslak
  * 
- * @struts.action path="/pedagogicalPlanner" name="pedagogicalPlannerForm" parameter="dispatch" scope="request"
- *                validate="false"
+ *
+ *
  * 
- * @struts.action-forward name="success" path="/pages/authoring/pedagogicalPlannerForm.jsp"
+ *
  */
 public class PedagogicalPlannerAction extends LamsDispatchAction {
 

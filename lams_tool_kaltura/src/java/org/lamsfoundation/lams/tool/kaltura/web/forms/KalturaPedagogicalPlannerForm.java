@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class KalturaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     String instructions;

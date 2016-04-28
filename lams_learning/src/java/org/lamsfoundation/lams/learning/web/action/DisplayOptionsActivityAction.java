@@ -52,10 +52,10 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  *         XDoclet definition:
  * 
- * @struts:action path="/DisplayOptionsActivity" name="optionsActivityForm" input="/Activity.do" validate="false"
- *                scope="request"
+ *
+ *
  * 
- * @struts:action-forward name="displayOptions" path=".optionsActivity"
+ *
  * 
  */
 public class DisplayOptionsActivityAction extends ActivityAction {

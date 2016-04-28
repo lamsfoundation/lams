@@ -39,10 +39,10 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 /**
- * @jsp.tag name="Configuration"
- * 			body-content="empty"
- * 			display-name="Configuration value"
- * 			description="Get the configuration value for the specified key"
+ *
+ *
+ *
+ * Get the configuration value for the specified key
  * 	
  * @author Fiona Malikoff
  */
@@ -74,8 +74,8 @@ public class ConfigurationTag extends TagSupport {
 	}
 	
 	/**
-	 * @jsp.attribute required="false" rtexprvalue="true" 
-	 * description="Configuration Key"
+	 *
+	 * Configuration Key
 	 * 
 	 * @return Returns the property.
 	 */

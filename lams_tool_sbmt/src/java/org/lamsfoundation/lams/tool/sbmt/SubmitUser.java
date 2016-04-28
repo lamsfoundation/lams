@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 /**
  * 
- * @hibernate.class table="tl_lasbmt11_user"
+ *
  * @author Steve.Ni
  * 
  * @version $Revision$
@@ -73,7 +73,7 @@ public class SubmitUser implements Serializable, Cloneable {
     // Get / Set methods
     // ***********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the learnerID.
      */
     public Long getUid() {
@@ -89,7 +89,7 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * @return Returns the userID.
      */
     public Integer getUserID() {
@@ -105,7 +105,7 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="finished" length="1"
+     *
      * @return Returns the finished.
      */
     public boolean isFinished() {
@@ -121,7 +121,7 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="session_id" length="20"
+     *
      * @return Returns the sessionID.
      */
     public Long getSessionID() {
@@ -137,7 +137,7 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="first_name"
+     *
      */
     public String getFirstName() {
 	return firstName;
@@ -148,7 +148,7 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="login_name"
+     *
      */
     public String getLogin() {
 	return login;
@@ -159,7 +159,7 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="last_name"
+     *
      */
     public String getLastName() {
 	return lastName;
@@ -170,7 +170,7 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id"
+     *
      * @return Returns the sessionID.
      */
     public Long getContentID() {

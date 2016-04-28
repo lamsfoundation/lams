@@ -42,9 +42,9 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * @author jliew
  *  
- * @struts:action path="/disabledmanage" validate="false"
  *
- * @struts:action-forward name="disabledlist" path=".disabledlist"
+ *
+ *
  */
 public class DisabledUserManageAction extends Action {
 	

@@ -31,7 +31,7 @@ import java.util.Date;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_lasurv11_answer"
+ *
  * 
  */
 public class SurveyAnswer {
@@ -53,7 +53,7 @@ public class SurveyAnswer {
     private String[] choices;
 
     /**
-     * @hibernate.many-to-one column="question_uid" cascade="none"
+     *
      * @return
      */
     public SurveyQuestion getSurveyQuestion() {
@@ -65,7 +65,7 @@ public class SurveyAnswer {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -77,7 +77,7 @@ public class SurveyAnswer {
     }
 
     /**
-     * @hibernate.many-to-one column="user_uid" cascade="none"
+     *
      * @return
      */
     public SurveyUser getUser() {
@@ -89,7 +89,7 @@ public class SurveyAnswer {
     }
 
     /**
-     * @hibernate.property column="answer_choices"
+     *
      * @return
      */
     public String getAnswerChoices() {
@@ -101,7 +101,7 @@ public class SurveyAnswer {
     }
 
     /**
-     * @hibernate.property column="udpate_date"
+     *
      * @return
      */
     public Date getUpdateDate() {
@@ -113,7 +113,7 @@ public class SurveyAnswer {
     }
 
     /**
-     * @hibernate.property column="answer_text"
+     *
      * @return
      */
     public String getAnswerText() {

@@ -54,10 +54,10 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *
  *         XDoclet definition:
  * 
- * @struts:action path="/branching" name="BranchingForm" parameter="method" validate="false"
+ *
  * 
- * @struts:action-forward name="displayBranchingWait" path=".branchingActivityWait"
- * @struts:action-forward name="displayBranchingPreview" path=".branchingActivityPreview"
+ *
+ *
  * 
  */
 public class BranchingActivityAction extends LamsDispatchAction {

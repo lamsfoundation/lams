@@ -65,14 +65,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * Creation Date: 14-07-05
  *  
- * ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action path="/monitoring" name="NbMonitoringForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
- *                input=".monitoringContent" validate="false" parameter="method"
- * @struts:action-forward name="monitorPage" path="/monitoring/monitoring.jsp"
- * @struts:action-forward name="monitorReflectionPage" path="/monitoring/reflection.jsp"
- * @struts:action-forward name="monitorCommentsPage" path="/monitoring/comments.jsp"
- * ----------------XDoclet Tags--------------------
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public class NbMonitoringAction extends LamsDispatchAction {
     

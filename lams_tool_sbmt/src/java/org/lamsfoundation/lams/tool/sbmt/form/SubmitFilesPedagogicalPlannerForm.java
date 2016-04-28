@@ -27,8 +27,8 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts:form name="SbmtPedagogicalPlannerForm"
- *              type="org.lamsfoundation.lams.tool.sbmt.form.SubmitFilesPedagogicalPlannerForm"
+ *
+ *
  */
 public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     String instruction;

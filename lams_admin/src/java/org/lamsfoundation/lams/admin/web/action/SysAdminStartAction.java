@@ -40,8 +40,8 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * @author jliew
  *
- * @struts.action path="/sysadminstart" validate="false"
- * @struts.action-forward name="sysadmin" path=".sysadmin"
+ *
+ *
  */
 public class SysAdminStartAction extends Action {
 	

@@ -6,7 +6,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * @hibernate.class table="lams_planner_nodes"
+ *
  * @author Marcin Cieslak
  * 
  */
@@ -42,14 +42,14 @@ public class PedagogicalPlannerSequenceNode {
     private Integer permissions = PERMISSION_DEFAULT_SETTING;
 
     /**
-     * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
+     *
      */
     public Long getUid() {
 	return uid;
     }
 
     /**
-     * @hibernate.many-to-one column="parent_uid" cascade="save-update" foreign-key="FK_lams_planner_node_parent"
+     *
      * @return
      */
     public PedagogicalPlannerSequenceNode getParent() {
@@ -61,7 +61,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="order_id"
+     *
      * @return
      */
     public Integer getOrder() {
@@ -73,7 +73,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="title"
+     *
      * @return
      */
     public String getTitle() {
@@ -85,7 +85,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="brief_desc"
+     *
      * @return
      */
     public String getBriefDescription() {
@@ -97,7 +97,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="full_desc"
+     *
      * @return
      */
     public String getFullDescription() {
@@ -109,7 +109,7 @@ public class PedagogicalPlannerSequenceNode {
     }
     
     /**
-     * @hibernate.property formula="( SELECT ld.title FROM lams_learning_design ld WHERE ld.learning_design_id = ld_id )"
+     *
      * @return
      */
     public String getLearningDesignTitle() {
@@ -125,9 +125,9 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.set cascade="all" order-by="order_id asc"
-     * @hibernate.collection-key column="parent_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode"
+     *
+     *
+     *
      * @return
      */
     public Set<PedagogicalPlannerSequenceNode> getSubnodes() {
@@ -139,7 +139,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="locked"
+     *
      */
     public Boolean getLocked() {
 	return locked;
@@ -150,7 +150,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="ld_id"
+     *
      */
     public Long getLearningDesignId() {
 	return learningDesignId;
@@ -161,7 +161,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="content_folder_id"
+     *
      */
     public String getContentFolderId() {
 	return contentFolderId;
@@ -172,7 +172,7 @@ public class PedagogicalPlannerSequenceNode {
     }
     
     /**
-     * @hibernate.property column="permissions"
+     *
      */
     public Integer getPermissions() {
         return permissions;
@@ -183,7 +183,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.many-to-one column="user_id" foreign-key="FK_lams_planner_node_user"
+     *
      */
     public User getUser() {
 	return user;

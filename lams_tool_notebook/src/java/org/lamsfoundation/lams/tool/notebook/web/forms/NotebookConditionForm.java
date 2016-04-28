@@ -7,7 +7,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
  * A text search form with additional parameters for Notebook needs.
  * 
  * @author Marcin Cieslak
- * @struts.form name="notebookConditionForm"
+ *
  */
 public class NotebookConditionForm extends TextSearchActionForm {
 

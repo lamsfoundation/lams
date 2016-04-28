@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 
 
 /**
- * @struts.form name="authoringForm"
+ *
  */
 public class AuthoringForm extends ActionForm {
 

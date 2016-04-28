@@ -54,9 +54,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author Andrey Balan, Marcin Cieslak
  * 
- * @struts:action path="/emailUser" name="emailForm" parameter="method" validate="false"
+ *
  * 
- * @struts:action-forward name="emailuser" path="/emailuser.jsp"
+ *
  */
 public class EmailUserAction extends LamsDispatchAction {
 

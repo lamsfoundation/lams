@@ -34,7 +34,7 @@ import org.apache.struts.action.ActionForm;
  * 
  * @author Anthony Sukkar
  * 
- * @struts.form name="learningForm"
+ *
  */
 public class LearningForm extends ActionForm {
 

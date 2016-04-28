@@ -187,9 +187,9 @@ public class Group implements Serializable, Nullable, Comparable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none" table = "lams_user_group"
-     * @hibernate.collection-key column="group_id"
-     * @hibernate.collection-many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"
+     *
+     *
+     *
      */
     public Set<User> getUsers() {
 	return this.users;
@@ -200,9 +200,9 @@ public class Group implements Serializable, Nullable, Comparable {
     }
 
     /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="group_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.ToolSession"
+     *
+     *
+     *
      * 
      */
     public Set getToolSessions() {
@@ -218,9 +218,9 @@ public class Group implements Serializable, Nullable, Comparable {
      * that is applicable to a group, but this may be changed in the future. If the group is applied to multiple
      * branching activities, then there will be multiple branches - one for each branching activity.
      * 
-     * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphane"
-     * @hibernate.collection-key column="group_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
+     *
+     *
+     *
      * 
      */
     public Set getBranchActivities() {

@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
- * @struts.form name="pedagogicalPlannerForm"
+ *
  */
 public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     String instructions;

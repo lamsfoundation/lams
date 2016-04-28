@@ -27,14 +27,14 @@ package org.lamsfoundation.lams.monitoring.web;
 * The action servlet that provides the support for the tool output based branching.
 * 
 * @author Fiona Malikoff
-* ----------------XDoclet Tags--------------------
+*
 * 
-* @struts:action path="/toolBranching" 
-*                parameter="method" 
-*                validate="false"
-* @struts.action-forward name = "viewBranches" path = ".viewBranches"
+*
+*
+*
+*
 * 
-* ----------------XDoclet Tags--------------------
+*
 */
 public class ToolOutputBranchingAction extends BranchingAction{
 

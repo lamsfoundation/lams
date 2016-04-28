@@ -73,13 +73,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @since 2005-3-29
  * @version 1.1
  * 
- *          ----------------XDoclet Tags--------------------
+ *
  * 
- * @struts:action name = "GroupingForm" path="/grouping" parameter="method" validate="false"
- * @struts:action-forward name="viewGroup" path="/grouping.do?method=viewGrouping"
- * @struts:action-forward name="showGroup" path=".showgroup"
- * @struts:action-forward name="waitGroup" path=".waitgroup"
- * @struts:action-forward name="chooseGroup" path=".choosegroup" ----------------XDoclet Tags--------------------
+ *
+ *
+ *
+ *
+ *
  * 
  */
 public class GroupingAction extends LamsDispatchAction {

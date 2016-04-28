@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 /**
  * A text search form with additional parameters for Forum needs.
  * 
- * @struts.form name="forumConditionForm"
+ *
  * @author Marcin Cieslak
  * 
  */

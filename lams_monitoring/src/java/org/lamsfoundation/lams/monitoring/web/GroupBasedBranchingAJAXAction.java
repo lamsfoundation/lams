@@ -54,15 +54,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 * 
 * @author Fiona Malikoff
 
-* ----------------XDoclet Tags--------------------
+*
 * 
-* @struts:action path="/groupedBranching" 
-*                parameter="method" 
-*                validate="false"
-* @struts.action-forward name = "groupedSelection" path = "/branching/groupedSelection.jsp"
-* @struts.action-forward name = "viewBranches" path = ".viewBranches"
+*
+*
+*
+*
+*
 * 
-* ----------------XDoclet Tags--------------------
+*
 */
 public class GroupBasedBranchingAJAXAction extends BranchingAction {
 

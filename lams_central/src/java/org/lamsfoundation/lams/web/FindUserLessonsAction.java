@@ -35,9 +35,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author asukkar
  * 
- * @struts.action path="/findUserLessons" parameter="dispatch" validate="false"
+ *
  * 
- * @struts.action-forward name="success-getResults" path="/findUserLessons.jsp"
+ *
  */
 public class FindUserLessonsAction extends DispatchAction {
     private static IUserManagementService userManagementService;

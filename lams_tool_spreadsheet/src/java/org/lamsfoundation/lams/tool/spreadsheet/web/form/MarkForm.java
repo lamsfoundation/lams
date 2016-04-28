@@ -27,7 +27,7 @@ import org.apache.struts.action.ActionForm;
  
 /**
 * 	Mark Form.
-*	@struts.form name="markForm"
+*
 *
 * 	User: Andrey Balan
 */

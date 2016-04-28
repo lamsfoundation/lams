@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_scratchie"
+ *
  * 
  */
 public class Scratchie implements Cloneable {
@@ -160,7 +160,7 @@ public class Scratchie implements Cloneable {
      * Returns the object's creation date
      * 
      * @return date
-     * @hibernate.property column="create_date"
+     *
      */
     public Date getCreated() {
 	return created;
@@ -179,7 +179,7 @@ public class Scratchie implements Cloneable {
      * Returns the object's date of last update
      * 
      * @return date updated
-     * @hibernate.property column="update_date"
+     *
      */
     public Date getUpdated() {
 	return updated;
@@ -198,7 +198,7 @@ public class Scratchie implements Cloneable {
      * Returns deadline for learner's submission
      * 
      * @return submissionDeadline
-     * @hibernate.property column="submission_deadline"
+     *
      */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
@@ -214,7 +214,7 @@ public class Scratchie implements Cloneable {
     }
 
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     *
      */
     public Long getUid() {
 	return uid;
@@ -227,7 +227,7 @@ public class Scratchie implements Cloneable {
     /**
      * @return Returns the title.
      * 
-     * @hibernate.property column="title"
+     *
      * 
      */
     public String getTitle() {
@@ -245,7 +245,7 @@ public class Scratchie implements Cloneable {
     /**
      * @return Returns the instructions set by the teacher.
      * 
-     * @hibernate.property column="instructions" type="text"
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -258,9 +258,9 @@ public class Scratchie implements Cloneable {
     /**
      * 
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="order_id asc"
-     * @hibernate.collection-key column="scratchie_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem"
+     *
+     *
+     *
      * 
      * @return
      */
@@ -273,7 +273,7 @@ public class Scratchie implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later"
+     *
      * @return
      */
     public boolean isDefineLater() {
@@ -285,7 +285,7 @@ public class Scratchie implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_id" unique="true"
+     *
      * @return
      */
     public Long getContentId() {
@@ -297,7 +297,7 @@ public class Scratchie implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -309,7 +309,7 @@ public class Scratchie implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {
@@ -321,7 +321,7 @@ public class Scratchie implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="extra_point"
+     *
      * @return
      */
     public boolean isExtraPoint() {
@@ -333,7 +333,7 @@ public class Scratchie implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="burning_questions_enabled"
+     *
      * @return
      */
     public boolean isBurningQuestionsEnabled() {

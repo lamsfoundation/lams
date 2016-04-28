@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * This class maps to a sample question in the q&a wizard, it has a parent
  * cognitive skill which in turn has a parent category
  * 
- * @hibernate.class table="tl_laqa11_wizard_question"
+ *
  */
 public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuestion>, Cloneable {
 
@@ -53,7 +53,7 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * 
      */
     public Long getUid() {
@@ -66,9 +66,9 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
 
     /**
      * 
-     * @hibernate.many-to-one cascade="none"
-     *                        class="org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill"
-     *                        column="cognitive_skill_uid"
+     *
+     *
+     *
      * 
      */
     public QaWizardCognitiveSkill getCognitiveSkill() {
@@ -80,7 +80,7 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
     }
 
     /**
-     * @hibernate.property column="title" length="1027" not-null="true"
+     *
      */
     public String getQuestion() {
 	return question;

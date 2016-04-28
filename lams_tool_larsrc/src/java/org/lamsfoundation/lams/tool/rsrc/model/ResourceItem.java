@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
  * 
  * @author Dapeng Ni
  * 
- * @hibernate.class table="tl_larsrc11_resource_item"
+ *
  * 
  */
 public class ResourceItem implements Cloneable {
@@ -113,7 +113,7 @@ public class ResourceItem implements Cloneable {
     // Get/Set methods
     // **********************************************************
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -129,7 +129,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_uuid"
+     *
      * 
      * @return
      */
@@ -142,7 +142,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_version_id"
+     *
      * @return
      */
     public Long getFileVersionId() {
@@ -154,7 +154,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description"
+     *
      * @return
      */
     public String getDescription() {
@@ -166,7 +166,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="ims_schema"
+     *
      * @return
      */
     public String getImsSchema() {
@@ -178,7 +178,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="init_item"
+     *
      * @return
      */
     public String getInitialItem() {
@@ -190,11 +190,11 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.set lazy="false" cascade="all-delete-orphan" inverse="false"
-     *                order-by="sequence_id asc"
-     * @hibernate.collection-key column="item_uid"
-     * @hibernate.collection-one-to-many 
-     *                                   class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction"
+     *
+     *
+     *
+     *
+     *
      * @return
      */
     public Set getItemInstructions() {
@@ -206,7 +206,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="organization_xml" length="65535"
+     *
      * @return
      */
     public String getOrganizationXml() {
@@ -218,7 +218,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     *
      * @return
      */
     public String getTitle() {
@@ -230,7 +230,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="url" length="65535"
+     *
      * @return
      */
     public String getUrl() {
@@ -242,7 +242,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
+     *
      * 
      * @return
      */
@@ -255,7 +255,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_date"
+     *
      * @return
      */
     public Date getCreateDate() {
@@ -267,7 +267,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="create_by_author"
+     *
      * @return
      */
     public boolean isCreateByAuthor() {
@@ -279,7 +279,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="is_hide"
+     *
      * @return
      */
     public boolean isHide() {
@@ -291,7 +291,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="item_type"
+     *
      * @return
      */
     public short getType() {
@@ -303,7 +303,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_type"
+     *
      */
     public String getFileType() {
 	return fileType;
@@ -314,7 +314,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_name"
+     *
      */
     public String getFileName() {
 	return fileName;
@@ -325,7 +325,7 @@ public class ResourceItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="open_url_new_window"
+     *
      * @return
      */
     public boolean isOpenUrlNewWindow() {
@@ -337,7 +337,7 @@ public class ResourceItem implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="order_id"
+     *
      * @return
      */
     public Integer getOrderId() {

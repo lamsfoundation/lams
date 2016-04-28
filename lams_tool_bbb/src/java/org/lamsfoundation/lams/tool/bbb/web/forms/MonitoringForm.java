@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.bbb.web.forms;
 import org.apache.struts.action.ActionForm;
 
 /**
- * @struts.form name="monitoringForm"
+ *
  */
 public class MonitoringForm extends ActionForm {
 

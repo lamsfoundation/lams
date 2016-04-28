@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
 /**
- * @hibernate.class table="tl_lasbmt11_content"
+ *
  * @serial 9072799761861936838L
  */
 public class SubmitFilesContent implements Serializable, Cloneable {
@@ -100,7 +100,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.id generator-class="assigned" type="java.lang.Long" column="content_id"
+     *
      */
     public Long getContentID() {
 	return contentID;
@@ -111,7 +111,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="title" length="64" not-null="true"
+     *
      */
     public String getTitle() {
 	return title;
@@ -122,7 +122,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="instruction" type="text"
+     *
      */
     public String getInstruction() {
 	return instruction;
@@ -158,7 +158,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="define_later" length="1" not-null="true"
+     *
      */
     public boolean isDefineLater() {
 	return defineLater;
@@ -169,7 +169,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="content_in_use" length="1"
+     *
      * @return Returns the contentInUse.
      */
     public boolean isContentInUse() {
@@ -186,7 +186,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
     /**
      * 
-     * @hibernate.property column="lock_on_finished" length="1"
+     *
      * @return Returns the lockOnFinished.
      */
     public boolean isLockOnFinished() {
@@ -221,7 +221,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_instructions"
+     *
      * @return
      */
     public String getReflectInstructions() {
@@ -233,7 +233,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="reflect_on_activity"
+     *
      * @return
      */
     public boolean isReflectOnActivity() {
@@ -245,7 +245,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="limit_upload"
+     *
      * @return
      */
     public boolean isLimitUpload() {
@@ -257,7 +257,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="limit_upload_number"
+     *
      * @return
      */
     public int getLimitUploadNumber() {
@@ -269,7 +269,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="created"
+     *
      * @return
      */
     public Date getCreated() {
@@ -281,7 +281,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one column="created_by" cascade="save-update"
+     *
      * 
      * @return
      */
@@ -294,7 +294,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="updated"
+     *
      * @return
      */
     public Date getUpdated() {
@@ -306,7 +306,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="submission_deadline"
+     *
      * @return
      */
     public Date getSubmissionDeadline() {
@@ -318,7 +318,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="mark_release_notify"
+     *
      * @return
      */
     public boolean isNotifyLearnersOnMarkRelease() {
@@ -330,7 +330,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_submit_notify"
+     *
      * @return
      */
     public boolean isNotifyTeachersOnFileSubmit() {

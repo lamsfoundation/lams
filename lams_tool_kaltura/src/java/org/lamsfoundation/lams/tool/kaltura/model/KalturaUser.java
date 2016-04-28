@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
  * people's names change, they won't change in the "old" tool data.
  * 
- * @hibernate.class table="tl_lakalt11_user"
+ *
  */
 
 public class KalturaUser implements java.io.Serializable, Cloneable {
@@ -135,7 +135,7 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
 
     // Property accessors
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      */
     public Long getUid() {
 	return this.uid;
@@ -146,7 +146,7 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="user_id" length="20"
+     *
      * 
      */
     public Long getUserId() {
@@ -158,7 +158,7 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="last_name" length="255"
+     *
      * 
      */
     public String getLastName() {
@@ -170,7 +170,7 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="login_name" length="255"
+     *
      * 
      */
     public String getLoginName() {
@@ -182,7 +182,7 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="first_name" length="255"
+     *
      * 
      */
     public String getFirstName() {
@@ -194,7 +194,7 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="finishedActivity"
+     *
      */
     public boolean isFinishedActivity() {
 	return finishedActivity;
@@ -205,8 +205,8 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="kaltura_session_uid"
+     *
+     *
      * 
      */
     public KalturaSession getSession() {
@@ -218,7 +218,7 @@ public class KalturaUser implements java.io.Serializable, Cloneable {
     }
     
     /**
-     * @hibernate.many-to-one column="kaltura_uid" cascade="none"
+     *
      */
     public Kaltura getKaltura() {
 	return kaltura;

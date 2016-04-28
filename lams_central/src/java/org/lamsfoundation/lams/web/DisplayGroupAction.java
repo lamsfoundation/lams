@@ -63,8 +63,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jliew
  * 
- * @struts.action path="/displayGroup" validate="false"
- * @struts.action-forward name="group" path="/group.jsp"
+ *
+ *
  */
 public class DisplayGroupAction extends Action {
     private static IUserManagementService service;

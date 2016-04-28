@@ -37,7 +37,7 @@ import org.apache.struts.upload.FormFile;
  * 
  * Record Form.
  * 
- * @struts.form name="recordForm"
+ *
  * @author Marcin Cieslak
  */
 public class RecordForm extends ActionForm {

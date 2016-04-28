@@ -31,7 +31,7 @@ import java.util.Date;
  * 
  * @author Andrey Balan
  *
- * @hibernate.class table="tl_latask10_item_log"
+ *
  */
 public class TaskListItemVisitLog {
 
@@ -43,7 +43,7 @@ public class TaskListItemVisitLog {
     private Long sessionId;
 
     /**
-     * @hibernate.property column="access_date"
+     *
      * @return
      */
     public Date getAccessDate() {
@@ -55,7 +55,7 @@ public class TaskListItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="taskList_item_uid" cascade="none"
+     *
      * @return
      */
     public TaskListItem getTaskListItem() {
@@ -67,7 +67,7 @@ public class TaskListItemVisitLog {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     *
      * @return Returns the log Uid.
      */
     public Long getUid() {
@@ -79,7 +79,7 @@ public class TaskListItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="user_uid" cascade="save-update"
+     *
      * @return
      */
     public TaskListUser getUser() {
@@ -91,7 +91,7 @@ public class TaskListItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="complete"
+     *
      * @return
      */
     public boolean isComplete() {
@@ -103,7 +103,7 @@ public class TaskListItemVisitLog {
     }
 
     /**
-     * @hibernate.property column="session_id"
+     *
      * @return
      */
     public Long getSessionId() {

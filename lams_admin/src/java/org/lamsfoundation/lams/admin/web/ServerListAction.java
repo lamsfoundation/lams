@@ -46,9 +46,9 @@ import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 /**
  * struts doclets
  * 
- * @struts.action path="/serverlist" validate="false"
+ *
  * 
- * @struts.action-forward name="serverlist" path=".serverlist"
+ *
  */
 public class ServerListAction extends Action {
 	

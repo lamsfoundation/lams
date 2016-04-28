@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
  * 
  * CommonCartridge Form.
  * 
- * @struts.form name="commonCartridgeForm"
+ *
  * 
  *              User: Dapeng.Ni
  */

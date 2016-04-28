@@ -31,7 +31,7 @@ import java.io.Serializable;
  * @author Andrey Balan
  * @see java.util.TimeZone
  * 
- * @hibernate.class table="lams_timezone"
+ *
  */
 public class Timezone implements Serializable {
     
@@ -61,7 +61,7 @@ public class Timezone implements Serializable {
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="id"
+     *
      */
     public Long getId() {
 	return this.id;
@@ -73,7 +73,7 @@ public class Timezone implements Serializable {
     /**
      * Timezone id. This value is a copy of <code>java.util.TimeZone<code> ID.
      * 
-     * @hibernate.property column="timezone_id" length="255"
+     *
      */
     public String getTimezoneId() {
 	return this.timezoneId;
@@ -85,7 +85,7 @@ public class Timezone implements Serializable {
     /**
      * If this timezone is server's default one.
      * 
-     * @hibernate.property column="server_timezone" length="1" not-null="true"
+     *
      */    
     public boolean isServerTimezone() {
 	return this.serverTimezone;

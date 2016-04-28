@@ -30,7 +30,7 @@ import org.apache.struts.action.ActionForm;
  * 
  * @author lfoxton
  * 
- * @struts.form name="themeForm"
+ *
  */
 public class ThemeForm extends ActionForm {
 

@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Ruslan Kazakov
- * @hibernate.class table="tl_lamind10_node"
+ *
  */
 public class MindmapNode implements Cloneable {
 	
@@ -64,7 +64,7 @@ public class MindmapNode implements Cloneable {
 	//  **********************************************************
 	
 	/**
-	 * @hibernate.id column="node_id" generator-class="native"
+	 *
 	 */
 	public Long getNodeId() {
 	    return nodeId;
@@ -76,7 +76,7 @@ public class MindmapNode implements Cloneable {
 	
 	/**
 	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="unique_id"
+	 *
 	 */
 	public Long getUniqueId() {
 	    return uniqueId;
@@ -90,7 +90,7 @@ public class MindmapNode implements Cloneable {
 	}
 	
 	/**
-	 * @hibernate.many-to-one column="parent_id"
+	 *
 	 * @return
 	 */
 	public MindmapNode getParent() {
@@ -106,7 +106,7 @@ public class MindmapNode implements Cloneable {
 	
 	/**
 	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="node_text"
+	 *
 	 */
 	public String getText() {
 	    return text;
@@ -121,7 +121,7 @@ public class MindmapNode implements Cloneable {
 	
 	/**
 	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="node_color"
+	 *
 	 */
 	public String getColor() {
 	    return color;
@@ -136,7 +136,7 @@ public class MindmapNode implements Cloneable {
 
 	/**
 	 * @return Returns the sessionid of the session in Mindmap.
-	 * @hibernate.many-to-one column="session_id"
+	 *
 	 */
 	public MindmapSession getSession() {
 	    return session;
@@ -151,7 +151,7 @@ public class MindmapNode implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="user_id"
+	 *
 	 */
 	public MindmapUser getUser() {
 	    return user;
@@ -166,7 +166,7 @@ public class MindmapNode implements Cloneable {
 	
 	/**
 	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="mindmap_id"
+	 *
 	 */
 	public Mindmap getMindmap() {
 	    return mindmap;
