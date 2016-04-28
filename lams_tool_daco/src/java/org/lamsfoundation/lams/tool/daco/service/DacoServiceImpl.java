@@ -259,7 +259,11 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    for (DacoAnswer answer : answers) {
 		if (recordId != answer.getRecordId()) {
 		    recordId = answer.getRecordId();
-		    result.add(record);
+		    /* LDEV-3771: need to check we aren't adding a blank record 
+		     * if there isn't a record for record id 1 due to deletion. */
+		    if ( record.size() > 0) {
+			result.add(record);
+		    }
 		    record = new LinkedList<DacoAnswer>();
 		}
 		record.add(answer);

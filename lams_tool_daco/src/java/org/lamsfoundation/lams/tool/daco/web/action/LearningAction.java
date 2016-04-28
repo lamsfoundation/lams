@@ -311,10 +311,29 @@ public class LearningAction extends Action {
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	sessionMap.put(DacoConstants.ATTR_LEARNING_CURRENT_TAB, 1);
 
+	/* design decision - assume users will not have a lot of records each. If very large record sets 
+	 * we should go to the db and just get the size & the next id, and the record to be updated, 
+	 * rather than manipulating the full list of records.
+	 */
 	List<DacoAnswer> record = null;
 	List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
 	int recordCount = records.size();
 	int displayedRecordNumber = recordForm.getDisplayedRecordNumber();
+
+	/* Cannot use the displayRecordNumber as the new record id as records may be deleted and there will 
+	 * be missing numbers in the recordId sequence. Just using displayRecordNumber will add entries to 
+	 * existing records.
+	 */
+	int nextRecordId = 1;
+	if ( recordCount > 0 ) {
+	    // records should be in recordId order, so find the next record id based on the last record
+	    List<DacoAnswer> lastRecord = records.get(recordCount - 1);
+	    DacoAnswer lastRecordAnswer = lastRecord.get(0);
+	    if ( lastRecordAnswer.getRecordId() >= nextRecordId ) {
+		    nextRecordId = lastRecordAnswer.getRecordId() + 1;
+	    }
+	}
+
 	boolean isEdit = false;
 	if (displayedRecordNumber <= recordCount) {
 	    record = records.get(displayedRecordNumber - 1);
@@ -347,7 +366,7 @@ public class LearningAction extends Action {
 	    } else {
 		answer = new DacoAnswer();
 		answer.setQuestion(question);
-		answer.setRecordId(displayedRecordNumber);
+		answer.setRecordId(nextRecordId);
 		answer.setUser(user);
 	    }
 	    answer.setCreateDate(new Date());
