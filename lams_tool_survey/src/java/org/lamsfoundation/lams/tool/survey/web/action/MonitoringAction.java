@@ -86,7 +86,8 @@ public class MonitoringAction extends Action {
     private static final String MSG_LABEL_OPEN_RESPONSE = "label.open.response";
     private static final String MSG_LABEL_SESSION_NAME = "label.session.name";
     private static final String MSG_LABEL_POSSIBLE_ANSWERS = "message.possible.answers";
-    private static final String MSG_LABEL_LEARNER = "label.learner";
+    private static final String MSG_LABEL_LEARNER_NAME = "monitoring.label.user.name";
+    private static final String MSG_LABEL_LOGIN = "monitoring.label.user.loginname";
 
     public static Logger log = Logger.getLogger(MonitoringAction.class);
 
@@ -428,13 +429,17 @@ public class MonitoringAction extends Action {
 		    int cellIdx = 0;
 		    row = sheet.createRow(idx++);
 		    cell = row.createCell(cellIdx);
-		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_LEARNER));
+		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_LOGIN));
+		    cellIdx++;
+		    cell = row.createCell(cellIdx);
+		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_LEARNER_NAME));
+		    
 		    // increase one more option number if there are open entry option
 		    int optionsNum = options.size();
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			optionsNum++;
 		    }
-		    for (cellIdx = 1; cellIdx <= optionsNum; cellIdx++) {
+		    for (cellIdx = 2; cellIdx <= optionsNum; cellIdx++) {
 			cell = row.createCell(cellIdx);
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + cellIdx);
 		    }
@@ -443,8 +448,12 @@ public class MonitoringAction extends Action {
 		    for (AnswerDTO answer : answers) {
 			row = sheet.createRow(idx++);
 			cellIdx = 0;
+                        cell = row.createCell(cellIdx);
+                        cell.setCellValue(answer.getReplier().getLoginName());
+			cellIdx++;
 			cell = row.createCell(cellIdx);
-			cell.setCellValue(answer.getReplier().getLoginName());
+			cell.setCellValue(answer.getReplier().getLastName() + ", " + answer.getReplier().getFirstName());
+
 			// for answer's options
 			for (SurveyOption option : options) {
 			    cellIdx++;
