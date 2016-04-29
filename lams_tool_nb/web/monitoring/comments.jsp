@@ -23,9 +23,7 @@
 	<c:set var="title"><fmt:message key="activity.title" />: <fmt:message key="label.view.comments" /></c:set>
 	<lams:Page title="${title}" type="learner">
 
-	<div id="content">
-		<lams:Comments toolSessionId="${requestScope.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" mode="teacher"/>
-	</div>
+	<lams:Comments toolSessionId="${requestScope.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" mode="teacher"/>
 	
 	</lams:Page>
 	

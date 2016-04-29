@@ -2,7 +2,7 @@
 <!-- Basic Tab Content  -->
 <div class="form-group">
     <label for="title"><fmt:message key="basic.title"/></label>
-    <html:text property="title" style="width: 99%;"/>
+    <html:text property="title" styleClass="form-control"/>
 </div>
 
 <div class="form-group">
