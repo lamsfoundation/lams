@@ -1351,9 +1351,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	}
 
-	row = new ExcelCell[9 + (maxAnswers * 2)];
+	row = new ExcelCell[10 + (maxAnswers * 2)];
 	columnCount = 0;
 	row[columnCount++] = new ExcelCell(getMessage("label.student.name"), true);
+	row[columnCount++] = new ExcelCell(getMessage("label.student.username"), true);
 	row[columnCount++] = new ExcelCell(getMessage("label.team"), true);
 	row[columnCount++] = new ExcelCell(getMessage("label.question.number"), true);
 	row[columnCount++] = new ExcelCell(getMessage("label.question"), true);
@@ -1384,10 +1385,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		int questionCount = 1;
 		for (ScratchieItem item : summary.getItems()) {
 
-		    row = new ExcelCell[9 + (maxAnswers * 2)];
+		    row = new ExcelCell[10 + (maxAnswers * 2)];
 		    columnCount = 0;
-		    // user name
+		    // learner name
 		    row[columnCount++] = new ExcelCell(user.getFirstName() + " " + user.getLastName(), false);
+		    // username
+		    row[columnCount++] = new ExcelCell(user.getLoginName(), false);
 		    // group name
 		    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
 		    // question number
