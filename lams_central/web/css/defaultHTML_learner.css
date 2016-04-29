@@ -58,6 +58,9 @@ LAMS Learner Style
 .loffset10 {
   margin-left: 10px;
 }
+.loffset20 {
+  margin-left: 20px;
+}
 /* Comments/Forum classes */
 .msg .panel-heading {
   padding: 3px;

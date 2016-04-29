@@ -56,9 +56,9 @@
 	</lams:head>
 	<body>
 		
+			<div class="voffset10">
 			<c:if test='${not sessionMap.readOnly}'>
-              <hr>
-              <div class="comments voffset10"> 
+              <div class="comments"> 
 			<%@ include file="new.jsp"%>
               </div>
 			</c:if>
@@ -72,5 +72,6 @@
 			<div id="commentDiv">
 			<%@ include file="allview.jsp"%>
 			</div>	
+			</div>
 	</body>
 </lams:html>
