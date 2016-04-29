@@ -52,7 +52,8 @@
 		</c:if>
 
 		<c:if test="${allowComments}">
-			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}"
+			<hr/>
+			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" 
 				toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" />
 		</c:if>
 

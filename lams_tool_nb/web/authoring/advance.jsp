@@ -4,14 +4,15 @@
 
 <lams:CommentsAuthor/>
 
-<div class="form-group">
+<div class="checkbox">
+	<label for="reflectOnActivity">
     <html:checkbox property="reflectOnActivity" value="1"
 		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
-	<label for="reflectOnActivity">&nbsp;
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
-	<BR/>
-	<html:textarea property="reflectInstructions" cols="60" rows="3"  styleId="reflectInstructions"/>
+</div>
+<div class="form-group">
+	<html:textarea property="reflectInstructions" cols="60" rows="3"  styleId="reflectInstructions" styleClass="form-control"/>
 </div>
 
 <script type="text/javascript">
