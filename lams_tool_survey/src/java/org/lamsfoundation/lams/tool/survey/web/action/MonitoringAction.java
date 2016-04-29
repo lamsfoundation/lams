@@ -434,14 +434,13 @@ public class MonitoringAction extends Action {
 		    cell = row.createCell(cellIdx);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_LEARNER_NAME));
 		    
-		    // increase one more option number if there are open entry option
 		    int optionsNum = options.size();
-		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-			optionsNum++;
-		    }
-		    for (cellIdx = 2; cellIdx <= optionsNum; cellIdx++) {
+
+		    int iterOpts;
+		    for (iterOpts = 1; iterOpts <= optionsNum; iterOpts++) {
+			cellIdx++;
 			cell = row.createCell(cellIdx);
-			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + cellIdx);
+			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + iterOpts);
 		    }
 
 		    // display all users' answers for this question in multiple rows
