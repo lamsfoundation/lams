@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -827,6 +827,8 @@ public class SVGGenerator {
 	if (style != null) {
 	    textNode.setAttributeNS(null, "style", style);
 	}
+	textNode.setAttributeNS(null, "stroke", "#3b3b3b");
+	textNode.setAttributeNS(null, "stroke-width", "0.01");
 
 	g.appendChild(textNode);
     }
