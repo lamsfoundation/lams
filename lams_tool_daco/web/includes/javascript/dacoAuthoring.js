@@ -1,11 +1,6 @@
 	//"Div" area that holds the answer options
 	var answerOptionTargetDiv = "#answerOptionsArea";
 	
-	//Initial behavior
-	$(document).ready(function() {
-		defaultShowAdditionaOptionsArea();
-	});
-	
 	//Checks if the element exists and has an empty value
 	function checkNonDefaultValue(elementName){
 	    var elem = document.getElementById(elementName);
