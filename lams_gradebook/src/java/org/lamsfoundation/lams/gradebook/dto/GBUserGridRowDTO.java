@@ -38,8 +38,10 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     private String activityUrl;
     
     // For excel export
+    private Date finishDate;
     private String firstName;
     private String lastName;
+    private String login;
     private String currentActivity;
 
     public GBUserGridRowDTO() {
@@ -50,6 +52,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	this.rowName = StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
+	this.login = user.getLogin();
     }
 
     @Override
@@ -118,6 +121,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	this.lastName = lastName;
     }
     
+    public String getLogin() {
+	return login;
+    }
+
+    public void setLogin(String login) {
+	this.login = login;
+    }
+    
     public String getCurrentActivity() {
 	return currentActivity;
     }
@@ -132,6 +143,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public void setStartDate(Date startTime) {
         this.startDate = startTime;
+    }
+    
+    public Date getFinishDate() {
+        return finishDate;
+    }
+
+    public void setFinishDate(Date finishDate) {
+        this.finishDate = finishDate;
     }
 
 }
