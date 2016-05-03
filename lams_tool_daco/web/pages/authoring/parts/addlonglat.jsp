@@ -12,10 +12,11 @@
 	<script type="text/javascript">
 	   var msgShowAdditionalOptions = "<fmt:message key='label.authoring.basic.additionaloptions.show' />";
        var msgHideAdditionalOptions = "<fmt:message key='label.authoring.basic.additionaloptions.hide' />";
+	   	//Initial behavior
+	   	$(document).ready(function() {
+	   		defaultShowAdditionaOptionsArea();
+	   	});
 	</script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoAuthoring.js'/>"></script>
-
 </lams:head>
 <body class="tabpart">
 
