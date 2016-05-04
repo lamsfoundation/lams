@@ -25,8 +25,11 @@
 	if (login!=null) { 
 		session.removeAttribute("login");
 		response.sendRedirect("j_security_check?j_username="+login+"&j_password=dummy");
-	} 
+	}
 %>
+
+<%-- Optional Module Placeholder - do not remove --%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <lams:html>
 <!--
