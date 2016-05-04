@@ -8,6 +8,8 @@
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.dto.UserDTO"%>
 
+<%-- Optional Module Placeholder - do not remove --%>
+
 <c:if test="${empty requestScope.login}">
 	<c:set var="login" value="${sessionScope.login}" />
 	<c:set var="password" value="${sessionScope.password}" />
