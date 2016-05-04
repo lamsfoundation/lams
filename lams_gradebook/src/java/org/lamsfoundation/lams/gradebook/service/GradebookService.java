@@ -889,6 +889,7 @@ public class GradebookService implements IGradebookService {
     @Override
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId) {
+	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
 	// The entire data list
@@ -899,7 +900,7 @@ public class GradebookService implements IGradebookService {
 
 	if ((lessons != null) && (lessons.size() > 0)) {
 
-	    int numberOfCellsInARow = 3 + (lessons.size() * 4);
+	    int numberOfCellsInARow = 3 + (lessons.size() * 6);
 
 	    // Adding the user lesson marks to the summary----------------------
 	    ExcelCell[] lessonsNames = new ExcelCell[numberOfCellsInARow];
@@ -910,6 +911,8 @@ public class GradebookService implements IGradebookService {
 	    for (Lesson lesson : lessons) {
 		lessonsNames[i++] = new ExcelCell(messageService.getMessage("gradebook.exportcourse.lesson",
 			new Object[] { lesson.getLessonName() }), true);
+		lessonsNames[i++] = new ExcelCell("", false);
+		lessonsNames[i++] = new ExcelCell("", false);
 		lessonsNames[i++] = new ExcelCell("", false);
 		lessonsNames[i++] = new ExcelCell("", false);
 		lessonsNames[i++] = new ExcelCell("", false);
@@ -924,6 +927,8 @@ public class GradebookService implements IGradebookService {
 	    headerRow[i++] = new ExcelCell(getMessage("gradebook.export.login"), true);
 	    for (Lesson lesson : lessons) {
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.columntitle.startDate"), false);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.columntitle.completeDate"), false);
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.exportcourse.lessonFeedback"), true);
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
@@ -940,13 +945,9 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	    // Fetching the user data
-	    List<LearnerProgress> learnerProgresses;
-	    List<GradebookUserLesson> gradebookUserLessons;
-	    if (allLearners.isEmpty()) {
-		learnerProgresses = new LinkedList<LearnerProgress>();
-		gradebookUserLessons = new LinkedList<GradebookUserLesson>();
-		
-	    } else {
+	    List<LearnerProgress> learnerProgresses = new LinkedList<LearnerProgress>();
+	    List<GradebookUserLesson> gradebookUserLessons = new LinkedList<GradebookUserLesson>();
+	    if (!allLearners.isEmpty()) {
 		learnerProgresses = learnerProgressDAO.getLearnerProgressForLessons(lessonIds);
 		gradebookUserLessons = gradebookDAO.getGradebookUserLessons(lessonIds);
 	    }
@@ -964,6 +965,11 @@ public class GradebookService implements IGradebookService {
 
 		for (Lesson lesson : lessons) {
 		    GBUserGridRowDTO userDto = new GBUserGridRowDTO(learner);
+		    String startDate = "";
+		    String finishDate = "";
+		    Long timeTakenSeconds = null;
+		    Double mark = null;
+		    String feedback = "";
 
 		    // check if learner is participating in this lesson
 		    if (lesson.getAllLearners().contains(learner)) {
@@ -977,19 +983,27 @@ public class GradebookService implements IGradebookService {
 			    }
 			}
 			
-			// Setting the status for the user's lesson
+			// status for the user's lesson
 			userDto.setStatus(getLessonStatusStr(learnerProgress));
-
-			// set current activity if available
 			if ((learnerProgress != null) && (learnerProgress.getCurrentActivity() != null)) {
 			    userDto.setCurrentActivity(learnerProgress.getCurrentActivity().getTitle());
+			}
+			
+			// start date
+			if ((learnerProgress != null) && (learnerProgress.getStartDate() != null)) {
+			    startDate = cellDateFormat.format(learnerProgress.getStartDate());
+			}
+
+			// finish date
+			if ((learnerProgress != null) && (learnerProgress.getFinishDate() != null)) {
+			    finishDate = cellDateFormat.format(learnerProgress.getFinishDate());
 			}
 
 			// calculate time taken
 			if (learnerProgress != null) {
 			    if ((learnerProgress.getStartDate() != null) && (learnerProgress.getFinishDate() != null)) {
-				userDto.setTimeTaken(learnerProgress.getFinishDate().getTime()
-					- learnerProgress.getStartDate().getTime());
+				timeTakenSeconds = learnerProgress.getFinishDate().getTime()
+					- learnerProgress.getStartDate().getTime();
 			    }
 			}
 			
@@ -1003,8 +1017,8 @@ public class GradebookService implements IGradebookService {
 			}
 
 			if (gradebookUserLesson != null) {
-			    userDto.setMark(gradebookUserLesson.getMark());
-			    userDto.setFeedback(gradebookUserLesson.getFeedback());
+			    mark = gradebookUserLesson.getMark();
+			    feedback = gradebookUserLesson.getFeedback();
 			}
 		    } else {
 			userDto.setStatus("n/a");
@@ -1012,9 +1026,11 @@ public class GradebookService implements IGradebookService {
 		    
 		    //all of GBUserGridRowDTOs will be displayed on 1 line on course export.
 		    userDataRow[i++] = new ExcelCell(getProgressMessage(userDto), false);
-		    userDataRow[i++] = new ExcelCell(userDto.getTimeTakenSeconds(), false);
-		    userDataRow[i++] = new ExcelCell(userDto.getFeedback(), false);
-		    userDataRow[i++] = new ExcelCell(userDto.getMark(), false);
+		    userDataRow[i++] = new ExcelCell(startDate, false);
+		    userDataRow[i++] = new ExcelCell(finishDate, false);
+		    userDataRow[i++] = new ExcelCell(timeTakenSeconds, false);
+		    userDataRow[i++] = new ExcelCell(feedback, false);
+		    userDataRow[i++] = new ExcelCell(mark, false);
 		}
 
 		rowList.add(userDataRow);
@@ -1029,6 +1045,7 @@ public class GradebookService implements IGradebookService {
     @Override
     public LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
 	    String[] lessonIds) {
+	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
 	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationId);
@@ -1068,6 +1085,16 @@ public class GradebookService implements IGradebookService {
 	}
 
 	if (!selectedLessons.isEmpty()) {
+	    
+	    // Fetching the user data
+	    List<Long> lessonIdLongs = new LinkedList<Long>();
+	    for (String lessonId : lessonIds) {
+		lessonIdLongs.add(Long.valueOf(lessonId));
+	    }
+	    List<LearnerProgress> learnerProgresses = new LinkedList<LearnerProgress>();
+	    if (!allLearners.isEmpty()) {
+		learnerProgresses = learnerProgressDAO.getLearnerProgressForLessons(lessonIdLongs);
+	    }
 
 	    Map<Long, Long> activityToTotalMarkMap = getActivityToTotalMarkMap(allActivities);
 
@@ -1077,7 +1104,7 @@ public class GradebookService implements IGradebookService {
 		activityTouserToGradebookUserActivityMap.put(activity.getActivityId(), userToGradebookUserActivityMap);
 	    }
 
-	    int numberCellsPerRow = (selectedLessons.size() * 7) + (allActivities.size() * 2) + 5;
+	    int numberCellsPerRow = (selectedLessons.size() * 9) + (allActivities.size() * 2) + 5;
 
 	    // Lesson names row----------------------
 	    ExcelCell[] lessonsNames = new ExcelCell[numberCellsPerRow];
@@ -1086,7 +1113,7 @@ public class GradebookService implements IGradebookService {
 		Set<ToolActivity> lessonActivities = lessonActivitiesMap.get(lesson.getLessonId());
 		int numberActivities = lessonActivities.size();
 		lessonsNames[i + numberActivities] = new ExcelCell(lesson.getLessonName(), true);
-		i += 6 + (numberActivities * 2);
+		i += 9 + (numberActivities * 2);
 	    }
 	    i -= 2;
 	    lessonsNames[i++] = new ExcelCell("", ExcelCell.BORDER_STYLE_LEFT_THIN);
@@ -1104,6 +1131,8 @@ public class GradebookService implements IGradebookService {
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.first.name"), false);
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.login"), false);
 		headerRow[i++] = new ExcelCell(getMessage("label.group"), false);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.columntitle.startDate"), false);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.columntitle.completeDate"), false);
 
 		Set<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
 		for (Activity activity : activities) {
@@ -1136,6 +1165,7 @@ public class GradebookService implements IGradebookService {
 		    Double lessonMaxMark = 0d;
 		    Set<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
 
+		    //first, last names and login
 		    String lastName = (learner.getLastName() == null) ? "" : learner.getLastName().toUpperCase();
 		    userRow[i++] = new ExcelCell(lastName, false);
 		    String firstName = (learner.getFirstName() == null) ? "" : learner.getFirstName().toUpperCase();
@@ -1151,7 +1181,7 @@ public class GradebookService implements IGradebookService {
 			continue;
 		    }
 
-		    // getUserGroupName
+		    // group name
 		    String groupName = "";
 		    for (Group group : (Set<Group>) lesson.getLessonClass().getGroups()) {
 			if (group.hasLearner(learner)) {
@@ -1160,6 +1190,21 @@ public class GradebookService implements IGradebookService {
 			}
 		    }
 		    userRow[i++] = new ExcelCell(groupName, false);
+		    
+		    //start and complete dates
+		    LearnerProgress learnerProgress = null;
+		    for (LearnerProgress learnerProgressIter : learnerProgresses) {
+			if (learnerProgressIter.getUser().getUserId().equals(learner.getUserId())
+				&& learnerProgressIter.getLesson().getLessonId().equals(lesson.getLessonId())) {
+			    learnerProgress = learnerProgressIter;
+			}
+		    }
+		    String startDate = (learnerProgress == null || learnerProgress.getStartDate() == null) ? ""
+			    : cellDateFormat.format(learnerProgress.getStartDate());
+		    userRow[i++] = new ExcelCell(startDate, false);
+		    String finishDate = (learnerProgress == null || learnerProgress.getFinishDate() == null) ? ""
+			    : cellDateFormat.format(learnerProgress.getFinishDate());
+		    userRow[i++] = new ExcelCell(finishDate, false);
 
 		    for (ToolActivity activity : activities) {
 			Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = activityTouserToGradebookUserActivityMap
