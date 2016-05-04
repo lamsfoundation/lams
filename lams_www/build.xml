@@ -5,43 +5,6 @@
 	<import file="../lams_build/build_base.xml"/> 
 
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
-	<target name="_copy-war-resources">
-		<!-- Internal target: Adds additional web content to WAR -->
-		<echo>${ant.project.name}: Copying additional resources for WAR</echo>
-	 	<copy todir="${basedir}/build/war/WEB-INF">
-			<fileset dir="${conf.web.dir}/WEB-INF">
-				<include name="*.xml"/>
-			</fileset>
-	 	</copy>
-			
-		<copy todir="${basedir}/build/war/assembly/images">
-			<fileset dir="${conf.dir}/lams">
-				<include name="*.swf" />
-			</fileset>
-		</copy>
-		
-		<copy todir="${basedir}/build/war/assembly">
-			<fileset dir="${conf.dir}/lams">
-				<include name="news.html" />
-			</fileset>
-		</copy>
-	</target>
-		
-		
-	<target name="_build-war"
-			depends="_clean-dirs, _build-manifest, _copy-war-resources, _copy-jsp">
-		<!-- Internal target: Creates WAR file. -->	
-		<echo>${ant.project.name}: Building WAR</echo>
-		<war warfile="${basedir}/build/lib/${product}.war" 
-  		     webxml="${basedir}/build/war/WEB-INF/web.xml"
-			 manifest="${basedir}/build/MANIFEST.MF">
-			<fileset dir="${basedir}/build/war/assembly">
-				<include name="**" />
-			</fileset>
-		</war>
-	</target>
-	
-
 	<target name="deploy-jar" depends="_target-not-available" description="Deploys JAR." />
 	
 	
