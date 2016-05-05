@@ -263,6 +263,10 @@ nav.navbar-heading {
 	color:#337ab7 !important;
 }
 
+.navbar-text {
+	cursor: pointer;
+}
+
 /** CKEditor Inline */
 .cke_textarea_inline {
   /* From bootstrap form-control */
