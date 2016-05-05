@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -35,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -56,17 +57,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import org.apache.commons.codec.binary.Base64;
-
 /**
  * ConfigAction
- * 
+ *
  * @author Mitchell Seaton, edited by Luke Foxton
  */
 
 /**
  * struts doclets
- * 
+ *
  * @struts.action path="/register" parameter="method" name="RegisterForm"
  *                input=".register" scope="request" validate="false"
  * @struts.action-forward name="register" path=".register"
@@ -84,6 +83,7 @@ public class RegisterAction extends LamsDispatchAction {
     private static IUserManagementService userManagementService;
     private Configuration configurationService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -101,21 +101,20 @@ public class RegisterAction extends LamsDispatchAction {
 
 	configurationService = getConfiguration();
 
-	Registration reg = configurationService.getRegistration();
+	Registration reg = Configuration.getRegistration();
 	if (reg == null) {
 	    reg = new Registration();
 	    reg.setPublicDirectory(true);
 	}
 	updateForm(registerForm, reg);
 
-	
 	RegisterDTO registerDTO = new RegisterDTO();
 
-	// Get Server statistics for registration 
+	// Get Server statistics for registration
 	List groups = userManagementService.findByProperty(Organisation.class, "organisationType.organisationTypeId",
 		OrganisationType.COURSE_TYPE);
-	List subgroups = userManagementService.findByProperty(Organisation.class,
-		"organisationType.organisationTypeId", OrganisationType.CLASS_TYPE);
+	List subgroups = userManagementService.findByProperty(Organisation.class, "organisationType.organisationTypeId",
+		OrganisationType.CLASS_TYPE);
 
 	registerDTO.setGroupNumber(Integer.valueOf(groups.size()));
 	registerDTO.setSubgroupNumber(Integer.valueOf(subgroups.size()));
@@ -131,7 +130,7 @@ public class RegisterAction extends LamsDispatchAction {
 	registerDTO.setServerBuild(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
 	registerDTO.setServerLocale(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
 	registerDTO.setServerLanguageDate(Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED));
-	
+
 	request.setAttribute("registerDTO", registerDTO);
 
 	return mapping.findForward("register");
@@ -157,7 +156,7 @@ public class RegisterAction extends LamsDispatchAction {
 	registerForm.setSiteName(reg.getSiteName());
 	registerForm.setOrganisation(reg.getOrganisation());
 	registerForm.setServerCountry(reg.getServerCountry());
-	
+
 	registerForm.setPublicDirectory(reg.isPublicDirectory());
 	registerForm.setEnableLamsCommunityIntegration(reg.isEnableLamsCommunityIntegration());
     }
@@ -180,15 +179,15 @@ public class RegisterAction extends LamsDispatchAction {
 
 	// get the default registration if there is any
 	configurationService = getConfiguration();
-	Registration reg = configurationService.getRegistration();
+	Registration reg = Configuration.getRegistration();
 
 	if (reg == null) {
 	    reg = new Registration();
 	}
 	updateRegistration(registerForm, reg);
-	
+
 	if (reg.getServerKey() == null) {
-	   
+
 	    String url = LAMS_COMMUNITY_REGISTER_URL;
 
 	    HashMap<String, String> params = new HashMap<String, String>();
@@ -198,18 +197,16 @@ public class RegisterAction extends LamsDispatchAction {
 	    params.put("remail", URLEncoder.encode(registerForm.getEmail(), "UTF8"));
 	    params.put("servercountry", URLEncoder.encode(registerForm.getServerCountry(), "UTF8"));
 	    params.put("public", "" + registerForm.isPublicDirectory());
-	    
-	    
-	    
+
 	    params.put("serverurl", URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_URL), "UTF8"));
 	    params.put("serverversion", URLEncoder.encode(Configuration.get(ConfigurationKeys.VERSION), "UTF8"));
-	    params.put("serverbuild", URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER),
-		    "UTF8"));
+	    params.put("serverbuild",
+		    URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER), "UTF8"));
 	    params.put("serverlocale", URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE), "UTF8"));
-	    params.put("langdate", URLEncoder.encode(Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED),
-		    "UTF8"));
+	    params.put("langdate",
+		    URLEncoder.encode(Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED), "UTF8"));
 
-	    // Get Server statistics for registration 
+	    // Get Server statistics for registration
 	    List groups = userManagementService.findByProperty(Organisation.class,
 		    "organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
 	    List subgroups = userManagementService.findByProperty(Organisation.class,
@@ -230,28 +227,22 @@ public class RegisterAction extends LamsDispatchAction {
 	    BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
 	    String str = isReader.readLine();
 	    log.debug("Response from lamscommunity: " + str);
-	    
+
 	    // get the serverId,serverKey pair result back from lamscommunity
-	    if (str!=null)
-	    {
+	    if (str != null) {
 		String result[] = str.split(",");
-		
-		if (result.length == 2 && result[0].equals("success"))
-		{
-		    String decrypted = decrypt(result[1], LAMS_COMMUNITY_KEY);
+
+		if (result.length == 2 && result[0].equals("success")) {
+		    String decrypted = RegisterAction.decrypt(result[1], LAMS_COMMUNITY_KEY);
 		    String decryptedResult[] = decrypted.split(",");
 		    reg.setServerKey(decryptedResult[0]);
 		    reg.setServerID(decryptedResult[1]);
-		    configurationService.saveOrUpdateRegistration(reg);
+		    Configuration.saveOrUpdateRegistration(reg);
 		    request.setAttribute("successKey", "register.success");
-		}
-		else
-		{
+		} else {
 		    request.setAttribute("errorKey", "register.error.registrationFailed");
 		}
-	    }
-	    else
-	    {
+	    } else {
 		request.setAttribute("errorKey", "register.error.noResponseFromLamsCommunity");
 	    }
 	}
@@ -261,29 +252,31 @@ public class RegisterAction extends LamsDispatchAction {
 
     private Configuration getConfiguration() {
 	if (configurationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    configurationService = (Configuration) ctx.getBean("configurationService");
 
 	}
 	return configurationService;
     }
-    
-    public static String decrypt(String text, String password) throws Exception{
+
+    public static String decrypt(String text, String password) throws Exception {
 	Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-	
+
 	//setup key
-	byte[] keyBytes= new byte[16];
-	byte[] b= password.getBytes("UTF-8");
-	int len= b.length; 
-	if (len > keyBytes.length) len = keyBytes.length;
+	byte[] keyBytes = new byte[16];
+	byte[] b = password.getBytes("UTF-8");
+	int len = b.length;
+	if (len > keyBytes.length) {
+	    len = keyBytes.length;
+	}
 	System.arraycopy(b, 0, keyBytes, 0, len);
 	SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
 	IvParameterSpec ivSpec = new IvParameterSpec(keyBytes);
-	cipher.init(Cipher.DECRYPT_MODE,keySpec,ivSpec);
-	
-	byte [] results = cipher.doFinal(Base64.decodeBase64(text.getBytes()));
-	return new String(results,"UTF-8");
+	cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+
+	byte[] results = cipher.doFinal(Base64.decodeBase64(text.getBytes()));
+	return new String(results, "UTF-8");
     }
 
 }

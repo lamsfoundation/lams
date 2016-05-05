@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,19 +25,20 @@ package org.lamsfoundation.lams.admin.web.form;
 import org.apache.struts.action.ActionForm;
 
 /**
- * 
+ *
  * Form for theme management
- * 
+ *
  * @author lfoxton
- * 
+ *
  * @struts.form name="themeForm"
  */
 public class ThemeForm extends ActionForm {
 
     private static final long serialVersionUID = -3127221000563399156L;
-    
-    public ThemeForm() {}
-   
+
+    public ThemeForm() {
+    }
+
     private String method;
     private Long id;
     private String name;
@@ -47,47 +48,61 @@ public class ThemeForm extends ActionForm {
     private String type;
 
     public String getMethod() {
-        return method;
+	return method;
     }
+
     public void setMethod(String method) {
-        this.method = method;
+	this.method = method;
     }
+
     public Long getId() {
-        return id;
+	return id;
     }
+
     public void setId(Long id) {
-        this.id = id;
+	this.id = id;
     }
+
     public String getName() {
-        return name;
+	return name;
     }
+
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
+
     public String getDescription() {
-        return description;
+	return description;
     }
+
     public void setDescription(String description) {
-        this.description = description;
+	this.description = description;
     }
+
     public String getImageDirectory() {
-        return imageDirectory;
+	return imageDirectory;
     }
+
     public void setImageDirectory(String imageDirectory) {
-        this.imageDirectory = imageDirectory;
+	this.imageDirectory = imageDirectory;
     }
+
     public Boolean getCurrentDefaultTheme() {
-        return currentDefaultTheme;
+	return currentDefaultTheme;
     }
+
     public void setCurrentDefaultTheme(Boolean currentDefaultTheme) {
-        this.currentDefaultTheme = currentDefaultTheme;
+	this.currentDefaultTheme = currentDefaultTheme;
     }
+
     public String getType() {
-        return type;
+	return type;
     }
+
     public void setType(String type) {
-        this.type = type;
+	this.type = type;
     }
+
     public void clear() {
 	this.method = null;
 	this.id = null;
@@ -98,4 +113,3 @@ public class ThemeForm extends ActionForm {
 	this.type = null;
     }
 }
-	

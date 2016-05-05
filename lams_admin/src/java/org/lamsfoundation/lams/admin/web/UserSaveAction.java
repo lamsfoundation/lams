@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,8 +25,6 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +41,6 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -54,15 +51,15 @@ import org.lamsfoundation.lams.util.ValidationUtil;
 
 /**
  * @author Jun-Dir Liew
- * 
+ *
  * Created at 12:35:38 on 14/06/2006
  */
 
 /**
  * struts doclets
- * 
+ *
  * @struts:action path="/usersave" name="UserForm" input=".user" scope="request" validate="false"
- * 
+ *
  * @struts:action-forward name="user" path="/user.do?method=edit"
  * @struts:action-forward name="userlist" path="/usermanage.do"
  * @struts:action-forward name="userroles" path="/userroles.do"
@@ -90,8 +87,8 @@ public class UserSaveAction extends Action {
 	Boolean passwordChanged = true;
 	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class,
 		(Integer) userForm.get("localeId"));
-	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service.findById(
-		AuthenticationMethod.class, (Integer) userForm.get("authenticationMethodId"));
+	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service
+		.findById(AuthenticationMethod.class, (Integer) userForm.get("authenticationMethodId"));
 	UserSaveAction.log.debug("locale: " + locale);
 	UserSaveAction.log.debug("authenticationMethod:" + authenticationMethod);
 
@@ -122,9 +119,8 @@ public class UserSaveAction extends Action {
 		if ((user != null) && StringUtils.equals(user.getLogin(), login)) {
 		    // login exists - it's the user's current login
 		} else {
-		    errors.add("login",
-			    new ActionMessage("error.login.unique", "(" + login + ", ID: " + existingUser.getUserId()
-				    + ")"));
+		    errors.add("login", new ActionMessage("error.login.unique",
+			    "(" + login + ", ID: " + existingUser.getUserId() + ")"));
 		}
 	    }
 	}
@@ -140,7 +136,7 @@ public class UserSaveAction extends Action {
 		errors.add("password", new ActionMessage("error.password.required"));
 	    }
 	}
-	
+
 	//first name validation
 	String firstName = (userForm.get("firstName") == null) ? null : (String) userForm.get("firstName");
 	if (StringUtils.isBlank(firstName)) {
@@ -148,7 +144,7 @@ public class UserSaveAction extends Action {
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
 	}
-	
+
 	//last name validation
 	String lastName = (userForm.get("lastName") == null) ? null : (String) userForm.get("lastName");
 	if (StringUtils.isBlank(lastName)) {
@@ -156,7 +152,7 @@ public class UserSaveAction extends Action {
 	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.invalid.characters"));
 	}
-	
+
 	//user email validation
 	String userEmail = (userForm.get("email") == null) ? null : (String) userForm.get("email");
 	if (StringUtils.isBlank(userEmail)) {
@@ -200,8 +196,9 @@ public class UserSaveAction extends Action {
 		    user.setHtmlTheme(UserSaveAction.service.getDefaultHtmlTheme());
 		    user.setDisabledFlag(false);
 		    user.setCreateDate(new Date());
-		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service.findByProperty(
-			    AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database").get(0));
+		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service
+			    .findByProperty(AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database")
+			    .get(0));
 		    user.setUserId(null);
 		    user.setLocale(locale);
 

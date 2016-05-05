@@ -26,6 +26,6 @@ package org.lamsfoundation.lams.admin;
 
 public class AdminConstants {
 
-	public static final String MODULE_NAME = "admin";
-	
+    public static final String MODULE_NAME = "admin";
+
 }

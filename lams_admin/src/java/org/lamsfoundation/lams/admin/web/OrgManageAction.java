@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -61,13 +61,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- * 
- * @struts:action path="/orgmanage" parameter="dispatch" name="OrgManageForm" input=".orglist" scope="request" validate="false"
+ *
+ * @struts:action path="/orgmanage" parameter="dispatch" name="OrgManageForm" input=".orglist" scope="request"
+ *                validate="false"
  *
  * @struts:action-forward name="orglist" path=".orglist"
  */
 public class OrgManageAction extends LamsDispatchAction {
-    
+
     private static IUserManagementService userManagementService;
 
     @SuppressWarnings("unchecked")
@@ -75,7 +76,7 @@ public class OrgManageAction extends LamsDispatchAction {
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	initServices();
-	
+
 	// Get organisation whose child organisations we will populate the OrgManageForm with
 	Integer orgId = WebUtil.readIntParam(request, "org", true);
 	if (orgId == null) {
@@ -156,14 +157,14 @@ public class OrgManageAction extends LamsDispatchAction {
 	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 	return mapping.findForward("orglist");
     }
-    
+
     /**
      * Returns list of organisations for .
      */
     public ActionForward getOrgs(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	initServices();
-	
+
 	Integer parentOrgId = WebUtil.readIntParam(request, "parentOrgId");
 	Integer stateId = WebUtil.readIntParam(request, "stateId");
 	Integer typeIdParam = WebUtil.readIntParam(request, "type");
@@ -193,7 +194,7 @@ public class OrgManageAction extends LamsDispatchAction {
 	} else if (isSort3 != null) {
 	    sortBy = "code";
 	    sortOrder = isSort3.equals(0) ? "ASC" : "DESC";
-	    
+
 	} else if (isSort4 != null) {
 	    sortBy = "description";
 	    sortOrder = isSort4.equals(0) ? "ASC" : "DESC";
@@ -212,11 +213,11 @@ public class OrgManageAction extends LamsDispatchAction {
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("id", organisation.getOrganisationId());
-	    String orgName = organisation.getName() == null ? "" : organisation.getName(); 
+	    String orgName = organisation.getName() == null ? "" : organisation.getName();
 	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
-	    String orgCode = organisation.getCode() == null ? "" : organisation.getCode(); 
+	    String orgCode = organisation.getCode() == null ? "" : organisation.getCode();
 	    responseRow.put("code", StringEscapeUtils.escapeHtml(orgCode));
-	    String orgDescription = organisation.getDescription() == null ? "" : organisation.getDescription(); 
+	    String orgDescription = organisation.getDescription() == null ? "" : organisation.getDescription();
 	    responseRow.put("description", StringEscapeUtils.escapeHtml(orgDescription));
 
 	    rows.put(responseRow);
@@ -226,11 +227,11 @@ public class OrgManageAction extends LamsDispatchAction {
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
     }
-    
+
     private void initServices() {
 	if (userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 	    userManagementService = (UserManagementService) ctx.getBean("userManagementService");
 	}
     }

@@ -32,24 +32,24 @@ import org.apache.struts.upload.FormFile;
  * @struts.form name="ImportExcelForm"
  */
 public class ImportExcelForm extends ActionForm {
-	
-	private Integer orgId;
-	private FormFile file;
-	
-	public Integer getOrgId() {
-		return orgId;
-	}
-	
-	public void setOrgId(Integer orgId) {
-		this.orgId = orgId;
-	}
-	
-	public FormFile getFile() {
-		return file;
-	}
-	
-	public void setFile(FormFile file) {
-		this.file = file;
-	}
+
+    private Integer orgId;
+    private FormFile file;
+
+    public Integer getOrgId() {
+	return orgId;
+    }
+
+    public void setOrgId(Integer orgId) {
+	this.orgId = orgId;
+    }
+
+    public FormFile getFile() {
+	return file;
+    }
+
+    public void setFile(FormFile file) {
+	this.file = file;
+    }
 
 }

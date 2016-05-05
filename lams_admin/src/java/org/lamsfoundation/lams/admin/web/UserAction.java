@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -65,14 +65,14 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author Jun-Dir Liew
- * 
+ *
  * Created at 17:00:18 on 13/06/2006
  */
 
 /**
  * @struts:action path="/user" name="UserForm" scope="request"
  *                parameter="method" validate="false"
- * 
+ *
  * @struts:action-forward name="user" path=".user"
  * @struts:action-forward name="userlist" path="/usermanage.do"
  * @struts:action-forward name="remove" path=".remove"
@@ -85,7 +85,7 @@ public class UserAction extends LamsDispatchAction {
     private IUserManagementService service;
     private MessageService messageService;
     private static IThemeService themeService;
-    private static ITimezoneService timezoneService;    
+    private static ITimezoneService timezoneService;
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
@@ -101,10 +101,11 @@ public class UserAction extends LamsDispatchAction {
 	}
 	if (timezoneService == null) {
 	    timezoneService = AdminServiceProxy.getTimezoneService(getServlet().getServletContext());
-	}	
+	}
     }
 
-    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	initServices();
 	if (UserAction.locales == null) {
@@ -124,7 +125,7 @@ public class UserAction extends LamsDispatchAction {
 	request.setAttribute("cssThemes", cssThemes);
 	List<Theme> flashThemes = themeService.getAllFlashThemes();
 	request.setAttribute("flashThemes", flashThemes);
-	
+
 	// Select the default themes by default
 	Theme defaultCSSTheme = themeService.getDefaultCSSTheme();
 	for (Theme theme : cssThemes) {
@@ -148,8 +149,8 @@ public class UserAction extends LamsDispatchAction {
 	    org = (Organisation) service.findById(Organisation.class, orgId);
 	    if (!canEdit) {
 		OrganisationType orgType = org.getOrganisationType();
-		Integer orgIdOfCourse = orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE) ? org.getParentOrganisation().getOrganisationId()
-			: orgId;
+		Integer orgIdOfCourse = orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)
+			? org.getParentOrganisation().getOrganisationId() : orgId;
 		User requestor = service.getUserByLogin(request.getRemoteUser());
 		if (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
 			|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
@@ -221,7 +222,7 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	}
 	userForm.set("orgId", (org == null ? null : org.getOrganisationId()));
-		
+
 	// Get all available time zones
 	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
 	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
@@ -253,7 +254,8 @@ public class UserAction extends LamsDispatchAction {
     // display user's global roles, if any
     private UserOrgRoleDTO getGlobalRoles(User user) {
 	initServices();
-	UserOrganisation uo = service.getUserOrganisation(user.getUserId(), service.getRootOrganisation().getOrganisationId());
+	UserOrganisation uo = service.getUserOrganisation(user.getUserId(),
+		service.getRootOrganisation().getOrganisationId());
 	if (uo == null) {
 	    return null;
 	}
@@ -273,8 +275,8 @@ public class UserAction extends LamsDispatchAction {
 
 	initServices();
 	List<UserOrgRoleDTO> uorDTOs = new ArrayList<UserOrgRoleDTO>();
-	List<UserOrganisation> uos = service
-		.getUserOrganisationsForUserByTypeAndStatus(user.getLogin(), OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
+	List<UserOrganisation> uos = service.getUserOrganisationsForUserByTypeAndStatus(user.getLogin(),
+		OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
 	for (UserOrganisation uo : uos) {
 	    UserOrgRoleDTO uorDTO = new UserOrgRoleDTO();
 	    List<String> roles = new ArrayList<String>();
@@ -285,8 +287,9 @@ public class UserAction extends LamsDispatchAction {
 	    uorDTO.setOrgName(uo.getOrganisation().getName());
 	    uorDTO.setRoles(roles);
 	    List<UserOrgRoleDTO> childDTOs = new ArrayList<UserOrgRoleDTO>();
-	    List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(user.getLogin(), OrganisationType.CLASS_TYPE,
-		    OrganisationState.ACTIVE, uo.getOrganisation().getOrganisationId());
+	    List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(
+		    user.getLogin(), OrganisationType.CLASS_TYPE, OrganisationState.ACTIVE,
+		    uo.getOrganisation().getOrganisationId());
 	    for (UserOrganisation childuo : childuos) {
 		UserOrgRoleDTO childDTO = new UserOrgRoleDTO();
 		List<String> childroles = new ArrayList<String>();
@@ -306,7 +309,8 @@ public class UserAction extends LamsDispatchAction {
     }
 
     // determine whether to disable or delete user based on their lams data
-    public ActionForward remove(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward remove(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	initServices();
 
@@ -328,7 +332,8 @@ public class UserAction extends LamsDispatchAction {
 	return mapping.findForward("remove");
     }
 
-    public ActionForward disable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward disable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	initServices();
 
@@ -354,7 +359,8 @@ public class UserAction extends LamsDispatchAction {
 	}
     }
 
-    public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	initServices();
 
@@ -387,7 +393,8 @@ public class UserAction extends LamsDispatchAction {
     }
 
     // called from disabled users screen
-    public ActionForward enable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward enable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	initServices();
 
