@@ -322,3 +322,8 @@ a.button-add-item:before {
 .table-nonfluid {
    width: auto !important;
 }
+
+.form-control-inline {
+   width: auto !important;
+   display: inline-block;
+}
